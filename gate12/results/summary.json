@@ -1,0 +1,92 @@
+{
+ "name": "g12",
+ "arms": {
+  "N0": {
+   "hidden_pass": 0.368,
+   "ci95_by_function": [
+    0.272,
+    0.476
+   ],
+   "tests": 500
+  },
+  "Q1": {
+   "hidden_pass": 0.682,
+   "ci95_by_function": [
+    0.582,
+    0.776
+   ],
+   "tests": 500
+  },
+  "Q2": {
+   "hidden_pass": 0.75,
+   "ci95_by_function": [
+    0.652,
+    0.852
+   ],
+   "tests": 500
+  },
+  "Q4": {
+   "hidden_pass": 0.816,
+   "ci95_by_function": [
+    0.728,
+    0.9
+   ],
+   "tests": 500
+  }
+ },
+ "diffs": {
+  "Q1-N0": {
+   "points": 31.4,
+   "ci95": [
+    20.0,
+    42.8
+   ]
+  },
+  "Q2-N0": {
+   "points": 38.2,
+   "ci95": [
+    27.4,
+    49.6
+   ]
+  },
+  "Q4-N0": {
+   "points": 44.8,
+   "ci95": [
+    34.0,
+    55.4
+   ]
+  }
+ },
+ "allowance": {
+  "Q1": {
+   "1": {
+    "mean_gain_points": 25.2,
+    "ci95": [
+     17.8,
+     32.6
+    ],
+    "functions": 20
+   }
+  },
+  "Q2": {
+   "2": {
+    "mean_gain_points": 29.6,
+    "ci95": [
+     21.5,
+     37.6
+    ],
+    "functions": 20
+   }
+  },
+  "Q4": {
+   "4": {
+    "mean_gain_points": 33.6,
+    "ci95": [
+     26.0,
+     41.3
+    ],
+    "functions": 20
+   }
+  }
+ }
+}

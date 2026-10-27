@@ -1,0 +1,20 @@
+{"t": 1793103748, "worker": "Q1-w2", "sql": "SELECT NET_PRICE(10, 150), NET_PRICE(10, -10), NET_PRICE(0.05, 50)", "resp": {"answer": [2.0, 10.0, 0.03]}, "charged": true}
+{"t": 1793103748, "worker": "Q1-w2", "sql": "SELECT SPLIT_BILL(100, 3), SPLIT_BILL(100, 0), SPLIT_BILL(10, -2)", "resp": {"answer": [33.34, 100.0, 10.0]}, "charged": true}
+{"t": 1793103748, "worker": "Q1-w2", "sql": "SELECT LATE_FEE(0, 1000), LATE_FEE(-5, 1000), LATE_FEE(3, 10.25)", "resp": {"answer": [0.0, 0.0, 2.05]}, "charged": true}
+{"t": 1793103752, "worker": "Q1-w1", "sql": "SELECT INITIALS('jean-luc picard'), INITIALS(''), INITIALS('\u00e9lodie durand')", "resp": {"answer": ["JLP", "", "\u00c9D"]}, "charged": true}
+{"t": 1793103752, "worker": "Q1-w1", "sql": "SELECT SLUGIFY_TITLE('Tom''s Caf\u00e9 & Bar!'), SLUGIFY_TITLE(''), SLUGIFY_TITLE('  --Hello--  ')", "resp": {"answer": ["toms-caf-and-bar", "", "hello"]}, "charged": true}
+{"t": 1793103752, "worker": "Q1-w1", "sql": "SELECT PHONE_DIGITS('+44 20 7946 0958'), PHONE_DIGITS(''), PHONE_DIGITS('call me')", "resp": {"answer": ["+442079460958", null, null]}, "charged": true}
+{"t": 1793103759, "worker": "Q1-w3", "sql": "SELECT AGE_BAND('2010-01-01', '2026-01-01'), AGE_BAND('2008-06-15', '2026-06-15'), AGE_BAND('2008-06-15', '2026-06-14')", "resp": {"answer": ["minor", "18-24", "minor"]}, "charged": true}
+{"t": 1793103759, "worker": "Q1-w3", "sql": "SELECT BUSINESS_DAYS_ADD('2026-03-07', 0), BUSINESS_DAYS_ADD('2026-03-07', 1), BUSINESS_DAYS_ADD('2026-03-09', -1)", "resp": {"answer": ["2026-03-09", "2026-03-10", "2026-03-09"]}, "charged": true}
+{"t": 1793103759, "worker": "Q1-w3", "sql": "SELECT FISCAL_QUARTER('2026-03-31'), FISCAL_QUARTER('2026-04-01'), FISCAL_QUARTER('2026-04-01 10:00:00')", "resp": {"answer": ["FY2026-Q4", "FY2027-Q1", "FY2027-Q1"]}, "charged": true}
+{"t": 1793103800, "worker": "Q1-w1", "sql": "SELECT MASK_CARD('4111 1111 1111 1111'), MASK_CARD('1234'), MASK_CARD('')", "resp": {"answer": ["************1111", null, null]}, "charged": true}
+{"t": 1793103800, "worker": "Q1-w1", "sql": "SELECT SKU_CHECK('abc-1234'), SKU_CHECK(' ABC-1234 '), SKU_CHECK('ABC1234')", "resp": {"answer": ["ABC-1234", "ABC-1234", null]}, "charged": true}
+{"t": 1793103800, "worker": "Q1-w1", "sql": "SELECT INVOICE_NO(2026, 123456), INVOICE_NO(2026, 0), INVOICE_NO(2026, -5)", "resp": {"answer": [null, null, null]}, "charged": true}
+{"t": 1793103814, "worker": "Q1-w3", "sql": "SELECT GRADE_LETTER(89.5), GRADE_LETTER(105), GRADE_LETTER(-5)", "resp": {"answer": ["B", "A+", "F"]}, "charged": true}
+{"t": 1793103814, "worker": "Q1-w3", "sql": "SELECT STAR_RATING(20), STAR_RATING(0), STAR_RATING(150)", "resp": {"answer": [2, 1, null]}, "charged": true}
+{"t": 1793103814, "worker": "Q1-w3", "sql": "SELECT TIER_DISCOUNT(-20), TIER_DISCOUNT(0), TIER_DISCOUNT(9.99)", "resp": {"answer": [0, 0, 5]}, "charged": true}
+{"t": 1793103834, "worker": "Q1-w1", "sql": "SELECT LOYALTY_POINTS(100, 'GOLD'), LOYALTY_POINTS(100, 'bronze'), LOYALTY_POINTS(-50, 'gold')", "resp": {"answer": [200, 100, -100]}, "charged": true}
+{"t": 1793103834, "worker": "Q1-w1", "sql": "SELECT MINUTES_TO_HHMM(-75), MINUTES_TO_HHMM(90.5), MINUTES_TO_HHMM(1500)", "resp": {"answer": [null, "1:30", "25:00"]}, "charged": true}
+{"t": 1793103834, "worker": "Q1-w1", "sql": "SELECT PERCENT_CHANGE(0, 50), PERCENT_CHANGE(0, 0), PERCENT_CHANGE(-100, -50)", "resp": {"answer": [null, null, 50.0]}, "charged": true}
+{"t": 1793103845, "worker": "Q1-w2", "sql": "SELECT SHIPPING_COST(0, 1), SHIPPING_COST(2, 4), SHIPPING_COST(-2, 1)", "resp": {"answer": [null, 16.0, null]}, "charged": true}
+{"t": 1793103845, "worker": "Q1-w2", "sql": "SELECT (SELECT AVG_RATING(column1) FROM (VALUES (5),(4),(4))), (SELECT AVG_RATING(column1) FROM (VALUES (5),(0),(6),(NULL),(3))), (SELECT AVG_RATING(column1) FROM (VALUES (1)) WHERE 0)", "resp": {"answer": [4.3, null, null]}, "charged": true}
