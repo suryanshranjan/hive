@@ -8,3 +8,15 @@ This repo is the shared brain of the Hive research project. It holds evidence an
 - Never commit hidden test suites, or the private intent of a test that has not run yet. Regenerate hidden suites from the fixed seeds in `README.md`. A new intent experiment needs a new oracle, kept out of the repo until its run is scored.
 - If you are a worker inside a swarm experiment, do not read this repo at all: work only in your own clone, as your prompt says.
 - Write plainly: real numbers, labelled as established, model or conjecture.
+
+## Session protocol (laptop, VM or phone)
+
+- **Start:** read `BRAIN.md`, then `lab/QUEUE.md` ("Where we left off" and the ready cards).
+- **"Continue" or "run the next experiment":** take the top ready card in `lab/QUEUE.md` and run its command. Lab scripts are documented in `lab/README.md`. If the card needs design first, write its config and `PREDICTIONS.md`, push them, then run.
+- **Never launch** before the predictions are pushed. `lab/run_gate.py` checks this.
+- **After a run:**
+  - Write `gate<k>/RESULTS.md` (predictions scored, failures included).
+  - Update `BRAIN.md` (evidence log, scorecard, constants, open questions, changelog) and `lab/QUEUE.md` ("Where we left off").
+  - Commit and push in one go.
+- **Before stopping for the day:** make sure "Where we left off" says exactly what is done and what is next, and push.
+- **Real companies:** never commit a real company's name, rules or data. Use mock names in anything public.
