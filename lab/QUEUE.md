@@ -2,19 +2,11 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 27 2026, after Gate 12)
+## Where we left off (Oct 27 2026, after Gate 13)
 
-- Gates 0 to 8, 11 and 12 are done and written up (G9 and G10 are still cards). Gate 7 used a real company's rules, which stay private (never commit them).
-- Gate 12 (`gate12/RESULTS.md`): with 1 to 4 hidden decisions per function, more decisions make each question weaker (D1 held), but a floor of 21% of errors was never fixed by any team, even with 4 questions per function. Every stuck error was a decision no builder thought to probe (caps, extremes, alternative formats, holidays). The bottleneck is where questions point.
-- G13 is registered (`gate13/prompts/PREDICTIONS.md`, analysis code `gate13/referee/analyze.py`); `run_gate.py` builds the tour (`"tour_arms"`).
-
-## Ready
-
-### G13: the owner's decision tour vs builder questions
-- **Run:** `python3 lab/run_gate.py lab/experiments/g13_tour.json`
-- **Teams:** N0; T (tour of 50 owner examples, no questions); Q (17 builder questions); TQ (both).
-- **Cost:** about $11; about 10 minutes.
-- **Afterwards:** `python gate13/referee/analyze.py gate13/results`; write RESULTS.md, apply the decision rules, update BRAIN.md and this file, push.
+- Gates 0 to 8 and 11 to 13 are done and written up (G9 and G10 are still cards). Gate 7 used a real company's rules, which stay private (never commit them).
+- Gate 13 (`gate13/RESULTS.md`): the owner's decision tour (one worked example per policy decision, as visible tests) lifted hidden correctness from 57.8% to 89.4%, against 67.2% for the same number of builder-chosen answers; tour plus questions 95.2%. All predictions held. The tour is now step one of the intent interface. Its failure mode is over-generalization.
+- Next: G14, tour with contrast pairs, replicated on a new rule-giver.
 
 ## Running on a laptop (Docker)
 
