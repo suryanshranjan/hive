@@ -28,11 +28,11 @@ def main():
     o = intent.load_oracle(a.oracle); g = intent.Gen(o)
     run = os.path.join(ROOT, 'runs', a.name); seed = os.path.join(run, 'seed'); os.makedirs(run, exist_ok=True)
     # SQL-engine test categories (the 1,340 tests that must keep passing), read from the Gate 3 scale seed
-    tmp = tempfile.mkdtemp(); sh('git', 'clone', '-q', os.path.join(ROOT, 'gate3', 'seed_scale.bundle'), tmp)
+    tmp = tempfile.mkdtemp(); sh('git', 'clone', '-q', os.path.join(ROOT, 'gates', 'gate3', 'seed_scale.bundle'), tmp)
     sql_cats = {json.load(open(f))['category'] for f in glob.glob(os.path.join(tmp, 'tests', 'visible', '*.json'))}
     shutil.rmtree(tmp)
     # base: the finished engine with tools and README (Gate 6 seed); drop that gate's business functions
-    shutil.rmtree(seed, ignore_errors=True); sh('git', 'clone', '-q', os.path.join(ROOT, 'gate6', 'seed.bundle'), seed)
+    shutil.rmtree(seed, ignore_errors=True); sh('git', 'clone', '-q', os.path.join(ROOT, 'gates', 'gate6', 'seed.bundle'), seed)
     sh('git', 'remote', 'remove', 'origin', cwd=seed)
     if sh('git', 'log', '-1', '--format=%s', cwd=seed).startswith('Business functions project'):
         sh('git', 'reset', '-q', '--soft', 'HEAD~1', cwd=seed)

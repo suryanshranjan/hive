@@ -36,18 +36,18 @@ Research on swarms of AI coding agents that coordinate only through a shared rep
 | --- | --- |
 | `real_repos/` | Analysis of the C compiler's git history: leases, collision rates, collision cost (`ccc_*.py`, `parse_*.py`) |
 | `sim/` | Simulator v2 (`hive_sim.py`) and experiments A to D with held-out tests |
-| `gate0/` | Replay of the compiler history against hidden suites: scripts, per-commit results, `gate0_results.json` |
-| `gate1/referee/` | Test generators with SQLite as referee (`gen.py`, `fuzz.py`), replay evaluator, referee runner |
-| `gate1/prompts/` | Exact worker, breaker and founder prompts |
-| `gate1/swarms/*.bundle` | Full git history of every swarm: pilot, A, B, A2, F1, F2 (`git clone gate1/swarms/A.bundle`) |
-| `gate1/results/` | Per-commit visible and hidden scores for each swarm; `tokens.csv` per worker |
-| `gate1/logs/` | Every worker's CLAIM, LAND, CONFLICT and FOUND events |
-| `gate2/` | 113-category project: seed bundle, worker prompt, predictions registered before launch, `RESULTS.md` scoring them, all three swarm histories, per-commit hidden scores, `tokens.csv` |
-| `gate3/` | Protocol v2 (`tools/claim.py`, `tools/land.py`), the scale runs at 8 and 12 workers, and the intent test (private rules in `referee/oracle.py`, every question asked, call-by-call scores); see `gate3/README.md` and `RESULTS.md` |
-| `gate4/` | Planned vs free questions on fresh invented rules: oracle, planner prompt and plan, every question asked, histories, scores; see `gate4/RESULTS.md` |
-| `gate5/` | Defaults-first vs free questions on rules from an independent rule-giver agent; see `gate5/RESULTS.md` |
-| `gate6/` | Questions per function assigned at random (0, 1, 3) on a second independent rule-giver's rules; see `gate6/RESULTS.md` |
-| `gate7/` | A real company's rules as the product owner (results only; the rules are private) |
+| `gates/gate0/` | Replay of the compiler history against hidden suites: scripts, per-commit results, `gate0_results.json` |
+| `gates/gate1/referee/` | Test generators with SQLite as referee (`gen.py`, `fuzz.py`), replay evaluator, referee runner |
+| `gates/gate1/prompts/` | Exact worker, breaker and founder prompts |
+| `gates/gate1/swarms/*.bundle` | Full git history of every swarm: pilot, A, B, A2, F1, F2 (`git clone gates/gate1/swarms/A.bundle`) |
+| `gates/gate1/results/` | Per-commit visible and hidden scores for each swarm; `tokens.csv` per worker |
+| `gates/gate1/logs/` | Every worker's CLAIM, LAND, CONFLICT and FOUND events |
+| `gates/gate2/` | 113-category project: seed bundle, worker prompt, predictions registered before launch, `RESULTS.md` scoring them, all three swarm histories, per-commit hidden scores, `tokens.csv` |
+| `gates/gate3/` | Protocol v2 (`tools/claim.py`, `tools/land.py`), the scale runs at 8 and 12 workers, and the intent test (private rules in `referee/oracle.py`, every question asked, call-by-call scores); see `gates/gate3/README.md` and `RESULTS.md` |
+| `gates/gate4/` | Planned vs free questions on fresh invented rules: oracle, planner prompt and plan, every question asked, histories, scores; see `gates/gate4/RESULTS.md` |
+| `gates/gate5/` | Defaults-first vs free questions on rules from an independent rule-giver agent; see `gates/gate5/RESULTS.md` |
+| `gates/gate6/` | Questions per function assigned at random (0, 1, 3) on a second independent rule-giver's rules; see `gates/gate6/RESULTS.md` |
+| `gates/gate7/` | A real company's rules as the product owner (results only; the rules are private) |
 | `lab/` | Run any gate, or the next one, in one command; `lab/QUEUE.md` is the experiment queue and session handoff |
 | `BRAIN.md` | Shared memory: laws with status, constants, evidence, scorecard, next steps |
 | `docs/` | Hive v1 and Hive v2 write-ups |
@@ -57,35 +57,35 @@ Research on swarms of AI coding agents that coordinate only through a shared rep
 Hidden test suites are deliberately not committed, so future agents working in this repo can't read them. Regenerate them from the fixed seeds:
 
 ```
-python3 gate1/referee/gen.py hidden_big 9000 50        # 700 template tests
-python3 gate1/referee/fuzz.py hidden_fuzz 77000 600    # 600 combined queries
-python3 gate2/referee/gen2.py hidden2 5000000 20       # 2,260 Gate 2 tests
-python3 gate1/referee/evaluate.py <swarm repo or bundle clone> hidden_big out.json hidden_fuzz
+python3 gates/gate1/referee/gen.py hidden_big 9000 50        # 700 template tests
+python3 gates/gate1/referee/fuzz.py hidden_fuzz 77000 600    # 600 combined queries
+python3 gates/gate2/referee/gen2.py hidden2 5000000 20       # 2,260 Gate 2 tests
+python3 gates/gate1/referee/evaluate.py <swarm repo or bundle clone> hidden_big out.json hidden_fuzz
 ```
 
-Gate 0 needs `anthropics/claudes-c-compiler`, `c-testsuite/c-testsuite`, and the GCC torture tests (`gcc/testsuite/gcc.c-torture/execute`); see `gate0/replay.sh`.
+Gate 0 needs `anthropics/claudes-c-compiler`, `c-testsuite/c-testsuite`, and the GCC torture tests (`gcc/testsuite/gcc.c-torture/execute`); see `gates/gate0/replay.sh`.
 
 ## Gate 2 in one line
 
-Two workers finished the whole 10x project in 17.7 minutes for 515k tokens; twelve finished in 7.8 minutes for 1.62M. See `gate2/RESULTS.md`, including two registered predictions that failed.
+Two workers finished the whole 10x project in 17.7 minutes for 515k tokens; twelve finished in 7.8 minutes for 1.62M. See `gates/gate2/RESULTS.md`, including two registered predictions that failed.
 
 ## Gate 3 in one line
 
-Category claims and a landing guard kept main clean at 8 and 12 workers, and the token law held again. Finer claims did not make the swarm faster, because the last large task was claimed late. Swarms building invented business rules passed every visible example. On hidden tests they reached 58% with no one to ask, 87% with 30 questions and 98% with unlimited questions. See `gate3/RESULTS.md`.
+Category claims and a landing guard kept main clean at 8 and 12 workers, and the token law held again. Finer claims did not make the swarm faster, because the last large task was claimed late. Swarms building invented business rules passed every visible example. On hidden tests they reached 58% with no one to ask, 87% with 30 questions and 98% with unlimited questions. See `gates/gate3/RESULTS.md`.
 
 ## Gate 4 in one line
 
-On a fresh set of invented rules, 30 questions again added about 29 points (48% to 77%). A planner choosing the 30 questions by coverage, and turning each answer into a test, did no better than free asking (76.4% vs 76.8%), so the registered prediction failed. Both teams missed the same rules: NULL handling and caps on extreme values. See `gate4/RESULTS.md`.
+On a fresh set of invented rules, 30 questions again added about 29 points (48% to 77%). A planner choosing the 30 questions by coverage, and turning each answer into a test, did no better than free asking (76.4% vs 76.8%), so the registered prediction failed. Both teams missed the same rules: NULL handling and caps on extreme values. See `gates/gate4/RESULTS.md`.
 
 ## Gate 5 in one line
 
-An independent agent wrote the rules. A team told to ask about its defaults first (NULL, extremes, invalid input) did no better than free asking (62.2% vs 67.0%), so that prediction failed too. 30 questions added +32 points, the third replication. Pooled over three rule sets, a function's first question is worth about +20 points of edge-case accuracy, and a function nobody asks about gains nothing. See `gate5/RESULTS.md`.
+An independent agent wrote the rules. A team told to ask about its defaults first (NULL, extremes, invalid input) did no better than free asking (62.2% vs 67.0%), so that prediction failed too. 30 questions added +32 points, the third replication. Pooled over three rule sets, a function's first question is worth about +20 points of edge-case accuracy, and a function nobody asks about gains nothing. See `gates/gate5/RESULTS.md`.
 
 ## Gate 6 in one line
 
-With questions per function assigned at random, 3 questions on a function added +44 points of edge-case accuracy against +8 for none, so questions cause the gain. But one question added only +12: a rule needs several answered points to pin down. So spend questions in blocks of about 3, not one per function. See `gate6/RESULTS.md`.
+With questions per function assigned at random, 3 questions on a function added +44 points of edge-case accuracy against +8 for none, so questions cause the gain. But one question added only +12: a rule needs several answered points to pin down. So spend questions in blocks of about 3, not one per function. See `gates/gate6/RESULTS.md`.
 
 
 ## Gate 7 in one line
 
-With a real company's rules (name withheld), 15 answered questions lifted hidden correctness from 32.8% to 49.6%. The largest losses came from builders never being told the allowed input values. See `gate7/RESULTS.md`; the rules themselves stay private.
+With a real company's rules (name withheld), 15 answered questions lifted hidden correctness from 32.8% to 49.6%. The largest losses came from builders never being told the allowed input values. See `gates/gate7/RESULTS.md`; the rules themselves stay private.

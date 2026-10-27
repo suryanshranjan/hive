@@ -32,18 +32,18 @@ The session reads `CLAUDE.md`, `BRAIN.md` and `lab/QUEUE.md`, runs the top ready
 ## A scale run (no product owner)
 
 ```
-python3 lab/make_swarm.py --run scale12 --seed gate3/seed_scale.bundle --prompt gate3/prompts/prompt_scale.md --arm F12:12
+python3 lab/make_swarm.py --run scale12 --seed gates/gate3/seed_scale.bundle --prompt gates/gate3/prompts/prompt_scale.md --arm F12:12
 python3 lab/launch.py --run scale12
-python3 gate2/referee/gen2.py hidden2 5000000 20        # regenerate the hidden suite (never commit it)
-python3 gate2/referee/evaluate.py runs/scale12/upF12.git hidden2 runs/scale12/eval.json
+python3 gates/gate2/referee/gen2.py hidden2 5000000 20        # regenerate the hidden suite (never commit it)
+python3 gates/gate2/referee/evaluate.py runs/scale12/upF12.git hidden2 runs/scale12/eval.json
 ```
 
 ## Writing a new intent experiment
 
 1. Copy `experiments/g8_curve.json`. Give it a new `name` and seeds, its arms (`NAME:WORKERS:none`, `NAME:WORKERS:budget:PORT:N`, or `NAME:WORKERS:quota:PORT` with an `allowance` block), and an ask-text file with one `## NAME` section per arm.
-2. Write `gate<k>/prompts/PREDICTIONS.md` with predictions and kill conditions, then commit and push it. `run_gate.py` refuses to launch until it is on origin/main.
+2. Write `gates/gate<k>/prompts/PREDICTIONS.md` with predictions and kill conditions, then commit and push it. `run_gate.py` refuses to launch until it is on origin/main.
 3. Run `python3 lab/run_gate.py lab/experiments/<config>.json`.
-4. Write `gate<k>/RESULTS.md` from `runs/<name>/summary.md`, failures included. Update `BRAIN.md` and `lab/QUEUE.md`, then push.
+4. Write `gates/gate<k>/RESULTS.md` from `runs/<name>/summary.md`, failures included. Update `BRAIN.md` and `lab/QUEUE.md`, then push.
 
 `runs/` and `private/` are git-ignored. Private rules are published only after their run is scored, and never for real companies.
 
@@ -56,6 +56,6 @@ python3 gate2/referee/evaluate.py runs/scale12/upF12.git hidden2 runs/scale12/ev
 ## Smoke test (no tokens)
 
 ```
-HIVE_WORKER_CMD=true python3 lab/run_gate.py lab/experiments/test_plumbing.json --oracle gate6/referee/oracle.py --skip-prereg-check
+HIVE_WORKER_CMD=true python3 lab/run_gate.py lab/experiments/test_plumbing.json --oracle gates/gate6/referee/oracle.py --skip-prereg-check
 ```
 Every stage runs with do-nothing workers, so every score is 0%. A real worker costs about 0.1M tokens just to start.

@@ -2,13 +2,13 @@
 """Create a swarm run: one bare repo per team (arm), one clone per worker, one rendered prompt per worker.
 
 usage:
-  make_swarm.py --run scale12 --seed gate3/seed_scale.bundle --prompt gate3/prompts/prompt_scale.md --arm F12:12
-  make_swarm.py --run g8 --seed runs/g8/seed --prompt gate5/prompt_builder.md --ask-texts gate8/prompts/ask_texts.md \\
+  make_swarm.py --run scale12 --seed gates/gate3/seed_scale.bundle --prompt gates/gate3/prompts/prompt_scale.md --arm F12:12
+  make_swarm.py --run g8 --seed runs/g8/seed --prompt gates/gate5/prompt_builder.md --ask-texts gates/gate8/prompts/ask_texts.md \\
                 --example-file runs/g8/example.txt --arm D0:3:none --arm D30:3:budget:7401:30 --arm NQ:3:quota:7402
 
 --arm NAME:WORKERS[:none | :budget:PORT:BUDGET | :quota:PORT]  (default none). The arm decides tools/ask.py.
 Prompt placeholders filled: {ME} {N} {WORK} {LOG} {ASK} {EXAMPLE}. {ASK} comes from the "## NAME" section of
---ask-texts (the format of gate5/prompts/ask_texts.md), with {EXAMPLE} inside it filled too.
+--ask-texts (the format of gates/gate5/prompts/ask_texts.md), with {EXAMPLE} inside it filled too.
 Everything is written under runs/<run>/ (git-ignored)."""
 import argparse, os, re, shutil, subprocess, sys
 

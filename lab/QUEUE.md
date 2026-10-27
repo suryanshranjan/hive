@@ -5,7 +5,7 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 ## Where we left off (Oct 27 2026, after Gate 20)
 
 - Gates 0 to 8, 10 to 18, 20 to 22 and 24 are done and written up (G9 is still a card). Gates 7, 18 and 20 used a real company's rules, which stay private (never commit them).
-- Gate 20 (`gate20/RESULTS.md`): founder-written examples 72.4%, with questions 83.6%, with the company's documents too 84.8% (N0 23.6%). The documents covered 2 of 10 functions.
+- Gate 20 (`gates/gate20/RESULTS.md`): founder-written examples 72.4%, with questions 83.6%, with the company's documents too 84.8% (N0 23.6%). The documents covered 2 of 10 functions.
 - Gate 24: Hive v1 end to end holds (95.0% vs 53.0%).
 - The testing phase is complete apart from Gate 23's clean rerun (guard finish ratio). Next is building the product (see BRAIN.md section 7 for the design).
 

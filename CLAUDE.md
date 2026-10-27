@@ -15,7 +15,7 @@ This repo is the shared brain of the Hive research project. It holds evidence an
 - **"Continue" or "run the next experiment":** take the top ready card in `lab/QUEUE.md` and run its command. Lab scripts are documented in `lab/README.md`. If the card needs design first, write its config and `PREDICTIONS.md`, push them, then run.
 - **Never launch** before the predictions are pushed. `lab/run_gate.py` checks this.
 - **After a run:**
-  - Write `gate<k>/RESULTS.md` (predictions scored, failures included).
+  - Write `gates/gate<k>/RESULTS.md` (predictions scored, failures included).
   - Update `BRAIN.md` (evidence log, scorecard, constants, open questions, changelog) and `lab/QUEUE.md` ("Where we left off").
   - Commit and push in one go.
 - **Before stopping for the day:** make sure "Where we left off" says exactly what is done and what is next, and push.
