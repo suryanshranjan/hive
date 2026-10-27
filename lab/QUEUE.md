@@ -2,12 +2,11 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 27 2026, after Gate 20)
+## Where we left off (Oct 28 2026: building Hive v1)
 
-- Gates 0 to 8, 10 to 18, 20 to 22 and 24 are done and written up (G9 is still a card). Gates 7, 18 and 20 used a real company's rules, which stay private (never commit them).
-- Gate 20 (`gates/gate20/RESULTS.md`): founder-written examples 72.4%, with questions 83.6%, with the company's documents too 84.8% (N0 23.6%). The documents covered 2 of 10 functions.
-- Gate 24: Hive v1 end to end holds (95.0% vs 53.0%).
-- The testing phase is complete apart from Gate 23's clean rerun (guard finish ratio). Next is building the product (see BRAIN.md section 7 for the design).
+- Testing phase complete (Gates 0–24 in `gates/`; caveat in `gates/LAB_NOTE_guard_python.md`). Literature check in `docs/related_work.md`.
+- **Building Hive v1** (`docs/hive_v1_plan.md`, package `hive/`). **M1 done for pytest:** the runner-agnostic, content-keyed guard passes `tests/test_guard.sh` (run in the lab container: clean change lands, regression refused, duplicate refused, cache hit after a lock commit).
+- Next: M1 on a jest repository; M2 area claims; M3 `hive run`; M4 owner session; M5 the first real feature (proposed: the Creators commercial module).
 
 ## Needs the user
 
