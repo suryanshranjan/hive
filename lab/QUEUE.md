@@ -6,7 +6,14 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 
 - Gates 0 to 8 and 11 to 18 are done and written up (G9 and G10 are still cards). Gates 7 and 18 used a real company's rules, which stay private (never commit them; Gate 18 published aggregates only).
 - Gate 18 (`gate18/RESULTS.md`): on the real rules, owner-confirmed examples 64.8%, 19 questions 56.4%, both 78.0% (N0 26.0%; Gate 7's best 49.6%). The examples were agent-drafted and did not beat questions (0.93x). Conjecture: the owner must choose the points.
-- Next: the strongest tests now need the owner (G20 below) or the company's documents (G19).
+- G20 is waiting for the founder's examples (template in the session scratchpad). Meanwhile G10 (scale) is registered.
+
+## Ready
+
+### G10: largest-first claiming at 12 workers
+- **Run:** `sh gate10/run.sh` (in the lab container, after predictions are pushed). F12 (Gate 3's prompt) and L12 (largest family first) run at the same time.
+- "Largest" is by family (`json_*`, `window_*`): every category has 10 tests, so test count ranks nothing.
+- About $20 to $25; 15 to 20 minutes.
 
 ## Needs the user
 
@@ -27,10 +34,6 @@ Workers run shell commands, so run them in a container. Image: `node:22-bookworm
 - Arm A: free asking, 30 questions.
 - Arm B: the interface from Gates 4 to 8. The spec lists each function's allowed input values (taken from the rule-giver's docs), questions spread at about 2 per function before any gets a third (Gate 11; blocks of 3 lost), one thing changes per question, and answers become tests.
 - Needs: a "spec with allowed values" option in `lab/new_intent_gate.py` (one seed per arm), and the answers-as-tests step from Gate 7.
-
-### G10: largest-first claiming at 12 and 20 workers
-- Needs: `claim.py` to rank failing categories by size (failing-test count), and a scale config on `gate3/seed_scale.bundle` with `gate3/prompts/prompt_scale.md`.
-- Prediction to register first: 12 workers finish under 7.0 minutes.
 
 ### Repeats
 - Every gate is one run per team. The cheapest strengthening is a repeat of Gate 11 on a new rule-giver.
