@@ -1,0 +1,76 @@
+{"t": 1793088760, "worker": "Qinf-w1", "sql": "SELECT CLAMP(NULL, 1, 10), CLAMP(5, NULL, 10), CLAMP(5, 1, NULL)", "resp": {"answer": [null, 5, 5], "questions_left": null}, "charged": true}
+{"t": 1793088760, "worker": "Qinf-w1", "sql": "SELECT CLAMP(20, NULL, 10), CLAMP(-5, 1, NULL), CLAMP(5, 10, 1)", "resp": {"answer": [10, 1, 5], "questions_left": null}, "charged": true}
+{"t": 1793088760, "worker": "Qinf-w1", "sql": "SELECT CLAMP(5.5, 1, 10), CLAMP(0, 1.5, 10), CLAMP(-3, -10, -5)", "resp": {"answer": [5.5, 1.5, -5], "questions_left": null}, "charged": true}
+{"t": 1793088760, "worker": "Qinf-w1", "sql": "SELECT CLAMP('7', 1, 10), CLAMP('abc', 1, 10), CLAMP(5, 5, 5)", "resp": {"error": "OperationalError: user-defined function raised exception"}, "charged": false}
+{"t": 1793088760, "worker": "Qinf-w1", "sql": "SELECT CLAMP(0, 10, 1), CLAMP(20, 10, 1), CLAMP(5.0, 1, 10)", "resp": {"answer": [1, 10, 5.0], "questions_left": null}, "charged": true}
+{"t": 1793088761, "worker": "Qinf-w3", "sql": "SELECT LUHN_OK(NULL), LUHN_OK(''), LUHN_OK('0')", "resp": {"answer": [null, 0, 0], "questions_left": null}, "charged": true}
+{"t": 1793088761, "worker": "Qinf-w3", "sql": "SELECT LUHN_OK('4539 1488 0343 6467'), LUHN_OK('4539-1488-0343-6467'), LUHN_OK('00')", "resp": {"answer": [1, 1, 1], "questions_left": null}, "charged": true}
+{"t": 1793088761, "worker": "Qinf-w3", "sql": "SELECT LUHN_OK(79927398713), LUHN_OK('7992739871a'), LUHN_OK(' 79927398713 ')", "resp": {"answer": [1, 0, 1], "questions_left": null}, "charged": true}
+{"t": 1793088765, "worker": "Qinf-w2", "sql": "SELECT SCORE(10), SCORE(11), SCORE(9)", "resp": {"answer": [20, 21, 18], "questions_left": null}, "charged": true}
+{"t": 1793088765, "worker": "Qinf-w2", "sql": "SELECT SCORE(0), SCORE(-5), SCORE(NULL)", "resp": {"answer": [0, 0, 0], "questions_left": null}, "charged": true}
+{"t": 1793088765, "worker": "Qinf-w2", "sql": "SELECT SCORE(1000), SCORE(100), SCORE(2.5)", "resp": {"answer": [120.0, 110.0, 5.0], "questions_left": null}, "charged": true}
+{"t": 1793088765, "worker": "Qinf-w2", "sql": "SELECT SCORE('20'), SCORE('abc'), SCORE(10.5)", "resp": {"error": "OperationalError: user-defined function raised exception"}, "charged": false}
+{"t": 1793088765, "worker": "Qinf-w2", "sql": "SELECT GRADE(90), GRADE(89.9), GRADE(80)", "resp": {"answer": ["A", "B", "B"], "questions_left": null}, "charged": true}
+{"t": 1793088765, "worker": "Qinf-w2", "sql": "SELECT GRADE(70), GRADE(60), GRADE(59)", "resp": {"answer": ["C", "D", "F"], "questions_left": null}, "charged": true}
+{"t": 1793088765, "worker": "Qinf-w2", "sql": "SELECT GRADE(100), GRADE(101), GRADE(-1)", "resp": {"answer": ["A+", "A+", "F"], "questions_left": null}, "charged": true}
+{"t": 1793088765, "worker": "Qinf-w2", "sql": "SELECT GRADE(NULL), GRADE(0), GRADE('85')", "resp": {"error": "OperationalError: user-defined function raised exception"}, "charged": false}
+{"t": 1793088765, "worker": "Qinf-w1", "sql": "SELECT CLAMP('7', 1, 10)", "resp": {"error": "OperationalError: user-defined function raised exception"}, "charged": false}
+{"t": 1793088765, "worker": "Qinf-w1", "sql": "SELECT CLAMP('abc', 1, 10)", "resp": {"error": "OperationalError: user-defined function raised exception"}, "charged": false}
+{"t": 1793088766, "worker": "Qinf-w1", "sql": "SELECT CLAMP(5, 5, 5), CLAMP(NULL, NULL, NULL), CLAMP(3, 1.0, 10)", "resp": {"answer": [5, null, 3], "questions_left": null}, "charged": true}
+{"t": 1793088766, "worker": "Qinf-w1", "sql": "SELECT CLAMP(5, '1', '10')", "resp": {"error": "OperationalError: user-defined function raised exception"}, "charged": false}
+{"t": 1793088766, "worker": "Qinf-w1", "sql": "SELECT CLAMP(20, 1, 10.0), CLAMP(-0.0, 0, 1), CLAMP(1e20, 0, 1)", "resp": {"answer": [10.0, -0.0, 1], "questions_left": null}, "charged": true}
+{"t": 1793088766, "worker": "Qinf-w1", "sql": "SELECT typeof(CLAMP(3, 1.0, 10)), typeof(CLAMP(0, 1.0, 10)), CLAMP(x'01', 0, 10)", "resp": {"error": "OperationalError: user-defined function raised exception"}, "charged": false}
+{"t": 1793088768, "worker": "Qinf-w3", "sql": "SELECT LUHN_OK('18'), LUHN_OK('0 0'), LUHN_OK('  ')", "resp": {"answer": [1, 1, 0], "questions_left": null}, "charged": true}
+{"t": 1793088768, "worker": "Qinf-w3", "sql": "SELECT LUHN_OK('7992.7398.713'), LUHN_OK('7992/7398/713'), LUHN_OK('7992_7398_713')", "resp": {"answer": [0, 0, 0], "questions_left": null}, "charged": true}
+{"t": 1793088768, "worker": "Qinf-w3", "sql": "SELECT LUHN_OK(-79927398713), LUHN_OK(79927398713.0), LUHN_OK('--')", "resp": {"answer": [1, 0, 0], "questions_left": null}, "charged": true}
+{"t": 1793088768, "worker": "Qinf-w3", "sql": "SELECT LUHN_OK('5'), LUHN_OK('9'), LUHN_OK('-0-0-')", "resp": {"answer": [0, 0, 1], "questions_left": null}, "charged": true}
+{"t": 1793088774, "worker": "Qinf-w3", "sql": "SELECT LUHN_OK('7992739871' || char(9) || '3'), LUHN_OK('7992739871' || char(10) || '3'), LUHN_OK(x'3138')", "resp": {"answer": [0, 0, 0], "questions_left": null}, "charged": true}
+{"t": 1793088774, "worker": "Qinf-w3", "sql": "SELECT LUHN_OK('\uff17\uff19'), LUHN_OK('1 8'), LUHN_OK('1  - 8')", "resp": {"answer": [0, 1, 1], "questions_left": null}, "charged": true}
+{"t": 1793088774, "worker": "Qinf-w2", "sql": "SELECT SCORE(99), SCORE(101), SCORE(200)", "resp": {"answer": [109, 110.04, 113.01], "questions_left": null}, "charged": true}
+{"t": 1793088775, "worker": "Qinf-w2", "sql": "SELECT SCORE(500), SCORE(10000), SCORE(150)", "resp": {"answer": [116.99, 130.0, 111.76], "questions_left": null}, "charged": true}
+{"t": 1793088775, "worker": "Qinf-w2", "sql": "SELECT SCORE(90), SCORE(95), SCORE(98)", "resp": {"answer": [100, 105, 108], "questions_left": null}, "charged": true}
+{"t": 1793088775, "worker": "Qinf-w2", "sql": "SELECT SCORE('20')", "resp": {"error": "OperationalError: user-defined function raised exception"}, "charged": false}
+{"t": 1793088775, "worker": "Qinf-w2", "sql": "SELECT SCORE('abc')", "resp": {"error": "OperationalError: user-defined function raised exception"}, "charged": false}
+{"t": 1793088775, "worker": "Qinf-w2", "sql": "SELECT SCORE(10.5), SCORE(-0.5), SCORE(0.5)", "resp": {"answer": [20.5, 0, 1.0], "questions_left": null}, "charged": true}
+{"t": 1793088775, "worker": "Qinf-w2", "sql": "SELECT GRADE(NULL)", "resp": {"answer": ["I"], "questions_left": null}, "charged": true}
+{"t": 1793088775, "worker": "Qinf-w2", "sql": "SELECT GRADE(0)", "resp": {"answer": ["F"], "questions_left": null}, "charged": true}
+{"t": 1793088775, "worker": "Qinf-w2", "sql": "SELECT GRADE('85')", "resp": {"error": "OperationalError: user-defined function raised exception"}, "charged": false}
+{"t": 1793088775, "worker": "Qinf-w2", "sql": "SELECT GRADE(99.99), GRADE(100.0), GRADE(59.999)", "resp": {"answer": ["A", "A+", "F"], "questions_left": null}, "charged": true}
+{"t": 1793088775, "worker": "Qinf-w1", "sql": "SELECT CLAMP('7', NULL, NULL)", "resp": {"answer": ["7"], "questions_left": null}, "charged": true}
+{"t": 1793088775, "worker": "Qinf-w1", "sql": "SELECT BUCKET(NULL, 5), BUCKET(5, NULL), BUCKET(-3, 5)", "resp": {"answer": [null, null, -5], "questions_left": null}, "charged": true}
+{"t": 1793088775, "worker": "Qinf-w1", "sql": "SELECT BUCKET(7, 0)", "resp": {"answer": [null], "questions_left": null}, "charged": true}
+{"t": 1793088776, "worker": "Qinf-w1", "sql": "SELECT BUCKET(7.5, 2), BUCKET(7, 2.5), BUCKET(-10, 5)", "resp": {"answer": [6.0, 5.0, -10], "questions_left": null}, "charged": true}
+{"t": 1793088776, "worker": "Qinf-w1", "sql": "SELECT BUCKET(7, -5), BUCKET(-7, -5), BUCKET(0, 5)", "resp": {"answer": [null, null, 0], "questions_left": null}, "charged": true}
+{"t": 1793088779, "worker": "Qinf-w3", "sql": "SELECT NTH_WORD('the quick brown fox', 0), NTH_WORD('the quick brown fox', 5), NTH_WORD('the quick brown fox', -1)", "resp": {"answer": ["", "", "fox"], "questions_left": null}, "charged": true}
+{"t": 1793088779, "worker": "Qinf-w3", "sql": "SELECT NTH_WORD(NULL, 1), NTH_WORD('a b', NULL), NTH_WORD('', 1)", "resp": {"answer": [null, null, ""], "questions_left": null}, "charged": true}
+{"t": 1793088779, "worker": "Qinf-w3", "sql": "SELECT NTH_WORD('  the   quick  ', 1), NTH_WORD('  the   quick  ', 2), NTH_WORD('the quick brown fox', -2)", "resp": {"answer": ["the", "quick", "brown"], "questions_left": null}, "charged": true}
+{"t": 1793088779, "worker": "Qinf-w3", "sql": "SELECT NTH_WORD('a,b c', 1), NTH_WORD('a' || char(9) || 'b', 2), NTH_WORD('a b', 1.7)", "resp": {"answer": ["a,b", "b", "a"], "questions_left": null}, "charged": true}
+{"t": 1793088784, "worker": "Qinf-w1", "sql": "SELECT CLAMP('b', 'a', 'c'), CLAMP('z', 'a', 'c'), CLAMP(5, 1, NULL)", "resp": {"answer": ["b", "c", 5], "questions_left": null}, "charged": true}
+{"t": 1793088784, "worker": "Qinf-w1", "sql": "SELECT BUCKET('17', 5)", "resp": {"error": "OperationalError: user-defined function raised exception"}, "charged": false}
+{"t": 1793088784, "worker": "Qinf-w1", "sql": "SELECT BUCKET(17, '5')", "resp": {"error": "OperationalError: user-defined function raised exception"}, "charged": false}
+{"t": 1793088784, "worker": "Qinf-w1", "sql": "SELECT BUCKET(0.7, 0.1), BUCKET(-0.5, 1), BUCKET(1e300, 1e-300)", "resp": {"error": "DataError: string or blob too big"}, "charged": false}
+{"t": 1793088784, "worker": "Qinf-w1", "sql": "SELECT BUCKET(7, 0.0), BUCKET(7, -0.0), BUCKET(-1, 3)", "resp": {"answer": [null, null, -3], "questions_left": null}, "charged": true}
+{"t": 1793088784, "worker": "Qinf-w1", "sql": "SELECT typeof(BUCKET(7, 2.0)), BUCKET(9223372036854775807, 10), BUCKET(5, 5)", "resp": {"error": "DataError: string or blob too big"}, "charged": false}
+{"t": 1793088785, "worker": "Qinf-w3", "sql": "SELECT NTH_WORD('a b c', -1.7), NTH_WORD('a b c', '2'), NTH_WORD('a b c', 'x')", "resp": {"error": "OperationalError: user-defined function raised exception"}, "charged": false}
+{"t": 1793088785, "worker": "Qinf-w3", "sql": "SELECT NTH_WORD('a b c', -4), NTH_WORD('a b c', -3), NTH_WORD('a b c', 2.9)", "resp": {"answer": ["", "a", "b"], "questions_left": null}, "charged": true}
+{"t": 1793088785, "worker": "Qinf-w3", "sql": "SELECT NTH_WORD(12.5, 1), NTH_WORD('a' || char(10) || 'b' || char(13) || 'c', 3), NTH_WORD('a' || char(160) || 'b', 2)", "resp": {"answer": ["12.5", "c", "b"], "questions_left": null}, "charged": true}
+{"t": 1793088785, "worker": "Qinf-w3", "sql": "SELECT NTH_WORD('   ', 1), NTH_WORD('a b', 0.5), NTH_WORD('a b', -0.5)", "resp": {"answer": ["", "", ""], "questions_left": null}, "charged": true}
+{"t": 1793088788, "worker": "Qinf-w2", "sql": "SELECT SCORE(9.5), SCORE(10.0), SCORE(99.5)", "resp": {"answer": [19.0, 20.0, 109.5], "questions_left": null}, "charged": true}
+{"t": 1793088788, "worker": "Qinf-w2", "sql": "SELECT SCORE(0.0), SCORE(99.99), SCORE(1)", "resp": {"answer": [0.0, 109.99, 2], "questions_left": null}, "charged": true}
+{"t": 1793088788, "worker": "Qinf-w2", "sql": "SELECT TAX(100, 'UK'), TAX(100, 'eu'), TAX(100, 'XX')", "resp": {"answer": [20.0, 20.0, 0.0], "questions_left": null}, "charged": true}
+{"t": 1793088788, "worker": "Qinf-w2", "sql": "SELECT TAX(NULL, 'EU'), TAX(100, NULL), TAX(0, 'EU')", "resp": {"answer": [null, 0.0, 0.0], "questions_left": null}, "charged": true}
+{"t": 1793088788, "worker": "Qinf-w2", "sql": "SELECT TAX(-100, 'EU'), TAX(10.555, 'US'), TAX(1, 'US')", "resp": {"answer": [0.0, 0.77, 0.07], "questions_left": null}, "charged": true}
+{"t": 1793088788, "worker": "Qinf-w2", "sql": "SELECT TAX(100, 'IN'), TAX(100, 'CA'), TAX(100, 'JP')", "resp": {"answer": [18.0, 0.0, 0.0], "questions_left": null}, "charged": true}
+{"t": 1793088788, "worker": "Qinf-w2", "sql": "SELECT TAX(100, 'AU'), TAX(100, ' EU'), TAX(100, '')", "resp": {"answer": [0.0, 0.0, 0.0], "questions_left": null}, "charged": true}
+{"t": 1793088789, "worker": "Qinf-w2", "sql": "SELECT TAX(1, 'IN'), TAX(0.01, 'US'), TAX(3, 'US')", "resp": {"answer": [0.18, 0.0, 0.22], "questions_left": null}, "charged": true}
+{"t": 1793088789, "worker": "Qinf-w1", "sql": "SELECT BUCKET(0.7, 0.1), BUCKET(-0.5, 1), BUCKET(0.3, 0.1)", "resp": {"answer": [0.6000000000000001, -1.0, 0.2], "questions_left": null}, "charged": true}
+{"t": 1793088789, "worker": "Qinf-w1", "sql": "SELECT typeof(BUCKET(7, 2.0)), BUCKET(5, 5), typeof(BUCKET(7.0, 2))", "resp": {"answer": ["real", 5, "real"], "questions_left": null}, "charged": true}
+{"t": 1793088789, "worker": "Qinf-w1", "sql": "SELECT BUCKET(9223372036854775807, 10)", "resp": {"error": "DataError: string or blob too big"}, "charged": false}
+{"t": 1793088789, "worker": "Qinf-w1", "sql": "SELECT BUCKET(-9223372036854775808, 10)", "resp": {"error": "DataError: string or blob too big"}, "charged": false}
+{"t": 1793088789, "worker": "Qinf-w1", "sql": "SELECT BUCKET(1e300, 1e-300)", "resp": {"error": "DataError: string or blob too big"}, "charged": false}
+{"t": 1793088790, "worker": "Qinf-w3", "sql": "SELECT NTH_WORD('a b c', -1.7), NTH_WORD('a b c', '2')", "resp": {"answer": ["c", "b"], "questions_left": null}, "charged": true}
+{"t": 1793088790, "worker": "Qinf-w3", "sql": "SELECT NTH_WORD('a b c', 'x')", "resp": {"error": "OperationalError: user-defined function raised exception"}, "charged": false}
+{"t": 1793088790, "worker": "Qinf-w3", "sql": "SELECT NTH_WORD('a b c', ' 2 '), NTH_WORD('a b c', '2.5'), NTH_WORD('a b c', 1e0)", "resp": {"error": "OperationalError: user-defined function raised exception"}, "charged": false}
+{"t": 1793088795, "worker": "Qinf-w3", "sql": "SELECT NTH_WORD('a b c', ' 2 ')", "resp": {"answer": ["b"], "questions_left": null}, "charged": true}
+{"t": 1793088795, "worker": "Qinf-w3", "sql": "SELECT NTH_WORD('a b c', '2.5')", "resp": {"error": "OperationalError: user-defined function raised exception"}, "charged": false}
+{"t": 1793088795, "worker": "Qinf-w3", "sql": "SELECT NTH_WORD('a b c', 1e0), NTH_WORD('a b c', x'32')", "resp": {"answer": ["a", "b"], "questions_left": null}, "charged": true}

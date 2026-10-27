@@ -23,6 +23,8 @@ Research on swarms of AI coding agents that coordinate only through a shared rep
 | Onboarding law held a third time: 1.61M tokens at 12 workers (predicted 1.63M), 1.23M at 8 (predicted 1.19M) | Gate 3 | 2 swarms |
 | Guarded landing blocked both would-be regressions before they reached main; both swarms pass all 2,960 hidden tests with no gaming (gap ≤ 0.4 points) | Gate 3 | 2 swarms |
 | Finish time is set by the tail: 12 workers took 8.7 min (Gate 2: 7.8), the last 4% done by one worker who claimed a big task late | Gate 3 | 2 swarms |
+| Intent is binding: on invented rules, hidden pass was 58% / 87% / 98% with 0 / 30 / unlimited questions to a product owner; all 40 visible examples passed in every swarm | Gate 3 | 3 swarms of 3 |
+| Intent enters only where someone asks: edge cases right 96% on functions someone asked about, 76% on the rest; unlimited access still missed the rules no question touched | Gate 3 | 3 swarms of 3 |
 
 ## Layout
 
@@ -37,8 +39,7 @@ Research on swarms of AI coding agents that coordinate only through a shared rep
 | `gate1/results/` | Per-commit visible and hidden scores for each swarm; `tokens.csv` per worker |
 | `gate1/logs/` | Every worker's CLAIM, LAND, CONFLICT and FOUND events |
 | `gate2/` | 113-category project: seed bundle, worker prompt, predictions registered before launch, `RESULTS.md` scoring them, all three swarm histories, per-commit hidden scores, `tokens.csv` |
-| `gate3/` | Protocol v2 (`tools/claim.py`, `tools/land.py`), the scale runs at 8 and 12 workers with `RESULTS.md`, and the intent test (built, not yet run); see `gate3/README.md` |
-| `sealed/` | The intent test's private rules and aborted attempts, encrypted until that test has run |
+| `gate3/` | Protocol v2 (`tools/claim.py`, `tools/land.py`), the scale runs at 8 and 12 workers, and the intent test (private rules in `referee/oracle.py`, every question asked, call-by-call scores); see `gate3/README.md` and `RESULTS.md` |
 | `BRAIN.md` | Shared memory: laws with status, constants, evidence, scorecard, next steps |
 | `docs/` | Hive v1 and Hive v2 write-ups |
 
@@ -61,4 +62,4 @@ Two workers finished the whole 10x project in 17.7 minutes for 515k tokens; twel
 
 ## Gate 3 in one line
 
-Category claims and a landing guard kept main clean at 8 and 12 workers, and the token law held again. But finer claims did not make the swarm faster, because the last large task was claimed late. See `gate3/RESULTS.md`.
+Category claims and a landing guard kept main clean at 8 and 12 workers, and the token law held again. Finer claims did not make the swarm faster, because the last large task was claimed late. Swarms building invented business rules passed every visible example. On hidden tests they reached 58% with no one to ask, 87% with 30 questions and 98% with unlimited questions. See `gate3/RESULTS.md`.

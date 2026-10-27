@@ -2,7 +2,7 @@
 
 Read this first. It is the shared memory for anyone working on Hive, human or agent: what we know, how sure we are, what is being tested, and exactly how to continue. When you learn something, update this file in the same commit as the evidence.
 
-Last updated: Oct 27 2026, 14:00 IST.
+Last updated: Oct 27 2026, 14:30 IST.
 
 ## 1. The question
 
@@ -17,7 +17,7 @@ Two things limit them today:
 - **Cost is mostly onboarding.** Each worker spends about 110k tokens getting started, against about 3k to 5k per task after that.
 - **Speed stops improving at around 6 to 12 workers.** The biggest task, and how late it gets claimed, sets the finish time.
 
-The deeper limit, still to be measured, is intent: a swarm can only be as right as its ability to tell right from wrong, and that knowledge has to come from somewhere. Gate 3 step 3 tests this and is ready to run.
+The deeper limit is intent, now measured once (Gate 3 step 3). On rules a model cannot guess, a swarm with no one to ask passed all its visible examples but only 58% of the hidden tests. With 30 questions to a product owner it reached 87%, and with unlimited questions 98%. Intent enters only where someone asks: the rules no question touched stayed wrong, even with unlimited access. The swarm's correctness is capped by the intent fed into it, and by how well the questions cover the input space.
 
 ## 3. The law and how sure we are of each part
 
@@ -37,7 +37,8 @@ Status tags: **established** means outside theory or our data on real agents; **
 | 4 Threshold | bugs die out only if R < 1; with sampled checks and trace-back, live bugs = f(1−s)/s, independent of N | Branching threshold established; the N-independence is our model, matched in simulation within 3% |
 | 5 Referee consumption | k adaptive landings on n hidden tests leak √(k/n); a Ladder gate leaks (log(kn)/n)^(1/3) | Established (Blum & Hardt 2015); not binding at our scale |
 | 6 No universal referee | no automatic check decides arbitrary intent | Established (Rice) |
-| 7 Intent bandwidth | useful work per hour ≤ I/b | **Conjecture**; Gate 3 step 3 tests it |
+| 7 Intent bandwidth | useful work per hour ≤ I/b | **Measured once** (Gate 3): hidden pass 58% / 87% / 98% at 0 / 30 / 320 questions |
+| Coverage | per function, edge error ≈ e_g·(1 − coverage of input classes by questions), e_g ≈ 24% | **Model**, fitted on Gate 3 only; predicts a coverage-planned 30 questions ≈ unlimited |
 | Onboarding | tokens ≈ c_on·N + c_task·T | **Model**, held out three times (Gates 1, 2, 3) |
 | Tail | finish ≥ max(work/N, longest task + when it starts) | Established (scheduling theory); seen binding in Gate 3 |
 | Coverage cliff | N* ∝ (1−c)^−0.61 · τ^−1.04 · κ^−0.55 | Model, simulation only (1.4× typical error held out) |
@@ -56,7 +57,10 @@ Status tags: **established** means outside theory or our data on real agents; **
 | c_task | 4.9k per task (Gate 1), 3.0k per category (Gate 2) | Gates 1, 2 |
 | Conflicts per landing | 0.14 / 0.33 / 0.48 at N = 2 / 6 / 12 (about N^0.7); 0.36 at 8 and 0.44 at 12 with category claims | Gates 2, 3 |
 | Cost of one conflict | 10 s to 2 min | Gates 1 to 3 |
-| Visible minus hidden gap | under 1 point at every commit, every swarm | Gates 1, 2, 3 |
+| Visible minus hidden gap | under 1 point when visible and hidden sample the same intent; 42 points when intent is missing (no questions) | Gates 1 to 3 |
+| Guess accuracy without intent | 99% on happy paths, 73% on edge cases | Gate 3 |
+| Edge accuracy, function asked vs not | 96.1% vs 75.7% | Gate 3, 60 swarm-function pairs |
+| Cost of questions | +12% tokens and about 2.5 min for 320 questions | Gate 3 |
 
 ## 5. Evidence log
 
@@ -68,15 +72,16 @@ Status tags: **established** means outside theory or our data on real agents; **
 | Gate 1 | Oct 27 | 34 Claude workers, 6 swarms, SQL engine with SQLite as referee | No gaming; 2→6 builders bought 1.26×; onboarding dominates; foundation-first failed |
 | Gate 2 | Oct 27 | 10× project, 2 / 6 / 12 long-lived workers | Onboarding law held; speed saturated near 6; collisions grew slower than predicted; first semantic conflict, repaired in 22 s |
 | Gate 3, step 2 | Oct 27 | Protocol v2 (category claims, guarded landing), 8 and 12 workers | Onboarding law held a third time; guard blocked both would-be regressions; all 2,960 hidden tests pass; no gaming (gap ≤ 0.4 pts); finish time set by the tail |
-| Gate 3, step 3 | not yet run | Intent test: invented business rules, 0 / 30 / unlimited questions to a product owner | Built and reset; two attempts stopped at 3 minutes (usage limit, user stop) |
+| Gate 3, step 3 | Oct 27 | Intent test: 20 invented business rules, 3 swarms of 3, 0 / 30 / unlimited questions to a product owner | Hidden 58% / 87% / 98%; all predictions held; no cheating; the leftover errors are rules no question touched |
 
 ## 6. Prediction scorecard
 
 All predictions are written down before the run, in each gate's `PREDICTIONS.md`.
 
-- **Held:** onboarding law (Gates 2, 3); no gaming (Gates 1, 2, 3); guard keeps regressions off the tip of main (Gate 3; the blocked commit still sits in history next to its fix, so `--continue` should squash); no overlapping claims (Gate 3).
+- **Held:** intent is binding, and correctness rises with questions, all 5 intent predictions (Gate 3); onboarding law (Gates 2, 3); no gaming (Gates 1, 2, 3); guard keeps regressions off the tip of main (Gate 3; the blocked commit still sits in history next to its fix, so `--continue` should squash); no overlapping claims (Gate 3).
 - **Failed:** foundation-first is cheaper (Gate 1); speed of 3 to 4× at 12 workers (Gate 2: 2.3×); collisions growing as κ(N−1) (Gate 2: slower); finer claims lowering the time floor (Gate 3: 8.7 min against 7.8).
-- **Untested:** 24 workers; intent bandwidth; breakers at scale.
+- **Untested:** 24 workers; coverage-planned questions; breakers at scale.
+- **Flawed check, disclosed:** one cheating-signature rule (CHECKSUM +97) could be read off a visible example.
 
 ## 7. Design as of now (Hive v2 plus protocol v2)
 
@@ -89,10 +94,14 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
   - Claim the largest unclaimed category first, which cuts the tail.
   - Modules register themselves, which removes most conflicts.
   - `land.py --continue` squashes the fix into the blocked commit, so every commit on main passes.
+- **Intent interface** (from Gate 3):
+  - Budget questions per function, not first come, first served.
+  - Choose questions by coverage of input classes and their pairs.
+  - Write every answer into a shared test at once.
 
 ## 8. Open questions, most important first
 
-1. **Intent bandwidth.** On rules a model cannot guess, how much does access to a product owner raise correctness, and how many questions is it worth? (Gate 3 step 3, ready.)
+1. **Question planning.** Can questions chosen by coverage of input classes (NULL, empty, zero, negative, boundaries, category values, and their pairs) reach unlimited-access accuracy with about 30 questions? Answered once, every answer should become a shared test.
 2. **The tail.** Does largest-first claiming bring 12 workers under 7 minutes?
 3. **The largest swarm this lab allows**: 20 workers with largest-first claiming.
 4. **Turning intent into tests automatically**: the referee as the product.
@@ -100,7 +109,7 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 
 ## 9. Next experiments, exactly
 
-1. **Intent test** (about 1.4M tokens, 45 minutes). Launch the 9 workers with the prompts in `gate3/prompts/`. They have to be regenerated from `prompt_intent.md` per worker; the rendered copies sit in the working machine at `gate3/p_Q*-w*.md`. Then unseal the oracle, regenerate the hidden suite and score with `gate1/referee/evaluate.py`. Score against I1 to I5 in `gate3/prompts/PREDICTIONS.md`, and check the cheating signature.
+1. **Question planner** (about 0.4M tokens, 10 minutes). Same intent project and seeds, but with a new oracle so the rules are unknown again. Run two swarms of 3: a free-asking swarm with 30 questions, and a swarm whose 30 questions come from a coverage planner. In the planner swarm, each answer is written into a shared test file. Register the prediction first: the planner swarm scores at least 95% hidden.
 2. **Largest-first at 12 and 20 workers** (about 4M tokens). Same project as Gate 3 step 2. Registered prediction to write first: 12 workers under 7.0 minutes.
 3. **Self-registering modules** at 12 workers: conflicts per landing below 0.2.
 
@@ -141,4 +150,4 @@ Rules of the lab:
   - Gates 0, 1 and 2 run.
   - Protocol v2 built.
   - Gate 3 scale step run (8 and 12 workers).
-  - Gate 3 intent step built, attempted twice, reset.
+  - Gate 3 intent step built, attempted twice (stopped), then run: 58% / 87% / 98% hidden at 0 / 30 / unlimited questions. Oracle unsealed.

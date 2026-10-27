@@ -1,36 +1,26 @@
 # Gate 3
 
-Three steps, each answering an open question from Gate 2:
+Three steps, each answering an open question from Gate 2. Results and scored predictions are in `RESULTS.md`.
 
 1. **Protocol v2** (done). Claims name test categories, and landings are guarded. `tools/claim.py` and `tools/land.py` are tested against overlap, a simultaneous race, a regression and a duplicate definition.
-2. **Scale** (done; hidden replay pending). The Gate 2 project with protocol v2 at 12 workers and at 8; the 24-worker swarm was capped at 8. See `RESULTS.md`.
-3. **Intent bandwidth** (built, not yet run). Swarms add 20 business functions whose rules were invented for this test, so no model can know them. Workers see a one-line spec and 2 happy-path examples per function. A "product owner" server answers questions with the intended result. Three swarms of 3 workers differ only in how many questions they may ask: 0, 30, or unlimited. A hidden suite of 500 tests (70% edge cases) scores each swarm.
+2. **Scale** (done). The Gate 2 project with protocol v2 at 12 workers and at 8 (the 24-worker swarm was capped at 8). Both pass all 2,960 hidden tests. The finish time is set by the last large task claimed.
+3. **Intent bandwidth** (done). Three swarms of 3 workers added 20 business functions whose rules were invented for this test. They differed only in how many questions they could put to a product owner: 0, 30, or unlimited. Hidden correctness was 58%, 87% and 98%.
 
-## Step 3 status
-
-The intent test has been started twice and stopped twice:
-
-- **Attempt 1** was stopped by a usage limit about 3 minutes in.
-- **Attempt 2** was stopped by the user about 3 minutes in.
-
-Neither counts. Their data is kept in `../sealed/`. The repos, clones and question budgets have been reset to clean.
-
-What is kept out of plain sight until step 3 has run:
-
-- `referee/oracle.py`: the private intent.
-- The hidden suite (regenerate it with `python3 referee/gen3.py hidden <dir> 900000` once the oracle is unsealed).
-- The question logs.
-- The aborted attempts.
-
-All of these are in `../sealed/gate3_intent.tgz.enc`; the user holds the password. They are sealed so that no agent working in this repository can read the intended answers before the test.
+The intent test was first started twice and stopped about 3 minutes in each time: once by a usage limit, once by the user. Those attempts don't count. Their data is in `aborted_intent_runs/`. The scored run started from clean repos and fresh question budgets.
 
 ## Files
 
 | Path | Contents |
 | --- | --- |
-| `tools/` | `claim.py`, `land.py`, `ask_template.py` (the question client, rendered per arm) |
-| `referee/` | `gen3.py` (test generator for step 3), `ask_server.py` (the product-owner server: one SELECT of up to 3 values per question, budgeted) |
+| `tools/` | `claim.py`, `land.py`, `ask_template.py` (the question client, rendered per swarm) |
+| `referee/oracle.py` | The private intent: the 20 invented rules, registered as SQLite functions (sealed until the intent test had run) |
+| `referee/gen3.py` | Generates the visible examples (2 per function) and the hidden suite (25 per function, seed 900000) |
+| `referee/ask_server.py` | The product owner: one SELECT of up to 3 values per question, with a budget |
+| `referee/probe.py` | Scores a final engine call by call against the oracle, marking each call as happy-path or edge case |
 | `prompts/` | Exact worker prompts for steps 2 and 3, and the predictions registered before launch |
-| `seed_scale.bundle` | Starting repo for step 2 (Gate 2 seed plus protocol v2) |
-| `seed_intent.bundle` | Starting repo for step 3 (finished Gate 2 engine, the 20-function spec, 40 example tests) |
-| `swarms/`, `logs/`, `results/` | Step 2 histories, event logs, tokens |
+| `seed_scale.bundle`, `seed_intent.bundle` | Starting repos for steps 2 and 3 |
+| `swarms/` | Full histories: F8, F12, Q0, Q30, Qinf |
+| `logs/` | Every worker's CLAIM, LAND, CONFLICT and BLOCKED events |
+| `results/` | Tokens per worker; per-commit replays; call-by-call probes; every question and answer (`asks_Q30.log`, `asks_Qinf.log`) |
+
+Regenerate the hidden suite with `python3 referee/gen3.py hidden hidden3 900000`. It is never committed.
