@@ -6,10 +6,13 @@ usage:
   python -m hive land <short_name> "<commit message>"      # or: python -m hive land <short_name> --continue
   python -m hive areas                                      # every area and who holds it
   python -m hive run --repo <repo> --run <new folder> --workers N --goal <goal.md or text> [--minutes 40] [--max-parallel N]
+                    [--examples <examples.md>] [--questions N]     # the owner's examples; the team's question budget (0: none)
+  python -m hive owner --run <run>                          # the owner answers questions live
+  python -m hive ask "<question>"   /   python -m hive answers   (workers, inside a run)
 """
 import argparse, json, os, sys
 
-from . import claims, guard, swarm
+from . import claims, guard, owner, swarm
 
 def init(test_cmd, junit):
     os.makedirs('.hive', exist_ok=True); os.makedirs(guard.LOCK_DIR, exist_ok=True)
@@ -33,6 +36,10 @@ def main(argv=None):
     r = sub.add_parser('run'); r.add_argument('--repo', default='.'); r.add_argument('--run', required=True)
     r.add_argument('--workers', type=int, required=True); r.add_argument('--goal', required=True)
     r.add_argument('--minutes', type=int, default=40); r.add_argument('--max-parallel', type=int, default=0)
+    r.add_argument('--examples'); r.add_argument('--questions', type=int)
+    o = sub.add_parser('owner'); o.add_argument('--run', required=True)
+    q = sub.add_parser('ask'); q.add_argument('question'); q.add_argument('--timeout', type=int, default=30)
+    sub.add_parser('answers')
     a = ap.parse_args(argv)
     if a.cmd == 'init':
         return init(a.test_cmd, a.junit)
@@ -43,8 +50,14 @@ def main(argv=None):
     if a.cmd == 'areas':
         return claims.status()
     if a.cmd == 'run':
-        swarm.prepare(a.repo, a.run, a.workers, a.goal, a.minutes)
+        swarm.prepare(a.repo, a.run, a.workers, a.goal, a.minutes, a.examples, a.questions)
         return swarm.launch(a.run, a.max_parallel)
+    if a.cmd == 'owner':
+        return owner.serve(a.run)
+    if a.cmd == 'ask':
+        return owner.ask(a.question, a.timeout)
+    if a.cmd == 'answers':
+        return owner.answers()
 
 if __name__ == '__main__':
     sys.exit(main())

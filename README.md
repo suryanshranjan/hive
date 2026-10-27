@@ -43,13 +43,15 @@ The tool packages the measured design for any repository with tests. Plan and mi
 | M1 Guard for any test runner (JUnit XML), cache keyed by code content, secrets refused | **Done**: pytest (`tests/test_guard.sh`) and a real company's Node.js backend (384 tests) |
 | M2 Claims on areas of the codebase | **Done** (`tests/test_claims.sh`) |
 | M3 `hive run`: headless workers, one clone each | **Done** (`tests/test_run.sh`; a real 2-worker run, $0.43) |
-| M4 Owner session: examples and live answers become tests | Planned |
+| M4 Owner session: examples and live answers become tests | **Done** (`tests/test_owner.sh`) |
 | M5 First real feature, built end to end, scored on the owner's held-back tests | Planned |
 
 ```
-python -m hive init --test-cmd "python -m pytest -q --junitxml=.hive/junit.xml"
-python -m hive land <short_name> "<what you did>"
+python -m hive init --test-cmd "python -m pytest -q --junitxml=.hive/junit.xml"     # once per repository
+python -m hive run --repo . --run ../run1 --workers 4 --goal goal.md                    --examples my_examples.md --questions 17                          # start a swarm on a copy
+python -m hive owner --run ../run1                                                   # answer the workers live
 ```
+Workers use `hive claim`, `hive land`, `hive areas`, `hive ask` and `hive answers` inside their clones.
 
 Run workers in a container or throwaway VM: they execute shell commands.
 
