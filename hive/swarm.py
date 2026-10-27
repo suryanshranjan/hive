@@ -60,7 +60,7 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
     json.dump(dict(repo=repo, branch=b, workers=workers, started=None), open(os.path.join(run, 'run.json'), 'w'), indent=1)
     return run
 
-def launch(run, max_parallel=0):
+def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
     """Run every worker (at most max_parallel at once), wait for all, and write <run>/agents.csv."""
     run = os.path.abspath(run)
     cmd = shlex.split(os.environ.get('HIVE_WORKER_CMD', DEFAULT_CMD))
@@ -78,7 +78,7 @@ def launch(run, max_parallel=0):
             p.stdin.write(open(os.path.join(run, 'prompts', f'{me}.md')).read()); p.stdin.close()
         except BrokenPipeError:
             pass
-        print('launched', me, flush=True)
+        say(f'launched {me}')
         return [me, time.time(), p, out]
 
     cap = max_parallel or len(queue); live = []; rows = []
@@ -95,14 +95,14 @@ def launch(run, max_parallel=0):
             tok, cost, err = _usage(os.path.join(run, 'out', f'{me}.json'))
             rows.append(dict(worker=me, start=int(t0), end=int(time.time()), minutes=round((time.time() - t0) / 60, 1),
                              exit=p.returncode, tokens=tok, cost_usd=cost, api_error=err))
-            print(f'{me} finished: exit {p.returncode}, {rows[-1]["minutes"]} min, cost {cost}' + (f', API ERROR {err}' if err else ''), flush=True)
+            say(f'{me} finished: exit {p.returncode}, {rows[-1]["minutes"]} min, cost {cost}' + (f', API ERROR {err}' if err else ''))
         time.sleep(2)
     with open(os.path.join(run, 'agents.csv'), 'w', newline='') as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0])); w.writeheader(); w.writerows(rows)
     errors = [r for r in rows if r['api_error']]
     if errors:
-        print(f'WARNING: {len(errors)} worker(s) stopped on an API error (for example a usage limit); treat this run as incomplete.')
+        say(f'WARNING: {len(errors)} worker(s) stopped on an API error (for example a usage limit); treat this run as incomplete.')
     b = meta['branch']
-    print(f'result: {run}/up.git, branch {b}')
-    print(sh('git', '-C', os.path.join(run, 'up.git'), 'log', '--oneline', '-8', b).stdout)
+    say(f'result: {run}/up.git, branch {b}')
+    say(sh('git', '-C', os.path.join(run, 'up.git'), 'log', '--oneline', '-8', b).stdout)
     return 1 if errors else 0

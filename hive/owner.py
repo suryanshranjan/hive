@@ -113,15 +113,16 @@ def assumptions():
     d = _dir(); rows = [json.load(open(p)) for p in sorted(glob.glob(os.path.join(d, 'assumptions', '*.json')))]
     print('\n'.join(f"- ({a['worker']}) {a['text']}" for a in rows) if rows else 'no assumptions recorded yet'); return 0
 
-def review(run, width=72):
+def review(run, width=72, intro=True):
     """The owner's check after the build: each recorded default, right or wrong. Wrong ones, with the owner's rule, go to
     <run>/owner/corrections.md for the workers who fix them (Gate 27: builders never ask about defaults they feel sure of)."""
     import textwrap
     d = _dir(run)
     todo = [json.load(open(p)) for p in sorted(glob.glob(os.path.join(d, 'assumptions', '*.json')))]
     todo = [a for a in todo if not os.path.exists(os.path.join(d, 'reviews', a['id'] + '.json'))]
-    print(f"\nThe builders made {len(todo)} assumption(s) your instructions did not cover. For each one, press Enter\n"
-          "if it is right, or type what should happen instead. Ctrl+C to stop and come back later.", flush=True)
+    if intro:
+        print(f"\nThe builders made {len(todo)} assumption(s) your instructions did not cover. For each one, press Enter\n"
+              "if it is right, or type what should happen instead. Ctrl+C to stop and come back later.", flush=True)
     try:
         for n, a in enumerate(todo, 1):
             lines = ['', '=' * width, f" Assumption {n} of {len(todo)}  -  from builder {a['worker']}", '=' * width, '']
@@ -145,7 +146,11 @@ def review(run, width=72):
         "# The owner's corrections\n\nThe owner reviewed the defaults the builders applied, and each item below was wrong. "
         "Change the code to follow the owner, encode each correction as a test, and do not stretch it into rules it does not "
         "state.\n\n" + ('\n'.join(rows) if rows else 'No corrections: every assumption was right.') + '\n')
-    print(f"\n{len(rows)} correction(s) written to {os.path.join(d, 'corrections.md')}. Thank you!"); return 0
+    if intro:
+        print(f"\n{len(rows)} correction(s) written to {os.path.join(d, 'corrections.md')}. Thank you!")
+    else:
+        print('\nThanks. ' + ('Everything they assumed was right.' if not rows else f"{len(rows)} to fix."), flush=True)
+    return 0
 
 def answers():
     d = _dir(); rows = []
@@ -171,18 +176,26 @@ def format_question(q, number, budget=None, width=72):
     lines += ['', '  Your answer (a letter, or say it in your own words) > ']
     return '\n'.join(lines)
 
-def serve(run, poll=2):
-    """The owner's terminal: show each unanswered question, read the answer, write it. Ctrl+C to stop."""
+def serve(run, poll=2, until=None, tick=None, greet=True):
+    """The owner's terminal: show each unanswered question, read the answer, write it. Ctrl+C to stop.
+    Inside `hive start`: tick() narrates progress between questions, and the loop ends once until() is true and no
+    question is waiting."""
     if not os.path.exists(os.path.join(run, 'run.json')):
         print('Waiting for the builders to start...', flush=True)
         while not os.path.exists(os.path.join(run, 'run.json')):   # never create the run folder: hive run owns it
             time.sleep(poll)
     d = _dir(run); seen = set(); answered = 0; idle_note = False
-    print('\nHi! The builders are at work. When they hit a decision only you can make, the question appears here.\n'
-          'Each one is a real situation: pick a letter, or answer in your own words, and press Enter.\n'
-          'Press Enter on an empty line to come back to a question later; Ctrl+C when you are done.', flush=True)
+    if greet:
+        print('\nHi! The builders are at work. When they hit a decision only you can make, the question appears here.\n'
+              'Each one is a real situation: pick a letter, or answer in your own words, and press Enter.\n'
+              'Press Enter on an empty line to come back to a question later; Ctrl+C when you are done.', flush=True)
     try:
         while True:
+            if tick:
+                tick()
+            if until and until() and all(os.path.exists(os.path.join(d, 'answers', os.path.basename(p)))
+                                         for p in glob.glob(os.path.join(d, 'questions', '*.json'))):
+                return 0
             budget = _budget(d)
             for i, p in enumerate(sorted(glob.glob(os.path.join(d, 'questions', '*.json'))), 1):
                 q = json.load(open(p))
@@ -197,7 +210,7 @@ def serve(run, poll=2):
                           open(os.path.join(d, 'answers', q['id'] + '.json'), 'w'))
                 answered += 1; idle_note = True
                 print(f"  Thanks, sent to builder {q['worker']}. ({answered} answered so far)", flush=True)
-            if idle_note:
+            if idle_note and greet:
                 print('\n  Waiting for the next question...', flush=True); idle_note = False
             time.sleep(poll)
     except KeyboardInterrupt:
