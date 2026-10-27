@@ -53,6 +53,13 @@ python -m hive owner --run ../run1                                              
 ```
 Workers use `hive claim`, `hive land`, `hive areas`, `hive ask` and `hive answers` inside their clones.
 
+The owner never sees code. Workers must ask in plain words, one real-life situation with lettered choices, and `hive ask` refuses questions with code in them:
+
+> A creator was promised a bonus of up to Rs 2,000 but earned Rs 2,500. What should they get?
+> **A)** Rs 2,000, the promised maximum **B)** Rs 2,500, what they earned **C)** something else (please say)
+
+The owner types `A`, `B` or a few words; the worker turns the answer into a test.
+
 Run workers in a container or throwaway VM: they execute shell commands.
 
 ## How this research works
