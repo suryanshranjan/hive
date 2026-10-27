@@ -211,6 +211,12 @@ def main():
     if not a.skip_prereg_check: prereg_check(cfg['predictions'])
     oracle_path = get_rules(cfg, name, a.oracle)
     o, names = check_rules(oracle_path)
+    if cfg.get('require_decisions'):
+        dec = getattr(o, 'DECISIONS', None)
+        assert isinstance(dec, dict) and set(dec) == set(names), 'DECISIONS must list every function'
+        counts = collections.Counter(len(v) for v in dec.values())
+        assert all(1 <= len(v) <= 4 for v in dec.values()), 'each function needs 1 to 4 decisions'
+        say('declared decisions per function: ' + ', '.join(f'{k}:{counts[k]}' for k in sorted(counts)))
     sh(sys.executable, os.path.join(ROOT, 'lab', 'new_intent_gate.py'), '--name', name, '--oracle', oracle_path,
        '--visible-seed', str(cfg['visible_seed']), '--hidden-seed', str(cfg['hidden_seed']), cwd='/')
     say('starting repo and hidden suite built')
