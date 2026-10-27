@@ -2,20 +2,16 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 27 2026, after Gate 17)
+## Where we left off (Oct 27 2026, after Gate 18)
 
-- Gates 0 to 8 and 11 to 17 are done and written up (G9 and G10 are still cards). Gate 7 used a real company's rules, which stay private (never commit them).
-- Gate 17 (`gate17/RESULTS.md`): on the same rules, the documented owner's interface (handbook + extracted tour + 17 questions) reached 93.8% hidden and the listing owner's (tour + 17 questions) 98.2%. The gap (+4.4) sits entirely at decisions nobody wrote down. `BRAIN.md` section 2 now states the measured intent interface.
-- **Waiting on the user:** the next step needs real people or real documents (see "Needs the user" below). Agent-only gates can continue with the cards below.
-
-## Ready
-
-### G18: the decision tour on a real company's rules
-- **Run (needs the private Gate 7 wrapper, kept outside the repo):** `python3 lab/run_gate.py lab/experiments/g18_real.json --oracle <private>/oracle.py`
-- **Teams:** N0; T (56 owner-confirmed cases as tour); Q (19 questions); TQ (both). About $9, 10 minutes.
-- **Afterwards:** run `gate18/referee/analyze.py` on the private results; commit aggregates only.
+- Gates 0 to 8 and 11 to 18 are done and written up (G9 and G10 are still cards). Gates 7 and 18 used a real company's rules, which stay private (never commit them; Gate 18 published aggregates only).
+- Gate 18 (`gate18/RESULTS.md`): on the real rules, owner-confirmed examples 64.8%, 19 questions 56.4%, both 78.0% (N0 26.0%; Gate 7's best 49.6%). The examples were agent-drafted and did not beat questions (0.93x). Conjecture: the owner must choose the points.
+- Next: the strongest tests now need the owner (G20 below) or the company's documents (G19).
 
 ## Needs the user
+
+### G20: owner-chosen examples on the real rules
+- The founder writes one worked example per policy decision for Gate 7's 10 functions, without looking at the QA list (about 30 minutes). Compare with 19 builder questions, as in Gate 18. Tests whether the examples' advantage needs the owner to choose the points.
 
 ### G19: the documented-owner interface on a real company's documents
 - The company's policy pages (Notion was unavailable on Oct 27: the connector did not authorize in this session) as the handbook; the confirmed rules answer.
