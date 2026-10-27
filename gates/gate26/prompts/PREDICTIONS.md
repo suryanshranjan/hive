@@ -25,3 +25,10 @@ Note: F1's bar is lower than Gate 25's (95%) on purpose. The cases come from the
 **Honest prior.** F1 about 55%; F2 about 85%; F3 about 70%; F4 about 70%.
 
 **Cost.** About $4 at list price, plus the founder's time (cases, then live answers).
+
+## Amendment, registered before the run (Oct 28 2026)
+
+The founder chose to have the acceptance cases taken from the company's documents rather than writing them himself. So:
+- **The 18 acceptance cases come only from the company's written spec** (one section of its architecture document, plus the matching table that refers to it), translated by the experimenter, approved by the founder, and checked consistent against a private reference (18/18). Within each case the collaborations are identical, so choices the spec leaves open (for example how to combine different collaborations) do not affect the result.
+- **The founder still answers live** (F3, F4). This is the main change from Gate 25, where an AI proxy answered 11 of 12 questions.
+- **What F1 now measures:** whether the swarm implements the company's *documented* rules plus the founder's live rulings without breaking them. It no longer measures undocumented intent from the founder's head; that remains open.
