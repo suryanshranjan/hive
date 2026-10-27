@@ -219,10 +219,10 @@ def build_tour(o, names, run, contrast=False):
 def worker_cmd():
     return os.environ.get('HIVE_WORKER_CMD', 'claude -p --output-format json --permission-mode acceptEdits --allowedTools Bash Read Edit Write Glob Grep').split()
 
-def build_handbook(o, run):
-    """runs/<name>/seed_hb: the starting repo plus the owner's prose handbook (HANDBOOK.md), linked from README."""
-    out = os.path.join(run, 'seed_hb'); shutil.rmtree(out, ignore_errors=True)
-    sh('git', 'clone', '-q', os.path.join(run, 'seed'), out)
+def build_handbook(o, run, base='seed', out_name='seed_hb'):
+    """runs/<name>/<out_name>: the <base> starting repo plus the owner's prose handbook (HANDBOOK.md), linked from README."""
+    out = os.path.join(run, out_name); shutil.rmtree(out, ignore_errors=True)
+    sh('git', 'clone', '-q', os.path.join(run, base), out)
     open(os.path.join(out, 'HANDBOOK.md'), 'w').write(o.HANDBOOK.strip() + '\n')
     rp = os.path.join(out, 'README.md')
     open(rp, 'a').write("\n## Company policy handbook\n\nThe product team's policy handbook for these functions is in `HANDBOOK.md`.\n")
@@ -294,8 +294,9 @@ def run_arms(cfg, name, run, oracle_path, specs, max_parallel):
             args += ['--budget', p[4]] if p[2] == 'budget' else ['--allowance', os.path.join(run, f'allowance_{arm}.json')]
             servers.append(subprocess.Popen(args, cwd='/', stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)); wait_port(port)
     try:
-        kinds = tour_kinds(cfg); where = {'tour': 'seed_tour', 'contrast': 'seed_tourc', 'handbook': 'seed_hb', 'xtour': 'seed_xtour'}
-        for seed_dir in ('seed', 'seed_tour', 'seed_tourc', 'seed_hb', 'seed_xtour'):
+        kinds = tour_kinds(cfg); where = {'tour': 'seed_tour', 'contrast': 'seed_tourc', 'handbook': 'seed_hb', 'xtour': 'seed_xtour',
+                                          'xtour+handbook': 'seed_xtour_hb'}
+        for seed_dir in ('seed', 'seed_tour', 'seed_tourc', 'seed_hb', 'seed_xtour', 'seed_xtour_hb'):
             group = [s for s in specs if where.get(kinds.get(s.split(':')[0]), 'seed') == seed_dir]
             if not group: continue
             cmd = [sys.executable, os.path.join(ROOT, 'lab', 'make_swarm.py'), '--run', name, '--seed', os.path.join(run, seed_dir),
@@ -330,10 +331,12 @@ def main():
     sh(sys.executable, os.path.join(ROOT, 'lab', 'new_intent_gate.py'), '--name', name, '--oracle', oracle_path,
        '--visible-seed', str(cfg['visible_seed']), '--hidden-seed', str(cfg['hidden_seed']), cwd='/')
     say('starting repo and hidden suite built')
-    for kind in sorted(set(tour_kinds(cfg).values())):
+    kinds = set(tour_kinds(cfg).values())
+    for kind in sorted(kinds):
         if kind in ('tour', 'contrast'): build_tour(o, names, run, contrast=(kind == 'contrast'))
         elif kind == 'handbook': build_handbook(o, run)
-        elif kind == 'xtour': build_xtour(cfg, o, names, run, name)
+    if kinds & {'xtour', 'xtour+handbook'}: build_xtour(cfg, o, names, run, name)
+    if 'xtour+handbook' in kinds: build_handbook(o, run, base='seed_xtour', out_name='seed_xtour_hb')
     allowance = {}
     for arm, spec in cfg.get('allowance', {}).items():
         order = sorted(names); random.Random(spec['seed']).shuffle(order); alw = {}
