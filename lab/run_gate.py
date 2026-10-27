@@ -15,7 +15,7 @@ Stages (each prints what it did):
      errors, a seeded coin picks the 'hi' function of each pair, and each stratified arm's plan sets hi/lo questions.
   7. Scoring: every arm's final engine, call by call; 95% intervals bootstrapped over functions; paired differences
      against the baseline arm; gain by allowance level. Writes runs/<name>/summary.json and summary.md.
-Afterwards (by the session, not this script): write gate<k>/RESULTS.md from summary.md, update BRAIN.md and
+Afterwards (by the session, not this script): write gates/gate<k>/RESULTS.md from summary.md, update BRAIN.md and
 lab/QUEUE.md, and push. Private rules stay out of the repo until the run is scored."""
 import argparse, collections, json, os, random, re, shutil, signal, socket, subprocess, sys, time
 
@@ -379,7 +379,7 @@ def main():
     if a.replay:
         for spec in cfg['arms']:
             arm = spec.split(':')[0]
-            sh(sys.executable, os.path.join(ROOT, 'gate2', 'referee', 'evaluate.py'), os.path.join(run, f'up{arm}.git'),
+            sh(sys.executable, os.path.join(ROOT, 'gates', 'gate2', 'referee', 'evaluate.py'), os.path.join(run, f'up{arm}.git'),
                os.path.join(ROOT, 'private', name, 'hidden'), os.path.join(run, f'eval_{arm}.json'), cwd='/')
         say('per-commit replays written')
     say(f'done. Next: write the gate RESULTS.md from runs/{name}/summary.md, update BRAIN.md and lab/QUEUE.md, push.')

@@ -129,8 +129,8 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 ## 7. Design as of now (Hive v2 plus protocol v2)
 
 - Workers never talk. Long-lived workers take task after task, because onboarding costs about 20 tasks' worth of tokens.
-- Claims name test categories (`gate3/tools/claim.py`); overlapping claims are refused and races resolved by commit order.
-- Landing is guarded (`gate3/tools/land.py`): no new duplicate definitions, and no test that passes on main may fail after the change.
+- Claims name test categories (`gates/gate3/tools/claim.py`); overlapping claims are refused and races resolved by commit order.
+- Landing is guarded (`gates/gate3/tools/land.py`): no new duplicate definitions, and no test that passes on main may fail after the change.
 - Two suites: visible tests guide the workers, hidden tests judge. Hidden suites are never committed.
 - No founder phase: the swarm shapes its own extension points within minutes.
 - **Next changes:**

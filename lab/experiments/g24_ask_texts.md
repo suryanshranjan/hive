@@ -1,6 +1,6 @@
 # The only difference between the teams: this paragraph of the builder prompt
 
-{EXAMPLE} is filled in by lab/new_intent_gate.py. Both teams use the content-keyed cached guard (gate23/tools/land.py).
+{EXAMPLE} is filled in by lab/new_intent_gate.py. Both teams use the content-keyed cached guard (gates/gate23/tools/land.py).
 
 ## N0 (no tour, no questions)
 There is no product owner to ask on this project: `tools/ask.py` will tell you so. Work from the spec and the examples.
