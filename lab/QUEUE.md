@@ -6,7 +6,8 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 
 - Testing phase complete (Gates 0–24 in `gates/`; caveat in `gates/LAB_NOTE_guard_python.md`). Literature check in `docs/related_work.md`.
 - **Building Hive v1** (`docs/hive_v1_plan.md`, package `hive/`). **M1 done:** the guard passes `tests/test_guard.sh` (pytest, 7 checks) and the same checks on a real company's Node.js backend (private copy in the lab container; 384 `node:test` tests). Found and fixed on the real repo: branch names other than `main`, secrets (refused, exit 8), build artifacts (left out of commits).
-- Next: M1 on a jest repository; M2 area claims; M3 `hive run`; M4 owner session; M5 the first real feature (proposed: the Creators commercial module).
+- **M2 done:** area claims (`hive claim`, `hive areas`), `tests/test_claims.sh`.
+- Next: M3 `hive run`; M4 owner session; M5 the first real feature (proposed: the Creators commercial module).
 
 ## Needs the user
 
