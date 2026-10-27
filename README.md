@@ -26,6 +26,8 @@ Research on swarms of AI coding agents that coordinate only through a shared rep
 | Intent is binding: on invented rules, hidden pass was 58% / 87% / 98% with 0 / 30 / unlimited questions to a product owner; all 40 visible examples passed in every swarm | Gate 3 | 3 swarms of 3 |
 | Intent enters only where someone asks: edge cases right 96% on functions someone asked about, 76% on the rest (observational); unlimited access still missed the rules no question touched | Gate 3 | 3 swarms of 3 |
 | 30 questions add about 29 points of hidden correctness on a second rule set (48% → 77%); a planner choosing the 30 questions by coverage did no better (76.4% vs 76.8%); the registered prediction failed | Gate 4 | 3 teams of 3, plus a planner |
+| On an independent rule-giver's rules, 30 questions added +32 points (35% → 67%); asking about defaults first did no better (62.2%); the registered prediction failed | Gate 5 | 3 teams of 3 |
+| Per function: 0 questions gain nothing, the first question adds about +20 points of edge accuracy, three or more about +34 (observational) | Gates 3 to 5 | 100 team-function pairs |
 
 ## Layout
 
@@ -42,6 +44,7 @@ Research on swarms of AI coding agents that coordinate only through a shared rep
 | `gate2/` | 113-category project: seed bundle, worker prompt, predictions registered before launch, `RESULTS.md` scoring them, all three swarm histories, per-commit hidden scores, `tokens.csv` |
 | `gate3/` | Protocol v2 (`tools/claim.py`, `tools/land.py`), the scale runs at 8 and 12 workers, and the intent test (private rules in `referee/oracle.py`, every question asked, call-by-call scores); see `gate3/README.md` and `RESULTS.md` |
 | `gate4/` | Planned vs free questions on fresh invented rules: oracle, planner prompt and plan, every question asked, histories, scores; see `gate4/RESULTS.md` |
+| `gate5/` | Defaults-first vs free questions on rules from an independent rule-giver agent; see `gate5/RESULTS.md` |
 | `BRAIN.md` | Shared memory: laws with status, constants, evidence, scorecard, next steps |
 | `docs/` | Hive v1 and Hive v2 write-ups |
 
@@ -69,3 +72,7 @@ Category claims and a landing guard kept main clean at 8 and 12 workers, and the
 ## Gate 4 in one line
 
 On a fresh set of invented rules, 30 questions again added about 29 points (48% to 77%). A planner choosing the 30 questions by coverage, and turning each answer into a test, did no better than free asking (76.4% vs 76.8%), so the registered prediction failed. Both teams missed the same rules: NULL handling and caps on extreme values. See `gate4/RESULTS.md`.
+
+## Gate 5 in one line
+
+An independent agent wrote the rules. A team told to ask about its defaults first (NULL, extremes, invalid input) did no better than free asking (62.2% vs 67.0%), so that prediction failed too. 30 questions added +32 points, the third replication. Pooled over three rule sets, a function's first question is worth about +20 points of edge-case accuracy, and a function nobody asks about gains nothing. See `gate5/RESULTS.md`.
