@@ -4,7 +4,7 @@
 
 **Setup.**
 - **Codebase.** A real company's Node.js backend (Company X; private). A clean, shallow copy with no git history, no documentation folder and no remote, verified free of secrets before copying, run inside the lab container. The company's repository is never pushed to.
-- **Feature.** The settlement core of an unbuilt module from the company's own roadmap: validating compensation terms (5 models) and computing who pays and receives what (platform fee, creator payout, bonus caps, barter), as a pure library with a fixed public interface. The goal text quotes the company's product spec; its open questions are left for the founder.
+- **Feature.** The settlement core of an unbuilt module from the company's own roadmap: validating compensation terms (5 models) and computing who pays and receives what (platform fee, creator payout, bonus caps, in-kind compensation), as a pure library with a fixed public interface. The goal text quotes the company's product spec; its open questions are left for the founder.
 - **Hidden acceptance tests.** 23 tests, owner-approved, never shown to the swarm: 3 worked fixtures from the spec, 8 rules the spec states, and 8 open choices the founder settled before the run. Checked to be consistent against a private reference implementation (23/23).
 - **Swarm.** `hive run` with 4 workers, the content-keyed guard, area claims, and the owner session: the founder answers questions live (budget 17), plus the founder's own examples if provided (recorded either way).
 - **Existing suite.** 384 tests of the company's backend, which must keep passing.
