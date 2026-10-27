@@ -2,18 +2,11 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 27 2026, after Gate 18)
+## Where we left off (Oct 27 2026, after Gate 10)
 
-- Gates 0 to 8 and 11 to 18 are done and written up (G9 and G10 are still cards). Gates 7 and 18 used a real company's rules, which stay private (never commit them; Gate 18 published aggregates only).
-- Gate 18 (`gate18/RESULTS.md`): on the real rules, owner-confirmed examples 64.8%, 19 questions 56.4%, both 78.0% (N0 26.0%; Gate 7's best 49.6%). The examples were agent-drafted and did not beat questions (0.93x). Conjecture: the owner must choose the points.
-- G20 is waiting for the founder's examples (template in the session scratchpad). Meanwhile G10 (scale) is registered.
-
-## Ready
-
-### G10: largest-first claiming at 12 workers
-- **Run:** `sh gate10/run.sh` (in the lab container, after predictions are pushed). F12 (Gate 3's prompt) and L12 (largest family first) run at the same time.
-- "Largest" is by family (`json_*`, `window_*`): every category has 10 tests, so test count ranks nothing.
-- About $20 to $25; 15 to 20 minutes.
+- Gates 0 to 8, 10 and 11 to 18 are done and written up (G9 is still a card). Gates 7 and 18 used a real company's rules, which stay private (never commit them).
+- Gate 10 (`gate10/RESULTS.md`): largest-first claiming did not help (4.3 vs 3.5 min; kill fired). Both swarms were 2.5x faster than Gate 3 on 24 cores: on small machines the guard's CPU cost sets the finish. gen2.py now runs on Python 3.11; generate Gate 2's hidden suite with SQLite 3.49 (the container's 3.40 disagrees with 95 stored answers).
+- G20 still waits for the founder's examples (template in the session scratchpad).
 
 ## Needs the user
 
@@ -39,6 +32,8 @@ Workers run shell commands, so run them in a container. Image: `node:22-bookworm
 - Every gate is one run per team. The cheapest strengthening is a repeat of Gate 11 on a new rule-giver.
 
 ## Rules learned from Gates 8 and 11
+- Check the referee's SQLite version against stored visible answers before generating a hidden suite (Gate 10).
+- Workers often skip `export HIVE_LOG`; count claims and landings from git history instead (Gate 10).
 - A law fitted on two gates can fail on the third: keep one-parameter fits labelled as models until a registered prediction from them holds.
 - Matched pairs let one run measure a question's marginal value within the same functions; prefer them to level-by-level randomization.
 - On a 429 usage limit, refresh the container's credentials from the host and rerun from scratch.

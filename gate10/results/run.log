@@ -1,0 +1,58 @@
+F12: 12 workers, tools/ask.py port None, repo /home/node/hive/runs/g10/upF12.git
+next: python3 lab/launch.py --run g10
+L12: 12 workers, tools/ask.py port None, repo /home/node/hive/runs/g10/upL12.git
+next: python3 lab/launch.py --run g10
+launched F12-w1
+launched F12-w10
+launched F12-w11
+launched F12-w12
+launched F12-w2
+launched F12-w3
+launched F12-w4
+launched F12-w5
+launched F12-w6
+launched F12-w7
+launched F12-w8
+launched F12-w9
+launched L12-w1
+launched L12-w10
+launched L12-w11
+launched L12-w12
+launched L12-w2
+launched L12-w3
+launched L12-w4
+launched L12-w5
+launched L12-w6
+launched L12-w7
+launched L12-w8
+launched L12-w9
+F12-w6 finished: exit 0, 4.2 min, tokens 1753002, cost 1.0812229999999998
+F12-w12 finished: exit 0, 4.2 min, tokens 1687397, cost 0.9830202000000002
+F12-w5 finished: exit 0, 4.7 min, tokens 253631, cost 1.4232470000000002
+F12-w10 finished: exit 0, 5.2 min, tokens 785877, cost 0.7458526
+F12-w3 finished: exit 0, 5.3 min, tokens 2024820, cost 1.131049
+F12-w7 finished: exit 0, 5.3 min, tokens 1364536, cost 0.9106110000000001
+L12-w8 finished: exit 0, 5.5 min, tokens 124017, cost 1.0768041999999998
+L12-w5 finished: exit 0, 5.5 min, tokens 222052, cost 1.0911339999999998
+L12-w12 finished: exit 0, 5.6 min, tokens 2184071, cost 1.3014914
+L12-w4 finished: exit 0, 5.6 min, tokens 1570101, cost 0.9221886000000001
+F12-w9 finished: exit 0, 5.7 min, tokens 148757, cost 1.3562151999999998
+L12-w2 finished: exit 0, 5.8 min, tokens 2941506, cost 1.4598483999999998
+F12-w1 finished: exit 0, 5.8 min, tokens 2278663, cost 1.2776476
+F12-w2 finished: exit 0, 6.0 min, tokens 147538, cost 1.3497528
+L12-w11 finished: exit 0, 6.0 min, tokens 153468, cost 1.3893712
+L12-w9 finished: exit 0, 6.1 min, tokens 192877, cost 1.744635
+L12-w10 finished: exit 0, 6.1 min, tokens 163043, cost 1.5949232
+L12-w3 finished: exit 0, 6.4 min, tokens 137835, cost 1.3398324000000006
+F12-w4 finished: exit 0, 6.5 min, tokens 131378, cost 1.2029172000000001
+L12-w6 finished: exit 0, 7.0 min, tokens 2517956, cost 1.2361175999999998
+F12-w8 finished: exit 0, 7.4 min, tokens 1686888, cost 1.0488082
+F12-w11 finished: exit 0, 7.5 min, tokens 1770915, cost 1.0125453999999998
+L12-w7 finished: exit 0, 7.7 min, tokens 2133198, cost 1.2043510000000002
+L12-w1 finished: exit 0, 7.9 min, tokens 2356812, cost 1.2075049999999998
+wrote /home/node/hive/runs/g10/agents.csv
+  File "/home/node/hive/gate2/referee/gen2.py", line 88
+    C['like_escape'] = q_t(lambda r: f"s LIKE '{r.choice(['a%', '%E%', '_i%', '%\\_%'])}' ESCAPE '\\', LIKE('{r.choice(['%a%', 'b%'])}', s)")
+                                                                                                                                            ^
+SyntaxError: f-string expression part cannot include a backslash
+EXIT=1

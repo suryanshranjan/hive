@@ -2,7 +2,7 @@
 
 Read this first. It is the shared memory for anyone working on Hive, human or agent: what we know, how sure we are, what is being tested, and exactly how to continue. When you learn something, update this file in the same commit as the evidence.
 
-Last updated: Oct 27 2026, after Gate 18.
+Last updated: Oct 27 2026, after Gates 18 and 10.
 
 ## 1. The question
 
@@ -15,7 +15,7 @@ On projects up to 1,340 tests and 12 agents: yes. Silent swarms finished every p
 Two things limit them today:
 
 - **Cost is mostly onboarding.** Each worker spends about 110k tokens getting started, against about 3k to 5k per task after that.
-- **Speed stops improving at around 6 to 12 workers.** The biggest task, and how late it gets claimed, sets the finish time.
+- **Speed stops improving at around 6 to 12 workers.** On a 2-CPU machine the guard's full-suite runs per landing queue for the processor; on 24 cores the same 12-worker project finished in 3.5 minutes instead of 8.7 (Gate 10). Claiming the largest work first did not help (Gate 10).
 
 The deeper limit is intent, and Gates 3 to 17 have now mapped it. On rules a model cannot guess, swarms pass every visible example but only 35 to 58% of hidden tests when nobody tells them the rules.
 
@@ -56,7 +56,7 @@ Status tags: **established** means outside theory or our data on real agents; **
 | Two owners, same rules | listing owner (tour + 17 questions) 98.2% vs documented owner (handbook + extracted tour + 17 questions) 93.8%: +4.4 (CI −2.4 to +11.4); gap entirely at omitted decisions (1.00 vs 0.86) | **Randomized**, one run, fair copy rule (Gate 17) |
 | Real company's rules | owner-confirmed (agent-drafted) examples +38.8 points; 19 questions +30.4; both +52.0 (78.0%); examples / questions edge errors fixed 0.93; examples broke 26 calls, questions 60 | **Randomized**, one run, 10 real functions (Gate 18); aggregates only |
 | Onboarding | tokens ≈ c_on·N + c_task·T | **Model**, held out three times (Gates 1, 2, 3) |
-| Tail | finish ≥ max(work/N, longest task + when it starts) | Established (scheduling theory); seen binding in Gate 3 |
+| Tail | finish ≥ max(work/N, longest task + when it starts) | Established (scheduling theory); seen binding in Gate 3, not in Gate 10 (big families were claimed in the first half-minute under either rule) |
 | Coverage cliff | N* ∝ (1−c)^−0.61 · τ^−1.04 · κ^−0.55 | Model, simulation only (1.4× typical error held out) |
 
 ## 4. Measured constants
@@ -98,6 +98,7 @@ Status tags: **established** means outside theory or our data on real agents; **
 | Gate 4 | Oct 27 | Fresh rules; 0 questions, 30 free questions, 30 questions chosen by a coverage planner whose answers became tests | 47.8% / 76.8% / 76.4%: planning did not help (−0.4 pts, CI −12 to +11); kill condition fired; the +29-point gain from 30 questions replicated |
 | Gate 7 | Oct 27 | A real company's 10 rules (Company X, name withheld), checked against its internal documents; no questions vs 15 questions answered from the documented policy | 32.8% → 49.6% hidden (+16.8, CI +6 to +31); the same team gained +21 from its answers; the biggest losses came from never being told the allowed input values; rules kept private |
 | Gate 6 | Oct 27 | Second independent rule-giver; 0 questions, 30 free, and 0 / 1 / 3 questions per function assigned at random | Questions cause the gain (3 vs 0: +36 pts, CI +20 to +51); one question adds little (+12 vs +8); 'first question worth most' failed; concentration beats spreading (model); +25-point gain from 30 questions replicated a fourth time |
+| Gate 10 | Oct 27 | Largest-first claiming vs Gate 3's claiming, 12 workers each, same 24-core machine | F12 3.5 min, L12 4.3 min (tail 0.1 vs 0.7); kill fired; both 2.5× faster than Gate 3 on 2 CPUs; hidden suite regenerated on SQLite 3.49.1 (2,220 tests) |
 | Gate 18 | Oct 27 | Real company's rules (private); N0 vs owner-confirmed examples vs 19 questions vs both | 26.0 / 64.8 / 56.4 / 78.0%; R1, R3, R5 held; R2 failed (examples fixed 0.93× what questions did); aggregates only |
 | Gate 17 | Oct 27 | Same rules, fair copy rule: N0 vs extracted tour vs documented owner (HXQ) vs listing owner (TQ) | 46.4 / 87.8 / 93.8 / 98.2%; F1, F3–F6 held; F2 failed (gap +4.4, between decision thresholds); gap entirely at omitted decisions |
 | Gate 16 | Oct 27 | Handbook + extracted tour + questions, stacked | 41.4 / 60.8 / 71.0 / 83.2%; each layer added; S1 (90%), S4, S5 failed; copy rule found to penalize the extractor (17 of 50 picks dropped); a document's silence misled builders |
@@ -114,7 +115,7 @@ Status tags: **established** means outside theory or our data on real agents; **
 All predictions are written down before the run, in each gate's `PREDICTIONS.md`.
 
 - **Held:** intent is binding, and correctness rises with questions, all 5 intent predictions (Gate 3); no-questions baseline in range (Gate 4); gain from 30 questions in +15 to +43, treatment delivered, rules not guessable (Gate 5); questions cause the gain, fourth replication (Gate 6); questions cause the gain again, fifth replication, curve rises, rules not guessable, treatment delivered (Gate 8, R1, R2, R4, R5); spread beats blocks of 3 head to head, treatment delivered, rules not guessable (Gate 11, P1, P5, P6); fewer hidden decisions, more from the first question, curve rises (Gate 12, D1, D3, D5, D6); owner-chosen points beat builder-chosen points 2.7×, tour plus questions ≥ 0.80, tour reaches what questions miss (Gate 13, all of M1–M5); the tour replicates on a new rule set (Gate 14, C1); a handbook-derived tour keeps half the gain or more, beats handing over the handbook, and omitted decisions are its floor (Gate 15, X1–X4, X6); handbook and questions each add on top of an extracted tour (Gate 16, S2, S3); fairly scored extracted tour ≥ +30, documented stack ≥ 85%, listing stack ≥ 92% (Gate 17, F1, F3–F5); examples carry a real company's intent, and with questions reach 75% (Gate 18, R1, R3, R5); onboarding law (Gates 2, 3); no gaming (Gates 1, 2, 3); guard keeps regressions off the tip of main (Gate 3; the blocked commit still sits in history next to its fix, so `--continue` should squash); no overlapping claims (Gate 3).
-- **Failed:** owner-confirmed (agent-drafted) examples beat builder questions 1.3× on real rules (Gate 18: 0.93); the listing owner beats the documented owner by ≥ 5 points (Gate 17: +4.4, CI −2.4 to +11.4); the full documented stack reaches 90%, closes the omitted-decision floor, and the extracted tour replicates at ≥ +25 (Gate 16: 83.2%, 0.79, +19.4); the extracted tour keeps ≥ 40 of 50 inputs after the copy filter (Gate 15: 36; 14 were exact hidden inputs); contrasts halve tour breakage, and do not cost correctness (Gate 14: 19 vs 13 broken; −4.8 points); saturation point tracks decisions (Gate 12: ρ = 0.18); 4 questions per function reach 0.80 of errors (Gate 12: 0.76); Gate 8's one-parameter law on a new rule set (Gate 11: p = 0.35, outside 0.40–0.70); 3-question functions fix ≥ 0.75 (Gate 11: 0.63); the first question fixes ≥ 0.35 (Gate 11: 0.25); the first question is worth less than half of three (Gate 8: 0.54; its kill fired and "blocks of 3" was withdrawn); a surprise-count law found post hoc in Gate 8 (worse than question count on held-out Gate 6); the first question per function is worth the most (Gate 6: gain(1)/gain(3) = 0.27, later traced to a headroom imbalance); defaults-first questions beat free questions (Gate 5: 62.2% vs 67.0%); coverage-planned questions beat free questions, and reach 95% (Gate 4: 76.4% vs 76.8%); free 30 questions in 78–92% (Gate 4: 76.8%); free askers leave 3+ functions unasked (Gate 4: 2); foundation-first is cheaper (Gate 1); speed of 3 to 4× at 12 workers (Gate 2: 2.3×); collisions growing as κ(N−1) (Gate 2: slower); finer claims lowering the time floor (Gate 3: 8.7 min against 7.8).
+- **Failed:** largest-first claiming cuts the finish and the tail at 12 workers (Gate 10: 4.3 vs 3.5 min); owner-confirmed (agent-drafted) examples beat builder questions 1.3× on real rules (Gate 18: 0.93); the listing owner beats the documented owner by ≥ 5 points (Gate 17: +4.4, CI −2.4 to +11.4); the full documented stack reaches 90%, closes the omitted-decision floor, and the extracted tour replicates at ≥ +25 (Gate 16: 83.2%, 0.79, +19.4); the extracted tour keeps ≥ 40 of 50 inputs after the copy filter (Gate 15: 36; 14 were exact hidden inputs); contrasts halve tour breakage, and do not cost correctness (Gate 14: 19 vs 13 broken; −4.8 points); saturation point tracks decisions (Gate 12: ρ = 0.18); 4 questions per function reach 0.80 of errors (Gate 12: 0.76); Gate 8's one-parameter law on a new rule set (Gate 11: p = 0.35, outside 0.40–0.70); 3-question functions fix ≥ 0.75 (Gate 11: 0.63); the first question fixes ≥ 0.35 (Gate 11: 0.25); the first question is worth less than half of three (Gate 8: 0.54; its kill fired and "blocks of 3" was withdrawn); a surprise-count law found post hoc in Gate 8 (worse than question count on held-out Gate 6); the first question per function is worth the most (Gate 6: gain(1)/gain(3) = 0.27, later traced to a headroom imbalance); defaults-first questions beat free questions (Gate 5: 62.2% vs 67.0%); coverage-planned questions beat free questions, and reach 95% (Gate 4: 76.4% vs 76.8%); free 30 questions in 78–92% (Gate 4: 76.8%); free askers leave 3+ functions unasked (Gate 4: 2); foundation-first is cheaper (Gate 1); speed of 3 to 4× at 12 workers (Gate 2: 2.3×); collisions growing as κ(N−1) (Gate 2: slower); finer claims lowering the time floor (Gate 3: 8.7 min against 7.8).
 - **Untested:** a human owner's tour or handbook; handbook plus extracted tour plus questions stacked; a person answering live (Gate 7's answers came from documented policy); 24 workers; breakers at scale; gain beyond 3 questions; whether questions-to-saturation tracks the number of hidden decisions per function; a repeat of Gate 11.
 - **Dropped before running:** 'one question per function before any gets a third'. Our own table predicted 0–1 points of effect against ±10 of noise, and Gate 6's curve later showed it would have been the worst allocation. (Later corrected: Gate 8 traced that curve to a headroom imbalance, and Gate 11 found spreading beats blocks of 3, 1.25×.)
 - **Flawed check, disclosed:** one cheating-signature rule (CHECKSUM +97) could be read off a visible example.
@@ -127,7 +128,6 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 - Two suites: visible tests guide the workers, hidden tests judge. Hidden suites are never committed.
 - No founder phase: the swarm shapes its own extension points within minutes.
 - **Next changes:**
-  - Claim the largest unclaimed category first, which cuts the tail.
   - Modules register themselves, which removes most conflicts.
   - `land.py --continue` squashes the fix into the blocked commit, so every commit on main passes.
 - **Intent interface** (Gates 3, 4):
@@ -146,7 +146,7 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 
 1. **The intent curve.** How does hidden correctness grow with the number of answered values: 0, 10, 30, 100, 300 questions, repeated? This would turn limit 7 from evidence into a measured law.
 2. **Real owners.** Every owner so far was an agent that wrote its own rules. Does the documented-owner interface hold with a real company's documents and a person answering? Does a cheap elicitation step ("here are the decisions we found; which are missing?") recover the unwritten ones (Gate 17's remaining gap)?
-3. **The tail.** Does largest-first claiming bring 12 workers under 7 minutes?
+3. **The guard's cost.** Gate 10 suggests the finish on small machines is set by the guard running the full suite twice per landing. Does a guard that runs only affected categories keep regressions off main at a fraction of the CPU?
 4. **The largest swarm this lab allows**: 20 workers with largest-first claiming.
 5. **Turning intent into tests automatically**: the referee as the product.
 6. **Breakers at scale**: do they shorten the 31-hour unseen-bug lifetime?
@@ -157,7 +157,7 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 2. **The documented-owner interface on real documents** (needs the company's policy pages).
 2. **Repeat Gate 11 on a new rule-giver** (about $8.4).
 3. **Intent curve** (about 1.7M tokens per repeat). Fresh rules; teams of 3 with 0, 10, 30, 100 and 300 questions; then repeat. Fit hidden error against answered values, and register the form of the fit before the repeat.
-4. **Largest-first at 12 and 20 workers** (about 4M tokens). Same project as Gate 3 step 2. Registered prediction to write first: 12 workers under 7.0 minutes.
+4. **Cheaper guard** (about $25): Gate 3's scale project with the guard limited to affected categories plus a sampled rest, against the full guard, on a CPU-limited container (2 CPUs). Prediction: finish ≤ 0.7× with no regression reaching main.
 5. **Self-registering modules** at 12 workers: conflicts per landing below 0.2.
 
 ## Related systems
@@ -205,6 +205,7 @@ Rules of the lab:
 - T3 Code compared in Related systems.
 - Lab: `lab/` runs a whole gate in one command with real headless Claude Code workers, so any session (including from a phone) can continue from `lab/QUEUE.md`. Gate 8 predictions registered.
 - Gate 7: a real company's rules (Company X, name withheld), with its internal documents as the final authority. 15 answered questions lifted hidden correctness from 32.8% to 49.6%. Rules and answers are kept out of this public repo.
+- Gate 10: largest-first claiming did not beat Gate 3's claiming (4.3 vs 3.5 minutes; kill fired). Both swarms finished 2.5× faster than Gate 3 on 24 cores: the guard's CPU cost on small machines, not claim order, set Gate 3's finish. gen2.py made Python 3.11-compatible (identical output); referee SQLite version mismatch found and disclosed.
 - Gate 18: a real company's rules (Gate 7, private; aggregates only). Owner-confirmed examples 64.8%, 19 questions 56.4%, both 78.0% (N0 26.0%). Examples did not beat questions (0.93×) when they were agent-drafted; conjecture: the owner must choose the points.
 - Gate 17: documented owner (handbook + extracted tour + questions) 93.8% vs listing owner (tour + questions) 98.2% on the same rules, with a fair copy rule (extractor picks equal to hidden inputs kept, those calls unscored). Gap +4.4, between the decision thresholds, entirely at omitted decisions. Current answer rewritten as the measured intent interface.
 - Gate 16: the stacked documented-owner interface: extracted tour 60.8%, + handbook 71.0%, + 17 questions 83.2% (N0 41.4%). Each layer added; the 90% target and floor closure failed. Found a lab flaw: the copy rule drops the extractor's best picks. Found that a document's silence can mislead ("follow the standard").

@@ -85,7 +85,8 @@ C['hex_unhex'] = q_t(lambda r: f"HEX({S(r)}), HEX({N(r)}), HEX(UNHEX('{r.choice(
 C['quote'] = q_t(lambda r: f'QUOTE({S(r)}), QUOTE({N(r)})')
 C['printf'] = q_t(lambda r: f"PRINTF('{r.choice(['%d', '%5d', '%-5d|', '%05d', '%x', '%o'])}', {I(r)}), PRINTF('{r.choice(['%s', '%10s', '%-8s|', '%.2s'])}', {S(r)}), PRINTF('{r.choice(['%f', '%.2f', '%8.3f', '%e', '%g'])}', {N(r)})")
 C['format'] = q_t(lambda r: f"FORMAT('{r.choice(['%d-%s', '[%5.1f]', '%s%%', '%c'])}', {N(r)}, {S(r)})")
-C['like_escape'] = q_t(lambda r: f"s LIKE '{r.choice(['a%', '%E%', '_i%', '%\\_%'])}' ESCAPE '\\', LIKE('{r.choice(['%a%', 'b%'])}', s)")
+LIKE_PATS = ['a%', '%E%', '_i%', '%\\_%']   # outside the f-string: Python < 3.12 forbids backslashes in f-string expressions
+C['like_escape'] = q_t(lambda r: f"s LIKE '{r.choice(LIKE_PATS)}' ESCAPE '\\', LIKE('{r.choice(['%a%', 'b%'])}', s)")
 C['glob'] = q_t(lambda r: f"s GLOB '{r.choice(['a*', '*e', '[A-C]*', '?i*', '*[lp]*'])}', GLOB('{r.choice(['*a*', 'B*'])}', s)")
 C['collate_nocase'] = mix(lambda r: ([], f"SELECT id FROM t WHERE s = '{r.choice(['apple', 'APPLE', 'banana'])}' COLLATE NOCASE ORDER BY id", True),
                           lambda r: ([], 'SELECT s, id FROM t ORDER BY s COLLATE NOCASE, id', True),
@@ -123,7 +124,8 @@ C['strftime'] = q_d(lambda r: f"STRFTIME('{r.choice(['%Y', '%m/%d/%Y', '%H:%M', 
 C['timediff'] = q_d(lambda r: f"TIMEDIFF(ts, '{r.choice(DATES)}')")
 C['date_compare'] = lambda r: ([], f"SELECT id FROM d WHERE ts {r.choice(['<', '>=', '>'])} '{r.choice(DATES)}' ORDER BY id", True)
 # ---- json (table j)
-C['json_valid'] = q_j(lambda r: f"JSON_VALID(doc), JSON_VALID('{r.choice(['{', '[1,]', '{\"a\":1}', 'nul', '12'])}')")
+JSON_VALID_DOCS = ['{', '[1,]', '{"a":1}', 'nul', '12']
+C['json_valid'] = q_j(lambda r: f"JSON_VALID(doc), JSON_VALID('{r.choice(JSON_VALID_DOCS)}')")
 C['json_minify'] = q_j(lambda r: 'JSON(doc), JSON_QUOTE(doc)')
 C['json_build'] = mix(q_t(lambda r: f"JSON_ARRAY(id, {N(r)}, {S(r)}), JSON_OBJECT('k', {N(r)}, 's', {S(r)})"),
                       q_lit(lambda r: f"JSON_ARRAY({r.randint(1, 5)}, 'x', NULL, JSON('[1,2]'))"))
@@ -133,10 +135,12 @@ C['json_type'] = q_j(lambda r: f"JSON_TYPE(doc), JSON_TYPE(doc, '{r.choice(PATHS
 C['json_array_length'] = q_j(lambda r: f"JSON_ARRAY_LENGTH(doc), JSON_ARRAY_LENGTH(doc, '{r.choice(PATHS)}')")
 C['json_modify'] = q_j(lambda r: f"{r.choice(['JSON_INSERT', 'JSON_REPLACE', 'JSON_SET'])}(doc, '{r.choice(PATHS[1:])}', {r.choice(['99', chr(39)+'z'+chr(39), 'NULL', 'JSON(' + chr(39) + '[7]' + chr(39) + ')'])})")
 C['json_remove'] = q_j(lambda r: f"JSON_REMOVE(doc, '{r.choice(PATHS[1:])}')")
-C['json_patch'] = q_j(lambda r: f"JSON_PATCH(doc, '{r.choice(['{\"a\":null}', '{\"z\":1}', '{\"c\":{\"e\":2}}', '[9]'])}')")
+JSON_PATCHES = ['{"a":null}', '{"z":1}', '{"c":{"e":2}}', '[9]']
+C['json_patch'] = q_j(lambda r: f"JSON_PATCH(doc, '{r.choice(JSON_PATCHES)}')")
 C['json_group'] = mix(lambda r: ([], 'SELECT JSON_GROUP_ARRAY(s) FROM t', True), lambda r: ([], 'SELECT JSON_GROUP_OBJECT(id, a) FROM t', True),
                       lambda r: ([], 'SELECT b, JSON_GROUP_ARRAY(id) FROM t GROUP BY b', False))
-C['json_error_position'] = q_lit(lambda r: f"JSON_ERROR_POSITION('{r.choice(['{', '[1,]', '{\"a\":1}', 'nul', '[1,2'])}')")
+JSON_BAD_DOCS = ['{', '[1,]', '{"a":1}', 'nul', '[1,2']
+C['json_error_position'] = q_lit(lambda r: f"JSON_ERROR_POSITION('{r.choice(JSON_BAD_DOCS)}')")
 # ---- windows
 C['window_row_number'] = lambda r: ([], win(r, 'ROW_NUMBER()'), True)
 C['window_rank'] = lambda r: ([], win(r, r.choice(['RANK()', 'DENSE_RANK()'])), True)
