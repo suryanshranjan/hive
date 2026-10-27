@@ -1,0 +1,61 @@
+{
+ "name": "g13",
+ "arms": {
+  "N0": {
+   "hidden_pass": 0.578,
+   "ci95_by_function": [
+    0.456,
+    0.696
+   ],
+   "tests": 500
+  },
+  "T": {
+   "hidden_pass": 0.894,
+   "ci95_by_function": [
+    0.804,
+    0.964
+   ],
+   "tests": 500
+  },
+  "Q": {
+   "hidden_pass": 0.672,
+   "ci95_by_function": [
+    0.576,
+    0.772
+   ],
+   "tests": 500
+  },
+  "TQ": {
+   "hidden_pass": 0.952,
+   "ci95_by_function": [
+    0.894,
+    1.0
+   ],
+   "tests": 500
+  }
+ },
+ "diffs": {
+  "T-N0": {
+   "points": 31.6,
+   "ci95": [
+    15.6,
+    45.8
+   ]
+  },
+  "Q-N0": {
+   "points": 9.4,
+   "ci95": [
+    -0.6,
+    20.2
+   ]
+  },
+  "TQ-N0": {
+   "points": 37.4,
+   "ci95": [
+    22.8,
+    51.4
+   ]
+  }
+ },
+ "allowance": {}
+}

@@ -1,0 +1,30 @@
+functions with N0 edge errors >= 5: 19 of 20; decisions among them: 1:4, 2:5, 3:5, 4:5
+D1 share at 1 question, d<=2 minus d>=3: +0.296  (9 vs 10 functions)
+D2 Spearman rho(d, q*): +0.176  (19 functions)
+D3/D4 pooled share fixed: Q1 0.571, Q2 0.669, Q4 0.762
+mean share by decisions (q = 1 / 2 / 4):
+  d=1: +0.69 / +0.86 / +1.00  (4 functions)
+  d=2: +0.68 / +0.75 / +0.79  (5 functions)
+  d=3: +0.46 / +0.55 / +0.66  (5 functions)
+  d=4: +0.32 / +0.40 / +0.64  (5 functions)
+per function: d, N0 errors, share at 1 / 2 / 4, q*
+  grade_letter             d=1  E= 13  +0.31 / +1.00 / +1.00  q*=2
+  initials                 d=1  E= 28  +1.00 / +1.00 / +1.00  q*=1
+  invoice_no               d=1  E= 22  +1.00 / +1.00 / +1.00  q*=1
+  percent_change           d=1  E=  0    n/a /   n/a /   n/a  q*=-
+  tier_discount            d=1  E= 22  +0.45 / +0.45 / +1.00  q*=4
+  fiscal_quarter           d=2  E= 12  +0.42 / +0.42 / +0.42  q*=1
+  mask_card                d=2  E= 18  +0.61 / +1.00 / +1.00  q*=2
+  minutes_to_hhmm          d=2  E= 30  +0.83 / +0.83 / +1.00  q*=1
+  phone_digits             d=2  E= 27  +0.52 / +0.52 / +0.52  q*=1
+  split_bill               d=2  E= 27  +1.00 / +1.00 / +1.00  q*=1
+  age_band                 d=3  E= 14  +0.43 / +0.43 / +0.43  q*=1
+  business_days_add        d=3  E= 35  +0.66 / +0.66 / +0.66  q*=1
+  net_price                d=3  E= 30  +0.53 / +1.00 / +0.53  q*=2
+  slugify_title            d=3  E= 30  +0.67 / +0.67 / +0.67  q*=1
+  star_rating              d=3  E=  5  +0.00 / +0.00 / +1.00  q*=4
+  avg_rating               d=4  E= 15  +0.33 / +0.40 / +0.40  q*=1
+  late_fee                 d=4  E= 33  +0.15 / +0.30 / +1.00  q*=4
+  loyalty_points           d=4  E= 27  +0.85 / +0.85 / +0.85  q*=1
+  shipping_cost            d=4  E= 33  +0.24 / +0.45 / +0.45  q*=2
+  sku_check                d=4  E= 20  +0.00 / +0.00 / +0.50  q*=4
