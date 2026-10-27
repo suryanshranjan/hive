@@ -37,3 +37,8 @@ Kill: **R-after beats R-before by < 10 points on head-only cases.** If so, writi
 **Limits known in advance.**
 - Arm R gets a second build phase and arm Q does not. Extra build time alone could change results, but it cannot supply rules no one stated. P5 records which misses the list covered, so a gain can be traced to specific corrections.
 - One founder, one feature, one run per arm.
+
+## Amendment, registered before the run (Oct 28 2026)
+
+- **Cases.** The founder gave his verdicts on all 17 proposed edits: **15 need both sides to accept again and 2 do not.** Before the run, 2 cases are labelled documented and 15 head-only. A private reference passes all 17. The cases are kept out of the container until scoring.
+- **Ceiling rule.** The founder's rule turned out close to "every real change counts". A careful builder's default may already match it, which would leave a review nothing to recover (as in Gate 27, where 6 of 10 head-only cases matched the default). So: **if R-before already passes ≥ 80% of head-only cases (12 or more of 15), P1, P2 and the kill are scored "no room" rather than held or failed,** and the gate is reported as uninformative on them. P3 to P7 are scored as written.
