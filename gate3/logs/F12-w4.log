@@ -1,0 +1,10 @@
+1793082526 CLAIM setops intersect,union,union_all
+1793082543 CLAIM setops2 compound_order_limit,except
+1793082626 LAND setops 610
+1793082634 CLAIM ddl alter_rename_table,alter_table,drop_table
+1793082698 CONFLICT ddl minisql/engine.py minisql/parser.py
+1793082712 LAND ddl 870
+1793082721 CLAIM stmts create_index_noop,create_table_as,transactions
+1793082779 CONFLICT stmts minisql/engine.py minisql/parser.py
+1793082798 CONFLICT stmts minisql/parser.py
+1793082815 LAND stmts 1190
