@@ -216,6 +216,72 @@ def build_tour(o, names, run, contrast=False):
     say(f'decision tour built ({"with" if contrast else "without"} contrasts): {sum(len(v) for _, ex in sets for v in ex.values())} examples in {n} visible tests')
     return out
 
+def worker_cmd():
+    return os.environ.get('HIVE_WORKER_CMD', 'claude -p --output-format json --permission-mode acceptEdits --allowedTools Bash Read Edit Write Glob Grep').split()
+
+def build_handbook(o, run):
+    """runs/<name>/seed_hb: the starting repo plus the owner's prose handbook (HANDBOOK.md), linked from README."""
+    out = os.path.join(run, 'seed_hb'); shutil.rmtree(out, ignore_errors=True)
+    sh('git', 'clone', '-q', os.path.join(run, 'seed'), out)
+    open(os.path.join(out, 'HANDBOOK.md'), 'w').write(o.HANDBOOK.strip() + '\n')
+    rp = os.path.join(out, 'README.md')
+    open(rp, 'a').write("\n## Company policy handbook\n\nThe product team's policy handbook for these functions is in `HANDBOOK.md`.\n")
+    sh('git', 'add', '-A', cwd=out)
+    sh('git', '-c', 'user.name=hive', '-c', 'user.email=hive@local', 'commit', '-q', '-m', "Company policy handbook (HANDBOOK.md)", cwd=out)
+    say('handbook seed built'); return out
+
+def build_xtour(cfg, o, names, run, name):
+    """An extractor agent sees only the handbook and the one-line spec, and picks inputs (one per decision it finds or
+    suspects, at most 50). The owner (oracle) answers them; the answers become a tour in runs/<name>/seed_xtour.
+    Inputs equal to a TYPICAL or EDGE input are dropped (logged), so no hidden test is copied."""
+    d = os.path.join(ROOT, 'private', name, 'extractor'); shutil.rmtree(d, ignore_errors=True); os.makedirs(d)
+    open(os.path.join(d, 'handbook.md'), 'w').write(o.HANDBOOK.strip() + '\n')
+    open(os.path.join(d, 'spec.md'), 'w').write('\n'.join(
+        f'- `{o.SPEC[f].split(":", 1)[0].strip()}`: {o.SPEC[f].split(":", 1)[1].strip()}'
+        + (' (an aggregate over one column)' if f == o.AGGREGATE[0] else '') for f in names) + '\n')
+    brief = open(os.path.join(ROOT, cfg['extractor_brief'])).read().replace('{DIR}', d)
+    say('extractor reading the handbook (headless Claude Code)...')
+    with open(os.path.join(d, 'extractor.json'), 'w') as out:
+        subprocess.run(worker_cmd(), cwd=d, input=brief, stdout=out, stderr=subprocess.STDOUT, text=True)
+    path = os.path.join(d, 'tour_inputs.json')
+    if not os.path.exists(path): sys.exit(f'extractor wrote no tour_inputs.json; see {d}/extractor.json')
+    raw = json.load(open(path)); g = intent.Gen(o); picked, dropped = {}, []
+    total = 0
+    for f in names:
+        for args in raw.get(f, []):
+            if total >= 50: break
+            vals = list(args) if isinstance(args, list) else [args]
+            if f == g.AGG:
+                if vals in [list(v) for v in o.AGG_TYPICAL + o.AGG_EDGE]: dropped.append((f, vals)); continue
+            else:
+                if len(vals) != o.SCALARS[f][1] or any(v is not None and type(v) not in (int, float, str) for v in vals): dropped.append((f, vals)); continue
+                if tuple(vals) in {tuple(a) for a in o.TYPICAL[f] + o.EDGE[f]}: dropped.append((f, vals)); continue
+            picked.setdefault(f, []).append(vals if f == g.AGG else tuple(vals)); total += 1
+    json.dump(dict(picked={f: [list(a) for a in v] for f, v in picked.items()}, dropped=dropped), open(os.path.join(run, 'xtour_inputs.json'), 'w'), indent=1)
+    out = os.path.join(run, 'seed_xtour'); shutil.rmtree(out, ignore_errors=True)
+    sh('git', 'clone', '-q', os.path.join(run, 'seed'), out); vis = os.path.join(out, 'tests', 'visible'); n = 0
+    for f, ex in picked.items():
+        if f == g.AGG:
+            for k, vals in enumerate(ex):
+                setup = ['CREATE TABLE m (id INTEGER, v)'] + (['INSERT INTO m VALUES ' + ', '.join(f'({i}, {intent.L(v)})' for i, v in enumerate(vals, 1))] if vals else [])
+                q = f'SELECT {f.upper()}(v) FROM m'
+                try: exp = intent.oracle_rows(o, setup, q)
+                except Exception: continue
+                json.dump(dict(id=f'{f}_tour_{k}', category=f, setup=setup, query=q, expected=exp, ordered=True), open(os.path.join(vis, f'{f}_tour_{k}.json'), 'w')); n += 1
+            continue
+        ok = []
+        for a in ex:
+            try: intent.oracle_rows(o, [], 'SELECT ' + g.call(f, a)); ok.append(a)
+            except Exception: dropped.append((f, list(a)))
+        for k in range(0, len(ok), 3):
+            q = 'SELECT ' + ', '.join(g.call(f, a) for a in ok[k:k + 3])
+            json.dump(dict(id=f'{f}_tour_{k // 3}', category=f, setup=[], query=q, expected=intent.oracle_rows(o, [], q), ordered=True), open(os.path.join(vis, f'{f}_tour_{k // 3}.json'), 'w')); n += 1
+    sh('git', 'add', '-A', cwd=out)
+    sh('git', '-c', 'user.name=hive', '-c', 'user.email=hive@local', 'commit', '-q', '-m',
+       "Product owner's worked examples (tests/visible/*_tour_*.json), answered at inputs picked from the handbook", cwd=out)
+    say(f'extracted tour built: {total} inputs picked, {len(dropped)} dropped, {n} visible tests')
+    return out
+
 def run_arms(cfg, name, run, oracle_path, specs, max_parallel):
     """Product-owner servers, swarms and workers for the given arms only; waits until every worker exits.
     Arms listed in cfg['tour_arms'] start from runs/<name>/seed_tour instead of runs/<name>/seed."""
@@ -228,8 +294,8 @@ def run_arms(cfg, name, run, oracle_path, specs, max_parallel):
             args += ['--budget', p[4]] if p[2] == 'budget' else ['--allowance', os.path.join(run, f'allowance_{arm}.json')]
             servers.append(subprocess.Popen(args, cwd='/', stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)); wait_port(port)
     try:
-        kinds = tour_kinds(cfg); where = {'tour': 'seed_tour', 'contrast': 'seed_tourc'}
-        for seed_dir in ('seed', 'seed_tour', 'seed_tourc'):
+        kinds = tour_kinds(cfg); where = {'tour': 'seed_tour', 'contrast': 'seed_tourc', 'handbook': 'seed_hb', 'xtour': 'seed_xtour'}
+        for seed_dir in ('seed', 'seed_tour', 'seed_tourc', 'seed_hb', 'seed_xtour'):
             group = [s for s in specs if where.get(kinds.get(s.split(':')[0]), 'seed') == seed_dir]
             if not group: continue
             cmd = [sys.executable, os.path.join(ROOT, 'lab', 'make_swarm.py'), '--run', name, '--seed', os.path.join(run, seed_dir),
@@ -264,7 +330,10 @@ def main():
     sh(sys.executable, os.path.join(ROOT, 'lab', 'new_intent_gate.py'), '--name', name, '--oracle', oracle_path,
        '--visible-seed', str(cfg['visible_seed']), '--hidden-seed', str(cfg['hidden_seed']), cwd='/')
     say('starting repo and hidden suite built')
-    for kind in sorted(set(tour_kinds(cfg).values())): build_tour(o, names, run, contrast=(kind == 'contrast'))
+    for kind in sorted(set(tour_kinds(cfg).values())):
+        if kind in ('tour', 'contrast'): build_tour(o, names, run, contrast=(kind == 'contrast'))
+        elif kind == 'handbook': build_handbook(o, run)
+        elif kind == 'xtour': build_xtour(cfg, o, names, run, name)
     allowance = {}
     for arm, spec in cfg.get('allowance', {}).items():
         order = sorted(names); random.Random(spec['seed']).shuffle(order); alw = {}
