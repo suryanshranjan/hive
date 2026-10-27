@@ -1,6 +1,6 @@
 # Hive: a swarm that scales by not talking
 
-Oct 27, 2026 · \@Sumora
+Oct 27, 2026
 
 ## Summary
 
