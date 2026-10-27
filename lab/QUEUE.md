@@ -6,7 +6,14 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 
 - Gates 0 to 8 and 11 to 13 are done and written up (G9 and G10 are still cards). Gate 7 used a real company's rules, which stay private (never commit them).
 - Gate 13 (`gate13/RESULTS.md`): the owner's decision tour (one worked example per policy decision, as visible tests) lifted hidden correctness from 57.8% to 89.4%, against 67.2% for the same number of builder-chosen answers; tour plus questions 95.2%. All predictions held. The tour is now step one of the intent interface. Its failure mode is over-generalization.
-- Next: G14, tour with contrast pairs, replicated on a new rule-giver.
+- G14 is registered (`gate14/prompts/PREDICTIONS.md`, analysis `gate14/referee/analyze.py`); `tour_arms` now takes `{"arm": "tour" | "contrast"}`.
+
+## Ready
+
+### G14: tour with contrast pairs, replicated
+- **Run:** `python3 lab/run_gate.py lab/experiments/g14_contrast.json`
+- **Teams:** N0; T (tour); TC (tour plus a contrast per decision). About $8, 10 minutes.
+- **Afterwards:** `python gate14/referee/analyze.py gate14/results`; RESULTS.md, decision rules, BRAIN.md, this file, push.
 
 ## Running on a laptop (Docker)
 
