@@ -2,10 +2,10 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 28 2026, after Gate 26)
+## Where we left off (Oct 28 2026, after Gate 27)
 
-- Hive v1 M1–M5 done. Gate 25: first real feature (23/23, proxy owner). Gate 26: second real feature with the founder answering all 4 plain-language questions himself (18/18 acceptance from documents, 384/384 existing, $2.26).
-- Next: (1) acceptance cases from the founder's own head (not the documents); (2) a larger feature with persistence and endpoints; (3) a second founder and company; (4) packaging Hive v1 for others (install, owner screen).
+- Hive v1 M1–M5 done (Gates 25, 26). Gate 27, a negative result: on the founder's head-only rules, a live-founder swarm and a no-question swarm tied (19/24 each, same 5 misses, head-only 6/10 each). The kill fired. The questions confirmed defaults; the misses were confident defaults nobody asked about.
+- Next (Gate 28, needs design and the founder's time): **the assumption review.** After building, the workers list every default they applied, in plain words, and the founder marks the wrong ones; the workers then fix those. Rerun on Gate 27's feature and base with the same 24 private cases (kept in the experimenter's private scratchpad). Prediction to register: ≥ 4 of the 5 misses recovered, with documented cases not dropping. Also: a larger feature with persistence and endpoints, and a second founder.
 
 ## Needs the user
 
