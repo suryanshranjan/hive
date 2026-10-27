@@ -47,6 +47,7 @@ Research on swarms of AI coding agents that coordinate only through a shared rep
 | `gate4/` | Planned vs free questions on fresh invented rules: oracle, planner prompt and plan, every question asked, histories, scores; see `gate4/RESULTS.md` |
 | `gate5/` | Defaults-first vs free questions on rules from an independent rule-giver agent; see `gate5/RESULTS.md` |
 | `gate6/` | Questions per function assigned at random (0, 1, 3) on a second independent rule-giver's rules; see `gate6/RESULTS.md` |
+| `gate7/` | A real company's rules as the product owner (results only; the rules are private) |
 | `BRAIN.md` | Shared memory: laws with status, constants, evidence, scorecard, next steps |
 | `docs/` | Hive v1 and Hive v2 write-ups |
 
@@ -82,3 +83,8 @@ An independent agent wrote the rules. A team told to ask about its defaults firs
 ## Gate 6 in one line
 
 With questions per function assigned at random, 3 questions on a function added +44 points of edge-case accuracy against +8 for none, so questions cause the gain. But one question added only +12: a rule needs several answered points to pin down. So spend questions in blocks of about 3, not one per function. See `gate6/RESULTS.md`.
+
+
+## Gate 7 in one line
+
+With a real company's rules (name withheld), 15 answered questions lifted hidden correctness from 32.8% to 49.6%. The largest losses came from builders never being told the allowed input values. See `gate7/RESULTS.md`; the rules themselves stay private.
