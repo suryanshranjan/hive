@@ -48,12 +48,47 @@ The tool packages the measured design for any repository with tests. Plan and mi
 | M4 Owner session: examples and live answers become tests | **Done** (`tests/test_owner.sh`) |
 | M5 First real feature, built end to end, scored on the owner's held-back tests | **Done** ([Gate 25](gates/gate25/RESULTS.md): 23/23, proxy owner; [Gate 26](gates/gate26/RESULTS.md): 18/18 with the founder answering all 4 questions himself, 384/384 existing tests both times) |
 
+**Just start it.** In your project folder, type `python -m hive`. There is nothing to configure:
+
+```
+Hive here. What are we building today?
+  > Creators should see their earnings for the last 30 days.
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: node --test in Backend. 384 tests, all passing.
+
+I'll put 4 builders on it. They work on copies, so your branches stay exactly as they are.
+If they need a decision only you can make, the question will appear right here.
+
+[14:02] Starting.
+  [14:02] Builder w1 picked up: earnings math.
+  [14:05] Builder w3 landed: last-30-days window, with tests
+  ...
+[14:13] All 4 builders are done.
+Before I hand it over: they made 9 assumptions your description didn't cover. Let's check them together.
+  ...
+Thanks. 2 to fix.
+[14:14] Sending the builders back to fix 2 things.
+[14:18] Fixed.
+
+Let me check the result.
+  402 tests, all passing. All 384 that passed before still pass.
+
+Done in 16 minutes, about $3.40. Your result is on branch hive/creators-should-see-their-1028-1402.
+  Take it:           git merge hive/creators-should-see-their-1028-1402
+```
+
+The example above is illustrative, not a recorded run. Hive finds your tests on its own (Node's built-in test runner or pytest; otherwise it asks for the command once). It brings the builders' questions to you in plain words. At the end, it shows you the defaults they assumed so you can correct them. It never touches your branches: the result arrives as a new branch. End-to-end check with stand-in builders: `tests/test_start.sh`.
+
+The same steps, one at a time, for scripts and experiments:
 ```
 python -m hive init --test-cmd "python -m pytest -q --junitxml=.hive/junit.xml"     # once per repository
-python -m hive run --repo . --run ../run1 --workers 4 --goal goal.md                    --examples my_examples.md --questions 17                          # start a swarm on a copy
+python -m hive run --repo . --run ../run1 --workers 4 --goal goal.md --questions 17 --assumptions   # start a swarm on a copy
 python -m hive owner --run ../run1                                                   # answer the workers live
+python -m hive review --run ../run1                                                  # after the build: correct their assumptions
 ```
-Workers use `hive claim`, `hive land`, `hive areas`, `hive ask` and `hive answers` inside their clones.
+Workers use `hive claim`, `hive land`, `hive areas`, `hive ask`, `hive answers`, `hive assume` and `hive assumptions` inside their clones.
 
 The owner never sees code. Workers must ask in plain words, one real-life situation with lettered choices, and `hive ask` refuses questions with code in them:
 
