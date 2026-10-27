@@ -1,6 +1,8 @@
 # Hive
 
-Research on swarms of AI coding agents that coordinate only through a shared repository, never by messaging. This repo holds the code, data and swarm histories behind **Hive v2: the referee is the limit** ([doc](https://claude.ai/artifact/PZKUKvJY6a7C3dG8ZJrT8H)). The original Hive v1 write-up is in `docs/hive_v1.md`.
+Research on swarms of AI coding agents that coordinate only through a shared repository, never by messaging. This repo holds the code, data and swarm histories behind **Hive v2: the referee is the limit** (`docs/hive_v2.md`, live [doc](https://claude.ai/artifact/PZKUKvJY6a7C3dG8ZJrT8H)). The original Hive v1 write-up is in `docs/hive_v1.md`.
+
+**Start with [`BRAIN.md`](BRAIN.md)**, the shared memory of the project: what we know and how sure we are, every prediction and whether it held, open questions, the next experiments, and how to continue.
 
 ## What the evidence says so far (Oct 27 2026)
 
@@ -18,6 +20,9 @@ Research on swarms of AI coding agents that coordinate only through a shared rep
 | Speed saturates near 6 workers: 2.2x at 6, 2.3x at 12, floored by the largest task | Gate 2 | 3 swarms |
 | Collisions grew slower than predicted (0.14, 0.33, 0.48 per landing); first semantic conflict at N = 12, repaired in 22 s | Gate 2 | 3 swarms |
 | Still no gaming: hidden and visible within 0.4 points at every commit | Gate 2 | 3 swarms |
+| Onboarding law held a third time: 1.61M tokens at 12 workers (predicted 1.63M), 1.23M at 8 (predicted 1.19M) | Gate 3 | 2 swarms |
+| Guarded landing blocked both would-be regressions before they reached main; both swarms pass all 2,960 hidden tests with no gaming (gap ≤ 0.4 points) | Gate 3 | 2 swarms |
+| Finish time is set by the tail: 12 workers took 8.7 min (Gate 2: 7.8), the last 4% done by one worker who claimed a big task late | Gate 3 | 2 swarms |
 
 ## Layout
 
@@ -32,6 +37,10 @@ Research on swarms of AI coding agents that coordinate only through a shared rep
 | `gate1/results/` | Per-commit visible and hidden scores for each swarm; `tokens.csv` per worker |
 | `gate1/logs/` | Every worker's CLAIM, LAND, CONFLICT and FOUND events |
 | `gate2/` | 113-category project: seed bundle, worker prompt, predictions registered before launch, `RESULTS.md` scoring them, all three swarm histories, per-commit hidden scores, `tokens.csv` |
+| `gate3/` | Protocol v2 (`tools/claim.py`, `tools/land.py`), the scale runs at 8 and 12 workers with `RESULTS.md`, and the intent test (built, not yet run); see `gate3/README.md` |
+| `sealed/` | The intent test's private rules and aborted attempts, encrypted until that test has run |
+| `BRAIN.md` | Shared memory: laws with status, constants, evidence, scorecard, next steps |
+| `docs/` | Hive v1 and Hive v2 write-ups |
 
 ## Reproducing
 
@@ -49,3 +58,7 @@ Gate 0 needs `anthropics/claudes-c-compiler`, `c-testsuite/c-testsuite`, and the
 ## Gate 2 in one line
 
 Two workers finished the whole 10x project in 17.7 minutes for 515k tokens; twelve finished in 7.8 minutes for 1.62M. See `gate2/RESULTS.md`, including two registered predictions that failed.
+
+## Gate 3 in one line
+
+Category claims and a landing guard kept main clean at 8 and 12 workers, and the token law held again. But finer claims did not make the swarm faster, because the last large task was claimed late. See `gate3/RESULTS.md`.
