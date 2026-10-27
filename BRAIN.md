@@ -116,6 +116,8 @@ Status tags: **established** means outside theory or our data on real agents; **
 | Gate 8 | Oct 27 | Third independent rule-giver; 0 questions vs 0 / 1 / 2 / 3 questions per function at random (5 each), run in Docker with `lab/run_gate.py` | 42.4% → 71.8% hidden (+29.4, CI +16 to +43); gains 0 / +21.0 / +26.1 / +39.1; R3 failed and its kill fired; Gate 6's weak first question traced to a headroom imbalance; p ≈ 0.55 fits both gates |
 | Gate 5 | Oct 27 | Rules from an independent rule-giver agent; 0 questions, 30 free, 30 defaults-first | 34.6% / 67.0% / 62.2%: defaults-first did not help (−4.8 pts, CI −14.6 to +4.2) though delivered (37% of questions had NULL vs 10%); kill fired; +32.4-point gain from 30 questions replicated |
 
+**Caveat (found Oct 28 2026, `gates/LAB_NOTE_guard_python.md`):** in every Docker gate (10–24) the guard crashed on the container's Python 3.11.2. Workers worked around it themselves: in scale gates a fix reached main within 0.8–1.3 minutes; in intent gates landings went through workers' own wrappers. Intent results are unaffected (hidden suites); 'no breaking commits' stands as a measured outcome but is not fully credited to the guard in intent gates.
+
 ## 6. Prediction scorecard
 
 All predictions are written down before the run, in each gate's `PREDICTIONS.md`.
