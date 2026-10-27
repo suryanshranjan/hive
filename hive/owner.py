@@ -8,7 +8,23 @@ Inside a run (HIVE_RUN set by `hive run`):
 Files under <run>/owner/: examples.md (the owner's worked examples, also put in every worker's prompt),
 budget.json ({"questions": N}), questions/<id>.json, answers/<id>.json. Every answer is a ruling on that input:
 the worker who asked encodes it as a test before landing."""
-import glob, json, os, sys, time
+import glob, json, os, re, sys, time
+
+# Owners are not engineers. A question must read like a real-life situation, not code: in Gate 25, questions full of
+# code words led the founder to say "I don't remember" and hand the role over. These patterns are refused.
+JARGON = [
+    (r'\w\(|[{}\[\]]|=>|==', 'code symbols'),   # fee( or braces; plain "(please say)" and choice labels "A)" are fine
+    (r"'[^']*'|\"[^\"]*\"", 'quoted code values'),
+    (r'\b(?:BigInt|null|undefined|NaN|boolean|string|integer|float|JSON|API|JS|regex|enum|schema|throw|exception|'
+     r'function|param(?:eter)?s?|payload|normaliz\w*|serializ\w*|paise)\b', 'programming words'),
+    (r'\b(?:HTTP|status|code|error|with|return|throw)\s+(?:a\s+|an\s+)?[45]\d\d\b', 'status codes'),   # not "Rs 2,500"
+    (r'\b[a-z]+_[a-z_]+\b|\b[a-z]+[A-Z]\w*\b', 'code names'),
+]
+
+def plain_language_problems(question):
+    """Why a question is not plain enough for a non-technical owner (empty list when it is fine)."""
+    return sorted({why for pat, why in JARGON
+                   if re.search(pat, question, flags=0 if why in ('code names', 'quoted code values') else re.I)})
 
 def _dir(run=None):
     run = run or os.environ.get('HIVE_RUN')
@@ -36,14 +52,24 @@ def setup(run, examples=None, questions=None):
     if questions is not None:
         json.dump({'questions': questions}, open(os.path.join(d, 'budget.json'), 'w'))
     if questions != 0:
-        text += ("\n## Asking the owner\nThe owner answers questions live: `python3 -m hive ask \"<one concrete question, "
-                 "ideally a specific input and what it should do>\"` blocks until they answer. First read "
-                 "`python3 -m hive answers` (all answers so far). " + (f"The team has {questions} questions in all. " if questions else '') +
-                 "Ask about what the goal and examples leave open. Every answer is a ruling on that input: encode it as a "
-                 "test before you land, and do not stretch it into rules it does not state.\n")
+        text += ("\n## Asking the owner\nThe owner is a business person, not an engineer. Ask with "
+                 "`python3 -m hive ask \"<question>\"`, which blocks until they answer; first read `python3 -m hive answers` "
+                 "(all answers so far). " + (f"The team has {questions} questions in all. " if questions else '') +
+                 "Write every question as one real-life situation in plain words: real amounts in rupees, people and deals "
+                 "instead of code, and 2 or 3 lettered choices (A, B, C), the last one being \"something else (please say)\". "
+                 "No code, function names, quoted values, brackets or status codes: `hive ask` refuses them. Ask one thing "
+                 "per question. Translate the answer back into code yourself, encode it as a test before you land, and do not "
+                 "stretch it into rules it does not state.\n")
     return text
 
 def ask(question, timeout_min=30):
+    problems = plain_language_problems(question)
+    if problems:
+        print('Not asked: the owner is not an engineer. Rephrase it as one real-life situation in plain words, with amounts '
+              'in rupees and 2 or 3 lettered choices, for example:\n'
+              '  A creator was promised a bonus of up to Rs 2,000 but earned Rs 2,500. What should they get? '
+              'A) Rs 2,000, the promised maximum  B) Rs 2,500, what they earned  C) something else (please say)\n'
+              'Found: ' + ', '.join(problems)); return 5
     d = _dir(); budget = _budget(d)
     asked = len(glob.glob(os.path.join(d, 'questions', '*.json')))
     if budget is not None and asked >= budget:
@@ -82,7 +108,7 @@ def serve(run, poll=2):
                 if q['id'] in seen or os.path.exists(os.path.join(d, 'answers', q['id'] + '.json')):
                     continue
                 seen.add(q['id'])
-                print(f"\n[{q['worker']}] {q['question']}", flush=True)
+                print(f"\n[{q['worker']}] {q['question']}\n  Your answer (a letter, or a few words): ", end='', flush=True)
                 ans = sys.stdin.readline().strip()
                 if not ans:
                     seen.discard(q['id']); continue

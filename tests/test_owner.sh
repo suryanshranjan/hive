@@ -20,6 +20,7 @@ HIVE_WORKER_CMD="sh $HIVE/tests/fake_asking_worker.sh" python3 -m hive run --rep
 check "hive run exits cleanly" $? 0
 kill $OWNER 2>/dev/null
 check "the owner's examples were in the worker's prompt" "$(cat $T/run/saw_examples 2>/dev/null)" ok
+check "a question in code words was refused" "$(cat $T/run/jargon_ask_exit)" 5
 check "the worker got the owner's answer" "$(cat $T/run/got_answer)" "Negative amounts are invalid: raise ValueError."
 check "the answer was recorded with its response time" "$(ls $T/run/owner/answers/*.json | wc -l)" 1
 check "the second question was refused (budget 1)" "$(cat $T/run/second_ask_exit)" 3
