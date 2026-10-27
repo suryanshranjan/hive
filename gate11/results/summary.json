@@ -1,0 +1,169 @@
+{
+ "name": "g11",
+ "arms": {
+  "N0": {
+   "hidden_pass": 0.366,
+   "ci95_by_function": [
+    0.282,
+    0.458
+   ],
+   "tests": 500
+  },
+  "S": {
+   "hidden_pass": 0.586,
+   "ci95_by_function": [
+    0.482,
+    0.694
+   ],
+   "tests": 500
+  },
+  "B": {
+   "hidden_pass": 0.556,
+   "ci95_by_function": [
+    0.452,
+    0.672
+   ],
+   "tests": 500
+  }
+ },
+ "diffs": {
+  "S-N0": {
+   "points": 22.0,
+   "ci95": [
+    12.2,
+    31.8
+   ]
+  },
+  "B-N0": {
+   "points": 19.0,
+   "ci95": [
+    7.6,
+    31.8
+   ]
+  }
+ },
+ "allowance": {
+  "S": {
+   "1": {
+    "mean_gain_points": 10.5,
+    "ci95": [
+     1.3,
+     18.8
+    ],
+    "functions": 10
+   },
+   "2": {
+    "mean_gain_points": 27.5,
+    "ci95": [
+     20.4,
+     35.4
+    ],
+    "functions": 10
+   }
+  },
+  "B": {
+   "0": {
+    "mean_gain_points": 3.4,
+    "ci95": [
+     -4.3,
+     12.4
+    ],
+    "functions": 10
+   },
+   "3": {
+    "mean_gain_points": 26.8,
+    "ci95": [
+     16.4,
+     38.9
+    ],
+    "functions": 10
+   }
+  }
+ },
+ "stratified": {
+  "pairs": [
+   [
+    "panel_score",
+    "normalize_phone"
+   ],
+   [
+    "split_bill",
+    "age_band"
+   ],
+   [
+    "normalize_sku",
+    "money_format"
+   ],
+   [
+    "vat_amount",
+    "net_price"
+   ],
+   [
+    "credit_grade",
+    "shipping_cost"
+   ],
+   [
+    "add_business_days",
+    "slugify_title"
+   ],
+   [
+    "loyalty_points",
+    "business_days"
+   ],
+   [
+    "initials",
+    "fiscal_quarter"
+   ],
+   [
+    "rating_stars",
+    "meeting_end"
+   ],
+   [
+    "mask_card",
+    "late_fee"
+   ]
+  ],
+  "arms": {
+   "S": {
+    "errors_fixed": 197,
+    "base_errors": 441,
+    "share_fixed_by_questions": {
+     "1": {
+      "fixed": 55,
+      "base_errors": 222,
+      "share": 0.248
+     },
+     "2": {
+      "fixed": 142,
+      "base_errors": 219,
+      "share": 0.648
+     }
+    }
+   },
+   "B": {
+    "errors_fixed": 157,
+    "base_errors": 441,
+    "share_fixed_by_questions": {
+     "0": {
+      "fixed": 18,
+      "base_errors": 222,
+      "share": 0.081
+     },
+     "3": {
+      "fixed": 139,
+      "base_errors": 219,
+      "share": 0.635
+     }
+    }
+   }
+  },
+  "ratio": {
+   "arms": "S/B",
+   "value": 1.255,
+   "ci95": [
+    0.996,
+    1.778
+   ]
+  }
+ }
+}

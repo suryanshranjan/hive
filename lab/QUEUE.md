@@ -2,18 +2,12 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 27 2026, after Gate 8)
+## Where we left off (Oct 27 2026, after Gate 11)
 
-- Gates 0 to 8 are done and written up. Gate 7 used a real company's rules, which stay private (never commit them).
-- Gate 8 ran on a Windows laptop inside Docker (about 7 minutes, $6.0 at list price). Results: `gate8/RESULTS.md`. Headline: R3 failed and its kill fired. Gate 6's weak first question was a headroom imbalance, and one law (each answer fixes about half the remaining edge errors, p ≈ 0.55) fits both gates. "Ask in blocks of 3" is withdrawn.
-- G11's config and predictions are registered (`gate11/prompts/PREDICTIONS.md`), and `run_gate.py` has a two-stage stratified mode (tested with do-nothing workers).
-
-## Ready
-
-### G11: one-per-function vs blocks of 3, stratified by headroom
-- **Run:** `python3 lab/run_gate.py lab/experiments/g11_spread_vs_blocks.json`
-- **Cost:** about $9 at list price; about 15 minutes.
-- **Afterwards:** write `gate11/RESULTS.md` (score P1 to P6, apply the decision rules), copy `private/g11/oracle.py` to `gate11/referee/`, update BRAIN.md and this file, push.
+- Gates 0 to 8 and 11 are done and written up (G9 and G10 are still cards). Gate 7 used a real company's rules, which stay private (never commit them).
+- Gate 11 (`gate11/RESULTS.md`): spreading 30 questions as 1–2 per function beat blocks of 3 by 1.25× (CI 1.00 to 1.78). But Gate 8's one-parameter law failed (p = 0.35), and within the same functions the 3rd question added nothing. The law is withdrawn; spreading stays the default.
+- `run_gate.py` has a two-stage stratified mode (`"stratified"` in the config).
+- Nothing is ready to run. The next card (G12) needs one addition and its predictions first.
 
 ## Running on a laptop (Docker)
 
@@ -21,9 +15,15 @@ Workers run shell commands, so run them in a container. Image: `node:22-bookworm
 
 ## Needs design first (write the config and predictions, push them, then run)
 
+### G12: repeat Gate 11 on a new rule-giver, with hidden decisions counted
+- **Why:** one head-to-head win (interval reaching 1.0), and the curve's shape varies by rule set. Conjecture to test: questions saturate near the number of hidden policy decisions per function.
+- **Design:** copy `g11_spread_vs_blocks.json` with new seeds and name. Register a procedure, fixed before the rules exist, for counting each function's hidden decisions in the oracle after scoring (for example: distinct branches in its rule that change the output on its EDGE list).
+- **Predictions to register:** S/B ≥ 1.15 again; functions with 1–2 decisions saturate by 2 questions (3rd adds < 0.10), functions with 3+ do not.
+- **Cost:** about $8.4; about 12 minutes.
+
 ### G9: intent interface v1 vs free asking
 - Arm A: free asking, 30 questions.
-- Arm B: the interface from Gates 4 to 8. The spec lists each function's allowed input values (taken from the rule-giver's docs), every function gets a first question before any gets a second (Gate 8; blocks of 3 withdrawn), one thing changes per question, and answers become tests.
+- Arm B: the interface from Gates 4 to 8. The spec lists each function's allowed input values (taken from the rule-giver's docs), questions spread at about 2 per function before any gets a third (Gate 11; blocks of 3 lost), one thing changes per question, and answers become tests.
 - Needs: a "spec with allowed values" option in `lab/new_intent_gate.py` (one seed per arm), and the answers-as-tests step from Gate 7.
 
 ### G10: largest-first claiming at 12 and 20 workers
@@ -31,9 +31,12 @@ Workers run shell commands, so run them in a container. Image: `node:22-bookworm
 - Prediction to register first: 12 workers finish under 7.0 minutes.
 
 ### Repeats
-- Every gate is one run per team. The cheapest strengthening is to rerun G8 with a new rule-giver and a new seed, with allowances stratified by N0 headroom; it gives a third estimate of p.
+- Every gate is one run per team. The cheapest strengthening is G12 (a repeat of Gate 11 on a new rule-giver).
 
-## Rules learned from Gate 8
+## Rules learned from Gates 8 and 11
+- A law fitted on two gates can fail on the third: keep one-parameter fits labelled as models until a registered prediction from them holds.
+- Matched pairs let one run measure a question's marginal value within the same functions; prefer them to level-by-level randomization.
+- On a 429 usage limit, refresh the container's credentials from the host and rerun from scratch.
 - Randomize allowances within strata of headroom (run N0 first), and report gains as the share of errors fixed, not raw points.
 - Write a pre-flight power note before scoring; R2-style ordering predictions are weak at 5 functions per level.
 - Reported worker tokens include cache reads; quote cost in dollars.
