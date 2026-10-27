@@ -2,10 +2,11 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 28 2026, after Gate 27)
+## Where we left off (Oct 28 2026, after Gate 28)
 
-- Hive v1 M1–M5 done (Gates 25, 26). Gate 27, a negative result: on the founder's head-only rules, a live-founder swarm and a no-question swarm tied (19/24 each, same 5 misses, head-only 6/10 each). The kill fired. The questions confirmed defaults; the misses were confident defaults nobody asked about.
-- Next (Gate 28, needs design and the founder's time): **the assumption review.** After building, the workers list every default they applied, in plain words, and the founder marks the wrong ones; the workers then fix those. Rerun on Gate 27's feature and base with the same 24 private cases (kept in the experimenter's private scratchpad). Prediction to register: ≥ 4 of the 5 misses recovered, with documented cases not dropping. Also: a larger feature with persistence and endpoints, and a second founder.
+- Hive v1 M1–M5 done. `hive start` added: type `hive`, describe the goal, and it does the rest (tests found, questions inline, assumption review, fix round, result as a branch). Tested with stand-in builders only (`tests/test_start.sh`).
+- Gate 27: live questions tied with no questions on the founder's head-only rules (19/24 each). Gate 28: tied again (14/15 each). The builders' defaults already matched the founder, so the assumption review had no room, and the founder was away (proxy review, disclosed).
+- Next (Gate 29, needs the founder): **cases where the owner is surprising.** First ask him what new people usually get wrong about deals, terms and matching. Build 10 to 15 cases there, then rerun questions vs ranked assumption review (business defaults only, at most about 10 items), with the founder reviewing blind. Also: the first real `hive start` run on a real feature.
 
 ## Needs the user
 

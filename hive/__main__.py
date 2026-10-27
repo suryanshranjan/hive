@@ -38,7 +38,8 @@ def main(argv=None):
     st.add_argument('--minutes', type=int, default=40)
     i = sub.add_parser('init'); i.add_argument('--test-cmd', required=True); i.add_argument('--junit', default='.hive/junit.xml')
     c = sub.add_parser('claim'); c.add_argument('name'); c.add_argument('areas'); c.add_argument('desc')
-    l = sub.add_parser('land'); l.add_argument('name'); l.add_argument('message')
+    l = sub.add_parser('land'); l.add_argument('name'); l.add_argument('message', nargs='?')
+    l.add_argument('--continue', dest='cont', action='store_true')   # after fixing a conflict or a blocked landing
     sub.add_parser('areas')
     r = sub.add_parser('run'); r.add_argument('--repo', default='.'); r.add_argument('--run', required=True)
     r.add_argument('--workers', type=int, required=True); r.add_argument('--goal', required=True)
@@ -58,7 +59,9 @@ def main(argv=None):
     if a.cmd == 'claim':
         return claims.claim(a.name, a.areas, a.desc)
     if a.cmd == 'land':
-        return guard.land(a.name, a.message)
+        if not a.cont and not a.message:
+            ap.error('land needs a commit message, or --continue')
+        return guard.land(a.name, '--continue' if a.cont else a.message)
     if a.cmd == 'areas':
         return claims.status()
     if a.cmd == 'run':
