@@ -1,6 +1,6 @@
 # Hive v2: the referee is the limit
 
-Oct 27, 2026 · @Sumora
+Oct 27, 2026
 
 ## Summary
 
