@@ -2,17 +2,12 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 27 2026, Gate 23 aborted at a usage limit)
+## Where we left off (Oct 27 2026, after Gate 24)
 
-- Gates 0 to 8, 10 to 18, 21 and 22 are done and written up (G9 is still a card). Gates 7 and 18 used a real company's rules, which stay private (never commit them).
-- **Gate 23 aborted** (`gate23/ABORTED.md`): usage limit. Unscored but clear: the content-keyed guard cache hit 337 of 338 lookups. Rerun on its own for the finish ratio.
-- G24 is registered (`gate24/prompts/PREDICTIONS.md`): the end-to-end test of the whole v1 design.
-
-## Ready
-
-### G24: Hive v1 end to end
-- **Run:** `python3 lab/run_gate.py lab/experiments/g24_v1.json --replay`, then `python3 gate21/referee/regressions.py runs/g24/eval_<arm>.json runs/g24/agents.csv`. About $12.
-- G20 still waits for the founder's examples (template in the session scratchpad).
+- Gates 0 to 8, 10 to 18, 21, 22 and 24 are done and written up (G9 is still a card). Gates 7, 18 and 20 use a real company's rules, which stay private (never commit them).
+- Gate 24 (`gate24/RESULTS.md`): Hive v1 end to end, 95.0% vs 53.0% hidden at 6 workers, no breaking commits; every prediction held.
+- Gate 20 (the founder's own examples, plus the company's Notion policy pages as team HTQ) is registered and amended (`gate20/prompts/PREDICTIONS.md`); run it with the private oracle (`--oracle <private>/oracle_g20.py`).
+- Gate 23 still needs a clean rerun for its finish ratio (its cache hit rate is already clear).
 
 ## Needs the user
 
