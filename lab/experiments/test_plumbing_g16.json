@@ -1,0 +1,23 @@
+{
+ "name": "plumbing_g16",
+ "predictions": "lab/experiments/test_plumbing_g16.json",
+ "rulegiver_brief": "gate15/prompts/rulegiver_brief.md",
+ "extractor_brief": "gate15/prompts/extractor_brief.md",
+ "require_decisions": true,
+ "prompt": "lab/templates/prompt_builder.md",
+ "ask_texts": "lab/experiments/g16_ask_texts.md",
+ "visible_seed": 16100,
+ "hidden_seed": 16200000,
+ "baseline": "N0",
+ "tour_arms": {
+  "X": "xtour",
+  "HX": "xtour+handbook",
+  "HXQ": "xtour+handbook"
+ },
+ "arms": [
+  "N0:1:none",
+  "X:1:none",
+  "HX:1:none",
+  "HXQ:1:budget:7493:17"
+ ]
+}
