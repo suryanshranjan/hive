@@ -1,0 +1,19 @@
+{
+ "name": "g24",
+ "predictions": "gate24/prompts/PREDICTIONS.md",
+ "rulegiver_brief": "gate13/prompts/rulegiver_brief.md",
+ "require_decisions": true,
+ "guard": "gate23/tools/land.py",
+ "prompt": "lab/templates/prompt_builder.md",
+ "ask_texts": "lab/experiments/g24_ask_texts.md",
+ "visible_seed": 24100,
+ "hidden_seed": 24200000,
+ "baseline": "N0",
+ "tour_arms": {
+  "V1": "tour"
+ },
+ "arms": [
+  "N0:6:none",
+  "V1:6:budget:7494:17"
+ ]
+}

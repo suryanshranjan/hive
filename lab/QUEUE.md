@@ -6,7 +6,12 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 
 - Gates 0 to 8, 10 to 18, 21 and 22 are done and written up (G9 is still a card). Gates 7 and 18 used a real company's rules, which stay private (never commit them).
 - **Gate 23 aborted** (`gate23/ABORTED.md`): usage limit. Unscored but clear: the content-keyed guard cache hit 337 of 338 lookups. Rerun on its own for the finish ratio.
-- Next: G24, an end-to-end test of the whole v1 design (owner tour + questions + content-keyed guard, 6 workers). `run_gate.py` has a `"guard"` option for it.
+- G24 is registered (`gate24/prompts/PREDICTIONS.md`): the end-to-end test of the whole v1 design.
+
+## Ready
+
+### G24: Hive v1 end to end
+- **Run:** `python3 lab/run_gate.py lab/experiments/g24_v1.json --replay`, then `python3 gate21/referee/regressions.py runs/g24/eval_<arm>.json runs/g24/agents.csv`. About $12.
 - G20 still waits for the founder's examples (template in the session scratchpad).
 
 ## Needs the user
