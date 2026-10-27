@@ -1,0 +1,27 @@
+{"t": 1793083441, "worker": "Q30-w2", "sql": "SELECT SCORE(20), SCORE(95), SCORE(-5)", "resp": {"answer": [30, 105, 0], "questions_left": 29}, "charged": true}
+{"t": 1793083442, "worker": "Q30-w3", "sql": "SELECT LUHN_OK('4539 1488 0343 6467'), LUHN_OK('0'), LUHN_OK('')", "resp": {"answer": [1, 0, 0], "questions_left": 28}, "charged": true}
+{"t": 1793083442, "worker": "Q30-w3", "sql": "SELECT COLLAPSE('aAAb'), COLLAPSE('a  b'), COLLAPSE(NULL)", "resp": {"answer": ["ab", "a b", null], "questions_left": 27}, "charged": true}
+{"t": 1793083446, "worker": "Q30-w2", "sql": "SELECT SCORE(12), SCORE(7.5), SCORE(10000)", "resp": {"answer": [22, 15.0, 130.0], "questions_left": 26}, "charged": true}
+{"t": 1793083452, "worker": "Q30-w1", "sql": "SELECT BIZ_DAYS('2024-03-09', '2024-03-11'), BIZ_DAYS('2024-03-08', '2024-03-04'), BIZ_DAYS('2024-12-24', '2024-12-27')", "resp": {"answer": [0, -4, 3], "questions_left": 25}, "charged": true}
+{"t": 1793083452, "worker": "Q30-w1", "sql": "SELECT AGO('2024-05-01', '2024-05-01'), AGO('2024-05-01', '2024-05-02'), AGO('2024-05-06', '2024-05-01')", "resp": {"answer": ["today", "yesterday", "in the future"], "questions_left": 24}, "charged": true}
+{"t": 1793083452, "worker": "Q30-w1", "sql": "SELECT AGO('2024-05-01', '2024-05-15'), AGO('2024-01-01', '2024-05-01'), AGO('2020-05-01', '2024-05-01')", "resp": {"answer": ["2 weeks ago", "4 months ago", "4 years ago"], "questions_left": 23}, "charged": true}
+{"t": 1793083454, "worker": "Q30-w3", "sql": "SELECT LUHN_OK('00'), LUHN_OK('4539-1488-0343-6467'), LUHN_OK(NULL)", "resp": {"answer": [1, 1, null], "questions_left": 22}, "charged": true}
+{"t": 1793083454, "worker": "Q30-w3", "sql": "SELECT COLLAPSE('AAab'), CHECKSUM(''), CHECKSUM(NULL)", "resp": {"answer": ["Ab", 97, null], "questions_left": 21}, "charged": true}
+{"t": 1793083454, "worker": "Q30-w3", "sql": "SELECT CHECKSUM('\u00e9'), CHECKSUM('ABC'), LUHN_OK('79927398713x')", "resp": {"answer": [39, 10, 0], "questions_left": 20}, "charged": true}
+{"t": 1793083461, "worker": "Q30-w2", "sql": "SELECT SCORE(1000), SCORE(150), SCORE(100)", "resp": {"answer": [120.0, 111.76, 110.0], "questions_left": 19}, "charged": true}
+{"t": 1793083471, "worker": "Q30-w2", "sql": "SELECT GRADE(65), GRADE(90), GRADE(89.5)", "resp": {"answer": ["D", "A", "B"], "questions_left": 18}, "charged": true}
+{"t": 1793083474, "worker": "Q30-w1", "sql": "SELECT AGO('2024-05-01', '2024-05-08'), AGO('2024-05-01', '2024-05-14'), AGO('2024-05-01', '2024-05-31')", "resp": {"answer": ["1 week ago", "1 week ago", "1 month ago"], "questions_left": 17}, "charged": true}
+{"t": 1793083476, "worker": "Q30-w2", "sql": "SELECT GRADE(101), GRADE(-1), TAX(10, 'UK')", "resp": {"answer": ["A+", "F", 2.0], "questions_left": 16}, "charged": true}
+{"t": 1793083482, "worker": "Q30-w1", "sql": "SELECT AGO('2024-03-01', '2024-04-29'), AGO('2023-05-01', '2024-04-27'), AGO('2023-05-01', '2024-04-30')", "resp": {"answer": ["1 month ago", "12 months ago", "1 year ago"], "questions_left": 15}, "charged": true}
+{"t": 1793083482, "worker": "Q30-w2", "sql": "SELECT GRADE(100), TAX(10, 'XX'), TAX(10, 'us')", "resp": {"answer": ["A+", 0.0, 0.72], "questions_left": 14}, "charged": true}
+{"t": 1793083494, "worker": "Q30-w3", "sql": "SELECT CHECKSUM('a'), CHECKSUM('j'), CHECKSUM('k')", "resp": {"answer": [97, 106, 10], "questions_left": 13}, "charged": true}
+{"t": 1793083497, "worker": "Q30-w2", "sql": "SELECT TAX(30, 'US'), TAX(11, 'US'), TAX(70, 'US')", "resp": {"answer": [2.17, 0.8, 5.07], "questions_left": 12}, "charged": true}
+{"t": 1793083504, "worker": "Q30-w2", "sql": "SELECT TAX(-10, 'US'), TAX(100, 'CA'), TAX(100, 'AU')", "resp": {"answer": [0.0, 0.0, 0.0], "questions_left": 11}, "charged": true}
+{"t": 1793083538, "worker": "Q30-w3", "sql": "SELECT NTH_WORD('the quick brown fox', -1), NTH_WORD('the quick brown fox', 0), NTH_WORD('the quick brown fox', 5)", "resp": {"answer": ["fox", "", ""], "questions_left": 10}, "charged": true}
+{"t": 1793083538, "worker": "Q30-w3", "sql": "SELECT MASK('ab'), MASK('a'), MASK('ab cd')", "resp": {"answer": ["**", "*", "***cd"], "questions_left": 9}, "charged": true}
+{"t": 1793083538, "worker": "Q30-w3", "sql": "SELECT INITIALS(''), INITIALS('mary-jane watson'), INITIALS('  John   o''neil ')", "resp": {"answer": ["", "M.J.W.", "J.O."], "questions_left": 8}, "charged": true}
+{"t": 1793083552, "worker": "Q30-w3", "sql": "SELECT MASK('abc'), MASK('abcd'), NTH_WORD('a  b', 2)", "resp": {"answer": ["*bc", "**cd", "b"], "questions_left": 7}, "charged": true}
+{"t": 1793083558, "worker": "Q30-w1", "sql": "SELECT CLAMP(5, 10, 1), CLAMP(NULL, 1, 10), CLAMP(5, NULL, 3)", "resp": {"answer": [5, null, 3], "questions_left": 6}, "charged": true}
+{"t": 1793083558, "worker": "Q30-w1", "sql": "SELECT BUCKET(-3, 5), BUCKET(7, 0), BUCKET(7.5, 2)", "resp": {"answer": [-5, null, 6.0], "questions_left": 5}, "charged": true}
+{"t": 1793083558, "worker": "Q30-w1", "sql": "SELECT SAFE_DIV(NULL, 2, 9), SAFE_DIV(5, NULL, 9), SAFE_DIV(5, 0)", "resp": {"answer": [null, 9, 0], "questions_left": 4}, "charged": true}
+{"t": 1793083575, "worker": "Q30-w1", "sql": "SELECT CLAMP(20, 10, 1), BUCKET(7, -5), SAFE_DIV(5, 0, NULL)", "resp": {"answer": [10, null, 0], "questions_left": 3}, "charged": true}
