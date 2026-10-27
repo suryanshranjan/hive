@@ -2,16 +2,11 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 27 2026, Gate 22 aborted at a usage limit)
+## Where we left off (Oct 27 2026, after Gate 22)
 
-- Gates 0 to 8, 10 to 18 and 21 are done and written up (G9 is still a card). Gates 7 and 18 used a real company's rules, which stay private (never commit them).
-- **Gate 22 aborted** (`gate22/ABORTED.md`): every worker hit the account's usage limit (resets 6:20pm UTC, Oct 27). Rerun it from scratch with the same, already-pushed predictions.
+- Gates 0 to 8, 10 to 18, 21 and 22 are done and written up (G9 is still a card). Gates 7 and 18 used a real company's rules, which stay private (never commit them).
+- Gate 22 (`gate22/RESULTS.md`): cached guard 0.72x Gate 3's (Gate 21: 0.84x), no extra breakage; hits stuck at about 60% because half of main's commits are lock commits. Next guard change: key the cache by code content.
 - G20 still waits for the founder's examples (template in the session scratchpad).
-
-## Ready
-
-### G22: store-before-push guard, a held-out test of Gate 21's finish model (rerun after the usage limit resets)
-- **Run:** host `docker update --cpus 4 <container>`; container `sh gate22/run.sh swarm`; host `docker update --cpus <host cores> <container>`; container `sh gate22/run.sh score`. About $30.
 
 ## Needs the user
 
