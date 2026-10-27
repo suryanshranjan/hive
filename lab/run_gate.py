@@ -177,34 +177,43 @@ def score(cfg, name, oracle_path, arms, run, allowance):
     open(os.path.join(run, 'summary.md'), 'w').write('\n'.join(md) + '\n')
     print('\n'.join(md))
 
-def build_tour(o, names, run):
+def tour_kinds(cfg):
+    t = cfg.get('tour_arms', {})
+    return {a: 'tour' for a in t} if isinstance(t, list) else dict(t)
+
+def build_tour(o, names, run, contrast=False):
     """runs/<name>/seed_tour: the starting repo plus the owner's decision tour as visible tests (one example per declared
-    decision, at most 3 calls per test). Tour inputs must not be TYPICAL or EDGE inputs, so no hidden test is copied."""
-    dec, ex = o.DECISIONS, o.DECISION_EXAMPLES
-    assert set(ex) == set(names), 'DECISION_EXAMPLES must list every function'
-    g = intent.Gen(o); out = os.path.join(run, 'seed_tour'); shutil.rmtree(out, ignore_errors=True)
+    decision, at most 3 calls per test). Tour inputs must not be TYPICAL or EDGE inputs, so no hidden test is copied.
+    contrast=True (runs/<name>/seed_tourc) also adds CONTRAST_EXAMPLES: per decision, a nearby input it does not cover."""
+    dec = o.DECISIONS
+    sets = [('tour', o.DECISION_EXAMPLES)] + ([('contrast', o.CONTRAST_EXAMPLES)] if contrast else [])
+    g = intent.Gen(o); out = os.path.join(run, 'seed_tourc' if contrast else 'seed_tour'); shutil.rmtree(out, ignore_errors=True)
     sh('git', 'clone', '-q', os.path.join(run, 'seed'), out); vis = os.path.join(out, 'tests', 'visible'); n = 0
-    for f in names:
-        assert len(ex[f]) == len(dec[f]), f'{f}: one example per decision'
-        if f == g.AGG:
-            for k, vals in enumerate(ex[f]):
-                assert list(vals) not in [list(v) for v in o.AGG_TYPICAL + o.AGG_EDGE], f'{f}: tour input is a test input'
-                setup = ['CREATE TABLE m (id INTEGER, v)'] + (['INSERT INTO m VALUES ' + ', '.join(f'({i}, {intent.L(v)})' for i, v in enumerate(vals, 1))] if vals else [])
-                q = f'SELECT {f.upper()}(v) FROM m'
-                t = dict(id=f'{f}_tour_{k}', category=f, setup=setup, query=q, expected=intent.oracle_rows(o, setup, q), ordered=True)
+    seen = {f: {tuple(a) for a in o.TYPICAL[f] + o.EDGE[f]} for f in o.SCALARS}
+    for label, ex in sets:
+        assert set(ex) == set(names), f'{label} examples must list every function'
+        for f in names:
+            assert len(ex[f]) == len(dec[f]), f'{f}: one {label} example per decision'
+            if f == g.AGG:
+                for k, vals in enumerate(ex[f]):
+                    assert list(vals) not in [list(v) for v in o.AGG_TYPICAL + o.AGG_EDGE], f'{f}: {label} input is a test input'
+                    setup = ['CREATE TABLE m (id INTEGER, v)'] + (['INSERT INTO m VALUES ' + ', '.join(f'({i}, {intent.L(v)})' for i, v in enumerate(vals, 1))] if vals else [])
+                    q = f'SELECT {f.upper()}(v) FROM m'
+                    t = dict(id=f'{f}_{label}_{k}', category=f, setup=setup, query=q, expected=intent.oracle_rows(o, setup, q), ordered=True)
+                    json.dump(t, open(os.path.join(vis, t['id'] + '.json'), 'w')); n += 1
+                continue
+            for args in ex[f]:
+                assert tuple(args) not in seen[f], f'{f}: {label} input {args} is a TYPICAL, EDGE or earlier tour input'
+            seen[f] |= {tuple(a) for a in ex[f]}
+            for k in range(0, len(ex[f]), 3):
+                q = 'SELECT ' + ', '.join(g.call(f, a) for a in ex[f][k:k + 3])
+                t = dict(id=f'{f}_{label}_{k // 3}', category=f, setup=[], query=q, expected=intent.oracle_rows(o, [], q), ordered=True)
                 json.dump(t, open(os.path.join(vis, t['id'] + '.json'), 'w')); n += 1
-            continue
-        used = {tuple(a) for a in o.TYPICAL[f] + o.EDGE[f]}
-        for args in ex[f]:
-            assert tuple(args) not in used, f'{f}: tour input {args} is a TYPICAL or EDGE input'
-        for k in range(0, len(ex[f]), 3):
-            q = 'SELECT ' + ', '.join(g.call(f, a) for a in ex[f][k:k + 3])
-            t = dict(id=f'{f}_tour_{k // 3}', category=f, setup=[], query=q, expected=intent.oracle_rows(o, [], q), ordered=True)
-            json.dump(t, open(os.path.join(vis, t['id'] + '.json'), 'w')); n += 1
     sh('git', 'add', '-A', cwd=out)
     sh('git', '-c', 'user.name=hive', '-c', 'user.email=hive@local', 'commit', '-q', '-m',
-       "Product owner's decision tour: one worked example per policy decision (tests/visible/*_tour_*.json)", cwd=out)
-    say(f'decision tour built: {sum(len(v) for v in ex.values())} examples in {n} visible tests')
+       "Product owner's decision tour: one worked example per policy decision (tests/visible/*_tour_*.json)"
+       + (', each with a contrast example it does not cover (*_contrast_*.json)' if contrast else ''), cwd=out)
+    say(f'decision tour built ({"with" if contrast else "without"} contrasts): {sum(len(v) for _, ex in sets for v in ex.values())} examples in {n} visible tests')
     return out
 
 def run_arms(cfg, name, run, oracle_path, specs, max_parallel):
@@ -219,9 +228,9 @@ def run_arms(cfg, name, run, oracle_path, specs, max_parallel):
             args += ['--budget', p[4]] if p[2] == 'budget' else ['--allowance', os.path.join(run, f'allowance_{arm}.json')]
             servers.append(subprocess.Popen(args, cwd='/', stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)); wait_port(port)
     try:
-        tour = set(cfg.get('tour_arms', []))
-        for seed_dir, group in (('seed', [s for s in specs if s.split(':')[0] not in tour]),
-                                ('seed_tour', [s for s in specs if s.split(':')[0] in tour])):
+        kinds = tour_kinds(cfg); where = {'tour': 'seed_tour', 'contrast': 'seed_tourc'}
+        for seed_dir in ('seed', 'seed_tour', 'seed_tourc'):
+            group = [s for s in specs if where.get(kinds.get(s.split(':')[0]), 'seed') == seed_dir]
             if not group: continue
             cmd = [sys.executable, os.path.join(ROOT, 'lab', 'make_swarm.py'), '--run', name, '--seed', os.path.join(run, seed_dir),
                    '--prompt', os.path.join(ROOT, cfg['prompt']), '--ask-texts', os.path.join(ROOT, cfg['ask_texts']),
@@ -255,7 +264,7 @@ def main():
     sh(sys.executable, os.path.join(ROOT, 'lab', 'new_intent_gate.py'), '--name', name, '--oracle', oracle_path,
        '--visible-seed', str(cfg['visible_seed']), '--hidden-seed', str(cfg['hidden_seed']), cwd='/')
     say('starting repo and hidden suite built')
-    if cfg.get('tour_arms'): build_tour(o, names, run)
+    for kind in sorted(set(tour_kinds(cfg).values())): build_tour(o, names, run, contrast=(kind == 'contrast'))
     allowance = {}
     for arm, spec in cfg.get('allowance', {}).items():
         order = sorted(names); random.Random(spec['seed']).shuffle(order); alw = {}

@@ -1,0 +1,20 @@
+{
+ "name": "plumbing_g14",
+ "predictions": "lab/experiments/test_plumbing_g14.json",
+ "rulegiver_brief": "gate14/prompts/rulegiver_brief.md",
+ "require_decisions": true,
+ "prompt": "lab/templates/prompt_builder.md",
+ "ask_texts": "lab/experiments/g14_ask_texts.md",
+ "visible_seed": 14100,
+ "hidden_seed": 14200000,
+ "baseline": "N0",
+ "tour_arms": {
+  "T": "tour",
+  "TC": "contrast"
+ },
+ "arms": [
+  "N0:1:none",
+  "T:1:none",
+  "TC:1:none"
+ ]
+}
