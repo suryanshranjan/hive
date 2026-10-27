@@ -8,10 +8,17 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 - Gate 17 (`gate17/RESULTS.md`): on the same rules, the documented owner's interface (handbook + extracted tour + 17 questions) reached 93.8% hidden and the listing owner's (tour + 17 questions) 98.2%. The gap (+4.4) sits entirely at decisions nobody wrote down. `BRAIN.md` section 2 now states the measured intent interface.
 - **Waiting on the user:** the next step needs real people or real documents (see "Needs the user" below). Agent-only gates can continue with the cards below.
 
+## Ready
+
+### G18: the decision tour on a real company's rules
+- **Run (needs the private Gate 7 wrapper, kept outside the repo):** `python3 lab/run_gate.py lab/experiments/g18_real.json --oracle <private>/oracle.py`
+- **Teams:** N0; T (56 owner-confirmed cases as tour); Q (19 questions); TQ (both). About $9, 10 minutes.
+- **Afterwards:** run `gate18/referee/analyze.py` on the private results; commit aggregates only.
+
 ## Needs the user
 
-### G18: the documented-owner interface on a real company's documents
-- Gate 7's company documents (kept privately by the user, never in this repo) as the handbook; a person, or the documented policy, answers the extractor's picks and 17 questions.
+### G19: the documented-owner interface on a real company's documents
+- The company's policy pages (Notion was unavailable on Oct 27: the connector did not authorize in this session) as the handbook; the confirmed rules answer.
 - Publish only anonymized aggregate numbers, as in Gate 7.
 
 ## Running on a laptop (Docker)
