@@ -11,6 +11,8 @@ Stages (each prints what it did):
   4. Tests and starting repo (lab/new_intent_gate.py); hidden suite goes to private/<name>/hidden.
   5. Random allowance per function, if the config has one (seeded, fixed in the config before the rules exist).
   6. Product-owner servers for every arm that can ask; swarms (lab/make_swarm.py); workers (lab/launch.py).
+     With a "stratified" block, the baseline arm runs and is scored first; functions are then paired by its edge
+     errors, a seeded coin picks the 'hi' function of each pair, and each stratified arm's plan sets hi/lo questions.
   7. Scoring: every arm's final engine, call by call; 95% intervals bootstrapped over functions; paired differences
      against the baseline arm; gain by allowance level. Writes runs/<name>/summary.json and summary.md.
 Afterwards (by the session, not this script): write gate<k>/RESULTS.md from summary.md, update BRAIN.md and
@@ -81,22 +83,44 @@ def wait_port(port):
 def boot(vals, rng, n=4000):
     b = sorted(sum(rng.choice(vals) for _ in vals) / len(vals) for _ in range(n)); return b[int(.025 * n)], b[int(.975 * n) - 1]
 
+def probe(cfg, oracle_path, run, arm):
+    final = os.path.join(run, f'final_{arm}'); shutil.rmtree(final, ignore_errors=True)
+    sh('git', 'clone', '-q', os.path.join(run, f'up{arm}.git'), final)
+    out = os.path.join(run, f'probe_{arm}.json')
+    sh(sys.executable, os.path.join(ROOT, 'lab', 'intent.py'), 'probe', oracle_path, final, out, str(cfg['hidden_seed']), cwd='/')
+    return json.load(open(out))
+
+def edge_errors(rows):
+    err = collections.Counter()
+    for r in rows:
+        if r['kind'] == 'edge': err[r['cat']] += not r['ok']
+    return err
+
+def pair_allowance(st, names, err):
+    """Sort functions by the base arm's edge errors, pair neighbours, and flip a seeded coin per pair for which one is 'hi'.
+    Every stratified arm gives st['plans'][arm]['hi'] questions to the hi function of each pair and ['lo'] to the other."""
+    order = sorted(names, key=lambda f: (err[f], f)); rng = random.Random(st['seed'])
+    assert len(order) % 2 == 0, 'stratified pairing needs an even number of functions'
+    pairs = []
+    for i in range(0, len(order), 2):
+        a, b = order[i], order[i + 1]
+        pairs.append((a, b) if rng.random() < .5 else (b, a))      # (hi, lo)
+    alw = {arm: {f: plan[k] for hi, lo in pairs for f, k in ((hi, 'hi'), (lo, 'lo'))} for arm, plan in st['plans'].items()}
+    return pairs, alw
+
 def score(cfg, name, oracle_path, arms, run, allowance):
     say('scoring every arm call by call...')
     o = intent.load_oracle(oracle_path); cats = intent.Gen(o).CATS
     res = {}
     for arm in arms:
-        final = os.path.join(run, f'final_{arm}'); shutil.rmtree(final, ignore_errors=True)
-        sh('git', 'clone', '-q', os.path.join(run, f'up{arm}.git'), final)
-        out = os.path.join(run, f'probe_{arm}.json')
-        sh(sys.executable, os.path.join(ROOT, 'lab', 'intent.py'), 'probe', oracle_path, final, out, str(cfg['hidden_seed']), cwd='/')
-        rows = json.load(open(out))
+        rows = probe(cfg, oracle_path, run, arm)
         tests = collections.defaultdict(lambda: collections.defaultdict(list)); edge = collections.defaultdict(list)
         for r in rows:
             tests[r['cat']][r['test']].append(r['ok'])
             if r['kind'] == 'edge': edge[r['cat']].append(r['ok'])
         res[arm] = dict(tests={c: [all(v) for v in tests[c].values()] for c in cats},
-                        edge={c: (sum(edge[c]) / len(edge[c]) if edge[c] else None) for c in cats})
+                        edge={c: (sum(edge[c]) / len(edge[c]) if edge[c] else None) for c in cats},
+                        right={c: sum(edge[c]) for c in cats}, wrong={c: len(edge[c]) - sum(edge[c]) for c in cats})
     rng = random.Random(7); summary = dict(name=name, arms={}, diffs={}, allowance={})
     for arm in arms:
         T = res[arm]['tests']; n = sum(len(v) for v in T.values()); p = sum(sum(v) for v in T.values()) / n
@@ -115,6 +139,23 @@ def score(cfg, name, oracle_path, arms, run, allowance):
                 g[alw[c]].append(res[arm]['edge'][c] - res[base]['edge'][c])
         summary['allowance'][arm] = {str(k): dict(mean_gain_points=round(100 * sum(v) / len(v), 1),
                                                   ci95=[round(100 * x, 1) for x in boot(v, rng)], functions=len(v)) for k, v in sorted(g.items())}
+    st = cfg.get('stratified')
+    if st:
+        # errors fixed = edge calls right minus the base arm's, per function; ratio of two arms bootstrapped over pairs
+        pairs = json.load(open(os.path.join(run, 'pairs.json')))
+        fixed = {arm: {c: res[arm]['right'][c] - res[base]['right'][c] for c in cats} for arm in st['plans']}
+        summary['stratified'] = dict(pairs=pairs, arms={})
+        for arm in st['plans']:
+            lv = collections.defaultdict(lambda: [0, 0])
+            for c in cats:
+                lv[allowance[arm][c]][0] += fixed[arm][c]; lv[allowance[arm][c]][1] += res[base]['wrong'][c]
+            summary['stratified']['arms'][arm] = dict(errors_fixed=sum(fixed[arm].values()), base_errors=sum(res[base]['wrong'].values()),
+                share_fixed_by_questions={str(q): dict(fixed=f, base_errors=e, share=round(f / e, 3) if e else None) for q, (f, e) in sorted(lv.items())})
+        num, den = st['ratio']
+        def ratio(ps):
+            d = sum(fixed[den][c] for p in ps for c in p); return sum(fixed[num][c] for p in ps for c in p) / d if d else float('inf')
+        bs = sorted(ratio([rng.choice(pairs) for _ in pairs]) for _ in range(4000))
+        summary['stratified']['ratio'] = dict(arms=f'{num}/{den}', value=round(ratio(pairs), 3), ci95=[round(bs[100], 3), round(bs[3899], 3)])
     json.dump(summary, open(os.path.join(run, 'summary.json'), 'w'), indent=1)
     md = [f'# {name}: summary', '', '| Arm | Hidden pass | 95% CI by function |', '| --- | --- | --- |']
     md += [f"| {a} | {v['hidden_pass']:.1%} | {v['ci95_by_function'][0]:.1%}–{v['ci95_by_function'][1]:.1%} |" for a, v in summary['arms'].items()]
@@ -124,8 +165,42 @@ def score(cfg, name, oracle_path, arms, run, allowance):
     for arm, levels in summary['allowance'].items():
         md += ['', f'Gain in edge-call accuracy over {base}, by allowance ({arm}):', '', '| Questions allowed | Mean gain | 95% CI | Functions |', '| --- | --- | --- | --- |']
         md += [f"| {k} | {v['mean_gain_points']:+.1f} | {v['ci95'][0]:+.1f} to {v['ci95'][1]:+.1f} | {v['functions']} |" for k, v in levels.items()]
+    if st:
+        s = summary['stratified']
+        md += ['', f'Edge errors fixed over {base} (pairs matched on {base} edge errors):', '',
+               '| Arm | Errors fixed | Share fixed at 0 / 1 / 2 / 3 questions |', '| --- | --- | --- |']
+        for arm, v in s['arms'].items():
+            lv = v['share_fixed_by_questions']
+            md.append(f"| {arm} | {v['errors_fixed']} of {v['base_errors']} | " +
+                      ' / '.join(f"{lv[q]['share']:.2f}" if q in lv and lv[q]['share'] is not None else '–' for q in '0123') + ' |')
+        r = s['ratio']; md += ['', f"Ratio {r['arms']}: **{r['value']:.2f}** (95% CI {r['ci95'][0]:.2f} to {r['ci95'][1]:.2f}, bootstrap over pairs)"]
     open(os.path.join(run, 'summary.md'), 'w').write('\n'.join(md) + '\n')
     print('\n'.join(md))
+
+def run_arms(cfg, name, run, oracle_path, specs, max_parallel):
+    """Product-owner servers, swarms and workers for the given arms only; waits until every worker exits."""
+    servers = []
+    for spec in specs:
+        p = spec.split(':'); arm = p[0]
+        if len(p) > 2 and p[2] in ('budget', 'quota'):
+            port = int(p[3]); args = [sys.executable, os.path.join(ROOT, 'lab', 'ask_server.py'), '--oracle', oracle_path, '--port', str(port),
+                                      '--log', os.path.join(run, f'asks_{arm}.log')]
+            args += ['--budget', p[4]] if p[2] == 'budget' else ['--allowance', os.path.join(run, f'allowance_{arm}.json')]
+            servers.append(subprocess.Popen(args, cwd='/', stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)); wait_port(port)
+    try:
+        cmd = [sys.executable, os.path.join(ROOT, 'lab', 'make_swarm.py'), '--run', name, '--seed', os.path.join(run, 'seed'),
+               '--prompt', os.path.join(ROOT, cfg['prompt']), '--ask-texts', os.path.join(ROOT, cfg['ask_texts']),
+               '--example-file', os.path.join(run, 'example.txt')]
+        for spec in specs:
+            p = spec.split(':'); cmd += ['--arm', spec if not (len(p) > 2 and p[2] == 'quota') else ':'.join(p[:4])]
+        print(sh(*cmd), end='')
+        say('launching workers...')
+        launch = [sys.executable, os.path.join(ROOT, 'lab', 'launch.py'), '--run', name]
+        for spec in specs: launch += ['--arm', spec.split(':')[0]]
+        if max_parallel: launch += ['--max-parallel', str(max_parallel)]
+        subprocess.run(launch, cwd=ROOT, check=True)
+    finally:
+        for s in servers: s.send_signal(signal.SIGTERM)
 
 def main():
     ap = argparse.ArgumentParser()
@@ -147,27 +222,22 @@ def main():
         assert not order, 'allowance counts must cover every function'
         json.dump(alw, open(os.path.join(run, f'allowance_{arm}.json'), 'w'), indent=1); allowance[arm] = alw
         say(f'allowance for {arm}: ' + ', '.join(f'{k}:{sum(1 for v in alw.values() if v == int(k))}' for k in spec['counts']))
-    servers = []
-    for spec in cfg['arms']:
-        p = spec.split(':'); arm = p[0]
-        if len(p) > 2 and p[2] in ('budget', 'quota'):
-            port = int(p[3]); args = [sys.executable, os.path.join(ROOT, 'lab', 'ask_server.py'), '--oracle', oracle_path, '--port', str(port),
-                                      '--log', os.path.join(run, f'asks_{arm}.log')]
-            args += ['--budget', p[4]] if p[2] == 'budget' else ['--allowance', os.path.join(run, f'allowance_{arm}.json')]
-            servers.append(subprocess.Popen(args, cwd='/', stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)); wait_port(port)
-    try:
-        cmd = [sys.executable, os.path.join(ROOT, 'lab', 'make_swarm.py'), '--run', name, '--seed', os.path.join(run, 'seed'),
-               '--prompt', os.path.join(ROOT, cfg['prompt']), '--ask-texts', os.path.join(ROOT, cfg['ask_texts']),
-               '--example-file', os.path.join(run, 'example.txt')]
-        for spec in cfg['arms']:
-            p = spec.split(':'); cmd += ['--arm', spec if not (len(p) > 2 and p[2] == 'quota') else ':'.join(p[:4])]
-        print(sh(*cmd), end='')
-        say('launching workers...')
-        launch = [sys.executable, os.path.join(ROOT, 'lab', 'launch.py'), '--run', name]
-        if a.max_parallel: launch += ['--max-parallel', str(a.max_parallel)]
-        subprocess.run(launch, cwd=ROOT, check=True)
-    finally:
-        for s in servers: s.send_signal(signal.SIGTERM)
+    st = cfg.get('stratified')
+    if st:
+        # stage 1: the base arm alone, scored, so allowances can be matched on what it got wrong
+        base_specs = [s for s in cfg['arms'] if s.split(':')[0] == cfg['baseline']]
+        say(f'stage 1: {cfg["baseline"]} alone')
+        run_arms(cfg, name, run, oracle_path, base_specs, a.max_parallel)
+        err = edge_errors(probe(cfg, oracle_path, run, cfg['baseline']))
+        pairs, alw = pair_allowance(st, names, err)
+        json.dump([list(p) for p in pairs], open(os.path.join(run, 'pairs.json'), 'w'), indent=1)
+        for arm, al in alw.items():
+            json.dump(al, open(os.path.join(run, f'allowance_{arm}.json'), 'w'), indent=1); allowance[arm] = al
+            say(f'allowance for {arm} (stratified, {len(pairs)} pairs): ' + ', '.join(f'{q}:{sum(1 for v in al.values() if v == q)}' for q in sorted(set(al.values()))))
+        say(f'stage 2: ' + ', '.join(s.split(':')[0] for s in cfg['arms'] if s not in base_specs))
+        run_arms(cfg, name, run, oracle_path, [s for s in cfg['arms'] if s not in base_specs], a.max_parallel)
+    else:
+        run_arms(cfg, name, run, oracle_path, cfg['arms'], a.max_parallel)
     score(cfg, name, oracle_path, [s.split(':')[0] for s in cfg['arms']], run, allowance)
     if a.replay:
         for spec in cfg['arms']:

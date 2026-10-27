@@ -27,7 +27,7 @@ The session reads `CLAUDE.md`, `BRAIN.md` and `lab/QUEUE.md`, runs the top ready
 | `make_swarm.py` | One bare repo per team, one clone per worker, one rendered prompt per worker |
 | `launch.py` | Runs each worker as a separate headless `claude -p` process, waits, and records minutes, tokens and cost |
 | `templates/prompt_builder.md` | The builder prompt used since Gate 3 |
-| `experiments/*.json` | One config per experiment; `g8_curve.json` is ready |
+| `experiments/*.json` | One config per experiment. A `"stratified"` block (see `g11_spread_vs_blocks.json`) runs the baseline arm first, pairs functions by its edge errors, and sets each arm's questions per pair (`hi`/`lo`) |
 
 ## A scale run (no product owner)
 

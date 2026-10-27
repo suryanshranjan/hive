@@ -1,0 +1,12 @@
+{
+  "name": "g11",
+  "predictions": "gate11/prompts/PREDICTIONS.md",
+  "rulegiver_brief": "gate5/prompts/rulegiver_brief.md",
+  "prompt": "lab/templates/prompt_builder.md",
+  "ask_texts": "lab/experiments/g11_ask_texts.md",
+  "visible_seed": 11100,
+  "hidden_seed": 11200000,
+  "baseline": "N0",
+  "arms": ["N0:3:none", "S:3:quota:7411", "B:3:quota:7412"],
+  "stratified": {"seed": 11000, "plans": {"S": {"hi": 2, "lo": 1}, "B": {"hi": 3, "lo": 0}}, "ratio": ["S", "B"]}
+}
