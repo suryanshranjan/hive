@@ -2,7 +2,7 @@
 
 Read this first. It is the shared memory for anyone working on Hive, human or agent: what we know, how sure we are, what is being tested, and exactly how to continue. When you learn something, update this file in the same commit as the evidence.
 
-Last updated: Oct 27 2026, 16:20 IST.
+Last updated: Oct 27 2026, after Gate 8.
 
 ## 1. The question
 
@@ -17,7 +17,7 @@ Two things limit them today:
 - **Cost is mostly onboarding.** Each worker spends about 110k tokens getting started, against about 3k to 5k per task after that.
 - **Speed stops improving at around 6 to 12 workers.** The biggest task, and how late it gets claimed, sets the finish time.
 
-The deeper limit is intent. On rules a model cannot guess, swarms passed every visible example but only 35 to 58% of the hidden tests when there was no one to ask (Gates 3 to 5, including rules written by an independent agent). 30 questions to a product owner added +28.6, +29.0 and +32.4 points on three different rule sets; 320 questions reached 98%. Gate 6 assigned questions per function at random and showed that questions **cause** the gain: 3 questions on a function added +44 points of edge-case accuracy, 1 question only +12, none +8. A rule needs several answered points to pin down, so questions are worth more in blocks of about 3 than spread one per function. Two strategies for choosing questions failed to beat free asking: coverage planning (Gate 4) and defaults-first (Gate 5). Where an owner's surprises sit depends on the owner.
+The deeper limit is intent. On rules a model cannot guess, swarms passed every visible example but only 35 to 58% of the hidden tests when there was no one to ask (Gates 3 to 5, including rules written by an independent agent). 30 questions to a product owner added +25 to +32 points on five different rule sets; 320 questions reached 98%. Gates 6 and 8 assigned questions per function at random and showed that questions **cause** the gain. Counted against what each function got wrong without questions, one law fits both independent rule sets: **each answered question fixes about half (p ≈ 0.55) of the edge errors still left on its function**, with diminishing returns (model, held out once). Gate 6's "one question buys little" came from a randomization imbalance (its 1-question functions had half the errors to fix), so the advice to ask in blocks of 3 is withdrawn; one question per function first is the new default (model, not yet run head to head). Two strategies for choosing questions failed to beat free asking: coverage planning (Gate 4) and defaults-first (Gate 5). Where an owner's surprises sit depends on the owner.
 
 ## 3. The law and how sure we are of each part
 
@@ -39,8 +39,8 @@ Status tags: **established** means outside theory or our data on real agents; **
 | 6 No universal referee | no automatic check decides arbitrary intent | Established (Rice) |
 | 7 Intent bandwidth | useful work per hour ≤ I/b | **Evidence that intent binds** (Gates 3, 4): hidden pass rises with questions (58 / 87 / 98% at 0 / 30 / 320). The rate law itself (I and b) is **not measured** |
 | Coverage | edge error ≈ e_g·(1 − coverage of input classes by questions) | **Prediction failed** (Gate 4): coverage-planned 30 questions = free 30 questions |
-| Questions per function | edge-accuracy gain +7.9 / +11.9 / +44.0 points at 0 / 1 / 3 questions on that function (3 − 0: +36.1, CI +20 to +51) | **Randomized** (Gate 6, one rule set, 6–7 functions per group). The earlier observational table (0 / +20 / +24 / +34, Gates 3–5) overstated the first question |
-| Allocation of a fixed budget | concentrating about 3 questions per function beats one per function (model mean edge gain 25.9 vs 19.9 for 30 questions) | **Model** from the Gate 6 curve; gain(2) interpolated |
+| Questions per function | errors fixed ≈ E_f·(1 − (1−p)^q), E_f = the function's edge errors with no questions, q = answered questions on it; p = 0.53 (Gate 6, CI 0.43–0.65), 0.56 (Gate 8, CI 0.38–0.75). Raw gains: +7.9 / +11.9 / +44.0 (Gate 6) and 0 / +21.0 / +26.1 / +39.1 (Gate 8) at 0 / 1 / (2) / 3 | Gains are **randomized** (two rule sets, 5–7 functions per group). The law is a **model**: fitted on Gate 6, held out once on Gate 8 (level means within 4.3 pts). Gate 6's convex reading was a headroom imbalance |
+| Allocation of a fixed budget | one question per function before any second: about 1.5× the errors fixed of blocks of 3 (13.5 vs 9.1 units of E for 30 questions over 20 functions) | **Model** from the law above; reverses Gate 6's table; not run head to head |
 | Onboarding | tokens ≈ c_on·N + c_task·T | **Model**, held out three times (Gates 1, 2, 3) |
 | Tail | finish ≥ max(work/N, longest task + when it starts) | Established (scheduling theory); seen binding in Gate 3 |
 | Coverage cliff | N* ∝ (1−c)^−0.61 · τ^−1.04 · κ^−0.55 | Model, simulation only (1.4× typical error held out) |
@@ -61,8 +61,11 @@ Status tags: **established** means outside theory or our data on real agents; **
 | Cost of one conflict | 10 s to 2 min | Gates 1 to 3 |
 | Visible minus hidden gap | under 1 point when visible and hidden sample the same intent; 42 to 52 points when intent is missing (no questions) | Gates 1 to 4 |
 | Guess accuracy without intent | 99 to 100% on happy paths, 66 to 73% on edge cases | Gates 3, 4 |
-| Gain from 30 questions | +28.6, +29.0, +32.4, +25.0 points hidden (paired 95% CIs about ±12) | Gates 3 to 6 |
-| Guessing baseline, edge calls | 73% (Gate 3), 66% (Gate 4), 54% and 60% (Gates 5, 6: independent rule-givers) | Gates 3 to 6 |
+| Gain from 30 questions | +28.6, +29.0, +32.4, +25.0, +29.4 points hidden (paired 95% CIs about ±13) | Gates 3 to 6, 8 |
+| Guessing baseline, edge calls | 73% (Gate 3), 66% (Gate 4), 54%, 60% and 57% (Gates 5, 6, 8: independent rule-givers) | Gates 3 to 6, 8 |
+| p, share of remaining edge errors one answer fixes | 0.53 and 0.56 | Gates 6, 8 |
+| Spillover to unasked functions | 0.15 of their errors (Gate 6), 0 (Gate 8) | Gates 6, 8 |
+| Cost of a 2-team intent gate | $6.0 at list price (rule-giver $0.82, 6 builders $5.16); reported tokens include cache reads | Gate 8 |
 | Edge accuracy, function asked vs not | 96.1% vs 75.7% (observational: workers chose what to ask) | Gate 3 |
 | Remaining error after 30 questions | 51 to 56% is NULL handling and caps on extremes | Gate 4 |
 | Cost of questions | +12% tokens and about 2.5 min for 320 questions | Gate 3 |
@@ -81,15 +84,16 @@ Status tags: **established** means outside theory or our data on real agents; **
 | Gate 4 | Oct 27 | Fresh rules; 0 questions, 30 free questions, 30 questions chosen by a coverage planner whose answers became tests | 47.8% / 76.8% / 76.4%: planning did not help (−0.4 pts, CI −12 to +11); kill condition fired; the +29-point gain from 30 questions replicated |
 | Gate 7 | Oct 27 | A real company's 10 rules (Company X, name withheld), checked against its internal documents; no questions vs 15 questions answered from the documented policy | 32.8% → 49.6% hidden (+16.8, CI +6 to +31); the same team gained +21 from its answers; the biggest losses came from never being told the allowed input values; rules kept private |
 | Gate 6 | Oct 27 | Second independent rule-giver; 0 questions, 30 free, and 0 / 1 / 3 questions per function assigned at random | Questions cause the gain (3 vs 0: +36 pts, CI +20 to +51); one question adds little (+12 vs +8); 'first question worth most' failed; concentration beats spreading (model); +25-point gain from 30 questions replicated a fourth time |
+| Gate 8 | Oct 27 | Third independent rule-giver; 0 questions vs 0 / 1 / 2 / 3 questions per function at random (5 each), run in Docker with `lab/run_gate.py` | 42.4% → 71.8% hidden (+29.4, CI +16 to +43); gains 0 / +21.0 / +26.1 / +39.1; R3 failed and its kill fired; Gate 6's weak first question traced to a headroom imbalance; p ≈ 0.55 fits both gates |
 | Gate 5 | Oct 27 | Rules from an independent rule-giver agent; 0 questions, 30 free, 30 defaults-first | 34.6% / 67.0% / 62.2%: defaults-first did not help (−4.8 pts, CI −14.6 to +4.2) though delivered (37% of questions had NULL vs 10%); kill fired; +32.4-point gain from 30 questions replicated |
 
 ## 6. Prediction scorecard
 
 All predictions are written down before the run, in each gate's `PREDICTIONS.md`.
 
-- **Held:** intent is binding, and correctness rises with questions, all 5 intent predictions (Gate 3); no-questions baseline in range (Gate 4); gain from 30 questions in +15 to +43, treatment delivered, rules not guessable (Gate 5); questions cause the gain, fourth replication (Gate 6); onboarding law (Gates 2, 3); no gaming (Gates 1, 2, 3); guard keeps regressions off the tip of main (Gate 3; the blocked commit still sits in history next to its fix, so `--continue` should squash); no overlapping claims (Gate 3).
-- **Failed:** the first question per function is worth the most (Gate 6: gain(1)/gain(3) = 0.27); defaults-first questions beat free questions (Gate 5: 62.2% vs 67.0%); coverage-planned questions beat free questions, and reach 95% (Gate 4: 76.4% vs 76.8%); free 30 questions in 78–92% (Gate 4: 76.8%); free askers leave 3+ functions unasked (Gate 4: 2); foundation-first is cheaper (Gate 1); speed of 3 to 4× at 12 workers (Gate 2: 2.3×); collisions growing as κ(N−1) (Gate 2: slower); finer claims lowering the time floor (Gate 3: 8.7 min against 7.8).
-- **Untested:** a person answering live (Gate 7's answers came from documented policy); 24 workers; breakers at scale; gain at 2 questions and beyond 3; a concentrated allocation run head to head; which functions deserve the blocks.
+- **Held:** intent is binding, and correctness rises with questions, all 5 intent predictions (Gate 3); no-questions baseline in range (Gate 4); gain from 30 questions in +15 to +43, treatment delivered, rules not guessable (Gate 5); questions cause the gain, fourth replication (Gate 6); questions cause the gain again, fifth replication, curve rises, rules not guessable, treatment delivered (Gate 8, R1, R2, R4, R5); onboarding law (Gates 2, 3); no gaming (Gates 1, 2, 3); guard keeps regressions off the tip of main (Gate 3; the blocked commit still sits in history next to its fix, so `--continue` should squash); no overlapping claims (Gate 3).
+- **Failed:** the first question is worth less than half of three (Gate 8: 0.54; its kill fired and "blocks of 3" was withdrawn); a surprise-count law found post hoc in Gate 8 (worse than question count on held-out Gate 6); the first question per function is worth the most (Gate 6: gain(1)/gain(3) = 0.27, later traced to a headroom imbalance); defaults-first questions beat free questions (Gate 5: 62.2% vs 67.0%); coverage-planned questions beat free questions, and reach 95% (Gate 4: 76.4% vs 76.8%); free 30 questions in 78–92% (Gate 4: 76.8%); free askers leave 3+ functions unasked (Gate 4: 2); foundation-first is cheaper (Gate 1); speed of 3 to 4× at 12 workers (Gate 2: 2.3×); collisions growing as κ(N−1) (Gate 2: slower); finer claims lowering the time floor (Gate 3: 8.7 min against 7.8).
+- **Untested:** a person answering live (Gate 7's answers came from documented policy); 24 workers; breakers at scale; gain beyond 3 questions; one-per-function against blocks of 3, head to head; p on a third rule-giver.
 - **Dropped before running:** 'one question per function before any gets a third'. Our own table predicted 0–1 points of effect against ±10 of noise, and Gate 6's curve later showed it would have been the worst allocation.
 - **Flawed check, disclosed:** one cheating-signature rule (CHECKSUM +97) could be read off a visible example.
 
@@ -108,7 +112,8 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
   - Write every answer into a shared test at once.
   - Label each answer as a ruling on that input only. Builders stretched rulings into rules, within and across functions (Gate 4: about 45 of 139 failing calls).
   - Planning questions by coverage (Gate 4) and asking about defaults first (Gate 5) did not beat free asking. Don't rely on either.
-  - Spend questions in blocks of about 3 per function, enough to triangulate a rule. One question per function buys little (Gate 6). Which functions get the blocks is still open.
+  - Give every function a first question before any gets a second; each answer fixes about half of what is left (Gates 6, 8; model). Spend seconds where the first answer surprised. The earlier "blocks of 3" advice is withdrawn (Gate 8).
+  - A question that confirms the builders' guess buys nothing; confirmation does not mean the function is right (Gate 8, conjecture).
   - Put the allowed input values (statuses, types, categories) in the spec. Their absence caused the largest losses with a real company's rules (Gate 7).
   - Read the company's own documents first. They overturned two of the owner's rules before any code was written (Gate 7).
   - Vary one thing per question. A question that mixed a small group with an invalid value taught the wrong rule (Gate 5, `nps_score`).
@@ -116,7 +121,7 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 ## 8. Open questions, most important first
 
 1. **The intent curve.** How does hidden correctness grow with the number of answered values: 0, 10, 30, 100, 300 questions, repeated? This would turn limit 7 from evidence into a measured law.
-2. **Which functions get the blocks.** With 3 questions per function, a 30-question budget covers only 10 of 20 functions. What predicts where the blocks pay most (spec vagueness, number of arguments, the builders' own confidence)? Also measure gain at 2 questions and at 5 or more.
+2. **Is p a constant?** p ≈ 0.55 on two rule-givers. Does it hold on a third, at 5+ questions, and for a person answering? And does one-per-function beat blocks of 3 head to head, with allowances stratified by headroom?
 3. **The tail.** Does largest-first claiming bring 12 workers under 7 minutes?
 4. **The largest swarm this lab allows**: 20 workers with largest-first claiming.
 5. **Turning intent into tests automatically**: the referee as the product.
@@ -124,9 +129,10 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 
 ## 9. Next experiments, exactly
 
-1. **Intent curve** (about 1.7M tokens per repeat). Fresh rules; teams of 3 with 0, 10, 30, 100 and 300 questions; then repeat. Fit hidden error against answered values, and register the form of the fit before the repeat.
-2. **Largest-first at 12 and 20 workers** (about 4M tokens). Same project as Gate 3 step 2. Registered prediction to write first: 12 workers under 7.0 minutes.
-3. **Self-registering modules** at 12 workers: conflicts per landing below 0.2.
+1. **Spread vs blocks, stratified** (about $8). Fresh rules; run N0 first and measure each function's edge errors; then two arms with 30 questions: one on every function plus 10 seconds, against 3 on 10 functions, matched on headroom. Prediction to register: spread fixes ≥ 1.3× the edge errors. Kill: blocks fix as many or more.
+2. **Intent curve** (about 1.7M tokens per repeat). Fresh rules; teams of 3 with 0, 10, 30, 100 and 300 questions; then repeat. Fit hidden error against answered values, and register the form of the fit before the repeat.
+3. **Largest-first at 12 and 20 workers** (about 4M tokens). Same project as Gate 3 step 2. Registered prediction to write first: 12 workers under 7.0 minutes.
+4. **Self-registering modules** at 12 workers: conflicts per landing below 0.2.
 
 ## Related systems
 
@@ -173,4 +179,5 @@ Rules of the lab:
 - T3 Code compared in Related systems.
 - Lab: `lab/` runs a whole gate in one command with real headless Claude Code workers, so any session (including from a phone) can continue from `lab/QUEUE.md`. Gate 8 predictions registered.
 - Gate 7: a real company's rules (Company X, name withheld), with its internal documents as the final authority. 15 answered questions lifted hidden correctness from 32.8% to 49.6%. Rules and answers are kept out of this public repo.
+- Gate 8: 0/1/2/3 questions per function at random, on a third rule-giver, run in Docker on a laptop. Questions cause the gain again (+39 at 3 vs 0); R3 failed and its kill fired. Gate 6's weak first question was a headroom imbalance; one law (each answer fixes about half the remaining errors, p ≈ 0.55) fits both gates; "blocks of 3" withdrawn in favour of one question per function first. A post-hoc surprise law failed its held-out test. Pre-flight power note added before scoring.
 - Gate 6: the spread-the-budget test was dropped after a pre-flight calculation showed it could not detect its own predicted effect. Instead, 0/1/3 questions per function were randomly assigned. Questions cause the gain (+36 points for 3 vs 0); one question adds little; concentration beats spreading (model).

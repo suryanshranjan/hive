@@ -1,0 +1,66 @@
+{
+ "name": "g8",
+ "arms": {
+  "N0": {
+   "hidden_pass": 0.424,
+   "ci95_by_function": [
+    0.304,
+    0.548
+   ],
+   "tests": 500
+  },
+  "NQ": {
+   "hidden_pass": 0.718,
+   "ci95_by_function": [
+    0.606,
+    0.82
+   ],
+   "tests": 500
+  }
+ },
+ "diffs": {
+  "NQ-N0": {
+   "points": 29.4,
+   "ci95": [
+    16.0,
+    42.6
+   ]
+  }
+ },
+ "allowance": {
+  "NQ": {
+   "0": {
+    "mean_gain_points": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "functions": 5
+   },
+   "1": {
+    "mean_gain_points": 21.0,
+    "ci95": [
+     -1.5,
+     43.6
+    ],
+    "functions": 5
+   },
+   "2": {
+    "mean_gain_points": 26.1,
+    "ci95": [
+     5.0,
+     47.8
+    ],
+    "functions": 5
+   },
+   "3": {
+    "mean_gain_points": 39.1,
+    "ci95": [
+     25.8,
+     52.3
+    ],
+    "functions": 5
+   }
+  }
+ }
+}

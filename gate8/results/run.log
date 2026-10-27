@@ -1,0 +1,44 @@
+[11:22:10] predictions registered on origin/main: gate8/prompts/PREDICTIONS.md
+[11:22:10] rule-giver writing private rules (headless Claude Code)...
+[11:25:29] rules checked: 20 functions, 248 calls, deterministic
+[11:25:30] starting repo and hidden suite built
+[11:25:30] allowance for NQ: 0:5, 1:5, 2:5, 3:5
+N0: 3 workers, tools/ask.py port None, repo /home/node/hive/runs/g8/upN0.git
+NQ: 3 workers, tools/ask.py port 7401, repo /home/node/hive/runs/g8/upNQ.git
+next: python3 lab/launch.py --run g8
+[11:25:31] launching workers...
+launched N0-w1
+launched N0-w2
+launched N0-w3
+launched NQ-w1
+launched NQ-w2
+launched NQ-w3
+N0-w2 finished: exit 0, 2.1 min, tokens 879829, cost 0.7184725999999999
+N0-w3 finished: exit 0, 2.5 min, tokens 1121613, cost 0.8162088000000001
+NQ-w3 finished: exit 0, 2.5 min, tokens 1113138, cost 0.8542331999999998
+NQ-w2 finished: exit 0, 2.6 min, tokens 920164, cost 0.7901384
+N0-w1 finished: exit 0, 2.7 min, tokens 1095217, cost 0.8034673999999998
+NQ-w1 finished: exit 0, 3.4 min, tokens 1837245, cost 1.1829355999999998
+wrote /home/node/hive/runs/g8/agents.csv
+[11:28:57] scoring every arm call by call...
+# g8: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 42.4% | 30.4%–54.8% |
+| NQ | 71.8% | 60.6%–82.0% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| NQ-N0 | +29.4 | +16.0 to +42.6 |
+
+Gain in edge-call accuracy over N0, by allowance (NQ):
+
+| Questions allowed | Mean gain | 95% CI | Functions |
+| --- | --- | --- | --- |
+| 0 | +0.0 | +0.0 to +0.0 | 5 |
+| 1 | +21.0 | -1.5 to +43.6 | 5 |
+| 2 | +26.1 | +5.0 to +47.8 | 5 |
+| 3 | +39.1 | +25.8 to +52.3 | 5 |
+[11:28:58] done. Next: write the gate RESULTS.md from runs/g8/summary.md, update BRAIN.md and lab/QUEUE.md, push.
+EXIT=0
