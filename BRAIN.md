@@ -122,6 +122,13 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 2. **Largest-first at 12 and 20 workers** (about 4M tokens). Same project as Gate 3 step 2. Registered prediction to write first: 12 workers under 7.0 minutes.
 3. **Self-registering modules** at 12 workers: conflicts per landing below 0.2.
 
+## Related systems
+
+- **T3 Code** (Ping.gg, open source; v0.1.0 on Oct 15 2026): a control surface for coding agents (Codex, Claude Code, Cursor and others) across desktop, web and phone. Parallel threads run in separate git worktrees. A person reviews diffs and approves, and `delegate_task` lets a parent agent start child agents.
+  - **Contrast with Hive.** T3 Code helps one person *supervise* several agents, with the person as referee. Hive removes the supervisor: agents coordinate through claims and guarded landings, and tests are the referee.
+  - **Model, not measured on T3 Code.** A person reviewing every landing is a serial gate (limit 2). Our 12-worker swarm landed about 4 changes a minute, so at 2 minutes per review it would need about 8 reviewers. Hive moves the person to intent (limit 7) instead.
+  - **They complement each other.** T3 Code could serve as a Hive dashboard; Hive cannot work where there is no referee, and T3 Code can.
+
 ## 10. What this lab allows
 
 - At most 20 agents at once per session. A launch beyond that silently starts only the first 20.
