@@ -29,7 +29,7 @@ def _areas_text(cfg):
         return 'No areas are configured: claim short names for the parts of the goal you build (for example `fees`, `payouts`).'
     return '\n'.join(f'- `{a}`: tests matching {", ".join(f"`{g}`" for g in globs)}' for a, globs in sorted(areas.items()))
 
-def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None):
+def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None, assumptions=False):
     """Create <run>/up.git, one clone per worker in <run>/work, and one prompt per worker in <run>/prompts."""
     repo = os.path.abspath(repo); run = os.path.abspath(run)
     cfg = config.load(repo)
@@ -38,7 +38,7 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None)
         raise SystemExit(f'{run} exists: choose a new run folder')
     for d in ('work', 'prompts', 'logs', 'out'):
         os.makedirs(os.path.join(run, d))
-    owner_text = owner.setup(run, examples, questions)
+    owner_text = owner.setup(run, examples, questions, assumptions)
     up = os.path.join(run, 'up.git')
     sh('git', 'clone', '-q', '--bare', '--branch', b, repo, up)
     sh('git', '-C', up, 'symbolic-ref', 'HEAD', f'refs/heads/{b}')
