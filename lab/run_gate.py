@@ -340,6 +340,10 @@ def main():
     sh(sys.executable, os.path.join(ROOT, 'lab', 'new_intent_gate.py'), '--name', name, '--oracle', oracle_path,
        '--visible-seed', str(cfg['visible_seed']), '--hidden-seed', str(cfg['hidden_seed']), cwd='/')
     say('starting repo and hidden suite built')
+    if cfg.get('guard'):   # install another tools/land.py (e.g. Gate 23's cached guard) in the starting repo; tour repos clone it
+        seed = os.path.join(run, 'seed'); shutil.copy(os.path.join(ROOT, cfg['guard']), os.path.join(seed, 'tools', 'land.py'))
+        sh('git', '-c', 'user.name=hive', '-c', 'user.email=hive@local', 'commit', '-q', '-am', f'tools/land.py from {cfg["guard"]}', cwd=seed)
+        say(f'guard installed: {cfg["guard"]}')
     kinds = set(tour_kinds(cfg).values())
     for kind in sorted(kinds):
         if kind in ('tour', 'contrast'): build_tour(o, names, run, contrast=(kind == 'contrast'))
