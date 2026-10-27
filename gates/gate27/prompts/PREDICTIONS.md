@@ -28,3 +28,10 @@ Kill: **arm A passes < 60% of the founder's cases**, or **F6 fails with arm A â‰
 **Cost.** About $5 at list price for both arms, plus the founder's time: about 20 minutes to write the cases, then live answers.
 
 **Limits known in advance.** The experimenter translates the founder's words into tests, so a translation error counts against the swarm. To guard against this, the founder approves each translated case. One founder, one company and one run per arm, so the result is a strong hint, not a measured effect size.
+
+## Amendment, registered before the run (Oct 28 2026)
+
+- **Where the cases came from.** The founder first wrote 15 cases. On reading them, the experimenter judged 14 of the 15 to be decided by the written spec (they follow its wording closely), leaving 1 head-only case: too few to measure F6. So the experimenter proposed 9 more situations that the documents leave open, and the founder gave his own verdict on each (shown or not shown, with a reason). **The situations were proposed by the experimenter; the verdicts are the founder's.**
+- **Final set: 24 cases, 14 documented and 10 head-only.** They are scored on the shown / not shown verdict only, not on the exclusion code, because the founder gave verdicts, not codes. A private reference passes all 24, so they agree with one another. They were deleted from the container before the run.
+- **Owner screen.** Before the run, `hive owner` was made friendlier (numbered questions, one choice per line), and workers were told to ask the way they would ask a busy founder in person. This applies to arm A only, because arm B cannot ask.
+- **Predictions and kill conditions are unchanged.** With 10 head-only cases, one case is 10 points, so F6 needs a gap of at least 2 cases.
