@@ -2,11 +2,13 @@
 
 usage:
   python -m hive init --test-cmd "<command that runs all tests and writes JUnit XML to .hive/junit.xml>"
+  python -m hive claim <short_name> <area>[,<area>...] "<what you will build>"
   python -m hive land <short_name> "<commit message>"      # or: python -m hive land <short_name> --continue
+  python -m hive areas                                      # every area and who holds it
 """
 import argparse, json, os, sys
 
-from . import guard
+from . import claims, guard
 
 def init(test_cmd, junit):
     os.makedirs('.hive', exist_ok=True); os.makedirs(guard.LOCK_DIR, exist_ok=True)
@@ -24,12 +26,18 @@ def main(argv=None):
     ap = argparse.ArgumentParser(prog='hive', description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest='cmd', required=True)
     i = sub.add_parser('init'); i.add_argument('--test-cmd', required=True); i.add_argument('--junit', default='.hive/junit.xml')
+    c = sub.add_parser('claim'); c.add_argument('name'); c.add_argument('areas'); c.add_argument('desc')
     l = sub.add_parser('land'); l.add_argument('name'); l.add_argument('message')
+    sub.add_parser('areas')
     a = ap.parse_args(argv)
     if a.cmd == 'init':
         return init(a.test_cmd, a.junit)
+    if a.cmd == 'claim':
+        return claims.claim(a.name, a.areas, a.desc)
     if a.cmd == 'land':
         return guard.land(a.name, a.message)
+    if a.cmd == 'areas':
+        return claims.status()
 
 if __name__ == '__main__':
     sys.exit(main())

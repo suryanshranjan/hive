@@ -41,7 +41,7 @@ tests/                     Hive's own tests
 | # | Milestone | Done when |
 | --- | --- | --- |
 | M1 | Runner-agnostic guard | **Done.** `tests/test_guard.sh` (pytest, 7 checks) and a real company's Node.js backend (private; `node:test` with Node's JUnit reporter, 384 tests): clean change lands, regression refused, duplicate refused, cache hit after a lock commit, secrets refused, artifacts left out, any shared branch name |
-| M2 | Claims on areas | Two workers claiming overlapping areas: the later one is refused; a race resolves by commit order |
+| M2 | Claims on areas | **Done.** `tests/test_claims.sh` (9 checks, repeated 4 times): overlapping claims refused, unknown areas refused, two simultaneous claims leave exactly one holder, landing frees the area |
 | M3 | `hive run` | N headless workers on a sample repository, each in its own clone, finish a small backlog; cost and minutes logged |
 | M4 | Owner session | The owner's examples become tests in the project's framework; a worker's question reaches the owner's terminal and the answer is added as a test |
 | M5 | First real feature | A feature from a real backlog built by Hive end to end, the owner answering live; scored on the owner's held-back acceptance tests |
