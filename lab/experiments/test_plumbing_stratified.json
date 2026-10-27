@@ -1,0 +1,12 @@
+{
+  "name": "plumbing_strat",
+  "predictions": "lab/experiments/test_plumbing_stratified.json",
+  "rulegiver_brief": "gate5/prompts/rulegiver_brief.md",
+  "prompt": "lab/templates/prompt_builder.md",
+  "ask_texts": "lab/experiments/g11_ask_texts.md",
+  "visible_seed": 11100,
+  "hidden_seed": 11200000,
+  "baseline": "N0",
+  "arms": ["N0:1:none", "S:1:quota:7491", "B:1:quota:7492"],
+  "stratified": {"seed": 11000, "plans": {"S": {"hi": 2, "lo": 1}, "B": {"hi": 3, "lo": 0}}, "ratio": ["S", "B"]}
+}

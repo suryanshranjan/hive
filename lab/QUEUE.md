@@ -6,19 +6,20 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 
 - Gates 0 to 8 are done and written up. Gate 7 used a real company's rules, which stay private (never commit them).
 - Gate 8 ran on a Windows laptop inside Docker (about 7 minutes, $6.0 at list price). Results: `gate8/RESULTS.md`. Headline: R3 failed and its kill fired. Gate 6's weak first question was a headroom imbalance, and one law (each answer fixes about half the remaining edge errors, p ≈ 0.55) fits both gates. "Ask in blocks of 3" is withdrawn.
-- Nothing is ready to run. The next card (G11) needs its config and predictions first.
+- G11's config and predictions are registered (`gate11/prompts/PREDICTIONS.md`), and `run_gate.py` has a two-stage stratified mode (tested with do-nothing workers).
+
+## Ready
+
+### G11: one-per-function vs blocks of 3, stratified by headroom
+- **Run:** `python3 lab/run_gate.py lab/experiments/g11_spread_vs_blocks.json`
+- **Cost:** about $9 at list price; about 15 minutes.
+- **Afterwards:** write `gate11/RESULTS.md` (score P1 to P6, apply the decision rules), copy `private/g11/oracle.py` to `gate11/referee/`, update BRAIN.md and this file, push.
 
 ## Running on a laptop (Docker)
 
 Workers run shell commands, so run them in a container. Image: `node:22-bookworm` plus `python3 sqlite3 git` and `npm i -g @anthropic-ai/claude-code`, run as user `node`. Mount the repo read-write at `/host/hive` and `~/.claude/.credentials.json` read-only; copy the credentials into the container's `~/.claude/`; work in a fresh clone inside the container (a Windows checkout has CRLF line endings), with `origin` pointed at GitHub. Copy results back out and push from the host.
 
 ## Needs design first (write the config and predictions, push them, then run)
-
-### G11: one-per-function vs blocks of 3, stratified by headroom
-- **Why:** the Gate 8 law predicts that one question per function before any second fixes about 1.5× the errors of blocks of 3. This is the test that could kill the law.
-- **Design:** fresh rule-giver and seeds. Stage 1: run N0 alone and measure each function's edge errors on the hidden suite. Stage 2: two arms with 30 questions each. **S** gets one question per function plus a second on 10 functions; **B** gets 3 questions on 10 functions. Pick the 10 functions per arm to match on N0 headroom.
-- **Prediction to register:** S fixes ≥ 1.3× the edge errors B fixes. **Kill:** B fixes as many or more.
-- **Needs:** `run_gate.py` to take a precomputed allowance per arm (it already takes `allowance.counts`; add explicit per-function lists), and a stage-1 mode that stops after scoring N0.
 
 ### G9: intent interface v1 vs free asking
 - Arm A: free asking, 30 questions.
