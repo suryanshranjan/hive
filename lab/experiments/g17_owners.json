@@ -1,0 +1,24 @@
+{
+ "name": "g17",
+ "predictions": "gate17/prompts/PREDICTIONS.md",
+ "rulegiver_brief": "gate15/prompts/rulegiver_brief.md",
+ "extractor_brief": "gate15/prompts/extractor_brief.md",
+ "require_decisions": true,
+ "copy_rule": "exclude_from_hidden",
+ "prompt": "lab/templates/prompt_builder.md",
+ "ask_texts": "lab/experiments/g17_ask_texts.md",
+ "visible_seed": 17100,
+ "hidden_seed": 17200000,
+ "baseline": "N0",
+ "tour_arms": {
+  "X": "xtour",
+  "HXQ": "xtour+handbook",
+  "TQ": "tour"
+ },
+ "arms": [
+  "N0:3:none",
+  "X:3:none",
+  "HXQ:3:budget:7472:17",
+  "TQ:3:budget:7473:17"
+ ]
+}

@@ -112,8 +112,12 @@ def score(cfg, name, oracle_path, arms, run, allowance):
     say('scoring every arm call by call...')
     o = intent.load_oracle(oracle_path); cats = intent.Gen(o).CATS
     res = {}
+    ex_path = os.path.join(run, 'hidden_exclude.json'); exclude = set(json.load(open(ex_path))) if os.path.exists(ex_path) else set()
     for arm in arms:
         rows = probe(cfg, oracle_path, run, arm)
+        if exclude:
+            rows = [r for r in rows if r['q'] not in exclude]
+            json.dump(rows, open(os.path.join(run, f'probe_{arm}.json'), 'w'), default=str)
         tests = collections.defaultdict(lambda: collections.defaultdict(list)); edge = collections.defaultdict(list)
         for r in rows:
             tests[r['cat']][r['test']].append(r['ok'])
@@ -245,7 +249,8 @@ def build_xtour(cfg, o, names, run, name):
         subprocess.run(worker_cmd(), cwd=d, input=brief, stdout=out, stderr=subprocess.STDOUT, text=True)
     path = os.path.join(d, 'tour_inputs.json')
     if not os.path.exists(path): sys.exit(f'extractor wrote no tour_inputs.json; see {d}/extractor.json')
-    raw = json.load(open(path)); g = intent.Gen(o); picked, dropped = {}, []
+    raw = json.load(open(path)); g = intent.Gen(o); picked, dropped, overlap = {}, [], []
+    fair = cfg.get('copy_rule') == 'exclude_from_hidden'   # keep picks that equal hidden inputs; drop those calls from scoring
     total = 0
     for f in names:
         for args in raw.get(f, []):
@@ -255,9 +260,12 @@ def build_xtour(cfg, o, names, run, name):
                 if vals in [list(v) for v in o.AGG_TYPICAL + o.AGG_EDGE]: dropped.append((f, vals)); continue
             else:
                 if len(vals) != o.SCALARS[f][1] or any(v is not None and type(v) not in (int, float, str) for v in vals): dropped.append((f, vals)); continue
-                if tuple(vals) in {tuple(a) for a in o.TYPICAL[f] + o.EDGE[f]}: dropped.append((f, vals)); continue
+                if tuple(vals) in {tuple(a) for a in o.TYPICAL[f] + o.EDGE[f]}:
+                    if not fair: dropped.append((f, vals)); continue
+                    overlap.append('SELECT ' + g.call(f, vals))
             picked.setdefault(f, []).append(vals if f == g.AGG else tuple(vals)); total += 1
-    json.dump(dict(picked={f: [list(a) for a in v] for f, v in picked.items()}, dropped=dropped), open(os.path.join(run, 'xtour_inputs.json'), 'w'), indent=1)
+    json.dump(dict(picked={f: [list(a) for a in v] for f, v in picked.items()}, dropped=dropped, overlap=overlap), open(os.path.join(run, 'xtour_inputs.json'), 'w'), indent=1)
+    if fair: json.dump(sorted(set(overlap)), open(os.path.join(run, 'hidden_exclude.json'), 'w'), indent=1)
     out = os.path.join(run, 'seed_xtour'); shutil.rmtree(out, ignore_errors=True)
     sh('git', 'clone', '-q', os.path.join(run, 'seed'), out); vis = os.path.join(out, 'tests', 'visible'); n = 0
     for f, ex in picked.items():
@@ -279,7 +287,8 @@ def build_xtour(cfg, o, names, run, name):
     sh('git', 'add', '-A', cwd=out)
     sh('git', '-c', 'user.name=hive', '-c', 'user.email=hive@local', 'commit', '-q', '-m',
        "Product owner's worked examples (tests/visible/*_tour_*.json), answered at inputs picked from the handbook", cwd=out)
-    say(f'extracted tour built: {total} inputs picked, {len(dropped)} dropped, {n} visible tests')
+    say(f'extracted tour built: {total} inputs picked, {len(dropped)} dropped, {len(overlap)} equal hidden inputs'
+        + (' (kept; those calls are removed from scoring for every team)' if fair else '') + f', {n} visible tests')
     return out
 
 def run_arms(cfg, name, run, oracle_path, specs, max_parallel):

@@ -6,7 +6,14 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 
 - Gates 0 to 8 and 11 to 16 are done and written up (G9 and G10 are still cards). Gate 7 used a real company's rules, which stay private (never commit them).
 - Gate 16 (`gate16/RESULTS.md`): handbook + extracted tour + questions stacked: 60.8% → 71.0% → 83.2% hidden (N0 41.4%). Each layer added; the 90% target failed. Lab flaw found: the copy rule drops the extractor's best picks (17 of 50). Next gate uses the fair rule (remove overlaps from the hidden suite instead).
-- Next: G17, documented owner vs listing owner on the same rules, with the fair copy rule.
+- G17 is registered (`gate17/prompts/PREDICTIONS.md`, analysis `gate17/referee/analyze.py`); `run_gate.py` has the fair copy rule (`"copy_rule": "exclude_from_hidden"`).
+
+## Ready
+
+### G17: documented owner vs listing owner, same rules, fair copy rule
+- **Run:** `python3 lab/run_gate.py lab/experiments/g17_owners.json`
+- **Teams:** N0; X (extracted tour); HXQ (handbook + extracted tour + 17 questions); TQ (owner's tour + 17 questions). About $11, 12 minutes.
+- **Afterwards:** `python gate17/referee/analyze.py gate17/results gate17/referee/oracle.py`; RESULTS.md, decision rules, BRAIN.md, this file, push.
 
 ## Running on a laptop (Docker)
 
