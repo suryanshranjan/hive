@@ -6,7 +6,14 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 
 - Gates 0 to 8 and 11 to 14 are done and written up (G9 and G10 are still cards). Gate 7 used a real company's rules, which stay private (never commit them).
 - Gate 14 (`gate14/RESULTS.md`): the owner's decision tour replicated on a new rule set (42.4% → 95.6% hidden). Contrast examples did not help (90.8%) and were dropped.
-- Next: G15, a tour produced from a policy handbook by an extractor agent (the real-world version of the tour).
+- G15 is registered (`gate15/prompts/PREDICTIONS.md`, analysis `gate15/referee/analyze.py`); `tour_arms` also takes `handbook` and `xtour` (an extractor agent stage).
+
+## Ready
+
+### G15: a tour from a policy handbook
+- **Run:** `python3 lab/run_gate.py lab/experiments/g15_handbook.json`
+- **Teams:** N0; T (owner's tour); H (handbook); X (owner's answers at extractor-picked inputs). About $10, 12 minutes.
+- **Afterwards:** `python gate15/referee/analyze.py gate15/results gate15/referee/oracle.py`; RESULTS.md, decision rules, BRAIN.md, this file, push.
 
 ## Running on a laptop (Docker)
 
