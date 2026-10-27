@@ -14,6 +14,10 @@ Research on swarms of AI coding agents that coordinate only through a shared rep
 | Each worker costs about 101k tokens to onboard and about 5k per task; 84 to 93% of tokens went to onboarding | Gate 1, fitted on 14 workers, predicted held-out runs within 12% | Small project |
 | Foundation-first scheduling made swarms slower and costlier (prediction failed) | Gate 1, two runs each arm | Small project |
 | Breakers found one in-scope bug class, then mostly expanded scope | Gate 1 Arm B | One run |
+| Onboarding law replicated on a 10x project: tokens = 111k per worker + 3.0k per category (predicted 101k + 5k) | Gate 2: 2, 6, 12 workers, 99 categories | 3 swarms, 1 run each |
+| Speed saturates near 6 workers: 2.2x at 6, 2.3x at 12, floored by the largest task | Gate 2 | 3 swarms |
+| Collisions grew slower than predicted (0.14, 0.33, 0.48 per landing); first semantic conflict at N = 12, repaired in 22 s | Gate 2 | 3 swarms |
+| Still no gaming: hidden and visible within 0.4 points at every commit | Gate 2 | 3 swarms |
 
 ## Layout
 
@@ -27,7 +31,7 @@ Research on swarms of AI coding agents that coordinate only through a shared rep
 | `gate1/swarms/*.bundle` | Full git history of every swarm: pilot, A, B, A2, F1, F2 (`git clone gate1/swarms/A.bundle`) |
 | `gate1/results/` | Per-commit visible and hidden scores for each swarm; `tokens.csv` per worker |
 | `gate1/logs/` | Every worker's CLAIM, LAND, CONFLICT and FOUND events |
-| `gate2/` | Prepared, not yet run: 113-category project, seed repo bundle, long-lived worker prompt, `PREDICTIONS.md` registered before launch |
+| `gate2/` | 113-category project: seed bundle, worker prompt, predictions registered before launch, `RESULTS.md` scoring them, all three swarm histories, per-commit hidden scores, `tokens.csv` |
 
 ## Reproducing
 
@@ -42,6 +46,6 @@ python3 gate1/referee/evaluate.py <swarm repo or bundle clone> hidden_big out.js
 
 Gate 0 needs `anthropics/claudes-c-compiler`, `c-testsuite/c-testsuite`, and the GCC torture tests (`gcc/testsuite/gcc.c-torture/execute`); see `gate0/replay.sh`.
 
-## Next experiment (Gate 2)
+## Gate 2 in one line
 
-2, 6 and 12 long-lived workers on a project with about 100 open tasks, 60 minutes each, run concurrently. It tests whether tokens per task follow `c_task + c_on * N / T` and whether collisions and the referee become visible once onboarding stops dominating. Predictions are in `gate2/prompts/PREDICTIONS.md`.
+Two workers finished the whole 10x project in 17.7 minutes for 515k tokens; twelve finished in 7.8 minutes for 1.62M. See `gate2/RESULTS.md`, including two registered predictions that failed.
