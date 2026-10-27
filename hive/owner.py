@@ -3,7 +3,10 @@
 Inside a run (HIVE_RUN set by `hive run`):
   workers:  hive ask "<question>"     ask the owner; blocks until answered; prints the answer
             hive answers              every question answered so far in this run (read before asking)
+            hive assume "<default>"   record a default you applied that the goal does not state (with --assumptions)
+            hive assumptions          every default recorded so far in this run
   owner:    hive owner --run <run>    answer pending questions in a terminal, as they arrive
+            hive review --run <run>   after the build, check each recorded default; wrong ones go to corrections.md
 
 Files under <run>/owner/: examples.md (the owner's worked examples, also put in every worker's prompt),
 budget.json ({"questions": N}), questions/<id>.json, answers/<id>.json. Every answer is a ruling on that input:
@@ -31,7 +34,7 @@ def _dir(run=None):
     if not run:
         raise SystemExit('not inside a hive run: HIVE_RUN is not set')
     d = os.path.join(run, 'owner')
-    for sub in ('questions', 'answers'):
+    for sub in ('questions', 'answers', 'assumptions', 'reviews'):
         os.makedirs(os.path.join(d, sub), exist_ok=True)
     return d
 
@@ -39,7 +42,7 @@ def _budget(d):
     p = os.path.join(d, 'budget.json')
     return json.load(open(p)).get('questions') if os.path.exists(p) else None
 
-def setup(run, examples=None, questions=None):
+def setup(run, examples=None, questions=None, assumptions=False):
     """Called by hive run: copy the owner's examples and set the question budget. Returns the prompt text."""
     d = _dir(run)
     text = ''
@@ -61,6 +64,14 @@ def setup(run, examples=None, questions=None):
                  "per question, the way you would ask a busy founder in person: one friendly sentence setting the scene "
                  "(who, what, how much), then the question, then the choices, under about 70 words in all. Translate the answer back into code yourself, encode it as a test before you land, and do not "
                  "stretch it into rules it does not state.\n")
+    if assumptions:
+        text += ("\n## Recording your assumptions\nThe owner will read, after the build, every default you chose that the goal "
+                 "does not state, and correct the wrong ones. Builders miss most where they feel sure (Gate 27), so record every "
+                 "such default, **especially the ones that seem obvious**: missing or unknown data, near matches, edge amounts, "
+                 "mixed cases. For each one, before you land, run `python3 -m hive assume \"<one plain sentence>\"`: the situation "
+                 "and what your code does, in the owner's words, with no code, for example: \"If a creator has not entered their "
+                 "city, they are still shown for campaigns that require a city.\" Read `python3 -m hive assumptions` first so as "
+                 "not to repeat one.\n")
     return text
 
 def ask(question, timeout_min=30):
@@ -86,6 +97,55 @@ def ask(question, timeout_min=30):
             print('ANSWER: ' + a['answer']); return 0
         time.sleep(3)
     print(f'no answer within {timeout_min} minutes; decide from the goal and examples, and say so when you land'); return 4
+
+def assume(text):
+    problems = plain_language_problems(text)
+    if problems:
+        print('Not recorded: write it for the owner, as one plain sentence about a real situation and what happens, for example:\n'
+              '  If a creator has not entered their city, they are still shown for campaigns that require a city.\n'
+              'Found: ' + ', '.join(problems)); return 5
+    d = _dir(); aid = f'{int(time.time() * 1000)}-{os.environ.get("HIVE_WORKER", "w")}'
+    json.dump({'id': aid, 'worker': os.environ.get('HIVE_WORKER', '?'), 'text': text.strip(), 'at': int(time.time())},
+              open(os.path.join(d, 'assumptions', aid + '.json'), 'w'))
+    print(f'recorded for the owner to review (assumption {aid})'); return 0
+
+def assumptions():
+    d = _dir(); rows = [json.load(open(p)) for p in sorted(glob.glob(os.path.join(d, 'assumptions', '*.json')))]
+    print('\n'.join(f"- ({a['worker']}) {a['text']}" for a in rows) if rows else 'no assumptions recorded yet'); return 0
+
+def review(run, width=72):
+    """The owner's check after the build: each recorded default, right or wrong. Wrong ones, with the owner's rule, go to
+    <run>/owner/corrections.md for the workers who fix them (Gate 27: builders never ask about defaults they feel sure of)."""
+    import textwrap
+    d = _dir(run)
+    todo = [json.load(open(p)) for p in sorted(glob.glob(os.path.join(d, 'assumptions', '*.json')))]
+    todo = [a for a in todo if not os.path.exists(os.path.join(d, 'reviews', a['id'] + '.json'))]
+    print(f"\nThe builders made {len(todo)} assumption(s) your instructions did not cover. For each one, press Enter\n"
+          "if it is right, or type what should happen instead. Ctrl+C to stop and come back later.", flush=True)
+    try:
+        for n, a in enumerate(todo, 1):
+            lines = ['', '=' * width, f" Assumption {n} of {len(todo)}  -  from builder {a['worker']}", '=' * width, '']
+            lines += textwrap.wrap(' '.join(a['text'].split()), width - 2, initial_indent='  ', subsequent_indent='  ')
+            lines += ['', '  Right? Press Enter if yes, or say what should happen instead > ']
+            t0 = time.time(); print('\n'.join(lines), end='', flush=True)
+            ans = sys.stdin.readline().strip()
+            ok = ans.lower() in ('', 'y', 'yes', 'right', 'ok', 'correct')
+            json.dump({'id': a['id'], 'ok': ok, 'correction': None if ok else ans, 'seconds': int(time.time() - t0)},
+                      open(os.path.join(d, 'reviews', a['id'] + '.json'), 'w'))
+            print('  Kept.' if ok else '  Noted: the builders will change this.', flush=True)
+    except KeyboardInterrupt:
+        print('\nStopped; run hive review again to finish.')
+    rows = []
+    for p in sorted(glob.glob(os.path.join(d, 'reviews', '*.json'))):
+        r = json.load(open(p))
+        if not r['ok']:
+            a = json.load(open(os.path.join(d, 'assumptions', r['id'] + '.json')))
+            rows.append(f"- The builders assumed: {a['text']}\n  **The owner says:** {r['correction']}")
+    open(os.path.join(d, 'corrections.md'), 'w').write(
+        "# The owner's corrections\n\nThe owner reviewed the defaults the builders applied, and each item below was wrong. "
+        "Change the code to follow the owner, encode each correction as a test, and do not stretch it into rules it does not "
+        "state.\n\n" + ('\n'.join(rows) if rows else 'No corrections: every assumption was right.') + '\n')
+    print(f"\n{len(rows)} correction(s) written to {os.path.join(d, 'corrections.md')}. Thank you!"); return 0
 
 def answers():
     d = _dir(); rows = []

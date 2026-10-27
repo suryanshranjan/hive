@@ -7,8 +7,11 @@ usage:
   python -m hive areas                                      # every area and who holds it
   python -m hive run --repo <repo> --run <new folder> --workers N --goal <goal.md or text> [--minutes 40] [--max-parallel N]
                     [--examples <examples.md>] [--questions N]     # the owner's examples; the team's question budget (0: none)
+                    [--assumptions]                                # workers record every default they apply
   python -m hive owner --run <run>                          # the owner answers questions live
+  python -m hive review --run <run>                         # the owner checks the workers' assumptions; writes corrections.md
   python -m hive ask "<question>"   /   python -m hive answers   (workers, inside a run)
+  python -m hive assume "<default>" /   python -m hive assumptions   (workers, inside a run)
 """
 import argparse, json, os, sys
 
@@ -36,10 +39,13 @@ def main(argv=None):
     r = sub.add_parser('run'); r.add_argument('--repo', default='.'); r.add_argument('--run', required=True)
     r.add_argument('--workers', type=int, required=True); r.add_argument('--goal', required=True)
     r.add_argument('--minutes', type=int, default=40); r.add_argument('--max-parallel', type=int, default=0)
-    r.add_argument('--examples'); r.add_argument('--questions', type=int)
+    r.add_argument('--examples'); r.add_argument('--questions', type=int); r.add_argument('--assumptions', action='store_true')
     o = sub.add_parser('owner'); o.add_argument('--run', required=True)
     q = sub.add_parser('ask'); q.add_argument('question'); q.add_argument('--timeout', type=int, default=30)
     sub.add_parser('answers')
+    v = sub.add_parser('review'); v.add_argument('--run', required=True)
+    s_ = sub.add_parser('assume'); s_.add_argument('text')
+    sub.add_parser('assumptions')
     a = ap.parse_args(argv)
     if a.cmd == 'init':
         return init(a.test_cmd, a.junit)
@@ -50,7 +56,7 @@ def main(argv=None):
     if a.cmd == 'areas':
         return claims.status()
     if a.cmd == 'run':
-        swarm.prepare(a.repo, a.run, a.workers, a.goal, a.minutes, a.examples, a.questions)
+        swarm.prepare(a.repo, a.run, a.workers, a.goal, a.minutes, a.examples, a.questions, a.assumptions)
         return swarm.launch(a.run, a.max_parallel)
     if a.cmd == 'owner':
         return owner.serve(a.run)
@@ -58,6 +64,12 @@ def main(argv=None):
         return owner.ask(a.question, a.timeout)
     if a.cmd == 'answers':
         return owner.answers()
+    if a.cmd == 'review':
+        return owner.review(a.run)
+    if a.cmd == 'assume':
+        return owner.assume(a.text)
+    if a.cmd == 'assumptions':
+        return owner.assumptions()
 
 if __name__ == '__main__':
     sys.exit(main())
