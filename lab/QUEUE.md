@@ -8,6 +8,12 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 - Gate 10 (`gate10/RESULTS.md`): largest-first claiming did not help (4.3 vs 3.5 min; kill fired). Both swarms were 2.5x faster than Gate 3 on 24 cores: on small machines the guard's CPU cost sets the finish. gen2.py now runs on Python 3.11; generate Gate 2's hidden suite with SQLite 3.49 (the container's 3.40 disagrees with 95 stored answers).
 - G20 still waits for the founder's examples (template in the session scratchpad).
 
+## Ready
+
+### G21: cached guard on a CPU-limited machine
+- **Run:** host `docker update --cpus 4 <container>`; container `sh gate21/run.sh swarm`; host `docker update --cpus 0 <container>`; container `sh gate21/run.sh score`.
+- F12 (Gate 3's guard) vs C12 (main's suite results cached per commit). About $25 to $30.
+
 ## Needs the user
 
 ### G20: owner-chosen examples on the real rules
