@@ -1,0 +1,35 @@
+{"t": 1793090934, "worker": "R30-w1", "sql": "SELECT ROMAN(0), ROMAN(-5), ROMAN(4000)", "resp": {"answer": ["N", null, null], "questions_left": 29}, "charged": true}
+{"t": 1793090934, "worker": "R30-w1", "sql": "SELECT ELAPSED(59), ELAPSED(90000), ELAPSED(-5)", "resp": {"answer": ["59s", "1d 1:00:00", "-5s"], "questions_left": 28}, "charged": true}
+{"t": 1793090934, "worker": "R30-w1", "sql": "SELECT ORDINAL(-1), ORDINAL(0), ORDINAL(112)", "resp": {"answer": [null, "0th", "112th"], "questions_left": 27}, "charged": true}
+{"t": 1793090940, "worker": "R30-w1", "sql": "SELECT ELAPSED(60), ELAPSED(605), ELAPSED(-3661)", "resp": {"answer": ["0:01:00", "0:10:05", "-1:01:01"], "questions_left": 26}, "charged": true}
+{"t": 1793090948, "worker": "R30-w1", "sql": "SELECT ROMAN(4.6), ORDINAL(2.5), ELAPSED(3661.7)", "resp": {"answer": ["V", null, "1:01:01"], "questions_left": 25}, "charged": true}
+{"t": 1793090952, "worker": "R30-w2", "sql": "SELECT AGE('2000-02-29', '2023-02-28'), AGE('2000-02-29', '2023-03-01'), AGE('2024-06-15', '2020-01-01')", "resp": {"answer": [22, 23, null], "questions_left": 24}, "charged": true}
+{"t": 1793090952, "worker": "R30-w2", "sql": "SELECT NEXT_BIZDAY('2024-12-24'), NEXT_BIZDAY('2024-07-03'), NEXT_BIZDAY('2024-03-08 15:30:00')", "resp": {"answer": ["2024-12-26", "2024-07-04", "2024-03-11"], "questions_left": 23}, "charged": true}
+{"t": 1793090955, "worker": "R30-w3", "sql": "SELECT SPLIT_PART('a,b,c', ',', 5), SPLIT_PART('a,b,c', ',', -1), SPLIT_PART('a,b,c', ',', 0)", "resp": {"answer": [null, "c", "a,b,c"], "questions_left": 22}, "charged": true}
+{"t": 1793090955, "worker": "R30-w3", "sql": "SELECT COLOR_HEX(300, 0, 0), COLOR_HEX(-1, 0, 0), COLOR_HEX(12.6, 0, 0)", "resp": {"answer": ["#ff0000", "#000000", "#0d0000"], "questions_left": 21}, "charged": true}
+{"t": 1793090955, "worker": "R30-w3", "sql": "SELECT VOWELS('AEIOU'), VOWELS('rhythm'), VOWELS('')", "resp": {"answer": [5, 0, 0], "questions_left": 20}, "charged": true}
+{"t": 1793090961, "worker": "R30-w2", "sql": "SELECT NEXT_BIZDAY('2024-12-31'), NEXT_BIZDAY('2024-04-30'), NEXT_BIZDAY('2022-12-23')", "resp": {"answer": ["2025-01-02", "2024-05-01", "2022-12-26"], "questions_left": 19}, "charged": true}
+{"t": 1793090962, "worker": "R30-w3", "sql": "SELECT SPLIT_PART('abc', '', 1), SPLIT_PART('a,b,c', ',', -5), SPLIT_PART('', ',', 1)", "resp": {"answer": [null, null, ""], "questions_left": 18}, "charged": true}
+{"t": 1793090962, "worker": "R30-w3", "sql": "SELECT COLOR_HEX(12.5, 0, 0), COLOR_HEX('128', 0, 0), COLOR_HEX('abc', 0, 0)", "resp": {"error": "OperationalError: user-defined function raised exception"}, "charged": false}
+{"t": 1793090962, "worker": "R30-w3", "sql": "SELECT VOWELS(NULL), VOWELS('caf\u00e9'), VOWELS(NULL)", "resp": {"answer": [null, 1, null], "questions_left": 17}, "charged": true}
+{"t": 1793090966, "worker": "R30-w1", "sql": "SELECT ROMAN(2.5), ORDINAL(2.0), ELAPSED(-0.5)", "resp": {"answer": ["III", "2nd", "-0s"], "questions_left": 16}, "charged": true}
+{"t": 1793090969, "worker": "R30-w2", "sql": "SELECT WEEKDAY('2024-02-30'), WEEKDAY(''), WEEKDAY('2024-3-6')", "resp": {"answer": [null, null, null], "questions_left": 15}, "charged": true}
+{"t": 1793090970, "worker": "R30-w3", "sql": "SELECT COLOR_HEX(12.5, 0, 0), COLOR_HEX('128', 0, 0), COLOR_HEX(NULL, 0, 0)", "resp": {"error": "OperationalError: user-defined function raised exception"}, "charged": false}
+{"t": 1793090972, "worker": "R30-w3", "sql": "SELECT COLOR_HEX(12.5, 0, 0), COLOR_HEX(NULL, 0, 0), COLOR_HEX(0, 0, 0)", "resp": {"answer": ["#0d0000", null, "#000000"], "questions_left": 14}, "charged": true}
+{"t": 1793091021, "worker": "R30-w3", "sql": "SELECT SHIPPING(3, 'local'), SHIPPING(1, 'intl'), SHIPPING(2.5, 'national')", "resp": {"answer": [9, 25, 14], "questions_left": 13}, "charged": true}
+{"t": 1793091021, "worker": "R30-w3", "sql": "SELECT LOYALTY_PTS(100, 2), LOYALTY_PTS(100, 5), LOYALTY_PTS(100, 10)", "resp": {"answer": [150, 200, 200], "questions_left": 12}, "charged": true}
+{"t": 1793091021, "worker": "R30-w3", "sql": "SELECT DISCOUNT(100, 'platinum'), DISCOUNT(100, 'GOLD'), DISCOUNT(19.99, 'gold')", "resp": {"answer": [100.0, 80.0, 15.99], "questions_left": 11}, "charged": true}
+{"t": 1793091025, "worker": "R30-w2", "sql": "SELECT STARS(2.5), STARS(3.7), STARS(7)", "resp": {"answer": ["**+", "***+", "*****"], "questions_left": 10}, "charged": true}
+{"t": 1793091025, "worker": "R30-w2", "sql": "SELECT GRADE_POINT('A+'), GRADE_POINT('b+'), GRADE_POINT('E')", "resp": {"answer": [4.0, 3.3, 0.0], "questions_left": 9}, "charged": true}
+{"t": 1793091025, "worker": "R30-w2", "sql": "SELECT CREDIT_BAND(299), CREDIT_BAND(851), CREDIT_BAND(579.5)", "resp": {"answer": ["invalid", "invalid", "poor"], "questions_left": 8}, "charged": true}
+{"t": 1793091037, "worker": "R30-w2", "sql": "SELECT STARS(3.2), STARS(3.3), STARS(3.8)", "resp": {"answer": ["***", "***+", "****"], "questions_left": 7}, "charged": true}
+{"t": 1793091037, "worker": "R30-w2", "sql": "SELECT GRADE_POINT('Z'), GRADE_POINT(''), GRADE_POINT(' a- ')", "resp": {"answer": [null, null, 3.7], "questions_left": 6}, "charged": true}
+{"t": 1793091037, "worker": "R30-w1", "sql": "SELECT BAND(10), BAND(50), BAND(75)", "resp": {"answer": ["mid", "mid", "high"], "questions_left": 5}, "charged": true}
+{"t": 1793091038, "worker": "R30-w1", "sql": "SELECT ABBREV('abcdef', 1), ABBREV('abcdef', 0), ABBREV('abcdef', -1)", "resp": {"answer": [null, null, null], "questions_left": 4}, "charged": true}
+{"t": 1793091038, "worker": "R30-w1", "sql": "SELECT PHONE_FMT('1-555-123-4567'), PHONE_FMT('123-4567'), PHONE_FMT('12345')", "resp": {"answer": ["+1 (555) 123-4567", "invalid", "invalid"], "questions_left": 3}, "charged": true}
+{"t": 1793091044, "worker": "R30-w3", "sql": "SELECT LOYALTY_PTS(75, 2), LOYALTY_PTS(99.9, 0), LOYALTY_PTS(100, 4)", "resp": {"answer": [112, 99, 150], "questions_left": 2}, "charged": true}
+{"t": 1793091044, "worker": "R30-w3", "sql": "SELECT SHIPPING(0, 'local'), SHIPPING(1, 'mars'), SHIPPING(-2, 'local')", "resp": {"answer": [0, null, 0], "questions_left": 1}, "charged": true}
+{"t": 1793091050, "worker": "R30-w2", "sql": "SELECT CREDIT_BAND(''), STARS(''), STARS(-1)", "resp": {"error": "OperationalError: user-defined function raised exception"}, "charged": false}
+{"t": 1793091055, "worker": "R30-w2", "sql": "SELECT STARS(-1), STARS(0), STARS(NULL)", "resp": {"answer": ["", "", null], "questions_left": 0}, "charged": true}
+{"t": 1793091055, "worker": "R30-w3", "sql": "SELECT DISCOUNT(100, NULL), DISCOUNT(-10, 'gold'), LOYALTY_PTS(-50, 0)", "resp": {"error": "question budget exhausted (30 questions for the whole team)"}, "charged": false}
+{"t": 1793091061, "worker": "R30-w1", "sql": "SELECT BAND(51), BAND(60), BAND(74)", "resp": {"error": "question budget exhausted (30 questions for the whole team)"}, "charged": false}
