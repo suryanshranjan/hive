@@ -2,7 +2,7 @@
 
 Read this first. It is the shared memory for anyone working on Hive, human or agent: what we know, how sure we are, what is being tested, and exactly how to continue. When you learn something, update this file in the same commit as the evidence.
 
-Last updated: Oct 27 2026, after Gate 24.
+Last updated: Oct 27 2026, after Gate 20.
 
 ## 1. The question
 
@@ -24,7 +24,8 @@ The deeper limit is intent, and Gates 3 to 17 have now mapped it. On rules a mod
 - **An owner with documents gets most of the way.** An extractor agent reads the handbook and picks inputs; the owner answers; handbook, answered examples and questions ship together: 93.8% on the same rules where the listing owner reached 98.2% (Gate 17). The gap sits entirely at decisions nobody wrote down (0.86 vs 1.00 of those errors fixed).
 - **On a real company's rules (Gate 18):** 56 owner-confirmed examples took hidden correctness from 26.0% to 64.8%, and with 19 questions to 78.0% (Gate 7's best on the same rules: 49.6%). But the examples were agent-drafted QA cases the owner only confirmed, and they fixed no more than 19 builder questions (ratio 0.93). Conjecture: the examples' advantage needs the owner to *choose* the points.
 - **The whole v1 design works as a system (Gate 24):** silent swarm, cached guard, owner's decision tour and 17 questions, at 6 workers: 95.0% hidden against 53.0% without the intent interface, with no breaking commit on main.
-- **Open:** a real owner choosing the examples, and real documents (Gate 20 running).
+- **The founder's own examples (Gate 20):** on the real rules, 58 founder-written examples took hidden correctness from 23.6% to 72.4% (agent-drafted, Gate 18: +38.8 vs founder +48.8), fixed 1.17× the errors 19 questions did, and broke 5 calls against 34. With questions, 83.6%; with the company's own documents too, 84.8%. The documents covered only 2 of 10 functions, settled those completely and changed nothing elsewhere.
+- **Open:** a person answering questions live (every answer so far came from encoded rules); more founders and companies.
 
 ## 3. The law and how sure we are of each part
 
@@ -99,6 +100,7 @@ Status tags: **established** means outside theory or our data on real agents; **
 | Gate 4 | Oct 27 | Fresh rules; 0 questions, 30 free questions, 30 questions chosen by a coverage planner whose answers became tests | 47.8% / 76.8% / 76.4%: planning did not help (−0.4 pts, CI −12 to +11); kill condition fired; the +29-point gain from 30 questions replicated |
 | Gate 7 | Oct 27 | A real company's 10 rules (Company X, name withheld), checked against its internal documents; no questions vs 15 questions answered from the documented policy | 32.8% → 49.6% hidden (+16.8, CI +6 to +31); the same team gained +21 from its answers; the biggest losses came from never being told the allowed input values; rules kept private |
 | Gate 6 | Oct 27 | Second independent rule-giver; 0 questions, 30 free, and 0 / 1 / 3 questions per function assigned at random | Questions cause the gain (3 vs 0: +36 pts, CI +20 to +51); one question adds little (+12 vs +8); 'first question worth most' failed; concentration beats spreading (model); +25-point gain from 30 questions replicated a fourth time |
+| Gate 20 | Oct 27 | Real rules (private): founder-written examples vs 19 questions vs both vs both + the company's Notion policy pages | 23.6 / 72.4 / 59.2 / 83.6 / 84.8%; examples/questions 1.17×; documents covered 2 of 10 functions and fixed all their errors; O2–O5, O7 held, O1, O6 failed |
 | Gate 24 | Oct 27 | Hive v1 end to end: N0 vs owner's tour + 17 questions, 6 workers each, content-keyed cached guard | 53.0% vs 95.0% hidden (+42.0); no breaking commits; all five predictions held |
 | Gate 22 | Oct 27 | Store-before-push cached guard vs Gate 3's guard, 4 CPUs (rerun after a usage-limit abort) | F12 15.1 min, S12 10.9 (0.72×); hit rate still 58%: half of main's commits are lock commits the cache never sees; H1, H2, H4 failed, H3, H5 held |
 | Gate 21 | Oct 27 | Cached guard vs Gate 3's guard, 12 workers each, container limited to 4 CPUs | F12 12.1 min (3.5 unlimited), C12 10.2 (0.84×); 61% cache hits; no extra breakage; G1, G3–G5 held, G2 failed |
@@ -210,6 +212,7 @@ Rules of the lab:
 - T3 Code compared in Related systems.
 - Lab: `lab/` runs a whole gate in one command with real headless Claude Code workers, so any session (including from a phone) can continue from `lab/QUEUE.md`. Gate 8 predictions registered.
 - Gate 7: a real company's rules (Company X, name withheld), with its internal documents as the final authority. 15 answered questions lifted hidden correctness from 32.8% to 49.6%. Rules and answers are kept out of this public repo.
+- Gate 20: the founder's own examples on the real rules beat agent-drafted ones (+48.8 vs +38.8; 1.17× questions vs 0.93×) and broke far less; the company's Notion policy covered only 2 of 10 functions, settled those, added +1.2 overall. Aggregates only.
 - Gate 24: Hive v1 end to end (owner's tour + 17 questions + content-keyed guard, 6 workers): 95.0% vs 53.0% hidden, no breaking commits; every prediction held. The design is the measured baseline for building the product.
 - Gate 23 (content-keyed guard cache) aborted at the usage limit; unscored, its cache hit 337 of 338 lookups. `run_gate.py` gained a `guard` option.
 - Gate 22: rerun after a usage-limit abort. The store-before-push cached guard finished in 10.9 minutes against 15.1 (0.72×), but hits stayed at 58%: half of main's commits are lock commits the commit-keyed cache never sees. The two-term model missed by 0.13 on held-out data; the baseline moved 3 minutes between runs.
