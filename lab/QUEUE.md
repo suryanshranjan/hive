@@ -2,18 +2,17 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 27 2026, after Gate 16)
+## Where we left off (Oct 27 2026, after Gate 17)
 
-- Gates 0 to 8 and 11 to 16 are done and written up (G9 and G10 are still cards). Gate 7 used a real company's rules, which stay private (never commit them).
-- Gate 16 (`gate16/RESULTS.md`): handbook + extracted tour + questions stacked: 60.8% → 71.0% → 83.2% hidden (N0 41.4%). Each layer added; the 90% target failed. Lab flaw found: the copy rule drops the extractor's best picks (17 of 50). Next gate uses the fair rule (remove overlaps from the hidden suite instead).
-- G17 is registered (`gate17/prompts/PREDICTIONS.md`, analysis `gate17/referee/analyze.py`); `run_gate.py` has the fair copy rule (`"copy_rule": "exclude_from_hidden"`).
+- Gates 0 to 8 and 11 to 17 are done and written up (G9 and G10 are still cards). Gate 7 used a real company's rules, which stay private (never commit them).
+- Gate 17 (`gate17/RESULTS.md`): on the same rules, the documented owner's interface (handbook + extracted tour + 17 questions) reached 93.8% hidden and the listing owner's (tour + 17 questions) 98.2%. The gap (+4.4) sits entirely at decisions nobody wrote down. `BRAIN.md` section 2 now states the measured intent interface.
+- **Waiting on the user:** the next step needs real people or real documents (see "Needs the user" below). Agent-only gates can continue with the cards below.
 
-## Ready
+## Needs the user
 
-### G17: documented owner vs listing owner, same rules, fair copy rule
-- **Run:** `python3 lab/run_gate.py lab/experiments/g17_owners.json`
-- **Teams:** N0; X (extracted tour); HXQ (handbook + extracted tour + 17 questions); TQ (owner's tour + 17 questions). About $11, 12 minutes.
-- **Afterwards:** `python gate17/referee/analyze.py gate17/results gate17/referee/oracle.py`; RESULTS.md, decision rules, BRAIN.md, this file, push.
+### G18: the documented-owner interface on a real company's documents
+- Gate 7's company documents (kept privately by the user, never in this repo) as the handbook; a person, or the documented policy, answers the extractor's picks and 17 questions.
+- Publish only anonymized aggregate numbers, as in Gate 7.
 
 ## Running on a laptop (Docker)
 
