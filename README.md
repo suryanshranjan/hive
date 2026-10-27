@@ -44,7 +44,7 @@ The tool packages the measured design for any repository with tests. Plan and mi
 | M2 Claims on areas of the codebase | **Done** (`tests/test_claims.sh`) |
 | M3 `hive run`: headless workers, one clone each | **Done** (`tests/test_run.sh`; a real 2-worker run, $0.43) |
 | M4 Owner session: examples and live answers become tests | **Done** (`tests/test_owner.sh`) |
-| M5 First real feature, built end to end, scored on the owner's held-back tests | Planned |
+| M5 First real feature, built end to end, scored on the owner's held-back tests | **Run** ([Gate 25](gates/gate25/RESULTS.md)): 23/23 hidden, 384/384 existing; owner answers mostly by an AI proxy (disclosed) |
 
 ```
 python -m hive init --test-cmd "python -m pytest -q --junitxml=.hive/junit.xml"     # once per repository

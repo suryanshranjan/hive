@@ -2,14 +2,10 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 28 2026: building Hive v1)
+## Where we left off (Oct 28 2026, after Gate 25)
 
-- Testing phase complete (Gates 0–24 in `gates/`; caveat in `gates/LAB_NOTE_guard_python.md`). Literature check in `docs/related_work.md`.
-- **Building Hive v1** (`docs/hive_v1_plan.md`, package `hive/`). **M1 done:** the guard passes `tests/test_guard.sh` (pytest, 7 checks) and the same checks on a real company's Node.js backend (private copy in the lab container; 384 `node:test` tests). Found and fixed on the real repo: branch names other than `main`, secrets (refused, exit 8), build artifacts (left out of commits).
-- **M2 done:** area claims (`hive claim`, `hive areas`), `tests/test_claims.sh`.
-- **M3 done:** `hive run` (`tests/test_run.sh`, plus a real 2-worker run).
-- **M4 done:** owner session (`hive owner`, `hive ask`, `hive answers`; `tests/test_owner.sh`).
-- Next: M4 owner session; M5 the first real feature (proposed: the Creators commercial module).
+- Hive v1 M1–M4 done (`hive/`, `tests/`); M5 run as Gate 25 (`gates/gate25/RESULTS.md`): a real backlog feature on a real company's backend, 23/23 hidden acceptance tests and 384/384 existing tests, $3.18. The founder answered 1 of 12 questions and delegated the rest to an AI proxy, so the founder-live test is still open.
+- Next: (1) the founder-live rerun, hidden tests written by someone other than the answerer; (2) `hive owner` showing the owner's own past decisions next to each question; (3) a larger feature with persistence and endpoints.
 
 ## Needs the user
 
