@@ -169,6 +169,8 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 
 ## Related systems
 
+- **Literature check, Oct 28 2026 (`docs/related_work.md`):** the building blocks are not new: parallel agents through git (Anthropic's C compiler, Cursor's FastRender), clarifying questions (ClarifyGPT, AMBIG-SWE), user-confirmed tests (TiCoder), and above all **Specification by Example**, which the decision tour is. Possibly new (not found in a first-pass search): a randomized head-to-head of owner-chosen examples against builder questions, a measured question floor, and owner-chosen vs owner-confirmed. Systematic review needed before any public novelty claim.
+
 - **T3 Code** (Ping.gg, open source; v0.1.0 on Oct 15 2026): a control surface for coding agents (Codex, Claude Code, Cursor and others) across desktop, web and phone. Parallel threads run in separate git worktrees. A person reviews diffs and approves, and `delegate_task` lets a parent agent start child agents.
   - **Contrast with Hive.** T3 Code helps one person *supervise* several agents, with the person as referee. Hive removes the supervisor: agents coordinate through claims and guarded landings, and tests are the referee.
   - **Model, not measured on T3 Code.** A person reviewing every landing is a serial gate (limit 2). Our 12-worker swarm landed about 4 changes a minute, so at 2 minutes per review it would need about 8 reviewers. Hive moves the person to intent (limit 7) instead.
