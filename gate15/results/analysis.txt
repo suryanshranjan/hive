@@ -1,0 +1,30 @@
+handbook status of the 50 decisions: {'clear': 20, 'vague': 15, 'omitted': 15}
+extracted tour: 36 inputs kept, 14 dropped
+hidden pass: N0 44.6%, T 92.6%, H 77.2%, X 80.6%
+X1 X − N0 = +36.0 against half of T − N0 = +24.0  (X keeps 0.75 of the tour gain)
+X2 X − H = +3.4
+X3 T − X = +12.0
+X4 T: share fixed, no omitted decision 0.77 (6 functions, 48 errors) vs ≥ 1 omitted 0.97 (14 functions, 320 errors): -0.19
+X4 H: share fixed, no omitted decision 1.00 (6 functions, 48 errors) vs ≥ 1 omitted 0.60 (14 functions, 320 errors): +0.40
+X4 X: share fixed, no omitted decision 1.00 (6 functions, 48 errors) vs ≥ 1 omitted 0.70 (14 functions, 320 errors): +0.30
+per function: decisions (status), N0 edge errors, fixed by T / H / X
+  business_days_add        vco    28    28 /  23 /  23
+  days_overdue             cc     16    11 /  16 /  16
+  discount_price           cvoc   36    36 /  31 /  31
+  grade_letter             cov    30    26 /  19 /  14
+  hours_billed             c       0     0 /   0 /   0
+  initials                 v       8     8 /   8 /   8
+  invoice_number           o      11    11 /   0 /   0
+  late_fee                 ccvo   29    25 /  19 /  19
+  loyalty_tier             c       5     5 /   5 /   5
+  mask_card                ov     15    15 /   3 /   0
+  parcel_cost              ccvo   26    23 /  26 /  26
+  password_strength        vo     12    12 /  12 /  12
+  phone_format             co     31    31 /   0 /  31
+  prorate_rent             cvc    19    13 /  19 /  19
+  reading_time             c       0     0 /   0 /   0
+  sku_normalize            cvo    23    23 /   3 /   3
+  split_bill               cov    24    24 /   5 /  14
+  stars_display            vo     21    21 /  21 /  21
+  typical_order_value      ocov   12    12 /   7 /   7
+  username_slug            vocv   22    22 /  22 /  22
