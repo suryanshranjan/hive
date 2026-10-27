@@ -1,0 +1,28 @@
+N0 edge errors 255; fixed: T 195 (0.76), Q 72 (0.28), TQ 227 (0.89)
+M1 T/Q = 2.708  (95% CI 1.127 to 13.545, bootstrap over functions)
+M2 TQ share fixed = 0.890
+M3 reach: of 139 edge calls wrong in N0 and Q, T gets 0.906 right, TQ 0.906
+M4 questions used Q: 17 of 17
+M4 questions used TQ: 17 of 17
+M5 hidden pass: N0 57.8%, T 89.4%, Q 67.2%, TQ 95.2%
+per function: N0 errors, fixed by T / Q / TQ
+  age_years                E= 13   +13 /   +3 /  +13
+  business_days            E= 20   +20 /  +14 /  +20
+  days_between             E=  0    -6 /   +0 /  -15
+  discount_price           E= 17   +17 /   +4 /  +17
+  due_date                 E= 32   +32 /  +20 /  +32
+  format_money             E=  7    +7 /   +7 /   +7
+  grade_letter             E= 14   +14 /   +0 /  +14
+  initials                 E=  7    +0 /   -9 /   +0
+  late_fee                 E= 22   +22 /   +9 /  +22
+  loyalty_points           E= 20   +14 /   +0 /  +14
+  mask_card                E=  5   -21 /   -1 /   +5
+  median_spend             E=  3    +3 /   +0 /   +3
+  normalize_phone          E=  0    +0 /   +0 /   +0
+  percent_change           E=  0    +0 /   -7 /   +0
+  rating_stars             E= 22   +22 /   +0 /  +22
+  shipping_cost            E=  6    +6 /   +0 /   +6
+  sku_check                E= 22   +15 /   +7 /  +22
+  slugify                  E= 13   +13 /   +7 /  +13
+  tip_amount               E=  8    +5 /   -6 /   +8
+  title_case               E= 24   +19 /  +24 /  +24

@@ -1,0 +1,55 @@
+[12:31:23] predictions registered on origin/main: gate13/prompts/PREDICTIONS.md
+[12:31:23] rule-giver writing private rules (headless Claude Code)...
+[12:35:18] rules checked: 20 functions, 247 calls, deterministic
+[12:35:18] declared decisions per function: 1:5, 2:5, 3:5, 4:5
+[12:35:18] starting repo and hidden suite built
+[12:35:19] decision tour built: 50 examples in 27 visible tests
+N0: 3 workers, tools/ask.py port None, repo /home/node/hive/runs/g13/upN0.git
+Q: 3 workers, tools/ask.py port 7432, repo /home/node/hive/runs/g13/upQ.git
+next: python3 lab/launch.py --run g13
+T: 3 workers, tools/ask.py port None, repo /home/node/hive/runs/g13/upT.git
+TQ: 3 workers, tools/ask.py port 7433, repo /home/node/hive/runs/g13/upTQ.git
+next: python3 lab/launch.py --run g13
+[12:35:21] launching workers...
+launched N0-w1
+launched N0-w2
+launched N0-w3
+launched Q-w1
+launched Q-w2
+launched Q-w3
+launched T-w1
+launched T-w2
+launched T-w3
+launched TQ-w1
+launched TQ-w2
+launched TQ-w3
+N0-w3 finished: exit 0, 1.9 min, tokens 727073, cost 0.6020210000000003
+N0-w1 finished: exit 0, 2.0 min, tokens 940970, cost 0.6721942000000002
+N0-w2 finished: exit 0, 2.1 min, tokens 766690, cost 0.5797714
+Q-w2 finished: exit 0, 2.1 min, tokens 833744, cost 0.6581816
+TQ-w3 finished: exit 0, 2.1 min, tokens 830920, cost 0.6559244
+Q-w1 finished: exit 0, 2.3 min, tokens 982192, cost 0.7224032
+Q-w3 finished: exit 0, 2.5 min, tokens 960947, cost 0.7896474
+TQ-w2 finished: exit 0, 2.8 min, tokens 1196398, cost 0.8472500000000001
+TQ-w1 finished: exit 0, 3.0 min, tokens 1303926, cost 0.8896488
+T-w2 finished: exit 0, 3.0 min, tokens 844545, cost 0.673211
+T-w3 finished: exit 0, 3.4 min, tokens 973016, cost 0.8003268
+T-w1 finished: exit 0, 3.5 min, tokens 1690266, cost 1.0825976
+wrote /home/node/hive/runs/g13/agents.csv
+[12:38:53] scoring every arm call by call...
+# g13: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 57.8% | 45.6%–69.6% |
+| T | 89.4% | 80.4%–96.4% |
+| Q | 67.2% | 57.6%–77.2% |
+| TQ | 95.2% | 89.4%–100.0% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| T-N0 | +31.6 | +15.6 to +45.8 |
+| Q-N0 | +9.4 | -0.6 to +20.2 |
+| TQ-N0 | +37.4 | +22.8 to +51.4 |
+[12:38:54] done. Next: write the gate RESULTS.md from runs/g13/summary.md, update BRAIN.md and lab/QUEUE.md, push.
+EXIT=0
