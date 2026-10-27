@@ -1,0 +1,60 @@
+[13:27:17] predictions registered on origin/main: gate17/prompts/PREDICTIONS.md
+[13:27:17] rule-giver writing private rules (headless Claude Code)...
+[13:33:28] rules checked: 20 functions, 231 calls, deterministic
+[13:33:28] declared decisions per function: 1:5, 2:5, 3:5, 4:5
+[13:33:29] starting repo and hidden suite built
+[13:33:29] decision tour built (without contrasts): 50 examples in 27 visible tests
+[13:33:29] extractor reading the handbook (headless Claude Code)...
+[13:34:09] extracted tour built: 50 inputs picked, 0 dropped, 6 equal hidden inputs (kept; those calls are removed from scoring for every team), 23 visible tests
+[13:34:09] handbook seed built
+N0: 3 workers, tools/ask.py port None, repo /home/node/hive/runs/g17/upN0.git
+next: python3 lab/launch.py --run g17
+TQ: 3 workers, tools/ask.py port 7473, repo /home/node/hive/runs/g17/upTQ.git
+next: python3 lab/launch.py --run g17
+X: 3 workers, tools/ask.py port None, repo /home/node/hive/runs/g17/upX.git
+next: python3 lab/launch.py --run g17
+HXQ: 3 workers, tools/ask.py port 7472, repo /home/node/hive/runs/g17/upHXQ.git
+next: python3 lab/launch.py --run g17
+[13:34:12] launching workers...
+launched HXQ-w1
+launched HXQ-w2
+launched HXQ-w3
+launched N0-w1
+launched N0-w2
+launched N0-w3
+launched TQ-w1
+launched TQ-w2
+launched TQ-w3
+launched X-w1
+launched X-w2
+launched X-w3
+X-w2 finished: exit 0, 2.1 min, tokens 846223, cost 0.6518172000000001
+HXQ-w1 finished: exit 0, 2.2 min, tokens 784540, cost 0.6558924000000002
+X-w3 finished: exit 0, 2.2 min, tokens 54166, cost 0.7788768000000001
+HXQ-w2 finished: exit 0, 2.3 min, tokens 957252, cost 0.7168530000000001
+HXQ-w3 finished: exit 0, 2.4 min, tokens 1001187, cost 0.7738853999999998
+TQ-w2 finished: exit 0, 2.5 min, tokens 1257613, cost 0.8664966000000001
+TQ-w3 finished: exit 0, 2.6 min, tokens 1163868, cost 0.8436300000000001
+TQ-w1 finished: exit 0, 2.8 min, tokens 1040381, cost 0.7790050000000001
+N0-w3 finished: exit 0, 4.0 min, tokens 880382, cost 0.6654986
+N0-w2 finished: exit 0, 4.2 min, tokens 908845, cost 0.7035952
+X-w1 finished: exit 0, 7.2 min, tokens 773938, cost 0.6479994
+N0-w1 finished: exit 0, 12.4 min, tokens 945723, cost 0.6888608
+wrote /home/node/hive/runs/g17/agents.csv
+[13:46:36] scoring every arm call by call...
+# g17: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 46.4% | 36.4%–56.6% |
+| X | 87.8% | 80.0%–94.6% |
+| HXQ | 93.8% | 88.0%–98.6% |
+| TQ | 98.2% | 94.6%–100.0% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| X-N0 | +41.4 | +32.8 to +49.4 |
+| HXQ-N0 | +47.4 | +38.0 to +56.2 |
+| TQ-N0 | +51.8 | +41.6 to +61.8 |
+[13:46:38] done. Next: write the gate RESULTS.md from runs/g17/summary.md, update BRAIN.md and lab/QUEUE.md, push.
+EXIT=0

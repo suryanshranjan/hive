@@ -1,0 +1,61 @@
+{
+ "name": "g17",
+ "arms": {
+  "N0": {
+   "hidden_pass": 0.464,
+   "ci95_by_function": [
+    0.364,
+    0.566
+   ],
+   "tests": 500
+  },
+  "X": {
+   "hidden_pass": 0.878,
+   "ci95_by_function": [
+    0.8,
+    0.946
+   ],
+   "tests": 500
+  },
+  "HXQ": {
+   "hidden_pass": 0.938,
+   "ci95_by_function": [
+    0.88,
+    0.986
+   ],
+   "tests": 500
+  },
+  "TQ": {
+   "hidden_pass": 0.982,
+   "ci95_by_function": [
+    0.946,
+    1.0
+   ],
+   "tests": 500
+  }
+ },
+ "diffs": {
+  "X-N0": {
+   "points": 41.4,
+   "ci95": [
+    32.8,
+    49.4
+   ]
+  },
+  "HXQ-N0": {
+   "points": 47.4,
+   "ci95": [
+    38.0,
+    56.2
+   ]
+  },
+  "TQ-N0": {
+   "points": 51.8,
+   "ci95": [
+    41.6,
+    61.8
+   ]
+  }
+ },
+ "allowance": {}
+}
