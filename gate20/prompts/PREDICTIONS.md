@@ -25,3 +25,19 @@ Decision rules:
 **Honest prior.** O1 about 35% (lowered after the 53% overlap was measured, before any builder ran); O2 about 45%; O3 about 55%.
 
 **Cost.** About $7 at list price; about 5 minutes. Run after Gate 24, on its own.
+
+## Amendment, registered before the run: the company's own documents (Oct 27 2026)
+
+The founder asked to use the company's Notion documents to strengthen this gate. A search of the workspace found that **only 2 of the 10 functions' rules are written down anywhere** (a fee rule and a payout rule); the other 8 exist only in the founder's head. The policy sections of the two relevant pages (two sections of the company's strategy document and two of its product architecture document; 808 words, verbatim) become a private handbook.
+
+- **New team HTQ** (3 builders): `HANDBOOK.md` + the founder's 58 examples + 19 questions. Same prompt; its ask text adds one sentence pointing to the handbook and noting it covers only some functions.
+- **Analysis:** `gate20/referee/analyze_htq.py` (aggregates only), registered with this amendment.
+
+| # | Prediction |
+| --- | --- |
+| O6 | Real documents add on top of examples and questions: HTQ − TQ ≥ +3 points hidden |
+| O7 | Where the documents speak, they settle it: on the 2 documented functions HTQ fixes ≥ 0.9 of N0's edge errors, and at least 0.1 more than TQ |
+
+**Honest prior.** O6 about 35% (the documents cover 2 of 10 functions); O7 about 50%.
+
+**Cost of the amendment.** About $2 more (3 builders).

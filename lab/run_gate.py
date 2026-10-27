@@ -304,8 +304,8 @@ def run_arms(cfg, name, run, oracle_path, specs, max_parallel):
             servers.append(subprocess.Popen(args, cwd='/', stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)); wait_port(port)
     try:
         kinds = tour_kinds(cfg); where = {'tour': 'seed_tour', 'contrast': 'seed_tourc', 'handbook': 'seed_hb', 'xtour': 'seed_xtour',
-                                          'xtour+handbook': 'seed_xtour_hb'}
-        for seed_dir in ('seed', 'seed_tour', 'seed_tourc', 'seed_hb', 'seed_xtour', 'seed_xtour_hb'):
+                                          'xtour+handbook': 'seed_xtour_hb', 'tour+handbook': 'seed_tour_hb'}
+        for seed_dir in ('seed', 'seed_tour', 'seed_tourc', 'seed_hb', 'seed_xtour', 'seed_xtour_hb', 'seed_tour_hb'):
             group = [s for s in specs if where.get(kinds.get(s.split(':')[0]), 'seed') == seed_dir]
             if not group: continue
             cmd = [sys.executable, os.path.join(ROOT, 'lab', 'make_swarm.py'), '--run', name, '--seed', os.path.join(run, seed_dir),
@@ -346,10 +346,11 @@ def main():
         say(f'guard installed: {cfg["guard"]}')
     kinds = set(tour_kinds(cfg).values())
     for kind in sorted(kinds):
-        if kind in ('tour', 'contrast'): build_tour(o, names, run, contrast=(kind == 'contrast'))
+        if kind in ('tour', 'contrast') or (kind == 'tour+handbook' and 'tour' not in kinds): build_tour(o, names, run, contrast=(kind == 'contrast'))
         elif kind == 'handbook': build_handbook(o, run)
     if kinds & {'xtour', 'xtour+handbook'}: build_xtour(cfg, o, names, run, name)
     if 'xtour+handbook' in kinds: build_handbook(o, run, base='seed_xtour', out_name='seed_xtour_hb')
+    if 'tour+handbook' in kinds: build_handbook(o, run, base='seed_tour', out_name='seed_tour_hb')
     allowance = {}
     for arm, spec in cfg.get('allowance', {}).items():
         order = sorted(names); random.Random(spec['seed']).shuffle(order); alw = {}
