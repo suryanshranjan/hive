@@ -28,6 +28,7 @@ Research on swarms of AI coding agents that coordinate only through a shared rep
 | 30 questions add about 29 points of hidden correctness on a second rule set (48% → 77%); a planner choosing the 30 questions by coverage did no better (76.4% vs 76.8%); the registered prediction failed | Gate 4 | 3 teams of 3, plus a planner |
 | On an independent rule-giver's rules, 30 questions added +32 points (35% → 67%); asking about defaults first did no better (62.2%); the registered prediction failed | Gate 5 | 3 teams of 3 |
 | Per function: 0 questions gain nothing, the first question adds about +20 points of edge accuracy, three or more about +34 (observational) | Gates 3 to 5 | 100 team-function pairs |
+| Randomized: questions cause the gain. 3 questions on a function add +44 points of edge accuracy, 1 adds +12, none +8; the observational table overstated the first question | Gate 6 | 20 functions, random 0/1/3 |
 
 ## Layout
 
@@ -45,6 +46,7 @@ Research on swarms of AI coding agents that coordinate only through a shared rep
 | `gate3/` | Protocol v2 (`tools/claim.py`, `tools/land.py`), the scale runs at 8 and 12 workers, and the intent test (private rules in `referee/oracle.py`, every question asked, call-by-call scores); see `gate3/README.md` and `RESULTS.md` |
 | `gate4/` | Planned vs free questions on fresh invented rules: oracle, planner prompt and plan, every question asked, histories, scores; see `gate4/RESULTS.md` |
 | `gate5/` | Defaults-first vs free questions on rules from an independent rule-giver agent; see `gate5/RESULTS.md` |
+| `gate6/` | Questions per function assigned at random (0, 1, 3) on a second independent rule-giver's rules; see `gate6/RESULTS.md` |
 | `BRAIN.md` | Shared memory: laws with status, constants, evidence, scorecard, next steps |
 | `docs/` | Hive v1 and Hive v2 write-ups |
 
@@ -76,3 +78,7 @@ On a fresh set of invented rules, 30 questions again added about 29 points (48% 
 ## Gate 5 in one line
 
 An independent agent wrote the rules. A team told to ask about its defaults first (NULL, extremes, invalid input) did no better than free asking (62.2% vs 67.0%), so that prediction failed too. 30 questions added +32 points, the third replication. Pooled over three rule sets, a function's first question is worth about +20 points of edge-case accuracy, and a function nobody asks about gains nothing. See `gate5/RESULTS.md`.
+
+## Gate 6 in one line
+
+With questions per function assigned at random, 3 questions on a function added +44 points of edge-case accuracy against +8 for none, so questions cause the gain. But one question added only +12: a rule needs several answered points to pin down. So spend questions in blocks of about 3, not one per function. See `gate6/RESULTS.md`.
