@@ -1,0 +1,74 @@
+[12:17:35] predictions registered on origin/main: gate12/prompts/PREDICTIONS.md
+[12:17:35] rule-giver writing private rules (headless Claude Code)...
+[12:22:00] rules checked: 20 functions, 254 calls, deterministic
+[12:22:00] declared decisions per function: 1:5, 2:5, 3:5, 4:5
+[12:22:01] starting repo and hidden suite built
+[12:22:01] allowance for Q1: 1:20
+[12:22:01] allowance for Q2: 2:20
+[12:22:01] allowance for Q4: 4:20
+N0: 3 workers, tools/ask.py port None, repo /home/node/hive/runs/g12/upN0.git
+Q1: 3 workers, tools/ask.py port 7421, repo /home/node/hive/runs/g12/upQ1.git
+Q2: 3 workers, tools/ask.py port 7422, repo /home/node/hive/runs/g12/upQ2.git
+Q4: 3 workers, tools/ask.py port 7424, repo /home/node/hive/runs/g12/upQ4.git
+next: python3 lab/launch.py --run g12
+[12:22:03] launching workers...
+launched N0-w1
+launched N0-w2
+launched N0-w3
+launched Q1-w1
+launched Q1-w2
+launched Q1-w3
+launched Q2-w1
+launched Q2-w2
+launched Q2-w3
+launched Q4-w1
+launched Q4-w2
+launched Q4-w3
+Q2-w2 finished: exit 0, 2.2 min, tokens 739783, cost 0.6643434
+N0-w3 finished: exit 0, 2.3 min, tokens 979709, cost 0.7387638000000001
+Q2-w1 finished: exit 0, 2.4 min, tokens 974007, cost 0.7895957999999998
+N0-w1 finished: exit 0, 2.5 min, tokens 905808, cost 0.6431263999999999
+Q1-w1 finished: exit 0, 2.6 min, tokens 1058666, cost 0.7560244
+Q1-w2 finished: exit 0, 2.7 min, tokens 1108479, cost 0.8296855999999999
+Q2-w3 finished: exit 0, 2.7 min, tokens 1319615, cost 0.8910554
+Q1-w3 finished: exit 0, 2.8 min, tokens 1187344, cost 0.8319645999999999
+Q4-w1 finished: exit 0, 2.9 min, tokens 976302, cost 0.8201892000000001
+N0-w2 finished: exit 0, 3.1 min, tokens 940653, cost 0.6774074
+Q4-w2 finished: exit 0, 3.4 min, tokens 1494862, cost 1.012792
+Q4-w3 finished: exit 0, 3.6 min, tokens 808173, cost 0.7242464000000001
+wrote /home/node/hive/runs/g12/agents.csv
+[12:25:43] scoring every arm call by call...
+# g12: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 36.8% | 27.2%–47.6% |
+| Q1 | 68.2% | 58.2%–77.6% |
+| Q2 | 75.0% | 65.2%–85.2% |
+| Q4 | 81.6% | 72.8%–90.0% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| Q1-N0 | +31.4 | +20.0 to +42.8 |
+| Q2-N0 | +38.2 | +27.4 to +49.6 |
+| Q4-N0 | +44.8 | +34.0 to +55.4 |
+
+Gain in edge-call accuracy over N0, by allowance (Q1):
+
+| Questions allowed | Mean gain | 95% CI | Functions |
+| --- | --- | --- | --- |
+| 1 | +25.2 | +17.8 to +32.6 | 20 |
+
+Gain in edge-call accuracy over N0, by allowance (Q2):
+
+| Questions allowed | Mean gain | 95% CI | Functions |
+| --- | --- | --- | --- |
+| 2 | +29.6 | +21.5 to +37.6 | 20 |
+
+Gain in edge-call accuracy over N0, by allowance (Q4):
+
+| Questions allowed | Mean gain | 95% CI | Functions |
+| --- | --- | --- | --- |
+| 4 | +33.6 | +26.0 to +41.3 | 20 |
+[12:25:45] done. Next: write the gate RESULTS.md from runs/g12/summary.md, update BRAIN.md and lab/QUEUE.md, push.
+EXIT=0

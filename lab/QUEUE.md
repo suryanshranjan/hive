@@ -2,26 +2,23 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 27 2026, after Gate 11)
+## Where we left off (Oct 27 2026, after Gate 12)
 
-- Gates 0 to 8 and 11 are done and written up (G9 and G10 are still cards). Gate 7 used a real company's rules, which stay private (never commit them).
-- Gate 11 (`gate11/RESULTS.md`): spreading 30 questions as 1–2 per function beat blocks of 3 by 1.25× (CI 1.00 to 1.78). But Gate 8's one-parameter law failed (p = 0.35), and within the same functions the 3rd question added nothing. The law is withdrawn; spreading stays the default.
-- `run_gate.py` has a two-stage stratified mode (`"stratified"` in the config).
-- G12 is registered (`gate12/prompts/PREDICTIONS.md`, analysis code `gate12/referee/analyze.py`).
-
-## Ready
-
-### G12: does question saturation track hidden decisions?
-- **Run:** `python3 lab/run_gate.py lab/experiments/g12_saturation.json`
-- **Design:** the rule-giver gives 5 functions each 1, 2, 3 and 4 hidden decisions (declared privately); teams N0 / Q1 / Q2 / Q4 ask 0 / 1 / 2 / 4 questions on every function.
-- **Cost:** about $11; about 10 minutes.
-- **Afterwards:** `python gate12/referee/analyze.py gate12/results gate12/referee/oracle.py`; write RESULTS.md, apply the decision rules, update BRAIN.md and this file, push.
+- Gates 0 to 8, 11 and 12 are done and written up (G9 and G10 are still cards). Gate 7 used a real company's rules, which stay private (never commit them).
+- Gate 12 (`gate12/RESULTS.md`): with 1 to 4 hidden decisions per function, more decisions make each question weaker (D1 held), but a floor of 21% of errors was never fixed by any team, even with 4 questions per function. Every stuck error was a decision no builder thought to probe (caps, extremes, alternative formats, holidays). The bottleneck is where questions point.
+- Next: G13, the owner's decision tour against builder questions (needs a per-arm seed repo in `run_gate.py`).
 
 ## Running on a laptop (Docker)
 
 Workers run shell commands, so run them in a container. Image: `node:22-bookworm` plus `python3 sqlite3 git` and `npm i -g @anthropic-ai/claude-code`, run as user `node`. Mount the repo read-write at `/host/hive` and `~/.claude/.credentials.json` read-only; copy the credentials into the container's `~/.claude/`; work in a fresh clone inside the container (a Windows checkout has CRLF line endings), with `origin` pointed at GitHub. Copy results back out and push from the host.
 
 ## Needs design first (write the config and predictions, push them, then run)
+
+### G13: decision tour vs builder questions
+- **Why:** Gate 12's floor is decisions builders cannot imagine. The owner knows where they are.
+- **Design:** rule-giver as in Gate 12, plus `DECISION_EXAMPLES` (one argument tuple per decision, not in TYPICAL or EDGE). Arms: N0; **T** (tour as visible tests, no questions); **Q** (team budget of 17 questions, about the same 50 answered values); **TQ** (tour plus 17 questions).
+- **Needs:** per-arm starting repos (the tour added as visible tests for T and TQ only).
+- **Predictions to register:** T fixes ≥ 1.3× Q's errors; TQ ≥ 0.80 of N0's edge errors; T fixes ≥ half of the errors Q leaves.
 
 ### G9: intent interface v1 vs free asking
 - Arm A: free asking, 30 questions.
