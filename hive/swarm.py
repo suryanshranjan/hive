@@ -8,7 +8,7 @@ Workers run $HIVE_WORKER_CMD (default: headless Claude Code) inside their clone 
 shell commands, so run swarms in a container or a throwaway VM."""
 import csv, json, os, shlex, shutil, subprocess, sys, time
 
-from . import config
+from . import config, owner
 from .guard import sh
 
 DEFAULT_CMD = 'claude -p --output-format json --permission-mode acceptEdits --allowedTools Bash Read Edit Write Glob Grep'
@@ -29,7 +29,7 @@ def _areas_text(cfg):
         return 'No areas are configured: claim short names for the parts of the goal you build (for example `fees`, `payouts`).'
     return '\n'.join(f'- `{a}`: tests matching {", ".join(f"`{g}`" for g in globs)}' for a, globs in sorted(areas.items()))
 
-def prepare(repo, run, workers, goal, minutes=40, owner_text=''):
+def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None):
     """Create <run>/up.git, one clone per worker in <run>/work, and one prompt per worker in <run>/prompts."""
     repo = os.path.abspath(repo); run = os.path.abspath(run)
     cfg = config.load(repo)
@@ -38,6 +38,7 @@ def prepare(repo, run, workers, goal, minutes=40, owner_text=''):
         raise SystemExit(f'{run} exists: choose a new run folder')
     for d in ('work', 'prompts', 'logs', 'out'):
         os.makedirs(os.path.join(run, d))
+    owner_text = owner.setup(run, examples, questions)
     up = os.path.join(run, 'up.git')
     sh('git', 'clone', '-q', '--bare', '--branch', b, repo, up)
     sh('git', '-C', up, 'symbolic-ref', 'HEAD', f'refs/heads/{b}')
@@ -64,7 +65,7 @@ def launch(run, max_parallel=0):
     run = os.path.abspath(run)
     cmd = shlex.split(os.environ.get('HIVE_WORKER_CMD', DEFAULT_CMD))
     env = dict(os.environ, PYTHONPATH=HIVE_ROOT + os.pathsep + os.environ.get('PYTHONPATH', ''),
-               HIVE_GUARD_CACHE=os.path.join(run, 'guard_cache'))
+               HIVE_GUARD_CACHE=os.path.join(run, 'guard_cache'), HIVE_RUN=run)
     queue = sorted(f[:-3] for f in os.listdir(os.path.join(run, 'prompts')) if f.endswith('.md'))
     meta = json.load(open(os.path.join(run, 'run.json'))); meta['started'] = int(time.time())
     json.dump(meta, open(os.path.join(run, 'run.json'), 'w'), indent=1)

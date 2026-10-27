@@ -43,7 +43,7 @@ tests/                     Hive's own tests
 | M1 | Runner-agnostic guard | **Done.** `tests/test_guard.sh` (pytest, 7 checks) and a real company's Node.js backend (private; `node:test` with Node's JUnit reporter, 384 tests): clean change lands, regression refused, duplicate refused, cache hit after a lock commit, secrets refused, artifacts left out, any shared branch name |
 | M2 | Claims on areas | **Done.** `tests/test_claims.sh` (9 checks, repeated 4 times): overlapping claims refused, unknown areas refused, two simultaneous claims leave exactly one holder, landing frees the area |
 | M3 | `hive run` | **Done.** `tests/test_run.sh` (fake workers, 6 checks: result passes, both land, no lock left, source untouched, cost logged). Real check: 2 Claude workers built a two-area goal in 0.5 min for $0.43; one lost a simultaneous claim, withdrew automatically and took the other area; 17/17 tests, 15 of them added by the workers |
-| M4 | Owner session | The owner's examples become tests in the project's framework; a worker's question reaches the owner's terminal and the answer is added as a test |
+| M4 | Owner session | **Done.** `hive run --examples --questions`, `hive owner`, `hive ask`, `hive answers`. `tests/test_owner.sh` (6 checks): examples in every prompt, question reaches the owner's terminal and the answer comes back, response time recorded, budget enforced, the answer lands as a passing test |
 | M5 | First real feature | A feature from a real backlog built by Hive end to end, the owner answering live; scored on the owner's held-back acceptance tests |
 
 M1 to M4 use small sample repositories so they cost little. M5 is the breakthrough test.
