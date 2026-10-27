@@ -1,91 +1,86 @@
 # Hive
 
-Research on swarms of AI coding agents that coordinate only through a shared repository, never by messaging. This repo holds the code, data and swarm histories behind **Hive v2: the referee is the limit** (`docs/hive_v2.md`, live [doc](https://claude.ai/artifact/PZKUKvJY6a7C3dG8ZJrT8H)). The original Hive v1 write-up is in `docs/hive_v1.md`.
+**Silent swarms of AI coding agents that build software to the owner's intent.**
 
-**Start with [`BRAIN.md`](BRAIN.md)**, the shared memory of the project: what we know and how sure we are, every prediction and whether it held, open questions, the next experiments, and how to continue.
+Hive runs many coding agents on one repository. They never message each other: they coordinate only through git, claiming areas of work and landing changes through a guard that refuses anything that breaks a passing test. The owner's intent reaches them as tests: worked examples from the owner, answers to the builders' questions, and the company's documents.
 
-## What the evidence says so far (Oct 27 2026)
+This repository holds the research behind it (24 pre-registered experiments, about 30 swarms, every failure reported) and the first version of the tool.
 
-| Finding | Evidence | Strength |
+**Start with [`BRAIN.md`](BRAIN.md):** what is known, how sure we are, every prediction and whether it held.
+
+## The main finding
+
+Silent swarms finish what they are given. On rules no model can guess, they are limited by intent: how much of what the owner wants reaches them.
+
+- **Questions help, but hit a floor.** Builders ask about what they can imagine. About a fifth of errors survive any number of questions, because they sit at decisions nobody thinks to ask about ([Gate 12](gates/gate12/RESULTS.md)).
+- **When the owner points, intent gets through.** One worked example per rule, chosen by the owner, beat the same number of answers to builder-chosen questions: 89.4% against 67.2% of hidden tests ([Gate 13](gates/gate13/RESULTS.md)).
+- **With both, swarms reach 95–98%.** Owner examples plus about 17 questions: 95.2% and 98.2% on two rule sets ([Gates 13](gates/gate13/RESULTS.md), [17](gates/gate17/RESULTS.md)), and **95.0% end to end at 6 workers with no broken commits** ([Gate 24](gates/gate24/RESULTS.md)).
+- **On a real company's rules: 84.8%,** against 49.6% before, using the founder's own examples, questions and the company's documents ([Gate 20](gates/gate20/RESULTS.md)). The documents covered 2 of 10 functions; the rest lived only in the founder's head.
+
+The worked examples are **Specification by Example**, an established practice. What this work adds is measurement: a randomized comparison of owner-chosen examples against builder questions, and the question floor. See [`docs/related_work.md`](docs/related_work.md) for what is and is not new.
+
+## What the evidence says
+
+| Finding | Result | Where |
 | --- | --- | --- |
-| Collisions between agents are rare and cheap: 5% of concurrent pairs touch the same lines, each costs about a quarter of a restart | Anthropic's C compiler history, 2,043 task leases | One real project |
-| A swarm ships with main almost never fully green, but live bugs stay small and don't accumulate (mean 5 of 620 hidden tests) | Gate 0: compiler history rebuilt at 415 commits against 620 hidden tests | One real project |
-| Bugs are bimodal: 83% caught in about 0.3 h, 17% unseen by the swarm for 7 to 142 h | Gate 0 fine windows | One real project |
-| Honest agents did not game the tests: visible and hidden pass rates matched at every commit | Gate 1: 34 Claude workers in 6 swarms | Small project |
-| Tripling builders from 2 to 6 bought 1.26x speed; the critical path bound first | Gate 1 | Small project, few runs |
-| Each worker costs about 101k tokens to onboard and about 5k per task; 84 to 93% of tokens went to onboarding | Gate 1, fitted on 14 workers, predicted held-out runs within 12% | Small project |
-| Foundation-first scheduling made swarms slower and costlier (prediction failed) | Gate 1, two runs each arm | Small project |
-| Breakers found one in-scope bug class, then mostly expanded scope | Gate 1 Arm B | One run |
-| Onboarding law replicated on a 10x project: tokens = 111k per worker + 3.0k per category (predicted 101k + 5k) | Gate 2: 2, 6, 12 workers, 99 categories | 3 swarms, 1 run each |
-| Speed saturates near 6 workers: 2.2x at 6, 2.3x at 12, floored by the largest task | Gate 2 | 3 swarms |
-| Collisions grew slower than predicted (0.14, 0.33, 0.48 per landing); first semantic conflict at N = 12, repaired in 22 s | Gate 2 | 3 swarms |
-| Still no gaming: hidden and visible within 0.4 points at every commit | Gate 2 | 3 swarms |
-| Onboarding law held a third time: 1.61M tokens at 12 workers (predicted 1.63M), 1.23M at 8 (predicted 1.19M) | Gate 3 | 2 swarms |
-| Guarded landing blocked both would-be regressions before they reached main; both swarms pass all 2,960 hidden tests with no gaming (gap ≤ 0.4 points) | Gate 3 | 2 swarms |
-| Finish time is set by the tail: 12 workers took 8.7 min (Gate 2: 7.8), the last 4% done by one worker who claimed a big task late | Gate 3 | 2 swarms |
-| Intent is binding: on invented rules, hidden pass was 58% / 87% / 98% with 0 / 30 / unlimited questions to a product owner; all 40 visible examples passed in every swarm | Gate 3 | 3 swarms of 3 |
-| Intent enters only where someone asks: edge cases right 96% on functions someone asked about, 76% on the rest (observational); unlimited access still missed the rules no question touched | Gate 3 | 3 swarms of 3 |
-| 30 questions add about 29 points of hidden correctness on a second rule set (48% → 77%); a planner choosing the 30 questions by coverage did no better (76.4% vs 76.8%); the registered prediction failed | Gate 4 | 3 teams of 3, plus a planner |
-| On an independent rule-giver's rules, 30 questions added +32 points (35% → 67%); asking about defaults first did no better (62.2%); the registered prediction failed | Gate 5 | 3 teams of 3 |
-| Per function: 0 questions gain nothing, the first question adds about +20 points of edge accuracy, three or more about +34 (observational) | Gates 3 to 5 | 100 team-function pairs |
-| Randomized: questions cause the gain. 3 questions on a function add +44 points of edge accuracy, 1 adds +12, none +8; the observational table overstated the first question | Gate 6 | 20 functions, random 0/1/3 |
+| Silent swarms finish the project and do not game the tests | Every project finished; visible and hidden pass rates within 0.4 points | Gates 1–3 |
+| Collisions between agents are rare and cheap | 5% of concurrent pairs touch the same lines; about a quarter of a restart each | C compiler history |
+| Cost is mostly onboarding | About 110k tokens per worker to start, 3k–5k per task after | Gates 1–3 |
+| On a small machine, speed is set by CPU per guard check | 3.5 min on 24 cores, 12.1 on 4; caching main's results saves about a fifth | Gates 10, 21, 22 |
+| Without the owner's intent, swarms pass every visible example but few hidden tests | 24–58% hidden | Gates 3–24 |
+| Questions cause the gain, with diminishing returns | +25 to +32 points from 30 questions on five rule sets | Gates 3–8, 11 |
+| Owner-chosen examples beat builder-chosen questions | 2.7× the errors fixed (agent rules); 1.17× (a real founder) | Gates 13, 20 |
+| The whole design works as a system | 95.0% hidden at 6 workers, no breaking commit on main | Gate 24 |
+
+**Failed and withdrawn, with the evidence kept:** asking in blocks of 3 per function, a one-constant law for questions, contrast examples, coverage-planned and defaults-first questions, largest-first claiming, a two-term speed model. Each was predicted, tested and dropped ([`BRAIN.md`](BRAIN.md) §6).
+
+## Hive v1 (in progress)
+
+The tool packages the measured design for any repository with tests. Plan and milestones: [`docs/hive_v1_plan.md`](docs/hive_v1_plan.md).
+
+| Milestone | Status |
+| --- | --- |
+| M1 Guard for any test runner (JUnit XML), cache keyed by code content | **Done for pytest** (`tests/test_guard.sh`) |
+| M2 Claims on areas of the codebase | Next |
+| M3 `hive run`: headless workers, one clone each | Planned |
+| M4 Owner session: examples and live answers become tests | Planned |
+| M5 First real feature, built end to end, scored on the owner's held-back tests | Planned |
+
+```
+python -m hive init --test-cmd "python -m pytest -q --junitxml=.hive/junit.xml"
+python -m hive land <short_name> "<what you did>"
+```
+
+Run workers in a container or throwaway VM: they execute shell commands.
+
+## How this research works
+
+Every experiment (a "gate") registers its predictions and kill conditions on GitHub **before** it runs (`lab/run_gate.py` refuses to start otherwise), then scores them in its `RESULTS.md`, failures included. Hidden test suites are never committed; they regenerate from fixed seeds. Lab flaws found later are written up, not hidden ([`gates/LAB_NOTE_guard_python.md`](gates/LAB_NOTE_guard_python.md)).
 
 ## Layout
 
 | Path | Contents |
 | --- | --- |
-| `real_repos/` | Analysis of the C compiler's git history: leases, collision rates, collision cost (`ccc_*.py`, `parse_*.py`) |
-| `sim/` | Simulator v2 (`hive_sim.py`) and experiments A to D with held-out tests |
-| `gates/gate0/` | Replay of the compiler history against hidden suites: scripts, per-commit results, `gate0_results.json` |
-| `gates/gate1/referee/` | Test generators with SQLite as referee (`gen.py`, `fuzz.py`), replay evaluator, referee runner |
-| `gates/gate1/prompts/` | Exact worker, breaker and founder prompts |
-| `gates/gate1/swarms/*.bundle` | Full git history of every swarm: pilot, A, B, A2, F1, F2 (`git clone gates/gate1/swarms/A.bundle`) |
-| `gates/gate1/results/` | Per-commit visible and hidden scores for each swarm; `tokens.csv` per worker |
-| `gates/gate1/logs/` | Every worker's CLAIM, LAND, CONFLICT and FOUND events |
-| `gates/gate2/` | 113-category project: seed bundle, worker prompt, predictions registered before launch, `RESULTS.md` scoring them, all three swarm histories, per-commit hidden scores, `tokens.csv` |
-| `gates/gate3/` | Protocol v2 (`tools/claim.py`, `tools/land.py`), the scale runs at 8 and 12 workers, and the intent test (private rules in `referee/oracle.py`, every question asked, call-by-call scores); see `gates/gate3/README.md` and `RESULTS.md` |
-| `gates/gate4/` | Planned vs free questions on fresh invented rules: oracle, planner prompt and plan, every question asked, histories, scores; see `gates/gate4/RESULTS.md` |
-| `gates/gate5/` | Defaults-first vs free questions on rules from an independent rule-giver agent; see `gates/gate5/RESULTS.md` |
-| `gates/gate6/` | Questions per function assigned at random (0, 1, 3) on a second independent rule-giver's rules; see `gates/gate6/RESULTS.md` |
-| `gates/gate7/` | A real company's rules as the product owner (results only; the rules are private) |
-| `lab/` | Run any gate, or the next one, in one command; `lab/QUEUE.md` is the experiment queue and session handoff |
-| `BRAIN.md` | Shared memory: laws with status, constants, evidence, scorecard, next steps |
-| `docs/` | Hive v1 and Hive v2 write-ups |
+| [`BRAIN.md`](BRAIN.md) | Shared memory: the law and its status, measured constants, evidence log, prediction scorecard, design, open questions |
+| [`hive/`](hive/) | Hive v1, the tool |
+| [`gates/`](gates/) | Every experiment: predictions, results, referee code, swarm histories (`*.bundle`), logs. Gates 0–24 |
+| [`lab/`](lab/) | Run any gate in one command; [`lab/QUEUE.md`](lab/QUEUE.md) is the queue and session handoff |
+| [`docs/`](docs/) | Design write-ups, the v1 build plan, related work |
+| `real_repos/`, `sim/` | Analysis of real agent-swarm histories (Anthropic's C compiler); the simulator |
+| `tests/` | Tests for the tool |
 
 ## Reproducing
 
-Hidden test suites are deliberately not committed, so future agents working in this repo can't read them. Regenerate them from the fixed seeds:
+Run swarms in a container (the lab used `node:22-bookworm` with Python, git, SQLite and Claude Code; see [`lab/README.md`](lab/README.md)).
 
 ```
-python3 gates/gate1/referee/gen.py hidden_big 9000 50        # 700 template tests
-python3 gates/gate1/referee/fuzz.py hidden_fuzz 77000 600    # 600 combined queries
-python3 gates/gate2/referee/gen2.py hidden2 5000000 20       # 2,260 Gate 2 tests
-python3 gates/gate1/referee/evaluate.py <swarm repo or bundle clone> hidden_big out.json hidden_fuzz
+python3 lab/run_gate.py lab/experiments/<config>.json            # a whole intent gate, after its predictions are pushed
+python3 gates/gate2/referee/gen2.py hidden2 5000000 20            # Gate 2's hidden suite (use SQLite 3.49; see gates/gate10/RESULTS.md)
+python3 gates/gate1/referee/evaluate.py <swarm clone> hidden_big out.json
 ```
 
-Gate 0 needs `anthropics/claudes-c-compiler`, `c-testsuite/c-testsuite`, and the GCC torture tests (`gcc/testsuite/gcc.c-torture/execute`); see `gates/gate0/replay.sh`.
+Every swarm's full history is in its gate's `swarms/*.bundle` (`git clone gates/gate24/swarms/V1.bundle`).
 
-## Gate 2 in one line
+## Privacy
 
-Two workers finished the whole 10x project in 17.7 minutes for 515k tokens; twelve finished in 7.8 minutes for 1.62M. See `gates/gate2/RESULTS.md`, including two registered predictions that failed.
-
-## Gate 3 in one line
-
-Category claims and a landing guard kept main clean at 8 and 12 workers, and the token law held again. Finer claims did not make the swarm faster, because the last large task was claimed late. Swarms building invented business rules passed every visible example. On hidden tests they reached 58% with no one to ask, 87% with 30 questions and 98% with unlimited questions. See `gates/gate3/RESULTS.md`.
-
-## Gate 4 in one line
-
-On a fresh set of invented rules, 30 questions again added about 29 points (48% to 77%). A planner choosing the 30 questions by coverage, and turning each answer into a test, did no better than free asking (76.4% vs 76.8%), so the registered prediction failed. Both teams missed the same rules: NULL handling and caps on extreme values. See `gates/gate4/RESULTS.md`.
-
-## Gate 5 in one line
-
-An independent agent wrote the rules. A team told to ask about its defaults first (NULL, extremes, invalid input) did no better than free asking (62.2% vs 67.0%), so that prediction failed too. 30 questions added +32 points, the third replication. Pooled over three rule sets, a function's first question is worth about +20 points of edge-case accuracy, and a function nobody asks about gains nothing. See `gates/gate5/RESULTS.md`.
-
-## Gate 6 in one line
-
-With questions per function assigned at random, 3 questions on a function added +44 points of edge-case accuracy against +8 for none, so questions cause the gain. But one question added only +12: a rule needs several answered points to pin down. So spend questions in blocks of about 3, not one per function. See `gates/gate6/RESULTS.md`.
-
-
-## Gate 7 in one line
-
-With a real company's rules (name withheld), 15 answered questions lifted hidden correctness from 32.8% to 49.6%. The largest losses came from builders never being told the allowed input values. See `gates/gate7/RESULTS.md`; the rules themselves stay private.
+Gates 7, 18 and 20 used a real company's rules (Company X). Its name, rules, examples, documents and answers are not in this repository; those gates publish aggregate numbers only.
