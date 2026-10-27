@@ -145,7 +145,8 @@ def review(run, width=72, intro=True):
     open(os.path.join(d, 'corrections.md'), 'w').write(
         "# The owner's corrections\n\nThe owner reviewed the defaults the builders applied, and each item below was wrong. "
         "Change the code to follow the owner, encode each correction as a test, and do not stretch it into rules it does not "
-        "state.\n\n" + ('\n'.join(rows) if rows else 'No corrections: every assumption was right.') + '\n')
+        "state. An existing test that asserts an overturned assumption is now wrong: change it to the owner's rule (the "
+        "guard accepts an edited test that passes) and name it in your land message; leave every other test alone.\n\n" + ('\n'.join(rows) if rows else 'No corrections: every assumption was right.') + '\n')
     if intro:
         print(f"\n{len(rows)} correction(s) written to {os.path.join(d, 'corrections.md')}. Thank you!")
     else:
