@@ -1,0 +1,32 @@
+handbook status: {'clear': 20, 'vague': 15, 'omitted': 15}
+extracted tour: 33 inputs kept, 17 dropped
+hidden pass: N0 41.4%, X 60.8%, HX 71.0%, HXQ 83.2%
+S1 HXQ = 83.2%
+S2 HX − X = +10.2 (95% CI -1.6 to +23.2)
+S3 HXQ − HX = +12.2 (95% CI +3.4 to +21.8)
+S4 X − N0 = +19.4 (95% CI +6.2 to +32.4)
+S5 X: share fixed, functions with an omitted decision 0.50 (248 errors); without 0.69 (131 errors)
+S5 HX: share fixed, functions with an omitted decision 0.66 (248 errors); without 0.85 (131 errors)
+S5 HXQ: share fixed, functions with an omitted decision 0.79 (248 errors); without 0.83 (131 errors)
+S6 questions used HXQ: 17 of 17
+per function: status, N0 edge errors, fixed by X / HX / HXQ
+  age_bracket              o      15    15 /  15 /  15
+  avg_order_value          cov     9     3 /   5 /   5
+  check_digit              o       0     0 /   0 /   0
+  format_phone             vco    26    11 /  11 /  26
+  initials                 vc     38    31 /  31 /  31
+  invoice_number           vo     22    22 /  18 /  22
+  late_fee                 cvc    23     9 /  23 /  23
+  loyalty_tier             vc     15     5 /   7 /  15
+  mask_card                v      15     5 /  15 /   5
+  meeting_slot             cvoc   36    14 /  30 /  36
+  net_price                ccvo   29    17 /  17 /  24
+  normalize_sku            c      18    18 /  13 /  13
+  nps_category             o      28    15 /   0 /   0
+  quarter_label            ov     13     0 /   9 /   9
+  renewal_date             ccov   14    10 /  10 /  10
+  shipping_cost            cvc    22    22 /  22 /  22
+  split_bill               cov    21    14 /  14 /  14
+  star_rating              co      0     0 /   0 /   0
+  tax_amount               occv   20     0 /  20 /  20
+  workdays_between         voco   15     4 /  15 /  15

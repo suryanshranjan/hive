@@ -1,0 +1,61 @@
+{
+ "name": "g16",
+ "arms": {
+  "N0": {
+   "hidden_pass": 0.414,
+   "ci95_by_function": [
+    0.31,
+    0.534
+   ],
+   "tests": 500
+  },
+  "X": {
+   "hidden_pass": 0.608,
+   "ci95_by_function": [
+    0.494,
+    0.724
+   ],
+   "tests": 500
+  },
+  "HX": {
+   "hidden_pass": 0.71,
+   "ci95_by_function": [
+    0.62,
+    0.802
+   ],
+   "tests": 500
+  },
+  "HXQ": {
+   "hidden_pass": 0.832,
+   "ci95_by_function": [
+    0.732,
+    0.918
+   ],
+   "tests": 500
+  }
+ },
+ "diffs": {
+  "X-N0": {
+   "points": 19.4,
+   "ci95": [
+    6.0,
+    32.2
+   ]
+  },
+  "HX-N0": {
+   "points": 29.6,
+   "ci95": [
+    16.4,
+    41.4
+   ]
+  },
+  "HXQ-N0": {
+   "points": 41.8,
+   "ci95": [
+    28.4,
+    54.6
+   ]
+  }
+ },
+ "allowance": {}
+}

@@ -1,0 +1,58 @@
+[13:13:43] predictions registered on origin/main: gate16/prompts/PREDICTIONS.md
+[13:13:43] rule-giver writing private rules (headless Claude Code)...
+[13:19:12] rules checked: 20 functions, 247 calls, deterministic
+[13:19:12] declared decisions per function: 1:5, 2:5, 3:5, 4:5
+[13:19:13] starting repo and hidden suite built
+[13:19:13] extractor reading the handbook (headless Claude Code)...
+[13:19:57] extracted tour built: 33 inputs picked, 17 dropped, 20 visible tests
+[13:19:57] handbook seed built
+N0: 3 workers, tools/ask.py port None, repo /home/node/hive/runs/g16/upN0.git
+next: python3 lab/launch.py --run g16
+X: 3 workers, tools/ask.py port None, repo /home/node/hive/runs/g16/upX.git
+next: python3 lab/launch.py --run g16
+HX: 3 workers, tools/ask.py port None, repo /home/node/hive/runs/g16/upHX.git
+HXQ: 3 workers, tools/ask.py port 7463, repo /home/node/hive/runs/g16/upHXQ.git
+next: python3 lab/launch.py --run g16
+[13:19:59] launching workers...
+launched HX-w1
+launched HX-w2
+launched HX-w3
+launched HXQ-w1
+launched HXQ-w2
+launched HXQ-w3
+launched N0-w1
+launched N0-w2
+launched N0-w3
+launched X-w1
+launched X-w2
+launched X-w3
+N0-w2 finished: exit 0, 2.1 min, tokens 715099, cost 0.5570046000000001
+HX-w1 finished: exit 0, 2.2 min, tokens 819169, cost 0.6822005999999998
+N0-w3 finished: exit 0, 2.2 min, tokens 926060, cost 0.6759678
+N0-w1 finished: exit 0, 2.4 min, tokens 806136, cost 0.6501890000000001
+HX-w3 finished: exit 0, 2.4 min, tokens 916156, cost 0.7470662000000001
+HX-w2 finished: exit 0, 2.5 min, tokens 792235, cost 0.6352192
+HXQ-w3 finished: exit 0, 2.5 min, tokens 1051433, cost 0.77329
+X-w3 finished: exit 0, 2.6 min, tokens 768192, cost 0.7142195999999998
+HXQ-w1 finished: exit 0, 2.6 min, tokens 1142908, cost 0.7597262
+HXQ-w2 finished: exit 0, 2.7 min, tokens 1054629, cost 0.7819208
+X-w1 finished: exit 0, 2.7 min, tokens 1047321, cost 0.8024086000000001
+X-w2 finished: exit 0, 2.9 min, tokens 191916, cost 0.9407288
+wrote /home/node/hive/runs/g16/agents.csv
+[13:22:57] scoring every arm call by call...
+# g16: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 41.4% | 31.0%–53.4% |
+| X | 60.8% | 49.4%–72.4% |
+| HX | 71.0% | 62.0%–80.2% |
+| HXQ | 83.2% | 73.2%–91.8% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| X-N0 | +19.4 | +6.0 to +32.2 |
+| HX-N0 | +29.6 | +16.4 to +41.4 |
+| HXQ-N0 | +41.8 | +28.4 to +54.6 |
+[13:22:59] done. Next: write the gate RESULTS.md from runs/g16/summary.md, update BRAIN.md and lab/QUEUE.md, push.
+EXIT=0
