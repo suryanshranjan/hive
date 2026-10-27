@@ -58,7 +58,8 @@ def setup(run, examples=None, questions=None):
                  "Write every question as one real-life situation in plain words: real amounts in rupees, people and deals "
                  "instead of code, and 2 or 3 lettered choices (A, B, C), the last one being \"something else (please say)\". "
                  "No code, function names, quoted values, brackets or status codes: `hive ask` refuses them. Ask one thing "
-                 "per question. Translate the answer back into code yourself, encode it as a test before you land, and do not "
+                 "per question, the way you would ask a busy founder in person: one friendly sentence setting the scene "
+                 "(who, what, how much), then the question, then the choices, under about 70 words in all. Translate the answer back into code yourself, encode it as a test before you land, and do not "
                  "stretch it into rules it does not state.\n")
     return text
 
@@ -93,28 +94,52 @@ def answers():
         rows.append(f"Q ({q['worker']}): {q['question']}\nA: {a['answer']}\n")
     print('\n'.join(rows) if rows else 'no answers yet'); return 0
 
+def format_question(q, number, budget=None, width=72):
+    """One question as the owner sees it: a header, the situation wrapped, then each lettered choice on its own line."""
+    import textwrap
+    parts = re.split(r'\s+(?=[A-D]\)\s)', q['question'].strip())
+    situation, choices = parts[0], parts[1:]
+    waited = max(0, int(time.time()) - q.get('asked', int(time.time())))
+    head = f" Question {number}" + (f" of up to {budget}" if budget else '') + \
+           f"  -  from builder {q['worker']}  -  asked {waited // 60}:{waited % 60:02d} ago"
+    lines = ['', '=' * width, head, '=' * width, '']
+    lines += textwrap.wrap(' '.join(situation.split()), width - 2, initial_indent='  ', subsequent_indent='  ')
+    if choices:
+        lines.append('')
+        for c in choices:
+            lines += textwrap.wrap(' '.join(c.split()), width - 4, initial_indent='    ', subsequent_indent='       ')
+    lines += ['', '  Your answer (a letter, or say it in your own words) > ']
+    return '\n'.join(lines)
+
 def serve(run, poll=2):
     """The owner's terminal: show each unanswered question, read the answer, write it. Ctrl+C to stop."""
     if not os.path.exists(os.path.join(run, 'run.json')):
-        print('waiting for the run to start...', flush=True)
+        print('Waiting for the builders to start...', flush=True)
         while not os.path.exists(os.path.join(run, 'run.json')):   # never create the run folder: hive run owns it
             time.sleep(poll)
-    d = _dir(run); seen = set()
-    print('Answering questions for this run. Type the answer and press Enter; Ctrl+C to stop.', flush=True)
+    d = _dir(run); seen = set(); answered = 0; idle_note = False
+    print('\nHi! The builders are at work. When they hit a decision only you can make, the question appears here.\n'
+          'Each one is a real situation: pick a letter, or answer in your own words, and press Enter.\n'
+          'Press Enter on an empty line to come back to a question later; Ctrl+C when you are done.', flush=True)
     try:
         while True:
-            for p in sorted(glob.glob(os.path.join(d, 'questions', '*.json'))):
+            budget = _budget(d)
+            for i, p in enumerate(sorted(glob.glob(os.path.join(d, 'questions', '*.json'))), 1):
                 q = json.load(open(p))
                 if q['id'] in seen or os.path.exists(os.path.join(d, 'answers', q['id'] + '.json')):
                     continue
                 seen.add(q['id'])
-                print(f"\n[{q['worker']}] {q['question']}\n  Your answer (a letter, or a few words): ", end='', flush=True)
+                print(format_question(q, i, budget), end='', flush=True)
                 ans = sys.stdin.readline().strip()
                 if not ans:
-                    seen.discard(q['id']); continue
+                    seen.discard(q['id']); print('  OK, I will show it again shortly.', flush=True); continue
                 json.dump({'id': q['id'], 'answer': ans, 'answered': int(time.time()), 'seconds': int(time.time()) - q['asked']},
                           open(os.path.join(d, 'answers', q['id'] + '.json'), 'w'))
-                print('  saved.', flush=True)
+                answered += 1; idle_note = True
+                print(f"  Thanks, sent to builder {q['worker']}. ({answered} answered so far)", flush=True)
+            if idle_note:
+                print('\n  Waiting for the next question...', flush=True); idle_note = False
             time.sleep(poll)
     except KeyboardInterrupt:
+        print(f'\nDone. You answered {answered} question(s). Thank you!')
         return 0
