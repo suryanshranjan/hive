@@ -16,6 +16,7 @@ Silent swarms finish what they are given. On rules no model can guess, they are 
 - **When the owner points, intent gets through.** One worked example per rule, chosen by the owner, beat the same number of answers to builder-chosen questions: 89.4% against 67.2% of hidden tests ([Gate 13](gates/gate13/RESULTS.md)).
 - **With both, swarms reach 95–98%.** Owner examples plus about 17 questions: 95.2% and 98.2% on two rule sets ([Gates 13](gates/gate13/RESULTS.md), [17](gates/gate17/RESULTS.md)), and **95.0% end to end at 6 workers with no broken commits** ([Gate 24](gates/gate24/RESULTS.md)).
 - **On a real company's rules: 84.8%,** against 49.6% before, using the founder's own examples, questions and the company's documents ([Gate 20](gates/gate20/RESULTS.md)). The documents covered 2 of 10 functions; the rest lived only in the founder's head.
+- **In a real company's codebase, with the founder answering live:** the tool built two roadmap features on a real Node.js backend, passing 23/23 and 18/18 acceptance cases with all 384 existing tests intact, for about $3 each. Plain-language questions made the difference: the founder answered 4 of 4 himself, against 1 of 12 when questions were in code terms ([Gates 25](gates/gate25/RESULTS.md), [26](gates/gate26/RESULTS.md)).
 
 The worked examples are **Specification by Example**, an established practice. What this work adds is measurement: a randomized comparison of owner-chosen examples against builder questions, and the question floor. See [`docs/related_work.md`](docs/related_work.md) for what is and is not new.
 
@@ -44,7 +45,7 @@ The tool packages the measured design for any repository with tests. Plan and mi
 | M2 Claims on areas of the codebase | **Done** (`tests/test_claims.sh`) |
 | M3 `hive run`: headless workers, one clone each | **Done** (`tests/test_run.sh`; a real 2-worker run, $0.43) |
 | M4 Owner session: examples and live answers become tests | **Done** (`tests/test_owner.sh`) |
-| M5 First real feature, built end to end, scored on the owner's held-back tests | **Run** ([Gate 25](gates/gate25/RESULTS.md)): 23/23 hidden, 384/384 existing; owner answers mostly by an AI proxy (disclosed) |
+| M5 First real feature, built end to end, scored on the owner's held-back tests | **Done** ([Gate 25](gates/gate25/RESULTS.md): 23/23, proxy owner; [Gate 26](gates/gate26/RESULTS.md): 18/18 with the founder answering all 4 questions himself, 384/384 existing tests both times) |
 
 ```
 python -m hive init --test-cmd "python -m pytest -q --junitxml=.hive/junit.xml"     # once per repository

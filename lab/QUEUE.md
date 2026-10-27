@@ -2,10 +2,10 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 28 2026, after Gate 25)
+## Where we left off (Oct 28 2026, after Gate 26)
 
-- Hive v1 M1–M4 done (`hive/`, `tests/`); M5 run as Gate 25 (`gates/gate25/RESULTS.md`): a real backlog feature on a real company's backend, 23/23 hidden acceptance tests and 384/384 existing tests, $3.18. The founder answered 1 of 12 questions and delegated the rest to an AI proxy, so the founder-live test is still open.
-- Next: (1) the founder-live rerun, hidden tests written by someone other than the answerer; (2) `hive owner` showing the owner's own past decisions next to each question; (3) a larger feature with persistence and endpoints.
+- Hive v1 M1–M5 done. Gate 25: first real feature (23/23, proxy owner). Gate 26: second real feature with the founder answering all 4 plain-language questions himself (18/18 acceptance from documents, 384/384 existing, $2.26).
+- Next: (1) acceptance cases from the founder's own head (not the documents); (2) a larger feature with persistence and endpoints; (3) a second founder and company; (4) packaging Hive v1 for others (install, owner screen).
 
 ## Needs the user
 
