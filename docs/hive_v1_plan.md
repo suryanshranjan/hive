@@ -44,7 +44,7 @@ tests/                     Hive's own tests
 | M2 | Claims on areas | **Done.** `tests/test_claims.sh` (9 checks, repeated 4 times): overlapping claims refused, unknown areas refused, two simultaneous claims leave exactly one holder, landing frees the area |
 | M3 | `hive run` | **Done.** `tests/test_run.sh` (fake workers, 6 checks: result passes, both land, no lock left, source untouched, cost logged). Real check: 2 Claude workers built a two-area goal in 0.5 min for $0.43; one lost a simultaneous claim, withdrew automatically and took the other area; 17/17 tests, 15 of them added by the workers |
 | M4 | Owner session | **Done.** `hive run --examples --questions`, `hive owner`, `hive ask`, `hive answers`. `tests/test_owner.sh` (6 checks): examples in every prompt, question reaches the owner's terminal and the answer comes back, response time recorded, budget enforced, the answer lands as a passing test |
-| M5 | First real feature | A feature from a real backlog built by Hive end to end, the owner answering live; scored on the owner's held-back acceptance tests |
+| M5 | First real feature | **Run (Gate 25):** 23/23 hidden acceptance tests and 384/384 existing tests on a real company's backend, $3.18. The founder delegated 11 of 12 answers to an AI proxy, so the founder-live version is still to run |
 
 M1 to M4 use small sample repositories so they cost little. M5 is the breakthrough test.
 
