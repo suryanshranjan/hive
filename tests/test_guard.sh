@@ -28,11 +28,15 @@ printf 'def add(a, b):\n    return 0\n' >> calc.py
 python3 -m hive land dup "duplicate add" >/dev/null; check "duplicate definition refused" $? 6
 git rebase --abort 2>/dev/null; git reset -q --hard origin/main
 # 4. a lock commit changes no code, so the next lander reuses main's cached results
-mkdir -p current_tasks && echo "b: x" > current_tasks/x.txt && git add -A && git commit -qm "Lock: x" && git push -q origin HEAD:main
+mkdir -p current_tasks && echo "b: x" > current_tasks/x.txt && git add current_tasks/x.txt && git commit -qm "Lock: x" && git push -q origin HEAD:main
 hits() { cat $HIVE_GUARD_CACHE/*/stats.log 2>/dev/null | grep -c hit; }
 before=$(hits)
 cd $T/a && git pull -q --rebase origin main && printf '\ndef sub(a, b):\n    return a - b\n' >> calc.py
 python3 -m hive land sub "add sub" >/dev/null; check "lands after a lock commit" $? 0
 after=$(hits)
 check "main's results came from the cache" $((after > before)) 1
+# 5. a secret or a dependency folder is never committed
+cd $T/a && git pull -q --rebase origin main && echo "API_KEY=abc" > .env && echo "x = 1" > extra.py
+python3 -m hive land leak "with a .env" >/dev/null; check "secret file refused" $? 8
+test -z "$(git log origin/main --name-only --format= | grep -x .env)"; check ".env never reached the shared branch" $? 0
 rm -rf $T; exit $fail

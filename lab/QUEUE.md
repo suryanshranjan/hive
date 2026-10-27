@@ -5,7 +5,7 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 ## Where we left off (Oct 28 2026: building Hive v1)
 
 - Testing phase complete (Gates 0–24 in `gates/`; caveat in `gates/LAB_NOTE_guard_python.md`). Literature check in `docs/related_work.md`.
-- **Building Hive v1** (`docs/hive_v1_plan.md`, package `hive/`). **M1 done for pytest:** the runner-agnostic, content-keyed guard passes `tests/test_guard.sh` (run in the lab container: clean change lands, regression refused, duplicate refused, cache hit after a lock commit).
+- **Building Hive v1** (`docs/hive_v1_plan.md`, package `hive/`). **M1 done:** the guard passes `tests/test_guard.sh` (pytest, 7 checks) and the same checks on a real company's Node.js backend (private copy in the lab container; 384 `node:test` tests). Found and fixed on the real repo: branch names other than `main`, secrets (refused, exit 8), build artifacts (left out of commits).
 - Next: M1 on a jest repository; M2 area claims; M3 `hive run`; M4 owner session; M5 the first real feature (proposed: the Creators commercial module).
 
 ## Needs the user

@@ -40,7 +40,7 @@ tests/                     Hive's own tests
 
 | # | Milestone | Done when |
 | --- | --- | --- |
-| M1 | Runner-agnostic guard | `hive land` blocks a regression and passes a clean change on a sample pytest repository and a sample jest repository; cache hits on lock commits |
+| M1 | Runner-agnostic guard | **Done.** `tests/test_guard.sh` (pytest, 7 checks) and a real company's Node.js backend (private; `node:test` with Node's JUnit reporter, 384 tests): clean change lands, regression refused, duplicate refused, cache hit after a lock commit, secrets refused, artifacts left out, any shared branch name |
 | M2 | Claims on areas | Two workers claiming overlapping areas: the later one is refused; a race resolves by commit order |
 | M3 | `hive run` | N headless workers on a sample repository, each in its own clone, finish a small backlog; cost and minutes logged |
 | M4 | Owner session | The owner's examples become tests in the project's framework; a worker's question reaches the owner's terminal and the answer is added as a test |

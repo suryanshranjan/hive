@@ -2,21 +2,46 @@
 
 Runner-agnostic version of gates/gate23/tools/land.py (Gates 3, 21-23). In order:
   1. commit the work and release the worker's lock;
-  2. rebase onto origin/main;
+  2. rebase onto the shared branch (config "branch", else the remote default);
   3. refuse new duplicate definitions in Python files (git merges them silently and the last one wins);
-  4. refuse any test that passes on main but fails with the change, per test, using the project's own test
+  4. refuse any test that passes on the shared branch but fails with the change, per test, using the project's own test
      command and its JUnit XML;
   5. push.
 Main's results are cached by code content (Gate 23: lock commits change no code, so they reuse the landing's run).
-Exit codes: 0 landed; 2 push kept failing; 5 rebase conflict; 6 duplicate definitions; 7 regressions."""
-import ast, hashlib, io, json, os, subprocess, sys, tarfile, tempfile, time
+Before committing it refuses secrets (.env files other than templates, private keys, credential files; projects can
+add patterns with "never_commit") and leaves build artifacts and dependency folders out of the commit.
+Exit codes: 0 landed; 2 push kept failing; 5 rebase conflict; 6 duplicate definitions; 7 regressions; 8 forbidden files."""
+import ast, fnmatch, hashlib, io, json, os, subprocess, sys, tarfile, tempfile, time
 
 from . import config, junit
 
 LOCK_DIR = 'current_tasks'
+NEVER_COMMIT = ['.env', '.env.*', '*.pem', '*.key', '*.p12', '*.pfx', 'id_rsa*', 'id_ed25519*', '*credentials*.json',
+                '*service-account*.json', '.npmrc', '.pypirc']
+ARTIFACTS = ['node_modules', '.venv', 'venv', '__pycache__', '*.pyc', '.pytest_cache', '.mypy_cache', '.next', '.turbo',
+             'coverage', '.hive']
+TEMPLATES = ('.example', '.sample', '.template')
+
+def _matches(path, patterns):
+    return any(fnmatch.fnmatch(part, pat) for part in path.split('/') for pat in patterns)
+
+def forbidden(path, extra=()):
+    """True for a secret-like file that must never be committed (.env.example and other templates are allowed)."""
+    return _matches(path, NEVER_COMMIT + list(extra)) and not path.endswith(TEMPLATES)
+
+def artifact(path):
+    """True for build output and dependencies, which are left out of commits."""
+    return _matches(path, ARTIFACTS) and not (path == '.hive/config.json')
 
 def sh(*a, **k):
     return subprocess.run(list(a), capture_output=True, text=True, **k)
+
+def branch(cfg):
+    """The shared branch: .hive/config.json "branch", else the remote's default branch (origin/HEAD), else main."""
+    if cfg.get('branch'):
+        return cfg['branch']
+    ref = sh('git', 'symbolic-ref', '--short', 'refs/remotes/origin/HEAD').stdout.strip()
+    return ref.split('/', 1)[1] if ref.startswith('origin/') else 'main'
 
 def log(event):
     p = os.environ.get('HIVE_LOG')
@@ -62,9 +87,9 @@ def run_suite(code_dir, cfg):
         return {}
 
 def main_snapshot(cfg):
-    """origin/main checked out in a temporary folder, with dependency folders linked from this clone."""
+    """The shared branch checked out in a temporary folder, with dependency folders linked from this clone."""
     d = tempfile.mkdtemp(prefix='hive-main-')
-    data = subprocess.run(['git', 'archive', 'origin/main'], capture_output=True).stdout
+    data = subprocess.run(['git', 'archive', f'origin/{branch(cfg)}'], capture_output=True).stdout
     tar = tarfile.open(fileobj=io.BytesIO(data))
     try:
         tar.extractall(d, filter='data')      # Python 3.12, and 3.11.4+
@@ -97,33 +122,43 @@ def cache_put(rev, res):
     json.dump(res, open(tmp, 'w')); os.replace(tmp, os.path.join(d, key + '.json'))
 
 def main_results(cfg):
-    d = cache_dir(); p = os.path.join(d, code_key('origin/main') + '.json')
+    main = f'origin/{branch(cfg)}'; d = cache_dir(); p = os.path.join(d, code_key(main) + '.json')
     try:
         res = json.load(open(p)); open(os.path.join(d, 'stats.log'), 'a').write('hit\n'); return res
     except Exception:
-        res = run_suite(main_snapshot(cfg), cfg); cache_put('origin/main', res)
+        res = run_suite(main_snapshot(cfg), cfg); cache_put(main, res)
         open(os.path.join(d, 'stats.log'), 'a').write('miss\n'); return res
 
 # ---------------------------------------------------------------- landing
 
 def land(name, message):
     """message is a commit message, or '--continue' after resolving a rebase conflict."""
-    cfg = config.load()
+    cfg = config.load(); b = branch(cfg)
     lock = os.path.join(LOCK_DIR, f'{name}.txt')
     if message != '--continue':
         if os.path.exists(lock):
             sh('git', 'rm', '-q', '--cached', lock); os.remove(lock)
         sh('git', 'add', '-A')
+        staged = sh('git', 'diff', '--cached', '--name-only').stdout.splitlines()
+        skip = [f for f in staged if f and artifact(f)]
+        if skip:
+            sh('git', 'reset', '-q', '--', *skip)
+        bad = sorted(f for f in staged if f and forbidden(f, cfg.get('never_commit', [])))
+        if bad:
+            sh('git', 'reset', '-q')
+            log(f'BLOCKED_FORBIDDEN {name} {len(bad)}')
+            print('Refused: these files must never be committed (secrets or dependencies): ' + ', '.join(bad[:10]))
+            print('Delete them or add them to .gitignore, then run hive land again.'); return 8
         r = sh('git', 'commit', '-q', '-m', f'{message} (lock {name} released)')
         if r.returncode and 'nothing to commit' not in r.stdout + r.stderr:
             print(r.stdout, r.stderr); return 2
     for _ in range(8):
-        if sh('git', 'pull', '--rebase', 'origin', 'main').returncode:
+        if sh('git', 'pull', '--rebase', 'origin', b).returncode:
             files = sh('git', 'diff', '--name-only', '--diff-filter=U').stdout.split()
             log(f'CONFLICT {name} {" ".join(files)}')
             print('Rebase conflict in: ' + ', '.join(files) + f'\nResolve, git add, git rebase --continue, then: hive land {name} --continue')
             return 5
-        new_dups = dup_defs(python_sources('HEAD')) - dup_defs(python_sources('origin/main'))
+        new_dups = dup_defs(python_sources('HEAD')) - dup_defs(python_sources(f'origin/{b}'))
         if new_dups:
             log(f'BLOCKED_DUP {name} {len(new_dups)}')
             print('New duplicate definitions (the last one silently wins):')
@@ -137,7 +172,7 @@ def land(name, message):
             print(f'{len(regressed)} tests pass on main but fail with your change, e.g.: ' + ', '.join(regressed[:8]))
             print(f'Fix, commit, then: hive land {name} --continue'); return 7
         cache_put('HEAD', mine)   # stored before pushing: any later commit with the same code finds it
-        if sh('git', 'push', '-q', 'origin', 'HEAD:main').returncode == 0:
+        if sh('git', 'push', '-q', 'origin', f'HEAD:{b}').returncode == 0:
             log(f'LAND {name} {sum(mine.values())}')
             print(f'landed {name}: {sum(mine.values())}/{len(mine)} tests pass'); return 0
     print('push kept being rejected; run again'); return 2

@@ -40,7 +40,7 @@ The tool packages the measured design for any repository with tests. Plan and mi
 
 | Milestone | Status |
 | --- | --- |
-| M1 Guard for any test runner (JUnit XML), cache keyed by code content | **Done for pytest** (`tests/test_guard.sh`) |
+| M1 Guard for any test runner (JUnit XML), cache keyed by code content, secrets refused | **Done**: pytest (`tests/test_guard.sh`) and a real company's Node.js backend (384 tests) |
 | M2 Claims on areas of the codebase | Next |
 | M3 `hive run`: headless workers, one clone each | Planned |
 | M4 Owner session: examples and live answers become tests | Planned |
