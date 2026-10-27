@@ -1,0 +1,21 @@
+{
+ "name": "g18",
+ "predictions": "gate18/prompts/PREDICTIONS.md",
+ "rulegiver_brief": "gate15/prompts/rulegiver_brief.md",
+ "note": "run with --oracle pointing at the private Gate 7 wrapper (kept outside this repo); no rule-giver runs",
+ "prompt": "lab/templates/prompt_builder.md",
+ "ask_texts": "lab/experiments/g18_ask_texts.md",
+ "visible_seed": 18100,
+ "hidden_seed": 18200000,
+ "baseline": "N0",
+ "tour_arms": {
+  "T": "tour",
+  "TQ": "tour"
+ },
+ "arms": [
+  "N0:3:none",
+  "T:3:none",
+  "Q:3:budget:7481:19",
+  "TQ:3:budget:7482:19"
+ ]
+}
