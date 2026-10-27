@@ -5,10 +5,11 @@ usage:
   python -m hive claim <short_name> <area>[,<area>...] "<what you will build>"
   python -m hive land <short_name> "<commit message>"      # or: python -m hive land <short_name> --continue
   python -m hive areas                                      # every area and who holds it
+  python -m hive run --repo <repo> --run <new folder> --workers N --goal <goal.md or text> [--minutes 40] [--max-parallel N]
 """
 import argparse, json, os, sys
 
-from . import claims, guard
+from . import claims, guard, swarm
 
 def init(test_cmd, junit):
     os.makedirs('.hive', exist_ok=True); os.makedirs(guard.LOCK_DIR, exist_ok=True)
@@ -29,6 +30,9 @@ def main(argv=None):
     c = sub.add_parser('claim'); c.add_argument('name'); c.add_argument('areas'); c.add_argument('desc')
     l = sub.add_parser('land'); l.add_argument('name'); l.add_argument('message')
     sub.add_parser('areas')
+    r = sub.add_parser('run'); r.add_argument('--repo', default='.'); r.add_argument('--run', required=True)
+    r.add_argument('--workers', type=int, required=True); r.add_argument('--goal', required=True)
+    r.add_argument('--minutes', type=int, default=40); r.add_argument('--max-parallel', type=int, default=0)
     a = ap.parse_args(argv)
     if a.cmd == 'init':
         return init(a.test_cmd, a.junit)
@@ -38,6 +42,9 @@ def main(argv=None):
         return guard.land(a.name, a.message)
     if a.cmd == 'areas':
         return claims.status()
+    if a.cmd == 'run':
+        swarm.prepare(a.repo, a.run, a.workers, a.goal, a.minutes)
+        return swarm.launch(a.run, a.max_parallel)
 
 if __name__ == '__main__':
     sys.exit(main())
