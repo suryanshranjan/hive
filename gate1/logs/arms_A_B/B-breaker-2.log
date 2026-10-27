@@ -1,0 +1,12 @@
+1793074964 START
+1793075151 FOUND 3 affinity_compare,affinity_on_write,case_insensitive_names
+1793075219 FOUND 2 alias_in_where,alias_in_having
+1793075287 FOUND 1 empty_group_outer_ref
+1793075585 FOUND 4 case_operand_affinity,in_subquery_affinity,replace_empty_pattern,scalar_minmax_tie
+1793075767 FOUND 4 group_by_collate,distinct_collate,minmax_agg_collate,collate_propagation
+1793075895 FOUND 2 compound_order_by_resolution,compound_collate
+1793075985 FOUND 2 compound_empty_member,printf_function
+1793076124 FOUND 1 like_ascii_only_nocase
+1793076137 REMOVED 2 duplicates printf_function,like_ascii_only_nocase (already in k1)
+1793076328 FOUND 2 update_in_subquery_snapshot,update_subquery_scope
+1793076419 STOP 30min: 21 committed (2 later removed as k1 duplicates), 19 in tree, 10 fixed by builders
