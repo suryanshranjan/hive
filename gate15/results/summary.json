@@ -1,0 +1,61 @@
+{
+ "name": "g15",
+ "arms": {
+  "N0": {
+   "hidden_pass": 0.446,
+   "ci95_by_function": [
+    0.338,
+    0.562
+   ],
+   "tests": 500
+  },
+  "T": {
+   "hidden_pass": 0.926,
+   "ci95_by_function": [
+    0.854,
+    0.98
+   ],
+   "tests": 500
+  },
+  "H": {
+   "hidden_pass": 0.772,
+   "ci95_by_function": [
+    0.648,
+    0.888
+   ],
+   "tests": 500
+  },
+  "X": {
+   "hidden_pass": 0.806,
+   "ci95_by_function": [
+    0.712,
+    0.892
+   ],
+   "tests": 500
+  }
+ },
+ "diffs": {
+  "T-N0": {
+   "points": 48.0,
+   "ci95": [
+    32.4,
+    61.0
+   ]
+  },
+  "H-N0": {
+   "points": 32.6,
+   "ci95": [
+    21.2,
+    44.2
+   ]
+  },
+  "X-N0": {
+   "points": 36.0,
+   "ci95": [
+    24.4,
+    48.2
+   ]
+  }
+ },
+ "allowance": {}
+}
