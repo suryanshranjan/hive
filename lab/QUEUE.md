@@ -7,19 +7,21 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 - Gates 0 to 8 and 11 are done and written up (G9 and G10 are still cards). Gate 7 used a real company's rules, which stay private (never commit them).
 - Gate 11 (`gate11/RESULTS.md`): spreading 30 questions as 1–2 per function beat blocks of 3 by 1.25× (CI 1.00 to 1.78). But Gate 8's one-parameter law failed (p = 0.35), and within the same functions the 3rd question added nothing. The law is withdrawn; spreading stays the default.
 - `run_gate.py` has a two-stage stratified mode (`"stratified"` in the config).
-- Nothing is ready to run. The next card (G12) needs one addition and its predictions first.
+- G12 is registered (`gate12/prompts/PREDICTIONS.md`, analysis code `gate12/referee/analyze.py`).
+
+## Ready
+
+### G12: does question saturation track hidden decisions?
+- **Run:** `python3 lab/run_gate.py lab/experiments/g12_saturation.json`
+- **Design:** the rule-giver gives 5 functions each 1, 2, 3 and 4 hidden decisions (declared privately); teams N0 / Q1 / Q2 / Q4 ask 0 / 1 / 2 / 4 questions on every function.
+- **Cost:** about $11; about 10 minutes.
+- **Afterwards:** `python gate12/referee/analyze.py gate12/results gate12/referee/oracle.py`; write RESULTS.md, apply the decision rules, update BRAIN.md and this file, push.
 
 ## Running on a laptop (Docker)
 
 Workers run shell commands, so run them in a container. Image: `node:22-bookworm` plus `python3 sqlite3 git` and `npm i -g @anthropic-ai/claude-code`, run as user `node`. Mount the repo read-write at `/host/hive` and `~/.claude/.credentials.json` read-only; copy the credentials into the container's `~/.claude/`; work in a fresh clone inside the container (a Windows checkout has CRLF line endings), with `origin` pointed at GitHub. Copy results back out and push from the host.
 
 ## Needs design first (write the config and predictions, push them, then run)
-
-### G12: repeat Gate 11 on a new rule-giver, with hidden decisions counted
-- **Why:** one head-to-head win (interval reaching 1.0), and the curve's shape varies by rule set. Conjecture to test: questions saturate near the number of hidden policy decisions per function.
-- **Design:** copy `g11_spread_vs_blocks.json` with new seeds and name. Register a procedure, fixed before the rules exist, for counting each function's hidden decisions in the oracle after scoring (for example: distinct branches in its rule that change the output on its EDGE list).
-- **Predictions to register:** S/B ≥ 1.15 again; functions with 1–2 decisions saturate by 2 questions (3rd adds < 0.10), functions with 3+ do not.
-- **Cost:** about $8.4; about 12 minutes.
 
 ### G9: intent interface v1 vs free asking
 - Arm A: free asking, 30 questions.
@@ -31,7 +33,7 @@ Workers run shell commands, so run them in a container. Image: `node:22-bookworm
 - Prediction to register first: 12 workers finish under 7.0 minutes.
 
 ### Repeats
-- Every gate is one run per team. The cheapest strengthening is G12 (a repeat of Gate 11 on a new rule-giver).
+- Every gate is one run per team. The cheapest strengthening is a repeat of Gate 11 on a new rule-giver.
 
 ## Rules learned from Gates 8 and 11
 - A law fitted on two gates can fail on the third: keep one-parameter fits labelled as models until a registered prediction from them holds.

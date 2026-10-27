@@ -1,0 +1,15 @@
+{
+  "name": "g12",
+  "predictions": "gate12/prompts/PREDICTIONS.md",
+  "rulegiver_brief": "gate12/prompts/rulegiver_brief.md",
+  "require_decisions": true,
+  "prompt": "lab/templates/prompt_builder.md",
+  "ask_texts": "lab/experiments/g12_ask_texts.md",
+  "visible_seed": 12100,
+  "hidden_seed": 12200000,
+  "baseline": "N0",
+  "arms": ["N0:3:none", "Q1:3:quota:7421", "Q2:3:quota:7422", "Q4:3:quota:7424"],
+  "allowance": {"Q1": {"seed": 12001, "counts": {"1": 20}},
+                "Q2": {"seed": 12002, "counts": {"2": 20}},
+                "Q4": {"seed": 12004, "counts": {"4": 20}}}
+}

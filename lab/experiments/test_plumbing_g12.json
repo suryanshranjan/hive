@@ -1,0 +1,37 @@
+{
+ "name": "plumbing_g12",
+ "predictions": "lab/experiments/test_plumbing_g12.json",
+ "rulegiver_brief": "gate12/prompts/rulegiver_brief.md",
+ "require_decisions": true,
+ "prompt": "lab/templates/prompt_builder.md",
+ "ask_texts": "lab/experiments/g12_ask_texts.md",
+ "visible_seed": 12100,
+ "hidden_seed": 12200000,
+ "baseline": "N0",
+ "arms": [
+  "N0:1:none",
+  "Q1:1:quota:7491",
+  "Q2:1:quota:7492",
+  "Q4:1:quota:7494"
+ ],
+ "allowance": {
+  "Q1": {
+   "seed": 12001,
+   "counts": {
+    "1": 20
+   }
+  },
+  "Q2": {
+   "seed": 12002,
+   "counts": {
+    "2": 20
+   }
+  },
+  "Q4": {
+   "seed": 12004,
+   "counts": {
+    "4": 20
+   }
+  }
+ }
+}
