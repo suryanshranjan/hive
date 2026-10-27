@@ -2,7 +2,7 @@
 
 Read this first. It is the shared memory for anyone working on Hive, human or agent: what we know, how sure we are, what is being tested, and exactly how to continue. When you learn something, update this file in the same commit as the evidence.
 
-Last updated: Oct 27 2026, 15:00 IST.
+Last updated: Oct 27 2026, 15:30 IST.
 
 ## 1. The question
 
@@ -17,7 +17,7 @@ Two things limit them today:
 - **Cost is mostly onboarding.** Each worker spends about 110k tokens getting started, against about 3k to 5k per task after that.
 - **Speed stops improving at around 6 to 12 workers.** The biggest task, and how late it gets claimed, sets the finish time.
 
-The deeper limit is intent. On rules a model cannot guess, swarms passed every visible example but only 48 to 58% of the hidden tests when there was no one to ask (Gates 3, 4). 30 questions to a product owner added about 29 points on two different rule sets; 320 questions reached 98%. What remains wrong is where the owner breaks a convention nobody thought to ask about, such as NULL handling or caps on extreme values. A planner that chose the 30 questions by coverage did no better than free asking (Gate 4). So far the amount of intent fed in matters; how cleverly it is asked for has not been shown to matter.
+The deeper limit is intent. On rules a model cannot guess, swarms passed every visible example but only 35 to 58% of the hidden tests when there was no one to ask (Gates 3 to 5, including rules written by an independent agent). 30 questions to a product owner added +28.6, +29.0 and +32.4 points on three different rule sets; 320 questions reached 98%. Per function, the first question is worth about +20 points of edge-case accuracy, and returns diminish after about three. Two strategies for choosing the questions failed to beat free asking: coverage planning (Gate 4) and asking about defaults first (Gate 5). Where an owner's surprises sit depends on the owner. So far the amount of intent that reaches each function matters, and no rule for choosing questions has been shown to.
 
 ## 3. The law and how sure we are of each part
 
@@ -39,6 +39,7 @@ Status tags: **established** means outside theory or our data on real agents; **
 | 6 No universal referee | no automatic check decides arbitrary intent | Established (Rice) |
 | 7 Intent bandwidth | useful work per hour ≤ I/b | **Evidence that intent binds** (Gates 3, 4): hidden pass rises with questions (58 / 87 / 98% at 0 / 30 / 320). The rate law itself (I and b) is **not measured** |
 | Coverage | edge error ≈ e_g·(1 − coverage of input classes by questions) | **Prediction failed** (Gate 4): coverage-planned 30 questions = free 30 questions |
+| Questions per function | edge-accuracy gain ≈ 0 / +20 / +24 / +34 points at 0 / 1 / 2 / 3+ questions on that function | **Observational**, 100 team-function pairs over 3 rule sets (Gates 3 to 5) |
 | Onboarding | tokens ≈ c_on·N + c_task·T | **Model**, held out three times (Gates 1, 2, 3) |
 | Tail | finish ≥ max(work/N, longest task + when it starts) | Established (scheduling theory); seen binding in Gate 3 |
 | Coverage cliff | N* ∝ (1−c)^−0.61 · τ^−1.04 · κ^−0.55 | Model, simulation only (1.4× typical error held out) |
@@ -59,7 +60,8 @@ Status tags: **established** means outside theory or our data on real agents; **
 | Cost of one conflict | 10 s to 2 min | Gates 1 to 3 |
 | Visible minus hidden gap | under 1 point when visible and hidden sample the same intent; 42 to 52 points when intent is missing (no questions) | Gates 1 to 4 |
 | Guess accuracy without intent | 99 to 100% on happy paths, 66 to 73% on edge cases | Gates 3, 4 |
-| Gain from 30 questions | +28.6 and +29.0 points hidden (paired 95% CI +15 to +43 in Gate 4) | Gates 3, 4 |
+| Gain from 30 questions | +28.6, +29.0, +32.4 points hidden (paired 95% CIs about ±14) | Gates 3, 4, 5 |
+| Guessing baseline, edge calls | 73% (Gate 3), 66% (Gate 4), 54% (Gate 5, independent rule-giver) | Gates 3 to 5 |
 | Edge accuracy, function asked vs not | 96.1% vs 75.7% (observational: workers chose what to ask) | Gate 3 |
 | Remaining error after 30 questions | 51 to 56% is NULL handling and caps on extremes | Gate 4 |
 | Cost of questions | +12% tokens and about 2.5 min for 320 questions | Gate 3 |
@@ -76,14 +78,15 @@ Status tags: **established** means outside theory or our data on real agents; **
 | Gate 3, step 2 | Oct 27 | Protocol v2 (category claims, guarded landing), 8 and 12 workers | Onboarding law held a third time; guard blocked both would-be regressions; all 2,960 hidden tests pass; no gaming (gap ≤ 0.4 pts); finish time set by the tail |
 | Gate 3, step 3 | Oct 27 | Intent test: 20 invented business rules, 3 swarms of 3, 0 / 30 / unlimited questions to a product owner | Hidden 58% / 87% / 98% (function-clustered 95% CIs 45–71, 78–94, 93–100); all predictions held; no cheating; the leftover errors are rules no question touched |
 | Gate 4 | Oct 27 | Fresh rules; 0 questions, 30 free questions, 30 questions chosen by a coverage planner whose answers became tests | 47.8% / 76.8% / 76.4%: planning did not help (−0.4 pts, CI −12 to +11); kill condition fired; the +29-point gain from 30 questions replicated |
+| Gate 5 | Oct 27 | Rules from an independent rule-giver agent; 0 questions, 30 free, 30 defaults-first | 34.6% / 67.0% / 62.2%: defaults-first did not help (−4.8 pts, CI −14.6 to +4.2) though delivered (37% of questions had NULL vs 10%); kill fired; +32.4-point gain from 30 questions replicated |
 
 ## 6. Prediction scorecard
 
 All predictions are written down before the run, in each gate's `PREDICTIONS.md`.
 
-- **Held:** intent is binding, and correctness rises with questions, all 5 intent predictions (Gate 3); no-questions baseline in range (Gate 4); onboarding law (Gates 2, 3); no gaming (Gates 1, 2, 3); guard keeps regressions off the tip of main (Gate 3; the blocked commit still sits in history next to its fix, so `--continue` should squash); no overlapping claims (Gate 3).
-- **Failed:** coverage-planned questions beat free questions, and reach 95% (Gate 4: 76.4% vs 76.8%); free 30 questions in 78–92% (Gate 4: 76.8%); free askers leave 3+ functions unasked (Gate 4: 2); foundation-first is cheaper (Gate 1); speed of 3 to 4× at 12 workers (Gate 2: 2.3×); collisions growing as κ(N−1) (Gate 2: slower); finer claims lowering the time floor (Gate 3: 8.7 min against 7.8).
-- **Untested:** 24 workers; breakers at scale; asking about defaults; the curve of correctness against number of answers.
+- **Held:** intent is binding, and correctness rises with questions, all 5 intent predictions (Gate 3); no-questions baseline in range (Gate 4); gain from 30 questions in +15 to +43, treatment delivered, rules not guessable (Gate 5); onboarding law (Gates 2, 3); no gaming (Gates 1, 2, 3); guard keeps regressions off the tip of main (Gate 3; the blocked commit still sits in history next to its fix, so `--continue` should squash); no overlapping claims (Gate 3).
+- **Failed:** defaults-first questions beat free questions (Gate 5: 62.2% vs 67.0%); coverage-planned questions beat free questions, and reach 95% (Gate 4: 76.4% vs 76.8%); free 30 questions in 78–92% (Gate 4: 76.8%); free askers leave 3+ functions unasked (Gate 4: 2); foundation-first is cheaper (Gate 1); speed of 3 to 4× at 12 workers (Gate 2: 2.3×); collisions growing as κ(N−1) (Gate 2: slower); finer claims lowering the time floor (Gate 3: 8.7 min against 7.8).
+- **Untested:** 24 workers; breakers at scale; the curve of correctness against number of answers; a budget spread so every function gets a question before any gets a third.
 - **Flawed check, disclosed:** one cheating-signature rule (CHECKSUM +97) could be read off a visible example.
 
 ## 7. Design as of now (Hive v2 plus protocol v2)
@@ -100,12 +103,14 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 - **Intent interface** (Gates 3, 4):
   - Write every answer into a shared test at once.
   - Label each answer as a ruling on that input only. Builders stretched rulings into rules, within and across functions (Gate 4: about 45 of 139 failing calls).
-  - Planning questions by coverage and spreading them per function did not help at 30 questions (Gate 4). Don't rely on it.
+  - Planning questions by coverage (Gate 4) and asking about defaults first (Gate 5) did not beat free asking. Don't rely on either.
+  - Don't let early functions eat the budget. Unasked functions gained nothing in every gate. Hypothesis: one question per function before any function gets a third.
+  - Vary one thing per question. A question that mixed a small group with an invalid value taught the wrong rule (Gate 5, `nps_score`).
 
 ## 8. Open questions, most important first
 
 1. **The intent curve.** How does hidden correctness grow with the number of answered values: 0, 10, 30, 100, 300 questions, repeated? This would turn limit 7 from evidence into a measured law.
-2. **Asking about defaults.** Does a team that spends questions on the conventions it takes for granted (NULL, extremes, unknown values) beat free asking? This needs rules written by someone other than me, because I formed this idea after seeing my own rules.
+2. **Spreading the budget.** Does guaranteeing every function one question before any gets a third beat free asking? This is suggested by the pooled data, so it needs a fresh rule-giver.
 3. **The tail.** Does largest-first claiming bring 12 workers under 7 minutes?
 4. **The largest swarm this lab allows**: 20 workers with largest-first claiming.
 5. **Turning intent into tests automatically**: the referee as the product.
@@ -158,3 +163,4 @@ Rules of the lab:
   - Gate 3 intent step built, attempted twice (stopped), then run: 58% / 87% / 98% hidden at 0 / 30 / unlimited questions. Oracle unsealed.
 - Accuracy audit: function-clustered confidence intervals added; "limit 7 measured" corrected to "evidence that intent binds"; the asked-vs-not comparison flagged as observational.
 - Gate 4: coverage-planned questions vs free questions on fresh rules. No difference (76.4% vs 76.8%); kill condition fired; the +29-point gain from 30 questions replicated.
+- Gate 5: an independent agent wrote the rules; defaults-first questions vs free. No help (62.2% vs 67.0%); kill condition fired; the gain from 30 questions replicated a third time (+32.4). Questions-per-function table pooled across Gates 3 to 5.
