@@ -2,19 +2,19 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 27 2026, after Gate 24)
+## Where we left off (Oct 27 2026, after Gate 20)
 
-- Gates 0 to 8, 10 to 18, 21, 22 and 24 are done and written up (G9 is still a card). Gates 7, 18 and 20 use a real company's rules, which stay private (never commit them).
-- Gate 24 (`gate24/RESULTS.md`): Hive v1 end to end, 95.0% vs 53.0% hidden at 6 workers, no breaking commits; every prediction held.
-- Gate 20 (the founder's own examples, plus the company's Notion policy pages as team HTQ) is registered and amended (`gate20/prompts/PREDICTIONS.md`); run it with the private oracle (`--oracle <private>/oracle_g20.py`).
-- Gate 23 still needs a clean rerun for its finish ratio (its cache hit rate is already clear).
+- Gates 0 to 8, 10 to 18, 20 to 22 and 24 are done and written up (G9 is still a card). Gates 7, 18 and 20 used a real company's rules, which stay private (never commit them).
+- Gate 20 (`gate20/RESULTS.md`): founder-written examples 72.4%, with questions 83.6%, with the company's documents too 84.8% (N0 23.6%). The documents covered 2 of 10 functions.
+- Gate 24: Hive v1 end to end holds (95.0% vs 53.0%).
+- The testing phase is complete apart from Gate 23's clean rerun (guard finish ratio). Next is building the product (see BRAIN.md section 7 for the design).
 
 ## Needs the user
 
-### G20: owner-chosen examples on the real rules
-- The founder writes one worked example per policy decision for Gate 7's 10 functions, without looking at the QA list (about 30 minutes). Compare with 19 builder questions, as in Gate 18. Tests whether the examples' advantage needs the owner to choose the points.
+### A person answering live
+- Every answer so far came from encoded rules. Have the founder answer builder questions in real time on a small gate; measure consistency with their own rules and answer time (Gate 7's Q2 and Q3, never tested).
 
-### G19: the documented-owner interface on a real company's documents
+### G19 (folded into Gate 20): the company's documents
 - The company's policy pages (Notion was unavailable on Oct 27: the connector did not authorize in this session) as the handbook; the confirmed rules answer.
 - Publish only anonymized aggregate numbers, as in Gate 7.
 
