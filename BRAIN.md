@@ -208,6 +208,7 @@ Rules of the lab:
 - T3 Code compared in Related systems.
 - Lab: `lab/` runs a whole gate in one command with real headless Claude Code workers, so any session (including from a phone) can continue from `lab/QUEUE.md`. Gate 8 predictions registered.
 - Gate 7: a real company's rules (Company X, name withheld), with its internal documents as the final authority. 15 answered questions lifted hidden correctness from 32.8% to 49.6%. Rules and answers are kept out of this public repo.
+- Gate 23 (content-keyed guard cache) aborted at the usage limit; unscored, its cache hit 337 of 338 lookups. `run_gate.py` gained a `guard` option.
 - Gate 22: rerun after a usage-limit abort. The store-before-push cached guard finished in 10.9 minutes against 15.1 (0.72×), but hits stayed at 58%: half of main's commits are lock commits the commit-keyed cache never sees. The two-term model missed by 0.13 on held-out data; the baseline moved 3 minutes between runs.
 - Gate 21: under a controlled 4-CPU limit, Gate 3's setup took 12.1 minutes (3.5 unlimited): CPU per guard check sets the finish. A cached guard (main's results stored per commit; 61% hits) finished in 10.2 (0.84×), with no extra breakage. Two-term model of the finish fitted.
 - Gate 10: largest-first claiming did not beat Gate 3's claiming (4.3 vs 3.5 minutes; kill fired). Both swarms finished 2.5× faster than Gate 3 on 24 cores: the guard's CPU cost on small machines, not claim order, set Gate 3's finish. gen2.py made Python 3.11-compatible (identical output); referee SQLite version mismatch found and disclosed.

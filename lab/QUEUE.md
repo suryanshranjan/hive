@@ -2,10 +2,11 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 27 2026, after Gate 22)
+## Where we left off (Oct 27 2026, Gate 23 aborted at a usage limit)
 
 - Gates 0 to 8, 10 to 18, 21 and 22 are done and written up (G9 is still a card). Gates 7 and 18 used a real company's rules, which stay private (never commit them).
-- Gate 22 (`gate22/RESULTS.md`): cached guard 0.72x Gate 3's (Gate 21: 0.84x), no extra breakage; hits stuck at about 60% because half of main's commits are lock commits. Next guard change: key the cache by code content.
+- **Gate 23 aborted** (`gate23/ABORTED.md`): usage limit. Unscored but clear: the content-keyed guard cache hit 337 of 338 lookups. Rerun on its own for the finish ratio.
+- Next: G24, an end-to-end test of the whole v1 design (owner tour + questions + content-keyed guard, 6 workers). `run_gate.py` has a `"guard"` option for it.
 - G20 still waits for the founder's examples (template in the session scratchpad).
 
 ## Needs the user
