@@ -1,0 +1,13 @@
+{
+  "name": "g13",
+  "predictions": "gate13/prompts/PREDICTIONS.md",
+  "rulegiver_brief": "gate13/prompts/rulegiver_brief.md",
+  "require_decisions": true,
+  "prompt": "lab/templates/prompt_builder.md",
+  "ask_texts": "lab/experiments/g13_ask_texts.md",
+  "visible_seed": 13100,
+  "hidden_seed": 13200000,
+  "baseline": "N0",
+  "tour_arms": ["T", "TQ"],
+  "arms": ["N0:3:none", "T:3:none", "Q:3:budget:7432:17", "TQ:3:budget:7433:17"]
+}

@@ -1,0 +1,21 @@
+{
+ "name": "plumbing_g13",
+ "predictions": "lab/experiments/test_plumbing_g13.json",
+ "rulegiver_brief": "gate13/prompts/rulegiver_brief.md",
+ "require_decisions": true,
+ "prompt": "lab/templates/prompt_builder.md",
+ "ask_texts": "lab/experiments/g13_ask_texts.md",
+ "visible_seed": 13100,
+ "hidden_seed": 13200000,
+ "baseline": "N0",
+ "tour_arms": [
+  "T",
+  "TQ"
+ ],
+ "arms": [
+  "N0:1:none",
+  "T:1:none",
+  "Q:1:budget:7492:17",
+  "TQ:1:budget:7493:17"
+ ]
+}
