@@ -8,6 +8,11 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 - Gate 21 (`gate21/RESULTS.md`): under a 4-CPU limit, Gate 3's setup took 12.1 minutes (3.5 unlimited); the cached guard 10.2 (0.84x) with no extra breakage. `docker update --cpus 0` does not lift a limit; use `--cpus <host cores>`.
 - G20 still waits for the founder's examples (template in the session scratchpad).
 
+## Ready
+
+### G22: store-before-push guard, a held-out test of Gate 21's finish model
+- **Run:** host `docker update --cpus 4 <container>`; container `sh gate22/run.sh swarm`; host `docker update --cpus <host cores> <container>`; container `sh gate22/run.sh score`. About $30.
+
 ## Needs the user
 
 ### G20: owner-chosen examples on the real rules
