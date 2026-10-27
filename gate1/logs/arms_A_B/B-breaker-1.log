@@ -1,0 +1,15 @@
+1793074975 START breaker-1
+1793075741 FOUND 3 having_bare_column_minmax, outer_aggregate_in_subquery, row_value
+1793075841 FOUND 5 hex_literal, double_quoted_string_fallback, sql_comments, order_by_alias_in_expression, with_cte
+1793075938 FOUND 4 correlated_ref_inside_derived_table, window_functions, printf_function, update_set_row_value
+1793076005 FOUND 5 create_index, create_view, insert_conflict_resolution, like_non_ascii_case, values_clause
+1793076014 FOUND 4 returning_clause, alter_table, update_from, date_time_functions
+1793076092 FOUND 1 parenthesized_from_source
+1793076127 FOUND 4 blob_literal, create_table_constraints, create_temp_table, schema_qualified_name
+1793076159 FOUND 5 aggregate_order_by, json_functions, recursive_cte, generated_column, rowid_pseudo_column
+1793076189 FOUND 1 union_sorted_output_with_limit
+1793076206 FOUND 1 group_by_sorted_output_with_limit
+1793076227 FOUND 1 upsert_on_conflict
+1793076253 FOUND 3 true_false_literals, is_true_false_operator, is_distinct_from
+1793076274 FOUND 2 in_table_name, cte_prefix_on_dml
+1793076279 STOP committed=39 fixed_by_builders=5
