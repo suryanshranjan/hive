@@ -72,6 +72,8 @@ Nearly every rebase conflict (16 in F12, 13 in F8) was two workers adding a line
 | Q30 | 30 (all spent by minute 3.4) | 333k | 5.0 | 40/40 | **433/500 (86.6%)** | 94.6% | 92.4% | 100% |
 | Qinf | 320 | 384k | 6.9 | 40/40 | **488/500 (97.6%)** | 98.8% | 98.3% | 100% |
 
+Uncertainty: the 500 tests come from 20 functions, so the honest 95% intervals are bootstrapped over functions. They are 45–71% (Q0), 78–94% (Q30) and 93–100% (Qinf). There is one run per swarm, so variation between repeated runs is not captured.
+
 No swarm broke any of the 1,340 existing tests at any commit. The two scoring methods agree exactly: the replay of every commit (`results/eval_Q*.json.gz`) and the call-by-call probe of the final engine (`referee/probe.py`, `results/probe_Q*.json.gz`).
 
 ### Predictions scored
@@ -87,14 +89,14 @@ No swarm broke any of the 1,340 existing tests at any commit. The two scoring me
 
 ### What it shows
 
-1. **Intent is binding (limit 7, first measurement).** The no-questions swarm passed 100% of what it could see and 58% of what was intended. Its happy-path calls were 99% right; its edge calls only 73%. Visible examples cannot tell a right guess from a wrong one. Unlike Gates 1 and 2, this gap is not overfitting: it is intent that never entered the swarm.
-2. **A rule enters only where someone asks.** Pooled over all 60 (swarm, function) pairs, edge calls were right **75.7%** of the time on functions nobody asked about and **96.1%** on functions someone did. Q30 spent its whole budget in 3.4 minutes on the functions claimed first. Four functions claimed later never got a question; FISCAL_Q came out right anyway because it was guessable.
+1. **Intent is binding (evidence for limit 7; the rate I/b itself was not measured).** The no-questions swarm passed 100% of what it could see and 58% of what was intended. Its happy-path calls were 99% right; its edge calls only 73%. Visible examples cannot tell a right guess from a wrong one. Unlike Gates 1 and 2, this gap is not overfitting: it is intent that never entered the swarm.
+2. **A rule enters only where someone asks.** This is observational: workers chose what to ask about. Pooled over all 60 (swarm, function) pairs, edge calls were right **75.7%** of the time on functions nobody asked about and **96.1%** on functions someone did. Q30 spent its whole budget in 3.4 minutes on the functions claimed first. Four functions claimed later never got a question; FISCAL_Q came out right anyway because it was guessable.
 3. **Unlimited access still leaves the rules no question touches.** Qinf asked 320 questions, 26 of them about TAX, but none about a UK amount under 10, so it missed the exemption. It also never asked how WAVG rounds. All 12 of its failing tests come from those two rules. The leftover error is set by *which* questions get asked, not by how many are allowed.
 4. **Guesses are noisy across swarms.** On ROUND_HALF_EVEN, neither swarm asked. Q0 guessed decimal rounding (88% right) and Q30 guessed binary-float rounding (72%).
 5. **Questions are cheap in tokens, dear in attention.** 320 questions cost 12% more tokens and about 2.5 more minutes. The real price is the product owner's 320 answers.
 6. **Diminishing returns.** Edge-call error went 27.2% → 7.6% → 1.7% at 0, 30 and 320 questions. The first 30 questions removed 72% of the errors; the next 290 removed 78% of what was left.
 
-**Model (not yet tested).** For each function, edge error ≈ e_g × (1 − coverage). Here e_g ≈ 24% is the guessing error on edge behaviour, and coverage is the share of input classes some question touched: NULL, empty, zero, negative, boundaries, each category value, and their pairs. The model predicts that a planner choosing questions by coverage, including pairs such as region × small amount, can match Qinf with about 30 questions instead of 320.
+**Model, later tested in Gate 4 and failed there.** For each function, edge error ≈ e_g × (1 − coverage). Here e_g ≈ 24% is the guessing error on edge behaviour, and coverage is the share of input classes some question touched: NULL, empty, zero, negative, boundaries, each category value, and their pairs. The model predicts that a planner choosing questions by coverage, including pairs such as region × small amount, can match Qinf with about 30 questions instead of 320.
 
 **Design consequences for Hive's intent interface:**
 
