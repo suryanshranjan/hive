@@ -1,0 +1,46 @@
+{
+ "name": "g14",
+ "arms": {
+  "N0": {
+   "hidden_pass": 0.424,
+   "ci95_by_function": [
+    0.33,
+    0.532
+   ],
+   "tests": 500
+  },
+  "T": {
+   "hidden_pass": 0.956,
+   "ci95_by_function": [
+    0.906,
+    0.998
+   ],
+   "tests": 500
+  },
+  "TC": {
+   "hidden_pass": 0.908,
+   "ci95_by_function": [
+    0.84,
+    0.966
+   ],
+   "tests": 500
+  }
+ },
+ "diffs": {
+  "T-N0": {
+   "points": 53.2,
+   "ci95": [
+    42.8,
+    63.2
+   ]
+  },
+  "TC-N0": {
+   "points": 48.4,
+   "ci95": [
+    38.0,
+    58.8
+   ]
+  }
+ },
+ "allowance": {}
+}

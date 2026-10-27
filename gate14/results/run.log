@@ -1,0 +1,48 @@
+[12:44:46] predictions registered on origin/main: gate14/prompts/PREDICTIONS.md
+[12:44:46] rule-giver writing private rules (headless Claude Code)...
+[12:49:29] rules checked: 20 functions, 236 calls, deterministic
+[12:49:29] declared decisions per function: 1:5, 2:5, 3:5, 4:5
+[12:49:29] starting repo and hidden suite built
+[12:49:29] decision tour built (with contrasts): 100 examples in 50 visible tests
+[12:49:30] decision tour built (without contrasts): 50 examples in 25 visible tests
+N0: 3 workers, tools/ask.py port None, repo /home/node/hive/runs/g14/upN0.git
+next: python3 lab/launch.py --run g14
+T: 3 workers, tools/ask.py port None, repo /home/node/hive/runs/g14/upT.git
+next: python3 lab/launch.py --run g14
+TC: 3 workers, tools/ask.py port None, repo /home/node/hive/runs/g14/upTC.git
+next: python3 lab/launch.py --run g14
+[12:49:31] launching workers...
+launched N0-w1
+launched N0-w2
+launched N0-w3
+launched T-w1
+launched T-w2
+launched T-w3
+launched TC-w1
+launched TC-w2
+launched TC-w3
+T-w2 finished: exit 0, 2.0 min, tokens 655819, cost 0.5991226000000002
+N0-w2 finished: exit 0, 2.1 min, tokens 764672, cost 0.6434948
+T-w1 finished: exit 0, 2.2 min, tokens 826863, cost 0.662586
+N0-w3 finished: exit 0, 2.2 min, tokens 892155, cost 0.6252108000000001
+T-w3 finished: exit 0, 2.2 min, tokens 790680, cost 0.6567343999999998
+TC-w3 finished: exit 0, 2.5 min, tokens 1093935, cost 0.7944314000000001
+TC-w2 finished: exit 0, 2.7 min, tokens 1235572, cost 0.7844254
+TC-w1 finished: exit 0, 2.7 min, tokens 1018784, cost 0.7675024
+N0-w1 finished: exit 0, 3.5 min, tokens 848699, cost 0.6065098
+wrote /home/node/hive/runs/g14/agents.csv
+[12:53:03] scoring every arm call by call...
+# g14: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 42.4% | 33.0%–53.2% |
+| T | 95.6% | 90.6%–99.8% |
+| TC | 90.8% | 84.0%–96.6% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| T-N0 | +53.2 | +42.8 to +63.2 |
+| TC-N0 | +48.4 | +38.0 to +58.8 |
+[12:53:04] done. Next: write the gate RESULTS.md from runs/g14/summary.md, update BRAIN.md and lab/QUEUE.md, push.
+EXIT=0
