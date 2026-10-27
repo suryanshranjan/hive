@@ -2,18 +2,11 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 27 2026, after Gate 15)
+## Where we left off (Oct 27 2026, after Gate 16)
 
-- Gates 0 to 8 and 11 to 15 are done and written up (G9 and G10 are still cards). Gate 7 used a real company's rules, which stay private (never commit them).
-- Gate 15 (`gate15/RESULTS.md`): a tour built from a policy handbook (an extractor agent picks inputs, the owner answers) reached 80.6% hidden, against 77.2% for handing builders the handbook and 92.6% for the owner's own tour. Decisions nobody wrote down are the remaining floor.
-- G16 is registered (`gate16/prompts/PREDICTIONS.md`, analysis `gate16/referee/analyze.py`); `tour_arms` also takes `xtour+handbook`.
-
-## Ready
-
-### G16: the stacked interface
-- **Run:** `python3 lab/run_gate.py lab/experiments/g16_stack.json`
-- **Teams:** N0; X (extracted tour); HX (handbook + extracted tour); HXQ (both + 17 questions). About $11, 12 minutes.
-- **Afterwards:** `python gate16/referee/analyze.py gate16/results gate16/referee/oracle.py`; RESULTS.md, decision rules, BRAIN.md, this file, push.
+- Gates 0 to 8 and 11 to 16 are done and written up (G9 and G10 are still cards). Gate 7 used a real company's rules, which stay private (never commit them).
+- Gate 16 (`gate16/RESULTS.md`): handbook + extracted tour + questions stacked: 60.8% → 71.0% → 83.2% hidden (N0 41.4%). Each layer added; the 90% target failed. Lab flaw found: the copy rule drops the extractor's best picks (17 of 50). Next gate uses the fair rule (remove overlaps from the hidden suite instead).
+- Next: G17, documented owner vs listing owner on the same rules, with the fair copy rule.
 
 ## Running on a laptop (Docker)
 
