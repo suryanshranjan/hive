@@ -145,26 +145,19 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 
 ## 11. How to continue
 
-```
-git clone https://github.com/suryanshranjan/hive && cd hive
-cat BRAIN.md docs/hive_v2.md gate2/RESULTS.md gate3/RESULTS.md
-# regenerate hidden suites (never commit them)
-python3 gate1/referee/gen.py hidden_big 9000 50
-python3 gate1/referee/fuzz.py hidden_fuzz 77000 600
-python3 gate2/referee/gen2.py hidden2 5000000 20
-# a swarm: clone a seed bundle into a bare repo, make one clone per worker,
-# render one prompt per worker, launch the workers, then replay main:
-python3 gate2/referee/evaluate.py <bare repo> hidden2 out.json hidden_big
-```
+Open a Claude Code session on this repo (laptop, VM or phone) and say "Continue Hive: run the next ready experiment in lab/QUEUE.md".
+- `lab/QUEUE.md` holds the handoff note and the ready experiments.
+- `lab/README.md` explains the scripts.
+- One command runs a whole intent gate: `python3 lab/run_gate.py lab/experiments/<config>.json`.
 
 Rules of the lab:
 
 - Register predictions before launching.
 - Change one thing per experiment.
 - Every worker logs CLAIM, LAND, CONFLICT and BLOCKED events to `HIVE_LOG`.
-- Hidden suites and private intent stay out of the repo until their test has run.
+- Hidden suites and private intent stay out of the repo until their test has run, and real companies never appear.
 - Report failures as plainly as successes.
-- Give 95% intervals clustered by function: the hidden tests come from about 20 functions, not 500 independent cases. One run per team is not a replication. Say when a comparison is observational.
+- Give 95% intervals clustered by function, say when a comparison is observational, and remember that one run per team is not a replication.
 
 ## 12. Changelog
 
@@ -178,5 +171,6 @@ Rules of the lab:
 - Gate 4: coverage-planned questions vs free questions on fresh rules. No difference (76.4% vs 76.8%); kill condition fired; the +29-point gain from 30 questions replicated.
 - Gate 5: an independent agent wrote the rules; defaults-first questions vs free. No help (62.2% vs 67.0%); kill condition fired; the gain from 30 questions replicated a third time (+32.4). Questions-per-function table pooled across Gates 3 to 5.
 - T3 Code compared in Related systems.
+- Lab: `lab/` runs a whole gate in one command with real headless Claude Code workers, so any session (including from a phone) can continue from `lab/QUEUE.md`. Gate 8 predictions registered.
 - Gate 7: a real company's rules (Company X, name withheld), with its internal documents as the final authority. 15 answered questions lifted hidden correctness from 32.8% to 49.6%. Rules and answers are kept out of this public repo.
 - Gate 6: the spread-the-budget test was dropped after a pre-flight calculation showed it could not detect its own predicted effect. Instead, 0/1/3 questions per function were randomly assigned. Questions cause the gain (+36 points for 3 vs 0); one question adds little; concentration beats spreading (model).

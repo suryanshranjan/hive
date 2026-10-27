@@ -48,6 +48,7 @@ Research on swarms of AI coding agents that coordinate only through a shared rep
 | `gate5/` | Defaults-first vs free questions on rules from an independent rule-giver agent; see `gate5/RESULTS.md` |
 | `gate6/` | Questions per function assigned at random (0, 1, 3) on a second independent rule-giver's rules; see `gate6/RESULTS.md` |
 | `gate7/` | A real company's rules as the product owner (results only; the rules are private) |
+| `lab/` | Run any gate, or the next one, in one command; `lab/QUEUE.md` is the experiment queue and session handoff |
 | `BRAIN.md` | Shared memory: laws with status, constants, evidence, scorecard, next steps |
 | `docs/` | Hive v1 and Hive v2 write-ups |
 

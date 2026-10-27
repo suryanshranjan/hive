@@ -1,0 +1,12 @@
+{
+  "name": "g8",
+  "predictions": "gate8/prompts/PREDICTIONS.md",
+  "rulegiver_brief": "gate5/prompts/rulegiver_brief.md",
+  "prompt": "lab/templates/prompt_builder.md",
+  "ask_texts": "lab/experiments/g8_ask_texts.md",
+  "visible_seed": 8100,
+  "hidden_seed": 8200000,
+  "baseline": "N0",
+  "arms": ["N0:3:none", "NQ:3:quota:7401"],
+  "allowance": {"NQ": {"seed": 8000, "counts": {"0": 5, "1": 5, "2": 5, "3": 5}}}
+}
