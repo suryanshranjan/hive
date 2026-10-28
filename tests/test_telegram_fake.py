@@ -1,4 +1,5 @@
 """The fake Telegram shared by the tests (records what Hive sends, replies with scripted taps and messages)."""
+import html, re
 ME, STRANGER = 111, 999
 fail = 0
 def check(name, got, want):
@@ -11,10 +12,13 @@ class FakeTelegram:
     def __init__(self, script, stale=()):
         self.sent, self.script, self.uid, self.stale = [], list(script), 0, list(stale)
     def __call__(self, method, **p):
-        if method == 'sendMessage':
+        if method == 'sendMessage':   # tests read the text as the owner sees it: tags dropped, entities unescaped
+            p = dict(p, html=p['text'], text=html.unescape(re.sub(r'<[^>]+>', '', p['text'])))
             self.sent.append(p); return {'message_id': len(self.sent)}
         if method == 'answerCallbackQuery':
             return True
+        if method == 'getFile':
+            return {'file_path': 'voice/' + p['file_id'] + '.oga'}
         if method == 'getChat':
             return {'first_name': 'Suryansh'}
         if method == 'getUpdates':
@@ -32,7 +36,11 @@ class FakeTelegram:
                     out.append({'update_id': self.uid, 'callback_query': {'id': str(self.uid), 'data': data,
                                 'message': {'message_id': reply_to, 'chat': {'id': chat}}}})
                 else:
-                    m = {'message_id': 1000 + self.uid, 'chat': {'id': chat}, 'text': text}
+                    m = {'message_id': 1000 + self.uid, 'chat': {'id': chat}}
+                    if text.startswith('VOICE:'):   # a voice note: only a file id arrives
+                        m['voice'] = {'file_id': text[6:], 'duration': 4}
+                    else:
+                        m['text'] = text
                     if reply_to:
                         m['reply_to_message'] = {'message_id': reply_to}
                     out.append({'update_id': self.uid, 'message': m})

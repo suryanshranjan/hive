@@ -16,7 +16,8 @@ class FakeTelegram:
     def __init__(self, script, stale=()):
         self.sent, self.script, self.uid, self.stale = [], list(script), 0, list(stale)
     def __call__(self, method, **p):
-        if method == 'sendMessage':
+        if method == 'sendMessage':   # tests read the text as the owner sees it: tags dropped, entities unescaped
+            p = dict(p, html=p['text'], text=__import__('html').unescape(__import__('re').sub(r'<[^>]+>', '', p['text'])))
             self.sent.append(p); return {'message_id': len(self.sent)}
         if method == 'answerCallbackQuery':
             return True
@@ -64,7 +65,7 @@ check('the question reached the phone', 'delivery area' in fake.sent[0]['text'],
 check('it came with letter buttons', [b['text'] for b in fake.sent[0]['reply_markup']['inline_keyboard'][0]], ['A', 'B', 'C'])
 a = json.load(open(os.path.join(d, 'answers', 'q1.json')))
 check("the owner's tap became the answer, not the stranger's message", (a['answer'], a['via']), ('B', 'telegram'))
-check('the owner was thanked', fake.sent[-1]['text'] == 'Thank you. Passing it on.', True)
+check('the owner was thanked', fake.sent[-1]['text'] == '✅ Thank you. Passing it on.', True)
 
 # 2. a typed reply (not a button) answers the oldest waiting question
 run, d = make_run()
@@ -101,7 +102,7 @@ fake = FakeTelegram([tap(f'{ids[0]}|show'), tap(f'{ids[0]}|o1'), tap(f'{ids[1]}|
 rows = telegram.review(run, telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), goal='# Goal: combine metrics',
                        check='419 tests, all passing.', poll=1)
 check('it greets the owner by name and says what was built',
-      'Good morning, Suryansh. While you were away, the builders finished this: A report that adds up daily shop orders.'
+      'Good morning, Suryansh.\n\n✅ Built while you were away: A report that adds up daily shop orders.'
       in fake.sent[0]['text'], True)
 check('the greeting says how things stand and that a tap is enough',
       ('419 tests, all passing.' in fake.sent[0]['text'], 'a tap is enough' in fake.sent[0]['text']), (True, True))
@@ -113,9 +114,9 @@ check("a high-stakes decision is asked openly first; options only on request",
       ('What should happen here?' in decisions[0]['text'], 'Other ways' in decisions[0]['text'],
        'Show me some options' in str(decisions[0]['reply_markup'])), (True, False, True))
 check("the options offer real alternatives, each one tap, with Hive's pick starred",
-      ('★ Count once' in str(menu[0]['reply_markup']), 'Count every time' in str(menu[0]['reply_markup']),
+      ('⭐ Count once' in str(menu[0]['reply_markup']), 'Count every time' in str(menu[0]['reply_markup']),
        "I'd go with" in menu[0]['text']), (True, True, True))
-second = [m for m in decisions if m['text'].startswith('2 of 2')]
+second = [m for m in decisions if 'Decision 2 of 2' in m['text']]
 check('the first decision has no undo; later ones do',
       ('Undo' in str(decisions[0]['reply_markup']), 'Undo' in str(second[0]['reply_markup'])), (False, True))
 check('undo took the suggestion back: #1 ended as kept', json.load(open(os.path.join(d, 'reviews', ids[0] + '.json')))['ok'], True)
@@ -130,7 +131,7 @@ text = open(os.path.join(d, 'corrections.md')).read()
 check("the change carries the owner's final words and what the owner saw",
       ('Count each order once.' in text, 'Show it per customer' in text, 'The owner saw it as: In the shop report' in text),
       (True, False, True))
-check('the reply sounds like an assistant on it', fake.sent[-1]['text'].startswith('Right away.'), True)
+check('the reply sounds like an assistant on it', 'Right away.' in fake.sent[-1]['text'], True)
 
 # 4. the owner chose how to be addressed ("sir"): every greeting uses it
 run, d = make_run()
@@ -138,7 +139,7 @@ question(d, 'q9', 'w1', 'A deal is cut by Rs 500. Must both accept again? A) Yes
 fake = FakeTelegram([tap('q9|A')])
 telegram.bridge_questions(run, telegram.Channel({'chat_id': ME, 'token': 'x', 'address': 'sir'}, api=fake),
                           until=lambda: True, poll=1)
-check('a question opens with the chosen address', fake.sent[0]['text'].startswith('Sir, a quick one from the builders'), True)
+check('a question opens with the chosen address', 'Sir, a quick one from the builders' in fake.sent[0]['text'], True)
 
 # 5. "status?" at any time: answered on the spot, without being taken as an answer
 import subprocess
@@ -156,9 +157,9 @@ question(owner._dir(run), 'q7', 'w2', 'A typo is fixed. Must both accept again? 
 fake = FakeTelegram([say("How's it going?"), tap('q7|B')])
 telegram.bridge_questions(run, telegram.Channel({'chat_id': ME, 'token': 'x', 'address': 'sir'}, api=fake),
                           until=lambda: True, poll=1)
-reply = [m['text'] for m in fake.sent if m['text'].startswith('Sir. The builders')]
+reply = [m['text'] for m in fake.sent if 'Sir. The builders' in m['text']]
 check('during a build, "how\'s it going" gets a plain progress report',
-      reply[:1] == ['Sir. The builders are 2 minutes in. 1 of 4 have finished, and 2 pieces of work have landed so far, '
+      [r.split(chr(10) * 2, 1)[-1] for r in reply[:1]] == ['Sir. The builders are 2 minutes in. 1 of 4 have finished, and 2 pieces of work have landed so far, '
                     'each one passing every test. 1 question for you is waiting above.'], True)
 check('and is not taken as the answer', json.load(open(os.path.join(run, 'owner', 'answers', 'q7.json')))['answer'], 'B')
 
@@ -169,7 +170,7 @@ ids = [a['id'] for a in owner._assumptions(d, False)]
 fake = FakeTelegram([say('status'), tap(f'{ids[0]}|ok'), tap('aside|leave'), tap('final|send')])
 telegram.review(run, telegram.Channel({'chat_id': ME, 'token': 'x', 'address': 'sir'}, api=fake), goal='combine metrics', poll=1)
 check('during a review, "status" says where we are',
-      any(m['text'].startswith("Sir. We're on decision 1 of 1") for m in fake.sent), True)
+      any("Sir. We're on decision 1 of 1" in m['text'] for m in fake.sent), True)
 check('and the decision still waits for a real answer', json.load(open(os.path.join(d, 'reviews', ids[0] + '.json')))['ok'], True)
 
 # 6. two answers contradict each other: before sending, Hive asks which should win, and that ruling goes to the builders
@@ -224,14 +225,14 @@ ids = [a['id'] for a in owner._assumptions(d, False)]
 fake = FakeTelegram([tap('tri|3'), tap('tri|3'), say('2 and 5'), tap('tri|next'), tap('tri|next'),
                      say('Do it my way'), tap(f'{ids[4]}|ok'), tap('final|send')])
 rows = telegram.review(run, telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), goal='combine metrics', poll=1)
-pages = [m for m in fake.sent if m['text'].startswith('Decisions the builders made on their own, page ')]
+pages = [m for m in fake.sent if 'Decisions the builders made on their own' + chr(10) + 'page ' in m['text']]
 check('the owner is told these are decisions the builders made on their own',
       any('decisions ON THEIR OWN' in m['text'] for m in fake.sent), True)
 check('every decision is listed, one line each, across pages', (len(pages), '9. Rule number 8' in pages[1]['text']), (2, True))
 full = [m for m in fake.sent if 'What would you do instead?' in m['text']]
 check('only the marked ones (2 and 5) are asked in full, openly first', len(full), 2)
 check('a marked one asks for his way first; keeping it is the last, separate button',
-      [b[0]['text'] for b in full[0]['reply_markup']['inline_keyboard']][:2], ['Show me some options', 'Actually, keep it as is'])
+      [b[0]['text'] for b in full[0]['reply_markup']['inline_keyboard']][:2], ['💡 Show me some options', 'Actually, keep it as is'])
 check("the owner's words on #2 become the rule; #5 kept; the rest left as built",
       (json.load(open(os.path.join(d, 'reviews', ids[1] + '.json')))['correction'],
        json.load(open(os.path.join(d, 'reviews', ids[4] + '.json')))['ok'],
@@ -266,6 +267,15 @@ cases = [{'id': 's1', 'situation': 'A box arrives damaged.', 'options': ['Full r
 fake = FakeTelegram([tap('s1|0'), tap('s2|undo'), tap('s1|1'), say('Accept it, once, with a note')])
 got = telegram.verdicts(telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), cases, poll=1)
 check('verdicts: a tap, an undo, then the owner\'s own words', got, {'s1': 'Replace it', 's2': 'Accept it, once, with a note'})
+long = [{'id': 'L1', 'situation': 'A long one.', 'options': ['Yes, a pause only stops new applications and new hires, so work goes on',
+                                                             'The upload is accepted, but review and payment wait until it resumes']}]
+fake = FakeTelegram([tap('L1|1')])
+got = telegram.verdicts(telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), long, poll=1)
+q = [m for m in fake.sent if '1 of 1' in m['text']][0]
+check('long options are written out in full and numbered; the buttons are just numbers',
+      ('2. The upload is accepted, but review and payment wait until it resumes' in q['text'],
+       [b['text'] for b in q['reply_markup']['inline_keyboard'][0]], got['L1'].startswith('The upload is accepted')),
+      (True, ['1', '2'], True))
 
 # 9. not connected: hive behaves as before
 os.environ['HIVE_TELEGRAM'] = '0'
