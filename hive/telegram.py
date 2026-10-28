@@ -69,6 +69,7 @@ class Channel:
         self.offset = None
         self.note = None   # what to say when the owner asks for status (set by whoever is running)
         self.listener = listener   # the always-on listener never claims the chat; builds and reviews do
+        self.history = []   # the conversation so far, (who, text), so a reply is read in context: "yes" to what?
 
     def send(self, text, buttons=None, reply_to=None, html=False):
         """Every message goes out formatted; plain text is escaped first, so nothing the builders or the owner wrote can
@@ -80,6 +81,7 @@ class Channel:
                                                      for row in rows]}
         if reply_to:
             p['reply_to_message_id'] = reply_to
+        self.remember('hive', _html.unescape(re.sub(r'<[^>]+>', '', p['text'])))
         for wait in (2, 5, 15, None):   # a dropped connection must not lose the owner's question
             try:
                 return self.api('sendMessage', **p)['message_id']
@@ -87,6 +89,13 @@ class Channel:
                 if wait is None:
                     raise
                 time.sleep(wait)
+
+    def remember(self, who, text, keep=16):
+        self.history = (self.history + [(who, (text or '').strip()[:600])])[-keep:]
+
+    def recent(self, n=10):
+        """The last few turns, as plain lines, for a model reading his next message in context."""
+        return '\n'.join(f"{'Owner' if w == 'owner' else 'Hive'}: {t}" for w, t in self.history[-n:]) or '(nothing yet)'
 
     def typing(self):
         """Show "typing..." in the owner's chat while Hive works on a reply (best effort)."""
@@ -164,7 +173,7 @@ class Channel:
                     continue   # someone else: ignored
                 reply_to = (m.get('reply_to_message') or {}).get('message_id')
                 if m.get('text'):
-                    out.append((m['text'].strip(), None, reply_to))
+                    out.append((m['text'].strip(), None, reply_to)); self.remember('owner', m['text'].strip())
                 elif m.get('voice') or m.get('audio'):
                     heard = self.listen((m.get('voice') or m.get('audio'))['file_id'])
                     if heard:

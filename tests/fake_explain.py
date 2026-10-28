@@ -14,13 +14,20 @@ if 'short interview with a busy' in prompt:   # the interview: two situations
 if 'Write his rule as one clear sentence' in prompt:
     print(json.dumps({'result': json.dumps({'rule': 'A late fee is charged only after 7 days.'})}))
     sys.exit(0)
-if 'Classify it.' in prompt:   # the listener: what kind of message is this?
-    said = prompt.split('"')[1]
-    low = said.lower()
-    intent = ('cloud_on' if 'move to the cloud' in low else 'cloud_off' if 'delete the cloud' in low
+if 'His newest message:' in prompt and 'What does he mean?' in prompt:   # the listener: read in context
+    said = prompt.split('His newest message: "')[1].split('"\n')[0]
+    history = prompt.split('(oldest first):')[1].split('His newest message:')[0]
+    low = said.lower().strip(' !.')
+    asked = [l for l in history.splitlines() if l.startswith('Hive: ') and 'Shall I build this?' in l]
+    last_build = (history.split('Shall I build this?')[-1].strip().splitlines() or [''])[0] if asked else ''
+    confirmed = low in ('yes', 'go ahead', 'yes build it', 'do it') or 'already told you' in low
+    intent = ('build' if confirmed and asked or low.startswith('make ') or low.startswith('a page')
+              else 'cloud_on' if 'move to the cloud' in low else 'cloud_off' if 'delete the cloud' in low
               else 'change' if 'changed my mind' in low or low.startswith('actually') else 'status' if 'status' in low
-              else 'greeting' if low.strip(' !.') in ('hi', 'hello', 'hey hive') else 'other')
-    print(json.dumps({'result': json.dumps({'intent': intent, 'rule': said.split(':', 1)[-1].strip() if intent == 'change' else ''})}))
+              else 'greeting' if low in ('hi', 'hello', 'hey hive') else 'reply')
+    rule = (said.split(':', 1)[-1].strip() if intent == 'change' else
+            (last_build if confirmed else said) if intent == 'build' else '')
+    print(json.dumps({'result': json.dumps({'intent': intent, 'rule': rule, 'confirmed': bool(confirmed and asked)})}))
     sys.exit(0)
 if 'Which earlier rulings does this replace' in prompt:
     print(json.dumps({'result': json.dumps({'replaces': [1] if 'late' in prompt.split('He now says:')[1] else []})}))

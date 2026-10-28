@@ -87,7 +87,7 @@ def main(argv=None):
         from . import assistant
         from . import cloud_aws
         return assistant.listen('.', apply_build=start.apply_ruling,
-                                start_build=lambda repo, goal: start.start(repo, None, goal, 40, overnight=True),
+                                start_build=lambda repo, goal: assistant.background_build(repo, goal),   # Hive keeps answering meanwhile
                                 cloud=lambda repo, on, login=True: cloud_aws.new(repo, with_login=login) if on else
                                 cloud_aws.stop(ask=lambda q: 'y' if q.startswith('Delete the Hive machine') else 'n'))   # never 'lose the work'
     if a.cmd == 'cloud':

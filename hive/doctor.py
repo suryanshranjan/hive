@@ -30,7 +30,7 @@ def checks(repo='.', claude_probe=True):
     is_repo = bool(inside and inside.returncode == 0)
     out.append((is_repo, True, 'this folder is a git repository', 'Run Hive inside your project folder (git init if new).'))
     if is_repo:
-        dirty = _run(['git', '-C', repo, 'status', '--porcelain'])
+        dirty = _run(['git', '-C', repo, 'status', '--porcelain', '--untracked-files=no'])
         out.append((bool(dirty) and not dirty.stdout.strip(), True, 'no unsaved changes',
                     'Commit or stash your changes, so the builders start from what you see.'))
         cfg = os.path.join(repo, '.hive', 'config.json')
