@@ -109,8 +109,9 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
         cfg = telegram.load()
         if cfg:
             try:
-                telegram.Channel(cfg).send(f"I'm now running in the cloud ({name}). Message me any time: 'build: ...', "
-                                           "a change of mind, or 'status'.")
+                telegram.Channel(cfg).send(
+                    f"☁️ <b>I'm now running in the cloud</b>, with your project <b>{telegram.esc(name)}</b>. Your computer "
+                    "can be off. Message me any time: \"build: ...\", a change of mind, or \"status\".", html=True)
             except Exception:
                 pass
     say(f"Done. Bring results back any time with: hive cloud pull --from {t.to}")

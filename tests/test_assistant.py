@@ -219,6 +219,27 @@ fake = FakeTelegram([say("What is review i font understand"), tap('v1|0')])   # 
 rules = interview.interview('Ratings and reviews', ch(fake), situations=qs, poll=1, sheet=False)
 check('without a model, the phrase list still catches it', rules, ['How long can a review be left? -> 7 days'])
 
+# 3m. the listener never goes silent: an old tap Telegram refuses to acknowledge, and a message that fails, are survived
+class OldTap(FakeTelegram):
+    def __call__(self, method, **p):
+        if method == 'answerCallbackQuery':
+            raise RuntimeError('Telegram answerCallbackQuery: Bad Request: query is too old')
+        return super().__call__(method, **p)
+fake = OldTap([tap('cld|yes'), say('hi'), say('status')])
+calls = iter([RuntimeError('boom'), None, None])
+_handle = assistant.handle
+def flaky_handle(*a, **k):
+    e = next(calls)
+    if e:
+        raise e
+    return _handle(*a, **k)
+assistant.handle = flaky_handle
+assistant.listen(repo, poll=1, until=lambda: not fake.script, ch=telegram.Channel({'chat_id': ME, 'token': 'x', 'address': 'sir'}, api=fake, listener=True))
+assistant.handle = _handle
+texts = [m['text'] for m in fake.sent]
+check('an old tap and a failing message do not stop the listener; it says sorry and answers the next',
+      (any('something went wrong' in t for t in texts), any('The latest build' in t for t in texts)), (True, True))
+
 # 4. the listener steps aside while a build or review is talking to the owner
 json.dump({'pid': os.getppid(), 'at': time.time()}, open(telegram.BUSY, 'w'))
 check('another live process talking: the listener steps aside', telegram.busy_elsewhere(), True)
