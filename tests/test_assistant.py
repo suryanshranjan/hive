@@ -119,6 +119,14 @@ check('a contradiction with an earlier ruling is put to him, and his choice sett
       (any('pulls against an earlier ruling' in m['text'] for m in fake.sent), rules[-1].endswith('-> Total from the others')),
       (True, True))
 
+# 3h. the interview asks about what the code must decide: the builders' decisions, with their defaults, steer the questions
+seen, _ask_json = [], explain.ask_json
+explain.ask_json = lambda prompt: (seen.append(prompt), _ask_json(prompt))[1]
+qs = interview.write_situations('Fees and tips for a shop')
+explain.ask_json = _ask_json
+check("the questions are written from the build's own decisions and their defaults",
+      (len(qs), any("A tip is paid (builders' outcome: the usual fee)" in p for p in seen)), (2, True))
+
 # 4. the listener steps aside while a build or review is talking to the owner
 json.dump({'pid': os.getppid(), 'at': time.time()}, open(telegram.BUSY, 'w'))
 check('another live process talking: the listener steps aside', telegram.busy_elsewhere(), True)

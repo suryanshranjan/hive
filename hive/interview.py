@@ -8,16 +8,32 @@ import json, os, re
 
 from . import explain, telegram
 
+PLAN = """Software builders are about to build this feature for a business:
+{goal}
+
+List the decisions the code for this feature must take that the business owner could rule on (business outcomes, not
+technical choices): each one a case the product must handle, in plain words, with the outcome a careful builder would
+pick if nobody told him. If the description names the cases (a table, a list of situations, an interface), cover every
+one of them. Reply with JSON only: {{"decisions": [{{"case": "...", "default": "..."}}]}}"""
+
 WRITE = """You are preparing a short interview with a busy, non-technical business owner before his software builders start
 work. The feature to build:
 {goal}
-{rulings}
+{rulings}{decisions}
 List the {n} situations where his own business rules are most likely to matter and differ from what builders would
 assume: money, timing, limits, exceptions, missing information, conflicts between people. Skip anything the feature
 description already settles. Each situation is one concrete case in plain words (names, rupees, days), with 2 or 3
 realistic outcomes a business might choose, clearly different from each other. No technical words.
 
 Reply with JSON only: {{"situations": [{{"situation": "...", "options": ["...", "...", "..."]}}]}}"""
+
+FROM_DECISIONS = """
+These are the decisions the builders' code must take, each with the outcome they would pick if nobody told them:
+{listing}
+Ask only about these decisions, one situation for every decision, in this order (even ones that look minor: an
+owner's surprising rules are often there, Gate 36). In each situation, one option is the builders' outcome in plain
+words; the others are real alternatives.
+"""
 
 READ = """An owner answered a question about how his product should behave.
 
@@ -27,10 +43,23 @@ His answer, in his own words: {answer}
 Write his rule as one clear sentence a software builder can implement and test. Keep his meaning exactly; add nothing.
 Reply with JSON only: {{"rule": "..."}}"""
 
+MAX_QUESTIONS = 20   # about 5 minutes on a phone
+
+def decisions(goal):
+    """The business decisions the build must take, each with the builders' default (Gate 36: questions written from the
+    description alone covered 4 of 9 of the owner's surprising rules; most asked about things the code never decides)."""
+    got = explain.ask_json(PLAN.format(goal=re.sub(r'^#+\s*(goal:?)?\s*', '', goal.strip(), flags=re.I)[:8000])) or {}
+    return [d for d in got.get('decisions', []) if isinstance(d, dict) and d.get('case')][:40]
+
 def write_situations(goal, rulings=None, n=12):
     past = ("\nRules he has already given (don't ask about these again):\n" + '\n'.join(f'- {r}' for r in rulings[-40:])
             + '\n') if rulings else ''
-    got = explain.ask_json(WRITE.format(goal=explain._goal_summary(goal), rulings=past, n=n)) or {}
+    ds = decisions(goal)
+    if ds:   # cover every decision the code takes, up to MAX_QUESTIONS: ranking cut 2 of the owner's 9 surprises (Gate 37 pilot)
+        n = min(max(n, len(ds)), MAX_QUESTIONS)
+    plan = FROM_DECISIONS.format(listing='\n'.join(f"- {d['case']} (builders' outcome: {d.get('default') or 'unsure'})"
+                                                    for d in ds)) if ds else ''
+    got = explain.ask_json(WRITE.format(goal=explain._goal_summary(goal), rulings=past, decisions=plan, n=n)) or {}
     out = []
     for k, s in enumerate(got.get('situations', [])[:n], 1):
         opts = [o for o in s.get('options', []) if isinstance(o, str) and o.strip()][:3]
@@ -54,7 +83,8 @@ def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll
     if ch:
         got = telegram.verdicts(ch, qs, intro=f"Before the builders start, {len(qs)} quick situations where your rules "
                                               "matter. Tap what should happen at your company, or tell me in your own "
-                                              "words. About 3 minutes; it saves you checking their work afterwards.",
+                                              f"words. About {max(2, round(len(qs) / 4))} minutes; it saves you checking "
+                                              "their work afterwards.",
                               poll=poll, save=save and save + '.answers.json')
     else:
         got = {}
