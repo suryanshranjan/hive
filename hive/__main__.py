@@ -3,7 +3,7 @@ and hands back a tested branch.
 
 For the owner:
   hive                                   start: Hive asks what to build and does the rest
-  hive start [--overnight] [--workers 4] [--goal <text or file>] [--minutes 40]
+  hive start [--overnight] [--no-interview] [--workers 4] [--goal <text or file>] [--minutes 40]
   hive morning [--phone]                 after an overnight build: check its decisions (on Telegram with --phone)
   hive listen                            stay on Telegram: change your mind, "build: ...", "status"
   hive rules [forget <n>]                your standing rulings for this project
@@ -47,7 +47,7 @@ def main(argv=None):
     sub = ap.add_subparsers(dest='cmd')
     st = sub.add_parser('start'); st.add_argument('--workers', type=int, default=4); st.add_argument('--goal')
     st.add_argument('--minutes', type=int, default=40)
-    st.add_argument('--overnight', action='store_true')   # no questions; check the assumptions later with `hive morning`
+    st.add_argument('--overnight', action='store_true'); st.add_argument('--no-interview', action='store_true')   # no questions; check the assumptions later with `hive morning`
     sub.add_parser('doctor')
     sub.add_parser('listen')
     cl = sub.add_parser('cloud'); cl.add_argument('action', nargs='?', choices=['pull']); cl.add_argument('--to')
@@ -75,7 +75,7 @@ def main(argv=None):
     a = ap.parse_args(argv)
     if a.cmd in (None, 'start'):
         return start.start('.', getattr(a, 'workers', 4), getattr(a, 'goal', None), getattr(a, 'minutes', 40),
-                           getattr(a, 'overnight', False))
+                           getattr(a, 'overnight', False), not getattr(a, 'no_interview', False))
     if a.cmd == 'listen':
         from . import assistant
         return assistant.listen('.', apply_build=start.apply_ruling,

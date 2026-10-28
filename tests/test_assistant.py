@@ -60,6 +60,14 @@ fake = FakeTelegram([tap('bld|yes')])
 r = assistant.handle(ch(fake), repo, 'build: a refund page for brands', poll=1, start_build=lambda rp, goal: started.append(goal))
 check('"build: ..." asks once, then starts the build with that goal', (r, started), ('built', ['a refund page for brands']))
 
+# 3c. the interview on the phone: a tap, his own words, his confirmation of the reading -> rules for the builders
+from hive import interview
+fake = FakeTelegram([tap('q01|0'), say('Only after a week'), tap('q02|0')])
+rules = interview.interview('Fees and tips for a shop', ch(fake), poll=1)
+check('the interview turns a tap and confirmed own words into rules',
+      rules, ['Asha tips a creator Rs 500 after a great post. -> No fee on a tip', 'A late fee is charged only after 7 days.'])
+check("his rules go into the builders' instructions as tests to encode", 'Encode every one' in interview.instructions(rules), True)
+
 # 4. the listener steps aside while a build or review is talking to the owner
 json.dump({'pid': os.getppid(), 'at': time.time()}, open(telegram.BUSY, 'w'))
 check('another live process talking: the listener steps aside', telegram.busy_elsewhere(), True)
