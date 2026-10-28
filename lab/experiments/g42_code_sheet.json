@@ -1,0 +1,14 @@
+{
+ "name": "g42",
+ "predictions": "gates/gate42/prompts/PREDICTIONS.md",
+ "rulegiver_brief": "gates/gate42/prompts/rulegiver_brief.md",
+ "require_decisions": true,
+ "prompt": "gates/gate42/prompts/prompt_builder.md",
+ "ask_texts": "runs/g42/ask_texts.md",
+ "visible_seed": 42100,
+ "hidden_seed": 42200000,
+ "baseline": "N0",
+ "pre_launch": ["python3 gates/gate42/referee/code_sheet.py pre {run} {oracle}"],
+ "after_baseline": ["python3 gates/gate42/referee/code_sheet.py after {run} {oracle} {base}"],
+ "arms": ["N0:3:none", "H:3:none", "C:3:none", "R:3:none"]
+}
