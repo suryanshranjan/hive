@@ -123,6 +123,8 @@ def _phase(source, run, workers, goal, minutes, questions, assumptions, narrate_
     narrator = Narrator(os.path.join(run, 'up.git'), meta['branch'])
     if narrate_owner and phone:
         telegram.bridge_questions(run, phone, until=lambda: not t.is_alive(), tick=narrator.tick)
+    elif phone:   # no questions in this phase (overnight, or a fix round), but the owner can still ask for status
+        telegram.listen(run, phone, until=lambda: not t.is_alive(), tick=narrator.tick)
     elif narrate_owner:
         owner.serve(run, until=lambda: not t.is_alive(), tick=narrator.tick, greet=False)
     while t.is_alive():
@@ -267,7 +269,7 @@ def _review_and_fix(state, phone=None):
     corrections = open(os.path.join(run1, 'owner', 'corrections.md')).read()
     run2 = os.path.join(state['home'], 'fix')
     _phase(fsrc, run2, min(state['workers'], max(1, len(fixes))), state['goal'] + '\n\n' + corrections,
-           state['minutes'], 0, False, False)
+           state['minutes'], 0, False, False, phone)
     state.update(final=run2, cost=state['cost'] + _cost(run2))
     json.dump(state, open(os.path.join(state['home'], 'state.json'), 'w'), indent=1)
     say(f'[{_now()}] Fixed.')
