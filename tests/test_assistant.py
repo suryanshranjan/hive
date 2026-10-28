@@ -145,6 +145,14 @@ check('an answer that settles the next question skips it, and says so',
       (len(asked), any('Topic 2' in t for t in asked), any('also settles 1 of the coming' in m['text'] for m in fake.sent), rules),
       (2, False, True, ['Topic 3. -> Yes', 'A late fee is charged only after 7 days.']))
 
+explain.ask_json = lambda prompt: ({'settled': [1]} if 'already decide' in prompt and 'Topic 1.' in prompt.split('still to come')[0]
+                                   else {'settled': []} if 'already decide' in prompt else _ask_json(prompt))
+fake = FakeTelegram([tap('t1|0'), tap('t3|1')])
+rules = interview.interview('Fees', ch(fake), situations=qs, poll=1, sheet=False)
+explain.ask_json = _ask_json
+check('a tapped answer that settles a later question skips it too',
+      (any('Topic 2' in m['text'] for m in fake.sent if m['text'].startswith('📋')), rules), (False, ['Topic 1. -> Yes', 'Topic 3. -> No']))
+
 # 3j. the rule sheet: his answers become one general rule per decision; two answers that disagree are put to him; he
 # marks the wrong rule and says it in his own words (Gate 37: answers to two framings agreed 1 of 8)
 _ask_json = explain.ask_json

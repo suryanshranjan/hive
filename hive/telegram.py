@@ -736,7 +736,7 @@ def verdicts(ch, cases, poll=20, intro=None, save=None, after_text=None, context
         else:
             ch.send('✏️ Of course. What should happen?', reply_to=msg)
             out[c['id']] = _wait(ch, poll, set(), about=about)[1]
-        if after_text and out[c['id']] not in c['options']:   # his own words may already answer what comes next
+        if after_text:   # any answer, tapped or in his words, may already settle what comes next
             rest = [x for x in cases[i + 1:] if x['id'] not in out]
             try:
                 done = after_text(c['situation'], out[c['id']], rest)
