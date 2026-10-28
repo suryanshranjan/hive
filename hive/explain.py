@@ -200,3 +200,14 @@ def conflicts(decisions):
         except Exception:
             continue
     return []
+
+def ask_json(prompt):
+    """One question to a model that answers in JSON: Claude first, the backup model second; None if neither answers."""
+    for ask in (_ask_claude, _ask_backup):
+        try:
+            reply = ask(prompt)
+            if reply is not None:
+                return reply
+        except Exception:
+            continue
+    return None

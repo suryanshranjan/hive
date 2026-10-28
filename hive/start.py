@@ -350,3 +350,20 @@ def morning(name=None, phone=False):
         ch.send((f"Done{', ' + ch.name() if ch.name() else ''}. Your changes are in. {state['check']}" if fixed else 'All set.') +
                 f" It's ready on branch hive/{state['name']} whenever you are.")
     return rc
+
+def apply_ruling(state, rule, ch=None):
+    """The owner changed his mind after a build: one fix round on the latest build so it follows the new ruling, then
+    re-check every test and update the same branch (used by `hive listen`)."""
+    home = state['home']; n = len(glob.glob(os.path.join(home, 'change*'))) + 1
+    src = os.path.join(home, f'change{n}_source'); run = os.path.join(home, f'change{n}')
+    sh('git', 'clone', '-q', '--branch', state['b'], os.path.join(state['final'], 'up.git'), src)
+    _link(state['repo'], src, state['links'])
+    note = ("\n\n# The owner changed his mind\n\nAfter this was built, the owner gave this ruling. Change the code to "
+            "follow it, encode it as a test, change any existing test that asserts the old behaviour, and leave "
+            f"everything else alone:\n\n- {rule}\n")
+    _phase(src, run, 1, state['goal'] + memory.instructions(state['repo']) + note, state['minutes'], 0, False, False, ch)
+    state.update(final=run, cost=state.get('cost', 0) + _cost(run), started=time.time())
+    rc = _deliver(state)
+    if ch:
+        ch.send(f"Done. The build now follows your new ruling. {state['check']} It's on branch hive/{state['name']}.")
+    return rc

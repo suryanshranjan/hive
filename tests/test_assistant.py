@@ -1,0 +1,64 @@
+"""hive listen with a fake Telegram and a stand-in model (no network, no tokens): the owner changes his mind any time;
+Hive finds the ruling it overrides, confirms, updates the kept rulings and offers to update the latest build.
+usage: python3 tests/test_assistant.py   (run from the hive repo root)"""
+import json, os, subprocess, sys, tempfile, time
+sys.path.insert(0, os.getcwd())
+home = tempfile.mkdtemp(); os.environ['HOME'] = home
+from hive import assistant, explain, memory, telegram
+explain.CMD = '"' + sys.executable.replace(chr(92), '/') + '" tests/fake_explain.py'
+memory.DIR = os.path.join(home, '.hive', 'rules')
+assistant.RUNS = os.path.join(home, '.hive', 'runs')
+telegram.BUSY = os.path.join(home, '.hive', 'telegram.busy')
+os.makedirs(os.path.join(home, '.hive'), exist_ok=True)
+sys.path.insert(0, os.path.join(os.getcwd(), 'tests'))
+from test_telegram_fake import FakeTelegram, ME, tap, say
+
+fail = 0
+def check(name, got, want):
+    global fail
+    ok = got == want; fail |= not ok
+    print(('ok   ' if ok else 'FAIL ') + name + ('' if ok else f' (got {got!r}, expected {want!r})'))
+
+repo = os.path.join(home, 'project'); subprocess.run(['git', 'init', '-q', '-b', 'main', repo])
+subprocess.run(['git', '-C', repo, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '--allow-empty', '-m', 'init'])
+memory.add(repo, 'A late post is paid in full.'); memory.add(repo, 'Followers are counted once per account.')
+ch = lambda fake: telegram.Channel({'chat_id': ME, 'token': 'x', 'address': 'sir'}, api=fake)
+
+# 1. a change of mind: the earlier ruling is found, confirmed and replaced; with no build yet, it waits for the next one
+fake = FakeTelegram([tap('chg|replace')])
+r = assistant.handle(ch(fake), repo, 'Actually, I changed my mind: a late post loses 2% per day', poll=1)
+texts = [x['text'] for x in fake.sent]
+check('it quotes the earlier ruling it would replace', any('Earlier you ruled:\n- A late post is paid in full.' in t for t in texts), True)
+check('the earlier ruling is replaced by the new one', [x['text'] for x in memory.load(repo)],
+      ['Followers are counted once per account.', 'a late post loses 2% per day'])
+check('with no build yet, it says the next build will follow it', (r, texts[-1]), ('kept', 'Very good. The builders will follow it from the next build.'))
+
+# 2. with a build on record, it offers to update that build, and does so on Yes
+runs = os.path.join(home, '.hive', 'runs', 'b1'); os.makedirs(runs)
+json.dump({'repo': repo, 'name': 'b1', 'check': '12 tests, all passing.', 'home': runs}, open(os.path.join(runs, 'state.json'), 'w'))
+applied = []
+fake = FakeTelegram([tap('chg|both'), tap('upd|yes')])
+r = assistant.handle(ch(fake), repo, 'Actually, I changed my mind: a late post loses 5% per day', poll=1,
+                     apply_build=lambda st, rule, c: applied.append((st['name'], rule)))
+check('it offers to update the latest build and does it on Yes', (r, applied), ('applied', [('b1', 'a late post loses 5% per day')]))
+check('"keep both" keeps the earlier ruling too', len(memory.load(repo)), 3)
+
+# 3. a hello, a status request, and a new rule
+fake = FakeTelegram([])
+check('waking it up gets a greeting', (assistant.handle(ch(fake), repo, 'hi', poll=1), fake.sent[-1]['text'].startswith('At your service, Sir')),
+      ('greeting', True))
+fake = FakeTelegram([])
+assistant.handle(ch(fake), repo, 'status?', poll=1)
+check('status reports the latest build', fake.sent[-1]['text'], 'The latest build is on branch hive/b1. 12 tests, all passing.')
+fake = FakeTelegram([tap('as|rule'), tap('upd|no')])
+assistant.handle(ch(fake), repo, 'Brands must see a creator rating before inviting', poll=1)
+check('anything else can be kept as a standing rule', 'Brands must see a creator rating before inviting' in [x['text'] for x in memory.load(repo)], True)
+
+# 4. the listener steps aside while a build or review is talking to the owner
+json.dump({'pid': os.getppid(), 'at': time.time()}, open(telegram.BUSY, 'w'))
+check('another live process talking: the listener steps aside', telegram.busy_elsewhere(), True)
+json.dump({'pid': os.getppid(), 'at': time.time() - 600}, open(telegram.BUSY, 'w'))
+check('a stale claim is ignored', telegram.busy_elsewhere(), False)
+json.dump({'pid': os.getpid(), 'at': time.time()}, open(telegram.BUSY, 'w'))
+check("its own claim doesn't block it", telegram.busy_elsewhere(), False)
+sys.exit(fail)
