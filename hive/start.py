@@ -117,8 +117,18 @@ def _phase(source, run, workers, goal, minutes, questions, assumptions, narrate_
     meta = json.load(open(os.path.join(run, 'run.json')))
     log = open(os.path.join(run, 'hive.log'), 'w')
     result = {}
-    t = threading.Thread(target=lambda: result.update(code=swarm.launch(run, 0, say=lambda m: (log.write(m + '\n'), log.flush()))),
-                         daemon=True)
+
+    def heard(m):   # the launcher's log; a stop the owner must know about (a usage limit, an expired login) reaches him
+        log.write(m + '\n'); log.flush()
+        if ' stopped: ' in m:
+            say(f'\n[{_now()}] {m.split(" stopped: ", 1)[1]}')
+            if phone:
+                try:
+                    phone.send(('🔑 ' if 'login' in m else '⏳ ') + m.split(' stopped: ', 1)[1].replace('Run claude',
+                               'On the computer running Hive, run claude'))
+                except Exception:
+                    pass
+    t = threading.Thread(target=lambda: result.update(code=swarm.launch(run, 0, say=heard)), daemon=True)
     t.start()
     narrator = Narrator(os.path.join(run, 'up.git'), meta['branch'])
     if narrate_owner and phone:

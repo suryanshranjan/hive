@@ -94,6 +94,30 @@ def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll
                 rules.append(d['situation'])
             elif not no_rule(v):
                 rules.append(f"{asked} -> {d['own'] if v == 'Not quite' else v}" if asked else v)
+    if rulings and rules:
+        rules = _settle(rules, list(rulings), ch, ask, poll)
+    return rules
+
+def _settle(rules, rulings, ch=None, ask=None, poll=20):
+    """A new answer that contradicts one of his earlier rulings: ask which holds now, before the builders get both
+    (Gate 36: an interview answer on pausing pulled against his earlier verdict on the same situation)."""
+    earlier = [f'Earlier ruling: {r}' for r in rulings[-40:]]
+    for n, c in enumerate(explain.conflicts(earlier + [f'New answer: {r}' for r in rules])):
+        if max(c['a'], c['b']) < len(earlier):   # two old rulings: not this interview's business
+            continue
+        opts = [c['option_a'], c['option_b']]
+        if ch:
+            ch.send(f"⚖️ <b>One thing before the builders start:</b> this answer pulls against an earlier ruling of "
+                    f"yours.\n\n{telegram.esc(c['question'])}\n\n<b>1.</b> {telegram.esc(opts[0])}\n<b>2.</b> "
+                    f"{telegram.esc(opts[1])}", html=True, buttons=[('1', f'set|{n}|0'), ('2', f'set|{n}|1')])
+            kind, got = telegram._wait(ch, poll, {f'set|{n}|0', f'set|{n}|1'})
+            chosen = opts[int(got[-1])] if kind == 'tap' else got
+            ch.send('✅ Understood. That settles it.')
+        else:
+            got = (ask or input)(f"\nOne thing: this answer pulls against an earlier ruling of yours.\n{c['question']}\n"
+                                 f"  A) {opts[0]}  B) {opts[1]}\n  Which holds now? > ").strip()
+            chosen = opts[0] if got.upper() in ('A', '1') else opts[1] if got.upper() in ('B', '2') else got
+        rules.append(f"Settled by the owner (this replaces any earlier ruling it contradicts): {c['question']} -> {chosen}")
     return rules
 
 YES_WORDS = ('exactly', "that's it", 'thats it', "that's right", 'thats right', 'correct', 'yes', 'yep', 'yeah',

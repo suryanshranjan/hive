@@ -61,4 +61,10 @@ check "and the builders' instructions carry the ruling" \
   "$(grep -c '10 percent of the cash' $(ls -td $T/.hive/runs/*/ | head -1)build/prompts/w1.md)" 1
 check "a ruling can be forgotten" "$(python3 -m hive rules forget 1 | grep -c 'Forgotten')" 1
 check "and then one fewer is kept" "$(python3 -m hive rules | grep -c '^[0-9]*\. ')" 2
+# a usage limit overnight: the owner is told when it picks up again, and the build still finishes
+git checkout -q main
+printf 'Implement creator fees and payouts.\n' | HIVE_RESUME_MIN=1 HIVE_WORKER_CMD="sh $HIVE/tests/fake_limited_worker.sh" \
+  python3 -m hive start --workers 2 --overnight > $T/limit.txt 2>&1
+check "a usage limit is told to the owner, and the build still finishes" \
+  "$? $(grep -c "usage limit was reached. I'll pick up again at" $T/limit.txt)" "0 1"
 rm -rf $T; exit $fail
