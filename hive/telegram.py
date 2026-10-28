@@ -105,7 +105,7 @@ def bridge_questions(run, ch, until, poll=2, tick=None):
         for q in open_qs:
             if q['id'] not in sent:
                 who = ch.name()
-                sent[q['id']] = ch.send(f"{who + ', a' if who else 'A'} quick one from the builders:\n\n{q['question']}\n\n"
+                sent[q['id']] = ch.send(f"{who[:1].upper() + who[1:] + ', a' if who else 'A'} quick one from the builders:\n\n{q['question']}\n\n"
                                         "A tap is enough, or tell me in your own words.",
                                         buttons=[(c, f"{q['id']}|{c}") for c in _letters(q['question'])])
         if until() and not open_qs:
