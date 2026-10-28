@@ -3,7 +3,7 @@
 Hive asks what to build, finds the project's tests on its own, puts builders to work on copies, brings their questions
 and their assumptions to the owner in plain words, sends back what the owner corrects, checks the result, and hands
 over a branch. The owner's own branches are never changed: the result arrives as a new branch, hive/<name>."""
-import csv, glob, json, os, re, shlex, subprocess, threading, time
+import csv, glob, json, os, re, shlex, shutil, subprocess, threading, time
 
 from . import junit, owner, swarm
 from .guard import sh
@@ -128,7 +128,7 @@ def _phase(source, run, workers, goal, minutes, questions, assumptions, narrate_
     narrator.tick(); log.close()
     return meta['branch'], result.get('code', 1)
 
-def start(repo='.', workers=4, goal=None, minutes=40):
+def start(repo='.', workers=4, goal=None, minutes=40, overnight=False):
     repo = os.path.abspath(repo)
     say("\nHive here. What are we building today?")
     goal = goal or _ask("(Describe it in a sentence or two, or give the path of a file that describes it.)")
@@ -158,6 +158,9 @@ def start(repo='.', workers=4, goal=None, minutes=40):
 
     slug = '-'.join(re.findall(r'[a-z0-9]+', goal_text.lower())[:4])[:40] or 'build'
     name = f'{slug}-{time.strftime("%m%d-%H%M")}'
+    base, k = name, 2
+    while os.path.exists(os.path.join(RUNS, name)):   # two builds of the same goal in the same minute
+        name = f'{base}-{k}'; k += 1
     home = os.path.join(RUNS, name); os.makedirs(home)
     source = os.path.join(home, 'source')
     sh('git', 'clone', '-q', '--branch', branch, repo, source)
@@ -190,49 +193,98 @@ def start(repo='.', workers=4, goal=None, minutes=40):
     sh('git', '-C', source, 'commit', '-q', '-m', 'hive: settings for this build')
 
     say(f"\nI'll put {workers} builders on it. They work on copies, so your branches stay exactly as they are.")
-    say("If they need a decision only you can make, the question will appear right here.")
+    if overnight:
+        say("You're away, so they won't ask you anything: they'll decide, and write down every business assumption "
+            "for you to check when you're back.")
+    else:
+        say("If they need a decision only you can make, the question will appear right here.")
     say("(Builders run commands on this computer. For code you don't trust, run me in a container.)")
     say(f'\n[{_now()}] Starting.')
-    t0 = time.time()
+    state = dict(repo=repo, branch=branch, name=name, home=home, test_cmd=test_cmd, links=links, goal=goal_text,
+                 workers=workers, minutes=minutes, before=before, started=time.time(), overnight=overnight)
     run1 = os.path.join(home, 'build')
-    b, code = _phase(source, run1, workers, goal_text, minutes, 4 * workers, True, True)
-    final, cost = run1, _cost(run1)
+    b, code = _phase(source, run1, workers, goal_text, minutes, 0 if overnight else 4 * workers, True, not overnight)
+    state.update(b=b, code=code, final=run1, cost=_cost(run1))
+    json.dump(state, open(os.path.join(home, 'state.json'), 'w'), indent=1)
     say(f'\n[{_now()}] ' + (f'All {workers} builders are done.' if workers > 1 else 'The builder is done.'))
-
     found = owner._assumptions(os.path.join(run1, 'owner'), False)   # business defaults only; technical ones go to engineers
+    if overnight:
+        rc = _deliver(state)
+        if found:
+            say(f"\nThey made {_n(len(found), 'assumption')} your description didn't cover. When you're back, type "
+                f"`hive morning` to check {'it' if len(found) == 1 else 'them'}; I'll fix anything you correct and update "
+                f"the branch.")
+        return rc
     if found:
         n = len(found)
         say(f"Before I hand it over: they made {_n(n, 'assumption')} your description didn't cover. Let's check "
             f"{'it' if n == 1 else 'them'} together: press Enter if one is right, or say what should happen instead.")
-        owner.review(run1, intro=False)
-        fixes = [r for r in (json.load(open(p)) for p in glob.glob(os.path.join(run1, 'owner', 'reviews', '*.json'))) if not r['ok']]
-        if fixes:
-            say(f'\n[{_now()}] Sending the builders back to fix {_n(len(fixes), "thing")}.')
-            fsrc = os.path.join(home, 'fix_source')
-            sh('git', 'clone', '-q', '--branch', b, os.path.join(run1, 'up.git'), fsrc)
-            _link(repo, fsrc, links)
-            corrections = open(os.path.join(run1, 'owner', 'corrections.md')).read()
-            run2 = os.path.join(home, 'fix')
-            _phase(fsrc, run2, min(workers, max(1, len(fixes))), goal_text + '\n\n' + corrections, minutes, 0, False, False)
-            final, cost = run2, cost + _cost(run2)
-            say(f'[{_now()}] Fixed.')
+        _review_and_fix(state)
+    return _deliver(state)
 
+def _review_and_fix(state):
+    """The owner checks the business assumptions; anything corrected goes back to the builders for one fix round."""
+    run1 = os.path.join(state['home'], 'build')
+    owner.review(run1, intro=False)
+    fixes = [r for r in (json.load(open(p)) for p in glob.glob(os.path.join(run1, 'owner', 'reviews', '*.json'))) if not r['ok']]
+    if not fixes:
+        return
+    say(f'\n[{_now()}] Sending the builders back to fix {_n(len(fixes), "thing")}.')
+    fsrc = os.path.join(state['home'], 'fix_source')
+    sh('git', 'clone', '-q', '--branch', state['b'], os.path.join(run1, 'up.git'), fsrc)
+    _link(state['repo'], fsrc, state['links'])
+    corrections = open(os.path.join(run1, 'owner', 'corrections.md')).read()
+    run2 = os.path.join(state['home'], 'fix')
+    _phase(fsrc, run2, min(state['workers'], max(1, len(fixes))), state['goal'] + '\n\n' + corrections,
+           state['minutes'], 0, False, False)
+    state.update(final=run2, cost=state['cost'] + _cost(run2))
+    json.dump(state, open(os.path.join(state['home'], 'state.json'), 'w'), indent=1)
+    say(f'[{_now()}] Fixed.')
+
+def _deliver(state):
+    """Check every test on the result and hand it over as the branch hive/<name> (updated in place after a fix round)."""
     say('\nLet me check the result.')
-    result = os.path.join(home, 'result')
-    sh('git', 'clone', '-q', '--branch', b, os.path.join(final, 'up.git'), result)
-    _link(repo, result, links)
-    after = run_tests(result, test_cmd)
+    result = os.path.join(state['home'], 'result')
+    if os.path.exists(result):
+        shutil.rmtree(result)
+    sh('git', 'clone', '-q', '--branch', state['b'], os.path.join(state['final'], 'up.git'), result)
+    _link(state['repo'], result, state['links'])
+    before = state['before']; passed = sum(before.values())
+    after = run_tests(result, state['test_cmd'])
     p2, t2 = sum(after.values()), len(after)
     broken = [k for k, ok in before.items() if ok and not after.get(k)]
     say(f'  {_n(t2, "test")}, ' + ('all passing.' if p2 == t2 else f'{p2} passing.') +
         ('' if not passed else f' All {passed} that passed before still pass.' if not broken else
          f' {_n(len(broken), "test")} that passed before now fail: look before you merge.'))
-    out = f'hive/{name}'
-    sh('git', '-C', repo, 'fetch', '-q', os.path.join(final, 'up.git'), f'{b}:{out}')
-    mins = round((time.time() - t0) / 60)
+    out = f"hive/{state['name']}"
+    sh('git', '-C', state['repo'], 'fetch', '-q', '-f', os.path.join(state['final'], 'up.git'), f"+{state['b']}:{out}")
+    mins = round((time.time() - state['started']) / 60)
     took = 'under a minute' if mins < 1 else _n(mins, 'minute')
-    say(f'\nDone in {took}' + (f', about ${cost:.2f}' if cost >= 0.01 else '') + f'. Your result is on branch {out}.')
-    say(f'  See what changed:  git diff {branch}...{out}')
+    say(f'\nDone in {took}' + (f", about ${state['cost']:.2f}" if state['cost'] >= 0.01 else '') +
+        f'. Your result is on branch {out}.')
+    say(f"  See what changed:  git diff {state['branch']}...{out}")
     say(f'  Take it:           git merge {out}')
-    say(f'(Everything from this build, including the questions and answers, is in {home}.)')
-    return 0 if not broken and code == 0 else 1
+    say(f"(Everything from this build, including the questions and answers, is in {state['home']}.)")
+    return 0 if not broken and state['code'] == 0 else 1
+
+def morning(name=None):
+    """After an overnight build: check its assumptions, fix what the owner corrects, and update the branch."""
+    homes = sorted((h for h in glob.glob(os.path.join(RUNS, '*')) if os.path.exists(os.path.join(h, 'state.json'))),
+                   key=os.path.getmtime)
+    if name:
+        homes = [h for h in homes if os.path.basename(h) == name]
+    homes = [h for h in homes if json.load(open(os.path.join(h, 'state.json'))).get('overnight')]
+    if not homes:
+        say('No overnight build is waiting for you.'); return 0
+    state = json.load(open(os.path.join(homes[-1], 'state.json')))
+    run1 = os.path.join(state['home'], 'build')
+    todo = [a for a in owner._assumptions(os.path.join(run1, 'owner'), False)
+            if not os.path.exists(os.path.join(run1, 'owner', 'reviews', a['id'] + '.json'))]
+    say(f"\nGood morning. Overnight, the builders worked on: {state['goal'][:120]}")
+    if not todo:
+        say('There is nothing left for you to check. The result is on branch hive/' + state['name'] + '.'); return 0
+    say(f"They made {_n(len(todo), 'assumption')} your description didn't cover. Press Enter if one is right, or say "
+        "what should happen instead.")
+    state['started'] = time.time()
+    _review_and_fix(state)
+    return _deliver(state)

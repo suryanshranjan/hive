@@ -2,7 +2,8 @@
 
 usage:
   python -m hive                                            # just start: Hive asks what to build and does the rest
-  python -m hive start [--workers 4] [--goal <text or file>] [--minutes 40]
+  python -m hive start [--workers 4] [--goal <text or file>] [--minutes 40] [--overnight]
+  python -m hive morning                                    # after an overnight build: check its assumptions
   python -m hive init --test-cmd "<command that runs all tests and writes JUnit XML to .hive/junit.xml>"
   python -m hive claim <short_name> <area>[,<area>...] "<what you will build>"
   python -m hive land <short_name> "<commit message>"      # or: python -m hive land <short_name> --continue
@@ -36,6 +37,8 @@ def main(argv=None):
     sub = ap.add_subparsers(dest='cmd')
     st = sub.add_parser('start'); st.add_argument('--workers', type=int, default=4); st.add_argument('--goal')
     st.add_argument('--minutes', type=int, default=40)
+    st.add_argument('--overnight', action='store_true')   # no questions; check the assumptions later with `hive morning`
+    mo = sub.add_parser('morning'); mo.add_argument('name', nargs='?')
     i = sub.add_parser('init'); i.add_argument('--test-cmd', required=True); i.add_argument('--junit', default='.hive/junit.xml')
     c = sub.add_parser('claim'); c.add_argument('name'); c.add_argument('areas'); c.add_argument('desc')
     l = sub.add_parser('land'); l.add_argument('name'); l.add_argument('message', nargs='?')
@@ -53,7 +56,10 @@ def main(argv=None):
     sub.add_parser('assumptions')
     a = ap.parse_args(argv)
     if a.cmd in (None, 'start'):
-        return start.start('.', getattr(a, 'workers', 4), getattr(a, 'goal', None), getattr(a, 'minutes', 40))
+        return start.start('.', getattr(a, 'workers', 4), getattr(a, 'goal', None), getattr(a, 'minutes', 40),
+                           getattr(a, 'overnight', False))
+    if a.cmd == 'morning':
+        return start.morning(a.name)
     if a.cmd == 'init':
         return init(a.test_cmd, a.junit)
     if a.cmd == 'claim':
