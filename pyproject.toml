@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hive-swarm"
+version = "1.0.0"
+description = "A team of AI builders a non-technical owner directs by talking: it asks in plain words, never breaks what works, and hands back a tested branch."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+hive = "hive.__main__:main"
+
+[tool.setuptools]
+packages = ["hive"]
+
+[tool.setuptools.package-data]
+hive = ["templates/*.md"]
