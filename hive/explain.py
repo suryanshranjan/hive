@@ -22,9 +22,9 @@ The builders' assumptions (decisions the instructions did not cover), as JSON:
 Write like a composed, courteous, quietly confident assistant briefing the founder: short, warm, a step ahead, never
 flustered or chatty, no hedging. The owner should
 be able to decide each one in a few seconds. For each assumption:
-- "context": one short sentence on where this shows up and who notices it (a brand, a creator, the team).
-- "example": one short sentence with a concrete made-up case: a real-sounding name, simple numbers (rupees, followers,
-  views), and exactly what the product does now.
+- "context": one short sentence on where this shows up and who notices it (a customer, a partner, the team).
+- "example": one short sentence with a concrete made-up case: a real-sounding name, simple numbers (rupees,
+  counts, dates), and exactly what the product does now.
 - "advice": your recommendation in the first person, in one short sentence: "I'd keep it." or "I'd change it: <what>."
   Recommend what most well-run businesses would want here, and what fits the feature's stated rules.
 - "alternative": if you advise a change, the change itself in a few plain words (it becomes the owner's answer if they
@@ -147,3 +147,37 @@ def plan(owner_dir, goal, assumptions):
     shown = ranked[:SHOW]
     aside = [i for i in ex['items'] if i not in shown]
     return ex['summary'], shown, aside
+
+CONFLICT_PROMPT = """A business owner has just made these decisions about one feature of their product, one at a time:
+{decisions}
+
+Find pairs of decisions that contradict each other: both cannot be true in the product at once. Ignore pairs that are
+merely related or about different situations. For each real contradiction, write a short question in plain words asking
+the owner which should win, and a short label for each side (a few words each).
+
+Reply with JSON only: {{"conflicts": [{{"a": 1, "b": 2, "question": "...", "option_a": "...", "option_b": "..."}}]}}
+Reply {{"conflicts": []}} if there are none."""
+
+def conflicts(decisions):
+    """Pairs of the owner's decisions that contradict each other (in the first real review, two of the
+    owner's answers could not both hold, and the builders received both).
+    `decisions` is a list of plain sentences; returns [{a, b, question, option_a, option_b}] with 0-based a, b.
+    Best effort: if no model can be reached, returns []."""
+    if len(decisions) < 2:
+        return []
+    text = '\n'.join(f'{n}. {d}' for n, d in enumerate(decisions, 1))
+    for ask in (_ask_claude, _ask_backup):
+        try:
+            reply = ask(CONFLICT_PROMPT.format(decisions=text))
+            if reply is None:
+                continue
+            out = []
+            for c in reply.get('conflicts', []):
+                a, b = int(c['a']) - 1, int(c['b']) - 1
+                if 0 <= a < len(decisions) and 0 <= b < len(decisions) and a != b and c.get('question'):
+                    out.append({'a': a, 'b': b, 'question': c['question'], 'option_a': c.get('option_a') or 'The first',
+                                'option_b': c.get('option_b') or 'The second'})
+            return out
+        except Exception:
+            continue
+    return []

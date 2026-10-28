@@ -241,6 +241,29 @@ def _walk(ch, d, items, label, poll):
         else:
             i += 1
 
+def _resolve_conflicts(ch, d, items, poll):
+    """Before anything is sent: if two of the owner's decisions contradict each other, ask which should win."""
+    from . import explain
+    reviewed = [(i, json.load(open(os.path.join(d, 'reviews', i['id'] + '.json')))) for i in items
+                if os.path.exists(os.path.join(d, 'reviews', i['id'] + '.json'))]
+    reviewed = [(i, r) for i, r in reviewed if not r.get('auto')]
+    sentences = [(f"Keep as built: {i['text']}" if r['ok'] else f"Change it to: {r['correction']} (about: {i['text']})")
+                 for i, r in reviewed]
+    found = explain.conflicts(sentences)
+    path = os.path.join(d, 'resolutions.json')
+    resolutions = json.load(open(path)) if os.path.exists(path) else []
+    for n, c in enumerate(found):
+        who = ch.name()
+        ch.send(f"One thing before I send this{', ' + who if who else ''}: two of your answers pull in different "
+                f"directions.\n\n{c['question']}",
+                buttons=[(c['option_a'], f'conf|{n}|a'), (c['option_b'], f'conf|{n}|b')])
+        kind, got = _wait(ch, poll, {f'conf|{n}|a', f'conf|{n}|b'})
+        chosen = c['option_a'] if got == f'conf|{n}|a' else c['option_b'] if got == f'conf|{n}|b' else got
+        resolutions.append({'question': c['question'], 'chosen': chosen})
+        ch.send('Understood. That settles it.')
+    if found:
+        json.dump(resolutions, open(path, 'w'), indent=1)
+
 def review(run, ch, goal='', check='', poll=20, greeting='Good morning'):
     """The owner checks the builders' business assumptions on the phone: rewritten with context and an example, most
     important first, at most a handful; the smaller ones only if the owner asks to see them."""
@@ -270,6 +293,7 @@ def review(run, ch, goal='', check='', poll=20, greeting='Good morning'):
                 json.dump({'id': item['id'], 'ok': True, 'correction': None, 'seconds': 0, 'via': 'telegram',
                            'auto': 'left as built at the owner\'s choice', 'shown_as': item['text']},
                           open(os.path.join(d, 'reviews', item['id'] + '.json'), 'w'))
+    _resolve_conflicts(ch, d, shown + aside, poll)
     # one last look before anything goes to the builders
     while True:
         changes = [json.load(open(os.path.join(d, 'reviews', i['id'] + '.json'))) for i in shown + aside

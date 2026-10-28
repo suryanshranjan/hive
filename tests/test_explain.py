@@ -16,8 +16,8 @@ class Endpoint(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
         body = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
         seen['auth'], seen['model'] = self.headers.get('Authorization'), body['model']
-        reply = {'summary': 'A report that adds up campaign results.', 'items': [
-            {'id': 'a1', 'context': 'Brands see this on every report.', 'example': 'Priya has 1,000 followers.',
+        reply = {'summary': 'A report that adds up daily shop orders.', 'items': [
+            {'id': 'a1', 'context': 'The shop sees this on every report.', 'example': 'Asha has 3 orders.',
              'advice': "I'd keep it.", 'alternative': '', 'impact': 3, 'owner_can_judge': True}]}
         out = json.dumps({'choices': [{'message': {'content': 'Here you go: ' + json.dumps(reply)}}]}).encode()
         self.send_response(200); self.send_header('Content-Type', 'application/json'); self.end_headers()
@@ -44,7 +44,7 @@ json.dump({'base_url': f'http://127.0.0.1:{srv.server_port}/v1', 'api_key': 'tes
           open(explain.BACKUP, 'w'))
 summary, shown, aside = explain.plan(d, 'combine metrics', assumptions)
 check('when Claude fails, the backup model puts it in plain words', (summary, shown[0]['text']),
-      ('A report that adds up campaign results.', 'Brands see this on every report. Priya has 1,000 followers.'))
+      ('A report that adds up daily shop orders.', 'The shop sees this on every report. Asha has 3 orders.'))
 check('the suggestion comes through', shown[0]['advice'], "I'd keep it.")
 check('the key and model went to the endpoint', (seen['auth'], seen['model']), ('Bearer test-key', 'meta/llama-3.3-70b-instruct'))
 check('the plain words are cached for this build', os.path.exists(os.path.join(d, 'explained.json')), True)
