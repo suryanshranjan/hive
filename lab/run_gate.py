@@ -351,6 +351,10 @@ def main():
     if kinds & {'xtour', 'xtour+handbook'}: build_xtour(cfg, o, names, run, name)
     if 'xtour+handbook' in kinds: build_handbook(o, run, base='seed_xtour', out_name='seed_xtour_hb')
     if 'tour+handbook' in kinds: build_handbook(o, run, base='seed_tour', out_name='seed_tour_hb')
+    for cmd in cfg.get('pre_launch', []):   # gate-specific steps after the seeds exist and before any builder starts
+        say(f'pre-launch: {cmd}')         # (Gate 39: Hive's interview with a synthetic owner writes the ask texts)
+        r = subprocess.run(cmd.format(root=ROOT, run=run, name=name, oracle=oracle_path), shell=True, cwd=ROOT)
+        if r.returncode: sys.exit(f'pre-launch step failed: {cmd}')
     allowance = {}
     for arm, spec in cfg.get('allowance', {}).items():
         order = sorted(names); random.Random(spec['seed']).shuffle(order); alw = {}
