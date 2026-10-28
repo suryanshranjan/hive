@@ -17,7 +17,8 @@ if 'Write his rule as one clear sentence' in prompt:
 if 'Classify it.' in prompt:   # the listener: what kind of message is this?
     said = prompt.split('"')[1]
     low = said.lower()
-    intent = ('change' if 'changed my mind' in low or low.startswith('actually') else 'status' if 'status' in low
+    intent = ('cloud_on' if 'move to the cloud' in low else 'cloud_off' if 'delete the cloud' in low
+              else 'change' if 'changed my mind' in low or low.startswith('actually') else 'status' if 'status' in low
               else 'greeting' if low.strip(' !.') in ('hi', 'hello', 'hey hive') else 'other')
     print(json.dumps({'result': json.dumps({'intent': intent, 'rule': said.split(':', 1)[-1].strip() if intent == 'change' else ''})}))
     sys.exit(0)

@@ -60,6 +60,17 @@ fake = FakeTelegram([tap('bld|yes')])
 r = assistant.handle(ch(fake), repo, 'build: a refund page for brands', poll=1, start_build=lambda rp, goal: started.append(goal))
 check('"build: ..." asks once, then starts the build with that goal', (r, started), ('built', ['a refund page for brands']))
 
+# 3b2. "move to the cloud" from the phone: one tap to confirm, then the machine is made and Hive moves; "delete the
+# cloud machine" removes it; "not now" changes nothing
+moves = []
+fake = FakeTelegram([tap('cld|yes')])
+r = assistant.handle(ch(fake), repo, 'Please move to the cloud, my laptop is going off', poll=1,
+                     cloud=lambda rp, on: moves.append(on) or 0)
+check('"move to the cloud" asks once, then moves (and the local listener stops)', (r, moves), ('moved', [True]))
+fake = FakeTelegram([tap('cld|no')])
+r = assistant.handle(ch(fake), repo, 'delete the cloud machine', poll=1, cloud=lambda rp, on: moves.append(on) or 0)
+check('"not now" leaves the cloud machine alone', (r, moves), ('not_moved', [True]))
+
 # 3c. the interview on the phone: a tap, his own words, his confirmation of the reading -> rules for the builders
 from hive import interview
 fake = FakeTelegram([tap('q01|0'), say('Only after a week'), tap('q02|0')])

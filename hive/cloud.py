@@ -15,13 +15,15 @@ from . import memory, telegram
 REMOTE_HOME = 'hive-cloud'   # relative to the remote home folder (scp and ssh both start there; '~' is not expanded)
 
 class Target:
-    """Where Hive goes: user@host over SSH, or a local folder (tests, a mounted disk)."""
-    def __init__(self, to):
+    """Where Hive goes: user@host over SSH (with its own key, for a machine `hive cloud --new` made), or a local folder
+    (tests, a mounted disk)."""
+    def __init__(self, to, key=None):
         self.local = os.path.isabs(to) or to.startswith('.') or (':' not in to and '@' not in to)
         self.to = os.path.abspath(to) if self.local else to
+        self.opts = ['-o', 'BatchMode=yes'] + (['-i', key, '-o', 'StrictHostKeyChecking=accept-new'] if key else [])
 
     def run(self, cmd, check=True):
-        full = ['sh', '-c', cmd] if self.local else ['ssh', '-o', 'BatchMode=yes', self.to, cmd]
+        full = ['sh', '-c', cmd] if self.local else ['ssh'] + self.opts + [self.to, cmd]
         p = subprocess.run(full, capture_output=True, text=True)
         if check and p.returncode != 0:
             raise RuntimeError(f'on {self.to}: {cmd}\n{p.stderr.strip()[:400]}')
@@ -32,7 +34,7 @@ class Target:
             os.makedirs(os.path.dirname(dst), exist_ok=True); shutil.copy2(src, dst)
         else:
             self.run(f'mkdir -p {shlex.quote(os.path.dirname(dst))}')
-            subprocess.run(['scp', '-q', '-o', 'BatchMode=yes', src, f'{self.to}:{dst}'], check=True)
+            subprocess.run(['scp', '-q'] + self.opts + [src, f'{self.to}:{dst}'], check=True)
 
     def home(self):
         return os.path.join(self.to, 'hive-cloud') if self.local else REMOTE_HOME
@@ -40,13 +42,13 @@ class Target:
 def _project(repo):
     return os.path.basename(os.path.abspath(repo)) or 'project'
 
-def go(repo='.', to=None, with_login=False, start=True, say=print):
+def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
     repo = os.path.abspath(repo)
     if not to:
         say('Tell me where: hive cloud --to user@host'); return 2
     if subprocess.run(['git', '-C', repo, 'status', '--porcelain'], capture_output=True, text=True).stdout.strip():
         say('You have unsaved changes. Commit them first: only committed work goes to the cloud.'); return 3
-    t = Target(to); name = _project(repo)
+    t = Target(to, key); name = _project(repo)
     proj = f'{t.home()}/{name}'
     branch = subprocess.run(['git', '-C', repo, 'rev-parse', '--abbrev-ref', 'HEAD'], capture_output=True, text=True).stdout.strip()
     say(f"Moving {name} to {t.to}. Only committed work goes; .env files, keys and dependencies stay here.")
@@ -95,7 +97,7 @@ def go(repo='.', to=None, with_login=False, start=True, say=print):
         p = t.run(f'cd {proj} && {py} -m pip install -q -r requirements.txt', check=False)
         if p.returncode != 0:
             say(f'  The requirements did not install there: {p.stderr.strip()[-300:]}')
-    json.dump({'to': t.to, 'project': proj, 'branch': branch}, open(os.path.join(hive_dir if os.path.isdir(hive_dir) else tmp,
+    json.dump({'to': t.to, 'project': proj, 'branch': branch, 'key': key}, open(os.path.join(hive_dir if os.path.isdir(hive_dir) else tmp,
                                                                                   'cloud.json'), 'w'))
     say(f"  Copied: the project ({branch}), " + (', '.join(sent) if sent else 'no Hive settings yet') + '.')
     if not with_login:
@@ -117,14 +119,19 @@ def go(repo='.', to=None, with_login=False, start=True, say=print):
 def pull(repo='.', frm=None, say=print):
     """Fetch the hive/... result branches built in the cloud into this repository (your branches are not touched)."""
     repo = os.path.abspath(repo)
-    if not frm:
-        cfg = os.path.join(os.path.expanduser('~'), '.hive', 'cloud.json')
-        frm = json.load(open(cfg))['to'] if os.path.exists(cfg) else None
+    key = None
+    cfg = os.path.join(os.path.expanduser('~'), '.hive', 'cloud.json')
+    if os.path.exists(cfg):
+        saved = json.load(open(cfg))
+        if not frm or frm == saved.get('to'):
+            frm, key = saved['to'], saved.get('key')
     if not frm:
         say('Tell me where from: hive cloud pull --from user@host'); return 2
     t = Target(frm); proj = f'{t.home()}/{_project(repo)}'
     url = proj if t.local else f'{t.to}:{proj}'
-    p = subprocess.run(['git', '-C', repo, 'fetch', url, '+refs/heads/hive/*:refs/heads/hive/*'], capture_output=True, text=True)
+    env = dict(os.environ, GIT_SSH_COMMAND='ssh ' + ' '.join(shlex.quote(o) for o in Target(frm, key).opts)) if key else None
+    p = subprocess.run(['git', '-C', repo, 'fetch', url, '+refs/heads/hive/*:refs/heads/hive/*'], capture_output=True,
+                       text=True, env=env)
     if p.returncode != 0:
         say(f'Could not fetch: {p.stderr.strip()[:300]}'); return 1
     got = subprocess.run(['git', '-C', repo, 'branch', '--list', 'hive/*'], capture_output=True, text=True).stdout.split()

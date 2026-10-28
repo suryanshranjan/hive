@@ -16,13 +16,16 @@ RUNS = os.path.join(os.path.expanduser('~'), '.hive', 'runs')   # where `hive st
 CLASSIFY = """A business owner sent this message to his software assistant, Hive:
 "{text}"
 
-Classify it. Reply with JSON only: {{"intent": "build" | "change" | "rule" | "status" | "greeting" | "other",
+Classify it. Reply with JSON only: {{"intent": "build" | "change" | "rule" | "status" | "greeting" | "cloud_on" |
+"cloud_off" | "other",
 "rule": "the rule he now wants, or for a build, what to build, in plain sentences; otherwise empty"}}
 - "build": he asks Hive to build, add or make something in the product.
 - "change": he says he has changed his mind, or now wants something different from before.
 - "rule": he states a new rule for how the product should behave.
 - "status": he asks how things are going.
-- "greeting": a hello, or waking Hive up with no request yet."""
+- "greeting": a hello, or waking Hive up with no request yet.
+- "cloud_on": he wants Hive to move to the cloud, or keep working while his computer is off.
+- "cloud_off": he wants the cloud machine shut down or deleted."""
 
 RELATED = """A business owner's earlier rulings for his product:
 {rulings}
@@ -46,9 +49,10 @@ def latest_build(repo):
             return st
     return None
 
-def handle(ch, repo, text, poll=20, apply_build=None, start_build=None):
+def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=None):
     """Answer one message from the owner. apply_build(state, rule, ch) updates a build (hive.start.apply_ruling);
-    start_build(repo, goal) runs a new build that reports to the phone (hive.start.start, overnight style)."""
+    start_build(repo, goal) runs a new build that reports to the phone (hive.start.start, overnight style);
+    cloud(repo, on) makes a cloud machine and moves Hive there (on=True), or deletes it (hive.cloud_aws)."""
     low = text.lower().strip()
     if low.startswith('build:') or low.startswith('build '):   # an explicit request needs no model to recognise it
         got = {'intent': 'build', 'rule': text.split(':', 1)[1] if ':' in text else text[6:]}
@@ -65,6 +69,23 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None):
         ch.send("🛠 Right away. I'll message you as it goes; text 'status' any time.")
         start_build(repo, rule)
         return 'built'
+    if intent in ('cloud_on', 'cloud_off') and cloud:
+        on = intent == 'cloud_on'
+        ch.send("☁️ <b>Shall I move to the cloud?</b>\n\nI'll make a machine on your AWS account (about $0.09 an hour "
+                "while it runs), move this project there, and keep working while your computer is off."
+                if on else "☁️ <b>Shall I delete the cloud machine?</b>\n\nBring results back first if you need them; "
+                "after this nothing is left running or billing.", html=True,
+                buttons=[[('✅ Yes' if on else '🗑 Yes, delete it', 'cld|yes')], [('Not now', 'cld|no')]])
+        if telegram._wait(ch, poll, {'cld|yes', 'cld|no'})[1] != 'cld|yes':
+            ch.send('Very good. Just say the word.'); return 'not_moved'
+        ch.send("🛠 On it. This takes about 5 minutes; I'll tell you when I'm there." if on else '🛠 Deleting it now.')
+        rc = cloud(repo, on)
+        if rc != 0:
+            ch.send("⚠️ That didn't work. On your computer, run `hive cloud --new` (or `--stop`) to see why.")
+            return 'cloud_failed'
+        if not on:
+            ch.send('✅ Deleted. Nothing is left running.')
+        return 'moved' if on else 'cloud_off'
     if intent == 'greeting':
         ch.send(f"🐝 <b>At your service{', ' + telegram.esc(who) if who else ''}.</b>\n\nTell me if you've changed your mind "
                 "about anything, give me a new rule, or ask for the status. 🎙 Voice notes work too.", html=True)
@@ -109,7 +130,7 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None):
     ch.send('✅ Very good. The builders will follow it from the next build.')
     return 'kept'
 
-def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None):
+def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cloud=None):
     """Stay on the owner's Telegram between builds and handle whatever he sends. Ctrl+C to stop."""
     cfg = telegram.load()
     if not cfg:
@@ -122,8 +143,10 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None):
             if telegram.busy_elsewhere():
                 time.sleep(poll); continue   # a build or review is talking to the owner: step aside
             for text, data, _ in ch.updates(timeout=poll):
-                if text:
-                    handle(ch, repo, text, apply_build=apply_build, start_build=start_build)
+                if text and handle(ch, repo, text, apply_build=apply_build, start_build=start_build,
+                                   cloud=cloud) == 'moved':
+                    print('Hive now runs in the cloud and reads Telegram there; this listener stops.', flush=True)
+                    return 0   # one reader of the owner's chat at a time
     except KeyboardInterrupt:
         pass
     return 0
