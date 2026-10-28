@@ -195,7 +195,19 @@ check("picking the option Hive did not recommend is one tap, recorded as the own
       (r['correction'], r['followed_suggestion']), ('count it every time it appears', False))
 check('the stored wording is the decision itself, not the "1 of 1" header', r['shown_as'].startswith('In the shop report'), True)
 
-# 8. not connected: hive behaves as before
+# 8. an open question gathers every reply until Done; situations get one-tap verdicts, with undo and own words
+fake = FakeTelegram([say('- they treat goods like cash\n- they promise dates'), say("status"), say('they skip the brief'),
+                     tap('collect|done')])
+lines = telegram.collect(telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), 'What do new people get wrong?', poll=1)
+check('an open question gathers every point until Done, ignoring a status request',
+      lines, ['they treat goods like cash', 'they promise dates', 'they skip the brief'])
+cases = [{'id': 's1', 'situation': 'A box arrives damaged.', 'options': ['Full refund', 'Replace it']},
+         {'id': 's2', 'situation': 'A code expired yesterday.', 'options': ['Refuse it', 'Accept it']}]
+fake = FakeTelegram([tap('s1|0'), tap('s2|undo'), tap('s1|1'), say('Accept it, once, with a note')])
+got = telegram.verdicts(telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), cases, poll=1)
+check('verdicts: a tap, an undo, then the owner\'s own words', got, {'s1': 'Replace it', 's2': 'Accept it, once, with a note'})
+
+# 9. not connected: hive behaves as before
 os.environ['HIVE_TELEGRAM'] = '0'
 check('without a connection, nothing is sent', telegram.load(), None)
 sys.exit(fail)

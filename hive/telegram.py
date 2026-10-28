@@ -381,3 +381,75 @@ def test():
     ch = Channel(cfg); who = ch.name()
     ch.send(f"At your service{', ' + who if who else ''}. All systems are working; this is where your decisions will "
             "arrive."); print('Sent.'); return 0
+
+def collect(ch, question, poll=20):
+    """Ask the owner an open question and gather every reply until "Done": a list of the owner's lines."""
+    ch.drain()
+    who = ch.name()
+    ch.send(f"{who[:1].upper() + who[1:] + ', a' if who else 'A'} question for you:\n\n{question}\n\n"
+            "Send as many messages as you like, one point each is perfect. Tap Done when you've finished.",
+            buttons=[('Done', 'collect|done')])
+    lines, prev = [], ch.note
+    ch.note = lambda: f"I have {len(lines)} point{'s' if len(lines) != 1 else ''} from you so far. Tap Done when you've finished."
+    while True:
+        kind, got = _wait(ch, poll, {'collect|done'})
+        if got == 'collect|done' or (kind == 'text' and got.lower().strip('. !') in ('done', 'that is all', "that's all")):
+            break
+        new = [l.strip(' -•*\t') for l in got.splitlines() if l.strip(' -•*\t')]
+        lines += new
+        ch.send(f"Noted ({len(lines)} so far). Anything else? Tap Done when you've finished.",
+                buttons=[('Done', 'collect|done')])
+    ch.note = prev
+    ch.send(f"Thank you. I have {len(lines)} point{'s' if len(lines) != 1 else ''}. I'll take it from here.")
+    return lines
+
+def verdicts(ch, cases, poll=20, intro=None):
+    """Put situations to the owner, each with outcome buttons (and "Something else"); undo goes back one.
+    cases: [{id, situation, options: [text, ...]}]. Returns {id: chosen outcome in the owner's terms}."""
+    ch.drain()
+    if intro:
+        ch.send(intro)
+    out, i = {}, 0
+    while i < len(cases):
+        c = cases[i]
+        ch.note = lambda: f"We're on situation {i + 1} of {len(cases)}."
+        rows = [[(o[:60], f"{c['id']}|{n}")] for n, o in enumerate(c['options'])]
+        rows.append([('Something else', f"{c['id']}|x")] + ([('↩ Undo last', f"{c['id']}|undo")] if i else []))
+        msg = ch.send(f"{i + 1} of {len(cases)}\n\n{c['situation']}\n\nWhat should happen?", buttons=rows)
+        kind, got = _wait(ch, poll, {d for row in rows for _, d in row})
+        if got == f"{c['id']}|undo":
+            i -= 1; out.pop(cases[i]['id'], None); ch.send('Of course. Back to the previous one.'); continue
+        if kind == 'tap' and got.split('|')[-1].isdigit():
+            out[c['id']] = c['options'][int(got.split('|')[-1])]
+        elif kind == 'text':
+            out[c['id']] = got
+        else:
+            ch.send('Of course. What should happen?', reply_to=msg)
+            out[c['id']] = _wait(ch, poll, set())[1]
+        i += 1
+    ch.note = None
+    ch.send(f"That's all {len(cases)}. Thank you{', ' + ch.name() if ch.name() else ''}.")
+    return out
+
+def ask_cli(question, out):
+    """hive telegram ask "<question>" --out file: collect the owner's open answer into a private file."""
+    cfg = load()
+    if not cfg:
+        print('Not connected yet: run hive telegram setup.'); return 1
+    lines = collect(Channel(cfg), question)
+    with open(out, 'w') as f:
+        json.dump({'question': question, 'answers': lines, 'at': int(time.time())}, f, indent=1)
+    os.chmod(out, 0o600)
+    print(f'{len(lines)} point(s) saved to {out}.'); return 0
+
+def verdicts_cli(cases_file, out, intro=None):
+    """hive telegram verdicts <cases.json> --out file: the owner's verdict on each situation, into a private file."""
+    cfg = load()
+    if not cfg:
+        print('Not connected yet: run hive telegram setup.'); return 1
+    cases = json.load(open(cases_file))
+    got = verdicts(Channel(cfg), cases, intro=intro)
+    with open(out, 'w') as f:
+        json.dump(got, f, indent=1)
+    os.chmod(out, 0o600)
+    print(f'{len(got)} verdict(s) saved to {out}.'); return 0
