@@ -48,7 +48,14 @@ The tool packages the measured design for any repository with tests. Plan and mi
 | M4 Owner session: examples and live answers become tests | **Done** (`tests/test_owner.sh`) |
 | M5 First real feature, built end to end, scored on the owner's held-back tests | **Done** ([Gate 25](gates/gate25/RESULTS.md): 23/23, proxy owner; [Gate 26](gates/gate26/RESULTS.md): 18/18 with the founder answering all 4 questions himself, 384/384 existing tests both times) |
 
-**Just start it.** In your project folder, type `python -m hive`. There is nothing to configure:
+**Install** (you need Python 3.10+, git, and [Claude Code](https://claude.com/claude-code) installed and logged in):
+```
+pip install git+https://github.com/suryanshranjan/hive
+hive doctor      # checks this machine and project, and says how to fix anything missing
+hive telegram setup   # optional: questions and reviews on your phone
+```
+
+**Just start it.** In your project folder, type `hive`. There is nothing to configure:
 
 ```
 Hive here. What are we building today?

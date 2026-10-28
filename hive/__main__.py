@@ -2,6 +2,7 @@
 
 usage:
   python -m hive                                            # just start: Hive asks what to build and does the rest
+  python -m hive doctor                                     # check this machine and project are ready
   python -m hive start [--workers 4] [--goal <text or file>] [--minutes 40] [--overnight]
   python -m hive morning                                    # after an overnight build: check its assumptions (--phone: on Telegram)
   python -m hive telegram setup                             # once: questions and reviews come to your phone
@@ -41,6 +42,7 @@ def main(argv=None):
     st = sub.add_parser('start'); st.add_argument('--workers', type=int, default=4); st.add_argument('--goal')
     st.add_argument('--minutes', type=int, default=40)
     st.add_argument('--overnight', action='store_true')   # no questions; check the assumptions later with `hive morning`
+    sub.add_parser('doctor')
     mo = sub.add_parser('morning'); mo.add_argument('name', nargs='?'); mo.add_argument('--phone', action='store_true')
     tg = sub.add_parser('telegram'); tg.add_argument('action', choices=['setup', 'test', 'call', 'ask', 'verdicts'])
     tg.add_argument('address', nargs='?'); tg.add_argument('--out'); tg.add_argument('--intro')
@@ -65,6 +67,9 @@ def main(argv=None):
     if a.cmd in (None, 'start'):
         return start.start('.', getattr(a, 'workers', 4), getattr(a, 'goal', None), getattr(a, 'minutes', 40),
                            getattr(a, 'overnight', False))
+    if a.cmd == 'doctor':
+        from . import doctor
+        return doctor.main('.')
     if a.cmd == 'morning':
         return start.morning(a.name, a.phone)
     if a.cmd == 'rules':
