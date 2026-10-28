@@ -21,7 +21,9 @@ def _usage(path):
         return '', '', ''
     u = d.get('usage') or {}
     tok = sum(int(u.get(k) or 0) for k in ('input_tokens', 'output_tokens', 'cache_creation_input_tokens', 'cache_read_input_tokens'))
-    return tok or '', d.get('total_cost_usd', ''), d.get('api_error_status') or ''
+    err = d.get('api_error_status') or (('auth' if 'authenticat' in str(d.get('result', '')).lower() else 'error')
+                                        if d.get('is_error') and d.get('terminal_reason') == 'api_error' else '')
+    return tok or '', d.get('total_cost_usd', ''), err
 
 RESUME = ("\n\n# You are picking up again\n\nYou were stopped partway by Claude's usage limit; it has reset now. Your clone "
           "still has everything you did, and others may have landed work since. Read the end of your log, commit or "
@@ -29,12 +31,15 @@ RESUME = ("\n\n# You are picking up again\n\nYou were stopped partway by Claude'
           "that has already landed.\n")
 
 def _limit_hit(path):
-    """When a worker stopped on Claude's usage limit: the time it resets (a Unix time; 0 if not said), else None."""
+    """When a worker stopped on Claude's usage limit: the time it resets (a Unix time; 0 if not said); -1 when Claude's
+    login expired (it picks up once the owner logs in again); else None."""
     try:
         d = json.load(open(path))
     except Exception:
         return None
     text = str(d.get('result') or '')
+    if d.get('is_error') and 'authenticat' in text.lower():
+        return -1
     if str(d.get('api_error_status') or '') != '429' and 'limit' not in text.lower():
         return None
     if not (d.get('is_error') or d.get('api_error_status')):
@@ -46,6 +51,8 @@ def _limit_hit(path):
 def _resume_at(reset, attempt):
     """When to try again: just after the reset time if Claude said it, else waits growing from 5 minutes to an hour."""
     floor = float(os.environ.get('HIVE_RESUME_MIN', 60))
+    if reset == -1:   # waiting for a fresh login: check again every few minutes
+        return time.time() + max(floor, float(os.environ.get("HIVE_LOGIN_WAIT", 300)))
     return max(reset + 60, time.time() + floor) if reset else time.time() + max(floor, min(3600, 300 * 2 ** attempt))
 
 def _areas_text(cfg):
@@ -131,7 +138,9 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
                 t, c = spent.get(me, (0, 0.0)); spent[me] = (t + int(tok or 0), c + float(cost or 0))
                 shutil.copy(path, os.path.join(run, 'out', f'{me}.limit{n}.json'))
                 when = _resume_at(reset, n - 1); waiting.append((when, me))
-                say(f"{me} stopped: Claude's usage limit was reached. I'll pick up again at "
+                say((f"{me} stopped: Claude's login has expired. Run claude and log in again (/login); I'll try again "
+                     f"at {time.strftime('%H:%M', time.localtime(when))} and keep trying.") if reset == -1 else
+                    f"{me} stopped: Claude's usage limit was reached. I'll pick up again at "
                     f"{time.strftime('%H:%M', time.localtime(when))}; its work so far is kept.")
                 continue
             if queue:

@@ -30,4 +30,8 @@ check "it says when it will pick up again" "$(grep -c "usage limit was reached. 
 check "the stopped worker was told it is picking up again" "$(ls $T/run2/work/w1/.was_resumed 2>/dev/null | wc -l)" 1
 check "both workers landed after the pause" "$(git -C $T/run2/up.git log --format=%s main | grep -c '^implement ')" 2
 check "the cost of the stopped attempt is kept" "$(grep '^w1,' $T/run2/agents.csv | cut -d, -f7,9 | tr -d '\r')" "0.25,1"
+
+# an expired login: it says to log in again, keeps trying, and carries on once it works
+FAKE_STOP=auth HIVE_RESUME_MIN=1 HIVE_LOGIN_WAIT=1 HIVE_WORKER_CMD="sh $HIVE/tests/fake_limited_worker.sh" python3 -m hive run   --repo $T/project --run $T/run3 --workers 2 --goal "Implement creator fees and payouts." > $T/run3.out 2>&1
+check "an expired login is not the end: it says so, then carries on"   "$? $(grep -c "login has expired. Run claude and log in again" $T/run3.out) $(git -C $T/run3/up.git log --format=%s main | grep -c '^implement ')" "0 1 2"
 rm -rf $T; exit $fail
