@@ -132,7 +132,7 @@ question(d, 'q9', 'w1', 'A deal is cut by Rs 500. Must both accept again? A) Yes
 fake = FakeTelegram([tap('q9|A')])
 telegram.bridge_questions(run, telegram.Channel({'chat_id': ME, 'token': 'x', 'address': 'sir'}, api=fake),
                           until=lambda: True, poll=1)
-check('a question opens with the chosen address', fake.sent[0]['text'].startswith('sir, a quick one from the builders'), True)
+check('a question opens with the chosen address', fake.sent[0]['text'].startswith('Sir, a quick one from the builders'), True)
 
 # 5. not connected: hive behaves as before
 os.environ['HIVE_TELEGRAM'] = '0'
