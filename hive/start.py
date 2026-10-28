@@ -5,7 +5,7 @@ and their assumptions to the owner in plain words, sends back what the owner cor
 over a branch. The owner's own branches are never changed: the result arrives as a new branch, hive/<name>."""
 import csv, glob, json, os, re, shlex, shutil, subprocess, threading, time
 
-from . import PY, docs as docs_mod, interview, junit, law, memory, owner, swarm, telegram
+from . import PY, codesheet, docs as docs_mod, interview, junit, law, memory, owner, swarm, telegram
 from .guard import sh
 
 RUNS = os.path.join(os.path.expanduser('~'), '.hive', 'runs')
@@ -445,6 +445,23 @@ def handover(state, ch=None, poll=20, rounds=3):
     """The last step: show the owner what the product now does by his rules, and get a yes. Anything he says is
     different goes straight to a fix round on the same branch (Gate 37: his answer to one framing of a decision is not
     a settled rule, so he sees the whole result as rules and confirms it)."""
+    sheet = _code_sheet(state)
+    if sheet:   # Gate 42: the sheet from the built code is complete by construction; he marks only what is wrong
+        if not ch:
+            say('\nHere is everything the build does now, written from its code.')
+        done = interview.confirm_sheet(sheet, ch, None if ch else (lambda p: _ask(p, '')), poll,
+                                       title='What the build does now, as rules',
+                                       note='Each one is what the product will do. Mark any that is not your policy.',
+                                       missing=True)
+        changed = [r for r in done if r not in sheet]
+        if not changed:
+            if ch:
+                ch.send('🎉 Very good. It is yours.')
+            return 0
+        for r in changed:
+            memory.add(state['repo'], r, 'handover')
+        state.setdefault('asked', []).extend(changed)
+        apply_ruling(state, '\n- '.join(changed), ch)
     rules = state.get('asked') or [r['text'] for r in memory.load(state['repo'])][-12:]
     listing = '\n'.join(f'{n}. {r}' for n, r in enumerate(rules[:12], 1))
     for _ in range(rounds):
@@ -469,6 +486,20 @@ def handover(state, ch=None, poll=20, rounds=3):
         listing = '\n'.join(f'{n}. {r}' for n, r in enumerate(rules[-12:], 1))
         apply_ruling(state, got, ch)
     return 0
+
+def _code_sheet(state):
+    """Every business behaviour of the delivered build, as plain rules, written from its code ([] if unavailable)."""
+    if not (state.get('final') and state.get('b')) or os.environ.get('HIVE_CODE_SHEET') == '0':
+        return []
+    src = os.path.join(state['home'], 'sheet_source'); shutil.rmtree(src, ignore_errors=True)
+    try:
+        sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', state['b'], os.path.join(state['final'], 'up.git'), src)
+    except Exception:
+        return []
+    try:
+        return codesheet.describe(src, state.get('goal', ''))
+    finally:
+        shutil.rmtree(src, ignore_errors=True)
 
 def apply_ruling(state, rule, ch=None):
     """The owner changed his mind after a build: one fix round on the latest build so it follows the new ruling, then

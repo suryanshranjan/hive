@@ -34,6 +34,7 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 | His answers to two framings of one decision agree 1 of 8 (same session), 3 of 6 (next day) | Gates 36–37 | **The rule sheet**: answers become one general rule per decision, disagreeing answers are put to him, he confirms the whole sheet; **the hand-over**: "here is what it does now; looks right?" | `hive/interview.py` (`rule_sheet`), `hive/start.py` (`handover`) |
 | With a perfect owner, a complete rule sheet gives 250/250 and breaks nothing; Hive's interview 76% (tour 76%) | Gate 39 | Builders are not the bottleneck: the target of every intent channel is each decision stated whole | `hive/interview.py` |
 | "Mostly right, but you left out a minimum" replaced the whole rule (rate and cap lost); a choice said in words dropped his label ("void") | Gate 39 | **A correction amends the rule it answers**; the terminal restates a rule before its correction; own words count as a choice only if they add nothing | `hive/interview.py` (`_amend`), `hive/explain.py` (`UNDERSTAND`) |
+| Questions about cases deliver about half the decisions whole; a sheet written from the built code, corrected by the owner, took builders to 99.6% (interview 68.4%) | Gates 39–42 (synthetic owner) | **The hand-over starts with the code sheet**: every behaviour of the build as a rule; he marks what is wrong, says it right, adds what is missing; one fix round | `hive/codesheet.py`, `hive/interview.py` (`confirm_sheet`), `hive/start.py` (`handover`) |
 | A new answer can contradict an earlier ruling | Gate 30 | Contradictions with earlier rulings are put to him before the builders get both | `hive/interview.py` (`_settle`), `hive/telegram.py` |
 | A menu of alternatives led him away from his own rule | Gate 30 | High-stakes decisions in the review ask open first ("what would you do instead?") | `hive/telegram.py` |
 | Rulings kept between builds stop repeat questions (25 → 13 decisions to review) | Gate 29 | Rulings are remembered per project and reminded to every build | `hive/memory.py` |
@@ -55,7 +56,7 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 
 ## Still to turn into the product
 
-- **Gate 42:** questions about cases deliver about half the decisions whole (Gates 39–41). If a sheet written from the built code, corrected by the owner, beats the interview, Hive's hand-over becomes that sheet.
+- **The code sheet with a real owner:** Gate 42's result is with a synthetic owner who reads every rule. Test the founder on one real feature before relying on it.
 
 - **Gate 38** (running): does a confirmed rule hold a day later? If not, the hand-over ("looks right?") becomes the main channel, and the interview shrinks.
 - Self-registering modules would cut collisions further (BRAIN §7); not yet needed at 8 builders.
