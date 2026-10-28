@@ -223,6 +223,7 @@ def start(repo='.', workers=4, goal=None, minutes=40, overnight=False, interview
     if rules:
         k = len(memory.load(repo))
         say(f"I'll remind them of your {_n(k, 'earlier ruling')} on this project, so you won't be asked those again.")
+    asked = []
     if interview_first and (phone or not overnight):   # the owner is here: ask him first (Gates 30-35)
         say("\nFirst, a few quick situations where your own rules matter" + (", on your phone." if phone else ":"))
         asked = interview.interview(goal_text, phone, [r['text'] for r in memory.load(repo)], ask=lambda p: _ask(p, ''),
@@ -234,7 +235,8 @@ def start(repo='.', workers=4, goal=None, minutes=40, overnight=False, interview
             say(f"  Thank you. The builders will encode your {_n(len(asked), 'rule')} as tests before anything lands.")
     say(f'\n[{_now()}] Starting.')
     state = dict(repo=repo, branch=branch, name=name, home=home, test_cmd=test_cmd, links=links, goal=goal_text,
-                 rules=rules, workers=workers, minutes=minutes, before=before, started=time.time(), overnight=overnight)
+                 rules=rules, workers=workers, minutes=minutes, before=before, started=time.time(), overnight=overnight,
+                 asked=asked)
     run1 = os.path.join(home, 'build')
     b, code = _phase(source, run1, workers, goal_text + rules, minutes, 0 if overnight else 4 * workers, True,
                      not overnight, phone)
@@ -247,6 +249,7 @@ def start(repo='.', workers=4, goal=None, minutes=40, overnight=False, interview
         if not found:
             phone.send(f"🐝 Welcome back{', ' + phone.name() if phone.name() else ''}. The build is finished. "
                        f"{state['check']} Nothing needs your attention. It's ready on branch hive/{name}.")
+            handover(state, phone)
             return rc
         say(f'\n[{_now()}] Sent {_n(len(found), "assumption")} to your phone; waiting for your replies.')
         if _review_and_fix(state, phone):
@@ -254,6 +257,7 @@ def start(repo='.', workers=4, goal=None, minutes=40, overnight=False, interview
             phone.send(f"🎉 Done{', ' + phone.name() if phone.name() else ''}. Your changes are in. {state['check']} It's ready on branch hive/{name} whenever you are.")
         else:
             phone.send(f"✅ All set. It's ready on branch hive/{name} whenever you are.")
+        handover(state, phone)
         return rc
     if overnight:
         rc = _deliver(state)
@@ -271,7 +275,9 @@ def start(repo='.', workers=4, goal=None, minutes=40, overnight=False, interview
         except RuntimeError as e:   # the plain-words step failed: hand over as built; `hive morning` can review later
             say(str(e) + " The build is handed over as is; run `hive morning` later to check its decisions.")
             state["overnight"] = True
-    return _deliver(state)
+    rc = _deliver(state)
+    handover(state, phone)
+    return rc
 
 def _review_and_fix(state, phone=None):
     """The owner checks the business assumptions (here, or on the phone); anything corrected goes back to the builders
@@ -408,7 +414,37 @@ def morning(name=None, phone=False):
     if ch:
         ch.send((f"🎉 Done{', ' + ch.name() if ch.name() else ''}. Your changes are in. {state['check']}" if fixed else '✅ All set.') +
                 f" It's ready on branch hive/{state['name']} whenever you are.")
+    handover(state, ch)
     return rc
+
+def handover(state, ch=None, poll=20, rounds=3):
+    """The last step: show the owner what the product now does by his rules, and get a yes. Anything he says is
+    different goes straight to a fix round on the same branch (Gate 37: his answer to one framing of a decision is not
+    a settled rule, so he sees the whole result as rules and confirms it)."""
+    rules = state.get('asked') or [r['text'] for r in memory.load(state['repo'])][-12:]
+    listing = '\n'.join(f'{n}. {r}' for n, r in enumerate(rules[:12], 1))
+    for _ in range(rounds):
+        if ch:
+            ch.send("📜 <b>What it does now, by your rules:</b>\n\n" + telegram.esc(listing or '(no rules of yours yet)') +
+                    "\n\n<i>Looks right? If anything should be different, tell me and I'll have it changed.</i>",
+                    html=True, buttons=[[('👍 Looks right', 'hand|ok')], [('✏️ Change something', 'hand|change')]])
+            kind, got = telegram._wait(ch, poll, {'hand|ok', 'hand|change'})
+            if got == 'hand|ok' or (kind == 'text' and interview.is_yes(got)):
+                ch.send('🎉 Very good. It is yours.'); return 0
+            if kind == 'tap':
+                ch.send("✍️ What should be different? Your own words, or a 🎙 voice note.")
+                got = telegram._wait(ch, poll, set())[1]
+        else:
+            if listing:
+                say('\nWhat it does now, by your rules:\n' + '\n'.join('  ' + l for l in listing.splitlines()))
+            got = _ask("Looks right? Press Enter, or say what should be different.")
+            if not got or interview.is_yes(got):
+                return 0
+        memory.add(state['repo'], got, 'handover')
+        state.setdefault('asked', rules).append(got); rules = state['asked']
+        listing = '\n'.join(f'{n}. {r}' for n, r in enumerate(rules[-12:], 1))
+        apply_ruling(state, got, ch)
+    return 0
 
 def apply_ruling(state, rule, ch=None):
     """The owner changed his mind after a build: one fix round on the latest build so it follows the new ruling, then

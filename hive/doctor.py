@@ -3,7 +3,7 @@
 Checks: git; the Claude Code CLI and its login (the builders run on it); the project is a git repository with no unsaved
 changes; tests Hive can run; and the optional extras (a container, the owner's phone on Telegram, a backup model).
 Nothing is changed; it only looks."""
-import os, shutil, subprocess
+import os, shutil, subprocess, sys
 
 from . import explain, start, telegram
 
@@ -48,10 +48,35 @@ def checks(repo='.', claude_probe=True):
                 'Optional: hive telegram setup, so questions and reviews reach your phone.'))
     from . import voice
     out.append((voice.available(), False, 'voice notes (answer Hive by talking on Telegram)',
-                'Optional: pip install faster-whisper (transcribes on this machine; your voice never leaves it).'))
+                'Optional: pip install "hive-swarm[voice]" (transcribes on this machine; your voice never leaves it).'))
     out.append((os.path.exists(explain.BACKUP), False, 'a backup model for plain words',
                 'Optional: hive llm setup (for example NVIDIA NIM), used only if Claude cannot be reached.'))
     return out
+
+def setup(repo='.', ask=input, claude_probe=True):
+    """hive setup: the first run for a new owner. Check what's required, then offer each optional extra in turn."""
+    rows = checks(repo, claude_probe)
+    print("\nHive here. Let's get you set up; it takes a few minutes.\n")
+    missing = [r for r in rows if r[1] and not r[0]]
+    for ok, required, what, fix in rows:
+        if required:
+            print(f'  [{"ok  " if ok else "MISSING"}] {what}' + ('' if ok else f'\n           {fix}'))
+    if missing:
+        print(f"\nFix {'that' if len(missing) == 1 else 'those'} first, then run hive setup again.")
+        return 1
+    yes = lambda q: ask(f'\n{q} [y/N] > ').strip().lower() in ('y', 'yes')
+    from . import voice
+    if not telegram.load() and yes('Would you like questions and reviews on your phone, through Telegram?'):
+        telegram.setup()
+    if telegram.load() and not voice.available() and yes('Would you like to answer by voice note too? '
+                                                          '(installs Whisper, about 500 MB; your voice stays on this machine)'):
+        r = subprocess.run([sys.executable, '-m', 'pip', 'install', 'faster-whisper'])
+        print('  Voice notes are ready.' if r.returncode == 0 else
+              '  That did not install; you can try later: pip install "hive-swarm[voice]"')
+    if not os.path.exists(explain.BACKUP) and yes('Add a backup model, used only if Claude cannot be reached?'):
+        explain.setup_backup()
+    print("\nAll set. Type `hive` in your project folder and tell me what to build.")
+    return 0
 
 def main(repo='.', claude_probe=True):
     rows = checks(repo, claude_probe)

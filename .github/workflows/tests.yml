@@ -1,0 +1,36 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  tool:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test tools
+        run: python -m pip install pytest
+      - name: Git identity for the tests' repositories
+        run: |
+          git config --global user.email ci@hive.local
+          git config --global user.name ci
+          git config --global init.defaultBranch main
+      - name: Python tests (fake Telegram, stand-in model; no tokens)
+        run: |
+          set -e
+          for t in tests/test_telegram.py tests/test_assistant.py tests/test_explain.py; do
+            echo "== $t"; timeout 600 python3 $t
+          done
+      - name: Shell tests (stand-in builders; no tokens)
+        run: |
+          set -e
+          for t in tests/test_guard.sh tests/test_claims.sh tests/test_run.sh tests/test_owner.sh tests/test_assume.sh \
+                   tests/test_start.sh tests/test_doctor.sh tests/test_cloud.sh; do
+            echo "== $t"; timeout 900 bash $t
+          done

@@ -7,6 +7,7 @@ For the owner:
   hive morning [--phone]                 after an overnight build: check its decisions (on Telegram with --phone)
   hive listen                            stay on Telegram: change your mind, "build: ...", "status"
   hive rules [forget <n>]                your standing rulings for this project
+  hive setup                             first run: checks, then your phone, voice and a backup model
   hive doctor                            check this machine and project are ready
   hive telegram setup | test | call <name>   connect your phone; how Hive addresses you
   hive llm setup                         optional: a backup model (e.g. NVIDIA NIM) for plain words
@@ -48,7 +49,7 @@ def main(argv=None):
     st = sub.add_parser('start'); st.add_argument('--workers', type=int, default=4); st.add_argument('--goal')
     st.add_argument('--minutes', type=int, default=40)
     st.add_argument('--overnight', action='store_true'); st.add_argument('--no-interview', action='store_true')   # no questions; check the assumptions later with `hive morning`
-    sub.add_parser('doctor')
+    sub.add_parser('doctor'); sub.add_parser('setup')
     sub.add_parser('listen')
     cl = sub.add_parser('cloud'); cl.add_argument('action', nargs='?', choices=['pull']); cl.add_argument('--to')
     cl.add_argument('--from', dest='frm'); cl.add_argument('--with-login', action='store_true'); cl.add_argument('--no-start', action='store_true')
@@ -85,9 +86,9 @@ def main(argv=None):
         if a.action == 'pull':
             return cloud.pull('.', a.frm)
         return cloud.go('.', a.to, a.with_login, not a.no_start)
-    if a.cmd == 'doctor':
+    if a.cmd in ('doctor', 'setup'):
         from . import doctor
-        return doctor.main('.')
+        return doctor.main('.') if a.cmd == 'doctor' else doctor.setup('.')
     if a.cmd == 'morning':
         return start.morning(a.name, a.phone)
     if a.cmd == 'rules':
