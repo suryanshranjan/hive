@@ -12,7 +12,7 @@ ever stored as an answer or a correction, never run.
 
 Voice: a composed, courteous, quietly confident assistant that is a step ahead: short sentences, a clear recommendation,
 never flustered or chatty, and every message leaves the owner one easy thing to do."""
-import getpass, html as _html, http.client, json, os, time, urllib.error, urllib.request
+import getpass, html as _html, http.client, json, os, re, time, urllib.error, urllib.request
 
 PATH = os.path.join(os.path.expanduser('~'), '.hive', 'telegram.json')
 
@@ -284,10 +284,40 @@ def listen(run, ch, until, poll=2, tick=None):
             answer_status(ch, text)
     ch.note = None
 
-def _wait(ch, poll, want, current=None):
+CLARIFY = re.compile(r"\b(what (does|do|is|are|was) (it|this|that|these|you|review|they)\b|what do you mean|meaning|"
+                     r"means what|explain|elaborate|(don'?t|do not|didn'?t|did not|dont|font|can'?t|cannot) "
+                     r"(understand|get it|follow)|not clear|unclear|confus|samajh|samjh|matlab|kya (hai|matlab)|"
+                     r"say (it )?again|in simple|simpler)", re.I)
+
+def is_clarify(text):
+    """Without a model: does the owner's reply ask what the question means, rather than answer it?"""
+    t = (text or '').strip()
+    return bool(t) and len(t) < 160 and bool(CLARIFY.search(t) or re.fullmatch(r"(what|huh|hmm+|sorry)\W*\??", t, re.I))
+
+def understand(text, about):
+    """Reason about the owner's reply the way an assistant would (Gate 38: "What does it mean" and "What is review, I
+    don't understand" were taken as his rules): did he answer, or ask what the question means? Returns
+    ('question', explanation), ('answer', the choice he picked in his own words) or ('answer', None) for his own rule.
+    One model call; the phrase list only if no model answers."""
+    from . import explain
+    situation, options, context = about
+    got = explain.ask_json(explain.UNDERSTAND.format(context=context or '(none)', situation=situation, reply=text,
+                                                     options='\n'.join(f'- {o}' for o in options)))
+    if got and got.get('kind') in ('answer', 'question'):
+        if got['kind'] == 'question':
+            return 'question', got.get('explanation')
+        n = got.get('choice')   # "the second one": the choice itself, as if tapped
+        return 'answer', options[n - 1] if isinstance(n, int) and 1 <= n <= len(options) else None
+    if is_clarify(text):
+        return 'question', ("It's about this case: " + situation +
+                            (" The choices: " + '; '.join(options) + '.' if options else ''))
+    return 'answer', None
+
+def _wait(ch, poll, want, current=None, about=None):
     """Block until the owner taps one of `want` (button data) or types something: ('tap', data) or ('text', words).
     A request for status is answered on the spot and the wait goes on. A tap on an older message's button is answered
-    too, pointing at the question being asked (Gate 36: such taps were dropped in silence and the owner kept waiting)."""
+    too, pointing at the question being asked (Gate 36: such taps were dropped in silence and the owner kept waiting).
+    With `about` = (situation, options, context), "what does this mean?" gets an explanation, not taken as an answer."""
     while True:
         for text, data, _ in ch.updates(timeout=poll):
             if data in want:
@@ -298,6 +328,15 @@ def _wait(ch, poll, want, current=None):
                 continue
             if text and answer_status(ch, text):
                 continue
+            if text and about:
+                kind, explanation = understand(text, about)
+                if kind == 'question':
+                    ch.send(f"💡 {esc(explanation or about[0])}\n\n<i>So, what should happen? Tap an option above, or "
+                            "tell me in your own words.</i>", html=True, reply_to=current)
+                    continue
+                if explanation:   # he picked one of the choices in his own words
+                    ch.send(f'👍 Got it: "{esc(explanation)}"', html=True, reply_to=current)
+                    return 'text', explanation
             if text:
                 return 'text', text
 
@@ -334,7 +373,8 @@ def _ask_one(ch, d, item, header, poll, can_undo):
                         "<i>Tell me in your own words (🎙 voice works too), or keep it as is.</i>")
         first.append([('↩ Undo last', f'{k}|undo')] if can_undo else [])
         msg = ch.send(f"{title}\n\n{question}", buttons=[r for r in first if r], html=True)
-        kind, got = _wait(ch, poll, {data for row in first for _, data in row})
+        kind, got = _wait(ch, poll, {data for row in first for _, data in row}, current=msg,
+                          about=(item['text'], [o['text'] for o in options], ''))
         if got == f'{k}|undo':
             return 'undo'
         if got != f'{k}|show':
@@ -347,7 +387,8 @@ def _ask_one(ch, d, item, header, poll, can_undo):
                 ch.send("✅ Understood. I'll have it done that way.")
             return None
     msg = ch.send(card, buttons=rows, html=True)
-    kind, got = _wait(ch, poll, {data for row in rows for _, data in row})
+    kind, got = _wait(ch, poll, {data for row in rows for _, data in row}, current=msg,
+                      about=(item['text'], [o['text'] for o in options], ''))
     if got == f'{k}|undo':
         return 'undo'
     picked = got[len(k) + 2:] if kind == 'tap' and got.startswith(f'{k}|o') else ''
@@ -650,7 +691,7 @@ def _save(path, data):
 
 SETTLED = '(settled by an earlier answer)'
 
-def verdicts(ch, cases, poll=20, intro=None, save=None, after_text=None):
+def verdicts(ch, cases, poll=20, intro=None, save=None, after_text=None, context=''):
     """Put situations to the owner, each with outcome buttons (and "Something else"); undo goes back one.
     cases: [{id, situation, options: [text, ...]}]. Returns {id: chosen outcome in the owner's terms}.
     With `save`, every answer is kept in that file as it comes, and a rerun picks up at the first unanswered one: a
@@ -683,7 +724,8 @@ def verdicts(ch, cases, poll=20, intro=None, save=None, after_text=None):
         msg = ch.send(f"📋 <b>{i + 1} of {len(cases)}</b>   {bar(i + 1, len(cases))}\n\n{esc(c['situation'])}{listed}\n\n"
                       f"<i>What should happen? {'Tap a number' if listed else 'Tap an option'}, or reply in your own words. "
                       "🎙 Voice notes work too.</i>", buttons=rows, html=True)
-        kind, got = _wait(ch, poll, {d for row in rows for _, d in row}, current=msg)
+        about = (c['situation'], c['options'], context)
+        kind, got = _wait(ch, poll, {d for row in rows for _, d in row}, current=msg, about=about)
         if got == f"{c['id']}|undo":
             i -= 1; out.pop(cases[i]['id'], None); _save(save, out)
             ch.send('↩️ Of course. Back to the previous one.'); continue
@@ -693,7 +735,7 @@ def verdicts(ch, cases, poll=20, intro=None, save=None, after_text=None):
             out[c['id']] = got
         else:
             ch.send('✏️ Of course. What should happen?', reply_to=msg)
-            out[c['id']] = _wait(ch, poll, set())[1]
+            out[c['id']] = _wait(ch, poll, set(), about=about)[1]
         if after_text and out[c['id']] not in c['options']:   # his own words may already answer what comes next
             rest = [x for x in cases[i + 1:] if x['id'] not in out]
             try:
