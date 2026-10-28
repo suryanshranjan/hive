@@ -295,8 +295,9 @@ def _deliver(state):
     say(f"(Everything from this build, including the questions and answers, is in {state['home']}.)")
     return 0 if not broken and state['code'] == 0 else 1
 
-def morning(name=None):
-    """After an overnight build: check its assumptions, fix what the owner corrects, and update the branch."""
+def morning(name=None, phone=False):
+    """After an overnight build: check its assumptions (here, or on the phone with --phone), fix what the owner
+    corrects, and update the branch."""
     homes = sorted((h for h in glob.glob(os.path.join(RUNS, '*')) if os.path.exists(os.path.join(h, 'state.json'))),
                    key=os.path.getmtime)
     if name:
@@ -311,8 +312,21 @@ def morning(name=None):
     say(f"\nGood morning. Overnight, the builders worked on: {state['goal'][:120]}")
     if not todo:
         say('There is nothing left for you to check. The result is on branch hive/' + state['name'] + '.'); return 0
-    say(f"They made {_n(len(todo), 'assumption')} your description didn't cover. Press Enter if one is right, or say "
-        "what should happen instead.")
     state['started'] = time.time()
-    _review_and_fix(state)
-    return _deliver(state)
+    ch = None
+    if phone:
+        cfg = telegram.load()
+        if not cfg:
+            say('Telegram is not connected yet: run hive telegram setup first.'); return 1
+        ch = telegram.Channel(cfg)
+        ch.send(f"Good morning. Overnight, the builders worked on: {state['goal'][:200]}\n\nThey made "
+                f"{_n(len(todo), 'assumption')} you should check. Here they come, one at a time.")
+        say(f"Sent {_n(len(todo), 'assumption')} to your phone; waiting for your replies.")
+    else:
+        say(f"They made {_n(len(todo), 'assumption')} your description didn't cover. Press Enter if one is right, or say "
+            "what should happen instead.")
+    fixed = _review_and_fix(state, ch)
+    rc = _deliver(state)
+    if ch:
+        ch.send((f"Fixed. {state['check']}" if fixed else 'All set.') + f" The result is on branch hive/{state['name']}.")
+    return rc
