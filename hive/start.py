@@ -199,7 +199,7 @@ def start(repo='.', workers=4, goal=None, minutes=40):
     final, cost = run1, _cost(run1)
     say(f'\n[{_now()}] ' + (f'All {workers} builders are done.' if workers > 1 else 'The builder is done.'))
 
-    found = glob.glob(os.path.join(run1, 'owner', 'assumptions', '*.json'))
+    found = owner._assumptions(os.path.join(run1, 'owner'), False)   # business defaults only; technical ones go to engineers
     if found:
         n = len(found)
         say(f"Before I hand it over: they made {_n(n, 'assumption')} your description didn't cover. Let's check "

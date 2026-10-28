@@ -13,7 +13,7 @@ usage:
   python -m hive owner --run <run>                          # the owner answers questions live
   python -m hive review --run <run>                         # the owner checks the workers' assumptions; writes corrections.md
   python -m hive ask "<question>"   /   python -m hive answers   (workers, inside a run)
-  python -m hive assume "<default>" /   python -m hive assumptions   (workers, inside a run)
+  python -m hive assume [--technical] "<default>" / python -m hive assumptions   (workers, inside a run)
 """
 import argparse, json, os, sys
 
@@ -49,7 +49,7 @@ def main(argv=None):
     q = sub.add_parser('ask'); q.add_argument('question'); q.add_argument('--timeout', type=int, default=30)
     sub.add_parser('answers')
     v = sub.add_parser('review'); v.add_argument('--run', required=True)
-    s_ = sub.add_parser('assume'); s_.add_argument('text')
+    s_ = sub.add_parser('assume'); s_.add_argument('text'); s_.add_argument('--technical', action='store_true')
     sub.add_parser('assumptions')
     a = ap.parse_args(argv)
     if a.cmd in (None, 'start'):
@@ -76,7 +76,7 @@ def main(argv=None):
     if a.cmd == 'review':
         return owner.review(a.run)
     if a.cmd == 'assume':
-        return owner.assume(a.text)
+        return owner.assume(a.text, a.technical)
     if a.cmd == 'assumptions':
         return owner.assumptions()
 

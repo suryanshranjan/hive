@@ -71,7 +71,14 @@ def setup(run, examples=None, questions=None, assumptions=False):
                  "mixed cases. For each one, before you land, run `python3 -m hive assume \"<one plain sentence>\"`: the situation "
                  "and what your code does, in the owner's words, with no code, for example: \"If a creator has not entered their "
                  "city, they are still shown for campaigns that require a city.\" Read `python3 -m hive assumptions` first so as "
-                 "not to repeat one.\n")
+                 "not to repeat one.\n"
+                 "The owner reads only **business** defaults: what a customer, partner or user would notice (who is included, "
+                 "what is charged, what counts as a change, what happens with missing information). Keep them to the ones that "
+                 "change an outcome. Record purely technical choices (refusing malformed input, error handling, ordering of a "
+                 "list) with `python3 -m hive assume --technical \"...\"`: they go to the engineers' list, not the owner's.\n"
+                 + ("**If you apply an owner's answer to any situation beyond the one asked**, record that wider rule as an "
+                    "assumption too (\"The owner said a reworded item needs no new acceptance; I also treat a different item of "
+                    "the same value that way\"). In Gate 28 a stretched answer broke a rule the owner held.\n" if questions != 0 else ''))
     return text
 
 def ask(question, timeout_min=30):
@@ -98,28 +105,38 @@ def ask(question, timeout_min=30):
         time.sleep(3)
     print(f'no answer within {timeout_min} minutes; decide from the goal and examples, and say so when you land'); return 4
 
-def assume(text):
-    problems = plain_language_problems(text)
+def assume(text, technical=False):
+    """Record a default the goal does not state. Business defaults go to the owner's review; technical ones (Gate 28: most
+    of a 27-item list was error handling an owner cannot judge) go to the engineers' list."""
+    problems = [] if technical else plain_language_problems(text)
     if problems:
         print('Not recorded: write it for the owner, as one plain sentence about a real situation and what happens, for example:\n'
               '  If a creator has not entered their city, they are still shown for campaigns that require a city.\n'
-              'Found: ' + ', '.join(problems)); return 5
+              'Found: ' + ', '.join(problems) + '. If it is a purely technical choice, use hive assume --technical.'); return 5
     d = _dir(); aid = f'{int(time.time() * 1000)}-{os.environ.get("HIVE_WORKER", "w")}'
-    json.dump({'id': aid, 'worker': os.environ.get('HIVE_WORKER', '?'), 'text': text.strip(), 'at': int(time.time())},
-              open(os.path.join(d, 'assumptions', aid + '.json'), 'w'))
-    print(f'recorded for the owner to review (assumption {aid})'); return 0
+    json.dump({'id': aid, 'worker': os.environ.get('HIVE_WORKER', '?'), 'text': text.strip(), 'at': int(time.time()),
+               'technical': technical}, open(os.path.join(d, 'assumptions', aid + '.json'), 'w'))
+    print(f'recorded for the {"engineers" if technical else "owner"} to review (assumption {aid})'); return 0
+
+def _assumptions(d, technical):
+    rows = [json.load(open(p)) for p in sorted(glob.glob(os.path.join(d, 'assumptions', '*.json')))]
+    return [a for a in rows if bool(a.get('technical')) == technical]
 
 def assumptions():
-    d = _dir(); rows = [json.load(open(p)) for p in sorted(glob.glob(os.path.join(d, 'assumptions', '*.json')))]
-    print('\n'.join(f"- ({a['worker']}) {a['text']}" for a in rows) if rows else 'no assumptions recorded yet'); return 0
+    d = _dir(); rows = _assumptions(d, False) + _assumptions(d, True)
+    print('\n'.join(f"- ({a['worker']}){' [technical]' if a.get('technical') else ''} {a['text']}" for a in rows)
+          if rows else 'no assumptions recorded yet'); return 0
 
 def review(run, width=72, intro=True):
     """The owner's check after the build: each recorded default, right or wrong. Wrong ones, with the owner's rule, go to
     <run>/owner/corrections.md for the workers who fix them (Gate 27: builders never ask about defaults they feel sure of)."""
     import textwrap
     d = _dir(run)
-    todo = [json.load(open(p)) for p in sorted(glob.glob(os.path.join(d, 'assumptions', '*.json')))]
-    todo = [a for a in todo if not os.path.exists(os.path.join(d, 'reviews', a['id'] + '.json'))]
+    tech = _assumptions(d, True)
+    open(os.path.join(d, 'technical_assumptions.md'), 'w').write(
+        '# Technical choices the builders made (for engineers; the owner is not asked)\n\n' +
+        ('\n'.join(f"- ({a['worker']}) {a['text']}" for a in tech) if tech else 'None.') + '\n')
+    todo = [a for a in _assumptions(d, False) if not os.path.exists(os.path.join(d, 'reviews', a['id'] + '.json'))]
     if intro:
         print(f"\nThe builders made {len(todo)} assumption(s) your instructions did not cover. For each one, press Enter\n"
               "if it is right, or type what should happen instead. Ctrl+C to stop and come back later.", flush=True)
