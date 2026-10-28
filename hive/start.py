@@ -5,7 +5,7 @@ and their assumptions to the owner in plain words, sends back what the owner cor
 over a branch. The owner's own branches are never changed: the result arrives as a new branch, hive/<name>."""
 import csv, glob, json, os, re, shlex, shutil, subprocess, threading, time
 
-from . import junit, owner, swarm, telegram
+from . import junit, memory, owner, swarm, telegram
 from .guard import sh
 
 RUNS = os.path.join(os.path.expanduser('~'), '.hive', 'runs')
@@ -209,11 +209,16 @@ def start(repo='.', workers=4, goal=None, minutes=40, overnight=False):
     else:
         say("If they need a decision only you can make, the question will appear right here.")
     say("(Builders run commands on this computer. For code you don't trust, run me in a container.)")
+    rules = memory.instructions(repo)
+    if rules:
+        k = len(memory.load(repo))
+        say(f"I'll remind them of your {_n(k, 'earlier ruling')} on this project, so you won't be asked those again.")
     say(f'\n[{_now()}] Starting.')
     state = dict(repo=repo, branch=branch, name=name, home=home, test_cmd=test_cmd, links=links, goal=goal_text,
-                 workers=workers, minutes=minutes, before=before, started=time.time(), overnight=overnight)
+                 rules=rules, workers=workers, minutes=minutes, before=before, started=time.time(), overnight=overnight)
     run1 = os.path.join(home, 'build')
-    b, code = _phase(source, run1, workers, goal_text, minutes, 0 if overnight else 4 * workers, True, not overnight, phone)
+    b, code = _phase(source, run1, workers, goal_text + rules, minutes, 0 if overnight else 4 * workers, True,
+                     not overnight, phone)
     state.update(b=b, code=code, final=run1, cost=_cost(run1))
     json.dump(state, open(os.path.join(home, 'state.json'), 'w'), indent=1)
     say(f'\n[{_now()}] ' + (f'All {workers} builders are done.' if workers > 1 else 'The builder is done.'))
@@ -268,7 +273,7 @@ def _review_and_fix(state, phone=None):
     _link(state['repo'], fsrc, state['links'])
     corrections = open(os.path.join(run1, 'owner', 'corrections.md')).read()
     run2 = os.path.join(state['home'], 'fix')
-    _phase(fsrc, run2, min(state['workers'], max(1, (len(fixes) + 1) // 2)), state['goal'] + '\n\n' + corrections,
+    _phase(fsrc, run2, min(state['workers'], max(1, (len(fixes) + 1) // 2)), state['goal'] + state.get('rules', '') + '\n\n' + corrections,
            state['minutes'], 0, False, False, phone)
     state.update(final=run2, cost=state['cost'] + _cost(run2))
     json.dump(state, open(os.path.join(state['home'], 'state.json'), 'w'), indent=1)
@@ -292,6 +297,9 @@ def _deliver(state):
                        f' {_n(len(broken), "test")} that passed before now fail: look before you merge.'))
     say('  ' + state['check'])
     json.dump(state, open(os.path.join(state['home'], 'state.json'), 'w'), indent=1)
+    kept = memory.record(state['repo'], os.path.join(state['home'], 'build'), state['goal'])
+    if kept:
+        say(f"  I've noted {_n(kept, 'new ruling')} of yours for the next build on this project.")
     out = f"hive/{state['name']}"
     sh('git', '-C', state['repo'], 'fetch', '-q', '-f', os.path.join(state['final'], 'up.git'), f"+{state['b']}:{out}")
     mins = round((time.time() - state['started']) / 60)

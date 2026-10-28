@@ -5,6 +5,7 @@ usage:
   python -m hive start [--workers 4] [--goal <text or file>] [--minutes 40] [--overnight]
   python -m hive morning                                    # after an overnight build: check its assumptions (--phone: on Telegram)
   python -m hive telegram setup                             # once: questions and reviews come to your phone
+  python -m hive rules [forget <n>]                         # your standing rulings for this project
   python -m hive llm setup                                  # optional: a backup model (e.g. NVIDIA NIM) for plain words
   python -m hive init --test-cmd "<command that runs all tests and writes JUnit XML to .hive/junit.xml>"
   python -m hive claim <short_name> <area>[,<area>...] "<what you will build>"
@@ -43,6 +44,7 @@ def main(argv=None):
     mo = sub.add_parser('morning'); mo.add_argument('name', nargs='?'); mo.add_argument('--phone', action='store_true')
     tg = sub.add_parser('telegram'); tg.add_argument('action', choices=['setup', 'test', 'call']); tg.add_argument('address', nargs='?')
     lm = sub.add_parser('llm'); lm.add_argument('action', choices=['setup'])
+    ru = sub.add_parser('rules'); ru.add_argument('action', nargs='?', choices=['forget']); ru.add_argument('n', nargs='?', type=int)
     i = sub.add_parser('init'); i.add_argument('--test-cmd', required=True); i.add_argument('--junit', default='.hive/junit.xml')
     c = sub.add_parser('claim'); c.add_argument('name'); c.add_argument('areas'); c.add_argument('desc')
     l = sub.add_parser('land'); l.add_argument('name'); l.add_argument('message', nargs='?')
@@ -64,6 +66,9 @@ def main(argv=None):
                            getattr(a, 'overnight', False))
     if a.cmd == 'morning':
         return start.morning(a.name, a.phone)
+    if a.cmd == 'rules':
+        from . import memory
+        return memory.forget('.', a.n or 0) if a.action == 'forget' else memory.show('.')
     if a.cmd == 'llm':
         from . import explain
         return explain.setup_backup()
