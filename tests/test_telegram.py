@@ -224,7 +224,9 @@ ids = [a['id'] for a in owner._assumptions(d, False)]
 fake = FakeTelegram([tap('tri|3'), tap('tri|3'), say('2 and 5'), tap('tri|next'), tap('tri|next'),
                      say('Do it my way'), tap(f'{ids[4]}|ok'), tap('final|send')])
 rows = telegram.review(run, telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), goal='combine metrics', poll=1)
-pages = [m for m in fake.sent if m['text'].startswith('Page ')]
+pages = [m for m in fake.sent if m['text'].startswith('Decisions the builders made on their own, page ')]
+check('the owner is told these are decisions the builders made on their own',
+      any('decisions ON THEIR OWN' in m['text'] for m in fake.sent), True)
 check('every decision is listed, one line each, across pages', (len(pages), '9. Rule number 8' in pages[1]['text']), (2, True))
 full = [m for m in fake.sent if 'What would you do instead?' in m['text']]
 check('only the marked ones (2 and 5) are asked in full, openly first', len(full), 2)

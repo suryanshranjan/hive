@@ -384,9 +384,10 @@ def _triage_review(ch, d, items, technical, summary, check, poll, greeting, who,
     pages = [items[i:i + PAGE] for i in range(0, len(items), PAGE)]
     ch.send(f"{greeting}{', ' + who if who else ''}. While you were away, the builders finished this: {summary}\n\n"
             + (f"{check}\n\n" if check else '')
-            + f"They made {len(items)} calls your instructions didn't cover. I'll list them one line each. Tap only "
-              "the ones you would CHANGE (most owners mark a few), and I'll ask you how. Anything you don't tap stays "
-              "as it is. About a minute to scan.")
+            + f"While building, the builders had to make {len(items)} decisions ON THEIR OWN, because your instructions "
+              "didn't cover them. Each line below is one of those decisions: what the product does now. Tap only the "
+              "ones you would CHANGE (most owners mark a few), and I'll ask you how. Anything you don't tap stays as "
+              "it is. About a minute to scan.")
     flagged = []
     for p, page in enumerate(pages):
         base = p * PAGE
@@ -396,7 +397,8 @@ def _triage_review(ch, d, items, technical, summary, check, poll, greeting, who,
         last = p == len(pages) - 1
         rows.append([('Done' if last else 'Next →', 'tri|next')])
         ch.note = lambda: f"You're on page {p + 1} of {len(pages)} of the list; {len(flagged)} marked so far."
-        ch.send(f"Page {p + 1} of {len(pages)}\n\n{lines}", buttons=rows)
+        ch.send(f"Decisions the builders made on their own, page {p + 1} of {len(pages)}\n"
+                "(tap the ones you would change)\n\n" + lines, buttons=rows)
         while True:
             kind, got = _wait(ch, poll, {d_ for row in rows for _, d_ in row})
             if got == 'tri|next':
