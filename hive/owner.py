@@ -190,7 +190,8 @@ def write_corrections(d):
         "# The owner's corrections\n\nThe owner reviewed the defaults the builders applied, and each item below was wrong. "
         "Change the code to follow the owner, encode each correction as a test, and do not stretch it into rules it does not "
         "state. An existing test that asserts an overturned assumption is now wrong: change it to the owner's rule (the "
-        "guard accepts an edited test that passes) and name it in your land message; leave every other test alone.\n\n" + ('\n'.join(rows) if rows else 'No corrections: every assumption was right.') + '\n')
+        "guard accepts an edited test that passes) and name it in your land message; leave every other test alone. If other builders have already claimed every correction, "
+        "stop at once: there is nothing left for you.\n\n" +('\n'.join(rows) if rows else 'No corrections: every assumption was right.') + '\n')
     return rows
 
 def answers():

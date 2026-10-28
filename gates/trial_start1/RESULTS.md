@@ -45,6 +45,25 @@ Only aggregate numbers are published. The company (Company X), its spec, code an
 - The test source read "Your tests: your hive settings." It now reads "the command in your hive settings".
 - Branch names dropped the word "goal" from a goal file's title.
 
-## Waiting for the owner
+## The owner's review on his phone, and the fix round (same day)
 
-The 15 assumptions are waiting for the owner's `hive morning`. The result stays in the private copy until then.
+The founder reviewed the 15 assumptions on Telegram with `hive morning --phone`. Before he saw them, three changes went in after his first look:
+- The first version showed the builders' raw wording, and he found it "too technical". Each assumption is now rewritten with context and an example, the list is ranked, and at most 8 are shown first.
+- Each decision now carries Hive's recommendation, so one tap is enough.
+- An undo button was added.
+
+| Measure | Result |
+| --- | --- |
+| Decisions answered by the founder | **15 of 15**: the 8 most important, then the minor ones, which he chose to see |
+| Changed / kept | 4 changed, 11 kept |
+| Changes that took Hive's suggestion | **4 of 4** |
+| Time per decision | median about 4 seconds (the first, in the earlier flow, took 25 minutes to be noticed) |
+| Fix round | 4 changes landed by 3 builders in under 2 minutes; a 4th builder found nothing left and idled 26 minutes ($0.54) |
+| Final result | **437 / 437 tests**, all 384 original tests still pass |
+| Whole run | 32 minutes from start to the fixed branch, $4.81 at list price |
+
+**What it means:**
+- **The phone review works on a real build:** every decision was answered, mostly in seconds.
+- **Suggestions steer:** each change the founder made was the one Hive suggested. That is the product working as intended, and the reason experiments switch suggestions off (`HIVE_ADVICE=0`).
+- **Two answers could not both hold,** and the builders received both. The bot now checks for such contradictions before sending and asks which should win.
+- **The idle builder** led to two fixes: a fix round now uses one builder per two corrections, and a builder with nothing left stops at once.

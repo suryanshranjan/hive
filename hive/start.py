@@ -268,7 +268,7 @@ def _review_and_fix(state, phone=None):
     _link(state['repo'], fsrc, state['links'])
     corrections = open(os.path.join(run1, 'owner', 'corrections.md')).read()
     run2 = os.path.join(state['home'], 'fix')
-    _phase(fsrc, run2, min(state['workers'], max(1, len(fixes))), state['goal'] + '\n\n' + corrections,
+    _phase(fsrc, run2, min(state['workers'], max(1, (len(fixes) + 1) // 2)), state['goal'] + '\n\n' + corrections,
            state['minutes'], 0, False, False, phone)
     state.update(final=run2, cost=state['cost'] + _cost(run2))
     json.dump(state, open(os.path.join(state['home'], 'state.json'), 'w'), indent=1)
