@@ -127,6 +127,24 @@ explain.ask_json = _ask_json
 check("the questions are written from the build's own decisions and their defaults",
       (len(qs), any("A tip is paid (builders' outcome: the usual fee)" in p for p in seen)), (2, True))
 
+# 3i. no redundant questions (Gate 37: the founder found the interview repetitive): two questions on the same decision
+# become one, and an answer in his own words that already settles a later question skips it
+_ask_json = explain.ask_json
+explain.ask_json = lambda prompt: {'same': [[1, 3]]} if 'ask about the same decision' in prompt else _ask_json(prompt)
+qs3 = [{'id': f'q{k:02d}', 'situation': s, 'options': ['A', 'B']}
+       for k, s in enumerate(['Draft unreviewed for 3 days.', 'A late fee.', 'Draft unreviewed for 7 days.'], 1)]
+check('two questions about the same decision become one', [q['situation'] for q in interview._dedupe(qs3)],
+      ['Draft unreviewed for 3 days.', 'A late fee.'])
+explain.ask_json = lambda prompt: ({'settled': [1]} if 'already decide' in prompt else _ask_json(prompt))
+qs = [{'id': f't{k}', 'situation': f'Topic {k}.', 'options': ['Yes', 'No']} for k in (1, 2, 3)]
+fake = FakeTelegram([say('Remind them after 3 days, cancel after 7'), tap('t3|0'), say("It's exactly that")])
+rules = interview.interview('Fees', ch(fake), situations=qs, poll=1)
+explain.ask_json = _ask_json
+asked = [m['text'] for m in fake.sent if m['text'].startswith('📋') and 'Topic' in m['text']]
+check('an answer that settles the next question skips it, and says so',
+      (len(asked), any('Topic 2' in t for t in asked), any('also settles 1 of the coming' in m['text'] for m in fake.sent), rules),
+      (2, False, True, ['Topic 3. -> Yes', 'A late fee is charged only after 7 days.']))
+
 # 4. the listener steps aside while a build or review is talking to the owner
 json.dump({'pid': os.getppid(), 'at': time.time()}, open(telegram.BUSY, 'w'))
 check('another live process talking: the listener steps aside', telegram.busy_elsewhere(), True)

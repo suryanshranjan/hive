@@ -648,11 +648,14 @@ def _save(path, data):
         os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
         json.dump(data, open(path + '.tmp', 'w'), indent=1); os.replace(path + '.tmp', path)
 
-def verdicts(ch, cases, poll=20, intro=None, save=None):
+SETTLED = '(settled by an earlier answer)'
+
+def verdicts(ch, cases, poll=20, intro=None, save=None, after_text=None):
     """Put situations to the owner, each with outcome buttons (and "Something else"); undo goes back one.
     cases: [{id, situation, options: [text, ...]}]. Returns {id: chosen outcome in the owner's terms}.
     With `save`, every answer is kept in that file as it comes, and a rerun picks up at the first unanswered one: a
-    stopped process, a lost connection or a usage limit never costs the owner his answers."""
+    stopped process, a lost connection or a usage limit never costs the owner his answers. With `after_text(situation,
+    answer, remaining cases)`, an answer in his own words can settle later questions, which are then skipped."""
     ch.drain()
     out = {k: v for k, v in _load(save).items() if k in {c['id'] for c in cases}}
     i = next((n for n, c in enumerate(cases) if c['id'] not in out), len(cases))
@@ -664,6 +667,8 @@ def verdicts(ch, cases, poll=20, intro=None, save=None):
         ch.send(f'🐝 {esc(intro)}', html=True)
     while i < len(cases):
         c = cases[i]
+        if out.get(c['id']) == SETTLED:
+            i += 1; continue
         ch.note = lambda: f"We're on situation {i + 1} of {len(cases)}."
         # Telegram cuts long button text, so short options are buttons and long ones are numbered in the message
         # with numbered buttons (the founder could not read a cut-off option on his phone).
@@ -689,6 +694,17 @@ def verdicts(ch, cases, poll=20, intro=None, save=None):
         else:
             ch.send('✏️ Of course. What should happen?', reply_to=msg)
             out[c['id']] = _wait(ch, poll, set())[1]
+        if after_text and out[c['id']] not in c['options']:   # his own words may already answer what comes next
+            rest = [x for x in cases[i + 1:] if x['id'] not in out]
+            try:
+                done = after_text(c['situation'], out[c['id']], rest)
+            except Exception:
+                done = []
+            for k in done:
+                out[k] = SETTLED
+            if done:
+                ch.send(f"⏭ Your answer also settles {len(done)} of the coming question{'s' if len(done) != 1 else ''}, "
+                        "so I'll skip " + ('it.' if len(done) == 1 else 'them.'))
         _save(save, out)
         i += 1
     ch.note = None
