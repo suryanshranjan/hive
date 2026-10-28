@@ -1,0 +1,765 @@
+{
+ "R": [
+  "late_fee: Whenever amount_cents or days_late is NULL or cannot be read as a number (numeric text such as '20000' is accepted), late_fee returns NULL.",
+  "late_fee: Whenever amount_cents is zero or negative, late_fee returns 0.",
+  "late_fee: Whenever days_late is under 30 (including zero and negative values), late_fee returns 0.",
+  "late_fee: Only complete 30-day blocks of lateness count; a fractional days_late is rounded down first, and 59 days is one block.",
+  "late_fee: The raw fee is 5% of amount_cents for each complete 30-day block, so it grows linearly with the number of blocks.",
+  "late_fee: Whenever the raw fee has a fractional cent, round it up to the next whole cent.",
+  "late_fee: Whenever a fee applies, it is at least 500 cents.",
+  "late_fee: The fee never exceeds 25% of amount_cents, with that cap rounded down to a whole cent; the cap wins over the 500-cent minimum, so a small invoice can be charged less than 500.",
+  "late_fee: The result is always a whole number of cents.",
+  "card_mask: Whenever card_number is NULL, card_mask returns NULL.",
+  "card_mask: Whenever card_number is a number rather than text, treat it as the text of its digits (a whole-valued float counts as an integer); a non-finite float returns NULL.",
+  "card_mask: Remove every character that is not a digit 0-9 (spaces, hyphens, letters) before masking, and none of them appear in the output.",
+  "card_mask: Whenever the card has 8 or more digits, replace all digits except the last 4 with '*' and show the last 4 digits; the output has one character per digit.",
+  "card_mask: Whenever the card has fewer than 8 digits, replace every digit with '*' and show none.",
+  "card_mask: Whenever the input has no digits at all (empty text, letters only), return an empty string, not NULL.",
+  "bizday_add: Whenever start_date is NULL or not text, bizday_add returns NULL.",
+  "bizday_add: Whenever n is NULL or cannot be read as a number (numeric text is accepted), bizday_add returns NULL.",
+  "bizday_add: Ignore leading and trailing whitespace on start_date; after that it must be exactly four-digit year, two-digit month and two-digit day separated by hyphens and be a real calendar date, otherwise return NULL.",
+  "bizday_add: Saturdays, Sundays, January 1 and December 25 (in every year) are not business days; every other day is.",
+  "bizday_add: Whenever start_date is not a business day, first move it forward to the next business day, and only then count n days; this applies even when n is 0 or negative.",
+  "bizday_add: Whenever n is positive, count forward that many business days; whenever n is negative, count backward that many business days; whenever n is 0, return the start date (after any roll forward).",
+  "bizday_add: A fractional n is cut toward zero.",
+  "bizday_add: n is limited to the range -260 to 260; larger magnitudes are treated as 260 or -260.",
+  "bizday_add: Whenever the result would fall outside the supported calendar range, return NULL.",
+  "bizday_add: The result is an ISO YYYY-MM-DD date string.",
+  "star_display: Whenever avg_rating or review_count is NULL or cannot be read as a number (numeric text is accepted), star_display returns NULL.",
+  "star_display: Whenever review_count is below 3 (including zero, negative and fractional values like 2.5), star_display returns NULL; a count of exactly 3 is enough.",
+  "star_display: Clamp avg_rating into the range 0 to 5 before rounding, so negative averages show 0 and averages above 5 show 5.",
+  "star_display: Round avg_rating to the nearest half star, and exact ties between two half-star values round up.",
+  "star_display: The result is a number such as 4.0 or 3.5, not text.",
+  "phone_norm: Whenever raw_phone is NULL, phone_norm returns NULL.",
+  "phone_norm: Whenever raw_phone is a number rather than text, treat it as the text of its digits (a whole-valued float counts as an integer); a non-finite float returns NULL.",
+  "phone_norm: Cut the input at the first occurrence of 'ext', 'x' or '#' (any letter case) and discard it and everything after it, so extensions are dropped.",
+  "phone_norm: Remove every non-digit character from what remains (spaces, parentheses, hyphens, dots, plus signs).",
+  "phone_norm: Whenever 11 digits remain and the first is 1, drop that leading 1.",
+  "phone_norm: Whenever exactly 10 digits remain, return '+1' followed by those 10 digits; any other digit count (including none, 7-digit local numbers, other countries' numbers, and 11 digits not starting with 1) returns NULL.",
+  "phone_norm: Do not check the area code or exchange for validity; any 10 digits are accepted.",
+  "ship_cost: Whenever weight_g or zone is NULL or cannot be read as a number (numeric text is accepted), ship_cost returns NULL.",
+  "ship_cost: Whenever weight_g is over 25000, ship_cost returns NULL; exactly 25000 is allowed.",
+  "ship_cost: A fractional zone is cut toward zero, and zone is then clamped into 1 to 4, so zero, negative or fractional-below-1 zones count as zone 1 and zones above 4 count as zone 4.",
+  "ship_cost: The base charge is 300 cents plus 200 cents times the zone.",
+  "ship_cost: Whenever weight_g is above 500, add 150 cents for every 500 g step beyond the first 500 g, and a partial step is charged as a full step.",
+  "ship_cost: Whenever weight_g is zero or negative, charge only the base charge with no weight steps and no error.",
+  "ship_cost: Whenever weight_g is over 10000, add a flat 1000-cent heavy surcharge on top; exactly 10000 does not get it.",
+  "name_initials: Whenever full_name is NULL, name_initials returns NULL.",
+  "name_initials: Split full_name on whitespace (spaces, tabs, newlines) and ignore extra whitespace.",
+  "name_initials: Skip any word that is exactly one of the lowercase particles de, van, von, la, di, da, del; the match is case-sensitive, so 'Van' or 'De' is kept, and skipping applies at any position including the first.",
+  "name_initials: For each remaining word take its first alphabetic character, uppercased; leading digits or punctuation in the word are skipped over, and only one initial comes from each word, so a hyphenated or apostrophed word gives a single initial.",
+  "name_initials: Whenever a word contains no letters at all, it contributes nothing.",
+  "name_initials: Return at most 3 initials, taken from the first words that qualify.",
+  "name_initials: Whenever no initials result (empty text, only whitespace, only particles), return an empty string, not NULL.",
+  "pct_delta: Whenever old_value or new_value is NULL or cannot be read as a number (numeric text is accepted), pct_delta returns NULL.",
+  "pct_delta: Whenever old_value is 0, pct_delta returns 0.0 whatever new_value is, including when new_value is also 0.",
+  "pct_delta: Otherwise the result is (new_value - old_value) divided by the absolute value of old_value, times 100, so with a negative old_value an increase is still positive.",
+  "pct_delta: Round the result to one decimal place, and return it as a decimal number such as 10.0.",
+  "title_slug: Whenever title is NULL, title_slug returns NULL.",
+  "title_slug: Whenever title is not text, convert it to its text form first.",
+  "title_slug: Lowercase the title and keep only the ASCII letters a-z and digits 0-9; accented and other non-ASCII letters are not kept and act as separators.",
+  "title_slug: Every run of one or more other characters (spaces, punctuation, tabs, newlines) becomes a single hyphen.",
+  "title_slug: The slug never starts or ends with a hyphen because of separators.",
+  "title_slug: Whenever the slug is longer than 40 characters, cut it to its first 40 characters and then remove any trailing hyphen left by the cut.",
+  "title_slug: Whenever the title has no letters or digits (empty or only punctuation), return an empty string, not NULL.",
+  "nps_score: Ignore NULL values, text values, and numbers below 0 or above 10; none of them count as answers.",
+  "nps_score: Fractional numeric answers between 0 and 10 are valid answers.",
+  "nps_score: Whenever fewer than 5 valid answers exist, nps_score returns NULL.",
+  "nps_score: An answer of 9 or more is a promoter, an answer of 6 or less is a detractor, and anything in between (including 6.5 and 8.5) is passive but still counts as a valid answer in the total.",
+  "nps_score: The score is (promoters minus detractors) divided by valid answers, times 100, rounded to a whole number with exact halves rounded away from zero (so -12.5 becomes -13 and 12.5 becomes 13).",
+  "nps_score: The result is an integer from -100 to 100."
+ ],
+ "interview": {
+  "rules": [
+   "Whenever a receipt is printed for a customer paying with a 16-digit card, show only the last 4 digits of the card number and hide the rest.",
+   "Whenever a late fee is calculated on an invoice, charge no fee until the invoice is at least 30 days overdue. Once it is 30 or more days overdue, the fee is 5% of the invoice amount for each full 30 days overdue, with no pro-rating for partial 30-day periods (\u20b910,000 at 45 days overdue is one full period, so \u20b9500; at 60 days it is two full periods, so \u20b91,000). Once the invoice is 30 or more days overdue, the fee is never less than a flat minimum of \u20b95 (500 cents), and it is never more than 25% of the invoice amount, however long the invoice stays unpaid (\u20b91,000 unpaid for 3 years stops at \u20b9250).",
+   "Whenever a badge is printed for a staff member, print the initials: one letter for every name they have, up to a maximum of three letters, so a longer name is cut off after the third (Mary Jane Watson prints as MJW). Lowercase particles such as \"de\", \"van\", \"von\", \"la\", \"di\", \"da\" and \"del\" are skipped and get no letter.",
+   "Whenever a customer gives a phone number, save the number without any extension if it is a US number ('(415) 555-0132 ext. 45' is saved as the number with the extension dropped). If the number is not a US number (for example +44 20 7946 0958 from London), leave the phone number blank, since only US numbers are supported.",
+   "Whenever a parcel is priced for shipping to a zone, the price is a base charge plus a rate for each half-kilo weight step, and each farther zone costs more than the one before. A very light parcel (for example 50 g to zone 1) still pays the full base charge, so the base charge is the minimum.",
+   "Whenever a parcel weighs more than 25 kg, refuse it and do not ship it (an 80 kg crate to zone 2 is refused).",
+   "Whenever a product's average rating is shown, round it to the nearest half star (4.3 out of 5 shows as 4.5 stars). Whenever a product has no reviews yet, its page shows nothing at all for reviews: no star rating and no review text.",
+   "Whenever business days are counted for a delivery promise (for example 3 business days), skip only Saturdays, Sundays, January 1 and December 25. Every other national public holiday counts as a normal working day. So an order placed on Monday is delivered on Thursday, unless Wednesday falls on January 1 or December 25.",
+   "Whenever last month's sales are \u20b90, the dashboard shows the percentage change as 0.0%, whatever this month's sales are (last month \u20b90 and this month \u20b95,000 displays 0.0%).",
+   "Whenever a web address (URL) is generated from a blog post's title, cut it off at 40 characters, even if the cut falls in the middle of a word (a title of about 120 characters is cut at 40).",
+   "For a small invoice where 25% of the invoice amount is less than \u20b95 (any invoice under \u20b920, such as \u20b910, where 25% is \u20b92.50), the flat \u20b95 minimum and the 25% maximum cannot both hold. Which one applies once the invoice is 30 or more days overdue? -> The 25% maximum wins, so the fee is 25% of the invoice (for example \u20b92.50 on \u20b910), even though that is less than \u20b95."
+  ],
+  "rulings": [
+   "A customer pays with a 16-digit card, and the receipt must hide most of the number. -> Only the last 4 digits are visible",
+   "An invoice of \u20b91,000 stays unpaid for 3 years and the late fee keeps growing. -> The fee stops at 25% of the invoice (\u20b9250)",
+   "A staff member's badge is printed for 'Mary Jane Watson'. -> MJW, one letter for every name",
+   "A customer gives their phone number as '(415) 555-0132 ext. 45'. -> Save the number and drop the extension",
+   "A customer in London enters the number +44 20 7946 0958. -> Leave it blank, since only US numbers are supported",
+   "A customer ships a tiny 50 g parcel to zone 1. -> They pay the full base charge, so there is a minimum",
+   "A product's average rating is 4.3 out of 5. -> Shown to the nearest half star, so 4.5 stars",
+   "When counting business days for a 3-business-day delivery promise, skip only Saturdays, Sundays, January 1 and December 25; every other national public holiday counts as a normal working day, so an order placed on Monday is delivered on Thursday unless Wednesday falls on January 1 or December 25.",
+   "No fee is charged on an invoice until it is at least 30 days overdue. Once it is 30 or more days overdue, the fee is 5% of the invoice amount for each full 30 days overdue, with no pro-rating for partial 30-day periods (e.g., \u20b910,000 at 45 days overdue is one full period, so \u20b9500; at 60 days it is two full periods, so \u20b91,000). Once an invoice is 30 or more days overdue, the fee is never less than a flat minimum of \u20b95 (500 cents), and it is never more than 25% of the invoice amount.",
+   "When last month's sales are \u20b90, the dashboard shows the percentage change as 0.0% regardless of this month's sales, so last month \u20b90 and this month \u20b95,000 displays 0.0%.",
+   "The shipping price for a parcel to zone 3 is a base charge plus a rate for each half-kilo weight step, and each farther zone costs more than the one before.",
+   "Parcels heavier than 25 kg are refused and not shipped, so an 80 kg crate to zone 2 is refused.",
+   "When a product has no reviews yet, its page must display nothing at all for reviews: no star rating and no review text.",
+   "When a blog post's title is about 120 characters long, the web address (URL) generated from it is cut off at 40 characters, and that cut may fall in the middle of a word."
+  ],
+  "questions": [
+   {
+    "id": "q01",
+    "situation": "Rohan's shop promises delivery 'in 3 business days'. An order is placed on Monday, and Wednesday is a national public holiday.",
+    "options": [
+     "Only Saturdays and Sundays are days off, so the holiday counts as a working day and delivery is Thursday",
+     "National public holidays are also skipped, so delivery is Friday",
+     "Our own shop-closure days are skipped too, so delivery date follows our own holiday calendar"
+    ]
+   },
+   {
+    "id": "q02",
+    "situation": "A customer pays with a 16-digit card, and the receipt must hide most of the number.",
+    "options": [
+     "Only the last 4 digits are visible",
+     "The first 6 and last 4 digits are visible",
+     "Only the last 2 digits are visible"
+    ]
+   },
+   {
+    "id": "q03",
+    "situation": "Priya's invoice of \u20b910,000 is 45 days overdue.",
+    "options": [
+     "1.5% of the amount for each 30-day month late, so \u20b9150 per month, charged in proportion to the days",
+     "One flat fee of \u20b9500, however late it is",
+     "\u20b950 for every day late"
+    ]
+   },
+   {
+    "id": "q04",
+    "situation": "An invoice of \u20b91,000 stays unpaid for 3 years and the late fee keeps growing.",
+    "options": [
+     "The fee can never be more than the invoice itself (\u20b91,000)",
+     "The fee stops at 25% of the invoice (\u20b9250)",
+     "No limit; the fee keeps growing for as long as it is unpaid"
+    ]
+   },
+   {
+    "id": "q05",
+    "situation": "A staff member's badge is printed for 'Mary Jane Watson'.",
+    "options": [
+     "MW, the first and last name only",
+     "MJW, one letter for every name",
+     "MJ, the first two names only"
+    ]
+   },
+   {
+    "id": "q06",
+    "situation": "On the dashboard, last month's sales were \u20b90 and this month's are \u20b95,000.",
+    "options": [
+     "Show nothing (no percentage), because the change can't be worked out",
+     "Show 100% growth",
+     "Show a fixed label such as 'New' instead of a number"
+    ]
+   },
+   {
+    "id": "q07",
+    "situation": "A customer gives their phone number as '(415) 555-0132 ext. 45'.",
+    "options": [
+     "Save the number and drop the extension",
+     "Refuse to save it, so staff must ask for a clean number",
+     "Save the number and keep the extension separately"
+    ]
+   },
+   {
+    "id": "q08",
+    "situation": "A customer in London enters the number +44 20 7946 0958.",
+    "options": [
+     "Leave it blank, since only US numbers are supported",
+     "Keep the number as typed, with the plus sign and digits only",
+     "Flag it as invalid so staff must fix it"
+    ]
+   },
+   {
+    "id": "q09",
+    "situation": "How should the shipping price be built for a parcel going to zone 3?",
+    "options": [
+     "A base charge plus a rate per kilo, with each farther zone costing more",
+     "One flat price per zone, whatever the weight",
+     "A price for each weight band (for example up to 1 kg, 1 to 5 kg, over 5 kg) in each zone"
+    ]
+   },
+   {
+    "id": "q10",
+    "situation": "A parcel weighs exactly 2 kg, and another weighs 2.1 kg.",
+    "options": [
+     "Any started kilo is charged, so 2 kg pays for 2 kilos and 2.1 kg pays for 3 kilos",
+     "Charged by the exact weight, so 2.1 kg pays slightly more than 2 kg",
+     "Rounded up to the next half kilo, so 2.1 kg pays for 2.5 kilos"
+    ]
+   },
+   {
+    "id": "q11",
+    "situation": "A customer wants to send an 80 kg crate to zone 2.",
+    "options": [
+     "Charge normally, with the price rising with weight",
+     "Refuse it, because it is over our parcel limit",
+     "Use a special flat heavy-freight price"
+    ]
+   },
+   {
+    "id": "q12",
+    "situation": "A customer ships a tiny 50 g parcel to zone 1.",
+    "options": [
+     "They pay the full base charge, so there is a minimum",
+     "They pay a reduced price in proportion to the weight",
+     "It ships free"
+    ]
+   },
+   {
+    "id": "q13",
+    "situation": "A product's average rating is 4.3 out of 5.",
+    "options": [
+     "Shown to the nearest half star, so 4.5 stars",
+     "Shown to the nearest whole star, so 4 stars",
+     "Always rounded down, so 4 stars"
+    ]
+   },
+   {
+    "id": "q14",
+    "situation": "A brand-new product has no reviews yet.",
+    "options": [
+     "Show 'No reviews yet' instead of stars",
+     "Show five empty stars",
+     "Show nothing at all"
+    ]
+   },
+   {
+    "id": "q15",
+    "situation": "A blog post has a very long title of about 120 characters.",
+    "options": [
+     "The web address uses the whole title, with no cut-off",
+     "The web address is cut at 60 characters",
+     "The web address is cut at about 80 characters, at the end of a whole word"
+    ]
+   }
+  ],
+  "planned_decisions": [
+   {
+    "case": "bizday_add: which days count as non-business days (holidays)",
+    "default": "Only Saturdays and Sundays are non-business days; no public holidays are skipped."
+   },
+   {
+    "case": "bizday_add: start date falls on a weekend",
+    "default": "Count from the weekend date as if rolling to the next business day: Saturday/Sunday + 1 business day gives Monday."
+   },
+   {
+    "case": "bizday_add: n is negative (subtract business days)",
+    "default": "Move backward over business days, skipping weekends."
+   },
+   {
+    "case": "bizday_add: n is zero and the start date is a weekend",
+    "default": "Return the start date unchanged."
+   },
+   {
+    "case": "bizday_add: invalid or malformed date, or NULL input",
+    "default": "Return NULL rather than raising an error."
+   },
+   {
+    "case": "card_mask: how many digits remain visible",
+    "default": "Show only the last 4 digits; mask all earlier digits with '*', keeping the original length."
+   },
+   {
+    "case": "card_mask: input contains spaces or dashes",
+    "default": "Ignore separators, mask the digits, and return the result as a continuous string with no separators."
+   },
+   {
+    "case": "card_mask: number is too short (fewer than 4 digits), non-numeric, or NULL",
+    "default": "Mask all digits when fewer than 4 digits remain; return NULL for NULL input; return NULL for input containing no digits."
+   },
+   {
+    "case": "late_fee: fee formula (flat vs percentage vs per-day, and rate)",
+    "default": "1.5% of the amount per 30-day month late, rounded to the nearest cent with a minimum fee of 0 for no lateness; simple (non-compounding) interest."
+   },
+   {
+    "case": "late_fee: invoice not late (days_late is 0 or negative)",
+    "default": "Fee is 0."
+   },
+   {
+    "case": "late_fee: grace period",
+    "default": "No grace period: any day late incurs the fee."
+   },
+   {
+    "case": "late_fee: cap on the fee",
+    "default": "Fee is capped at the invoice amount."
+   },
+   {
+    "case": "late_fee: rounding of fractional cents",
+    "default": "Round half up to the nearest whole cent."
+   },
+   {
+    "case": "late_fee: negative or NULL amount",
+    "default": "Return NULL for NULL input; return 0 for a negative or zero amount."
+   },
+   {
+    "case": "name_initials: how many initials for names with more than two words",
+    "default": "Use first letter of the first and last word only (e.g. 'Mary Jane Watson' gives 'MW')."
+   },
+   {
+    "case": "name_initials: single-word names",
+    "default": "Return one initial."
+   },
+   {
+    "case": "name_initials: hyphenated names, particles (van, de) and suffixes (Jr.)",
+    "default": "Treat the hyphenated name as one word, count particles and suffixes as normal words, and ignore trailing suffixes such as Jr., III."
+   },
+   {
+    "case": "name_initials: empty, blank or NULL name, extra whitespace, or non-letter leading characters",
+    "default": "Trim whitespace; return empty string for blank input and NULL for NULL."
+   },
+   {
+    "case": "pct_delta: old value is zero",
+    "default": "Return NULL (change is undefined), not an error or infinity."
+   },
+   {
+    "case": "pct_delta: old value is negative",
+    "default": "Divide by the absolute value of the old value so an increase is always positive."
+   },
+   {
+    "case": "pct_delta: rounding rule to one decimal",
+    "default": "Round half away from zero to one decimal place; return a number, not a string with a % sign."
+   },
+   {
+    "case": "pct_delta: NULL inputs",
+    "default": "Return NULL."
+   },
+   {
+    "case": "phone_norm: number already has country code 1 or leading +1",
+    "default": "Accept 11 digits starting with 1 and output +1 followed by the 10 digits."
+   },
+   {
+    "case": "phone_norm: formatting characters, extensions",
+    "default": "Strip spaces, dashes, dots, parentheses; drop any extension (x123, ext.) from the result."
+   },
+   {
+    "case": "phone_norm: invalid number (wrong digit count, area code or exchange starting with 0 or 1)",
+    "default": "Return NULL rather than guessing or erroring."
+   },
+   {
+    "case": "phone_norm: non-US international numbers",
+    "default": "Return NULL; only US/NANP numbers are supported."
+   },
+   {
+    "case": "ship_cost: rate table (base price per zone and weight band)",
+    "default": "Base charge plus a per-kilogram rate that increases by zone, e.g. zone 1 base 500 cents + 100 cents per started kg, with each higher zone costing more; business to supply real rates."
+   },
+   {
+    "case": "ship_cost: weight exactly on a band boundary or partial kilogram",
+    "default": "Round the weight up to the next whole kilogram (any started kg is billed); a boundary weight stays in the lower band."
+   },
+   {
+    "case": "ship_cost: zone outside 1-4, NULL, or non-integer",
+    "default": "Return NULL for invalid zone."
+   },
+   {
+    "case": "ship_cost: zero or negative weight, or weight above a maximum parcel limit",
+    "default": "Zero or negative weight returns NULL; no maximum weight limit, charge keeps scaling."
+   },
+   {
+    "case": "ship_cost: free shipping threshold or minimum charge",
+    "default": "No free shipping; every valid parcel pays at least the minimum base charge."
+   },
+   {
+    "case": "star_display: rounding of the average to displayed stars",
+    "default": "Round to the nearest half star."
+   },
+   {
+    "case": "star_display: no reviews (review_count 0)",
+    "default": "Show no rating (return NULL or a 'No reviews yet' label) instead of 0 stars."
+   },
+   {
+    "case": "star_display: too few reviews to be trustworthy",
+    "default": "Show the rounded average regardless of count; no minimum review threshold."
+   },
+   {
+    "case": "star_display: out-of-range average (below 0 or above 5)",
+    "default": "Clamp to the 0-5 range."
+   },
+   {
+    "case": "star_display: output format",
+    "default": "Return a text string of filled and empty star characters out of 5, e.g. '\u2605\u2605\u2605\u2605\u2606'."
+   },
+   {
+    "case": "title_slug: accented and non-ASCII characters",
+    "default": "Transliterate accents to plain ASCII letters (\u00e9 to e); drop characters that cannot be transliterated."
+   },
+   {
+    "case": "title_slug: punctuation, repeated separators, and case",
+    "default": "Lowercase, replace runs of non-alphanumeric characters with a single hyphen, trim leading and trailing hyphens."
+   },
+   {
+    "case": "title_slug: maximum slug length",
+    "default": "No truncation."
+   },
+   {
+    "case": "title_slug: title yields an empty slug (only symbols or empty), or NULL",
+    "default": "Return empty string for empty slug; NULL for NULL."
+   }
+  ],
+  "answered": {
+   "q01": [
+    "Only weekends, New Year's Day (Jan 1) and Christmas Day (Dec 25) are skipped. Other national public holidays count as normal working days, so unless Wednesday is one of those two dates, delivery is Thursday."
+   ],
+   "q02": [
+    "A"
+   ],
+   "q03": [
+    "Nothing is charged until an invoice is at least 30 days overdue. After that we charge 5% of the amount for each full 30 days late, with no pro-rating for part-months. So Priya's \u20b910,000 at 45 days overdue is one full 30-day period, which is a \u20b9500 fee. At 60 days it would be \u20b91,000."
+   ],
+   "q04": [
+    "B"
+   ],
+   "q05": [
+    "B"
+   ],
+   "q06": [
+    "When last month's sales are zero, we show 0.0% change, whatever this month's sales are. So \u20b90 to \u20b95,000 shows 0.0%."
+   ],
+   "q07": [
+    "A"
+   ],
+   "q08": [
+    "A"
+   ],
+   "q09": [
+    "A base charge plus a rate per weight step, and each farther zone costs more. Option A is close, but we charge per half-kilo rather than per kilo."
+   ],
+   "q11": [
+    "B\n\nWait \u2014 my policy refuses anything over 25 kg, so B fits: we don't ship parcels heavier than 25 kg.\n\nB"
+   ],
+   "q12": [
+    "A"
+   ],
+   "q13": [
+    "A"
+   ],
+   "q14": [
+    "Show nothing at all (no stars and no text) when a product has no reviews yet."
+   ],
+   "q15": [
+    "The web address is cut off at 40 characters. The cut can fall in the middle of a word."
+   ]
+  },
+  "skipped": [
+   "q10"
+  ],
+  "owner_replies": 24,
+  "owner_cost": 1.691,
+  "minutes": 4.6,
+  "terminal": "\n1 of 15. Rohan's shop promises delivery 'in 3 business days'. An order is placed on Monday, and Wednesday is a national public holiday.\n  A) Only Saturdays and Sundays are days off, so the holiday counts as a working day and delivery is Thursday  B) National public holidays are also skipped, so delivery is Friday  C) Our own shop-closure days are skipped too, so delivery date follows our own holiday calendar\n  Your answer (a letter, or your own words) > Only weekends, New Year's Day (Jan 1) and Christmas Day (Dec 25) are skipped. Other national public holidays count as normal working days, so unless Wednesday is one of those two dates, delivery is Thursday.\n\n2 of 15. A customer pays with a 16-digit card, and the receipt must hide most of the number.\n  A) Only the last 4 digits are visible  B) The first 6 and last 4 digits are visible  C) Only the last 2 digits are visible\n  Your answer (a letter, or your own words) > A\n\n3 of 15. Priya's invoice of \u20b910,000 is 45 days overdue.\n  A) 1.5% of the amount for each 30-day month late, so \u20b9150 per month, charged in proportion to the days  B) One flat fee of \u20b9500, however late it is  C) \u20b950 for every day late\n  Your answer (a letter, or your own words) > Nothing is charged until an invoice is at least 30 days overdue. After that we charge 5% of the amount for each full 30 days late, with no pro-rating for part-months. So Priya's \u20b910,000 at 45 days overdue is one full 30-day period, which is a \u20b9500 fee. At 60 days it would be \u20b91,000.\n\n4 of 15. An invoice of \u20b91,000 stays unpaid for 3 years and the late fee keeps growing.\n  A) The fee can never be more than the invoice itself (\u20b91,000)  B) The fee stops at 25% of the invoice (\u20b9250)  C) No limit; the fee keeps growing for as long as it is unpaid\n  Your answer (a letter, or your own words) > B\n\n5 of 15. A staff member's badge is printed for 'Mary Jane Watson'.\n  A) MW, the first and last name only  B) MJW, one letter for every name  C) MJ, the first two names only\n  Your answer (a letter, or your own words) > B\n\n6 of 15. On the dashboard, last month's sales were \u20b90 and this month's are \u20b95,000.\n  A) Show nothing (no percentage), because the change can't be worked out  B) Show 100% growth  C) Show a fixed label such as 'New' instead of a number\n  Your answer (a letter, or your own words) > When last month's sales are zero, we show 0.0% change, whatever this month's sales are. So \u20b90 to \u20b95,000 shows 0.0%.\n\n7 of 15. A customer gives their phone number as '(415) 555-0132 ext. 45'.\n  A) Save the number and drop the extension  B) Refuse to save it, so staff must ask for a clean number  C) Save the number and keep the extension separately\n  Your answer (a letter, or your own words) > A\n\n8 of 15. A customer in London enters the number +44 20 7946 0958.\n  A) Leave it blank, since only US numbers are supported  B) Keep the number as typed, with the plus sign and digits only  C) Flag it as invalid so staff must fix it\n  Your answer (a letter, or your own words) > A\n\n9 of 15. How should the shipping price be built for a parcel going to zone 3?\n  A) A base charge plus a rate per kilo, with each farther zone costing more  B) One flat price per zone, whatever the weight  C) A price for each weight band (for example up to 1 kg, 1 to 5 kg, over 5 kg) in each zone\n  Your answer (a letter, or your own words) > A base charge plus a rate per weight step, and each farther zone costs more. Option A is close, but we charge per half-kilo rather than per kilo.\n  (Your answer also settles 1 of the coming question; I'll skip it.)\n\n11 of 15. A customer wants to send an 80 kg crate to zone 2.\n  A) Charge normally, with the price rising with weight  B) Refuse it, because it is over our parcel limit  C) Use a special flat heavy-freight price\n  Your answer (a letter, or your own words) > B\n\nWait \u2014 my policy refuses anything over 25 kg, so B fits: we don't ship parcels heavier than 25 kg.\n\nB\n\n12 of 15. A customer ships a tiny 50 g parcel to zone 1.\n  A) They pay the full base charge, so there is a minimum  B) They pay a reduced price in proportion to the weight  C) It ships free\n  Your answer (a letter, or your own words) > A\n\n13 of 15. A product's average rating is 4.3 out of 5.\n  A) Shown to the nearest half star, so 4.5 stars  B) Shown to the nearest whole star, so 4 stars  C) Always rounded down, so 4 stars\n  Your answer (a letter, or your own words) > A\n\n14 of 15. A brand-new product has no reviews yet.\n  A) Show 'No reviews yet' instead of stars  B) Show five empty stars  C) Show nothing at all\n  Your answer (a letter, or your own words) > Show nothing at all (no stars and no text) when a product has no reviews yet.\n\n15 of 15. A blog post has a very long title of about 120 characters.\n  A) The web address uses the whole title, with no cut-off  B) The web address is cut at 60 characters  C) The web address is cut at about 80 characters, at the end of a whole word\n  Your answer (a letter, or your own words) > The web address is cut off at 40 characters. The cut can fall in the middle of a word.\n\nYour rule, as I'll build it: When counting business days for a 3-business-day delivery promise, skip only Saturdays, Sundays, January 1 and December 25; every other national public holiday counts as a normal working day, so an order placed on Monday is delivered on Thursday unless Wednesday falls on January 1 or December 25.\n  Right? (Enter = yes, or say what's off) > \n\nYour rule, as I'll build it: No fee is charged on an invoice until it is at least 30 days overdue; once it is, the fee is 5% of the invoice amount for each full 30 days overdue, with no pro-rating for partial 30-day periods (e.g., \u20b910,000 at 45 days overdue is one full period, so \u20b9500; at 60 days it is two full periods, so \u20b91,000).\n  Right? (Enter = yes, or say what's off) > Once an invoice is 30 or more days overdue, the fee is never less than a flat minimum of \u20b95 (500 cents). It is also never more than 25% of the invoice amount.\n\nYour rule, as I'll build it: When last month's sales are \u20b90, the dashboard shows the percentage change as 0.0% regardless of this month's sales, so last month \u20b90 and this month \u20b95,000 displays 0.0%.\n  Right? (Enter = yes, or say what's off) > \n\nYour rule, as I'll build it: The shipping price for a parcel to zone 3 is a base charge plus a rate for each half-kilo weight step, and each farther zone costs more than the one before.\n  Right? (Enter = yes, or say what's off) > \n\nYour rule, as I'll build it: Parcels heavier than 25 kg are refused and not shipped, so an 80 kg crate to zone 2 is refused.\n  Right? (Enter = yes, or say what's off) > \n\nYour rule, as I'll build it: When a product has no reviews yet, its page must display nothing at all for reviews: no star rating and no review text.\n  Right? (Enter = yes, or say what's off) > \n\nYour rule, as I'll build it: When a blog post's title is about 120 characters long, the web address (URL) generated from it is cut off at 40 characters, and that cut may fall in the middle of a word.\n  Right? (Enter = yes, or say what's off) > \n\nTwo of your answers pull different ways on one decision. Which is your policy?\nFor a small invoice where 25% of the invoice amount is less than \u20b95 (any invoice under \u20b920, such as \u20b910, where 25% is \u20b92.50), the flat \u20b95 minimum and the 25% maximum cannot both hold. Which one applies once the invoice is 30 or more days overdue?\n  A) The \u20b95 minimum wins, so the fee is \u20b95 even though that is more than 25% of the invoice.  B) The 25% maximum wins, so the fee is 25% of the invoice (for example \u20b92.50 on \u20b910), even though that is less than \u20b95.\n  > B\n\nYour rules for this feature, as the builders will follow them (each applies to every case like it):\n  1. Whenever a receipt is printed for a customer paying with a 16-digit card, show only the last 4 digits of the card number and hide the rest.\n  2. Whenever a late fee is calculated on an invoice, charge no fee until the invoice is at least 30 days overdue. Once it is 30 or more days overdue, the fee is 5% of the invoice amount for each full 30 days overdue, with no pro-rating for partial 30-day periods (\u20b910,000 at 45 days overdue is one full period, so \u20b9500; at 60 days it is two full periods, so \u20b91,000). Once the invoice is 30 or more days overdue, the fee is never less than a flat minimum of \u20b95 (500 cents), and it is never more than 25% of the invoice amount, however long the invoice stays unpaid (\u20b91,000 unpaid for 3 years stops at \u20b9250).\n  3. Whenever a badge is printed for a staff member, print the initials: one letter for every name they have (Mary Jane Watson prints as MJW).\n  4. Whenever a customer gives a phone number, save the number without any extension if it is a US number ('(415) 555-0132 ext. 45' is saved as the number with the extension dropped). If the number is not a US number (for example +44 20 7946 0958 from London), leave the phone number blank, since only US numbers are supported.\n  5. Whenever a parcel is priced for shipping to a zone, the price is a base charge plus a rate for each half-kilo weight step, and each farther zone costs more than the one before. A very light parcel (for example 50 g to zone 1) still pays the full base charge, so the base charge is the minimum.\n  6. Whenever a parcel weighs more than 25 kg, refuse it and do not ship it (an 80 kg crate to zone 2 is refused).\n  7. Whenever a product's average rating is shown, round it to the nearest half star (4.3 out of 5 shows as 4.5 stars). Whenever a product has no reviews yet, its page shows nothing at all for reviews: no star rating and no review text.\n  8. Whenever business days are counted for a delivery promise (for example 3 business days), skip only Saturdays, Sundays, January 1 and December 25. Every other national public holiday counts as a normal working day. So an order placed on Monday is delivered on Thursday, unless Wednesday falls on January 1 or December 25.\n  9. Whenever last month's sales are \u20b90, the dashboard shows the percentage change as 0.0%, whatever this month's sales are (last month \u20b90 and this month \u20b95,000 displays 0.0%).\n  10. Whenever a web address (URL) is generated from a blog post's title, cut it off at 40 characters, even if the cut falls in the middle of a word (a title of about 120 characters is cut at 40).\n  11. For a small invoice where 25% of the invoice amount is less than \u20b95 (any invoice under \u20b920, such as \u20b910, where 25% is \u20b92.50), the flat \u20b95 minimum and the 25% maximum cannot both hold. Which one applies once the invoice is 30 or more days overdue? -> The 25% maximum wins, so the fee is 25% of the invoice (for example \u20b92.50 on \u20b910), even though that is less than \u20b95.\n  Numbers of any that are wrong (Enter = all correct) > 3\n  Rule 3: Whenever a badge is printed for a staff member, print the initials: one letter for every name they have (Mary Jane Watson prints as MJW).\n  What should it be? > Badge initials use one letter for each name, up to a maximum of three letters, so a longer name is cut off after the third. Lowercase particles such as \"de\", \"van\", \"von\", \"la\", \"di\", \"da\" and \"del\" are skipped and get no letter.\n"
+ },
+ "handovers": {
+  "H": "\n\n## The owner's rules for this feature (from his interview)\nThe owner decided each of these himself. Encode every one that touches your area as a test before you land, follow it exactly, and do not stretch it beyond the situation it describes.\n\n- Whenever a receipt is printed for a customer paying with a 16-digit card, show only the last 4 digits of the card number and hide the rest.\n- Whenever a late fee is calculated on an invoice, charge no fee until the invoice is at least 30 days overdue. Once it is 30 or more days overdue, the fee is 5% of the invoice amount for each full 30 days overdue, with no pro-rating for partial 30-day periods (\u20b910,000 at 45 days overdue is one full period, so \u20b9500; at 60 days it is two full periods, so \u20b91,000). Once the invoice is 30 or more days overdue, the fee is never less than a flat minimum of \u20b95 (500 cents), and it is never more than 25% of the invoice amount, however long the invoice stays unpaid (\u20b91,000 unpaid for 3 years stops at \u20b9250).\n- Whenever a badge is printed for a staff member, print the initials: one letter for every name they have, up to a maximum of three letters, so a longer name is cut off after the third (Mary Jane Watson prints as MJW). Lowercase particles such as \"de\", \"van\", \"von\", \"la\", \"di\", \"da\" and \"del\" are skipped and get no letter.\n- Whenever a customer gives a phone number, save the number without any extension if it is a US number ('(415) 555-0132 ext. 45' is saved as the number with the extension dropped). If the number is not a US number (for example +44 20 7946 0958 from London), leave the phone number blank, since only US numbers are supported.\n- Whenever a parcel is priced for shipping to a zone, the price is a base charge plus a rate for each half-kilo weight step, and each farther zone costs more than the one before. A very light parcel (for example 50 g to zone 1) still pays the full base charge, so the base charge is the minimum.\n- Whenever a parcel weighs more than 25 kg, refuse it and do not ship it (an 80 kg crate to zone 2 is refused).\n- Whenever a product's average rating is shown, round it to the nearest half star (4.3 out of 5 shows as 4.5 stars). Whenever a product has no reviews yet, its page shows nothing at all for reviews: no star rating and no review text.\n- Whenever business days are counted for a delivery promise (for example 3 business days), skip only Saturdays, Sundays, January 1 and December 25. Every other national public holiday counts as a normal working day. So an order placed on Monday is delivered on Thursday, unless Wednesday falls on January 1 or December 25.\n- Whenever last month's sales are \u20b90, the dashboard shows the percentage change as 0.0%, whatever this month's sales are (last month \u20b90 and this month \u20b95,000 displays 0.0%).\n- Whenever a web address (URL) is generated from a blog post's title, cut it off at 40 characters, even if the cut falls in the middle of a word (a title of about 120 characters is cut at 40).\n- For a small invoice where 25% of the invoice amount is less than \u20b95 (any invoice under \u20b920, such as \u20b910, where 25% is \u20b92.50), the flat \u20b95 minimum and the 25% maximum cannot both hold. Which one applies once the invoice is 30 or more days overdue? -> The 25% maximum wins, so the fee is 25% of the invoice (for example \u20b92.50 on \u20b910), even though that is less than \u20b95.\n",
+  "K": "\n\n## The owner's rules for this feature (from his interview)\nThe owner decided each of these himself. Encode every one that touches your area as a test before you land, follow it exactly, and do not stretch it beyond the situation it describes.\n\n- Whenever a receipt is printed for a customer paying with a 16-digit card, show only the last 4 digits of the card number and hide the rest.\n- Whenever a late fee is calculated on an invoice, charge no fee until the invoice is at least 30 days overdue. Once it is 30 or more days overdue, the fee is 5% of the invoice amount for each full 30 days overdue, with no pro-rating for partial 30-day periods (\u20b910,000 at 45 days overdue is one full period, so \u20b9500; at 60 days it is two full periods, so \u20b91,000). Once the invoice is 30 or more days overdue, the fee is never less than a flat minimum of \u20b95 (500 cents), and it is never more than 25% of the invoice amount, however long the invoice stays unpaid (\u20b91,000 unpaid for 3 years stops at \u20b9250).\n- Whenever a badge is printed for a staff member, print the initials: one letter for every name they have, up to a maximum of three letters, so a longer name is cut off after the third (Mary Jane Watson prints as MJW). Lowercase particles such as \"de\", \"van\", \"von\", \"la\", \"di\", \"da\" and \"del\" are skipped and get no letter.\n- Whenever a customer gives a phone number, save the number without any extension if it is a US number ('(415) 555-0132 ext. 45' is saved as the number with the extension dropped). If the number is not a US number (for example +44 20 7946 0958 from London), leave the phone number blank, since only US numbers are supported.\n- Whenever a parcel is priced for shipping to a zone, the price is a base charge plus a rate for each half-kilo weight step, and each farther zone costs more than the one before. A very light parcel (for example 50 g to zone 1) still pays the full base charge, so the base charge is the minimum.\n- Whenever a parcel weighs more than 25 kg, refuse it and do not ship it (an 80 kg crate to zone 2 is refused).\n- Whenever a product's average rating is shown, round it to the nearest half star (4.3 out of 5 shows as 4.5 stars). Whenever a product has no reviews yet, its page shows nothing at all for reviews: no star rating and no review text.\n- Whenever business days are counted for a delivery promise (for example 3 business days), skip only Saturdays, Sundays, January 1 and December 25. Every other national public holiday counts as a normal working day. So an order placed on Monday is delivered on Thursday, unless Wednesday falls on January 1 or December 25.\n- Whenever last month's sales are \u20b90, the dashboard shows the percentage change as 0.0%, whatever this month's sales are (last month \u20b90 and this month \u20b95,000 displays 0.0%).\n- Whenever a web address (URL) is generated from a blog post's title, cut it off at 40 characters, even if the cut falls in the middle of a word (a title of about 120 characters is cut at 40).\n- For a small invoice where 25% of the invoice amount is less than \u20b95 (any invoice under \u20b920, such as \u20b910, where 25% is \u20b92.50), the flat \u20b95 minimum and the 25% maximum cannot both hold. Which one applies once the invoice is 30 or more days overdue? -> The 25% maximum wins, so the fee is 25% of the invoice (for example \u20b92.50 on \u20b910), even though that is less than \u20b95.\n\nHis answers to each situation, word for word (the rules above were written from them). Where an answer says more than the rules, the answer holds; encode it as a test too.\n\n- A customer pays with a 16-digit card, and the receipt must hide most of the number. -> Only the last 4 digits are visible\n- An invoice of \u20b91,000 stays unpaid for 3 years and the late fee keeps growing. -> The fee stops at 25% of the invoice (\u20b9250)\n- A staff member's badge is printed for 'Mary Jane Watson'. -> MJW, one letter for every name\n- A customer gives their phone number as '(415) 555-0132 ext. 45'. -> Save the number and drop the extension\n- A customer in London enters the number +44 20 7946 0958. -> Leave it blank, since only US numbers are supported\n- A customer ships a tiny 50 g parcel to zone 1. -> They pay the full base charge, so there is a minimum\n- A product's average rating is 4.3 out of 5. -> Shown to the nearest half star, so 4.5 stars\n- When counting business days for a 3-business-day delivery promise, skip only Saturdays, Sundays, January 1 and December 25; every other national public holiday counts as a normal working day, so an order placed on Monday is delivered on Thursday unless Wednesday falls on January 1 or December 25.\n- No fee is charged on an invoice until it is at least 30 days overdue. Once it is 30 or more days overdue, the fee is 5% of the invoice amount for each full 30 days overdue, with no pro-rating for partial 30-day periods (e.g., \u20b910,000 at 45 days overdue is one full period, so \u20b9500; at 60 days it is two full periods, so \u20b91,000). Once an invoice is 30 or more days overdue, the fee is never less than a flat minimum of \u20b95 (500 cents), and it is never more than 25% of the invoice amount.\n- When last month's sales are \u20b90, the dashboard shows the percentage change as 0.0% regardless of this month's sales, so last month \u20b90 and this month \u20b95,000 displays 0.0%.\n- The shipping price for a parcel to zone 3 is a base charge plus a rate for each half-kilo weight step, and each farther zone costs more than the one before.\n- Parcels heavier than 25 kg are refused and not shipped, so an 80 kg crate to zone 2 is refused.\n- When a product has no reviews yet, its page must display nothing at all for reviews: no star rating and no review text.\n- When a blog post's title is about 120 characters long, the web address (URL) generated from it is cut off at 40 characters, and that cut may fall in the middle of a word.\n",
+  "R": "\n\n## The owner's rules for this feature (from his interview)\nThe owner decided each of these himself. Encode every one that touches your area as a test before you land, follow it exactly, and do not stretch it beyond the situation it describes.\n\n- late_fee: Whenever amount_cents or days_late is NULL or cannot be read as a number (numeric text such as '20000' is accepted), late_fee returns NULL.\n- late_fee: Whenever amount_cents is zero or negative, late_fee returns 0.\n- late_fee: Whenever days_late is under 30 (including zero and negative values), late_fee returns 0.\n- late_fee: Only complete 30-day blocks of lateness count; a fractional days_late is rounded down first, and 59 days is one block.\n- late_fee: The raw fee is 5% of amount_cents for each complete 30-day block, so it grows linearly with the number of blocks.\n- late_fee: Whenever the raw fee has a fractional cent, round it up to the next whole cent.\n- late_fee: Whenever a fee applies, it is at least 500 cents.\n- late_fee: The fee never exceeds 25% of amount_cents, with that cap rounded down to a whole cent; the cap wins over the 500-cent minimum, so a small invoice can be charged less than 500.\n- late_fee: The result is always a whole number of cents.\n- card_mask: Whenever card_number is NULL, card_mask returns NULL.\n- card_mask: Whenever card_number is a number rather than text, treat it as the text of its digits (a whole-valued float counts as an integer); a non-finite float returns NULL.\n- card_mask: Remove every character that is not a digit 0-9 (spaces, hyphens, letters) before masking, and none of them appear in the output.\n- card_mask: Whenever the card has 8 or more digits, replace all digits except the last 4 with '*' and show the last 4 digits; the output has one character per digit.\n- card_mask: Whenever the card has fewer than 8 digits, replace every digit with '*' and show none.\n- card_mask: Whenever the input has no digits at all (empty text, letters only), return an empty string, not NULL.\n- bizday_add: Whenever start_date is NULL or not text, bizday_add returns NULL.\n- bizday_add: Whenever n is NULL or cannot be read as a number (numeric text is accepted), bizday_add returns NULL.\n- bizday_add: Ignore leading and trailing whitespace on start_date; after that it must be exactly four-digit year, two-digit month and two-digit day separated by hyphens and be a real calendar date, otherwise return NULL.\n- bizday_add: Saturdays, Sundays, January 1 and December 25 (in every year) are not business days; every other day is.\n- bizday_add: Whenever start_date is not a business day, first move it forward to the next business day, and only then count n days; this applies even when n is 0 or negative.\n- bizday_add: Whenever n is positive, count forward that many business days; whenever n is negative, count backward that many business days; whenever n is 0, return the start date (after any roll forward).\n- bizday_add: A fractional n is cut toward zero.\n- bizday_add: n is limited to the range -260 to 260; larger magnitudes are treated as 260 or -260.\n- bizday_add: Whenever the result would fall outside the supported calendar range, return NULL.\n- bizday_add: The result is an ISO YYYY-MM-DD date string.\n- star_display: Whenever avg_rating or review_count is NULL or cannot be read as a number (numeric text is accepted), star_display returns NULL.\n- star_display: Whenever review_count is below 3 (including zero, negative and fractional values like 2.5), star_display returns NULL; a count of exactly 3 is enough.\n- star_display: Clamp avg_rating into the range 0 to 5 before rounding, so negative averages show 0 and averages above 5 show 5.\n- star_display: Round avg_rating to the nearest half star, and exact ties between two half-star values round up.\n- star_display: The result is a number such as 4.0 or 3.5, not text.\n- phone_norm: Whenever raw_phone is NULL, phone_norm returns NULL.\n- phone_norm: Whenever raw_phone is a number rather than text, treat it as the text of its digits (a whole-valued float counts as an integer); a non-finite float returns NULL.\n- phone_norm: Cut the input at the first occurrence of 'ext', 'x' or '#' (any letter case) and discard it and everything after it, so extensions are dropped.\n- phone_norm: Remove every non-digit character from what remains (spaces, parentheses, hyphens, dots, plus signs).\n- phone_norm: Whenever 11 digits remain and the first is 1, drop that leading 1.\n- phone_norm: Whenever exactly 10 digits remain, return '+1' followed by those 10 digits; any other digit count (including none, 7-digit local numbers, other countries' numbers, and 11 digits not starting with 1) returns NULL.\n- phone_norm: Do not check the area code or exchange for validity; any 10 digits are accepted.\n- ship_cost: Whenever weight_g or zone is NULL or cannot be read as a number (numeric text is accepted), ship_cost returns NULL.\n- ship_cost: Whenever weight_g is over 25000, ship_cost returns NULL; exactly 25000 is allowed.\n- ship_cost: A fractional zone is cut toward zero, and zone is then clamped into 1 to 4, so zero, negative or fractional-below-1 zones count as zone 1 and zones above 4 count as zone 4.\n- ship_cost: The base charge is 300 cents plus 200 cents times the zone.\n- ship_cost: Whenever weight_g is above 500, add 150 cents for every 500 g step beyond the first 500 g, and a partial step is charged as a full step.\n- ship_cost: Whenever weight_g is zero or negative, charge only the base charge with no weight steps and no error.\n- ship_cost: Whenever weight_g is over 10000, add a flat 1000-cent heavy surcharge on top; exactly 10000 does not get it.\n- name_initials: Whenever full_name is NULL, name_initials returns NULL.\n- name_initials: Split full_name on whitespace (spaces, tabs, newlines) and ignore extra whitespace.\n- name_initials: Skip any word that is exactly one of the lowercase particles de, van, von, la, di, da, del; the match is case-sensitive, so 'Van' or 'De' is kept, and skipping applies at any position including the first.\n- name_initials: For each remaining word take its first alphabetic character, uppercased; leading digits or punctuation in the word are skipped over, and only one initial comes from each word, so a hyphenated or apostrophed word gives a single initial.\n- name_initials: Whenever a word contains no letters at all, it contributes nothing.\n- name_initials: Return at most 3 initials, taken from the first words that qualify.\n- name_initials: Whenever no initials result (empty text, only whitespace, only particles), return an empty string, not NULL.\n- pct_delta: Whenever old_value or new_value is NULL or cannot be read as a number (numeric text is accepted), pct_delta returns NULL.\n- pct_delta: Whenever old_value is 0, pct_delta returns 0.0 whatever new_value is, including when new_value is also 0.\n- pct_delta: Otherwise the result is (new_value - old_value) divided by the absolute value of old_value, times 100, so with a negative old_value an increase is still positive.\n- pct_delta: Round the result to one decimal place, and return it as a decimal number such as 10.0.\n- title_slug: Whenever title is NULL, title_slug returns NULL.\n- title_slug: Whenever title is not text, convert it to its text form first.\n- title_slug: Lowercase the title and keep only the ASCII letters a-z and digits 0-9; accented and other non-ASCII letters are not kept and act as separators.\n- title_slug: Every run of one or more other characters (spaces, punctuation, tabs, newlines) becomes a single hyphen.\n- title_slug: The slug never starts or ends with a hyphen because of separators.\n- title_slug: Whenever the slug is longer than 40 characters, cut it to its first 40 characters and then remove any trailing hyphen left by the cut.\n- title_slug: Whenever the title has no letters or digits (empty or only punctuation), return an empty string, not NULL.\n- nps_score: Ignore NULL values, text values, and numbers below 0 or above 10; none of them count as answers.\n- nps_score: Fractional numeric answers between 0 and 10 are valid answers.\n- nps_score: Whenever fewer than 5 valid answers exist, nps_score returns NULL.\n- nps_score: An answer of 9 or more is a promoter, an answer of 6 or less is a detractor, and anything in between (including 6.5 and 8.5) is passive but still counts as a valid answer in the total.\n- nps_score: The score is (promoters minus detractors) divided by valid answers, times 100, rounded to a whole number with exact halves rounded away from zero (so -12.5 becomes -13 and 12.5 becomes 13).\n- nps_score: The result is an integer from -100 to 100.\n"
+ },
+ "cost_usd": {
+  "documenter": 0.15646069999999998,
+  "owner": 1.691,
+  "judge": 0.1717759
+ },
+ "labels": [
+  {
+   "function": "late_fee",
+   "decision": 0,
+   "label": "q03",
+   "asked": true,
+   "skipped_only": false,
+   "answer": "right",
+   "H": "right",
+   "K": "right",
+   "R": "right",
+   "note": "q03"
+  },
+  {
+   "function": "late_fee",
+   "decision": 1,
+   "label": "never addressed except R",
+   "asked": false,
+   "skipped_only": false,
+   "answer": "-",
+   "H": "absent",
+   "K": "absent",
+   "R": "right",
+   "note": "never addressed except R"
+  },
+  {
+   "function": "late_fee",
+   "decision": 2,
+   "label": "q04",
+   "asked": true,
+   "skipped_only": false,
+   "answer": "right",
+   "H": "right",
+   "K": "right",
+   "R": "right",
+   "note": "q04"
+  },
+  {
+   "function": "late_fee",
+   "decision": 3,
+   "label": "min not asked; H adds via follow-up",
+   "asked": false,
+   "skipped_only": false,
+   "answer": "-",
+   "H": "right",
+   "K": "right",
+   "R": "right",
+   "note": "min not asked; H adds via follow-up"
+  },
+  {
+   "function": "card_mask",
+   "decision": 0,
+   "label": "q02 only about visible digits",
+   "asked": false,
+   "skipped_only": false,
+   "answer": "-",
+   "H": "absent",
+   "K": "absent",
+   "R": "right",
+   "note": "q02 only about visible digits"
+  },
+  {
+   "function": "card_mask",
+   "decision": 1,
+   "label": "H only covers 16-digit",
+   "asked": false,
+   "skipped_only": false,
+   "answer": "-",
+   "H": "absent",
+   "K": "absent",
+   "R": "right",
+   "note": "H only covers 16-digit"
+  },
+  {
+   "function": "bizday_add",
+   "decision": 0,
+   "label": "not asked",
+   "asked": false,
+   "skipped_only": false,
+   "answer": "-",
+   "H": "absent",
+   "K": "absent",
+   "R": "right",
+   "note": "not asked"
+  },
+  {
+   "function": "bizday_add",
+   "decision": 1,
+   "label": "q01",
+   "asked": true,
+   "skipped_only": false,
+   "answer": "right",
+   "H": "right",
+   "K": "right",
+   "R": "right",
+   "note": "q01"
+  },
+  {
+   "function": "bizday_add",
+   "decision": 2,
+   "label": "not asked",
+   "asked": false,
+   "skipped_only": false,
+   "answer": "-",
+   "H": "absent",
+   "K": "absent",
+   "R": "right",
+   "note": "not asked"
+  },
+  {
+   "function": "star_display",
+   "decision": 0,
+   "label": "4.3->4.5 only; ties unstated",
+   "asked": false,
+   "skipped_only": false,
+   "answer": "-",
+   "H": "partial",
+   "K": "partial",
+   "R": "right",
+   "note": "4.3->4.5 only; ties unstated"
+  },
+  {
+   "function": "star_display",
+   "decision": 1,
+   "label": "q14 only zero reviews, not <3",
+   "asked": true,
+   "skipped_only": false,
+   "answer": "partial",
+   "H": "partial",
+   "K": "partial",
+   "R": "right",
+   "note": "q14 only zero reviews, not <3"
+  },
+  {
+   "function": "star_display",
+   "decision": 2,
+   "label": "not asked",
+   "asked": false,
+   "skipped_only": false,
+   "answer": "-",
+   "H": "absent",
+   "K": "absent",
+   "R": "right",
+   "note": "not asked"
+  },
+  {
+   "function": "phone_norm",
+   "decision": 0,
+   "label": "q07",
+   "asked": true,
+   "skipped_only": false,
+   "answer": "right",
+   "H": "right",
+   "K": "right",
+   "R": "right",
+   "note": "q07"
+  },
+  {
+   "function": "phone_norm",
+   "decision": 1,
+   "label": "q08 only non-US; digit count not covered",
+   "asked": true,
+   "skipped_only": false,
+   "answer": "partial",
+   "H": "partial",
+   "K": "partial",
+   "R": "right",
+   "note": "q08 only non-US; digit count not covered"
+  },
+  {
+   "function": "ship_cost",
+   "decision": 0,
+   "label": "half-kilo steps stated; q10 skipped; round-up vague",
+   "asked": true,
+   "skipped_only": false,
+   "answer": "partial",
+   "H": "partial",
+   "K": "partial",
+   "R": "right",
+   "note": "half-kilo steps stated; q10 skipped; round-up vague"
+  },
+  {
+   "function": "ship_cost",
+   "decision": 1,
+   "label": "not asked",
+   "asked": false,
+   "skipped_only": false,
+   "answer": "-",
+   "H": "absent",
+   "K": "absent",
+   "R": "right",
+   "note": "not asked"
+  },
+  {
+   "function": "ship_cost",
+   "decision": 2,
+   "label": "q11",
+   "asked": true,
+   "skipped_only": false,
+   "answer": "right",
+   "H": "right",
+   "K": "right",
+   "R": "right",
+   "note": "q11"
+  },
+  {
+   "function": "ship_cost",
+   "decision": 3,
+   "label": "not asked",
+   "asked": false,
+   "skipped_only": false,
+   "answer": "-",
+   "H": "absent",
+   "K": "absent",
+   "R": "right",
+   "note": "not asked"
+  },
+  {
+   "function": "name_initials",
+   "decision": 0,
+   "label": "q05 one per name; cap 3 not stated in reply",
+   "asked": true,
+   "skipped_only": false,
+   "answer": "partial",
+   "H": "right",
+   "K": "right",
+   "R": "right",
+   "note": "q05 one per name; cap 3 not stated in reply"
+  },
+  {
+   "function": "name_initials",
+   "decision": 1,
+   "label": "not asked; H adds particles",
+   "asked": false,
+   "skipped_only": false,
+   "answer": "-",
+   "H": "right",
+   "K": "right",
+   "R": "right",
+   "note": "not asked; H adds particles"
+  },
+  {
+   "function": "pct_delta",
+   "decision": 0,
+   "label": "q06",
+   "asked": true,
+   "skipped_only": false,
+   "answer": "right",
+   "H": "right",
+   "K": "right",
+   "R": "right",
+   "note": "q06"
+  },
+  {
+   "function": "title_slug",
+   "decision": 0,
+   "label": "q15; trailing hyphen not mentioned",
+   "asked": true,
+   "skipped_only": false,
+   "answer": "right",
+   "H": "right",
+   "K": "right",
+   "R": "right",
+   "note": "q15; trailing hyphen not mentioned"
+  },
+  {
+   "function": "nps_score",
+   "decision": 0,
+   "label": "not asked",
+   "asked": false,
+   "skipped_only": false,
+   "answer": "-",
+   "H": "absent",
+   "K": "absent",
+   "R": "right",
+   "note": "not asked"
+  },
+  {
+   "function": "nps_score",
+   "decision": 1,
+   "label": "not asked",
+   "asked": false,
+   "skipped_only": false,
+   "answer": "-",
+   "H": "absent",
+   "K": "absent",
+   "R": "right",
+   "note": "not asked"
+  },
+  {
+   "function": "nps_score",
+   "decision": 2,
+   "label": "not asked",
+   "asked": false,
+   "skipped_only": false,
+   "answer": "-",
+   "H": "absent",
+   "K": "absent",
+   "R": "right",
+   "note": "not asked"
+  }
+ ]
+}
