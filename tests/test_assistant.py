@@ -145,6 +145,34 @@ check('an answer that settles the next question skips it, and says so',
       (len(asked), any('Topic 2' in t for t in asked), any('also settles 1 of the coming' in m['text'] for m in fake.sent), rules),
       (2, False, True, ['Topic 3. -> Yes', 'A late fee is charged only after 7 days.']))
 
+# 3j. the rule sheet: his answers become one general rule per decision; two answers that disagree are put to him; he
+# marks the wrong rule and says it in his own words (Gate 37: answers to two framings agreed 1 of 8)
+_ask_json = explain.ask_json
+explain.ask_json = lambda prompt: ({'rules': [{'rule': 'Whenever a tip is paid, no fee is charged.', 'from': [1]},
+                                              {'rule': 'Whenever a fee is late, the brand is reminded.', 'from': [2]}],
+                                    'disagree': [{'from': [1, 2], 'question': 'Is a late tip charged a fee?',
+                                                  'option_a': 'No fee', 'option_b': 'The late fee'}]}
+                                   if 'Turn them into his policy' in prompt else _ask_json(prompt))
+qs = [{'id': f'w{k}', 'situation': f'Case {k}.', 'options': ['Yes', 'No']} for k in (1, 2)]
+fake = FakeTelegram([tap('w1|0'), tap('w2|1'), tap('dis|0|0'), tap('sheet|2'), tap('sheet|done'), say('Only after a week')])
+rules = interview.interview('Fees', ch(fake), situations=qs, poll=1)
+explain.ask_json = _ask_json
+check('the rule sheet: general rules, a disagreement settled by him, a wrong rule rewritten in his words',
+      (rules, any('Your rules for this feature' in m['text'] for m in fake.sent)),
+      (['Whenever a tip is paid, no fee is charged.', 'A late fee is charged only after 7 days.',
+        'Is a late tip charged a fee? -> No fee'], True))
+
+# 3k. the hand-over: he sees what it does now by his rules; what he changes goes to a fix round; then his yes
+from hive import start
+fixed = []
+_apply, start.apply_ruling = start.apply_ruling, lambda st, rule, c=None: fixed.append(rule)
+fake = FakeTelegram([tap('hand|change'), say('Tips are never charged a fee'), tap('hand|ok')])
+start.handover({'repo': repo, 'asked': ['Whenever a tip is paid, the usual fee applies.']}, ch(fake), poll=1)
+start.apply_ruling = _apply
+check('the hand-over shows his rules, sends a change to a fix round, and ends on his yes',
+      (any('What it does now, by your rules' in m['text'] for m in fake.sent), fixed, fake.sent[-1]['text']),
+      (True, ['Tips are never charged a fee'], '🎉 Very good. It is yours.'))
+
 # 4. the listener steps aside while a build or review is talking to the owner
 json.dump({'pid': os.getppid(), 'at': time.time()}, open(telegram.BUSY, 'w'))
 check('another live process talking: the listener steps aside', telegram.busy_elsewhere(), True)

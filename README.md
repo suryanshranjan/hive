@@ -2,7 +2,7 @@
 
 **A team of AI builders you direct by talking. It asks in plain words, never breaks what already works, and hands back a tested branch.**
 
-You describe a feature. Before building, Hive lists the business decisions the code will have to take and asks you about each one, in plain words, in the terminal or on your phone (tap, type, or send a voice note). Then it puts several coding agents (the *builders*) to work on copies of your repository. They coordinate only through git, and a guard lets in nothing that breaks a passing test. Your answers become tests they must pass. At the end it shows you the calls they made on their own, you correct the ones you would make differently, and Hive delivers the result as a new branch. Your own branches are never touched.
+You describe a feature. Before building, Hive lists the business decisions the code will have to take and asks you about each one, in plain words, in the terminal or on your phone (tap, type, or send a voice note). Then it puts several coding agents (the *builders*) to work on copies of your repository. They coordinate only through git, and a guard lets in nothing that breaks a passing test. Your answers become rules, confirmed by you on one sheet, that the builders encode as tests. At the end it shows you the calls they made on their own and what the product now does by your rules; you change anything that's off, and Hive delivers the result as a new branch. Your own branches are never touched.
 
 Hive is a research project as much as a tool: **37 pre-registered experiments**, each scored against predictions pushed before it ran, failures included. Start with [`BRAIN.md`](BRAIN.md) for what is known and how sure we are.
 
@@ -14,7 +14,7 @@ You need Python 3.10+, git and [Claude Code](https://claude.com/claude-code), in
 
 ```
 pip install git+https://github.com/suryanshranjan/hive
-hive doctor            # checks this machine and project; says how to fix anything missing
+hive setup             # first run: checks this machine, then offers your phone, voice notes and a backup model
 hive                   # "What are we building today?"
 ```
 
@@ -22,6 +22,7 @@ Optional:
 
 ```
 hive telegram setup    # questions, reviews and status on your phone
+pip install "hive-swarm[voice] @ git+https://github.com/suryanshranjan/hive"   # answer by voice note
 hive llm setup         # a backup model (e.g. NVIDIA NIM) if Claude can't be reached
 hive cloud --to user@host   # run Hive on a server and drive it from your phone
 ```
@@ -70,13 +71,15 @@ You can also message it any time: *"status"*, *"build: a refund page for brands"
 | `hive listen` | Stay on Telegram: change your mind, start builds, ask for status |
 | `hive rules` | Your standing rulings for this project (`hive rules forget 3` drops one) |
 | `hive cloud --to user@host` / `hive cloud pull` | Move a project's Hive to a server; bring results back |
+| `hive setup` | First run: checks, then your phone, voice notes and a backup model |
 | `hive doctor` | Check that everything is ready |
 
 Lower-level commands for scripts and experiments (`hive init`, `run`, `owner`, `review`) and the builders' own commands (`claim`, `land`, `ask`, `assume`) are listed by `hive --help`.
 
 ## How it works
 
-- **It asks first.** Hive lists the business decisions the build will take (each with the default a builder would pick) and asks you one concrete situation per decision. Your answers become rules the builders encode as tests. An answer that contradicts an earlier ruling is put back to you.
+- **It asks first.** Hive lists the business decisions the build will take (each with the default a builder would pick) and asks you one concrete situation per decision. Then it shows your answers back as **one general rule per decision** (the rule sheet): you fix any that's wrong, and any two answers that disagree are put to you. The confirmed rules are what the builders encode as tests. An answer that contradicts an earlier ruling is put back to you.
+- **It ends with your yes.** At hand-over it lists what the product now does by your rules; anything you say is different goes straight to a fix round on the same branch.
 - **Builders work in parallel and never talk.** Each claims an area of the code with a lock file, works in its own clone, and lands through the **guard**. The guard refuses a landing that breaks a passing test, duplicates a definition, or commits a secret.
 - **Your intent reaches them as tests.** Your answers, your corrections and your standing rulings each become a test the code must keep passing.
 - **The review is built around where you differ.** Builders record every business decision your description didn't cover. Hive rewrites each in plain words with an example. You scan them all in one line each and mark only what you'd change; for each marked one it asks *"what would you do instead?"*. After the fix round, each change comes back as one line for your final yes.

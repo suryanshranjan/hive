@@ -112,7 +112,7 @@ def _rule(situation, answer):
     got = explain.ask_json(READ.format(situation=situation, answer=answer)) or {}
     return (got.get('rule') or f'{situation} -> {answer}').strip()
 
-def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll=20, save=None):
+def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll=20, save=None, sheet=True):
     """Run the interview. Returns the owner's rules, one plain sentence each. On the phone if `ch` is given, otherwise
     in the terminal (`ask(prompt)` returns his typed answer). With `save` (a file path), the questions, his answers and
     the readings are kept as they come, so a rerun after a stop picks up where he left off."""
@@ -165,9 +165,78 @@ def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll
                 rules.append(d['situation'])
             elif not no_rule(v):
                 rules.append(f"{asked} -> {d['own'] if v == 'Not quite' else v}" if asked else v)
+    if sheet and len(rules) >= 2:
+        rules = rule_sheet(rules, ch, ask, poll, save)
     if rulings and rules:
         rules = _settle(rules, list(rulings), ch, ask, poll)
     return rules
+
+GENERAL = """A business owner answered questions about how his product should behave. His answers, numbered:
+{listing}
+
+Turn them into his policy: one general rule per decision, in plain words a builder can implement and test, saying when
+it applies and what happens ("Whenever ..., ..."). Keep his meaning exactly and add nothing. Merge answers about the same
+decision into one rule. If two answers about the same decision disagree, do not choose: list them under "disagree",
+with a plain question and the two choices.
+Reply with JSON only: {{"rules": [{{"rule": "...", "from": [1]}}], "disagree": [{{"from": [2, 5], "question": "...",
+"option_a": "...", "option_b": "..."}}]}}"""
+
+def rule_sheet(rules, ch=None, ask=None, poll=20, save=None):
+    """Decide once, as a rule (Gate 37: his answers to two framings of one decision agreed 1 of 8 times in a session).
+    His answers become one general rule per decision; answers that disagree are put to him; then he sees the whole
+    sheet and marks only what is wrong. Returns the confirmed rules. If no model is reachable, the answers stand."""
+    path = save and save + '.sheet.json'
+    kept = telegram._load(path)
+    if kept.get('done'):
+        return kept['rules']
+    got = kept.get('draft') or explain.ask_json(GENERAL.format(
+        listing='\n'.join(f'{n}. {r}' for n, r in enumerate(rules, 1)))) or {}
+    general = [r['rule'].strip() for r in got.get('rules', []) if isinstance(r, dict) and r.get('rule')]
+    if not general:
+        return rules
+    telegram._save(path, {'draft': got})
+    for n, c in enumerate(d for d in got.get('disagree', []) if isinstance(d, dict) and d.get('question')):
+        opts = [c.get('option_a') or 'The first', c.get('option_b') or 'The second']
+        if ch:
+            ch.send(f"⚖️ <b>Two of your answers pull different ways on one decision.</b> Which is your policy?\n\n"
+                    f"{telegram.esc(c['question'])}\n\n<b>1.</b> {telegram.esc(opts[0])}\n<b>2.</b> {telegram.esc(opts[1])}",
+                    html=True, buttons=[('1', f'dis|{n}|0'), ('2', f'dis|{n}|1')])
+            kind, a = telegram._wait(ch, poll, {f'dis|{n}|0', f'dis|{n}|1'})
+            chosen = opts[int(a[-1])] if kind == 'tap' else a
+        else:
+            a = (ask or input)(f"\nTwo of your answers pull different ways on one decision. Which is your policy?\n"
+                               f"{c['question']}\n  A) {opts[0]}  B) {opts[1]}\n  > ").strip()
+            chosen = opts[0] if a.upper() in ('A', '1') else opts[1] if a.upper() in ('B', '2') else a
+        general.append(f"{c['question']} -> {chosen}")
+    listing = '\n'.join(f'<b>{n}.</b> {telegram.esc(r)}' for n, r in enumerate(general, 1))
+    if ch:
+        nums = [(str(n), f'sheet|{n}') for n in range(1, len(general) + 1)]
+        rows = [nums[i:i + 5] for i in range(0, len(nums), 5)] + [[('✅ All correct', 'sheet|done')]]
+        ch.send(f"📜 <b>Your rules for this feature, as the builders will follow them</b>\n\n{listing}\n\n<i>Each one "
+                "applies to every case like it, not just the example. Tap the number of any rule that is wrong, then "
+                "All correct.</i>", html=True, buttons=rows)
+        wrong = []
+        while True:
+            kind, a = telegram._wait(ch, poll, {d for row in rows for _, d in row})
+            if a == 'sheet|done' or (kind == 'text' and is_yes(a)):
+                break
+            for k in ([int(a.split('|')[1])] if kind == 'tap' else [int(x) for x in re.findall(r'\d+', a)]):
+                if 1 <= k <= len(general) and k not in wrong:
+                    wrong.append(k); ch.send(f'🔖 {k} marked. Tap more, or All correct.')
+        for k in wrong:
+            ch.send(f"✍️ <b>Rule {k}:</b> {telegram.esc(general[k - 1])}\n\n<b>What should it be?</b> <i>Your own words, "
+                    "or 🎙 a voice note.</i>", html=True)
+            general[k - 1] = _rule(general[k - 1], telegram._wait(ch, poll, set())[1])
+        ch.send('✅ Thank you. These are your rules now; the builders will encode every one as a test.')
+    else:
+        print('\nYour rules for this feature, as the builders will follow them (each applies to every case like it):')
+        for n, r in enumerate(general, 1):
+            print(f'  {n}. {r}')
+        for k in [int(x) for x in re.findall(r'\d+', (ask or input)("  Numbers of any that are wrong (Enter = all correct) > "))]:
+            if 1 <= k <= len(general):
+                general[k - 1] = _rule(general[k - 1], (ask or input)(f"  Rule {k}: what should it be? > ").strip())
+    telegram._save(path, {'draft': got, 'done': True, 'rules': general})
+    return general
 
 def _settle(rules, rulings, ch=None, ask=None, poll=20):
     """A new answer that contradicts one of his earlier rulings: ask which holds now, before the builders get both

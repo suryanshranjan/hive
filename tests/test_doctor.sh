@@ -13,6 +13,9 @@ code=$?
 check "the installed package finds its tests and templates" "$(grep -c 'tests found (pytest)' $T/ok.txt)" 1
 check "with only optional extras missing, it says all set" "$code $(grep -c 'All set' $T/ok.txt)" "0 1"
 check "the installed package carries the worker template" "$(ls $T/venv/lib/python3*/site-packages/hive/templates/worker.md | wc -l | tr -d ' ')" 1
+printf 'n\nn\n' | $T/venv/bin/python -c "from hive import doctor; import sys; sys.exit(doctor.setup('.', claude_probe=False))" > $T/setup.txt 2>&1
+check "hive setup checks, offers the extras one at a time, and ends ready" \
+  "$? $(grep -c 'on your phone, through Telegram' $T/setup.txt) $(grep -c 'All set. Type' $T/setup.txt)" "0 1 1"
 echo "x" > notes.txt
 $T/venv/bin/python -c "from hive import doctor; import sys; sys.exit(doctor.main('.', claude_probe=False))" > $T/dirty.txt 2>&1
 check "unsaved changes are reported with how to fix them" "$(grep -c 'Commit or stash' $T/dirty.txt)" 1
