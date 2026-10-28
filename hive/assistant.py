@@ -49,6 +49,53 @@ def latest_build(repo):
             return st
     return None
 
+VOICE = """You are Hive, a business owner's software assistant, in the manner of J.A.R.V.I.S. with Tony Stark: calm,
+precise, courteous, quietly confident, with a light touch of dry wit, never servile and never verbose. Address him as
+"{who}". At most 3 short sentences, then the single most useful next step he could take, in plain words. Use only the
+facts below; never invent a build, a number or an event. No technical words.
+
+What you know right now:
+{facts}
+
+{task}
+Reply with JSON only: {{"reply": "..."}}"""
+
+def facts(repo, ch=None):
+    """What Hive knows about this owner's project right now, in plain lines, for its replies."""
+    st = latest_build(repo)
+    lines = [f"Project: {os.path.basename(os.path.abspath(repo))}",
+             ('Running in the cloud; his computer can be off.' if os.environ.get('HIVE_IN_CLOUD') or
+              os.path.abspath(repo).startswith(os.path.join(os.path.expanduser('~'), 'hive-cloud')) else
+              'Running on his computer.'),
+             (f"Latest build: branch hive/{st['name']}. {st.get('check', '')}" if st else 'Nothing built on this project yet.'),
+             f"Standing rules he has given for this project: {len(memory.load(repo))}."]
+    note = ch.note() if ch is not None and callable(getattr(ch, 'note', None)) else None
+    if note:
+        lines.append(f'Happening now: {note}')
+    return '\n'.join(lines)
+
+def speak(ch, repo, task, fallback):
+    """One message in Hive's own voice (the owner: "like Jarvis handles Tony"); the plain fallback if no model."""
+    got = explain.ask_json(VOICE.format(who=_who(ch) or 'sir', facts=facts(repo, ch), task=task)) or {}
+    reply = (got.get('reply') or '').strip()
+    if reply:
+        ch.send('🐝 ' + telegram.esc(reply), html=True)
+    else:
+        ch.send(fallback, html=True)
+
+def coalesce(texts):
+    """Messages that arrived together are understood together: repeats once, and a bare greeting next to a real request
+    needs no reply of its own. Returns (the messages to handle, whether he had to repeat himself)."""
+    seen, out = set(), []
+    for t in texts:
+        k = ' '.join(t.lower().split()).strip(' ?!.')
+        if k and k not in seen:
+            seen.add(k); out.append(t)
+    greet = {'hi', 'hello', 'hey', 'hey hive', 'hii', 'yo', 'hola', 'namaste'}
+    if len(out) > 1:
+        out = [t for t in out if t.lower().strip(' ?!.') not in greet] or out[-1:]
+    return out, len(out) < len(texts)
+
 def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=None):
     """Answer one message from the owner. apply_build(state, rule, ch) updates a build (hive.start.apply_ruling);
     start_build(repo, goal) runs a new build that reports to the phone (hive.start.start, overnight style);
@@ -92,14 +139,20 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
             ch.send('✅ Deleted. Nothing is left running.')
         return 'moved' if on else 'cloud_off'
     if intent == 'greeting':
-        ch.send(f"🐝 <b>At your service{', ' + telegram.esc(who) if who else ''}.</b>\n\nTell me if you've changed your mind "
-                "about anything, give me a new rule, or ask for the status. 🎙 Voice notes work too.", html=True)
+        speak(ch, repo, f'He just said: "{text}". Greet him and say, in a sentence, where things stand.',
+              f"🐝 <b>At your service{', ' + telegram.esc(who) if who else ''}.</b>\n\nTell me if you've changed your "
+              "mind about anything, give me a new rule, or ask for the status. 🎙 Voice notes work too.")
         return 'greeting'
     if intent == 'status':
         st = latest_build(repo)
-        ch.send('📊 ' + (f"The latest build is on branch hive/{st['name']}. {st.get('check', '')}".strip()) if st else
-                'Nothing has been built on this project yet.')
+        speak(ch, repo, f'He asked: "{text}". Tell him exactly where things stand.',
+              telegram.esc('📊 ' + ((f"The latest build is on branch hive/{st['name']}. {st.get('check', '')}".strip())
+                                    if st else 'Nothing has been built on this project yet.')))
         return 'status'
+    if intent == 'other' and len(text.split()) < 5:   # small talk or a short question: answer it, in his assistant's voice
+        speak(ch, repo, f'He said: "{text}". Answer him helpfully from what you know; if you cannot, say so and say what '
+              'you can do.', "🐝 I'm here. Tell me what to build, a change of mind, or ask for the status.")
+        return 'chat'
     if intent not in ('change', 'rule'):
         ch.send("📝 Noted. Shall I keep this as a standing rule for the builders?",
                 buttons=[[('Yes, keep it as a rule', 'as|rule')], [('No, just a note', 'as|note')]])
@@ -152,10 +205,17 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
                 batch = ch.updates(timeout=poll)
             except Exception as e:   # never go silent on the owner: report, wait, listen again
                 print(f'Telegram error, retrying: {e}', flush=True); time.sleep(poll); continue
-            for text, data, _ in batch:
+            texts, repeated = coalesce([t for t, _, _ in batch if t])
+            if repeated and texts:   # he had to say it more than once: Hive was slow or away
                 try:
-                    if text and handle(ch, repo, text, apply_build=apply_build, start_build=start_build,
-                                       cloud=cloud) == 'moved':
+                    ch.send(f"🐝 My apologies for the wait{', ' + ch.name() if ch.name() else ''}; I have all your messages "
+                            "now. Here it is, once.")
+                except Exception:
+                    pass
+            for text in texts:
+                try:
+                    if handle(ch, repo, text, apply_build=apply_build, start_build=start_build,
+                              cloud=cloud) == 'moved':
                         print('Hive now runs in the cloud and reads Telegram there; this listener stops.', flush=True)
                         try:   # mark what this listener handled as read, so the cloud copy starts clean
                             ch.api('getUpdates', offset=ch.offset, timeout=0)
