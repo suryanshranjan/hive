@@ -5,7 +5,7 @@ and their assumptions to the owner in plain words, sends back what the owner cor
 over a branch. The owner's own branches are never changed: the result arrives as a new branch, hive/<name>."""
 import csv, glob, json, os, re, shlex, shutil, subprocess, threading, time
 
-from . import junit, owner, swarm
+from . import junit, owner, swarm, telegram
 from .guard import sh
 
 RUNS = os.path.join(os.path.expanduser('~'), '.hive', 'runs')
@@ -111,7 +111,7 @@ class Narrator:
                 short = subject if len(subject) <= 90 else subject[:87].rsplit(' ', 1)[0] + '...'
                 say(f'  [{_now()}] Builder {who} landed: {short}')
 
-def _phase(source, run, workers, goal, minutes, questions, assumptions, narrate_owner):
+def _phase(source, run, workers, goal, minutes, questions, assumptions, narrate_owner, phone=None):
     """One build: prepare, launch in the background, narrate progress and serve the owner until every builder is done."""
     swarm.prepare(source, run, workers, goal, minutes, None, questions, assumptions)
     meta = json.load(open(os.path.join(run, 'run.json')))
@@ -121,7 +121,9 @@ def _phase(source, run, workers, goal, minutes, questions, assumptions, narrate_
                          daemon=True)
     t.start()
     narrator = Narrator(os.path.join(run, 'up.git'), meta['branch'])
-    if narrate_owner:
+    if narrate_owner and phone:
+        telegram.bridge_questions(run, phone, until=lambda: not t.is_alive(), tick=narrator.tick)
+    elif narrate_owner:
         owner.serve(run, until=lambda: not t.is_alive(), tick=narrator.tick, greet=False)
     while t.is_alive():
         narrator.tick(); time.sleep(3)
@@ -194,9 +196,14 @@ def start(repo='.', workers=4, goal=None, minutes=40, overnight=False):
     sh('git', '-C', source, 'commit', '-q', '-m', 'hive: settings for this build')
 
     say(f"\nI'll put {workers} builders on it. They work on copies, so your branches stay exactly as they are.")
+    cfg_phone = telegram.load()
+    phone = telegram.Channel(cfg_phone) if cfg_phone else None
     if overnight:
         say("You're away, so they won't ask you anything: they'll decide, and write down every business assumption "
-            "for you to check when you're back.")
+            + ("for you. When they finish, I'll message you on Telegram to check them." if phone else
+               "for you to check when you're back."))
+    elif phone:
+        say("If they need a decision only you can make, the question will come to your phone on Telegram.")
     else:
         say("If they need a decision only you can make, the question will appear right here.")
     say("(Builders run commands on this computer. For code you don't trust, run me in a container.)")
@@ -204,11 +211,25 @@ def start(repo='.', workers=4, goal=None, minutes=40, overnight=False):
     state = dict(repo=repo, branch=branch, name=name, home=home, test_cmd=test_cmd, links=links, goal=goal_text,
                  workers=workers, minutes=minutes, before=before, started=time.time(), overnight=overnight)
     run1 = os.path.join(home, 'build')
-    b, code = _phase(source, run1, workers, goal_text, minutes, 0 if overnight else 4 * workers, True, not overnight)
+    b, code = _phase(source, run1, workers, goal_text, minutes, 0 if overnight else 4 * workers, True, not overnight, phone)
     state.update(b=b, code=code, final=run1, cost=_cost(run1))
     json.dump(state, open(os.path.join(home, 'state.json'), 'w'), indent=1)
     say(f'\n[{_now()}] ' + (f'All {workers} builders are done.' if workers > 1 else 'The builder is done.'))
     found = owner._assumptions(os.path.join(run1, 'owner'), False)   # business defaults only; technical ones go to engineers
+    if overnight and phone:
+        rc = _deliver(state)
+        phone.send(f"Hive: the overnight build is done. {state['check']}\n\n" +
+                   (f"The builders made {_n(len(found), 'assumption')} you should check. Here they come, one at a time."
+                    if found else 'Nothing needs you. The result is on branch hive/' + name + '.'))
+        if not found:
+            return rc
+        say(f'\n[{_now()}] Sent {_n(len(found), "assumption")} to your phone; waiting for your replies.')
+        if _review_and_fix(state, phone):
+            rc = _deliver(state)
+            phone.send(f"Fixed. {state['check']} The result is on branch hive/{name}.")
+        else:
+            phone.send(f"All set. The result is on branch hive/{name}.")
+        return rc
     if overnight:
         rc = _deliver(state)
         if found:
@@ -223,13 +244,17 @@ def start(repo='.', workers=4, goal=None, minutes=40, overnight=False):
         _review_and_fix(state)
     return _deliver(state)
 
-def _review_and_fix(state):
-    """The owner checks the business assumptions; anything corrected goes back to the builders for one fix round."""
+def _review_and_fix(state, phone=None):
+    """The owner checks the business assumptions (here, or on the phone); anything corrected goes back to the builders
+    for one fix round. Returns True when a fix round ran."""
     run1 = os.path.join(state['home'], 'build')
-    owner.review(run1, intro=False)
+    if phone:
+        telegram.review(run1, phone)
+    else:
+        owner.review(run1, intro=False)
     fixes = [r for r in (json.load(open(p)) for p in glob.glob(os.path.join(run1, 'owner', 'reviews', '*.json'))) if not r['ok']]
     if not fixes:
-        return
+        return False
     say(f'\n[{_now()}] Sending the builders back to fix {_n(len(fixes), "thing")}.')
     fsrc = os.path.join(state['home'], 'fix_source')
     sh('git', 'clone', '-q', '--branch', state['b'], os.path.join(run1, 'up.git'), fsrc)
@@ -241,6 +266,7 @@ def _review_and_fix(state):
     state.update(final=run2, cost=state['cost'] + _cost(run2))
     json.dump(state, open(os.path.join(state['home'], 'state.json'), 'w'), indent=1)
     say(f'[{_now()}] Fixed.')
+    return True
 
 def _deliver(state):
     """Check every test on the result and hand it over as the branch hive/<name> (updated in place after a fix round)."""
@@ -254,9 +280,10 @@ def _deliver(state):
     after = run_tests(result, state['test_cmd'])
     p2, t2 = sum(after.values()), len(after)
     broken = [k for k, ok in before.items() if ok and not after.get(k)]
-    say(f'  {_n(t2, "test")}, ' + ('all passing.' if p2 == t2 else f'{p2} passing.') +
-        ('' if not passed else f' All {passed} that passed before still pass.' if not broken else
-         f' {_n(len(broken), "test")} that passed before now fail: look before you merge.'))
+    state['check'] = (f'{_n(t2, "test")}, ' + ('all passing.' if p2 == t2 else f'{p2} passing.') +
+                      ('' if not passed else f' All {passed} that passed before still pass.' if not broken else
+                       f' {_n(len(broken), "test")} that passed before now fail: look before you merge.'))
+    say('  ' + state['check'])
     out = f"hive/{state['name']}"
     sh('git', '-C', state['repo'], 'fetch', '-q', '-f', os.path.join(state['final'], 'up.git'), f"+{state['b']}:{out}")
     mins = round((time.time() - state['started']) / 60)

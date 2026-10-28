@@ -153,6 +153,15 @@ def review(run, width=72, intro=True):
             print('  Kept.' if ok else '  Noted: the builders will change this.', flush=True)
     except KeyboardInterrupt:
         print('\nStopped; run hive review again to finish.')
+    rows = write_corrections(d)
+    if intro:
+        print(f"\n{len(rows)} correction(s) written to {os.path.join(d, 'corrections.md')}. Thank you!")
+    else:
+        print('\nThanks. ' + ('Everything they assumed was right.' if not rows else f"{len(rows)} to fix."), flush=True)
+    return 0
+
+def write_corrections(d):
+    """Every assumption the owner marked wrong, with the owner's rule, into <owner dir>/corrections.md."""
     rows = []
     for p in sorted(glob.glob(os.path.join(d, 'reviews', '*.json'))):
         r = json.load(open(p))
@@ -164,11 +173,7 @@ def review(run, width=72, intro=True):
         "Change the code to follow the owner, encode each correction as a test, and do not stretch it into rules it does not "
         "state. An existing test that asserts an overturned assumption is now wrong: change it to the owner's rule (the "
         "guard accepts an edited test that passes) and name it in your land message; leave every other test alone.\n\n" + ('\n'.join(rows) if rows else 'No corrections: every assumption was right.') + '\n')
-    if intro:
-        print(f"\n{len(rows)} correction(s) written to {os.path.join(d, 'corrections.md')}. Thank you!")
-    else:
-        print('\nThanks. ' + ('Everything they assumed was right.' if not rows else f"{len(rows)} to fix."), flush=True)
-    return 0
+    return rows
 
 def answers():
     d = _dir(); rows = []
