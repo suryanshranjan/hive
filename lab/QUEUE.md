@@ -2,12 +2,12 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 28 2026, after Gate 30)
+## Where we left off (Oct 28 2026, after Gate 35)
 
-- Tool: `hive start` (overnight, `hive morning`), Telegram (questions, reviews with alternatives, status, undo, contradiction check, open questions and verdicts), plain-words review, memory of rulings (`hive rules`), NIM backup for plain words. All tool tests pass.
-- Gates 27–29 tied; Gate 30 gave the first measured gain from the owner on surprising rules (+17 points, 3/6 vs 2/6), short of the +30 predicted.
-- Gate 31 done: the one-line list found 8 of 9 surprising rules, but all 22 marked decisions were kept (0 changes; kill fired). The answering step is fixed. Next: Gate 32, the same design on another fresh feature (needs the founder, about 15 minutes on Telegram).
-- Private material: `D:\Suryansh\Programming\hive_private\` and `/home/node/g30` in the container.
+- Tool: `hive` (start, overnight, morning), Telegram (questions, reviews, status, undo, change of mind via `hive listen`, "build: ..."), memory of rulings, contradiction checks, as-built confirmation, `hive doctor`, `pip install`, `hive cloud` (tested on a real EC2 instance). All tool tests pass.
+- Evidence: the review mechanism works with an owner who answers (Gate 34b: 0/8 to 7/8). The real founder answers situations reliably (48 of 48 across Gates 30-35) but not decision lists after a build (Gate 35: marked 0 of 27).
+- Next: **Gate 36, interview first.** Hive generates 10-15 situations for the feature before building, the owner answers on his phone, and the answers become tests the builders must pass. Compare with no owner on a fresh area. Needs about 5 minutes of the founder.
+- Private material: `D:\Suryansh\Programming\hive_private\` and `/home/node/g3x` in the container.
 
 ## Needs the user
 
