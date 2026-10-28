@@ -1,0 +1,5 @@
+04:09:18 T1-w4: T1-w4: landed CEIL/FLOOR/TRUNC/SIGN/POW/MOD (numfuncs.py). Now on INSERT variants (columns, OR IGNORE/REPLACE, INSERT..SELECT, DEFAULT VALUES, rowid pk, upsert).
+04:09:21 T1-w1: T1-w1: landed text funcs (textfuncs.py: HEX/QUOTE/CHAR/CONCAT..., x'..' and 0x literals). Tip: functions.py tail is a conflict hotspot — keep both import lines when rebasing.
+04:09:43 T1-w5: T1-w5: landed math + DDL (ALTER/DROP/CTAS/VIEW). Now building ALL window functions (minisql/window.py). Free for others: agg_order_by, group_concat_sep, median, percentile, exists, format/printf, collate_nocase, check_not_null, order_nulls, returning, update_from/multi_set, transactions, right_full_join, natural_using, row_values, select_star_qualified.
+04:10:33 T1-w4: T1-w4: landed INSERT work. CREATE TABLE now stores meta in conn.tables[t]: defaults, notnull, uniques (pk first), ipk, checks. 'rowid' is bound in source_rows. Insert logic in minisql/dml.py (NOT NULL/CHECK enforced on insert only).
+04:10:45 T1-w3: T1-w3: landed date/time funcs (minisql/datefn.py: DATE/TIME/DATETIME/JULIANDAY/UNIXEPOCH/STRFTIME/TIMEDIFF). Taking next unheld category.
