@@ -2,12 +2,22 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 28 2026, after Gate 35)
+## Where we left off (Oct 28 2026, after Gate 36)
 
-- Tool: `hive` (start, overnight, morning), Telegram (questions, reviews, status, undo, change of mind via `hive listen`, "build: ..."), memory of rulings, contradiction checks, as-built confirmation, `hive doctor`, `pip install`, `hive cloud` (tested on a real EC2 instance). All tool tests pass.
-- Evidence: the review mechanism works with an owner who answers (Gate 34b: 0/8 to 7/8). The real founder answers situations reliably (48 of 48 across Gates 30-35) but not decision lists after a build (Gate 35: marked 0 of 27).
-- Next: **Gate 36, interview first.** Hive generates 10-15 situations for the feature before building, the owner answers on his phone, and the answers become tests the builders must pass. Compare with no owner on a fresh area. Needs about 5 minutes of the founder.
-- Private material: `D:\Suryansh\Programming\hive_private\` and `/home/node/g3x` in the container.
+- **Done:** Gate 36 scored and written up (`gates/gate36/RESULTS.md`). Kill fired: interview first, with questions written from the description alone, gave 2/7 surprising cases in both arms. Coverage was 4/9, and on both covered cases the founder's interview answer contradicted his hidden-set verdict.
+- **Tool**, all tests passing:
+  - `hive` (start, overnight, morning, interview first).
+  - Telegram: formatted cards with progress bars, voice notes via local Whisper, questions, reviews, status, undo, change of mind via `hive listen`, "build: ...".
+  - Memory of rulings, contradiction checks (now including interview answers), as-built confirmation.
+  - **Picking up again:** interview answers are saved and resumed; taps on old buttons are answered; a builder stopped by a usage limit or an expired login resumes, and the owner is told.
+  - `hive doctor`, `pip install`, `hive cloud` (tested on a real EC2 instance).
+- **Next: Gate 37** (needs about 10 minutes of the founder):
+  - Hive writes the interview from the feature's interface, not the description.
+  - A blind judge scores its coverage of an independent hidden set.
+  - The same session re-asks 6 of his earlier situations in a new framing, to measure how often he agrees with himself.
+  - Build only if coverage reaches 70%.
+  - See `BRAIN.md` §9.
+- **Private material:** `D:\Suryansh\Programming\hive_private\` (`g36priv`: hidden tests, reference, scripts) and `/home/node/g3x` in the container.
 
 ## Needs the user
 
