@@ -144,7 +144,7 @@ def start(repo='.', workers=4, goal=None, minutes=40, overnight=False):
         say('  You have unsaved changes. Commit or stash them first, so the builders start from what you see.'); return 3
     cfg_path = os.path.join(repo, '.hive', 'config.json')
     cfg = json.load(open(cfg_path)) if os.path.exists(cfg_path) else {}
-    test_cmd, how = cfg.get('test_cmd'), 'your hive settings'
+    test_cmd, how = cfg.get('test_cmd'), 'the command in your hive settings'
     if not test_cmd:
         test_cmd, how = detect_tests(repo)
     if not test_cmd:
@@ -156,7 +156,8 @@ def start(repo='.', workers=4, goal=None, minutes=40, overnight=False):
     links = cfg.get('snapshot_links') or detect_links(repo)
     say(f'  Git repository on branch {branch}, no unsaved changes.')
 
-    slug = '-'.join(re.findall(r'[a-z0-9]+', goal_text.lower())[:4])[:40] or 'build'
+    words = [w for w in re.findall(r'[a-z0-9]+', goal_text.lower()) if w not in ('goal', 'the', 'a', 'an')]
+    slug = '-'.join(words[:4])[:40] or 'build'
     name = f'{slug}-{time.strftime("%m%d-%H%M")}'
     base, k = name, 2
     while os.path.exists(os.path.join(RUNS, name)):   # two builds of the same goal in the same minute
