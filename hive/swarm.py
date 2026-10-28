@@ -74,8 +74,8 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
     up = os.path.join(run, 'up.git')
     sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--bare', '--branch', b, repo, up)
     sh('git', '-C', up, 'symbolic-ref', 'HEAD', f'refs/heads/{b}')
-    template = open(os.path.join(HIVE_ROOT, 'hive', 'templates', 'worker.md')).read()
-    goal_text = open(goal).read().strip() if os.path.exists(goal) else goal
+    template = open(os.path.join(HIVE_ROOT, 'hive', 'templates', 'worker.md'), encoding='utf-8').read()
+    goal_text = open(goal, encoding='utf-8').read().strip() if os.path.exists(goal) else goal
     for k in range(1, workers + 1):
         me = f'w{k}'; work = os.path.join(run, 'work', me)
         sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', up, work)
@@ -88,7 +88,7 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
                 .replace('{LOG}', os.path.join(run, 'logs', f'{me}.log')).replace('{GOAL}', goal_text)
                 .replace('{TEST_CMD}', cfg['test_cmd']).replace('{AREAS}', _areas_text(cfg)).replace('{OWNER}', owner_text)
                 .replace('{MINUTES}', str(minutes)))
-        open(os.path.join(run, 'prompts', f'{me}.md'), 'w').write(text.replace('python3 -m hive', f'{PY} -m hive'))
+        open(os.path.join(run, 'prompts', f'{me}.md'), 'w', encoding='utf-8').write(text.replace('python3 -m hive', f'{PY} -m hive'))
     json.dump(dict(repo=repo, branch=b, workers=workers, started=None), open(os.path.join(run, 'run.json'), 'w'), indent=1)
     return run
 
@@ -108,9 +108,10 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
     def start(me):
         out = open(os.path.join(run, 'out', f'{me}.json'), 'w')
         p = subprocess.Popen(cmd, cwd=os.path.join(run, 'work', me), stdin=subprocess.PIPE, stdout=out,
-                             stderr=subprocess.STDOUT, text=True, env=dict(env, HIVE_WORKER=me))
+                             stderr=subprocess.STDOUT, text=True, encoding='utf-8', errors='replace',   # Windows: "₹" in a goal
+                             env=dict(env, HIVE_WORKER=me, PYTHONIOENCODING='utf-8'))
         try:
-            p.stdin.write(open(os.path.join(run, 'prompts', f'{me}.md')).read() + (RESUME if attempts.get(me) else ''))
+            p.stdin.write(open(os.path.join(run, 'prompts', f'{me}.md'), encoding='utf-8').read() + (RESUME if attempts.get(me) else ''))
             p.stdin.close()
         except BrokenPipeError:
             pass

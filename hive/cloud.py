@@ -12,6 +12,7 @@ import json, os, shlex, shutil, subprocess, tempfile
 
 from . import memory, telegram
 
+Q = shlex.quote   # every path in a shell command is quoted: owners' paths have spaces
 REMOTE_HOME = 'hive-cloud'   # relative to the remote home folder (scp and ssh both start there; '~' is not expanded)
 
 class Target:
@@ -19,7 +20,8 @@ class Target:
     (tests, a mounted disk)."""
     def __init__(self, to, key=None):
         self.local = os.path.isabs(to) or to.startswith('.') or (':' not in to and '@' not in to)
-        self.to = os.path.abspath(to) if self.local else to
+        # forward slashes for a local folder: the shell dropped Windows backslashes from its path
+        self.to = os.path.abspath(to).replace(os.sep, '/') if self.local else to
         self.opts = ['-o', 'BatchMode=yes'] + (['-i', key, '-o', 'StrictHostKeyChecking=accept-new'] if key else [])
 
     def run(self, cmd, check=True):
@@ -46,7 +48,7 @@ class Target:
         return subprocess.run(['scp', '-q'] + self.opts + [f'{self.to}:{src}', dst], capture_output=True).returncode == 0
 
     def home(self):
-        return os.path.join(self.to, 'hive-cloud') if self.local else REMOTE_HOME
+        return f'{self.to}/hive-cloud' if self.local else REMOTE_HOME
 
 def _project(repo):
     return os.path.basename(os.path.abspath(repo)) or 'project'
@@ -68,7 +70,7 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
     t.put(bundle, f'{t.home()}/{name}.bundle')
     # first time: clone; again later: bring that branch up to date with this machine (git will not fetch into a branch
     # that is checked out, which a second real run hit). Hive's result branches (hive/...) there are left alone.
-    t.run(f'mkdir -p {t.home()} && cd {t.home()} && if test -d {name}/.git; then git -C {name} fetch -q ../{name}.bundle '
+    t.run(f'mkdir -p {Q(t.home())} && cd {Q(t.home())} && if test -d {name}/.git; then git -C {name} fetch -q ../{name}.bundle '
           f'{branch} && git -C {name} checkout -q {branch} && git -C {name} reset -q --hard FETCH_HEAD; else '
           f'git clone -q -b {branch} {name}.bundle {name}; fi && rm -f {name}.bundle')
     # Hive itself, from GitHub, in its own Python environment there: current Ubuntu refuses `pip install --user` into
@@ -96,16 +98,16 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
         if os.path.exists(cred):
             t.put(cred, (f'{t.home()}/.claude' if t.local else '.claude') + '/.credentials.json'); sent.append('Claude login')
             t.run('chmod 700 .claude 2>/dev/null; chmod 600 .claude/.credentials.json 2>/dev/null || true', check=False)
-    t.run(f'chmod -R go-rwx {dst_hive} 2>/dev/null || true', check=False)
+    t.run(f'chmod -R go-rwx {Q(dst_hive)} 2>/dev/null || true', check=False)
     # dependencies, installed fresh there
     for pj in subprocess.run(['git', '-C', repo, 'ls-files', 'package-lock.json', '*/package-lock.json'],
                              capture_output=True, text=True).stdout.split():
         d = os.path.dirname(pj) or '.'
         say(f'  Installing dependencies in {d} there...')
-        t.run(f'cd {proj}/{d} && npm ci --silent >/dev/null 2>&1 || npm install --silent >/dev/null 2>&1', check=False)
+        t.run(f'cd {Q(proj + "/" + d)} && npm ci --silent >/dev/null 2>&1 || npm install --silent >/dev/null 2>&1', check=False)
     if subprocess.run(['git', '-C', repo, 'ls-files', 'requirements.txt'], capture_output=True, text=True).stdout.strip():
         say('  Installing the Python requirements there...')
-        p = t.run(f'cd {proj} && {py} -m pip install -q -r requirements.txt', check=False)
+        p = t.run(f'cd {Q(proj)} && {py} -m pip install -q -r requirements.txt', check=False)
         if p.returncode != 0:
             say(f'  The requirements did not install there: {p.stderr.strip()[-300:]}')
     json.dump({'to': t.to, 'project': proj, 'branch': branch, 'key': key}, open(os.path.join(hive_dir if os.path.isdir(hive_dir) else tmp,
@@ -122,7 +124,7 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
     elif not with_login:
         say("  The Claude login did not go over. On that machine, run `claude` once to log in (or rerun with --with-login).")
     if start:
-        t.run(f'cd {proj} && (nohup {py} -m hive listen > {t.home() if t.local else "$HOME/hive-cloud"}/listen.log 2>&1 &)',
+        t.run(f'cd {Q(proj)} && (nohup {py} -m hive listen > {Q(t.home()) if t.local else "$HOME/hive-cloud"}/listen.log 2>&1 &)',
               check=False)
         say("  Hive is listening there.")
         _stop_local_listener(say)

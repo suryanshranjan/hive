@@ -10,7 +10,7 @@ It uses the AWS command line (`aws`), logged in on this machine. What it makes, 
 - a firewall rule (security group) that lets SSH in from this machine's current IP address only;
 - one Ubuntu 24.04 machine that installs git, Python, Node.js and Claude Code by itself on first boot.
 Then the project moves there exactly as with `hive cloud --to` (only committed work; never .env files or keys)."""
-import json, os, subprocess, time, urllib.request
+import json, os, shlex, subprocess, time, urllib.request
 
 from . import cloud
 
@@ -31,7 +31,7 @@ touch /var/lib/hive-ready
 """
 
 def _aws(args, profile=None, region=None, check=True):
-    cmd = [AWS] + args + ['--output', 'json'] + (['--profile', profile] if profile else []) + (['--region', region] if region else [])
+    cmd = shlex.split(AWS) + args + ['--output', 'json'] + (['--profile', profile] if profile else []) + (['--region', region] if region else [])
     p = subprocess.run(cmd, capture_output=True, text=True)
     if check and p.returncode != 0:
         raise RuntimeError(f"aws {' '.join(args[:2])}: {p.stderr.strip()[:300]}")
@@ -58,7 +58,7 @@ def new(repo='.', size='t3.large', region=None, profile=None, with_login=True, s
     except (RuntimeError, FileNotFoundError):
         say("I need the AWS command line, logged in to your account: install it (aws.amazon.com/cli), then run "
             "`aws configure` or `aws login`, and try again."); return 2
-    region = region or subprocess.run([AWS, 'configure', 'get', 'region'] + (['--profile', profile] if profile else []),
+    region = region or subprocess.run(shlex.split(AWS) + ['configure', 'get', 'region'] + (['--profile', profile] if profile else []),
                                       capture_output=True, text=True).stdout.strip() or 'ap-south-1'
     name = f"hive-{cloud._project(repo)}-{int(time.time()) % 100000}"
     say(f"Making a cloud machine for Hive on AWS account {who.get('Account', '?')} ({region}, {size}, about "

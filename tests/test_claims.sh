@@ -4,9 +4,10 @@
 set -u
 python3 -c '' 2>/dev/null && PY=python3 || PY=python; export PY   # Windows has python, not python3
 [ "$PY" = python ] && export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false   # Windows: test repos keep LF
-HIVE=$(pwd); T=$(mktemp -d); export HIVE_GUARD_CACHE=$T/cache; export PYTHONPATH=$HIVE
+HIVE=$(pwd -W 2>/dev/null || pwd); T=$(mktemp -d); TW=$(cd "$T" && (pwd -W 2>/dev/null || pwd)); export HIVE_GUARD_CACHE=$T/cache; export PYTHONPATH=$HIVE
 fail=0; check() { if [ "$2" = "$3" ]; then echo "ok   $1"; else echo "FAIL $1 (exit $2, expected $3)"; fail=1; fi; }
-cd $T && git init -q -b main seed && cd seed && git config user.email t@t && git config user.name t
+cd "$T" || exit 1
+git init -q -b main seed && cd seed && git config user.email t@t && git config user.name t
 echo "def fee(x): return x // 10" > fees.py && echo "from fees import fee
 def test_fee(): assert fee(100) == 10" > test_fees.py
 $PY -m hive init --test-cmd "$PY -m pytest -q -p no:cacheprovider --junitxml=.hive/junit.xml" >/dev/null
