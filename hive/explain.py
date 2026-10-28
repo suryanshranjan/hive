@@ -74,13 +74,17 @@ def explain(owner_dir, goal, assumptions):
         seen = {i['id'] for i in out['items']}
         out['items'] += [i for i in fallback['items'] if i['id'] not in seen]   # never drop one silently
     except Exception:
-        out = fallback
+        return dict(fallback, failed=True)   # not cached: try again next time
     json.dump(out, open(cache, 'w'), indent=1)
     return out
 
 def plan(owner_dir, goal, assumptions):
-    """(summary, items to show the owner, most important first, at most SHOW; the rest, set aside)."""
+    """(summary, items to show the owner, most important first, at most SHOW; the rest, set aside).
+    Raises RuntimeError when the plain-words step could not run, so the owner is never handed the builders' raw list."""
     ex = explain(owner_dir, goal, assumptions)
+    if ex.get('failed'):
+        raise RuntimeError("I couldn't put the builders' decisions into plain words just now (the model could not be "
+                           "reached). Nothing was sent; try again in a few minutes.")
     ranked = sorted((i for i in ex['items'] if i['judge']), key=lambda i: -i['impact'])
     shown = ranked[:SHOW]
     aside = [i for i in ex['items'] if i not in shown]

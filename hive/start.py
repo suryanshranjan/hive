@@ -326,7 +326,10 @@ def morning(name=None, phone=False):
     else:
         say(f"They made {_n(len(todo), 'assumption')} your description didn't cover. Press Enter if one is right, or say "
             "what should happen instead.")
-    fixed = _review_and_fix(state, ch)
+    try:
+        fixed = _review_and_fix(state, ch)
+    except RuntimeError as e:
+        say(str(e)); return 1
     rc = _deliver(state)
     if ch:
         ch.send((f"Done. I've made your changes. {state['check']}" if fixed else 'All set.') +
