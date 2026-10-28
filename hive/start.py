@@ -311,7 +311,8 @@ def morning(name=None, phone=False):
     run1 = os.path.join(state['home'], 'build')
     todo = [a for a in owner._assumptions(os.path.join(run1, 'owner'), False)
             if not os.path.exists(os.path.join(run1, 'owner', 'reviews', a['id'] + '.json'))]
-    say(f"\nGood morning. Overnight, the builders worked on: {state['goal'][:120]}")
+    from .explain import _goal_summary
+    say(f"\nWelcome back. While you were away, the builders worked on: {_goal_summary(state['goal']).splitlines()[0][:120]}")
     if not todo:
         say('There is nothing left for you to check. The result is on branch hive/' + state['name'] + '.'); return 0
     state['started'] = time.time()
