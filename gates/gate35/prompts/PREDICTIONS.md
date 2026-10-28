@@ -19,3 +19,10 @@
 Kill: **R beats N by < 10 points on surprising cases.**
 
 **Honest prior.** S1 about 55%, A1 about 65%. The mechanism works with a careful owner (Gate 34b); the open question is a busy person on a phone.
+
+## Amendment, registered before the build (Oct 28 2026)
+
+- **Labels.** The founder gave verdicts on Telegram, against the cold probe that was unanimous 12/12. The blind judge labelled **8 surprising, 4 ordinary, 0 unclear.** The founder confirmed the experimenter's readings of his 4 free-text surprising verdicts (4 of 4 "Yes, exactly").
+- **One surprising case is not scored.** Its surprising part (the brand's credibility score drops; the creator is kept informed) has no field in the fixed interface, which is Gate 34's unchanged. That leaves **7 surprising and 4 ordinary hidden cases.** A private reference passes 11/11. Cases stay out of the container until scoring.
+- With 7 surprising cases, one case is 14 points. S1 (≥ 30) needs at least 3 more surprising cases in R than in N.
+- The review is the registered one (scan, mark, "what would you do instead?", suggestions off). The newer as-built confirmation is not used here, so the result stays comparable.
