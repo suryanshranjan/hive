@@ -1,0 +1,94 @@
+{
+ "draft": {
+  "rules": [
+   {
+    "rule": "Whenever a receipt is printed for a customer paying with a 16-digit card, show only the last 4 digits of the card number and hide the rest.",
+    "from": [
+     1
+    ]
+   },
+   {
+    "rule": "Whenever a late fee is calculated on an invoice, charge no fee until the invoice is at least 30 days overdue. Once it is 30 or more days overdue, the fee is 5% of the invoice amount for each full 30 days overdue, with no pro-rating for partial 30-day periods (\u20b910,000 at 45 days overdue is one full period, so \u20b9500; at 60 days it is two full periods, so \u20b91,000). Once the invoice is 30 or more days overdue, the fee is never less than a flat minimum of \u20b95 (500 cents), and it is never more than 25% of the invoice amount, however long the invoice stays unpaid (\u20b91,000 unpaid for 3 years stops at \u20b9250).",
+    "from": [
+     2,
+     9
+    ]
+   },
+   {
+    "rule": "Whenever a badge is printed for a staff member, print the initials: one letter for every name they have (Mary Jane Watson prints as MJW).",
+    "from": [
+     3
+    ]
+   },
+   {
+    "rule": "Whenever a customer gives a phone number, save the number without any extension if it is a US number ('(415) 555-0132 ext. 45' is saved as the number with the extension dropped). If the number is not a US number (for example +44 20 7946 0958 from London), leave the phone number blank, since only US numbers are supported.",
+    "from": [
+     4,
+     5
+    ]
+   },
+   {
+    "rule": "Whenever a parcel is priced for shipping to a zone, the price is a base charge plus a rate for each half-kilo weight step, and each farther zone costs more than the one before. A very light parcel (for example 50 g to zone 1) still pays the full base charge, so the base charge is the minimum.",
+    "from": [
+     6,
+     11
+    ]
+   },
+   {
+    "rule": "Whenever a parcel weighs more than 25 kg, refuse it and do not ship it (an 80 kg crate to zone 2 is refused).",
+    "from": [
+     12
+    ]
+   },
+   {
+    "rule": "Whenever a product's average rating is shown, round it to the nearest half star (4.3 out of 5 shows as 4.5 stars). Whenever a product has no reviews yet, its page shows nothing at all for reviews: no star rating and no review text.",
+    "from": [
+     7,
+     13
+    ]
+   },
+   {
+    "rule": "Whenever business days are counted for a delivery promise (for example 3 business days), skip only Saturdays, Sundays, January 1 and December 25. Every other national public holiday counts as a normal working day. So an order placed on Monday is delivered on Thursday, unless Wednesday falls on January 1 or December 25.",
+    "from": [
+     8
+    ]
+   },
+   {
+    "rule": "Whenever last month's sales are \u20b90, the dashboard shows the percentage change as 0.0%, whatever this month's sales are (last month \u20b90 and this month \u20b95,000 displays 0.0%).",
+    "from": [
+     10
+    ]
+   },
+   {
+    "rule": "Whenever a web address (URL) is generated from a blog post's title, cut it off at 40 characters, even if the cut falls in the middle of a word (a title of about 120 characters is cut at 40).",
+    "from": [
+     14
+    ]
+   }
+  ],
+  "disagree": [
+   {
+    "from": [
+     9
+    ],
+    "question": "For a small invoice where 25% of the invoice amount is less than \u20b95 (any invoice under \u20b920, such as \u20b910, where 25% is \u20b92.50), the flat \u20b95 minimum and the 25% maximum cannot both hold. Which one applies once the invoice is 30 or more days overdue?",
+    "option_a": "The \u20b95 minimum wins, so the fee is \u20b95 even though that is more than 25% of the invoice.",
+    "option_b": "The 25% maximum wins, so the fee is 25% of the invoice (for example \u20b92.50 on \u20b910), even though that is less than \u20b95."
+   }
+  ]
+ },
+ "done": true,
+ "rules": [
+  "Whenever a receipt is printed for a customer paying with a 16-digit card, show only the last 4 digits of the card number and hide the rest.",
+  "Whenever a late fee is calculated on an invoice, charge no fee until the invoice is at least 30 days overdue. Once it is 30 or more days overdue, the fee is 5% of the invoice amount for each full 30 days overdue, with no pro-rating for partial 30-day periods (\u20b910,000 at 45 days overdue is one full period, so \u20b9500; at 60 days it is two full periods, so \u20b91,000). Once the invoice is 30 or more days overdue, the fee is never less than a flat minimum of \u20b95 (500 cents), and it is never more than 25% of the invoice amount, however long the invoice stays unpaid (\u20b91,000 unpaid for 3 years stops at \u20b9250).",
+  "Whenever a badge is printed for a staff member, print the initials: one letter for every name they have, up to a maximum of three letters, so a longer name is cut off after the third (Mary Jane Watson prints as MJW). Lowercase particles such as \"de\", \"van\", \"von\", \"la\", \"di\", \"da\" and \"del\" are skipped and get no letter.",
+  "Whenever a customer gives a phone number, save the number without any extension if it is a US number ('(415) 555-0132 ext. 45' is saved as the number with the extension dropped). If the number is not a US number (for example +44 20 7946 0958 from London), leave the phone number blank, since only US numbers are supported.",
+  "Whenever a parcel is priced for shipping to a zone, the price is a base charge plus a rate for each half-kilo weight step, and each farther zone costs more than the one before. A very light parcel (for example 50 g to zone 1) still pays the full base charge, so the base charge is the minimum.",
+  "Whenever a parcel weighs more than 25 kg, refuse it and do not ship it (an 80 kg crate to zone 2 is refused).",
+  "Whenever a product's average rating is shown, round it to the nearest half star (4.3 out of 5 shows as 4.5 stars). Whenever a product has no reviews yet, its page shows nothing at all for reviews: no star rating and no review text.",
+  "Whenever business days are counted for a delivery promise (for example 3 business days), skip only Saturdays, Sundays, January 1 and December 25. Every other national public holiday counts as a normal working day. So an order placed on Monday is delivered on Thursday, unless Wednesday falls on January 1 or December 25.",
+  "Whenever last month's sales are \u20b90, the dashboard shows the percentage change as 0.0%, whatever this month's sales are (last month \u20b90 and this month \u20b95,000 displays 0.0%).",
+  "Whenever a web address (URL) is generated from a blog post's title, cut it off at 40 characters, even if the cut falls in the middle of a word (a title of about 120 characters is cut at 40).",
+  "For a small invoice where 25% of the invoice amount is less than \u20b95 (any invoice under \u20b920, such as \u20b910, where 25% is \u20b92.50), the flat \u20b95 minimum and the 25% maximum cannot both hold. Which one applies once the invoice is 30 or more days overdue? -> The 25% maximum wins, so the fee is 25% of the invoice (for example \u20b92.50 on \u20b910), even though that is less than \u20b95."
+ ]
+}

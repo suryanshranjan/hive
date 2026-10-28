@@ -8,7 +8,8 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
   - **Gate 39 done** (wind tunnel, synthetic owner): complete rule sheet 250/250, Hive's interview 76.0%, tour 75.6%, none 38.4%. Leak: 8 of 25 decisions never asked (all unusual input), 4 lost before the sheet. See `gates/gate39/RESULTS.md`.
   - Tool fixes from it (all 203 checks pass): corrections amend the rule instead of replacing it; the terminal restates a rule before its correction; own words keep their detail.
   - **Gate 40 done:** asking about unusual input did not raise coverage (0.64 vs 0.76; +1.2 points); not shipped. Complete sheet 250/250 again. The sheet keeps only 0.69–0.76 of what was asked.
-  - **Gate 41 next** (or running): one interview, two hand-overs (sheet alone vs sheet plus every ruling kept whole); see `gates/gate41/`.
+  - **Gate 41 done:** whole rulings beside the sheet cost 6.8 points (kill fired). The merge lost nothing; the loss is coverage (11/25) and answers about one case (7/11 whole). Complete sheet 250/250 a third time.
+  - **Gate 42 next** (or running): a rule sheet written from the built code, the owner marks what is wrong; see `gates/gate42/`.
 
 - **Gate 38 is running.** Predictions in `gates/gate38/prompts/PREDICTIONS.md` (`72a5726`).
   - Day 1 is done: Hive's interview (13 questions, one per decision) and the rule sheet; 13 rules confirmed, one corrected, 7.9 minutes.
@@ -39,9 +40,9 @@ Workers run shell commands, so run them in a container. Image: `node:22-bookworm
 
 ## Needs design first (write the config and predictions, push them, then run)
 
-### G41: keep every ruling whole (synthetic owner, about $6)
-- Config `lab/experiments/g41_keep.json`; predictions `gates/gate41/prompts/PREDICTIONS.md`.
-- Command: `python3 lab/run_gate.py lab/experiments/g41_keep.json --max-parallel 6`, then `python3 gates/gate41/referee/analyze.py runs/g41`.
+### G42: a sheet complete by construction (synthetic owner, about $6)
+- Config `lab/experiments/g42_code_sheet.json`; predictions `gates/gate42/prompts/PREDICTIONS.md`.
+- Command: `python3 lab/run_gate.py lab/experiments/g42_code_sheet.json --max-parallel 6`, then `python3 gates/gate42/referee/analyze.py runs/g42`.
 
 ### G9: intent interface v1 vs free asking
 - Arm A: free asking, 30 questions.

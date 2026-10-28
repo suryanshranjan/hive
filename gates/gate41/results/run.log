@@ -1,0 +1,84 @@
+[03:21:31] predictions registered on origin/main: gates/gate41/prompts/PREDICTIONS.md
+[03:21:31] rule-giver writing private rules (headless Claude Code)...
+[03:24:03] rules checked: 10 functions, 136 calls, deterministic
+[03:24:03] declared decisions per function: 1:2, 2:3, 3:3, 4:2
+[03:24:04] starting repo and hidden suite built
+[03:24:04] pre-launch: python3 gates/gate41/referee/wind_tunnel.py {run} {oracle}
+[03:24:04] wind tunnel: documenter writing the owner's complete rule sheet...
+[03:24:43] wind tunnel: R: 68 rules ($0.16)
+[03:24:43] wind tunnel: interview starting (hive.interview as shipped, terminal mode)...
+[03:25:50] wind tunnel: H owner #1: "Only weekends, New Year's Day (Jan 1) and Christmas Day (Dec 25) are skipped. Ot"
+[03:25:58] wind tunnel: H owner #2: 'A'
+[03:26:07] wind tunnel: H owner #3: 'Nothing is charged until an invoice is at least 30 days overdue. After that we c'
+[03:26:16] wind tunnel: H owner #4: 'B'
+[03:26:24] wind tunnel: H owner #5: 'B'
+[03:26:30] wind tunnel: H owner #6: "When last month's sales are zero, we show 0.0% change, whatever this month's sal"
+[03:26:40] wind tunnel: H owner #7: 'A'
+[03:26:49] wind tunnel: H owner #8: 'A'
+[03:26:55] wind tunnel: H owner #9: 'A base charge plus a rate per weight step, and each farther zone costs more. Opt'
+[03:27:10] wind tunnel: H owner #10: "B\n\nWait — my policy refuses anything over 25 kg, so B fits: we don't ship parcel"
+[03:27:18] wind tunnel: H owner #11: 'A'
+[03:27:24] wind tunnel: H owner #12: 'A'
+[03:27:30] wind tunnel: H owner #13: 'Show nothing at all (no stars and no text) when a product has no reviews yet.'
+[03:27:41] wind tunnel: H owner #14: 'The web address is cut off at 40 characters. The cut can fall in the middle of a'
+[03:28:05] wind tunnel: H owner #15: ''
+[03:28:13] wind tunnel: H owner #16: 'Once an invoice is 30 or more days overdue, the fee is never less than a flat mi'
+[03:28:17] wind tunnel: H owner #17: ''
+[03:28:22] wind tunnel: H owner #18: ''
+[03:28:27] wind tunnel: H owner #19: ''
+[03:28:32] wind tunnel: H owner #20: ''
+[03:28:36] wind tunnel: H owner #21: ''
+[03:29:04] wind tunnel: H owner #22: 'B'
+[03:29:12] wind tunnel: H owner #23: '3'
+[03:29:20] wind tunnel: H owner #24: 'Badge initials use one letter for each name, up to a maximum of three letters, s'
+[03:29:22] wind tunnel: H: 11 rules and 14 rulings from 15 questions (1 skipped as settled; 40 planned decisions), 24 owner replies, 4.6 min, owner $1.69
+[03:29:22] wind tunnel: judge labelling every declared decision...
+[03:29:48] wind tunnel: judge: 25 labels ($0.17)
+[03:29:48] wind tunnel: ask texts written: /home/claude/hive/runs/g41/ask_texts.md
+N0: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g41/upN0.git
+H: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g41/upH.git
+K: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g41/upK.git
+R: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g41/upR.git
+next: python3 lab/launch.py --run g41
+[03:29:50] launching workers...
+launched H-w1
+launched H-w2
+launched H-w3
+launched K-w1
+launched K-w2
+launched K-w3
+launched N0-w1
+K-w3 finished: exit 0, 0.6 min, tokens 525447, cost 0.18708209999999997
+launched N0-w2
+H-w1 finished: exit 0, 0.7 min, tokens 560190, cost 0.1838395
+launched N0-w3
+K-w2 finished: exit 0, 0.9 min, tokens 664306, cost 0.2317589
+launched R-w1
+H-w3 finished: exit 0, 1.1 min, tokens 715200, cost 0.2500959
+launched R-w2
+K-w1 finished: exit 0, 1.2 min, tokens 755038, cost 0.28680649999999996
+launched R-w3
+H-w2 finished: exit 0, 1.2 min, tokens 894776, cost 0.2879899
+R-w3 finished: exit 0, 0.2 min, tokens 258929, cost 0.1226493
+N0-w3 finished: exit 0, 0.6 min, tokens 499902, cost 0.1760023
+N0-w1 finished: exit 0, 1.1 min, tokens 602076, cost 0.23998680000000003
+R-w1 finished: exit 0, 0.7 min, tokens 378083, cost 0.1830349
+N0-w2 finished: exit 0, 1.2 min, tokens 851721, cost 0.2769552
+R-w2 finished: exit 0, 0.8 min, tokens 498269, cost 0.21153499999999997
+wrote /home/claude/hive/runs/g41/agents.csv
+[03:31:52] scoring every arm call by call...
+# g41: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 43.6% | 30.0%–57.2% |
+| H | 72.8% | 54.4%–89.6% |
+| K | 66.0% | 45.6%–84.8% |
+| R | 100.0% | 100.0%–100.0% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| H-N0 | +29.2 | +15.6 to +41.6 |
+| K-N0 | +22.4 | +7.2 to +37.6 |
+| R-N0 | +56.4 | +43.2 to +70.4 |
+[03:31:53] done. Next: write the gate RESULTS.md from runs/g41/summary.md, update BRAIN.md and lab/QUEUE.md, push.

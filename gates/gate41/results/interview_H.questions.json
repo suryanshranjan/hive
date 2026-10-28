@@ -1,0 +1,139 @@
+{
+ "qs": [
+  {
+   "id": "q01",
+   "situation": "Rohan's shop promises delivery 'in 3 business days'. An order is placed on Monday, and Wednesday is a national public holiday.",
+   "options": [
+    "Only Saturdays and Sundays are days off, so the holiday counts as a working day and delivery is Thursday",
+    "National public holidays are also skipped, so delivery is Friday",
+    "Our own shop-closure days are skipped too, so delivery date follows our own holiday calendar"
+   ]
+  },
+  {
+   "id": "q02",
+   "situation": "A customer pays with a 16-digit card, and the receipt must hide most of the number.",
+   "options": [
+    "Only the last 4 digits are visible",
+    "The first 6 and last 4 digits are visible",
+    "Only the last 2 digits are visible"
+   ]
+  },
+  {
+   "id": "q03",
+   "situation": "Priya's invoice of \u20b910,000 is 45 days overdue.",
+   "options": [
+    "1.5% of the amount for each 30-day month late, so \u20b9150 per month, charged in proportion to the days",
+    "One flat fee of \u20b9500, however late it is",
+    "\u20b950 for every day late"
+   ]
+  },
+  {
+   "id": "q04",
+   "situation": "An invoice of \u20b91,000 stays unpaid for 3 years and the late fee keeps growing.",
+   "options": [
+    "The fee can never be more than the invoice itself (\u20b91,000)",
+    "The fee stops at 25% of the invoice (\u20b9250)",
+    "No limit; the fee keeps growing for as long as it is unpaid"
+   ]
+  },
+  {
+   "id": "q05",
+   "situation": "A staff member's badge is printed for 'Mary Jane Watson'.",
+   "options": [
+    "MW, the first and last name only",
+    "MJW, one letter for every name",
+    "MJ, the first two names only"
+   ]
+  },
+  {
+   "id": "q06",
+   "situation": "On the dashboard, last month's sales were \u20b90 and this month's are \u20b95,000.",
+   "options": [
+    "Show nothing (no percentage), because the change can't be worked out",
+    "Show 100% growth",
+    "Show a fixed label such as 'New' instead of a number"
+   ]
+  },
+  {
+   "id": "q07",
+   "situation": "A customer gives their phone number as '(415) 555-0132 ext. 45'.",
+   "options": [
+    "Save the number and drop the extension",
+    "Refuse to save it, so staff must ask for a clean number",
+    "Save the number and keep the extension separately"
+   ]
+  },
+  {
+   "id": "q08",
+   "situation": "A customer in London enters the number +44 20 7946 0958.",
+   "options": [
+    "Leave it blank, since only US numbers are supported",
+    "Keep the number as typed, with the plus sign and digits only",
+    "Flag it as invalid so staff must fix it"
+   ]
+  },
+  {
+   "id": "q09",
+   "situation": "How should the shipping price be built for a parcel going to zone 3?",
+   "options": [
+    "A base charge plus a rate per kilo, with each farther zone costing more",
+    "One flat price per zone, whatever the weight",
+    "A price for each weight band (for example up to 1 kg, 1 to 5 kg, over 5 kg) in each zone"
+   ]
+  },
+  {
+   "id": "q10",
+   "situation": "A parcel weighs exactly 2 kg, and another weighs 2.1 kg.",
+   "options": [
+    "Any started kilo is charged, so 2 kg pays for 2 kilos and 2.1 kg pays for 3 kilos",
+    "Charged by the exact weight, so 2.1 kg pays slightly more than 2 kg",
+    "Rounded up to the next half kilo, so 2.1 kg pays for 2.5 kilos"
+   ]
+  },
+  {
+   "id": "q11",
+   "situation": "A customer wants to send an 80 kg crate to zone 2.",
+   "options": [
+    "Charge normally, with the price rising with weight",
+    "Refuse it, because it is over our parcel limit",
+    "Use a special flat heavy-freight price"
+   ]
+  },
+  {
+   "id": "q12",
+   "situation": "A customer ships a tiny 50 g parcel to zone 1.",
+   "options": [
+    "They pay the full base charge, so there is a minimum",
+    "They pay a reduced price in proportion to the weight",
+    "It ships free"
+   ]
+  },
+  {
+   "id": "q13",
+   "situation": "A product's average rating is 4.3 out of 5.",
+   "options": [
+    "Shown to the nearest half star, so 4.5 stars",
+    "Shown to the nearest whole star, so 4 stars",
+    "Always rounded down, so 4 stars"
+   ]
+  },
+  {
+   "id": "q14",
+   "situation": "A brand-new product has no reviews yet.",
+   "options": [
+    "Show 'No reviews yet' instead of stars",
+    "Show five empty stars",
+    "Show nothing at all"
+   ]
+  },
+  {
+   "id": "q15",
+   "situation": "A blog post has a very long title of about 120 characters.",
+   "options": [
+    "The web address uses the whole title, with no cut-off",
+    "The web address is cut at 60 characters",
+    "The web address is cut at about 80 characters, at the end of a whole word"
+   ]
+  }
+ ]
+}
