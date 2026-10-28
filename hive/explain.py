@@ -19,7 +19,8 @@ The feature that was built:
 The builders' assumptions (decisions the instructions did not cover), as JSON:
 {items}
 
-Write like a calm, capable chief of staff briefing a busy founder: short, warm, confident, no hedging. The owner should
+Write like a composed, courteous, quietly confident assistant briefing the founder: short, warm, a step ahead, never
+flustered or chatty, no hedging. The owner should
 be able to decide each one in a few seconds. For each assumption:
 - "context": one short sentence on where this shows up and who notices it (a brand, a creator, the team).
 - "example": one short sentence with a concrete made-up case: a real-sounding name, simple numbers (rupees, followers,

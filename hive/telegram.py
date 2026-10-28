@@ -1,13 +1,17 @@
 """The owner's phone: Hive's questions and morning reviews over Telegram (Gate 28: the founder was away from the laptop,
 so his review had to be done by a proxy).
 
-  hive telegram setup     connect your Telegram once (asks for a bot token from @BotFather, then for one message from you)
-  hive telegram test      send yourself a test message
+  hive telegram setup        connect your Telegram once (asks for a bot token from @BotFather, then for one message)
+  hive telegram test         send yourself a test message
+  hive telegram call <name>  how Hive addresses you, for example: hive telegram call sir
 
 Once connected, `hive start` sends builders' questions to your phone and takes your replies as answers, and an overnight
 build sends its summary and its assumptions to your phone when it finishes. Safety: the token lives in
 ~/.hive/telegram.json (never in a repository); only messages from the chat that connected are read; a message is only
-ever stored as an answer or a correction, never run."""
+ever stored as an answer or a correction, never run.
+
+Voice: a composed, courteous, quietly confident assistant that is a step ahead: short sentences, a clear recommendation,
+never flustered or chatty, and every message leaves the owner one easy thing to do."""
 import getpass, json, os, time, urllib.request
 
 PATH = os.path.join(os.path.expanduser('~'), '.hive', 'telegram.json')
@@ -30,7 +34,7 @@ def load():
 class Channel:
     """One owner's chat. `api(method, **params)` is the Telegram Bot API (replaced by a fake in tests)."""
     def __init__(self, cfg, api=None):
-        self.chat = cfg['chat_id']
+        self.chat = cfg['chat_id']; self.address = cfg.get('address')
         self.api = api or (lambda method, **p: _call(cfg['token'], method, **p))
         self.offset = None
 
@@ -54,6 +58,9 @@ class Channel:
             self.offset = batch[-1]['update_id'] + 1
 
     def name(self):
+        """How to address the owner: the chosen form (for example "sir"), else the first name on Telegram."""
+        if self.address:
+            return self.address
         try:
             return self.api('getChat', chat_id=self.chat).get('first_name') or ''
         except Exception:
@@ -97,9 +104,9 @@ def bridge_questions(run, ch, until, poll=2, tick=None):
         open_qs = unanswered()
         for q in open_qs:
             if q['id'] not in sent:
-                n = len(os.listdir(os.path.join(d, 'questions')))
-                sent[q['id']] = ch.send(f"Question from builder {q['worker']}:\n\n{q['question']}\n\n"
-                                        "Tap a letter, or reply with your own words.",
+                who = ch.name()
+                sent[q['id']] = ch.send(f"{who + ', a' if who else 'A'} quick one from the builders:\n\n{q['question']}\n\n"
+                                        "A tap is enough, or tell me in your own words.",
                                         buttons=[(c, f"{q['id']}|{c}") for c in _letters(q['question'])])
         if until() and not open_qs:
             return 0
@@ -117,7 +124,7 @@ def bridge_questions(run, ch, until, poll=2, tick=None):
             q = json.load(open(os.path.join(d, 'questions', qid + '.json')))
             json.dump({'id': qid, 'answer': ans, 'answered': int(time.time()), 'seconds': int(time.time()) - q['asked'],
                        'via': 'telegram'}, open(path, 'w'))
-            ch.send(f"Got it. Sent to builder {q['worker']}.", reply_to=sent.get(qid))
+            ch.send('Thank you. Passing it on.', reply_to=sent.get(qid))
 
 YES = ('right', 'yes', 'ok', 'okay', 'correct', 'y', 'keep', 'keep it', 'fine', 'sure', 'yes thats right')
 
@@ -150,13 +157,13 @@ def _ask_one(ch, d, item, header, poll, can_undo):
     elif kind == 'text':
         ok, correction = False, got
     else:   # "Something else": ask for the owner's words
-        ch.send('Of course. What would you like instead?', reply_to=msg)
+        ch.send('Of course. What would you prefer?', reply_to=msg)
         _, words = _wait(ch, poll, set())
         ok, correction = False, words
     json.dump({'id': k, 'ok': ok, 'correction': correction, 'seconds': int(time.time() - t0), 'via': 'telegram',
                'shown_as': item['text'] + advice}, open(os.path.join(d, 'reviews', k + '.json'), 'w'))
     if not ok:
-        ch.send('Understood. ' + (f'I\'ll have it changed: {correction}' if got == f'{k}|alt' else "I'll have that changed."))
+        ch.send('Very good. I\'ll see to it.' if got == f'{k}|alt' else "Understood. I'll have it done that way.")
 
 def _walk(ch, d, items, label, poll):
     """Ask each item in turn; "Undo last" takes the previous answer back and asks it again."""
@@ -165,7 +172,7 @@ def _walk(ch, d, items, label, poll):
         if _ask_one(ch, d, items[i], f'{label} {i + 1} of {len(items)}'.strip(), poll, can_undo=i > 0) == 'undo':
             i -= 1
             os.remove(os.path.join(d, 'reviews', items[i]['id'] + '.json'))
-            ch.send('No problem. Here it is again.')
+            ch.send('Of course. Back to the previous one.')
         else:
             i += 1
 
@@ -179,15 +186,16 @@ def review(run, ch, goal='', check='', poll=20, greeting='Good morning'):
     summary, shown, aside = explain.plan(d, goal, todo)
     who = ch.name()
     mins = max(1, round(len(shown) * 0.3))
-    ch.send(f"{greeting}{', ' + who if who else ''}. While you were away, I built this: {summary}\n\n"
+    ch.send(f"{greeting}{', ' + who if who else ''}. While you were away, the builders finished this: {summary}\n\n"
             + (f"{check}\n\n" if check else '')
-            + (f"I need your call on {len(shown)} small thing{'s' if len(shown) != 1 else ''}, about {mins} "
-               f"minute{'s' if mins != 1 else ''}. Each has my suggestion; one tap is enough." if shown else
-               "Nothing needs your judgement."))
+            + (f"There {'is' if len(shown) == 1 else 'are'} {len(shown)} decision{'s' if len(shown) != 1 else ''} I'd like "
+               f"you to make, about {mins} minute{'s' if mins != 1 else ''}. I've put my recommendation on each, so a "
+               "tap is enough." if shown else "Nothing needs your attention."))
     _walk(ch, d, shown, '', poll)
     if aside:
-        ch.send(f"There {'is' if len(aside) == 1 else 'are'} {len(aside)} smaller one{'s' if len(aside) != 1 else ''} I'd "
-                "leave as the builders had them. Want to see them?",
+        ch.send(f"{len(aside)} minor one{'s' if len(aside) != 1 else ''} remain{'s' if len(aside) == 1 else ''}. I'd leave "
+                f"{'it' if len(aside) == 1 else 'them'} as the builders had {'it' if len(aside) == 1 else 'them'}, unless "
+                "you'd like a look.",
                 buttons=[('Show me', 'aside|show'), ('Leave them', 'aside|leave')])
         kind, got = _wait(ch, poll, {'aside|show', 'aside|leave'})
         if got == 'aside|show' or (kind == 'text' and got.lower().startswith(('show', 'yes', 'see'))):
@@ -202,8 +210,9 @@ def review(run, ch, goal='', check='', poll=20, greeting='Good morning'):
         changes = [json.load(open(os.path.join(d, 'reviews', i['id'] + '.json'))) for i in shown + aside
                    if os.path.exists(os.path.join(d, 'reviews', i['id'] + '.json'))]
         n = sum(not r['ok'] for r in changes)
-        ch.send(f"That's everything. {n} change{'s' if n != 1 else ''} to make." if n else "That's everything. Nothing "
-                "to change.", buttons=[('Send it', 'final|send'), ('↩ Undo last', 'final|undo')])
+        ch.send(f"That's everything: {n} change{'s' if n != 1 else ''}. Shall I send {'it' if n == 1 else 'them'} to the "
+                "builders?" if n else "That's everything, and nothing needs changing. Shall I close it out?",
+                buttons=[('Send it' if n else 'Close it out', 'final|send'), ('↩ Undo last', 'final|undo')])
         kind, got = _wait(ch, poll, {'final|send', 'final|undo'})
         if got != 'final|undo':
             break
@@ -212,11 +221,11 @@ def review(run, ch, goal='', check='', poll=20, greeting='Good morning'):
         if not last:
             break
         os.remove(os.path.join(d, 'reviews', last[-1]['id'] + '.json'))
-        ch.send('No problem. Here it is again.')
+        ch.send('Of course. Back to the previous one.')
         _walk(ch, d, [last[-1]], '', poll)
     rows = owner.write_corrections(d)
-    ch.send(('Right away. ' + f"I'm sending the builders back to make {'that change' if len(rows) == 1 else 'those changes'}"
-             " and will message you when it's done.") if rows else 'Very good. Everything stands as built.')
+    ch.send(('Right away. The builders are on it. ' + "I'll let you know the moment it's done.") if rows else
+            'Very good. Everything stands as built.')
     return rows
 
 def setup():
@@ -243,16 +252,31 @@ def setup():
     if chat is None:
         print('  No message arrived within 5 minutes. Run hive telegram setup again.'); return 1
     _call(token, 'getUpdates', offset=offset, timeout=0)   # mark it read
+    address = input(f'\n4. How should Hive address you? (Enter for "{who}"; or for example: sir) > ').strip() or who
     os.makedirs(os.path.dirname(PATH), exist_ok=True)
     with open(PATH, 'w') as f:
-        json.dump({'token': token, 'chat_id': chat}, f)
+        json.dump({'token': token, 'chat_id': chat, 'address': address}, f)
     os.chmod(PATH, 0o600)
-    _call(token, 'sendMessage', chat_id=chat, text=f"Hi {who}! Hive is connected. Builders' questions and your morning "
-                                                  "reviews will come here. I only listen to this chat.")
-    print(f'  Connected. Hive will message {who} from now on. (Saved to {PATH}; keep it private.)'); return 0
+    _call(token, 'sendMessage', chat_id=chat, text=f"Hello, {address}. I'm connected and at your service. When the "
+                                                  "builders need a decision, I'll bring it here, with my recommendation. "
+                                                  "I listen to this chat only.")
+    print(f'  Connected. Hive will address you as "{address}". (Saved to {PATH}; keep it private.)'); return 0
+
+def call(address):
+    """Change how Hive addresses the owner."""
+    cfg = load()
+    if not cfg:
+        print('Not connected yet: run hive telegram setup.'); return 1
+    cfg['address'] = address.strip()
+    with open(PATH, 'w') as f:
+        json.dump(cfg, f)
+    os.chmod(PATH, 0o600)
+    Channel(cfg).send(f'Very good, {cfg["address"]}.'); print(f'Hive will address you as "{cfg["address"]}".'); return 0
 
 def test():
     cfg = load()
     if not cfg:
         print('Not connected yet: run hive telegram setup.'); return 1
-    Channel(cfg).send('Test from Hive: this is where your questions will arrive.'); print('Sent.'); return 0
+    ch = Channel(cfg); who = ch.name()
+    ch.send(f"At your service{', ' + who if who else ''}. All systems are working; this is where your decisions will "
+            "arrive."); print('Sent.'); return 0
