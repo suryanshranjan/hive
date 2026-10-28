@@ -155,7 +155,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     goal = goal or _ask("(Describe it in a sentence or two, or give the path of a file that describes it.)")
     if not goal:
         say('Nothing to build; come back any time.'); return 0
-    goal_text = open(goal).read().strip() if os.path.exists(goal) else goal
+    goal_text = open(goal, encoding='utf-8').read().strip() if os.path.exists(goal) else goal
     papers = docs_mod.read(docs)
     if papers:   # the company's own documents: the interview skips what they settle; builders follow them
         say(f"  I'll read your documents ({len(papers) // 1000 or 1}k characters) and only ask about what they don't settle.")

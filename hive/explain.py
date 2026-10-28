@@ -63,7 +63,9 @@ def _ask_claude(prompt):
     if time.time() - _CLAUDE_DOWN[0] < 600:
         raise RuntimeError('claude failed recently; using the backup')
     try:
-        p = subprocess.run(shlex.split(CMD), input=prompt, capture_output=True, text=True, timeout=300)
+        # UTF-8 both ways: Windows' default encoding cannot carry "₹", emoji or curly quotes, so every model call failed there
+        p = subprocess.run(shlex.split(CMD), input=prompt, capture_output=True, text=True, encoding='utf-8',
+                           errors='replace', timeout=300, env=dict(os.environ, PYTHONIOENCODING='utf-8'))
         reply = json.loads(p.stdout)
     except Exception:
         _CLAUDE_DOWN[0] = time.time(); raise
