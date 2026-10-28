@@ -2,7 +2,7 @@
 
 Read this first. It is the shared memory for anyone working on Hive, human or agent: what we know, how sure we are, what is being tested, and exactly how to continue. When you learn something, update this file in the same commit as the evidence.
 
-Last updated: Oct 28 2026, after Gate 34.
+Last updated: Oct 28 2026, after Gate 35.
 
 ## 1. The question
 
@@ -34,6 +34,7 @@ The deeper limit is intent, and Gates 3 to 17 have now mapped it. On rules a mod
 - **Scanning every decision fixes coverage; the answering step then failed (Gate 31, kill fired):** with all 29 decisions listed in one line, the founder marked a matching decision for 8 of his 9 surprising rules (Gate 30: 3 of 6 shown). Then he kept all 22 he had marked, in 2 to 12 s each, so nothing changed (3/9 both arms). Marked decisions now ask for his way first, and three quick keeps prompt a check.
 - **A model of the founder cannot stand in for him (Gate 33):** given his business and his past verdicts, a model predicted 7 of his 20 surprising rules on held-out gates (35%; the cold default gets 0%) and 79% of ordinary ones. His surprising rules are mostly new in each area. Gate 32 was not run: only 5 surprising cases in selection and invitations (credits had 9), so how surprising an owner is depends on the area.
 - **The review mechanism works end to end when the owner answers (Gate 34b, synthetic owner):** with 8 deliberately unusual rules, a model-owner drove Hive's real review code. Unusual rules went from 0/8 (no owner) to 7/8 (after review and one fix round); coverage 8/8 recorded, 8/8 marked, 11/11 marked changed; 384/384 kept. The gap in Gates 30-31 is the human answering step, not the machinery. A stand-in model of the founder gave only 1 surprising verdict of 12 (Gate 34, not run).
+- **The owner's rules come out when he answers situations before the build, not when he audits decisions after it (Gates 30-35):** across 48 situations he answered every one (28 differing from the default) and confirmed 16 of 16 readings; reviewing builders' decisions he found half (30), kept all he found (31), and in Gate 35 marked none of 27 (kill fired; 1/7 both arms). Next: interview first, with the owner's answers becoming tests before the build (Gate 36).
 - **Open:** an assumption review (builders list the defaults they applied, the owner marks the wrong ones); all 5 Gate 27 misses trace to defaults stated in the builders' own commit messages (post hoc). Also larger features with persistence and endpoints, and more founders and companies.
 
 ## 3. The law and how sure we are of each part
@@ -110,6 +111,7 @@ Status tags: **established** means outside theory or our data on real agents; **
 | Gate 7 | Oct 27 | A real company's 10 rules (Company X, name withheld), checked against its internal documents; no questions vs 15 questions answered from the documented policy | 32.8% → 49.6% hidden (+16.8, CI +6 to +31); the same team gained +21 from its answers; the biggest losses came from never being told the allowed input values; rules kept private |
 | Gate 6 | Oct 27 | Second independent rule-giver; 0 questions, 30 free, and 0 / 1 / 3 questions per function assigned at random | Questions cause the gain (3 vs 0: +36 pts, CI +20 to +51); one question adds little (+12 vs +8); 'first question worth most' failed; concentration beats spreading (model); +25-point gain from 30 questions replicated a fourth time |
 | Gate 20 | Oct 27 | Real rules (private): founder-written examples vs 19 questions vs both vs both + the company's Notion policy pages | 23.6 / 72.4 / 59.2 / 83.6 / 84.8%; examples/questions 1.17×; documents covered 2 of 10 functions and fixed all their errors; O2–O5, O7 held, O1, O6 failed |
+| Gate 35 | Oct 28 | The real founder, plans and payments, fixed review | Surprising 1/7 both arms: he marked 0 of 27 decisions; ordinary 4/4; 384/384; kill fired |
 | Gate 34 | Oct 28 | Plans and payments; the founder model as owner | Not run: it gave 1 surprising verdict of 12 |
 | Gate 34b | Oct 28 | Synthetic owner with 8 known unusual rules, real review code over a simulated chat | Unusual 7/8 vs 0/8 (+88); ordinary 4/4 vs 3/4; coverage 8/8; changes 11/11; all predictions held |
 | Gate 32 | Oct 28 | Selection and invitations | Not run: 5 surprising (6 required) |
