@@ -2,20 +2,12 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 28 2026, after Gate 28)
+## Where we left off (Oct 28 2026, after Gate 30)
 
-- Hive v1 M1–M5 done. `hive start` added: type `hive`, describe the goal, and it does the rest (tests found, questions inline, assumption review, fix round, result as a branch). Tested with stand-in builders only (`tests/test_start.sh`).
-- Gate 27: live questions tied with no questions on the founder's head-only rules (19/24 each). Gate 28: tied again (14/15 each). The builders' defaults already matched the founder, so the assumption review had no room, and the founder was away (proxy review, disclosed).
-- **If this session is on the phone or the web (no laptop):** the company's code copy, the container and every private case live only on the laptop. Do **not** try to run a company gate, and never put the founder's answers or cases in this repo. Do Gate 30 step 1 only:
-  1. Ask the founder, in plain words: "What do new people at your company usually get wrong about deals, terms or matching? List as many as come to mind, one line each."
-  2. For each item, ask for one concrete situation and his verdict (what should happen, and what a newcomer would wrongly do).
-  3. Save everything to a **private Notion page** titled "Hive Gate 30 private cases (do not share)", not to GitHub. Commit nothing about the cases.
-  4. Update "Where we left off" here to say the Notion page exists and how many cases it has, then push.
-  The laptop session then turns them into hidden tests, registers predictions and runs the gate.
-- Tool, Oct 28 2026: Telegram connected (`hive telegram setup`; the founder's bot is set up in the container). Questions and reviews reach the phone; assumptions are rewritten in plain words with an example, ranked, at most 8 shown (`hive/explain.py`), with the rest offered. The founder's phone review of the trial's assumptions is running in the container (`/home/node/trial1/morning.log`); when he finishes, the fix round runs and he gets a message.
-- Trial: the first real `hive start --overnight` run on the company backend copy worked unattended (419/419 tests, 384 kept, 5 min, $2.49). 15 business assumptions are waiting for the founder: in the container, `cd /home/node/bn && PYTHONPATH=/tmp/hivepkg python3 -m hive morning`. Next tool step: rank assumptions by impact; consider a phone channel for questions and morning reviews (ideas from OpenClaw: chat channel, heartbeat, a file of owner rulings kept across builds).
-- Gate 29 done: memory tied with no memory (5/5 each; the founder's rulings were all Hive's suggestions), and halved the review list (13 vs 25). A fair test needs rulings where the owner rejected Hive's suggestion: Gate 30.
-- Next (Gate 30, needs the founder): **cases where the owner is surprising.** First ask him what new people usually get wrong about deals, terms and matching. Build 10 to 15 cases there, then rerun questions vs ranked assumption review (business defaults only, at most about 10 items), with the founder reviewing blind. Also: the first real `hive start` run on a real feature.
+- Tool: `hive start` (overnight, `hive morning`), Telegram (questions, reviews with alternatives, status, undo, contradiction check, open questions and verdicts), plain-words review, memory of rulings (`hive rules`), NIM backup for plain words. All tool tests pass.
+- Gates 27–29 tied; Gate 30 gave the first measured gain from the owner on surprising rules (+17 points, 3/6 vs 2/6), short of the +30 predicted.
+- Next (tool, then Gate 31): rank the review by where the owner is likely to differ (his past rulings and topics, not impact); ask open first on high-stakes decisions before offering a menu; check new answers against earlier rulings. Then rerun Gate 30's design on a fresh feature with the same founder.
+- Private material: `D:\Suryansh\Programming\hive_private\` and `/home/node/g30` in the container.
 
 ## Needs the user
 
