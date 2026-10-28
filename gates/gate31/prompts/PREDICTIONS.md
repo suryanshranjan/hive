@@ -36,3 +36,12 @@ Kill: **R beats N by < 10 points on surprising cases.**
 **Honest prior.** S1 about 50%. C1 about 60%: the owner has to recognise his rule in a one-line title. Gate 30's +17 was one case, so even a working fix could show as +17 again.
 
 **Cost.** About $7 at list price, plus about 15 minutes of the founder's time on Telegram.
+
+## Amendment, registered before the build (Oct 28 2026)
+
+- **Cases.** The experimenter wrote 12 situations on AI credits, and the founder gave verdicts on Telegram. The cold probe (3 runs) was unanimous on 10 of 12. The blind judge labelled **9 surprising, 3 ordinary, 0 unclear.** The founder confirmed the experimenter's readings of the 6 surprising verdicts he gave in his own words (6 of 6 "Yes, exactly"); the other 3 surprising ones were taps on an option.
+- **Hidden cases:** 12 (9 surprising, 3 ordinary). A private reference passes 12/12. The cases are kept out of the container until scoring.
+- **Interface:** a fixed `decide(situation, facts)` with enumerated decisions, as in Gate 30.
+- **The review** uses the full list (every decision in one line, the founder marks the ones to change), open-first questions, ranking by likely disagreement with his kept rulings, and the contradiction check against earlier rulings. Hive's suggestions are off.
+- With 9 surprising cases, one case is 11 points. S1 (≥ 30) needs at least 3 more surprising cases in arm R than in arm N; the kill (< 10) fires on a gain of 0 cases.
+- Predictions are unchanged.
