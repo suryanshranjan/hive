@@ -35,6 +35,13 @@ check "morning greets and fixes the correction" "$(grep -c -e 'Welcome back' -e 
 [ "$(git rev-parse $(git branch --list 'hive/*' | tr -d ' *'))" != "$night" ]
 check "the same branch was updated with the fix" $? 0
 check "nothing is left for a second morning" "$(python3 -m hive morning | grep -c 'nothing left')" 1
+# a change of mind after the build: one fix round on the latest build, then every test re-checked
+python3 -c "
+import json, glob, os
+from hive import start
+st = json.load(open(sorted(glob.glob(os.path.expanduser('~/.hive/runs/*/state.json')), key=os.path.getmtime)[-1]))
+start.apply_ruling(st, 'The fee is 10 percent of the cash only.')" > $T/change.txt 2>&1
+check "a change of mind runs one fix round on the latest build and re-checks every test"   "$(ls -d $T/.hive/runs/*/change1 2>/dev/null | wc -l | tr -d ' ') $(grep -c '2 tests, all passing' $T/change.txt)" "1 1"
 # memory: the owner's ruling is kept (once, though given in two builds), reminded to the next build, and can be forgotten
 check "the owner's ruling is kept for this project, once" "$(python3 -m hive rules | grep -c '10 percent of the cash')" 1
 git checkout -q main

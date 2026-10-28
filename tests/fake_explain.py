@@ -2,6 +2,16 @@
 ranks them by their position, and marks the last one as something an owner cannot judge."""
 import json, re, sys
 prompt = sys.stdin.read()
+if 'Classify it.' in prompt:   # the listener: what kind of message is this?
+    said = prompt.split('"')[1]
+    low = said.lower()
+    intent = ('change' if 'changed my mind' in low or low.startswith('actually') else 'status' if 'status' in low
+              else 'greeting' if low.strip(' !.') in ('hi', 'hello', 'hey hive') else 'other')
+    print(json.dumps({'result': json.dumps({'intent': intent, 'rule': said.split(':', 1)[-1].strip() if intent == 'change' else ''})}))
+    sys.exit(0)
+if 'Which earlier rulings does this replace' in prompt:
+    print(json.dumps({'result': json.dumps({'replaces': [1] if 'late' in prompt.split('He now says:')[1] else []})}))
+    sys.exit(0)
 if 'contradict each other' in prompt:   # the contradiction check: decisions 1 and 2 clash when the owner's words say so
     clash = 'CONFLICT-ME' in prompt
     print(json.dumps({'result': json.dumps({'conflicts': [{'a': 1, 'b': 2, 'question': 'Should a missing price hide the day total?',

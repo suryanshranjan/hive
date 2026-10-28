@@ -1,0 +1,46 @@
+"""The fake Telegram shared by the tests (records what Hive sends, replies with scripted taps and messages)."""
+ME, STRANGER = 111, 999
+fail = 0
+def check(name, got, want):
+    global fail
+    ok = got == want; fail |= not ok
+    print(('ok   ' if ok else 'FAIL ') + name + ('' if ok else f' (got {got!r}, expected {want!r})'))
+
+class FakeTelegram:
+    """Records what Hive sends; replies with the owner's scripted taps and messages, one batch per poll."""
+    def __init__(self, script, stale=()):
+        self.sent, self.script, self.uid, self.stale = [], list(script), 0, list(stale)
+    def __call__(self, method, **p):
+        if method == 'sendMessage':
+            self.sent.append(p); return {'message_id': len(self.sent)}
+        if method == 'answerCallbackQuery':
+            return True
+        if method == 'getChat':
+            return {'first_name': 'Suryansh'}
+        if method == 'getUpdates':
+            if p.get('timeout') == 0:   # Hive skipping what was sent before it started listening
+                batch = [lambda f, s=s: [s] for s in self.stale][:1] and [self.stale.pop(0)] if self.stale else []
+                return [{'update_id': self._next(), 'message': {'message_id': 1, 'chat': {'id': c}, 'text': t}}
+                        for c, t, _, _ in batch]
+            if not self.script:
+                return []
+            batch = self.script.pop(0)(self)
+            out = []
+            for chat, text, data, reply_to in batch:
+                self.uid += 1
+                if data:
+                    out.append({'update_id': self.uid, 'callback_query': {'id': str(self.uid), 'data': data,
+                                'message': {'message_id': reply_to, 'chat': {'id': chat}}}})
+                else:
+                    m = {'message_id': 1000 + self.uid, 'chat': {'id': chat}, 'text': text}
+                    if reply_to:
+                        m['reply_to_message'] = {'message_id': reply_to}
+                    out.append({'update_id': self.uid, 'message': m})
+            return out
+        raise AssertionError(method)
+    def _next(self):
+        self.uid += 1; return self.uid
+
+
+tap = lambda data: (lambda f: [(ME, None, data, 2)])
+say = lambda words: (lambda f: [(ME, words, None, None)])

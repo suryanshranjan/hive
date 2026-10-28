@@ -15,6 +15,21 @@ never flustered or chatty, and every message leaves the owner one easy thing to 
 import getpass, json, os, time, urllib.request
 
 PATH = os.path.join(os.path.expanduser('~'), '.hive', 'telegram.json')
+BUSY = os.path.join(os.path.expanduser('~'), '.hive', 'telegram.busy')   # who is talking to the owner right now
+
+def _alive(pid):
+    try:
+        os.kill(pid, 0); return True
+    except Exception:
+        return False
+
+def busy_elsewhere(stale=90):
+    """True while another Hive process (a build or a review) is reading the owner's chat; the listener steps aside."""
+    try:
+        b = json.load(open(BUSY))
+    except Exception:
+        return False
+    return b.get('pid') != os.getpid() and _alive(b.get('pid', -1)) and time.time() - b.get('at', 0) < stale
 
 def _call(token, method, **params):
     req = urllib.request.Request(f'https://api.telegram.org/bot{token}/{method}', data=json.dumps(params).encode(),
@@ -33,11 +48,12 @@ def load():
 
 class Channel:
     """One owner's chat. `api(method, **params)` is the Telegram Bot API (replaced by a fake in tests)."""
-    def __init__(self, cfg, api=None):
+    def __init__(self, cfg, api=None, listener=False):
         self.chat = cfg['chat_id']; self.address = cfg.get('address')
         self.api = api or (lambda method, **p: _call(cfg['token'], method, **p))
         self.offset = None
         self.note = None   # what to say when the owner asks for status (set by whoever is running)
+        self.listener = listener   # the always-on listener never claims the chat; builds and reviews do
 
     def send(self, text, buttons=None, reply_to=None):
         p = {'chat_id': self.chat, 'text': text}
@@ -74,8 +90,20 @@ class Channel:
         p = {'timeout': timeout, 'allowed_updates': ['message', 'callback_query']}
         if self.offset is not None:
             p['offset'] = self.offset
+        if not self.listener:
+            try:
+                os.makedirs(os.path.dirname(BUSY), exist_ok=True)
+                json.dump({'pid': os.getpid(), 'at': time.time()}, open(BUSY, 'w'))
+            except Exception:
+                pass
         out = []
-        for u in self.api('getUpdates', **p):
+        try:
+            batch = self.api('getUpdates', **p)
+        except RuntimeError as e:   # another reader polled at the same moment (Telegram allows one): try again shortly
+            if 'onflict' not in str(e):
+                raise
+            time.sleep(2); return []
+        for u in batch:
             self.offset = u['update_id'] + 1
             if 'callback_query' in u:
                 cq = u['callback_query']

@@ -83,3 +83,18 @@ def forget(repo, n):
         print(f'There is no ruling {n}.'); return 1
     gone = rulings.pop(n - 1); _save(repo, rulings)
     print(f'Forgotten: {gone["text"]}'); return 0
+
+def add(repo, text, kind='owner'):
+    """Keep one ruling the owner gave directly (for example on Telegram, outside a build)."""
+    rulings = load(repo)
+    text = ' '.join(text.split())
+    if text and text not in {r['text'] for r in rulings}:
+        rulings.append({'text': text, 'kind': kind, 'when': time.strftime('%Y-%m-%d'), 'feature': ''})
+        _save(repo, rulings)
+    return len(rulings)
+
+def replace(repo, old_indexes, text):
+    """The owner changed his mind: drop the rulings he overrode (0-based indexes) and keep the new one."""
+    rulings = [r for n, r in enumerate(load(repo)) if n not in set(old_indexes)]
+    _save(repo, rulings)
+    return add(repo, text, 'changed')
