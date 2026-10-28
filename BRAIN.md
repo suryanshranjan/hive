@@ -199,7 +199,10 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 
 ## 9. Next experiments, exactly
 
-0. **Gate 37: where to ask, and how stable the owner is** (needs about 10 minutes of the founder, on a fresh area). (a) Hive writes its interview from the feature's interface (the situations the code decides), and a blind judge scores coverage of an independent hidden set against Gate 36's 44%. (b) The same session re-asks 6 of his earlier situations in a new framing, to measure his agreement with himself. Build and score as in Gate 36 only if coverage reaches 70%.
+0. **Gate 37, registered and running: where to ask, and how stable the owner is** (content approval and revisions).
+   - Hive's interview is written from the decisions the code must take, one situation per decision, up to 20. The pilot gave 7 of 9 coverage of Gate 36's surprising situations, against 3 from the description; see `gates/gate37/PILOT_RESULTS.md`.
+   - It is scored on an independent hidden set: I against N.
+   - The same session re-asks 6 of the founder's Gate 36 situations in a new framing, to measure his agreement with himself (K1).
 1. **Owner-chosen examples on real rules** (needs the owner's time): the founder writes one example per decision for Gate 7's functions, without seeing the QA list; compare with the same number of builder questions. Tests the Gate 18 conjecture.
 2. **The documented-owner interface on real documents** (needs the company's policy pages).
 2. **Repeat Gate 11 on a new rule-giver** (about $8.4).
