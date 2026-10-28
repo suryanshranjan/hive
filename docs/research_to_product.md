@@ -38,6 +38,7 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 | A menu of alternatives led him away from his own rule | Gate 30 | High-stakes decisions in the review ask open first ("what would you do instead?") | `hive/telegram.py` |
 | Rulings kept between builds stop repeat questions (25 → 13 decisions to review) | Gate 29 | Rulings are remembered per project and reminded to every build | `hive/memory.py` |
 | Contrast examples moved boundaries and broke more | Gate 14 | Not used | |
+| Telling the interview's planner that unusual input is an owner decision (up to 30 questions) | Gate 40: coverage 0.64 vs 0.76, +1.2 points | Not used (`inputs=False` by default) | `hive/interview.py` |
 | Coverage-planned or defaults-first questions did not beat free asking | Gates 4, 5 | Not used | |
 | A model of the founder cannot answer for him | Gates 33, 34 | Hive never answers for the owner | |
 
@@ -53,7 +54,7 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 
 ## Still to turn into the product
 
-- **Gate 40:** the interview never asked about unusual input (8 of 25 decisions in Gate 39). If asking about it adds ≥ 5 points, the planner lists it by default.
+- **Gate 41:** the sheet keeps only 0.69–0.76 of the decisions the interview asked (Gates 39, 40). If handing builders every ruling whole adds ≥ 5 points, Hive does so.
 
 - **Gate 38** (running): does a confirmed rule hold a day later? If not, the hand-over ("looks right?") becomes the main channel, and the interview shrinks.
 - Self-registering modules would cut collisions further (BRAIN §7); not yet needed at 8 builders.

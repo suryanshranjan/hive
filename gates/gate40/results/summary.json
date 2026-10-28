@@ -1,0 +1,76 @@
+{
+ "name": "g40",
+ "arms": {
+  "N0": {
+   "hidden_pass": 0.416,
+   "ci95_by_function": [
+    0.252,
+    0.6
+   ],
+   "tests": 250
+  },
+  "H": {
+   "hidden_pass": 0.632,
+   "ci95_by_function": [
+    0.484,
+    0.8
+   ],
+   "tests": 250
+  },
+  "H2": {
+   "hidden_pass": 0.644,
+   "ci95_by_function": [
+    0.444,
+    0.844
+   ],
+   "tests": 250
+  },
+  "R": {
+   "hidden_pass": 1.0,
+   "ci95_by_function": [
+    1.0,
+    1.0
+   ],
+   "tests": 250
+  },
+  "T": {
+   "hidden_pass": 0.84,
+   "ci95_by_function": [
+    0.676,
+    0.968
+   ],
+   "tests": 250
+  }
+ },
+ "diffs": {
+  "H-N0": {
+   "points": 21.6,
+   "ci95": [
+    4.8,
+    37.6
+   ]
+  },
+  "H2-N0": {
+   "points": 22.8,
+   "ci95": [
+    6.0,
+    40.4
+   ]
+  },
+  "R-N0": {
+   "points": 58.4,
+   "ci95": [
+    39.6,
+    74.8
+   ]
+  },
+  "T-N0": {
+   "points": 42.4,
+   "ci95": [
+    24.4,
+    60.8
+   ]
+  }
+ },
+ "allowance": {}
+}

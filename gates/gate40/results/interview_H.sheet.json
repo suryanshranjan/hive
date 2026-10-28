@@ -1,0 +1,93 @@
+{
+ "draft": {
+  "rules": [
+   {
+    "rule": "Whenever a delivery date is promised in working days, count Saturdays, Sundays and national public holidays as days off (so Christmas Day and New Year's Day are not counted). Whenever an order arrives on a Saturday, treat it as received on Monday, so an order received on Saturday 14 June with a promise of 1 working day is promised for Tuesday 17 June.",
+    "from": [
+     1,
+     2
+    ]
+   },
+   {
+    "rule": "Whenever a birth date or order date in a customer record is blank or impossible (such as 30 February) while a report is running, give a blank result for that date and let the report carry on.",
+    "from": [
+     3
+    ]
+   },
+   {
+    "rule": "Whenever a customer was born on 29 February and the year has no 29 February, treat them as turning 18 (for the 18+ age check) on 1 March of that year, so someone born on 29 February 2000 turns 18 on 1 March.",
+    "from": [
+     4
+    ]
+   },
+   {
+    "rule": "Whenever a student scores 89.5 out of 100 on a course, the grade is A, because we round up to the nearest whole mark, or because our cut-offs are lower (for example A from 85).",
+    "from": [
+     5
+    ]
+   },
+   {
+    "rule": "Whenever a student's score is above 100 because of bonus questions (for example 105 out of 100), the student gets an A, because bonus marks are fine.",
+    "from": [
+     6
+    ]
+   },
+   {
+    "rule": "Whenever a product title needs a web address ending (slug), make it lowercase, remove accents, drop symbols and join the words with hyphens, so 'Caf\u00e9 Cr\u00e8me \u2013 50% Off!' becomes cafe-creme-50-off. Whenever the title contains no usable Latin letters (for example it is written entirely in Hindi script or consists only of symbols), the slug is the single word \"untitled\".",
+    "from": [
+     7,
+     15
+    ]
+   },
+   {
+    "rule": "Whenever a late fee is calculated, charge no fee at all if the invoice is not late or has nothing due. Otherwise the fee is 1% of the invoice amount for each day late, but never less than $5 and never more than 25% of the invoice amount (the $5 minimum applies only once the invoice is at least one day late), so a $1,000 invoice paid 60 days late is charged the 25% cap of $250.",
+    "from": [
+     8
+    ]
+   },
+   {
+    "rule": "Whenever a card number is printed, ignore any dashes and spaces in the input. If the number contains any letters, print nothing and give a blank result. Otherwise, if it has fewer than 8 digits, print it fully hidden with stars. Otherwise print only the card's last 4 digits, replace every other digit with a star and remove all spaces, so 4111 1111 1111 1234 prints as 12 stars followed by 1234.",
+    "from": [
+     9,
+     10
+    ]
+   },
+   {
+    "rule": "Whenever a discount is entered above 50%, apply it as 50% off, so a $50 item with a 120% discount entered sells for $25.",
+    "from": [
+     11
+    ]
+   },
+   {
+    "rule": "Whenever a parcel's shipping price is calculated, round its weight up to the next whole kilogram (2.3 kg is charged as 3 kg, 0.4 kg as 1 kg) and charge a base fee plus a per-kg rate times the rounded weight, with zone A cheapest, then zone B, then zone C. A 2.3 kg parcel to zone B costs $12.50, a 0.4 kg parcel to zone B costs $9.50 and a 2.3 kg parcel to zone C costs $16.50. Whenever the delivery zone is not exactly the uppercase letter A, B or C (including lowercase letters such as 'b' and zones with no rates such as 'D'), charge the zone C rate. There is no maximum weight and no free shipping, so every parcel, including an 80 kg item, is charged the normal rate, and whenever a parcel is over 30 kg a heavy-parcel surcharge is charged on top of that normal charge.",
+    "from": [
+     12,
+     13,
+     14
+    ]
+   },
+   {
+    "rule": "Whenever a product's rating is displayed, ignore invalid ratings (such as a 9 on a star scale). Show a rating only if the product has at least 3 valid ratings, otherwise show no rating and leave it blank (ratings of 5, 4 and an invalid 9 give no rating, and a product with no ratings gives no rating). When it is shown, it is the average of the valid star ratings rounded to the nearest half star, so an average of 4.33 (from ratings of 5, 4 and 4) displays as 4.5.",
+    "from": [
+     16,
+     17
+    ]
+   }
+  ],
+  "disagree": []
+ },
+ "done": true,
+ "rules": [
+  "Whenever a delivery date is promised in working days, count only Saturdays, Sundays, Christmas Day (25 December) and New Year's Day (1 January) as days off, so none of them are counted as working days. There are no other public holidays. Whenever an order arrives on a day off (a Saturday, a Sunday, Christmas Day or New Year's Day), treat it as received on the next working day, and start the count from that day. For example, an order received on Saturday 14 June with a promise of 1 working day is treated as received on Monday 16 June and is promised for Tuesday 17 June.",
+  "Whenever a birth date or order date in a customer record is blank or impossible (such as 30 February) while a report is running, give a blank result for that date and let the report carry on.",
+  "Whenever a customer was born on 29 February and the year has no 29 February, treat them as turning 18 (for the 18+ age check) on 1 March of that year, so someone born on 29 February 2000 turns 18 on 1 March.",
+  "Whenever a student scores 89.5 out of 100 on a course, the grade is A, because we round up to the nearest whole mark, or because our cut-offs are lower (for example A from 85).",
+  "Whenever a student's score is above 100 because of bonus questions (for example 105 out of 100), the student gets an A, because bonus marks are fine.",
+  "Whenever a product title needs a web address ending (slug), make it lowercase, remove accents, drop symbols and join the words with hyphens, so 'Caf\u00e9 Cr\u00e8me \u2013 50% Off!' becomes cafe-creme-50-off. Whenever the title contains no usable Latin letters (for example it is written entirely in Hindi script or consists only of symbols), the slug is the single word \"untitled\".",
+  "Whenever a late fee is calculated, charge no fee at all if the invoice is not late or has nothing due. Otherwise the fee is 1% of the invoice amount for each day late, but never less than $5 and never more than 25% of the invoice amount (the $5 minimum applies only once the invoice is at least one day late), so a $1,000 invoice paid 60 days late is charged the 25% cap of $250.",
+  "Whenever a card number is printed, ignore any dashes and spaces in the input. If the number contains any letters, print nothing and give a blank result. Otherwise, if it has fewer than 8 digits, print it fully hidden with stars. Otherwise print only the card's last 4 digits, replace every other digit with a star and remove all spaces, so 4111 1111 1111 1234 prints as 12 stars followed by 1234.",
+  "Whenever a discount is entered above 50%, apply it as 50% off, so a $50 item with a 120% discount entered sells for $25.",
+  "Whenever a parcel's shipping price is calculated, round its weight up to the next whole kilogram (2.3 kg is charged as 3 kg, 0.4 kg as 1 kg) and charge a base fee plus a per-kg rate times the rounded weight, with zone A cheapest, then zone B, then zone C. A 2.3 kg parcel to zone B costs $12.50, a 0.4 kg parcel to zone B costs $9.50 and a 2.3 kg parcel to zone C costs $16.50. Whenever the delivery zone is not exactly the uppercase letter A, B or C (including lowercase letters such as 'b' and zones with no rates such as 'D'), charge the zone C rate. There is no maximum weight and no free shipping, so every parcel, including an 80 kg item, is charged the normal rate, and whenever a parcel is over 30 kg a heavy-parcel surcharge is charged on top of that normal charge.",
+  "Whenever a product's rating is displayed, ignore invalid ratings (such as a 9 on a star scale). Show a rating only if the product has at least 3 valid ratings, otherwise show no rating and leave it blank (ratings of 5, 4 and an invalid 9 give no rating, and a product with no ratings gives no rating). When it is shown, it is the average of the valid star ratings rounded to the nearest half star, so an average of 4.33 (from ratings of 5, 4 and 4) displays as 4.5."
+ ]
+}

@@ -1,0 +1,1065 @@
+{
+ "R": [
+  "Whenever any function receives a boolean, a text value where a number is expected, or a non-finite number (NaN or infinity) in a numeric argument, it returns NULL (net_price, add_bdays, letter_grade, ship_cost, bmi_value, late_fee).",
+  "Whenever net_price gets a NULL price or a NULL discount_pct, it returns NULL.",
+  "Whenever net_price gets a negative price, it returns NULL; a price of zero is valid and gives 0.0.",
+  "Whenever net_price gets a discount_pct below 0, it treats the discount as 0 and returns the full price rounded to cents.",
+  "Whenever net_price gets a discount_pct above 50, it treats the discount as 50.",
+  "Whenever net_price computes the discounted amount, it uses exact decimal arithmetic on the values as written and rounds half-up to 2 decimals (so a half-cent rounds up).",
+  "Whenever add_bdays gets a start_date that is not exactly four digits, a dash, two digits, a dash and two digits, or is not a real calendar date, it returns NULL; leading and trailing whitespace around the date is ignored.",
+  "Whenever add_bdays gets a NULL start_date or NULL n, it returns NULL.",
+  "Whenever add_bdays gets an n that is not a whole-number integer (a decimal such as 2.0, text, or a boolean), it returns NULL.",
+  "Whenever add_bdays gets a negative n, it returns NULL.",
+  "Whenever add_bdays gets an n above 260, it treats n as 260.",
+  "Whenever add_bdays counts business days, a business day is Monday to Friday excluding December 25 and January 1 of any year; no other holidays exist and a holiday that falls on a weekend is not moved to a weekday.",
+  "Whenever the start_date passed to add_bdays is not itself a business day (a Saturday, Sunday, December 25 or January 1), it first moves forward to the next business day and then counts n from there, even when n is 0.",
+  "Whenever add_bdays gets n equal to 0 and a start_date that is a business day, it returns that same date.",
+  "Whenever add_bdays counts, day 1 is the first business day strictly after the (adjusted) start date.",
+  "Whenever add_bdays would produce a date beyond the maximum representable date (year 9999), it returns NULL.",
+  "Whenever add_bdays returns a date, it is formatted as zero-padded YYYY-MM-DD.",
+  "Whenever mask_card gets NULL, it returns NULL.",
+  "Whenever mask_card gets a boolean or a decimal (floating-point) number, it returns NULL; a whole-number integer is accepted and treated as its digit text.",
+  "Whenever mask_card gets text, it first removes every space and every hyphen, and no other separator is removed.",
+  "Whenever mask_card is left with an empty string after removing spaces and hyphens, or with any character that is not an ASCII digit 0-9 (letters, slashes, dots, a minus sign, tabs, non-ASCII digits), it returns NULL.",
+  "Whenever mask_card gets 8 or more digits, it returns asterisks for all but the last 4 digits, followed by those last 4 digits.",
+  "Whenever mask_card gets fewer than 8 digits (1 to 7), it returns only asterisks, one per digit, and shows no digits.",
+  "Whenever mask_card returns a value, the original spaces and hyphens are not kept: the output is one unbroken string with exactly one character per digit.",
+  "Whenever letter_grade gets a NULL score or a NULL max_score, it returns NULL.",
+  "Whenever letter_grade gets a max_score of 0 or less (after the NULL check), it returns the text 'N/A' whatever the score is.",
+  "Whenever letter_grade computes the percentage score/max_score*100, it rounds it half-up to a whole number first and then assigns the band: 90 or more is A, 80-89 is B, 70-79 is C, 60-69 is D, below 60 is F.",
+  "Whenever letter_grade gets a score above max_score, it still grades it by the same bands (so over 100% is A); a negative score gives F.",
+  "Whenever letter_grade does its division, it uses exact decimal arithmetic on the values as written, so there is no floating-point error at band edges.",
+  "Whenever slugify gets NULL, it returns NULL.",
+  "Whenever slugify gets a non-text value such as a number, it converts it to its text form and slugifies that.",
+  "Whenever slugify builds a slug, it lowercases the text.",
+  "Whenever slugify meets accented letters, it replaces them with their unaccented base letters (for example \u00e9 becomes e).",
+  "Whenever slugify meets any character other than a-z or 0-9 after accent folding (spaces, punctuation, symbols, letters with no base Latin form), it treats it as a separator, and each run of consecutive separators becomes a single hyphen.",
+  "Whenever slugify would produce a slug that begins or ends with a hyphen, it removes those leading and trailing hyphens.",
+  "Whenever slugify produces a slug longer than 40 characters, it cuts it to the first 40 characters and then removes any trailing hyphen left by the cut.",
+  "Whenever slugify's result is empty (empty input, only punctuation or whitespace, or only characters with no Latin form), it returns the text 'untitled'.",
+  "Whenever ship_cost gets a NULL weight_kg, or a zone that is NULL or not text, it returns NULL.",
+  "Whenever ship_cost gets a weight of 0 or less, it returns 0.0 whatever the zone is, including an unknown zone.",
+  "Whenever ship_cost prices a positive weight, the charge is the zone base fee plus 1.50 for each whole kilogram, with the weight rounded up to the next whole kilogram (2.2 kg bills as 3 kg).",
+  "Whenever ship_cost looks up the zone base fee, zone 'A' is 5.00, zone 'B' is 8.00 and zone 'C' is 12.00.",
+  "Whenever ship_cost gets a zone that is not exactly 'A', 'B' or 'C' (lowercase letters, empty text, other letters), it bills it at the zone C base fee instead of returning NULL; zone matching is case-sensitive.",
+  "Whenever ship_cost gets a weight strictly over 30 kg, it adds a flat 20.00 surcharge; exactly 30 kg has no surcharge, and 30.5 kg does.",
+  "Whenever bmi_value gets a NULL weight or height, or a weight or height of 0 or less, it returns NULL.",
+  "Whenever bmi_value computes weight divided by height in metres squared (height_cm / 100), it truncates the result toward zero to 1 decimal place and never rounds up.",
+  "Whenever bmi_value does its arithmetic, it uses exact decimal arithmetic on the values as written, so there is no floating-point error before truncating.",
+  "Whenever bmi_value gets very large or very small but positive inputs, it applies no range limits and just computes the formula.",
+  "Whenever age_years gets a NULL birth_date or as_of_date, or a date that is not strict YYYY-MM-DD or not a real calendar date, it returns NULL; surrounding whitespace is ignored.",
+  "Whenever age_years gets an as_of_date earlier than the birth_date, it returns NULL.",
+  "Whenever age_years gets an as_of_date equal to the birth_date, it returns 0.",
+  "Whenever age_years computes age, it is the year difference minus 1 if the as_of month-day is before the birth month-day, so the birthday itself counts as the new age.",
+  "Whenever age_years gets a Feb 29 birth date and the as_of year is not a leap year, it treats the birthday as March 1, so the person turns a year older on March 1 and not on February 28.",
+  "Whenever age_years gets a Feb 29 birth date and the as_of year is a leap year, the birthday is Feb 29 itself.",
+  "Whenever late_fee gets a NULL amount_due or NULL days_late, it returns NULL.",
+  "Whenever late_fee gets an amount_due of 0 or less, or a days_late of 0 or less, it returns 0.0 with no minimum fee.",
+  "Whenever late_fee has a positive amount and positive days, the base penalty is 1% of the amount for each day late (amount * days / 100); days_late may be fractional.",
+  "Whenever late_fee's base penalty exceeds 25% of amount_due, it is capped at 25% of amount_due.",
+  "Whenever late_fee's penalty after the cap is below 5.00, it is raised to the minimum of 5.00, and this minimum wins even when it exceeds 25% of a small amount_due (amounts under 20.00).",
+  "Whenever late_fee computes a fee, it uses exact decimal arithmetic and rounds half-up to 2 decimals.",
+  "Whenever avg_stars receives a NULL, a non-numeric value, a boolean, or a non-finite number, it ignores that value and does not count it.",
+  "Whenever avg_stars receives a numeric rating below 1 or above 5, it ignores it entirely; 1 and 5 are valid, and decimals such as 2.5 are valid ratings.",
+  "Whenever avg_stars has fewer than 3 valid ratings (including none at all), it returns NULL.",
+  "Whenever avg_stars has 3 or more valid ratings, it takes the exact mean of the valid ratings only and rounds it to the nearest 0.5, with an exact tie between two halves rounding up (a mean of 3.25 gives 3.5, 3.75 gives 4.0).",
+  "Whenever avg_stars returns a value, it is always one of 1.0, 1.5, ... 5.0."
+ ],
+ "interviews": {
+  "H": {
+   "rules": [
+    "Whenever a delivery date is promised in working days, count only Saturdays, Sundays, Christmas Day (25 December) and New Year's Day (1 January) as days off, so none of them are counted as working days. There are no other public holidays. Whenever an order arrives on a day off (a Saturday, a Sunday, Christmas Day or New Year's Day), treat it as received on the next working day, and start the count from that day. For example, an order received on Saturday 14 June with a promise of 1 working day is treated as received on Monday 16 June and is promised for Tuesday 17 June.",
+    "Whenever a birth date or order date in a customer record is blank or impossible (such as 30 February) while a report is running, give a blank result for that date and let the report carry on.",
+    "Whenever a customer was born on 29 February and the year has no 29 February, treat them as turning 18 (for the 18+ age check) on 1 March of that year, so someone born on 29 February 2000 turns 18 on 1 March.",
+    "Whenever a student scores 89.5 out of 100 on a course, the grade is A, because we round up to the nearest whole mark, or because our cut-offs are lower (for example A from 85).",
+    "Whenever a student's score is above 100 because of bonus questions (for example 105 out of 100), the student gets an A, because bonus marks are fine.",
+    "Whenever a product title needs a web address ending (slug), make it lowercase, remove accents, drop symbols and join the words with hyphens, so 'Caf\u00e9 Cr\u00e8me \u2013 50% Off!' becomes cafe-creme-50-off. Whenever the title contains no usable Latin letters (for example it is written entirely in Hindi script or consists only of symbols), the slug is the single word \"untitled\".",
+    "Whenever a late fee is calculated, charge no fee at all if the invoice is not late or has nothing due. Otherwise the fee is 1% of the invoice amount for each day late, but never less than $5 and never more than 25% of the invoice amount (the $5 minimum applies only once the invoice is at least one day late), so a $1,000 invoice paid 60 days late is charged the 25% cap of $250.",
+    "Whenever a card number is printed, ignore any dashes and spaces in the input. If the number contains any letters, print nothing and give a blank result. Otherwise, if it has fewer than 8 digits, print it fully hidden with stars. Otherwise print only the card's last 4 digits, replace every other digit with a star and remove all spaces, so 4111 1111 1111 1234 prints as 12 stars followed by 1234.",
+    "Whenever a discount is entered above 50%, apply it as 50% off, so a $50 item with a 120% discount entered sells for $25.",
+    "Whenever a parcel's shipping price is calculated, round its weight up to the next whole kilogram (2.3 kg is charged as 3 kg, 0.4 kg as 1 kg) and charge a base fee plus a per-kg rate times the rounded weight, with zone A cheapest, then zone B, then zone C. A 2.3 kg parcel to zone B costs $12.50, a 0.4 kg parcel to zone B costs $9.50 and a 2.3 kg parcel to zone C costs $16.50. Whenever the delivery zone is not exactly the uppercase letter A, B or C (including lowercase letters such as 'b' and zones with no rates such as 'D'), charge the zone C rate. There is no maximum weight and no free shipping, so every parcel, including an 80 kg item, is charged the normal rate, and whenever a parcel is over 30 kg a heavy-parcel surcharge is charged on top of that normal charge.",
+    "Whenever a product's rating is displayed, ignore invalid ratings (such as a 9 on a star scale). Show a rating only if the product has at least 3 valid ratings, otherwise show no rating and leave it blank (ratings of 5, 4 and an invalid 9 give no rating, and a product with no ratings gives no rating). When it is shown, it is the average of the valid star ratings rounded to the nearest half star, so an average of 4.33 (from ratings of 5, 4 and 4) displays as 4.5."
+   ],
+   "questions": [
+    {
+     "id": "q01",
+     "situation": "A customer orders on Friday 20 December and you promise delivery in 5 working days. Christmas Day and New Year's Day fall inside that period.",
+     "options": [
+      "Only Saturdays and Sundays are days off, so the holidays still count as working days",
+      "Saturdays, Sundays and national public holidays are days off",
+      "Saturdays, Sundays, public holidays and our own shop closure days are all days off"
+     ]
+    },
+    {
+     "id": "q02",
+     "situation": "An order arrives on Saturday 14 June and the promise is '1 working day'.",
+     "options": [
+      "Promised for Monday 16 June, with the count starting from the next working day",
+      "Promised for Tuesday 17 June, because Saturday orders are treated as received on Monday",
+      "Staff must pick the date by hand for weekend orders"
+     ]
+    },
+    {
+     "id": "q03",
+     "situation": "A supplier's deadline is Wednesday and staff need the date 3 working days before it, to place the order in time.",
+     "options": [
+      "Count backwards over working days only, which gives the previous Friday",
+      "Count backwards over every calendar day, weekends included, which gives the previous Sunday",
+      "Counting backwards is not allowed, only forward dates are given"
+     ]
+    },
+    {
+     "id": "q04",
+     "situation": "A staff member types a birth date or order date that is impossible (30 February) or leaves it blank in a customer record, and a report is running.",
+     "options": [
+      "A blank gives a blank result, while an impossible date stops the report with an error message",
+      "Both a blank and an impossible date give a blank result and the report carries on",
+      "Any blank or impossible date stops the whole report with an error message"
+     ]
+    },
+    {
+     "id": "q05",
+     "situation": "A customer was born on 29 February 2000 and wants to buy an age-restricted item (18+) in a year with no 29 February.",
+     "options": [
+      "They turn 18 on 1 March",
+      "They turn 18 on 28 February",
+      "Staff decide each case by hand"
+     ]
+    },
+    {
+     "id": "q06",
+     "situation": "A $1,000 invoice is paid 60 days late.",
+     "options": [
+      "1.5% for every 30 days late, counted day by day, so $30 with no cap and no minimum",
+      "A single flat $25 fee, however many days late",
+      "2% for each month started, with a $10 minimum and a cap of 10% of the invoice"
+     ]
+    },
+    {
+     "id": "q07",
+     "situation": "A student scores 89.5 out of 100 on a course.",
+     "options": [
+      "B, because A starts at 90, with 80, 70 and 60 for B, C and D and no plus or minus grades",
+      "B+, because we use plus and minus grades",
+      "A, because we round up to the nearest whole mark, or our cut-offs are lower (for example A from 85)"
+     ]
+    },
+    {
+     "id": "q08",
+     "situation": "A student scores 105 out of 100 thanks to bonus questions.",
+     "options": [
+      "Gets an A, because bonus marks are fine",
+      "Gets an A, but the record is flagged for a teacher to check",
+      "No grade is given, because a score over the maximum is treated as a data entry mistake"
+     ]
+    },
+    {
+     "id": "q09",
+     "situation": "A receipt is printed for the card 4111 1111 1111 1234.",
+     "options": [
+      "Only the last 4 digits are shown, and every other digit is hidden",
+      "The first 6 and the last 4 digits are shown",
+      "Only the last 2 digits are shown"
+     ]
+    },
+    {
+     "id": "q10",
+     "situation": "A cashier types a card number with dashes (4111-1111-1111-1234), or a number that is too short, or one that contains letters.",
+     "options": [
+      "Dashes and spaces are ignored; a short number or one with letters is fully hidden",
+      "Dashes are kept in the printout; a short number or one with letters is fully hidden",
+      "Anything that is not a clean card number is refused and nothing is printed"
+     ]
+    },
+    {
+     "id": "q11",
+     "situation": "A staff member enters a 120% discount by mistake on a $50 item.",
+     "options": [
+      "The entry is refused with an error message",
+      "It is treated as 100% off, so the item is free",
+      "It is ignored and the item is sold at full price"
+     ]
+    },
+    {
+     "id": "q12",
+     "situation": "A 2.3 kg parcel is going to zone B.",
+     "options": [
+      "Charged as 3 kg, with partial kilograms rounded up, at a base fee plus a rate per kg (cheapest A, then B, then C)",
+      "Charged for exactly 2.3 kg",
+      "Charged by weight band: up to 1 kg, up to 5 kg and up to 10 kg, each at one flat price"
+     ]
+    },
+    {
+     "id": "q13",
+     "situation": "A parcel is booked for delivery zone 'D', which has no rates, or a zone typed in lowercase ('b').",
+     "options": [
+      "Lowercase is accepted; an unknown zone gives an error and no charge",
+      "Lowercase is accepted; an unknown zone is charged at the zone C rate",
+      "Lowercase is accepted; for an unknown zone the shipping charge is left blank so staff quote by hand"
+     ]
+    },
+    {
+     "id": "q14",
+     "situation": "A customer wants to send an 80 kg item, or a very light 0.4 kg parcel.",
+     "options": [
+      "No weight limit and no free shipping: the same formula applies to everything",
+      "Over 30 kg we do not ship it, and staff give a manual quote",
+      "Parcels under 0.5 kg ship free as a promotion"
+     ]
+    },
+    {
+     "id": "q15",
+     "situation": "A product is titled 'Caf\u00e9 Cr\u00e8me \u2013 50% Off!' and needs a web address ending.",
+     "options": [
+      "cafe-creme-50-off, lowercase with accents removed and symbols dropped",
+      "caf\u00e9-cr\u00e8me-50-off, keeping the accents",
+      "cafe-creme-50-percent-off, with the % sign spelled out"
+     ]
+    },
+    {
+     "id": "q16",
+     "situation": "A product title is written entirely in Hindi script (or is just symbols), so no usable Latin letters are left.",
+     "options": [
+      "The web address ending is left empty",
+      "The original script is kept in the web address ending",
+      "A generic word with a number is used instead, such as 'product-1234'"
+     ]
+    },
+    {
+     "id": "q17",
+     "situation": "A product has three ratings: 5, 4 and 4 stars (average 4.33).",
+     "options": [
+      "Shows 4.3, rounded to one decimal",
+      "Shows 4.5, rounded to the nearest half star",
+      "Shows 4 stars, rounded to a whole number"
+     ]
+    },
+    {
+     "id": "q18",
+     "situation": "One product has ratings of 5, 4 and a glitch entry of 9 stars, and a second product has no ratings at all.",
+     "options": [
+      "The glitch and blank entries are ignored, and a product with no ratings shows 'no rating yet'",
+      "The 9 is counted as 5 stars, and a product with no ratings shows 0 stars",
+      "A product with any invalid entry shows no headline rating until staff check it"
+     ]
+    },
+    {
+     "id": "q19",
+     "situation": "A brand-new product has just one rating, a 5-star review from the owner's cousin.",
+     "options": [
+      "Shows 5.0 stars straight away",
+      "Shows no headline rating until it has at least 5 ratings",
+      "Shows a figure pulled toward the shop's overall average, for example 4.2"
+     ]
+    }
+   ],
+   "planned_decisions": [
+    {
+     "case": "add_bdays: which days count as non-business days (weekends only, or also public holidays; which holiday calendar)",
+     "default": "Business days are Monday\u2013Friday; weekends skipped, no public holidays excluded."
+    },
+    {
+     "case": "add_bdays: n = 0, or a start date that falls on a weekend",
+     "default": "n=0 returns the start date unchanged; a weekend start counts from the next business day onward without counting the weekend start itself (e.g., Saturday + 1 = Monday)."
+    },
+    {
+     "case": "add_bdays: negative n (business days before the start date)",
+     "default": "Supported: counts backward over weekdays, skipping weekends."
+    },
+    {
+     "case": "add_bdays / age_years: invalid, malformed or NULL date input",
+     "default": "Return NULL for NULL input; return an error for malformed or impossible dates (e.g., 2025-02-30)."
+    },
+    {
+     "case": "age_years: birthday on Feb 29 in a non-leap year, and as_of_date before birth_date",
+     "default": "Feb 29 birthday is reached on Mar 1 in non-leap years; an as_of_date before birth date returns an error (or NULL), never a negative age."
+    },
+    {
+     "case": "bmi_value: rounding and precision of the result",
+     "default": "Round to 1 decimal place, using weight_kg / (height_cm/100)^2."
+    },
+    {
+     "case": "bmi_value: zero, negative or NULL weight/height",
+     "default": "Zero or negative height or weight is an error/NULL; NULL input gives NULL."
+    },
+    {
+     "case": "late_fee: how the penalty is calculated (flat fee, percent per day, monthly rate, minimum fee, cap)",
+     "default": "1.5% of amount due per 30 days late, prorated simple (non-compounding) daily, no cap and no minimum, rounded to cents."
+    },
+    {
+     "case": "late_fee: invoice not yet late (days_late \u2264 0) or zero amount",
+     "default": "Fee is 0.00."
+    },
+    {
+     "case": "late_fee: grace period before fees start",
+     "default": "No grace period; fee accrues from day 1 late."
+    },
+    {
+     "case": "letter_grade: score cutoffs for A\u2013F and plus/minus grades",
+     "default": "Percentage = score/max_score: A \u2265 90, B \u2265 80, C \u2265 70, D \u2265 60, else F; no plus/minus."
+    },
+    {
+     "case": "letter_grade: score above max_score (extra credit), negative score, or max_score zero/NULL",
+     "default": "Score above max is still A; negative score is F; max_score \u2264 0 or NULL returns NULL/error."
+    },
+    {
+     "case": "mask_card: how many digits are shown and what is hidden",
+     "default": "Show only the last 4 digits, replace all others with '*', keep original length."
+    },
+    {
+     "case": "mask_card: input with spaces/dashes, too short, or non-numeric",
+     "default": "Strip spaces and dashes before masking; if fewer than 5 digits or non-numeric, mask everything (never reveal the input) ; NULL gives NULL."
+    },
+    {
+     "case": "net_price: rounding of the result and discount percentage out of range (negative, over 100)",
+     "default": "Round to cents (half up); discount below 0 or above 100 is an error; 100 gives 0.00."
+    },
+    {
+     "case": "ship_cost: rate structure (base fee, per-kg rate, per zone) and weight brackets",
+     "default": "Base charge plus per-kg rate per zone (A cheapest, then B, then C), partial kilograms rounded up to the next whole kg, rounded to cents."
+    },
+    {
+     "case": "ship_cost: unknown zone, lowercase zone, zero/negative/NULL weight",
+     "default": "Zone matching is case-insensitive; an unknown zone or non-positive weight is an error; NULL gives NULL."
+    },
+    {
+     "case": "ship_cost: maximum weight or free-shipping thresholds",
+     "default": "No maximum weight and no free shipping; the formula applies to any weight."
+    },
+    {
+     "case": "slugify: handling of case, accents, punctuation, spaces, repeated separators",
+     "default": "Lowercase, transliterate accents to ASCII, replace runs of non-alphanumeric characters with a single hyphen, trim leading/trailing hyphens."
+    },
+    {
+     "case": "slugify: empty title, title with no usable characters (e.g., only symbols or non-Latin script), and maximum length",
+     "default": "Empty result returns an empty string; no length truncation; NULL gives NULL."
+    },
+    {
+     "case": "avg_stars: how the headline rating is rounded and displayed",
+     "default": "Arithmetic mean rounded to 1 decimal place."
+    },
+    {
+     "case": "avg_stars: ratings outside 1\u20135, NULL ratings, and products with no ratings",
+     "default": "NULLs are ignored; out-of-range ratings are ignored (not counted); no valid ratings gives NULL."
+    },
+    {
+     "case": "avg_stars: whether the headline is a plain average or weighted/adjusted (e.g., minimum number of ratings, Bayesian smoothing)",
+     "default": "Plain average with no minimum number of ratings and no smoothing."
+    }
+   ],
+   "owner_replies": 29,
+   "owner_cost": 2.098,
+   "minutes": 5.9,
+   "terminal": "\n1 of 19. A customer orders on Friday 20 December and you promise delivery in 5 working days. Christmas Day and New Year's Day fall inside that period.\n  A) Only Saturdays and Sundays are days off, so the holidays still count as working days  B) Saturdays, Sundays and national public holidays are days off  C) Saturdays, Sundays, public holidays and our own shop closure days are all days off\n  Your answer (a letter, or your own words) > B\n  (Your answer also settles 1 of the coming question; I'll skip it.)\n\n2 of 19. An order arrives on Saturday 14 June and the promise is '1 working day'.\n  A) Promised for Monday 16 June, with the count starting from the next working day  B) Promised for Tuesday 17 June, because Saturday orders are treated as received on Monday  C) Staff must pick the date by hand for weekend orders\n  Your answer (a letter, or your own words) > B\n\n4 of 19. A staff member types a birth date or order date that is impossible (30 February) or leaves it blank in a customer record, and a report is running.\n  A) A blank gives a blank result, while an impossible date stops the report with an error message  B) Both a blank and an impossible date give a blank result and the report carries on  C) Any blank or impossible date stops the whole report with an error message\n  Your answer (a letter, or your own words) > B\n\n5 of 19. A customer was born on 29 February 2000 and wants to buy an age-restricted item (18+) in a year with no 29 February.\n  A) They turn 18 on 1 March  B) They turn 18 on 28 February  C) Staff decide each case by hand\n  Your answer (a letter, or your own words) > A\n\n6 of 19. A $1,000 invoice is paid 60 days late.\n  A) 1.5% for every 30 days late, counted day by day, so $30 with no cap and no minimum  B) A single flat $25 fee, however many days late  C) 2% for each month started, with a $10 minimum and a cap of 10% of the invoice\n  Your answer (a letter, or your own words) > The fee is 1% of the invoice for each day late, with a $5 minimum and a cap of 25% of the invoice. A $1,000 invoice 60 days late therefore pays the cap of $250.\n\n7 of 19. A student scores 89.5 out of 100 on a course.\n  A) B, because A starts at 90, with 80, 70 and 60 for B, C and D and no plus or minus grades  B) B+, because we use plus and minus grades  C) A, because we round up to the nearest whole mark, or our cut-offs are lower (for example A from 85)\n  Your answer (a letter, or your own words) > C. A student on 89.5 gets an A because we round the score to the nearest whole mark first, so 89.5 becomes 90.\n\n8 of 19. A student scores 105 out of 100 thanks to bonus questions.\n  A) Gets an A, because bonus marks are fine  B) Gets an A, but the record is flagged for a teacher to check  C) No grade is given, because a score over the maximum is treated as a data entry mistake\n  Your answer (a letter, or your own words) > A. A score over the maximum still gets an A, and nothing is flagged.\n\n9 of 19. A receipt is printed for the card 4111 1111 1111 1234.\n  A) Only the last 4 digits are shown, and every other digit is hidden  B) The first 6 and the last 4 digits are shown  C) Only the last 2 digits are shown\n  Your answer (a letter, or your own words) > A. Only the last 4 digits are shown and every other digit is hidden with a star. The spaces are dropped, so the printed result is 12 stars followed by 1234.\n\n10 of 19. A cashier types a card number with dashes (4111-1111-1111-1234), or a number that is too short, or one that contains letters.\n  A) Dashes and spaces are ignored; a short number or one with letters is fully hidden  B) Dashes are kept in the printout; a short number or one with letters is fully hidden  C) Anything that is not a clean card number is refused and nothing is printed\n  Your answer (a letter, or your own words) > Dashes and spaces are ignored. A number that is too short (under 8 digits) is fully hidden with stars. A number containing letters gets no printout at all, so the result is blank.\n\n11 of 19. A staff member enters a 120% discount by mistake on a $50 item.\n  A) The entry is refused with an error message  B) It is treated as 100% off, so the item is free  C) It is ignored and the item is sold at full price\n  Your answer (a letter, or your own words) > The discount is capped at 50%, so a 120% entry is treated as 50% off. The $50 item sells for $25.\n\n12 of 19. A 2.3 kg parcel is going to zone B.\n  A) Charged as 3 kg, with partial kilograms rounded up, at a base fee plus a rate per kg (cheapest A, then B, then C)  B) Charged for exactly 2.3 kg  C) Charged by weight band: up to 1 kg, up to 5 kg and up to 10 kg, each at one flat price\n  Your answer (a letter, or your own words) > A. A 2.3 kg parcel to zone B is charged as 3 kg, because we round partial kilograms up. That comes to $12.50, a base fee plus a rate per kg, with zone A cheapest, then B, then C.\n\n13 of 19. A parcel is booked for delivery zone 'D', which has no rates, or a zone typed in lowercase ('b').\n  A) Lowercase is accepted; an unknown zone gives an error and no charge  B) Lowercase is accepted; an unknown zone is charged at the zone C rate  C) Lowercase is accepted; for an unknown zone the shipping charge is left blank so staff quote by hand\n  Your answer (a letter, or your own words) > Lowercase is not accepted. A zone typed as 'b' is not treated as zone B. Any zone that isn't exactly A, B or C, lowercase letters included, is charged at the zone C rate. For a 2.3 kg parcel that is $16.50.\n\n14 of 19. A customer wants to send an 80 kg item, or a very light 0.4 kg parcel.\n  A) No weight limit and no free shipping: the same formula applies to everything  B) Over 30 kg we do not ship it, and staff give a manual quote  C) Parcels under 0.5 kg ship free as a promotion\n  Your answer (a letter, or your own words) > There is no weight limit and nothing ships free. An 80 kg item is charged the normal way, with partial kilograms rounded up, and a 0.4 kg parcel is charged as 1 kg, so to zone B it costs $9.50. Parcels over 30 kg also carry an extra heavy-parcel surcharge on top of the normal charge.\n\n15 of 19. A product is titled 'Caf\u00e9 Cr\u00e8me \u2013 50% Off!' and needs a web address ending.\n  A) cafe-creme-50-off, lowercase with accents removed and symbols dropped  B) caf\u00e9-cr\u00e8me-50-off, keeping the accents  C) cafe-creme-50-percent-off, with the % sign spelled out\n  Your answer (a letter, or your own words) > A\n\n16 of 19. A product title is written entirely in Hindi script (or is just symbols), so no usable Latin letters are left.\n  A) The web address ending is left empty  B) The original script is kept in the web address ending  C) A generic word with a number is used instead, such as 'product-1234'\n  Your answer (a letter, or your own words) > When no usable Latin letters are left, the web address ending is the single word \"untitled\".\n\n17 of 19. A product has three ratings: 5, 4 and 4 stars (average 4.33).\n  A) Shows 4.3, rounded to one decimal  B) Shows 4.5, rounded to the nearest half star  C) Shows 4 stars, rounded to a whole number\n  Your answer (a letter, or your own words) > Rounds to nearest half star: 4.33 \u2192 4.5.\n\nB\n\n18 of 19. One product has ratings of 5, 4 and a glitch entry of 9 stars, and a second product has no ratings at all.\n  A) The glitch and blank entries are ignored, and a product with no ratings shows 'no rating yet'  B) The 9 is counted as 5 stars, and a product with no ratings shows 0 stars  C) A product with any invalid entry shows no headline rating until staff check it\n  Your answer (a letter, or your own words) > Invalid entries like the 9 are ignored, and a headline rating is only shown once a product has at least 3 valid ratings. The first product has only two valid ratings (5 and 4), so it shows no rating, and the product with no ratings also shows no rating, left blank.\n  (Your answer also settles 1 of the coming question; I'll skip it.)\n\nYour rule, as I'll build it: The late fee equals 1% of the invoice amount for each day the invoice is late, but never less than $5 and never more than 25% of the invoice amount, so a $1,000 invoice paid 60 days late is charged the 25% cap of $250.\n  Right? (Enter = yes, or say what's off) > Not quite: an invoice that isn't late, or has nothing due, is charged no fee at all, so the $5 minimum only applies once the invoice is at least one day late.\n\nYour rule, as I'll build it: When a receipt is printed for a card number, the output must show only the card's last 4 digits and replace every other digit with a star, with all spaces removed, so that 4111 1111 1111 1234 prints as 12 stars followed by 1234.\n  Right? (Enter = yes, or say what's off) > \n\nYour rule, as I'll build it: When a card number is printed, dashes and spaces in the input are ignored; if the number contains any letters, nothing is printed and the result is blank; otherwise, if it has fewer than 8 digits, it is printed fully hidden with stars.\n  Right? (Enter = yes, or say what's off) > \n\nYour rule, as I'll build it: A discount entered above 50% is capped at 50%, so any discount over 50% (for example a mistaken 120% entry) is applied as 50% off, and a $50 item with a 120% discount entered sells for $25.\n  Right? (Enter = yes, or say what's off) > \n\nYour rule, as I'll build it: A parcel's weight is rounded up to the next whole kilogram (partial kilograms round up, so 2.3 kg is charged as 3 kg), and the price is a base fee plus a per-kg rate times the rounded weight, with zone A cheapest, then zone B, then zone C; a 2.3 kg parcel to zone B is charged as 3 kg and costs $12.50.\n  Right? (Enter = yes, or say what's off) > \n\nYour rule, as I'll build it: Any delivery zone that is not exactly the uppercase letter A, B or C (including lowercase letters such as 'b' and zones with no rates such as 'D') is charged at the zone C rate, which for a 2.3 kg parcel is $16.50.\n  Right? (Enter = yes, or say what's off) > \n\nYour rule, as I'll build it: There is no maximum weight and no free shipping: every parcel, including an 80 kg item, is charged the normal rate with the weight rounded up to the next whole kilogram (so a 0.4 kg parcel is charged as 1 kg, which costs $9.50 to zone B), and any parcel over 30 kg is additionally charged a heavy-parcel surcharge on top of that normal charge.\n  Right? (Enter = yes, or say what's off) > \n\nYour rule, as I'll build it: When a product title contains no usable Latin letters (for example, it is written entirely in Hindi script or consists only of symbols), the web address ending (slug) must be the single word \"untitled\".\n  Right? (Enter = yes, or say what's off) > \n\nYour rule, as I'll build it: A product's displayed rating is its average star rating rounded to the nearest half star, so an average of 4.33 (from ratings of 5, 4 and 4) displays as 4.5.\n  Right? (Enter = yes, or say what's off) > \n\nYour rule, as I'll build it: Ignore invalid ratings (such as a 9 on a star scale), and show a product's headline rating only if it has at least 3 valid ratings; otherwise show no rating, leaving it blank (e.g., ratings of 5, 4 and an invalid 9 give no rating, and a product with no ratings gives no rating).\n  Right? (Enter = yes, or say what's off) > \n\nYour rules for this feature, as the builders will follow them (each applies to every case like it):\n  1. Whenever a delivery date is promised in working days, count Saturdays, Sundays and national public holidays as days off (so Christmas Day and New Year's Day are not counted). Whenever an order arrives on a Saturday, treat it as received on Monday, so an order received on Saturday 14 June with a promise of 1 working day is promised for Tuesday 17 June.\n  2. Whenever a birth date or order date in a customer record is blank or impossible (such as 30 February) while a report is running, give a blank result for that date and let the report carry on.\n  3. Whenever a customer was born on 29 February and the year has no 29 February, treat them as turning 18 (for the 18+ age check) on 1 March of that year, so someone born on 29 February 2000 turns 18 on 1 March.\n  4. Whenever a student scores 89.5 out of 100 on a course, the grade is A, because we round up to the nearest whole mark, or because our cut-offs are lower (for example A from 85).\n  5. Whenever a student's score is above 100 because of bonus questions (for example 105 out of 100), the student gets an A, because bonus marks are fine.\n  6. Whenever a product title needs a web address ending (slug), make it lowercase, remove accents, drop symbols and join the words with hyphens, so 'Caf\u00e9 Cr\u00e8me \u2013 50% Off!' becomes cafe-creme-50-off. Whenever the title contains no usable Latin letters (for example it is written entirely in Hindi script or consists only of symbols), the slug is the single word \"untitled\".\n  7. Whenever a late fee is calculated, charge no fee at all if the invoice is not late or has nothing due. Otherwise the fee is 1% of the invoice amount for each day late, but never less than $5 and never more than 25% of the invoice amount (the $5 minimum applies only once the invoice is at least one day late), so a $1,000 invoice paid 60 days late is charged the 25% cap of $250.\n  8. Whenever a card number is printed, ignore any dashes and spaces in the input. If the number contains any letters, print nothing and give a blank result. Otherwise, if it has fewer than 8 digits, print it fully hidden with stars. Otherwise print only the card's last 4 digits, replace every other digit with a star and remove all spaces, so 4111 1111 1111 1234 prints as 12 stars followed by 1234.\n  9. Whenever a discount is entered above 50%, apply it as 50% off, so a $50 item with a 120% discount entered sells for $25.\n  10. Whenever a parcel's shipping price is calculated, round its weight up to the next whole kilogram (2.3 kg is charged as 3 kg, 0.4 kg as 1 kg) and charge a base fee plus a per-kg rate times the rounded weight, with zone A cheapest, then zone B, then zone C. A 2.3 kg parcel to zone B costs $12.50, a 0.4 kg parcel to zone B costs $9.50 and a 2.3 kg parcel to zone C costs $16.50. Whenever the delivery zone is not exactly the uppercase letter A, B or C (including lowercase letters such as 'b' and zones with no rates such as 'D'), charge the zone C rate. There is no maximum weight and no free shipping, so every parcel, including an 80 kg item, is charged the normal rate, and whenever a parcel is over 30 kg a heavy-parcel surcharge is charged on top of that normal charge.\n  11. Whenever a product's rating is displayed, ignore invalid ratings (such as a 9 on a star scale). Show a rating only if the product has at least 3 valid ratings, otherwise show no rating and leave it blank (ratings of 5, 4 and an invalid 9 give no rating, and a product with no ratings gives no rating). When it is shown, it is the average of the valid star ratings rounded to the nearest half star, so an average of 4.33 (from ratings of 5, 4 and 4) displays as 4.5.\n  Numbers of any that are wrong (Enter = all correct) > 1\n  Rule 1: Whenever a delivery date is promised in working days, count Saturdays, Sundays and national public holidays as days off (so Christmas Day and New Year's Day are not counted). Whenever an order arrives on a Saturday, treat it as received on Monday, so an order received on Saturday 14 June with a promise of 1 working day is promised for Tuesday 17 June.\n  What should it be? > Only Saturdays, Sundays, Christmas Day (25 Dec) and New Year's Day (1 Jan) are days off. We have no other public holidays. Any order that arrives on a day off, which includes Sundays and those two holidays as well as Saturdays, is treated as received on the next working day. The count starts from that day.\n"
+  },
+  "H2": {
+   "rules": [
+    "Whenever working days are counted (for example a '5 working days' promise from today), skip only Saturdays, Sundays, December 25 and January 1; every other day, including public holidays like next Wednesday, counts as a working day, and no national or company holiday list is used. Whenever an order comes in on a day that is not a working day (for example a Saturday with a '1 working day' promise), the clock starts on the next working day, so a Saturday order promised in 1 working day is due Tuesday.",
+    "Whenever a customer's age is shown, the age counts only birthdays that have already happened, so someone born on 29 February 2000 is 23 on 28 February 2024 and turns 24 on 1 March in years with no 29 February. Whenever the birth date is in the future (for example entered as next year by mistake), the age is blank so someone checks the entry.",
+    "Whenever an invoice is late, the late fee is 1% of the invoice amount for each day late, charged in full from day 1 with no grace period (even for a long-standing friend of the business), but never less than 5 dollars and never more than 25% of the invoice amount. For example, a 1,000 dollar invoice 10 days late is charged 100 dollars.",
+    "Whenever a student's score is turned into a letter grade, use no plus or minus: A for 90 and above, B for 80 and above, C for 70 and above, D for 60 and above, and F for below 60, so 85 out of 100 is a B.",
+    "Whenever a card number is shown on a receipt, only its last 4 digits can be seen.",
+    "Whenever a product's price is negative (for example -20 dollars from a refund or data error), the price is invalid and nothing is shown (blank).",
+    "Whenever a product page title is turned into a web address (slug), make it lowercase, turn accents into plain letters, drop characters with no plain-English letters (such as Japanese), convert each apostrophe to a hyphen, and remove \"&\" and \"%\" entirely without spelling them out, so \"Caf\u00e9 \u65e5\u672c Tea\" becomes \"cafe-tea\" and \"Bob's Fish & Chips -- 50% Off!\" becomes \"bob-s-fish-chips-50-off\". Whenever two different products end up with the same web address, both get the same address and the team makes them unique by hand.",
+    "Whenever a product's headline rating is shown, use only ratings from 1 to 5 (ignore any outside that range, such as 0 or 7) and round their average to the nearest half star, so ratings of 5, 4 and 4 (average 4.33) show 4.5. Whenever the product has fewer than 3 valid ratings (including no ratings or only blank ratings), the rating display is blank: not shown at all, and never shown as zero stars.",
+    "Whenever a body mass index is displayed, show exactly one decimal place by cutting off every digit after the first decimal place, never rounding, so 24.96 is displayed as 24.9 and not 25.0.",
+    "Whenever a parcel's shipping charge is worked out, it is the zone's base charge (5 dollars for zone A, 8 dollars for zone B, 12 dollars for zone C) plus 1.50 dollars for every kilogram of weight, where any part of a kilogram counts as a full kilogram. Whenever a parcel is over 30 kg, add a flat 20 dollar heavy-parcel surcharge on top. There is no weight limit and no parcel is ever refused. For example, an 80 kg parcel to zone B costs 8 + (80 \u00d7 1.50) + 20 = 148 dollars.",
+    "When a late invoice belongs to a customer who has a credit on their account (they are owed money), is the late fee zero, or does the minimum fee of 5 dollars still apply? -> No penalty at all: the fee is 0.00."
+   ],
+   "questions": [
+    {
+     "id": "q01",
+     "situation": "A customer's order is promised '5 working days' from today. Next Wednesday is a public holiday and your office is shut.",
+     "options": [
+      "Only Saturdays and Sundays are days off; the holiday still counts as a working day",
+      "Public holidays are also skipped, using the national holiday list",
+      "Public holidays are skipped, using our own company holiday list"
+     ]
+    },
+    {
+     "id": "q02",
+     "situation": "An order comes in on a Saturday and the promise is '1 working day'. When does the clock start?",
+     "options": [
+      "It starts from the next working day, Monday, so the answer is Tuesday",
+      "Saturday counts as a day on the clock, so the answer is Monday",
+      "It is treated as if the order came in on Friday, so the answer is Monday"
+     ]
+    },
+    {
+     "id": "q03",
+     "situation": "A manager asks for the date 3 working days BEFORE a Wednesday deadline, to know when work must start.",
+     "options": [
+      "Count back normally, giving the previous Friday",
+      "Counting backwards is not allowed; no date is given",
+      "Count back but never land earlier than today"
+     ]
+    },
+    {
+     "id": "q04",
+     "situation": "A customer was born on 29 February 2000. On 28 February 2024 (not yet a birthday), how old do you say they are?",
+     "options": [
+      "23, since the birthday has not come yet; they turn 24 on 1 March in years with no 29 February",
+      "23 until 29 February arrives; in years with no 29 February they turn older on 28 February",
+      "Treated as a birthday on 28 February, so 24"
+     ]
+    },
+    {
+     "id": "q05",
+     "situation": "Someone's birth date is entered as next year by mistake, so they appear not yet born.",
+     "options": [
+      "Show nothing (blank) so someone checks the entry",
+      "Show an age of 0",
+      "Show a clear warning instead of an age"
+     ]
+    },
+    {
+     "id": "q06",
+     "situation": "A wellness report shows a staff member's body mass index as 24.96.",
+     "options": [
+      "Show 25.0, rounded to one decimal place",
+      "Show 25, a whole number",
+      "Show 24.96, two decimal places"
+     ]
+    },
+    {
+     "id": "q07",
+     "situation": "A wrong entry gives a height of 5 cm for a 70 kg person, producing a body mass index of 2800.",
+     "options": [
+      "Show the silly number as is; the data entry is the problem",
+      "Show nothing (blank) when the numbers are not believable (for example height under 100 cm or over 250 cm)",
+      "Show a clear warning that the entry looks wrong"
+     ]
+    },
+    {
+     "id": "q08",
+     "situation": "A client's invoice of 1,000 dollars is 10 days late. What penalty do you charge?",
+     "options": [
+      "A one-time 5% fee, so 50 dollars, however many days late",
+      "1.5% for every 30 days late, spread out day by day, never more than the invoice itself",
+      "A flat 25 dollars no matter the amount or the days"
+     ]
+    },
+    {
+     "id": "q09",
+     "situation": "An invoice is only 2 days late and the client is a long-standing friend of the business.",
+     "options": [
+      "Charge the full penalty from day 1; no grace period",
+      "Allow a grace of 5 days, no penalty until after that",
+      "Allow a grace of 15 days, no penalty until after that"
+     ]
+    },
+    {
+     "id": "q10",
+     "situation": "A customer has a credit of 200 dollars on their account (they are owed money) and the invoice shows as late.",
+     "options": [
+      "No penalty: 0.00",
+      "Penalty is worked out on the invoice anyway",
+      "Nothing is shown (blank) so someone looks at the account"
+     ]
+    },
+    {
+     "id": "q11",
+     "situation": "A student scores 89.6 out of 100 and the cut-off for an A is 90.",
+     "options": [
+      "B: the exact score is used and not rounded up",
+      "A: the score is rounded to the nearest whole mark first",
+      "A: anything within one mark of the cut-off is lifted up"
+     ]
+    },
+    {
+     "id": "q12",
+     "situation": "A student scores 85 out of 100. Does your school use plus and minus grades?",
+     "options": [
+      "No: A 90+, B 80+, C 70+, D 60+, F below 60, so 85 is a B",
+      "Yes: for example 87+ is B+, 83 to 86 is B, below 83 is B-",
+      "Different cut-offs: A 85+, B 70+, C 55+, D 40+, F below 40"
+     ]
+    },
+    {
+     "id": "q13",
+     "situation": "A student scores 105 out of 100 because of extra credit.",
+     "options": [
+      "A: anything above full marks is an A",
+      "A, but the score is first capped at 100",
+      "Nothing is shown (blank) because the score looks like an error"
+     ]
+    },
+    {
+     "id": "q14",
+     "situation": "A receipt shows a customer's card number. How much of it can be seen?",
+     "options": [
+      "Only the last 4 digits",
+      "The first 6 and last 4 digits",
+      "Only the last 2 digits"
+     ]
+    },
+    {
+     "id": "q15",
+     "situation": "A card number is entered with only 3 digits, for example a mistyped code.",
+     "options": [
+      "Mask all of it, never show anything",
+      "Show it exactly as typed, since it is too short to be a real card",
+      "Show nothing at all (blank)"
+     ]
+    },
+    {
+     "id": "q16",
+     "situation": "A 50 dollar item has a promotion of 120% off because someone mistyped the discount.",
+     "options": [
+      "Price is 0.00; any discount above 100% counts as 100%",
+      "Nothing is shown (blank) so someone fixes the promotion",
+      "Price is the full 50 dollars; the odd discount is ignored"
+     ]
+    },
+    {
+     "id": "q17",
+     "situation": "The price on a product is negative, for example -20 dollars, because of a refund or data error.",
+     "options": [
+      "Nothing is shown (blank); a negative price is invalid",
+      "Show the negative price after discount as given",
+      "Treat it as 0.00"
+     ]
+    },
+    {
+     "id": "q18",
+     "situation": "Shipping a parcel to zone B. What is the charge structure?",
+     "options": [
+      "5.00 base plus 1.00 per kg for A, 2.00 for B, 3.00 for C",
+      "A flat price per zone, whatever the weight",
+      "Different base charges per zone, which we will give you"
+     ]
+    },
+    {
+     "id": "q19",
+     "situation": "A parcel weighs 1.2 kg.",
+     "options": [
+      "Charged as 2 kg: always rounded up to the next whole kilo",
+      "Charged as 1 kg: part kilos are dropped",
+      "Charged by the exact weight, 1.2 kg"
+     ]
+    },
+    {
+     "id": "q20",
+     "situation": "A customer wants to ship a 80 kg crate, heavier than any parcel you normally take.",
+     "options": [
+      "Price it by the same formula, no weight limit",
+      "Refuse; nothing is shown above 30 kg",
+      "Refuse above 30 kg and ask for a special quote"
+     ]
+    },
+    {
+     "id": "q21",
+     "situation": "A product page is titled \"Bob's Fish & Chips -- 50% Off!\"",
+     "options": [
+      "bobs-fish-chips-50-off: apostrophes removed, & and symbols become hyphens",
+      "bob-s-fish-and-chips-50-off: apostrophes become hyphens and & becomes 'and'",
+      "bobs-fish-and-chips-50-percent-off: & and % are spelled out as words"
+     ]
+    },
+    {
+     "id": "q22",
+     "situation": "A product is called \"Caf\u00e9 \u65e5\u672c Tea\" and the Japanese characters have no plain-English letters.",
+     "options": [
+      "cafe-tea: accents become plain letters and the Japanese is dropped",
+      "cafe-ri-ben-tea: Japanese is spelled out in English letters",
+      "The whole title is left alone and the web address keeps the original characters"
+     ]
+    },
+    {
+     "id": "q23",
+     "situation": "Two different products, \"Blue Shirt\" and \"Blue-Shirt!\", end up with the same web address.",
+     "options": [
+      "Both get the same address; the team makes them unique by hand",
+      "The second one gets a number added, like blue-shirt-2",
+      "Refuse the second; someone must retitle it"
+     ]
+    },
+    {
+     "id": "q24",
+     "situation": "A product has ratings of 5, 4 and 4, an average of 4.33. What is the headline rating?",
+     "options": [
+      "4.3: rounded to one decimal place, half up",
+      "4.5: rounded to the nearest half star",
+      "4: rounded to a whole star"
+     ]
+    },
+    {
+     "id": "q25",
+     "situation": "A product gets a rating of 0 and another of 7, both outside the 1 to 5 range.",
+     "options": [
+      "Ignore them and use only ratings from 1 to 5",
+      "Count a 0 as 1 and a 7 as 5",
+      "Show nothing (blank) for the product until someone checks the data"
+     ]
+    },
+    {
+     "id": "q26",
+     "situation": "A new product has no ratings yet, or only blank ones.",
+     "options": [
+      "Show nothing (blank), not zero stars",
+      "Show 0 stars",
+      "Show a default of 3 stars until real ratings arrive"
+     ]
+    },
+    {
+     "id": "q27",
+     "situation": "A brand new product has just one review, a single 5-star rating.",
+     "options": [
+      "Show 5.0 as it is",
+      "Show nothing until there are at least 3 ratings",
+      "Pull it toward the store average until more ratings come in"
+     ]
+    }
+   ],
+   "planned_decisions": [
+    {
+     "case": "add_bdays: which days count as non-business days (weekends only, or also public holidays; which holiday calendar)",
+     "default": "Business days are Monday to Friday. Public holidays are not skipped, because no holiday calendar is defined."
+    },
+    {
+     "case": "add_bdays: start date falls on a weekend and n is positive",
+     "default": "Count from the next Monday. Saturday + 1 business day = Tuesday, with Monday as day 0 of the count... more simply: roll the start forward to the next business day, then add n business days. Do not count the weekend start as day 0."
+    },
+    {
+     "case": "add_bdays: n is zero",
+     "default": "Return the start date unchanged, even if it falls on a weekend."
+    },
+    {
+     "case": "add_bdays: n is negative",
+     "default": "Count backwards: return the date n business days before the start date."
+    },
+    {
+     "case": "add_bdays: n is fractional or very large",
+     "default": "A fractional n is truncated toward zero. A very large n is calculated normally, and the result returns NULL if it goes past the valid date range."
+    },
+    {
+     "case": "Date inputs (add_bdays, age_years) are missing, blank, unreadable, not YYYY-MM-DD, or impossible (e.g. 2023-02-30)",
+     "default": "Return NULL, with no error and no guessing. Dates with surrounding spaces are trimmed first. Other formats such as 12/31/2023 are not accepted."
+    },
+    {
+     "case": "age_years: birthday not yet reached on the as-of date, and a Feb 29 birthday in a non-leap year",
+     "default": "Age counts only completed years, so the birthday must have passed. A Feb 29 birthday counts as reached on Mar 1 in non-leap years."
+    },
+    {
+     "case": "age_years: birth date is after the as-of date, or the age is implausibly large",
+     "default": "Return NULL for a birth date after the as-of date. Do not cap large ages."
+    },
+    {
+     "case": "bmi_value: rounding and display precision",
+     "default": "weight / (height in metres)^2, rounded to 1 decimal place (half up)."
+    },
+    {
+     "case": "bmi_value: weight or height is zero, negative, missing or non-numeric",
+     "default": "Return NULL. Height of zero is never divided by."
+    },
+    {
+     "case": "bmi_value: implausible values (e.g. height 5 cm, weight 1000 kg)",
+     "default": "Calculate the value as given, with no range check. A caller who entered height in metres or inches gets a silly number, not an error."
+    },
+    {
+     "case": "late_fee: penalty formula (flat fee, percentage per day or month, grace period, cap)",
+     "default": "1.5% of the amount due per 30-day month late, no grace period, pro-rated daily, capped at the amount due... Simpler default: 5% of the amount due as a one-time fee when days_late is 1 or more, with no daily accrual and no cap."
+    },
+    {
+     "case": "late_fee: invoice is not late (days_late is 0 or negative)",
+     "default": "The fee is 0.00."
+    },
+    {
+     "case": "late_fee: amount_due is zero, negative (credit) or missing, or days_late is missing",
+     "default": "Fee is 0.00 for zero or negative amounts. NULL if either input is missing or non-numeric."
+    },
+    {
+     "case": "late_fee: rounding to cents",
+     "default": "Round half up to 2 decimals."
+    },
+    {
+     "case": "letter_grade: percentage cut-offs and plus/minus grades",
+     "default": "A \u226590%, B \u226580%, C \u226570%, D \u226560%, F below 60%. No plus or minus grades."
+    },
+    {
+     "case": "letter_grade: boundary rounding (e.g. 89.6%)",
+     "default": "Use the exact percentage with no rounding up, so 89.6% is a B."
+    },
+    {
+     "case": "letter_grade: score above max_score (extra credit)",
+     "default": "Treat as A."
+    },
+    {
+     "case": "letter_grade: negative score, max_score zero or negative, or missing/non-numeric inputs",
+     "default": "Negative score gives F. max_score of zero or less, or any missing input, returns NULL."
+    },
+    {
+     "case": "mask_card: how many digits are shown",
+     "default": "Show only the last 4 digits, with every other digit replaced by * and the length preserved (e.g. ************1111)."
+    },
+    {
+     "case": "mask_card: input has spaces or dashes",
+     "default": "Strip separators first. Return an unseparated masked string of the digits."
+    },
+    {
+     "case": "mask_card: too short (4 or fewer digits), contains letters, or the length is outside 12-19 digits",
+     "default": "Mask everything except the last 4 if there are more than 4 digits. If there are 4 or fewer digits, mask all of them. Never return the original number. Input with letters has the non-digits removed first."
+    },
+    {
+     "case": "mask_card: missing or blank card number",
+     "default": "Return NULL for NULL and an empty string for blank. Never raise an error that could echo the number into logs."
+    },
+    {
+     "case": "mask_card: should the card number be checked for validity (Luhn) or card brand",
+     "default": "No validity check. Mask whatever is supplied."
+    },
+    {
+     "case": "net_price: discount percentage over 100 or negative",
+     "default": "Discount above 100 is capped at 100, giving a price of 0.00. A negative discount is treated as 0, so there is no surcharge."
+    },
+    {
+     "case": "net_price: negative, zero or missing price, or missing discount",
+     "default": "A zero price gives 0.00. A negative price or missing/non-numeric price returns NULL. A missing discount is treated as 0%."
+    },
+    {
+     "case": "net_price: rounding to cents",
+     "default": "Round half up to 2 decimals on the final price."
+    },
+    {
+     "case": "ship_cost: rate card (base charge and per-kg rate for each zone A, B, C)",
+     "default": "Flat 5.00 base plus per-kg rates of 1.00 for A, 2.00 for B, 3.00 for C, as placeholders to be confirmed by the business."
+    },
+    {
+     "case": "ship_cost: partial kilograms (e.g. 1.2 kg)",
+     "default": "Round the weight up to the next whole kilogram before charging."
+    },
+    {
+     "case": "ship_cost: zone is lower case, has spaces, or is unknown, blank or missing",
+     "default": "Trim spaces and ignore letter case, so ' b ' is zone B. An unknown, blank or missing zone returns NULL rather than a guessed price."
+    },
+    {
+     "case": "ship_cost: weight zero, negative, missing, or over a maximum parcel weight",
+     "default": "Zero or negative returns NULL. Missing returns NULL. No maximum weight limit; heavy parcels are priced by the same formula."
+    },
+    {
+     "case": "slugify: allowed characters, case and separators",
+     "default": "Lower case, letters and digits only, with runs of other characters collapsed to a single hyphen and no leading or trailing hyphen."
+    },
+    {
+     "case": "slugify: accented or non-Latin characters (e.g. Caf\u00e9, \u65e5\u672c)",
+     "default": "Accents are transliterated to plain ASCII (Caf\u00e9 becomes cafe). Characters with no ASCII equivalent are dropped."
+    },
+    {
+     "case": "slugify: symbols such as & and apostrophes",
+     "default": "Apostrophes are removed without a hyphen (Bob's becomes bobs). '&' is treated as a separator and dropped."
+    },
+    {
+     "case": "slugify: very long titles, or titles that produce an empty slug (only symbols), or missing/blank titles",
+     "default": "No length limit. Empty results and NULL/blank input return an empty string for blank and NULL for NULL."
+    },
+    {
+     "case": "slugify: two different titles that give the same slug",
+     "default": "The function stays pure and returns the same slug. Uniqueness is the caller's job."
+    },
+    {
+     "case": "avg_stars: rounding of the headline rating",
+     "default": "Arithmetic mean rounded to 1 decimal place, half up."
+    },
+    {
+     "case": "avg_stars: ratings outside 1-5 (0, 6, negative), fractional, or non-numeric",
+     "default": "Ignore ratings outside 1 to 5 and non-numeric values. Fractional ratings within the range are kept as given."
+    },
+    {
+     "case": "avg_stars: NULL ratings, or no valid ratings at all",
+     "default": "NULL ratings are ignored and not counted. If no valid ratings remain, return NULL, not 0."
+    },
+    {
+     "case": "avg_stars: products with very few ratings (one 5-star review)",
+     "default": "Show the plain average with no minimum count or Bayesian smoothing."
+    }
+   ],
+   "owner_replies": 28,
+   "owner_cost": 2.038,
+   "minutes": 5.5,
+   "terminal": "\n1 of 27. A customer's order is promised '5 working days' from today. Next Wednesday is a public holiday and your office is shut.\n  A) Only Saturdays and Sundays are days off; the holiday still counts as a working day  B) Public holidays are also skipped, using the national holiday list  C) Public holidays are skipped, using our own company holiday list\n  Your answer (a letter, or your own words) > Only Saturdays and Sundays are days off, plus two fixed holidays, December 25 and January 1. Any other public holiday, like that Wednesday, still counts as a working day. We don't use a national or company holiday list.\n  (Your answer also settles 1 of the coming question; I'll skip it.)\n\n2 of 27. An order comes in on a Saturday and the promise is '1 working day'. When does the clock start?\n  A) It starts from the next working day, Monday, so the answer is Tuesday  B) Saturday counts as a day on the clock, so the answer is Monday  C) It is treated as if the order came in on Friday, so the answer is Monday\n  Your answer (a letter, or your own words) > A\n\n4 of 27. A customer was born on 29 February 2000. On 28 February 2024 (not yet a birthday), how old do you say they are?\n  A) 23, since the birthday has not come yet; they turn 24 on 1 March in years with no 29 February  B) 23 until 29 February arrives; in years with no 29 February they turn older on 28 February  C) Treated as a birthday on 28 February, so 24\n  Your answer (a letter, or your own words) > A\n\n5 of 27. Someone's birth date is entered as next year by mistake, so they appear not yet born.\n  A) Show nothing (blank) so someone checks the entry  B) Show an age of 0  C) Show a clear warning instead of an age\n  Your answer (a letter, or your own words) > A\n  (Your answer also settles 3 of the coming questions; I'll skip them.)\n\n6 of 27. A wellness report shows a staff member's body mass index as 24.96.\n  A) Show 25.0, rounded to one decimal place  B) Show 25, a whole number  C) Show 24.96, two decimal places\n  Your answer (a letter, or your own words) > Our policy is to show one decimal place, but we cut it off instead of rounding. So 24.96 is shown as 24.9, not 25.0.\n  (Your answer also settles 1 of the coming question; I'll skip it.)\n\n8 of 27. A client's invoice of 1,000 dollars is 10 days late. What penalty do you charge?\n  A) A one-time 5% fee, so 50 dollars, however many days late  B) 1.5% for every 30 days late, spread out day by day, never more than the invoice itself  C) A flat 25 dollars no matter the amount or the days\n  Your answer (a letter, or your own words) > None of those options. We charge 1% of the invoice for each day late, so a 1,000 dollar invoice that is 10 days late is charged 100 dollars. The fee is never less than 5 dollars and never more than a quarter of the invoice.\n\n9 of 27. An invoice is only 2 days late and the client is a long-standing friend of the business.\n  A) Charge the full penalty from day 1; no grace period  B) Allow a grace of 5 days, no penalty until after that  C) Allow a grace of 15 days, no penalty until after that\n  Your answer (a letter, or your own words) > A\n\n10 of 27. A customer has a credit of 200 dollars on their account (they are owed money) and the invoice shows as late.\n  A) No penalty: 0.00  B) Penalty is worked out on the invoice anyway  C) Nothing is shown (blank) so someone looks at the account\n  Your answer (a letter, or your own words) > A) No penalty: 0.00. When the account is in credit, nothing is owed, so we charge no penalty.\n\n12 of 27. A student scores 85 out of 100. Does your school use plus and minus grades?\n  A) No: A 90+, B 80+, C 70+, D 60+, F below 60, so 85 is a B  B) Yes: for example 87+ is B+, 83 to 86 is B, below 83 is B-  C) Different cut-offs: A 85+, B 70+, C 55+, D 40+, F below 40\n  Your answer (a letter, or your own words) > A\n  (Your answer also settles 1 of the coming question; I'll skip it.)\n\n14 of 27. A receipt shows a customer's card number. How much of it can be seen?\n  A) Only the last 4 digits  B) The first 6 and last 4 digits  C) Only the last 2 digits\n  Your answer (a letter, or your own words) > A) Only the last 4 digits are shown, and every other digit is replaced with an asterisk.\n\n17 of 27. The price on a product is negative, for example -20 dollars, because of a refund or data error.\n  A) Nothing is shown (blank); a negative price is invalid  B) Show the negative price after discount as given  C) Treat it as 0.00\n  Your answer (a letter, or your own words) > A) Nothing is shown (blank) for a negative price; we treat it as invalid.\n\n18 of 27. Shipping a parcel to zone B. What is the charge structure?\n  A) 5.00 base plus 1.00 per kg for A, 2.00 for B, 3.00 for C  B) A flat price per zone, whatever the weight  C) Different base charges per zone, which we will give you\n  Your answer (a letter, or your own words) > Each zone has its own base charge: 5 dollars for zone A, 8 for B and 12 for C. On top of that we charge 1.50 dollars for every kilogram, with any part of a kilo counted as a full kilo.\n  (Your answer also settles 1 of the coming question; I'll skip it.)\n\n20 of 27. A customer wants to ship a 80 kg crate, heavier than any parcel you normally take.\n  A) Price it by the same formula, no weight limit  B) Refuse; nothing is shown above 30 kg  C) Refuse above 30 kg and ask for a special quote\n  Your answer (a letter, or your own words) > A) Price it by the same formula; we have no weight limit, so an 80 kg crate to zone B is charged 148 dollars.\n\n21 of 27. A product page is titled \"Bob's Fish & Chips -- 50% Off!\"\n  A) bobs-fish-chips-50-off: apostrophes removed, & and symbols become hyphens  B) bob-s-fish-and-chips-50-off: apostrophes become hyphens and & becomes 'and'  C) bobs-fish-and-chips-50-percent-off: & and % are spelled out as words\n  Your answer (a letter, or your own words) > Apostrophes become hyphens, and \"&\" and \"%\" are dropped rather than spelled out. So the title becomes \"bob-s-fish-chips-50-off\".\n\n22 of 27. A product is called \"Caf\u00e9 \u65e5\u672c Tea\" and the Japanese characters have no plain-English letters.\n  A) cafe-tea: accents become plain letters and the Japanese is dropped  B) cafe-ri-ben-tea: Japanese is spelled out in English letters  C) The whole title is left alone and the web address keeps the original characters\n  Your answer (a letter, or your own words) > A) The accent becomes a plain letter and the Japanese characters are dropped, so the slug is \"cafe-tea\".\n\n23 of 27. Two different products, \"Blue Shirt\" and \"Blue-Shirt!\", end up with the same web address.\n  A) Both get the same address; the team makes them unique by hand  B) The second one gets a number added, like blue-shirt-2  C) Refuse the second; someone must retitle it\n  Your answer (a letter, or your own words) > A\n\n24 of 27. A product has ratings of 5, 4 and 4, an average of 4.33. What is the headline rating?\n  A) 4.3: rounded to one decimal place, half up  B) 4.5: rounded to the nearest half star  C) 4: rounded to a whole star\n  Your answer (a letter, or your own words) > B\n\n25 of 27. A product gets a rating of 0 and another of 7, both outside the 1 to 5 range.\n  A) Ignore them and use only ratings from 1 to 5  B) Count a 0 as 1 and a 7 as 5  C) Show nothing (blank) for the product until someone checks the data\n  Your answer (a letter, or your own words) > A) Ignore them and use only ratings from 1 to 5.\n\n26 of 27. A new product has no ratings yet, or only blank ones.\n  A) Show nothing (blank), not zero stars  B) Show 0 stars  C) Show a default of 3 stars until real ratings arrive\n  Your answer (a letter, or your own words) > Nothing is shown (blank), not zero stars. We also show nothing for a product with fewer than 3 valid ratings, not just one with none.\n  (Your answer also settles 1 of the coming question; I'll skip it.)\n\nYour rule, as I'll build it: When counting working days (such as the '5 working days' promised from today), skip only Saturdays, Sundays, December 25 and January 1; every other day, including public holidays like next Wednesday, counts as a working day, and no national or company holiday list is used.\n  Right? (Enter = yes, or say what's off) > \n\nYour rule, as I'll build it: A body mass index is displayed with exactly one decimal place by truncating (cutting off) every digit after the first decimal place, never rounding, so 24.96 is displayed as 24.9 and not 25.0.\n  Right? (Enter = yes, or say what's off) > \n\nYour rule, as I'll build it: The late fee equals 1% of the invoice amount for each day the invoice is late (for example, a 1,000 dollar invoice that is 10 days late is charged 100 dollars), but the fee is never less than 5 dollars and never more than 25% of the invoice amount.\n  Right? (Enter = yes, or say what's off) > \n\nYour rule, as I'll build it: The shipping charge for a parcel is the base charge of its zone (5 dollars for zone A, 8 dollars for zone B, 12 dollars for zone C) plus 1.50 dollars for every kilogram of weight, where any part of a kilogram counts as a full kilogram, so a parcel to zone B costs 8 dollars plus 1.50 dollars per kilogram rounded up.\n  Right? (Enter = yes, or say what's off) > Not quite: any parcel over 30 kg also gets a flat 20 dollar heavy-parcel surcharge on top, which is why an 80 kg parcel to zone B comes to 148 dollars.\n\nYour rule, as I'll build it: An 80 kg crate is priced by the same pricing formula as any other parcel, with no weight limit and no surcharge or refusal for heavy parcels, so an 80 kg crate shipped to zone B is charged 148 dollars.\n  Right? (Enter = yes, or say what's off) > Not quite: any parcel over 30 kg gets a flat 20 dollar heavy-parcel surcharge on top of the usual charge. That is why an 80 kg crate to zone B comes to 148 dollars. There is no weight limit and we never refuse a parcel.\n\nYour rule, as I'll build it: When turning a product page title into its slug, convert each apostrophe to a hyphen and remove \"&\" and \"%\" entirely without spelling them out, so that \"Bob's Fish & Chips -- 50% Off!\" becomes \"bob-s-fish-chips-50-off\".\n  Right? (Enter = yes, or say what's off) > \n\nYour rule, as I'll build it: A product's rating display is blank (not shown at all, and never shown as zero stars) whenever the product has fewer than 3 valid ratings, which includes a product with no ratings or only blank ratings.\n  Right? (Enter = yes, or say what's off) > \n\nTwo of your answers pull different ways on one decision. Which is your policy?\nWhen a late invoice belongs to a customer who has a credit on their account (they are owed money), is the late fee zero, or does the minimum fee of 5 dollars still apply?\n  A) No penalty at all: the fee is 0.00.  B) The fee is never less than 5 dollars, so the minimum 5 dollar fee is still charged.\n  > A\n\nYour rules for this feature, as the builders will follow them (each applies to every case like it):\n  1. Whenever working days are counted (for example a '5 working days' promise from today), skip only Saturdays, Sundays, December 25 and January 1; every other day, including public holidays like next Wednesday, counts as a working day, and no national or company holiday list is used. Whenever an order comes in on a day that is not a working day (for example a Saturday with a '1 working day' promise), the clock starts on the next working day, so a Saturday order promised in 1 working day is due Tuesday.\n  2. Whenever a customer's age is shown, the age counts only birthdays that have already happened, so someone born on 29 February 2000 is 23 on 28 February 2024 and turns 24 on 1 March in years with no 29 February. Whenever the birth date is in the future (for example entered as next year by mistake), the age is blank so someone checks the entry.\n  3. Whenever an invoice is late, the late fee is 1% of the invoice amount for each day late, charged in full from day 1 with no grace period (even for a long-standing friend of the business), but never less than 5 dollars and never more than 25% of the invoice amount. For example, a 1,000 dollar invoice 10 days late is charged 100 dollars.\n  4. Whenever a student's score is turned into a letter grade, use no plus or minus: A for 90 and above, B for 80 and above, C for 70 and above, D for 60 and above, and F for below 60, so 85 out of 100 is a B.\n  5. Whenever a card number is shown on a receipt, only its last 4 digits can be seen.\n  6. Whenever a product's price is negative (for example -20 dollars from a refund or data error), the price is invalid and nothing is shown (blank).\n  7. Whenever a product page title is turned into a web address (slug), make it lowercase, turn accents into plain letters, drop characters with no plain-English letters (such as Japanese), convert each apostrophe to a hyphen, and remove \"&\" and \"%\" entirely without spelling them out, so \"Caf\u00e9 \u65e5\u672c Tea\" becomes \"cafe-tea\" and \"Bob's Fish & Chips -- 50% Off!\" becomes \"bob-s-fish-chips-50-off\". Whenever two different products end up with the same web address, both get the same address and the team makes them unique by hand.\n  8. Whenever a product's headline rating is shown, use only ratings from 1 to 5 (ignore any outside that range, such as 0 or 7) and round their average to the nearest half star, so ratings of 5, 4 and 4 (average 4.33) show 4.5. Whenever the product has fewer than 3 valid ratings (including no ratings or only blank ratings), the rating display is blank: not shown at all, and never shown as zero stars.\n  9. Whenever a body mass index is displayed, show exactly one decimal place by cutting off every digit after the first decimal place, never rounding, so 24.96 is displayed as 24.9 and not 25.0.\n  10. Whenever a parcel's shipping charge is worked out, it is the zone's base charge (5 dollars for zone A, 8 dollars for zone B, 12 dollars for zone C) plus 1.50 dollars for every kilogram of weight, where any part of a kilogram counts as a full kilogram. Whenever a parcel is over 30 kg, add a flat 20 dollar heavy-parcel surcharge on top. There is no weight limit and no parcel is ever refused. For example, an 80 kg parcel to zone B costs 8 + (80 \u00d7 1.50) + 20 = 148 dollars.\n  11. When a late invoice belongs to a customer who has a credit on their account (they are owed money), is the late fee zero, or does the minimum fee of 5 dollars still apply? -> No penalty at all: the fee is 0.00.\n  Numbers of any that are wrong (Enter = all correct) > \n"
+  }
+ },
+ "cost_usd": {
+  "documenter": 0.1444253,
+  "owner_H": 2.098,
+  "owner_H2": 2.038,
+  "judge": 0.2289661
+ },
+ "labels": [
+  {
+   "function": "net_price",
+   "decision": 0,
+   "label": "discount capped at 50%",
+   "asked_H": true,
+   "asked_H2": true,
+   "H": "right",
+   "H2": "absent",
+   "R": "right",
+   "note": "H2 sheet only covers negative price"
+  },
+  {
+   "function": "net_price",
+   "decision": 1,
+   "label": "half-up rounding to cents",
+   "asked_H": false,
+   "asked_H2": false,
+   "H": "absent",
+   "H2": "absent",
+   "R": "right",
+   "note": "never asked"
+  },
+  {
+   "function": "add_bdays",
+   "decision": 0,
+   "label": "weekend start rolls to Monday before counting",
+   "asked_H": true,
+   "asked_H2": true,
+   "H": "right",
+   "H2": "right",
+   "R": "right",
+   "note": "Sat order counted from Monday"
+  },
+  {
+   "function": "add_bdays",
+   "decision": 1,
+   "label": "negative n returns NULL",
+   "asked_H": true,
+   "asked_H2": true,
+   "H": "absent",
+   "H2": "absent",
+   "R": "right",
+   "note": "backward-count questions; sheets silent"
+  },
+  {
+   "function": "add_bdays",
+   "decision": 2,
+   "label": "Dec 25 and Jan 1 are not business days",
+   "asked_H": true,
+   "asked_H2": true,
+   "H": "right",
+   "H2": "right",
+   "R": "right",
+   "note": "Dec 25/Jan 1 only"
+  },
+  {
+   "function": "add_bdays",
+   "decision": 3,
+   "label": "n capped at 260",
+   "asked_H": false,
+   "asked_H2": false,
+   "H": "absent",
+   "H2": "absent",
+   "R": "right",
+   "note": "never asked"
+  },
+  {
+   "function": "mask_card",
+   "decision": 0,
+   "label": "spaces and dashes stripped from output",
+   "asked_H": true,
+   "asked_H2": false,
+   "H": "right",
+   "H2": "absent",
+   "R": "right",
+   "note": "H2 sheet only says last 4 visible"
+  },
+  {
+   "function": "mask_card",
+   "decision": 1,
+   "label": "fewer than 8 digits fully masked",
+   "asked_H": true,
+   "asked_H2": true,
+   "H": "right",
+   "H2": "absent",
+   "R": "right",
+   "note": "H2 asked but sheet omits"
+  },
+  {
+   "function": "mask_card",
+   "decision": 2,
+   "label": "other characters give NULL",
+   "asked_H": true,
+   "asked_H2": false,
+   "H": "partial",
+   "H2": "absent",
+   "R": "right",
+   "note": "H sheet covers letters only"
+  },
+  {
+   "function": "letter_grade",
+   "decision": 0,
+   "label": "percent rounded half-up to integer before banding",
+   "asked_H": true,
+   "asked_H2": true,
+   "H": "partial",
+   "H2": "absent",
+   "R": "right",
+   "note": "H hedged (rounding or lower cutoffs); H2 no rounding"
+  },
+  {
+   "function": "letter_grade",
+   "decision": 1,
+   "label": "max_score <= 0 gives N/A",
+   "asked_H": false,
+   "asked_H2": false,
+   "H": "absent",
+   "H2": "absent",
+   "R": "right",
+   "note": "never asked"
+  },
+  {
+   "function": "slugify",
+   "decision": 0,
+   "label": "truncate to 40 chars then strip trailing hyphen",
+   "asked_H": false,
+   "asked_H2": false,
+   "H": "absent",
+   "H2": "absent",
+   "R": "right",
+   "note": "never asked"
+  },
+  {
+   "function": "slugify",
+   "decision": 1,
+   "label": "accents folded to base letters",
+   "asked_H": true,
+   "asked_H2": true,
+   "H": "right",
+   "H2": "right",
+   "R": "right",
+   "note": "accents folded"
+  },
+  {
+   "function": "slugify",
+   "decision": 2,
+   "label": "empty result is untitled",
+   "asked_H": true,
+   "asked_H2": false,
+   "H": "right",
+   "H2": "absent",
+   "R": "right",
+   "note": "H states untitled"
+  },
+  {
+   "function": "ship_cost",
+   "decision": 0,
+   "label": "weight rounded up to whole kg",
+   "asked_H": true,
+   "asked_H2": true,
+   "H": "right",
+   "H2": "right",
+   "R": "right",
+   "note": "round up to kg"
+  },
+  {
+   "function": "ship_cost",
+   "decision": 1,
+   "label": "unknown zone billed at zone C",
+   "asked_H": true,
+   "asked_H2": false,
+   "H": "right",
+   "H2": "absent",
+   "R": "right",
+   "note": "H2 asked about structure only"
+  },
+  {
+   "function": "ship_cost",
+   "decision": 2,
+   "label": "surcharge 20 when weight over 30kg",
+   "asked_H": true,
+   "asked_H2": true,
+   "H": "partial",
+   "H2": "right",
+   "R": "right",
+   "note": "H sheet gives no surcharge amount"
+  },
+  {
+   "function": "ship_cost",
+   "decision": 3,
+   "label": "non-positive weight costs 0",
+   "asked_H": false,
+   "asked_H2": false,
+   "H": "absent",
+   "H2": "absent",
+   "R": "right",
+   "note": "never asked"
+  },
+  {
+   "function": "bmi_value",
+   "decision": 0,
+   "label": "truncated rather than rounded to 1 decimal",
+   "asked_H": false,
+   "asked_H2": true,
+   "H": "absent",
+   "H2": "right",
+   "R": "right",
+   "note": "truncation only in H2"
+  },
+  {
+   "function": "age_years",
+   "decision": 0,
+   "label": "Feb 29 birthday turns on Mar 1 in non-leap years",
+   "asked_H": true,
+   "asked_H2": true,
+   "H": "right",
+   "H2": "right",
+   "R": "right",
+   "note": "Mar 1 in non-leap years"
+  },
+  {
+   "function": "late_fee",
+   "decision": 0,
+   "label": "fee capped at 25% of amount",
+   "asked_H": true,
+   "asked_H2": true,
+   "H": "right",
+   "H2": "right",
+   "R": "right",
+   "note": "25% cap"
+  },
+  {
+   "function": "late_fee",
+   "decision": 1,
+   "label": "minimum fee of 5.00",
+   "asked_H": true,
+   "asked_H2": true,
+   "H": "right",
+   "H2": "right",
+   "R": "right",
+   "note": "5.00 minimum"
+  },
+  {
+   "function": "avg_stars",
+   "decision": 0,
+   "label": "result rounded to nearest 0.5 (ties up)",
+   "asked_H": true,
+   "asked_H2": true,
+   "H": "partial",
+   "H2": "partial",
+   "R": "right",
+   "note": "nearest half; ties unstated"
+  },
+  {
+   "function": "avg_stars",
+   "decision": 1,
+   "label": "ratings outside 1-5 ignored",
+   "asked_H": true,
+   "asked_H2": true,
+   "H": "right",
+   "H2": "right",
+   "R": "right",
+   "note": "outside 1-5 ignored"
+  },
+  {
+   "function": "avg_stars",
+   "decision": 2,
+   "label": "fewer than 3 valid ratings gives NULL",
+   "asked_H": true,
+   "asked_H2": true,
+   "H": "right",
+   "H2": "right",
+   "R": "right",
+   "note": "fewer than 3 gives blank"
+  }
+ ]
+}

@@ -1,0 +1,175 @@
+{
+ "qs": [
+  {
+   "id": "q01",
+   "situation": "A customer orders on Friday 20 December and you promise delivery in 5 working days. Christmas Day and New Year's Day fall inside that period.",
+   "options": [
+    "Only Saturdays and Sundays are days off, so the holidays still count as working days",
+    "Saturdays, Sundays and national public holidays are days off",
+    "Saturdays, Sundays, public holidays and our own shop closure days are all days off"
+   ]
+  },
+  {
+   "id": "q02",
+   "situation": "An order arrives on Saturday 14 June and the promise is '1 working day'.",
+   "options": [
+    "Promised for Monday 16 June, with the count starting from the next working day",
+    "Promised for Tuesday 17 June, because Saturday orders are treated as received on Monday",
+    "Staff must pick the date by hand for weekend orders"
+   ]
+  },
+  {
+   "id": "q03",
+   "situation": "A supplier's deadline is Wednesday and staff need the date 3 working days before it, to place the order in time.",
+   "options": [
+    "Count backwards over working days only, which gives the previous Friday",
+    "Count backwards over every calendar day, weekends included, which gives the previous Sunday",
+    "Counting backwards is not allowed, only forward dates are given"
+   ]
+  },
+  {
+   "id": "q04",
+   "situation": "A staff member types a birth date or order date that is impossible (30 February) or leaves it blank in a customer record, and a report is running.",
+   "options": [
+    "A blank gives a blank result, while an impossible date stops the report with an error message",
+    "Both a blank and an impossible date give a blank result and the report carries on",
+    "Any blank or impossible date stops the whole report with an error message"
+   ]
+  },
+  {
+   "id": "q05",
+   "situation": "A customer was born on 29 February 2000 and wants to buy an age-restricted item (18+) in a year with no 29 February.",
+   "options": [
+    "They turn 18 on 1 March",
+    "They turn 18 on 28 February",
+    "Staff decide each case by hand"
+   ]
+  },
+  {
+   "id": "q06",
+   "situation": "A $1,000 invoice is paid 60 days late.",
+   "options": [
+    "1.5% for every 30 days late, counted day by day, so $30 with no cap and no minimum",
+    "A single flat $25 fee, however many days late",
+    "2% for each month started, with a $10 minimum and a cap of 10% of the invoice"
+   ]
+  },
+  {
+   "id": "q07",
+   "situation": "A student scores 89.5 out of 100 on a course.",
+   "options": [
+    "B, because A starts at 90, with 80, 70 and 60 for B, C and D and no plus or minus grades",
+    "B+, because we use plus and minus grades",
+    "A, because we round up to the nearest whole mark, or our cut-offs are lower (for example A from 85)"
+   ]
+  },
+  {
+   "id": "q08",
+   "situation": "A student scores 105 out of 100 thanks to bonus questions.",
+   "options": [
+    "Gets an A, because bonus marks are fine",
+    "Gets an A, but the record is flagged for a teacher to check",
+    "No grade is given, because a score over the maximum is treated as a data entry mistake"
+   ]
+  },
+  {
+   "id": "q09",
+   "situation": "A receipt is printed for the card 4111 1111 1111 1234.",
+   "options": [
+    "Only the last 4 digits are shown, and every other digit is hidden",
+    "The first 6 and the last 4 digits are shown",
+    "Only the last 2 digits are shown"
+   ]
+  },
+  {
+   "id": "q10",
+   "situation": "A cashier types a card number with dashes (4111-1111-1111-1234), or a number that is too short, or one that contains letters.",
+   "options": [
+    "Dashes and spaces are ignored; a short number or one with letters is fully hidden",
+    "Dashes are kept in the printout; a short number or one with letters is fully hidden",
+    "Anything that is not a clean card number is refused and nothing is printed"
+   ]
+  },
+  {
+   "id": "q11",
+   "situation": "A staff member enters a 120% discount by mistake on a $50 item.",
+   "options": [
+    "The entry is refused with an error message",
+    "It is treated as 100% off, so the item is free",
+    "It is ignored and the item is sold at full price"
+   ]
+  },
+  {
+   "id": "q12",
+   "situation": "A 2.3 kg parcel is going to zone B.",
+   "options": [
+    "Charged as 3 kg, with partial kilograms rounded up, at a base fee plus a rate per kg (cheapest A, then B, then C)",
+    "Charged for exactly 2.3 kg",
+    "Charged by weight band: up to 1 kg, up to 5 kg and up to 10 kg, each at one flat price"
+   ]
+  },
+  {
+   "id": "q13",
+   "situation": "A parcel is booked for delivery zone 'D', which has no rates, or a zone typed in lowercase ('b').",
+   "options": [
+    "Lowercase is accepted; an unknown zone gives an error and no charge",
+    "Lowercase is accepted; an unknown zone is charged at the zone C rate",
+    "Lowercase is accepted; for an unknown zone the shipping charge is left blank so staff quote by hand"
+   ]
+  },
+  {
+   "id": "q14",
+   "situation": "A customer wants to send an 80 kg item, or a very light 0.4 kg parcel.",
+   "options": [
+    "No weight limit and no free shipping: the same formula applies to everything",
+    "Over 30 kg we do not ship it, and staff give a manual quote",
+    "Parcels under 0.5 kg ship free as a promotion"
+   ]
+  },
+  {
+   "id": "q15",
+   "situation": "A product is titled 'Caf\u00e9 Cr\u00e8me \u2013 50% Off!' and needs a web address ending.",
+   "options": [
+    "cafe-creme-50-off, lowercase with accents removed and symbols dropped",
+    "caf\u00e9-cr\u00e8me-50-off, keeping the accents",
+    "cafe-creme-50-percent-off, with the % sign spelled out"
+   ]
+  },
+  {
+   "id": "q16",
+   "situation": "A product title is written entirely in Hindi script (or is just symbols), so no usable Latin letters are left.",
+   "options": [
+    "The web address ending is left empty",
+    "The original script is kept in the web address ending",
+    "A generic word with a number is used instead, such as 'product-1234'"
+   ]
+  },
+  {
+   "id": "q17",
+   "situation": "A product has three ratings: 5, 4 and 4 stars (average 4.33).",
+   "options": [
+    "Shows 4.3, rounded to one decimal",
+    "Shows 4.5, rounded to the nearest half star",
+    "Shows 4 stars, rounded to a whole number"
+   ]
+  },
+  {
+   "id": "q18",
+   "situation": "One product has ratings of 5, 4 and a glitch entry of 9 stars, and a second product has no ratings at all.",
+   "options": [
+    "The glitch and blank entries are ignored, and a product with no ratings shows 'no rating yet'",
+    "The 9 is counted as 5 stars, and a product with no ratings shows 0 stars",
+    "A product with any invalid entry shows no headline rating until staff check it"
+   ]
+  },
+  {
+   "id": "q19",
+   "situation": "A brand-new product has just one rating, a 5-star review from the owner's cousin.",
+   "options": [
+    "Shows 5.0 stars straight away",
+    "Shows no headline rating until it has at least 5 ratings",
+    "Shows a figure pulled toward the shop's overall average, for example 4.2"
+   ]
+  }
+ ]
+}
