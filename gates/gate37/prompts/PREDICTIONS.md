@@ -25,3 +25,13 @@ Kill: **I beats N by < 10 points on surprising cases, with C2 held.** If coverag
 **Honest prior.** S1 about 45%, C2 about 70%, K1 about 50%. Gate 36's two contradictions out of two say framing could cap S1 even at full coverage.
 
 **Cost.** About $7 at list price for both arms, plus about 10 to 12 minutes of the founder (12 hidden, about 14 interview, 6 retest).
+
+## Amendment, registered before the build (Oct 28 2026)
+
+- **Hidden set.** The founder answered all 12 hidden situations on Telegram, most of them in his own words. The cold probe was unanimous on 10 of 12. The blind judge labelled **6 surprising, 4 ordinary and 2 unclear** (the unclear ones are not scored).
+- **Two surprising cases are not scored:** what differs from the default has no field in the fixed interface. That leaves **4 surprising and 4 ordinary hidden cases.** He confirmed the experimenter's readings of the 3 scored free-text surprising verdicts (3 of 3 "Yes, exactly"). A private reference passes 8/8. One surprising case is 25 points, so S1 (≥ 30) needs at least 2 more surprising cases passing in I than in N.
+- **Already scored, before any build:**
+  - **C2 held:** Hive's 20 interview situations covered **6 of 6** surprising hidden situations, including the 4 scored (blind judge, 3 votes each).
+  - **K1 failed:** on the 6 reframed Gate 36 situations he gave the same rule **3 of 6** times (blind judge, unanimous on every pair).
+  - **S4 failed:** the interview took 15.6 minutes of wall time. He said the questions felt redundant, and from the 12th question on he answered in 2 to 5 seconds each. Hive's planner had asked about some decisions twice, at different numbers. This is fixed in the tool after the session (one question per decision, and skipping questions his own words already settle). Arm I uses the session's code, as registered.
+- **Arm I** gets his 20 interview rules through the product's reading logic: 15 taps, plus 5 answers in his own words with their readings confirmed. The rules stay private. Both arms are built at the same time from `hs1-base`, 4 workers each.
