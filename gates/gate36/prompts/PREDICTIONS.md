@@ -24,3 +24,20 @@ Kill: **arm I beats arm N by < 10 points on surprising cases.** If so, an interv
 **Honest prior.** S1 about 55%; C2 about 55%. Hive's interview must guess where this owner differs without seeing the referee. Gate 33 showed a model predicts his answers poorly, but this only needs it to predict **which questions to ask**, not the answers.
 
 **Cost.** About $6 at list price for both arms, plus about 6 minutes of the founder's time.
+
+## Amendment, registered before the build (Oct 28 2026)
+
+- **Hidden set (the referee).** The founder answered all 12 hidden situations on Telegram. The cold default probe was unanimous 12/12. The blind judge labelled **9 surprising, 2 ordinary, 1 unclear** (the unclear one is not scored).
+- **Readings.** He was asked to confirm the experimenter's reading of 4 free-text surprising verdicts: **2 "Yes, exactly", 2 "Not quite".** The two not confirmed are not scored. That leaves **7 surprising and 2 ordinary hidden cases.** A private reference passes 9/9 (11/11 with the two dropped cases). The cases stay out of the container until scoring. One surprising case is 14 points, so S1 (≥ 30) needs at least 3 more surprising cases passing in I than in N.
+- **Hive's interview was damaged by a tool failure, so S4 is already scored as failed.**
+  - A tap on a stale button was dropped in silence, so the founder waited 1 h 42 min on a question he thought he had answered. The whole interview took 124 minutes against S4's limit of 6.
+  - Two more bugs showed up in reading his free-text replies: a yes in his own words was stored as the rule itself, and a correction lost the situation it was about.
+  - All three are fixed in the tool (`89472c9`), with tests.
+- **Arm I's rules.** These come from the fixed reading logic, applied mechanically to the answers he actually gave, with no experimenter judgment:
+  - 3 tapped answers;
+  - 3 rules in his own words;
+  - 3 corrections kept with their situation;
+  - 2 replies that left the choice to the builders give no rule;
+  - 1 confirmed reading was lost to the bug and is not used.
+  That is **9 rules from 12 situations.** His wording stays private.
+- **Arms.** Both arms are built at the same time from `hs1-base`, 4 workers each, assumptions recorded, no questions, no review. The tool now resumes a builder stopped by a usage limit. A builder that still ends on an API error voids that arm, which is then rerun.
