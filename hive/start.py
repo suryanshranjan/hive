@@ -240,7 +240,11 @@ def start(repo='.', workers=4, goal=None, minutes=40, overnight=False):
         n = len(found)
         say(f"Before I hand it over: they made {_n(n, 'assumption')} your description didn't cover. Let's check "
             f"{'it' if n == 1 else 'them'} together: press Enter if one is right, or say what should happen instead.")
-        _review_and_fix(state)
+        try:
+            _review_and_fix(state)
+        except RuntimeError as e:   # the plain-words step failed: hand over as built; `hive morning` can review later
+            say(str(e) + " The build is handed over as is; run `hive morning` later to check its decisions.")
+            state["overnight"] = True
     return _deliver(state)
 
 def _review_and_fix(state, phone=None):
