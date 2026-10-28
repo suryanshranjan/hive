@@ -106,6 +106,7 @@ Every result below was predicted on GitHub before the run. Real-company results 
 | A model of the founder cannot stand in for him | It predicts 35% of his surprising rules | Gate 33 |
 | The review mechanism, with an owner who answers | Unusual rules 0/8 → 7/8; all 384 tests kept (synthetic owner) | Gate 34b |
 | `hive cloud` on a real EC2 server | Project, tests and result branch round-trip; 3 bugs found and fixed | [`BRAIN.md`](BRAIN.md) |
+| One-step `hive cloud --new` on real AWS | Machine made and ready in 2.5 minutes; Claude Code and Hive installed, tests pass there, result branch pulled back; SSH open only to the owner's IP; `--stop` left nothing behind | [`BRAIN.md`](BRAIN.md) |
 | The real founder audits a list of the builders' decisions | He marked 0 of 27; his rules come out in situations (48 of 48 answered), not audits | Gate 35 |
 | Interview written from the feature description | Covered 4 of 9 of his surprising rules; no gain (2/7 both arms). On both covered cases his answers changed with the framing | Gate 36 |
 | Interview written from the decisions the code takes | Covered 7 of 9 of the same rules (3 of 9 from the description), with no founder time spent | Gate 37 pilot |
