@@ -23,4 +23,15 @@ check "one correction, one kept" "$(grep -c 'The owner says' $T/run/owner/correc
 check "the correction carries the owner's words" "$(grep -c 'left out when a city is required' $T/run/owner/corrections.md)" 1
 check "only the two business defaults reached the owner" "$(ls $T/run/owner/reviews | wc -l | tr -d ' ')" 2
 check "the technical choice went to the engineers' list" "$(grep -c 'TypeError' $T/run/owner/technical_assumptions.md)" 1
+# undo: the owner keeps #1, then types undo at #2, changes #1, and keeps #2
+export HIVE_RUN=$T/run3
+python3 -m hive assume "If a creator has no city, they are still shown." >/dev/null; sleep 0.01
+python3 -m hive assume "If a deal is cut by Rs 500, both must accept again." >/dev/null
+printf '
+undo
+No, leave them out.
+
+' | python3 -m hive review --run $T/run3 > $T/undo.out 2>&1
+check "undo brings the last decision back" "$(grep -c 'Here it is again' $T/undo.out)" 1
+check "the changed answer replaced the first one" "$(grep -c 'leave them out' $T/run3/owner/corrections.md)" 1
 rm -rf $T; exit $fail

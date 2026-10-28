@@ -147,16 +147,23 @@ def review(run, width=72, intro=True, goal=None):
         print(f"\nThe builders made {len(todo)} assumption(s) your instructions did not cover. For each one, press Enter\n"
               "if it is right, or type what should happen instead. Ctrl+C to stop and come back later.", flush=True)
     try:
-        for n, a in enumerate(todo, 1):
+        i = 0
+        while i < len(todo):
+            a = todo[i]; n = i + 1
             lines = ['', '=' * width, f" Assumption {n} of {len(todo)}  -  from builder {a['worker']}", '=' * width, '']
             lines += textwrap.wrap(' '.join(a['text'].split()), width - 2, initial_indent='  ', subsequent_indent='  ')
-            lines += ['', '  Right? Press Enter if yes, or say what should happen instead > ']
+            lines += ['', '  Right? Press Enter if yes, or say what should happen instead' +
+                      (" (or type undo to change the last one)" if i else '') + ' > ']
             t0 = time.time(); print('\n'.join(lines), end='', flush=True)
             ans = sys.stdin.readline().strip()
+            if ans.lower() == 'undo' and i:
+                i -= 1; os.remove(os.path.join(d, 'reviews', todo[i]['id'] + '.json'))
+                print('  No problem. Here it is again.', flush=True); continue
             ok = ans.lower() in ('', 'y', 'yes', 'right', 'ok', 'correct')
             json.dump({'id': a['id'], 'ok': ok, 'correction': None if ok else ans, 'seconds': int(time.time() - t0),
                        'shown_as': a.get('shown_as')}, open(os.path.join(d, 'reviews', a['id'] + '.json'), 'w'))
-            print('  Kept.' if ok else '  Noted: the builders will change this.', flush=True)
+            print('  Kept.' if ok else '  Understood. The builders will change this.', flush=True)
+            i += 1
     except KeyboardInterrupt:
         print('\nStopped; run hive review again to finish.')
     rows = write_corrections(d)
