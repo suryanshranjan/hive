@@ -173,6 +173,29 @@ check('the hand-over shows his rules, sends a change to a fix round, and ends on
       (any('What it does now, by your rules' in m['text'] for m in fake.sent), fixed, fake.sent[-1]['text']),
       (True, ['Tips are never charged a fee'], '🎉 Very good. It is yours.'))
 
+# 3l. "what does it mean?" is a question, not his answer (Gate 38): Hive reasons about the reply, explains the question
+# in plain words, and asks again; a real answer in his own words still counts
+_ask_json = explain.ask_json
+explain.ask_json = lambda prompt: ({'kind': 'question', 'explanation': 'A review is the stars a brand and a creator give '
+                                    'each other after a deal.'} if 'What does it mean' in prompt and 'Think about what he means' in prompt
+                                   else {'kind': 'answer'} if 'Think about what he means' in prompt else _ask_json(prompt))
+qs = [{'id': 'v1', 'situation': 'How long can a review be left?', 'options': ['7 days', '14 days']}]
+fake = FakeTelegram([say('What does it mean'), tap('v1|1')])
+rules = interview.interview('Ratings and reviews', ch(fake), situations=qs, poll=1, sheet=False)
+explain.ask_json = _ask_json
+check('a question about the question is explained, not taken as his rule',
+      (any(m['text'].startswith('💡 A review is the stars') for m in fake.sent), rules),
+      (True, ['How long can a review be left? -> 14 days']))
+explain.ask_json = lambda prompt: ({'kind': 'answer', 'choice': 2} if 'Think about what he means' in prompt
+                                   else _ask_json(prompt))
+fake = FakeTelegram([say('the longer one')])
+rules = interview.interview('Ratings and reviews', ch(fake), situations=qs, poll=1, sheet=False)
+explain.ask_json = _ask_json
+check('a choice picked in his own words counts as that choice', rules, ['How long can a review be left? -> 14 days'])
+fake = FakeTelegram([say("What is review i font understand"), tap('v1|0')])   # no model reachable: the phrase list
+rules = interview.interview('Ratings and reviews', ch(fake), situations=qs, poll=1, sheet=False)
+check('without a model, the phrase list still catches it', rules, ['How long can a review be left? -> 7 days'])
+
 # 4. the listener steps aside while a build or review is talking to the owner
 json.dump({'pid': os.getppid(), 'at': time.time()}, open(telegram.BUSY, 'w'))
 check('another live process talking: the listener steps aside', telegram.busy_elsewhere(), True)

@@ -99,6 +99,23 @@ def setup_backup():
     except Exception as e:
         print(f'  Saved, but a test call failed ({e}). Check the key and model with hive llm setup.'); return 1
 
+UNDERSTAND = """You are the owner's assistant. You asked a busy, non-technical business owner a question about his own
+product, and he replied. What the product is about:
+{context}
+
+Your question: {situation}
+The choices you offered:
+{options}
+His reply: "{reply}"
+
+Think about what he means. Did he answer (pick a choice, give his own rule, or leave it to you), or is he asking what
+the question means (he is confused by a word, the situation, or the choices)? If he is asking, explain in 2 or 3 short
+plain sentences what is being asked and what each choice would mean in practice for his business, using everyday words
+and the same names, without recommending one. If he answered by picking one of the choices in his own words (for
+example "the second one" or a few words of it), give its number; if he gave his own rule, the number is null.
+Reply with JSON only: {{"kind": "answer" | "question", "choice": number or null, "explanation": "..." (only for a
+question)}}"""
+
 def _goal_summary(goal):
     text = re.sub(r'^#+\s*(goal:?)?\s*', '', goal.strip(), flags=re.I)
     return text[:3000]

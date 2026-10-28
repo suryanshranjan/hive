@@ -3,6 +3,8 @@
 # usage: sh tests/test_doctor.sh   (needs git, python3 and pip; run from the hive repo root)
 set -u
 HIVE=$(pwd); T=$(mktemp -d); export HOME=$T
+mkdir -p $T/bin && printf '#!/bin/sh\necho OK\n' > $T/bin/claude && chmod +x $T/bin/claude
+export PATH=$T/bin:$PATH   # a stand-in Claude Code (the login probe is skipped)
 fail=0; check() { if [ "$2" = "$3" ]; then echo "ok   $1"; else echo "FAIL $1 (got $2, expected $3)"; fail=1; fi; }
 python3 -m venv $T/venv >/dev/null 2>&1 && $T/venv/bin/pip install -q $HIVE >/dev/null 2>&1
 check "it installs with pip and gives a hive command" "$(test -x $T/venv/bin/hive && echo yes)" yes

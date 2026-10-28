@@ -126,12 +126,21 @@ def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll
                                               "matter. Tap what should happen at your company, or tell me in your own "
                                               f"words. About {max(2, round(len(qs) / 4))} minutes; it saves you checking "
                                               "their work afterwards.",
-                              poll=poll, save=save and save + '.answers.json', after_text=settled_by)
+                              poll=poll, save=save and save + '.answers.json', after_text=settled_by,
+                              context=explain._goal_summary(goal)[:1500])
     else:
         got = {}
         for k, q in enumerate(qs, 1):
             opts = '  '.join(f'{chr(65 + i)}) {o}' for i, o in enumerate(q['options']))
             a = (ask or input)(f"\n{k} of {len(qs)}. {q['situation']}\n  {opts}\n  Your answer (a letter, or your own words) > ").strip()
+            for _ in range(3):   # "what does this mean?" gets an explanation, not taken as his answer
+                if not a or re.fullmatch(r'([A-Ca-c])[).]?', a):
+                    break
+                kind, why = telegram.understand(a, (q['situation'], q['options'], explain._goal_summary(goal)[:1500]))
+                if kind != 'question':
+                    a = why or a   # a choice he picked in his own words counts as that choice
+                    break
+                a = (ask or input)(f"  {why}\n  So, what should happen? (a letter, or your own words) > ").strip()
             m = re.fullmatch(r'([A-Ca-c])[).]?', a)
             got[q['id']] = q['options'][ord(m.group(1).upper()) - 65] if m and ord(m.group(1).upper()) - 65 < len(q['options']) else a
     rules, free = [], []
@@ -154,7 +163,8 @@ def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll
             ok = telegram.verdicts(ch, [{'id': d['id'], 'situation': f"Your rule, as I'll build it: {d['situation']}",
                                          'options': d['options']} for d in drafts],
                                    intro='Thank you. A few you answered in your own words; here is how I read them.',
-                                   poll=poll, save=save and save + '.readings.json')
+                                   poll=poll, save=save and save + '.readings.json',
+                                   context=explain._goal_summary(goal)[:1500])
         else:
             ok = {d['id']: (ask or input)(f"\nYour rule, as I'll build it: {d['situation']}\n  Right? (Enter = yes, or "
                                          "say what's off) > ").strip() or 'Yes, exactly' for d in drafts}
