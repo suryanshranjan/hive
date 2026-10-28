@@ -33,10 +33,13 @@ export HIVE_AWS="$PY $HIVE/tests/fake_aws.py"   # a stand-in aws, run by Python 
 export FAKE_AWS_LOG=$T/aws.log HIVE_NO_RELISTEN=1
 printf '[["owner", "build: a ratings page"]]' > $T/.hive/conversation.json
 HIVE_CLOUD_LOCAL=$T/box2 HIVE_MY_IP=198.51.100.7 $PY -m hive cloud --new --no-start > $T/new.txt 2>&1
+keymode() {   # private: mode 600 on Linux/macOS; on Windows, no group of other users on the file's access list
+  if [ "$PY" = python ]; then n=$(icacls "$(cd $T/.hive/cloud && pwd -W)/$(ls $T/.hive/cloud | grep pem)" | grep -c -E 'Everyone|BUILTIN.Users|Authenticated Users'); [ "$n" = 0 ] && echo 600 || echo open
+  else stat -c %a $T/.hive/cloud/*.pem; fi; }
 check "--new makes the machine and moves the project there" "$? $(git -C $T/box2/hive-cloud/project rev-parse --abbrev-ref HEAD)" "0 main"
 check "it says what it costs and how to delete it" "$(grep -c 'an hour while it runs). .hive cloud --stop. deletes it' $T/new.txt)" 1
 check "only this machine's IP may log in, with a key kept private" \
-  "$(grep -c 'authorize-security-group-ingress .*--cidr 198.51.100.7/32' $T/aws.log) $(stat -c %a $T/.hive/cloud/*.pem)" "1 600"
+  "$(grep -c 'authorize-security-group-ingress .*--cidr 198.51.100.7/32' $T/aws.log) $(keymode)" "1 600"
 check "the machine sets itself up on first boot (Claude Code included)" \
   "$(grep -c 'run-instances .*--user-data file://' $T/aws.log) $(grep -c 'claude-code' $T/.hive/cloud/*.boot.sh)" "1 1"
 printf 'n\n' | $PY -m hive cloud --stop > $T/keep.txt 2>&1

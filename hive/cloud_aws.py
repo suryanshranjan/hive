@@ -72,6 +72,9 @@ def new(repo='.', size='t3.large', region=None, profile=None, with_login=True, s
         with open(m['key'], 'w') as f:
             f.write(key['KeyMaterial'])
         os.chmod(m['key'], 0o600)
+        if os.name == 'nt':   # chmod does nothing on Windows, and Windows' ssh refuses a key others can read
+            user = os.environ.get('USERNAME', '')
+            subprocess.run(['icacls', m['key'], '/inheritance:r', '/grant:r', f'{user}:F'], capture_output=True)
         m['key_name'] = name
         json.dump(m, open(STATE(), 'w'), indent=1)   # from here on, --stop can clean up whatever was made
         sg = _aws(['ec2', 'create-security-group', '--group-name', name, '--description', 'Hive: SSH from the owner only',

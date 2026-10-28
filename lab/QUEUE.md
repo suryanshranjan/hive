@@ -2,26 +2,21 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 28 2026, after Gate 37)
+## Where we left off (Oct 29 2026, night before Gate 38 day 2)
 
-- **Done:** Gate 36 scored and written up (`gates/gate36/RESULTS.md`). Kill fired: interview first, with questions written from the description alone, gave 2/7 surprising cases in both arms. Coverage was 4/9, and on both covered cases the founder's interview answer contradicted his hidden-set verdict.
-- **Tool**, all tests passing:
-  - `hive` (start, overnight, morning, interview first).
-  - Telegram: formatted cards with progress bars, voice notes via local Whisper, questions, reviews, status, undo, change of mind via `hive listen`, "build: ...".
-  - Memory of rulings, contradiction checks (now including interview answers), as-built confirmation.
-  - **Picking up again:** interview answers are saved and resumed; taps on old buttons are answered; a builder stopped by a usage limit or an expired login resumes, and the owner is told.
-  - `hive doctor`, `pip install`, `hive cloud` (tested on a real EC2 instance).
-- **Gate 37 pilot done** (`gates/gate37/PILOT_RESULTS.md`, no founder time): an interview written from the code's decisions covered 7 of 9 of Gate 36's surprising situations, against 3 from the description. Hive now asks about every decision the code takes, up to 20.
-- **Done: Gate 37** (`gates/gate37/RESULTS.md`), kill fired.
-  - Coverage is solved: 6 of 6 from the code's decisions.
-  - The builders followed his answers.
-  - But his answers to two framings of a decision agree only 1 of 8 (same session) and 3 of 6 (a day apart), so the score did not move.
-  - The interview was redundant; fixed in `f5fccc1`.
-- **Next: Gate 38, decide once, as a rule** (`BRAIN.md` §9).
-  - Build the rule sheet first: after the interview, Hive shows one general rule per decision, flags disagreeing answers, and the owner confirms or edits each.
-  - Then register predictions and run it over two days with the founder (about 15 minutes).
-- **Private:** Gate 37's material is in `hive_private\g37priv` and `/home/node/g37` in the container.
-- **Private material:** `D:\Suryansh\Programming\hive_private\` (`g36priv`: hidden tests, reference, scripts) and `/home/node/g3x` in the container.
+- **Gate 38 is running.** Predictions in `gates/gate38/prompts/PREDICTIONS.md` (`72a5726`).
+  - Day 1 is done: Hive's interview (13 questions, one per decision) and the rule sheet; 13 rules confirmed, one corrected, 7.9 minutes.
+  - Day 2 is scheduled in the container: `/home/node/g38/day2.py` waits until 06:40 UTC on Oct 29, then puts the 12 referee situations (`cases.json`, cold probe unanimous 12/12) to the founder on Telegram. Log: `day2.log`; answers saved to `verdicts.json`.
+  - After day 2: blind judge labels (`judge.py`), confirm free-text readings, then the stability judge (confirmed rules vs day 2, and raw day-1 answers vs day 2: A1, A2), hidden tests and a private reference, the amendment, build arms N and I (I = goal + confirmed rules from `confirmed_rules.json`), score, RESULTS, BRAIN, and a row in `docs/research_to_product.md`.
+  - Nothing else may read the founder's Telegram while day 2 runs.
+- **Tool (all 203 checks pass on Linux and on GitHub):**
+  - Interview from the code's decisions, one question per decision, no repeats, explanations on "what does this mean?", the rule sheet, and the "looks right?" hand-over.
+  - The swarm law picks the number of builders; `--docs` reads company documents.
+  - Telegram works as an agent: messages are read in the conversation's context (the thread is kept on disk), builds run in the background and report problems, replies are fast and in one voice.
+  - Cloud: `hive cloud --new` (real AWS, verified), moving with the Claude login so builders work there; `--stop` brings results, rules and the conversation home, deletes the machine, and resumes listening here.
+  - Native Windows (no Docker): every suite passes (UTF-8 for Claude and the builders, paths with spaces, the key made private with icacls).
+- **Still to try live:** a full trip from the phone (build in the cloud, status mid-build, a correction mid-question, then `--stop`), after day 2.
+- **Private:** `D:\Suryansh\Programming\hive_private\` (`g36priv`, `g37priv`, `g38priv`) and `/home/node/g3x` in the container.
 
 ## Needs the user
 
