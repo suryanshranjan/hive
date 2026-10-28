@@ -261,9 +261,10 @@ def _review_and_fix(state, phone=None):
     if phone:
         hour = time.localtime().tm_hour
         telegram.review(run1, phone, goal=state['goal'], check=state.get('check', ''),
+                        rulings=[r['text'] for r in memory.load(state['repo'])],
                         greeting='Good morning' if 4 <= hour < 12 else 'Good afternoon' if hour < 17 else 'Good evening')
     else:
-        owner.review(run1, intro=False, goal=state['goal'])
+        owner.review(run1, intro=False, goal=state['goal'], rulings=[r['text'] for r in memory.load(state['repo'])])
     fixes = [r for r in (json.load(open(p)) for p in glob.glob(os.path.join(run1, 'owner', 'reviews', '*.json'))) if not r['ok']]
     if not fixes:
         return False

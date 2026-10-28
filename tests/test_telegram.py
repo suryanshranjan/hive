@@ -94,7 +94,7 @@ ids = [a['id'] for a in owner._assumptions(d, False)]
 # words; leaves the smaller one; at the final check undoes #2 and answers it again in his own words; then sends.
 tap = lambda data: (lambda f: [(ME, None, data, 2)])
 say = lambda words: (lambda f: [(ME, words, None, None)])
-fake = FakeTelegram([tap(f'{ids[0]}|o1'), tap(f'{ids[1]}|undo'), tap(f'{ids[0]}|ok'),
+fake = FakeTelegram([tap(f'{ids[0]}|show'), tap(f'{ids[0]}|o1'), tap(f'{ids[1]}|undo'), tap(f'{ids[0]}|ok'),
                      tap(f'{ids[1]}|no'), say('Show it per customer instead.'), tap('aside|leave'),
                      tap('final|undo'), tap(f'{ids[1]}|no'), say('Count each order once.'), tap('final|send')],
                     stale=[(ME, 'hi', None, None)])
@@ -108,11 +108,16 @@ check('the greeting says how things stand and that a tap is enough',
 decisions = [m for m in fake.sent if m.get('reply_markup') and 'Keep it' in str(m['reply_markup'])]
 check('each decision is in plain words with an example',
       all('In the shop report' in m['text'] and 'Asha' in m['text'] for m in decisions), True)
-check("the first offers real alternatives, each one tap, with Hive's pick starred",
-      ('Other ways to do it:' in decisions[0]['text'], '★ Count once' in str(decisions[0]['reply_markup']),
-       'Count every time' in str(decisions[0]['reply_markup']), "I'd go with" in decisions[0]['text']), (True, True, True, True))
+menu = [m for m in decisions if 'Other ways to do it:' in m['text']]
+check("a high-stakes decision is asked openly first; options only on request",
+      ('What should happen here?' in decisions[0]['text'], 'Other ways' in decisions[0]['text'],
+       'Show me some options' in str(decisions[0]['reply_markup'])), (True, False, True))
+check("the options offer real alternatives, each one tap, with Hive's pick starred",
+      ('★ Count once' in str(menu[0]['reply_markup']), 'Count every time' in str(menu[0]['reply_markup']),
+       "I'd go with" in menu[0]['text']), (True, True, True))
+second = [m for m in decisions if m['text'].startswith('2 of 2')]
 check('the first decision has no undo; later ones do',
-      ('Undo' in str(decisions[0]['reply_markup']), 'Undo' in str(decisions[1]['reply_markup'])), (False, True))
+      ('Undo' in str(decisions[0]['reply_markup']), 'Undo' in str(second[0]['reply_markup'])), (False, True))
 check('undo took the suggestion back: #1 ended as kept', json.load(open(os.path.join(d, 'reviews', ids[0] + '.json')))['ok'], True)
 check('a final check came before anything was sent', any('Send it' in str(m.get('reply_markup')) for m in fake.sent), True)
 check('the final undo let the owner change #2', json.load(open(os.path.join(d, 'reviews', ids[1] + '.json')))['correction'],
@@ -188,12 +193,28 @@ run, d = make_run(); os.environ['HIVE_RUN'] = run
 owner.assume('If the same order is imported twice, it is counted twice.'); time.sleep(0.01)
 owner.assume('If a platform name differs only by capital letters, it counts as the same platform.')
 ids = [a['id'] for a in owner._assumptions(d, False)]
-fake = FakeTelegram([tap(f'{ids[0]}|o2'), tap('aside|leave'), tap('final|send')])
+fake = FakeTelegram([tap(f'{ids[0]}|show'), tap(f'{ids[0]}|o2'), tap('aside|leave'), tap('final|send')])
 telegram.review(run, telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), goal='combine metrics', poll=1)
 r = json.load(open(os.path.join(d, 'reviews', ids[0] + '.json')))
 check("picking the option Hive did not recommend is one tap, recorded as the owner's own call",
       (r['correction'], r['followed_suggestion']), ('count it every time it appears', False))
 check('the stored wording is the decision itself, not the "1 of 1" header', r['shown_as'].startswith('In the shop report'), True)
+
+# 7b. asked openly, the owner answers in his own words (no menu shown); a new answer that contradicts a ruling he gave on
+#     an earlier build is caught before sending
+run, d = make_run(); os.environ['HIVE_RUN'] = run
+owner.assume('If the same order is imported twice, it is counted twice.'); time.sleep(0.01)
+owner.assume('If a platform name differs only by capital letters, it counts as the same platform.')
+ids = [a['id'] for a in owner._assumptions(d, False)]
+fake = FakeTelegram([say('Merge them, and tell the shop. CONFLICT-ME'), tap('aside|leave'), tap('conf|0|a'), tap('final|send')])
+telegram.review(run, telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), goal='combine metrics', poll=1,
+                rulings=['Duplicates are always kept apart.'])
+r = json.load(open(os.path.join(d, 'reviews', ids[0] + '.json')))
+check("asked openly, the owner's own words become the rule, with no menu shown",
+      (r['correction'], r.get('asked_open'), any('Other ways' in m['text'] for m in fake.sent)),
+      ('Merge them, and tell the shop. CONFLICT-ME', True, False))
+check('a new answer that contradicts an earlier ruling is put to the owner',
+      any('two of your answers pull in different directions' in m['text'] for m in fake.sent), True)
 
 # 8. an open question gathers every reply until Done; situations get one-tap verdicts, with undo and own words
 fake = FakeTelegram([tap('collect|done'), tap('collect|more'),   # an accidental early Done, taken back

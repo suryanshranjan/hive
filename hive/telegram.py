@@ -217,8 +217,27 @@ def _ask_one(ch, d, item, header, poll, can_undo):
     choices = ''.join(f"\n{n}. {o['text']}" for n, o in enumerate(options, 1))
     advice = f"\n\n{item['advice']}" if item.get('advice') else ''
     shown = item['text'] + (f"\n\nOther ways to do it:{choices}" if choices else '') + advice
-    msg = ch.send(f"{header}\n\n{shown}", buttons=rows)
     t0 = time.time()
+    if options and item.get('impact', 2) >= 3:
+        # High stakes: ask openly first, so a menu cannot frame the owner's own rule (Gate 30: offered options led the
+        # founder away from his free-text verdict). The options come only if he asks for them.
+        first = [[('Keep it as is', f'{k}|ok')], [('Show me some options', f'{k}|show')]]
+        first.append([('↩ Undo last', f'{k}|undo')] if can_undo else [])
+        msg = ch.send(f"{header}\n\n{item['text']}\n\nWhat should happen here? Tell me in your own words, or keep it "
+                      "as is.", buttons=[r for r in first if r])
+        kind, got = _wait(ch, poll, {data for row in first for _, data in row})
+        if got == f'{k}|undo':
+            return 'undo'
+        if got != f'{k}|show':
+            ok = got == f'{k}|ok' or (kind == 'text' and got.lower().strip('. !') in YES)
+            correction = None if ok else got
+            json.dump({'id': k, 'ok': ok, 'correction': correction, 'seconds': int(time.time() - t0), 'via': 'telegram',
+                       'shown_as': item['text'], 'asked_open': True, 'followed_suggestion': None},
+                      open(os.path.join(d, 'reviews', k + '.json'), 'w'))
+            if not ok:
+                ch.send("Understood. I'll have it done that way.")
+            return None
+    msg = ch.send(f"{header}\n\n{shown}", buttons=rows)
     kind, got = _wait(ch, poll, {data for row in rows for _, data in row})
     if got == f'{k}|undo':
         return 'undo'
@@ -253,15 +272,17 @@ def _walk(ch, d, items, label, poll):
         else:
             i += 1
 
-def _resolve_conflicts(ch, d, items, poll):
-    """Before anything is sent: if two of the owner's decisions contradict each other, ask which should win."""
+def _resolve_conflicts(ch, d, items, poll, rulings=None):
+    """Before anything is sent: if two of the owner's decisions contradict each other, or a new one contradicts a ruling
+    he gave on an earlier build (Gate 30: an answer contradicted his own verdict from an hour before), ask which wins."""
     from . import explain
     reviewed = [(i, json.load(open(os.path.join(d, 'reviews', i['id'] + '.json')))) for i in items
                 if os.path.exists(os.path.join(d, 'reviews', i['id'] + '.json'))]
     reviewed = [(i, r) for i, r in reviewed if not r.get('auto')]
-    sentences = [(f"Keep as built: {i['text']}" if r['ok'] else f"Change it to: {r['correction']} (about: {i['text']})")
-                 for i, r in reviewed]
-    found = explain.conflicts(sentences)
+    earlier = [f'Earlier ruling: {t}' for t in (rulings or [])[-40:]]
+    sentences = earlier + [(f"Keep as built: {i['text']}" if r['ok'] else f"Change it to: {r['correction']} (about: {i['text']})")
+                           for i, r in reviewed]
+    found = [c for c in explain.conflicts(sentences) if max(c['a'], c['b']) >= len(earlier)]   # at least one new answer
     path = os.path.join(d, 'resolutions.json')
     resolutions = json.load(open(path)) if os.path.exists(path) else []
     for n, c in enumerate(found):
@@ -276,14 +297,14 @@ def _resolve_conflicts(ch, d, items, poll):
     if found:
         json.dump(resolutions, open(path, 'w'), indent=1)
 
-def review(run, ch, goal='', check='', poll=20, greeting='Good morning'):
+def review(run, ch, goal='', check='', poll=20, greeting='Good morning', rulings=None):
     """The owner checks the builders' business assumptions on the phone: rewritten with context and an example, most
     important first, at most a handful; the smaller ones only if the owner asks to see them."""
     from . import explain, owner
     d = os.path.join(run, 'owner')
     todo = [a for a in owner._assumptions(d, False) if not os.path.exists(os.path.join(d, 'reviews', a['id'] + '.json'))]
     ch.drain()
-    summary, shown, aside = explain.plan(d, goal, todo)
+    summary, shown, aside = explain.plan(d, goal, todo, rulings)
     who = ch.name()
     mins = max(1, round(len(shown) * 0.3))
     ch.send(f"{greeting}{', ' + who if who else ''}. While you were away, the builders finished this: {summary}\n\n"
@@ -305,7 +326,7 @@ def review(run, ch, goal='', check='', poll=20, greeting='Good morning'):
                 json.dump({'id': item['id'], 'ok': True, 'correction': None, 'seconds': 0, 'via': 'telegram',
                            'auto': 'left as built at the owner\'s choice', 'shown_as': item['text']},
                           open(os.path.join(d, 'reviews', item['id'] + '.json'), 'w'))
-    _resolve_conflicts(ch, d, shown + aside, poll)
+    _resolve_conflicts(ch, d, shown + aside, poll, rulings)
     # one last look before anything goes to the builders
     while True:
         changes = [json.load(open(os.path.join(d, 'reviews', i['id'] + '.json'))) for i in shown + aside
