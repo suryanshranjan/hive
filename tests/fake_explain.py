@@ -2,6 +2,10 @@
 ranks them by their position, and marks the last one as something an owner cannot judge."""
 import json, re, sys
 prompt = sys.stdin.read()
+if 'decisions the code for this feature must take' in prompt:   # the interview's plan: what the code must decide
+    print(json.dumps({'result': json.dumps({'decisions': [{'case': 'A tip is paid', 'default': 'the usual fee'},
+                                                          {'case': 'A fee is paid late', 'default': 'a reminder'}]})}))
+    sys.exit(0)
 if 'short interview with a busy' in prompt:   # the interview: two situations
     print(json.dumps({'result': json.dumps({'situations': [
         {'situation': 'Asha tips a creator Rs 500 after a great post.', 'options': ['No fee on a tip', 'The usual 10% fee']},
