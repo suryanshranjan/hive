@@ -1,7 +1,8 @@
 """hive cloud --new / --stop: one command makes a cloud machine for Hive on the owner's own AWS account, and one deletes
 it, so nothing is left running (and billing).
 
-  hive cloud --new [--size t3.large] [--region ap-south-1] [--profile name]   make the machine, then move the project
+  hive cloud --new [--size t3.large] [--region ap-south-1] [--profile name] [--no-login]
+                       make the machine, then move the project; the Claude login goes too, so builders work there
   hive cloud --stop                                                           delete the machine, its key and firewall
 
 It uses the AWS command line (`aws`), logged in on this machine. What it makes, all tagged `hive`:
@@ -45,7 +46,7 @@ def _my_ip():
     with urllib.request.urlopen('https://checkip.amazonaws.com', timeout=15) as r:
         return r.read().decode().strip()
 
-def new(repo='.', size='t3.large', region=None, profile=None, with_login=False, start=True, say=print):
+def new(repo='.', size='t3.large', region=None, profile=None, with_login=True, start=True, say=print):
     """Make a machine on the owner's AWS account, wait until it is ready, and move the project there."""
     if os.path.exists(STATE()):
         m = json.load(open(STATE()))
