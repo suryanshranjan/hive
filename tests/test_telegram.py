@@ -134,7 +134,39 @@ telegram.bridge_questions(run, telegram.Channel({'chat_id': ME, 'token': 'x', 'a
                           until=lambda: True, poll=1)
 check('a question opens with the chosen address', fake.sent[0]['text'].startswith('Sir, a quick one from the builders'), True)
 
-# 5. not connected: hive behaves as before
+# 5. "status?" at any time: answered on the spot, without being taken as an answer
+import subprocess
+run = tempfile.mkdtemp(); owner._dir(run); os.makedirs(os.path.join(run, 'out'))
+repo = os.path.join(run, 'repo'); subprocess.run(['git', 'init', '-q', '-b', 'main', repo])
+subprocess.run(['git', '-C', repo, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '--allow-empty', '-m', 'base'])
+subprocess.run(['git', 'clone', '-q', '--bare', repo, os.path.join(run, 'up.git')])
+for k in (1, 2):
+    subprocess.run(['git', '-C', repo, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '--allow-empty', '-m', f'work {k}'])
+subprocess.run(['git', '-C', repo, 'push', '-q', os.path.join(run, 'up.git'), 'main'])
+subprocess.run(['git', '-C', repo, 'reset', '-q', '--hard', 'HEAD~2'])
+json.dump({'repo': repo, 'branch': 'main', 'workers': 4, 'started': int(time.time()) - 125}, open(os.path.join(run, 'run.json'), 'w'))
+open(os.path.join(run, 'out', 'w1.json'), 'w').write('{}')
+question(owner._dir(run), 'q7', 'w2', 'A typo is fixed. Must both accept again? A) Yes B) No')
+fake = FakeTelegram([say("How's it going?"), tap('q7|B')])
+telegram.bridge_questions(run, telegram.Channel({'chat_id': ME, 'token': 'x', 'address': 'sir'}, api=fake),
+                          until=lambda: True, poll=1)
+reply = [m['text'] for m in fake.sent if m['text'].startswith('Sir. The builders')]
+check('during a build, "how\'s it going" gets a plain progress report',
+      reply[:1] == ['Sir. The builders are 2 minutes in. 1 of 4 have finished, and 2 pieces of work have landed so far, '
+                    'each one passing every test. 1 question for you is waiting above.'], True)
+check('and is not taken as the answer', json.load(open(os.path.join(run, 'owner', 'answers', 'q7.json')))['answer'], 'B')
+
+run, d = make_run(); os.environ['HIVE_RUN'] = run
+owner.assume('If two sources disagree on a total, the total shows as not available.'); time.sleep(0.01)
+owner.assume('If a platform name differs only by capital letters, it counts as the same platform.')
+ids = [a['id'] for a in owner._assumptions(d, False)]
+fake = FakeTelegram([say('status'), tap(f'{ids[0]}|ok'), tap('aside|leave'), tap('final|send')])
+telegram.review(run, telegram.Channel({'chat_id': ME, 'token': 'x', 'address': 'sir'}, api=fake), goal='combine metrics', poll=1)
+check('during a review, "status" says where we are',
+      any(m['text'].startswith("Sir. We're on decision 1 of 1") for m in fake.sent), True)
+check('and the decision still waits for a real answer', json.load(open(os.path.join(d, 'reviews', ids[0] + '.json')))['ok'], True)
+
+# 6. not connected: hive behaves as before
 os.environ['HIVE_TELEGRAM'] = '0'
 check('without a connection, nothing is sent', telegram.load(), None)
 sys.exit(fail)

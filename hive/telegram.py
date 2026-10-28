@@ -37,6 +37,7 @@ class Channel:
         self.chat = cfg['chat_id']; self.address = cfg.get('address')
         self.api = api or (lambda method, **p: _call(cfg['token'], method, **p))
         self.offset = None
+        self.note = None   # what to say when the owner asks for status (set by whoever is running)
 
     def send(self, text, buttons=None, reply_to=None):
         p = {'chat_id': self.chat, 'text': text}
@@ -95,6 +96,7 @@ def bridge_questions(run, ch, until, poll=2, tick=None):
     """Send each new builder question to the phone; store the owner's replies as answers. Ends once until() is true and
     nothing is waiting. A reply goes to the question it replies to, or else to the oldest unanswered question."""
     d = os.path.join(run, 'owner'); sent = {}   # question id -> message id
+    ch.note = lambda: status_of(run)
     def unanswered():
         qs = [json.load(open(os.path.join(d, 'questions', f))) for f in sorted(os.listdir(os.path.join(d, 'questions')))]
         return [q for q in qs if not os.path.exists(os.path.join(d, 'answers', q['id'] + '.json'))]
@@ -109,8 +111,11 @@ def bridge_questions(run, ch, until, poll=2, tick=None):
                                         "A tap is enough, or tell me in your own words.",
                                         buttons=[(c, f"{q['id']}|{c}") for c in _letters(q['question'])])
         if until() and not open_qs:
+            ch.note = None
             return 0
         for text, data, reply_to in ch.updates(timeout=poll):
+            if not data and answer_status(ch, text):
+                continue
             if data and '|' in data:
                 qid, ans = data.split('|', 1)
             else:
@@ -127,13 +132,71 @@ def bridge_questions(run, ch, until, poll=2, tick=None):
             ch.send('Thank you. Passing it on.', reply_to=sent.get(qid))
 
 YES = ('right', 'yes', 'ok', 'okay', 'correct', 'y', 'keep', 'keep it', 'fine', 'sure', 'yes thats right')
+STATUS = ('status', 'how is it going', "how's it going", 'hows it going', 'progress', 'update', 'where are we',
+          'any news', 'what is happening', "what's happening", 'how far')
+
+def is_status(text):
+    t = text.lower().strip(' ?!.')
+    return any(t == s or t.startswith(s) for s in STATUS)
+
+def status_of(run):
+    """One plain paragraph on how a build is going, from the run folder alone."""
+    import subprocess
+    try:
+        meta = json.load(open(os.path.join(run, 'run.json')))
+    except Exception:
+        return "The builders haven't started yet."
+    n = meta.get('workers', 0)
+    done = sum(1 for f in os.listdir(os.path.join(run, 'out')) if os.path.getsize(os.path.join(run, 'out', f)) > 0)
+    log = subprocess.run(['git', '-C', os.path.join(run, 'up.git'), 'log', '--format=%s', meta['branch']],
+                         capture_output=True, text=True).stdout.splitlines()
+    landed = [s for s in log if not s.startswith('Lock:') and not s.startswith('hive:')]
+    base = subprocess.run(['git', '-C', meta['repo'], 'log', '--format=%s', meta['branch']], capture_output=True,
+                          text=True).stdout.splitlines() if os.path.isdir(meta.get('repo', '')) else []
+    new = max(0, len(landed) - len([s for s in base if not s.startswith('Lock:') and not s.startswith('hive:')]))
+    mins = max(0, int((time.time() - (meta.get('started') or time.time())) / 60))
+    waiting = 0
+    qdir = os.path.join(run, 'owner', 'questions')
+    if os.path.isdir(qdir):
+        waiting = sum(1 for f in os.listdir(qdir) if not os.path.exists(os.path.join(run, 'owner', 'answers', f)))
+    if done >= n:
+        line = 'All the builders have finished. I\'m checking the result now.'
+    else:
+        line = (f"The builders are {mins} minute{'s' if mins != 1 else ''} in. {done} of {n} have finished, and "
+                f"{new} piece{'s' if new != 1 else ''} of work {'has' if new == 1 else 'have'} landed so far, each one "
+                "passing every test.")
+    if waiting:
+        line += f" {waiting} question{'s' if waiting != 1 else ''} for you {'is' if waiting == 1 else 'are'} waiting above."
+    return line
+
+def answer_status(ch, text):
+    """True when the owner asked how things are going (and was answered)."""
+    if not text or not is_status(text):
+        return False
+    who = ch.name()
+    note = ch.note() if callable(getattr(ch, 'note', None)) else None
+    ch.send(f"{who[:1].upper() + who[1:] + '. ' if who else ''}{note or 'All quiet: nothing is running at the moment.'}")
+    return True
+
+def listen(run, ch, until, poll=2, tick=None):
+    """While a build runs with no questions to ask (overnight, or a fix round), still answer "status"."""
+    ch.note = lambda: status_of(run)
+    while not until():
+        if tick:
+            tick()
+        for text, _, _ in ch.updates(timeout=poll):
+            answer_status(ch, text)
+    ch.note = None
 
 def _wait(ch, poll, want):
-    """Block until the owner taps one of `want` (button data) or types something: ('tap', data) or ('text', words)."""
+    """Block until the owner taps one of `want` (button data) or types something: ('tap', data) or ('text', words).
+    A request for status is answered on the spot and the wait goes on."""
     while True:
         for text, data, _ in ch.updates(timeout=poll):
             if data in want:
                 return 'tap', data
+            if text and answer_status(ch, text):
+                continue
             if text:
                 return 'text', text
 
@@ -169,6 +232,8 @@ def _walk(ch, d, items, label, poll):
     """Ask each item in turn; "Undo last" takes the previous answer back and asks it again."""
     i = 0
     while i < len(items):
+        ch.note = lambda: (f"We're on decision {i + 1} of {len(items)}{' (the minor ones)' if label else ''}. Once you've "
+                           "answered, the builders make your changes and I'll report back.")
         if _ask_one(ch, d, items[i], f'{label} {i + 1} of {len(items)}'.strip(), poll, can_undo=i > 0) == 'undo':
             i -= 1
             os.remove(os.path.join(d, 'reviews', items[i]['id'] + '.json'))
