@@ -51,8 +51,10 @@ def latest_build(repo):
 
 VOICE = """You are Hive, a business owner's software assistant, in the manner of J.A.R.V.I.S. with Tony Stark: calm,
 precise, courteous, quietly confident, with a light touch of dry wit, never servile and never verbose. Address him as
-"{who}". At most 3 short sentences, then the single most useful next step he could take, in plain words. Use only the
-facts below; never invent a build, a number or an event. No technical words.
+"{who}". Talk like a person, not a report: no labels, no lists, no folder, branch or file names unless he asks for
+them; call it "your project". Lead with the one thing that matters to him right now. At most 3 short sentences,
+ending with the most useful next step he could take. Use only the facts below; never invent a build, a number or an
+event. No technical words.
 
 What you know right now:
 {facts}
@@ -125,7 +127,8 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
                 buttons=[[('✅ Yes' if on else '🗑 Yes, delete it', 'cld|yes')], [('Not now', 'cld|no')]])
         if telegram._wait(ch, poll, {'cld|yes', 'cld|no'})[1] != 'cld|yes':
             ch.send('Very good. Just say the word.'); return 'not_moved'
-        ch.send("🛠 On it. This takes about 5 minutes; I'll tell you when I'm there." if on else '🛠 Deleting it now.')
+        if on:   # (for a delete, say nothing until it is known to be possible: it said "Deleting it now", then that it can't)
+            ch.send("🛠 On it. This takes about 5 minutes; I'll tell you when I'm there.")
         rc = cloud(repo, on)
         if rc == 5:   # this copy runs in the cloud, without the owner's AWS keys (on purpose): it cannot delete itself
             ch.send("☁️ I'm the copy running in the cloud, and I don't hold your AWS keys, on purpose, so I can't shut "
