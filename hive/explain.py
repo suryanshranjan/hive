@@ -22,6 +22,8 @@ The builders' assumptions (decisions the instructions did not cover), as JSON:
 Write like a composed, courteous, quietly confident assistant briefing the founder: short, warm, a step ahead, never
 flustered or chatty, no hedging. The owner should
 be able to decide each one in a few seconds. For each assumption:
+- "title": the decision in at most 12 plain words, as it stands now, for a list the owner scans (for example
+  "A late post is still paid in full").
 - "context": one short sentence on where this shows up and who notices it (a customer, a partner, the team).
 - "example": one short sentence with a concrete made-up case: a real-sounding name, simple numbers (rupees,
   counts, dates), and exactly what the product does now.
@@ -41,7 +43,7 @@ Never use technical words (numerator, denominator, null, array, field, error, in
 Also write "summary": one plain sentence saying what was built, as you would tell the owner over coffee.
 
 Reply with JSON only, in this shape:
-{{"summary": "...", "items": [{{"id": "...", "context": "...", "example": "...",
+{{"summary": "...", "items": [{{"id": "...", "title": "...", "context": "...", "example": "...",
 "options": [{{"label": "...", "text": "..."}}], "recommend": 0, "advice": "...", "impact": 3, "differs": 2, "owner_can_judge": true}}]}}"""
 
 # In experiments, Hive's own recommendation could sway the owner (anchoring), so HIVE_ADVICE=0 leaves it out.
@@ -107,7 +109,8 @@ def explain(owner_dir, goal, assumptions, rulings=None):
     if os.path.exists(cache):
         return json.load(open(cache))
     fallback = {'summary': _goal_summary(goal).split('\n')[0][:200],
-                'items': [{'id': a['id'], 'text': a['text'], 'impact': 2, 'judge': True} for a in assumptions]}
+                'items': [{'id': a['id'], 'text': a['text'], 'title': a['text'][:120], 'impact': 2, 'judge': True}
+                          for a in assumptions]}
     if not assumptions:
         return fallback
     items = json.dumps([{'id': a['id'], 'assumption': a['text']} for a in assumptions], indent=1)
@@ -138,6 +141,7 @@ def explain(owner_dir, goal, assumptions, rulings=None):
             rec = int(it.get('recommend') or 0)
             rec = rec if 0 <= rec <= len(options) else 0
             out['items'].append({'id': it['id'], 'text': text or by_id[it['id']]['text'], 'options': options,
+                                 'title': (it.get('title') or by_id[it['id']]['text'])[:120],
                                  'recommend': rec if ADVICE else None, 'advice': (it.get('advice') or '') if ADVICE else '',
                                  'impact': int(it.get('impact') or 2), 'differs': int(it.get('differs') or 2),
                                  'judge': bool(it.get('owner_can_judge', True))})

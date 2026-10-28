@@ -216,6 +216,24 @@ check("asked openly, the owner's own words become the rule, with no menu shown",
 check('a new answer that contradicts an earlier ruling is put to the owner',
       any('two of your answers pull in different directions' in m['text'] for m in fake.sent), True)
 
+# 7c. many decisions: all listed one line each; the owner marks the ones he'd change; only those are asked in full
+run, d = make_run(); os.environ['HIVE_RUN'] = run
+for k in range(10):
+    owner.assume(f'Rule number {k} of the shop works the obvious way.'); time.sleep(0.01)
+ids = [a['id'] for a in owner._assumptions(d, False)]
+fake = FakeTelegram([tap('tri|3'), tap('tri|3'), say('2 and 5'), tap('tri|next'), tap('tri|next'),
+                     say('Do it my way'), tap(f'{ids[4]}|ok'), tap('final|send')])
+rows = telegram.review(run, telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), goal='combine metrics', poll=1)
+pages = [m for m in fake.sent if m['text'].startswith('Page ')]
+check('every decision is listed, one line each, across pages', (len(pages), '9. Rule number 8' in pages[1]['text']), (2, True))
+full = [m for m in fake.sent if 'What should happen here?' in m['text']]
+check('only the marked ones (2 and 5) are asked in full, openly first', len(full), 2)
+check("the owner's words on #2 become the rule; #5 kept; the rest left as built",
+      (json.load(open(os.path.join(d, 'reviews', ids[1] + '.json')))['correction'],
+       json.load(open(os.path.join(d, 'reviews', ids[4] + '.json')))['ok'],
+       sum(bool(json.load(open(os.path.join(d, 'reviews', i + '.json'))).get('auto')) for i in ids)), ('Do it my way', True, 8))
+check('one change goes to the builders', len(rows), 1)
+
 # 8. an open question gathers every reply until Done; situations get one-tap verdicts, with undo and own words
 fake = FakeTelegram([tap('collect|done'), tap('collect|more'),   # an accidental early Done, taken back
                      say('- they treat goods like cash\n- they promise dates'), say("status"), say('they skip the brief'),

@@ -297,6 +297,80 @@ def _resolve_conflicts(ch, d, items, poll, rulings=None):
     if found:
         json.dump(resolutions, open(path, 'w'), indent=1)
 
+TRIAGE_OVER = 8   # more decisions than this: list them all in one line each, and let the owner pick (Gate 30)
+PAGE = 8
+
+def _auto(d, item, why):
+    json.dump({'id': item['id'], 'ok': True, 'correction': None, 'seconds': 0, 'via': 'telegram', 'auto': why,
+               'shown_as': item.get('title') or item['text']}, open(os.path.join(d, 'reviews', item['id'] + '.json'), 'w'))
+
+def _finish(ch, d, items, poll, rulings):
+    """The contradiction check, then one last look before anything goes to the builders. Returns the corrections."""
+    from . import owner
+    _resolve_conflicts(ch, d, items, poll, rulings)
+    while True:
+        changes = [json.load(open(os.path.join(d, 'reviews', i['id'] + '.json'))) for i in items
+                   if os.path.exists(os.path.join(d, 'reviews', i['id'] + '.json'))]
+        n = sum(not r['ok'] for r in changes)
+        ch.send(f"That's everything: {n} change{'s' if n != 1 else ''}. Shall I send {'it' if n == 1 else 'them'} to the "
+                "builders?" if n else "That's everything, and nothing needs changing. Shall I close it out?",
+                buttons=[('Send it' if n else 'Close it out', 'final|send'), ('↩ Undo last', 'final|undo')])
+        kind, got = _wait(ch, poll, {'final|send', 'final|undo'})
+        if got != 'final|undo':
+            break
+        done = [i for i in items if os.path.exists(os.path.join(d, 'reviews', i['id'] + '.json'))
+                and not json.load(open(os.path.join(d, 'reviews', i['id'] + '.json'))).get('auto')]
+        if not done:
+            break
+        os.remove(os.path.join(d, 'reviews', done[-1]['id'] + '.json'))
+        ch.send('Of course. Back to the previous one.')
+        _walk(ch, d, [done[-1]], '', poll)
+    rows = owner.write_corrections(d)
+    ch.send(('Right away. The builders are on it. ' + "I'll let you know the moment it's done.") if rows else
+            'Very good. Everything stands as built.')
+    return rows
+
+def _triage_review(ch, d, items, technical, summary, check, poll, greeting, who, rulings):
+    """Every decision as one line; the owner taps the ones he would do differently, and only those are asked in full.
+    Gate 30: ranking alone showed 3 of the founder's 6 surprising rules; he is the one who knows where he differs."""
+    pages = [items[i:i + PAGE] for i in range(0, len(items), PAGE)]
+    ch.send(f"{greeting}{', ' + who if who else ''}. While you were away, the builders finished this: {summary}\n\n"
+            + (f"{check}\n\n" if check else '')
+            + f"They made {len(items)} calls your instructions didn't cover. I'll list them one line each; tap the "
+              "number of any you'd do differently, and I'll ask you about just those. About a minute to scan.")
+    flagged = []
+    for p, page in enumerate(pages):
+        base = p * PAGE
+        lines = '\n'.join(f"{base + n}. {it.get('title') or it['text']}" for n, it in enumerate(page, 1))
+        nums = [(str(base + n), f'tri|{base + n}') for n in range(1, len(page) + 1)]
+        rows = [nums[i:i + 4] for i in range(0, len(nums), 4)]
+        last = p == len(pages) - 1
+        rows.append([('Done' if last else 'Next →', 'tri|next')])
+        ch.note = lambda: f"You're on page {p + 1} of {len(pages)} of the list; {len(flagged)} marked so far."
+        ch.send(f"Page {p + 1} of {len(pages)}\n\n{lines}", buttons=rows)
+        while True:
+            kind, got = _wait(ch, poll, {d_ for row in rows for _, d_ in row})
+            if got == 'tri|next':
+                break
+            picks = [int(x) for x in (got.split('|')[1:] if kind == 'tap' else
+                                      __import__('re').findall(r'\d+', got)) if x.isdigit()]
+            for k in picks:
+                if 1 <= k <= len(items):
+                    if k in flagged:
+                        flagged.remove(k); ch.send(f'{k} unmarked.')
+                    else:
+                        flagged.append(k); ch.send(f'{k} marked. Tap more, or {"Done" if last else "Next"}.')
+    chosen = [dict(items[k - 1], impact=3) for k in sorted(flagged)]   # asked openly first, in full
+    for k, it in enumerate(items, 1):
+        if k not in flagged:
+            _auto(d, it, 'not marked on the list')
+    for it in technical:
+        _auto(d, it, 'left as built at the owner\'s choice')
+    if chosen:
+        ch.send(f"Thank you. Let's take your {len(chosen)} one{'s' if len(chosen) != 1 else ''} in turn.")
+        _walk(ch, d, chosen, '', poll)
+    return _finish(ch, d, items, poll, rulings)
+
 def review(run, ch, goal='', check='', poll=20, greeting='Good morning', rulings=None):
     """The owner checks the builders' business assumptions on the phone: rewritten with context and an example, most
     important first, at most a handful; the smaller ones only if the owner asks to see them."""
@@ -306,6 +380,10 @@ def review(run, ch, goal='', check='', poll=20, greeting='Good morning', rulings
     ch.drain()
     summary, shown, aside = explain.plan(d, goal, todo, rulings)
     who = ch.name()
+    judgeable = shown + [a for a in aside if a.get('judge', True)]
+    if len(judgeable) > TRIAGE_OVER:
+        return _triage_review(ch, d, judgeable, [a for a in aside if not a.get('judge', True)], summary, check, poll,
+                              greeting, who, rulings)
     mins = max(1, round(len(shown) * 0.3))
     ch.send(f"{greeting}{', ' + who if who else ''}. While you were away, the builders finished this: {summary}\n\n"
             + (f"{check}\n\n" if check else '')
