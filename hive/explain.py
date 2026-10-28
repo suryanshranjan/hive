@@ -67,9 +67,11 @@ def _ask_claude(prompt):
         reply = json.loads(p.stdout)
     except Exception:
         _CLAUDE_DOWN[0] = time.time(); raise
-    if isinstance(reply, dict) and (reply.get('is_error') or 'result' not in reply and 'items' not in reply):
+    if isinstance(reply, dict) and reply.get('is_error'):   # Claude itself failed (login, limit): skip it a while
         _CLAUDE_DOWN[0] = time.time()
         raise RuntimeError('claude call failed')
+    if isinstance(reply, dict) and 'result' not in reply and 'items' not in reply:   # an odd reply: this call only
+        raise RuntimeError('claude reply had no result')
     return _json_reply(reply.get('result', reply) if isinstance(reply, dict) else reply)
 
 def _ask_backup(prompt):

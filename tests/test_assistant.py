@@ -50,9 +50,31 @@ check('waking it up gets a greeting', (assistant.handle(ch(fake), repo, 'hi', po
 fake = FakeTelegram([])
 assistant.handle(ch(fake), repo, 'status?', poll=1)
 check('status reports the latest build', fake.sent[-1]['text'], '📊 The latest build is on branch hive/b1. 12 tests, all passing.')
-fake = FakeTelegram([tap('as|rule'), tap('upd|no')])
-assistant.handle(ch(fake), repo, 'Brands must see a creator rating before inviting', poll=1)
-check('anything else can be kept as a standing rule', 'Brands must see a creator rating before inviting' in [x['text'] for x in memory.load(repo)], True)
+fake = FakeTelegram([])
+r = assistant.handle(ch(fake), repo, 'I have already told you', poll=1)
+check('a complaint is answered, never saved as a rule (the live test saved "I have already told you")',
+      (r, 'I have already told you' in [x['text'] for x in memory.load(repo)]), ('chat', False))
+
+# 3a2. the live conversation, done right: a correction while Hive asks, then "yes", read in context
+started = []
+c = ch(FakeTelegram([say('a page saying Sunny Shop Creators'), say('yes')]))
+r = assistant.handle(c, repo, 'build: a page with suny shop creators on it', poll=1,
+                     start_build=lambda rp, goal: started.append(goal))
+check('a correction while Hive asks changes what it builds; "yes" then starts it (no "Just say the word")',
+      (r, started), ('built', ['a page saying Sunny Shop Creators']))
+
+# 3a3. a build runs in the background: "status" says it is running, and if it stops, he is told why at once
+# (the live cloud build stopped on "unsaved changes" and only the server's log knew)
+os.environ['HIVE_BUILD_CMD'] = 'sh -c "sleep 2; echo You have unsaved changes. Commit or stash them first.; exit 3"'
+fake = FakeTelegram([])
+assistant.background_build(repo, 'a page saying Sunny Shop Creators', ch(fake))
+assistant.handle(ch(fake), repo, 'status', poll=1)
+running = fake.sent[-1]['text']
+time.sleep(4)
+check('while it builds, status says a build is running; when it stops, he is told why',
+      ('build is running' in running, any('The build stopped' in m['text'] and 'unsaved changes' in m['text'] for m in fake.sent)),
+      (True, True))
+del os.environ['HIVE_BUILD_CMD']; assistant.BUILD.clear()
 
 # 3b. "build: ..." from the phone starts a build after one confirmation
 started = []

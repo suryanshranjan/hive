@@ -20,7 +20,7 @@ check "the installed package carries the worker template" "$(ls $T/venv/lib/pyth
 printf 'n\nn\n' | $T/venv/bin/python -c "from hive import doctor; import sys; sys.exit(doctor.setup('.', claude_probe=False))" > $T/setup.txt 2>&1
 check "hive setup checks, offers the extras one at a time, and ends ready" \
   "$? $(grep -c 'on your phone, through Telegram' $T/setup.txt) $(grep -c 'All set. Type' $T/setup.txt)" "0 1 1"
-echo "x" > notes.txt
+echo "# x" >> test_one.py   # an edit to a tracked file (untracked caches are ignored)
 $T/venv/bin/python -c "from hive import doctor; import sys; sys.exit(doctor.main('.', claude_probe=False))" > $T/dirty.txt 2>&1
 check "unsaved changes are reported with how to fix them" "$(grep -c 'Commit or stash' $T/dirty.txt)" 1
 rm -rf $T; exit $fail

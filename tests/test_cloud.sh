@@ -11,10 +11,10 @@ printf 'def test_one(): assert 1\n' > test_one.py && printf '.env\n' > .gitignor
 echo 'SECRET=do-not-send' > .env
 $PY -c "from hive import memory; memory.add('.', 'A late post is paid in full.')"
 mkdir -p $T/.hive && printf '{"token": "x", "chat_id": 1}' > $T/.hive/telegram.json
-echo "draft" > notes.txt
+echo "# draft" >> test_one.py   # an edit to a tracked file: real unsaved work (untracked caches are ignored)
 $PY -m hive cloud --to $T/box --no-start > $T/dirty.txt 2>&1
 check "unsaved work is refused (only committed work goes)" "$(grep -c 'Commit them first' $T/dirty.txt)" 1
-rm notes.txt
+git checkout -q test_one.py
 $PY -m hive cloud --to $T/box --no-start > $T/go.txt 2>&1
 check "it reports success" "$?" 0
 P=$T/box/hive-cloud/project

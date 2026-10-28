@@ -46,6 +46,9 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 | A tap on an old button was dropped and he waited 1 h 42 min; a lost connection ended an interview | Gate 36 | Stale taps are answered; sends and polls retry; every answer is saved and a rerun picks up | `hive/telegram.py` |
 | A usage limit voided a build; an expired login killed another | Gates 35, 36 | Builders stopped by a limit or a login wait, tell the owner when they will continue, and resume in their own clone | `hive/swarm.py`, `hive/start.py` |
 
+| Read alone, each message went wrong: a correction while Hive asked became "no", a later "Yes" had no context, a complaint was saved as a rule, and a build that stopped was only in the server's log | Live cloud test, Oct 29 | Hive reads every message with the recent conversation; a typed answer to "Shall I build?" is understood as yes, no or a corrected request; complaints are answered, never kept as rules; builds run in the background, "status" reports them, and a stop is told at once with its reason | `hive/assistant.py` (`read`, `background_build`) |
+| The cloud copy died on a 15-minute-old tap; replies took over a minute | Live cloud test | Old taps and failing messages are survived; "typing…" at once; "hi" and "status" need no model; an 8-second limit on phrasing; the backup reasons briefly | `hive/telegram.py`, `hive/assistant.py`, `hive/explain.py` |
+
 ## Still to turn into the product
 
 - **Gate 38** (running): does a confirmed rule hold a day later? If not, the hand-over ("looks right?") becomes the main channel, and the interview shrinks.

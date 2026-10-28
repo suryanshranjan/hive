@@ -160,7 +160,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     if sh('git', '-C', repo, 'rev-parse', '--is-inside-work-tree').returncode != 0:
         say('  This folder is not a git repository. Run me inside your project folder.'); return 2
     branch = sh('git', '-C', repo, 'rev-parse', '--abbrev-ref', 'HEAD').stdout.strip()
-    if sh('git', '-C', repo, 'status', '--porcelain').stdout.strip():
+    if sh('git', '-C', repo, 'status', '--porcelain', '--untracked-files=no').stdout.strip():
         say('  You have unsaved changes. Commit or stash them first, so the builders start from what you see.'); return 3
     cfg_path = os.path.join(repo, '.hive', 'config.json')
     cfg = json.load(open(cfg_path)) if os.path.exists(cfg_path) else {}

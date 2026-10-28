@@ -13,19 +13,27 @@ from . import explain, memory, telegram
 
 RUNS = os.path.join(os.path.expanduser('~'), '.hive', 'runs')   # where `hive start` keeps its builds
 
-CLASSIFY = """A business owner sent this message to his software assistant, Hive:
-"{text}"
+CLASSIFY = """You are Hive, a business owner's software assistant, reading his newest message in the context of your
+conversation. The conversation so far (oldest first):
+{history}
 
-Classify it. Reply with JSON only: {{"intent": "build" | "change" | "rule" | "status" | "greeting" | "cloud_on" |
-"cloud_off" | "other",
-"rule": "the rule he now wants, or for a build, what to build, in plain sentences; otherwise empty"}}
-- "build": he asks Hive to build, add or make something in the product.
-- "change": he says he has changed his mind, or now wants something different from before.
-- "rule": he states a new rule for how the product should behave.
+His newest message: "{text}"
+
+What does he mean? Read it as a person would, using the conversation: "yes" or "go ahead" answers the last thing you
+proposed; "I already told you" or "that one" points back to what he said before; a short correction ("no, Sunny Shop
+Creators") changes what you just proposed. Reply with JSON only:
+{{"intent": "build" | "change" | "rule" | "status" | "greeting" | "cloud_on" | "cloud_off" | "reply",
+"rule": "for a build, exactly what to build (taken from the conversation if he points back to it); for a change or a
+rule, the rule he now wants; otherwise empty",
+"confirmed": true if he is agreeing to do what you just proposed (or clearly telling you to go ahead now), else false}}
+- "build": he wants something built, added or made in the product (including agreeing to, or correcting, a build you
+  proposed).
+- "change": he has changed his mind about an earlier rule.
+- "rule": he states, plainly and on purpose, a rule for how the product should behave from now on.
 - "status": he asks how things are going.
-- "greeting": a hello, or waking Hive up with no request yet.
-- "cloud_on": he wants Hive to move to the cloud, or keep working while his computer is off.
-- "cloud_off": he wants the cloud machine shut down or deleted."""
+- "greeting": a hello, with no request yet.
+- "cloud_on" / "cloud_off": move Hive to the cloud / shut the cloud machine down.
+- "reply": anything else: a question, a complaint, frustration, small talk. Never a rule."""
 
 RELATED = """A business owner's earlier rulings for his product:
 {rulings}
@@ -71,6 +79,8 @@ def facts(repo, ch=None):
               'Running on his computer.'),
              (f"Latest build: branch hive/{st['name']}. {st.get('check', '')}" if st else 'Nothing built on this project yet.'),
              f"Standing rules he has given for this project: {len(memory.load(repo))}."]
+    if _building():
+        lines.append(_building())
     note = ch.note() if ch is not None and callable(getattr(ch, 'note', None)) else None
     if note:
         lines.append(f'Happening now: {note}')
@@ -104,6 +114,53 @@ def coalesce(texts):
         out = [t for t in out if t.lower().strip(' ?!.') not in GREETINGS] or out[-1:]
     return out, len(out) < len(texts)
 
+def read(ch, text):
+    """What the owner means by his newest message, read in the context of the conversation (Gate 38 live test: "Yes",
+    "I already told you" and a corrected request were each read alone, and went wrong)."""
+    history = ch.recent() if hasattr(ch, 'recent') else ''
+    return explain.ask_json(CLASSIFY.format(history=history, text=text)) or {}
+
+BUILD = {}   # the build running in the background: {'proc', 'goal', 'started', 'log'}
+CURRENT = {}   # the owner's chat, for news from a background build
+
+def background_build(repo, goal, ch=None):
+    """Run `hive start` for this goal in the background, so Hive keeps answering him; if it stops, tell him why at once
+    (a cloud build stopped on "unsaved changes", and only the server's log knew)."""
+    import subprocess, sys, tempfile, threading
+    ch = ch or CURRENT.get('ch')
+    gf = tempfile.NamedTemporaryFile('w', suffix='.md', delete=False); gf.write(goal); gf.close()
+    log = os.path.join(os.path.expanduser('~'), '.hive', 'build.log')
+    os.makedirs(os.path.dirname(log), exist_ok=True)
+    import shlex
+    cmd = (shlex.split(os.environ['HIVE_BUILD_CMD']) if os.environ.get('HIVE_BUILD_CMD') else   # tests: a stand-in
+           [sys.executable, '-m', 'hive', 'start', '--overnight', '--goal', gf.name])
+    proc = subprocess.Popen(cmd, cwd=repo,
+                            stdout=open(log, 'w'), stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL)
+    BUILD.update(proc=proc, goal=goal, started=time.time(), log=log)
+
+    def watch():
+        rc = proc.wait()
+        if rc != 0 and ch is not None:
+            lines = [l.strip() for l in open(log, encoding='utf-8', errors='replace').read().splitlines() if l.strip()]
+            why = lines[-1] if lines else 'no reason was given'
+            try:
+                ch.send(f"⚠️ <b>The build stopped before it finished.</b>\n\n{telegram.esc(why)}\n\n<i>Tell me how you'd "
+                        "like to go on, or fix that and say \"build again\".</i>", html=True)
+            except Exception:
+                pass
+    threading.Thread(target=watch, daemon=True).start()
+    return proc
+
+def _building():
+    p = BUILD.get('proc')
+    if p is None:
+        return None
+    mins = int((time.time() - BUILD['started']) / 60)
+    if p.poll() is None:
+        return f"A build is running ({mins} min so far): {BUILD['goal'][:200]}"
+    return (f"The last build finished {'successfully' if p.returncode == 0 else 'with a problem'}: "
+            f"{BUILD['goal'][:200]}")
+
 def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=None):
     """Answer one message from the owner. apply_build(state, rule, ch) updates a build (hive.start.apply_ruling);
     start_build(repo, goal) runs a new build that reports to the phone (hive.start.start, overnight style);
@@ -119,14 +176,33 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     elif telegram.is_status(text):
         got = {'intent': 'status'}
     else:
-        got = explain.ask_json(CLASSIFY.format(text=text)) or {}
-    intent, rule = got.get('intent', 'other'), (got.get('rule') or text).strip()
+        got = read(ch, text)
+    intent, rule = got.get('intent', 'reply'), (got.get('rule') or text).strip()
     who = _who(ch)
     if intent == 'build' and start_build:
-        ch.send(f"🏗 <b>Shall I build this?</b>\n\n{telegram.esc(rule)}\n\n"
-                "<i>I'll work on copies, then bring you the decisions to check.</i>", html=True,
-                buttons=[[('🚀 Yes, build it', 'bld|yes')], [('Not now', 'bld|no')]])
-        if telegram._wait(ch, poll, {'bld|yes', 'bld|no'})[1] != 'bld|yes':
+        go = bool(got.get('confirmed'))   # "yes, build it" / "I already told you": no need to ask again
+        for _ in range(3):
+            if go:
+                break
+            ch.send(f"🏗 <b>Shall I build this?</b>\n\n{telegram.esc(rule)}\n\n"
+                    "<i>I'll work on copies, then bring you the decisions to check. Tap, or just tell me.</i>", html=True,
+                    buttons=[[('🚀 Yes, build it', 'bld|yes')], [('Not now', 'bld|no')]])
+            kind, ans = telegram._wait(ch, poll, {'bld|yes', 'bld|no'})
+            if kind == 'tap':
+                go = ans == 'bld|yes'
+                if not go:
+                    ch.send('Very good. Just say the word.'); return 'not_built'
+                break
+            again = read(ch, ans)   # a typed answer is read in context, not taken as "no" (it was)
+            if again.get('confirmed'):
+                rule = (again.get('rule') or rule).strip() if again.get('intent') == 'build' else rule
+                go = True
+            elif again.get('intent') == 'build' and again.get('rule'):
+                rule = again['rule'].strip()   # he corrected what to build: ask once more, with his correction
+            else:   # something else entirely: hold the build, and answer what he said
+                ch.send("Very good, I'll hold that build for now.")
+                return handle(ch, repo, ans, poll, apply_build, start_build, cloud)
+        if not go:
             ch.send('Very good. Just say the word.'); return 'not_built'
         ch.send("🛠 Right away. I'll message you as it goes; text 'status' any time.")
         start_build(repo, rule)
@@ -165,21 +241,23 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
               f"🐝 <b>At your service{', ' + telegram.esc(who) if who else ''}.</b>\n\nTell me if you've changed your "
               "mind about anything, give me a new rule, or ask for the status. 🎙 Voice notes work too.")
         return 'greeting'
+    if intent == 'status' and _building():   # a build in the background: say so first
+        speak(ch, repo, f'He asked: "{text}". Tell him exactly where things stand, starting with the build.',
+              telegram.esc('📊 ' + _building()))
+        return 'status'
     if intent == 'status':
         st = latest_build(repo)
         speak(ch, repo, f'He asked: "{text}". Tell him exactly where things stand.',
               telegram.esc('📊 ' + ((f"The latest build is on branch hive/{st['name']}. {st.get('check', '')}".strip())
                                     if st else 'Nothing has been built on this project yet.')))
         return 'status'
-    if intent == 'other' and len(text.split()) < 5:   # small talk or a short question: answer it, in his assistant's voice
-        speak(ch, repo, f'He said: "{text}". Answer him helpfully from what you know; if you cannot, say so and say what '
-              'you can do.', "🐝 I'm here. Tell me what to build, a change of mind, or ask for the status.")
+    if intent not in ('change', 'rule'):   # a question, a complaint, small talk: answered, in context, never kept as a rule
+        speak(ch, repo, 'The conversation so far:\n' + (ch.recent() if hasattr(ch, 'recent') else '') +
+              f'\n\nHis newest message: "{text}". Reply as his assistant would: answer what he asked; if he is '
+              'frustrated, own the mistake plainly and say what you are doing about it; if he refers back to something, '
+              'pick it up from the conversation.',
+              "🐝 I'm here. Tell me what to build, a change of mind, or ask for the status.")
         return 'chat'
-    if intent not in ('change', 'rule'):
-        ch.send("📝 Noted. Shall I keep this as a standing rule for the builders?",
-                buttons=[[('Yes, keep it as a rule', 'as|rule')], [('No, just a note', 'as|note')]])
-        if telegram._wait(ch, poll, {'as|rule', 'as|note'})[1] != 'as|rule':
-            ch.send('Very good.'); return 'note'
     rulings = memory.load(repo)
     listing = '\n'.join(f'{n}. {r["text"]}' for n, r in enumerate(rulings, 1))
     found = (explain.ask_json(RELATED.format(rulings=listing, rule=rule)) or {}).get('replaces', []) if rulings else []
@@ -217,6 +295,7 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
         if not cfg:
             print('Not connected yet: run hive telegram setup.'); return 1
         ch = telegram.Channel(cfg, listener=True)
+    CURRENT['ch'] = ch   # a background build reports its problems here
     print("Listening on Telegram. Tell Hive anything, any time: a change of mind, a new rule, or 'status'. Ctrl+C to stop.",
           flush=True)
     try:

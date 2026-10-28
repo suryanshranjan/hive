@@ -46,7 +46,7 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
     repo = os.path.abspath(repo)
     if not to:
         say('Tell me where: hive cloud --to user@host'); return 2
-    if subprocess.run(['git', '-C', repo, 'status', '--porcelain'], capture_output=True, text=True).stdout.strip():
+    if subprocess.run(['git', '-C', repo, 'status', '--porcelain', '--untracked-files=no'], capture_output=True, text=True).stdout.strip():
         say('You have unsaved changes. Commit them first: only committed work goes to the cloud.'); return 3
     t = Target(to, key); name = _project(repo)
     proj = f'{t.home()}/{name}'
