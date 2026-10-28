@@ -234,6 +234,22 @@ check('the hand-over shows his rules, sends a change to a fix round, and ends on
       (any('What it does now, by your rules' in m['text'] for m in fake.sent), fixed, fake.sent[-1]['text']),
       (True, ['Tips are never charged a fee'], '🎉 Very good. It is yours.'))
 
+# 3k2. the hand-over from the built code (Gate 42): the sheet is written from the code; he marks the wrong rule and says
+# it right; the change goes to one fix round and is remembered; a sheet he accepts whole ends the hand-over
+fixed = []
+_apply, start.apply_ruling = start.apply_ruling, lambda st, rule, c=None: fixed.append(rule)
+_sheet, start._code_sheet = start._code_sheet, lambda st: ['A tip pays the usual fee.', 'A late fee starts at once.']
+fake = FakeTelegram([tap('sheet|2'), tap('sheet|done'), say('Only after 7 days'), tap('sheet|none'), tap('hand|ok')])
+start.handover({'repo': repo}, ch(fake), poll=1)
+check('the code sheet: he marks a rule, it is amended and sent to one fix round, then his yes',
+      (any('What the build does now, as rules' in m['text'] for m in fake.sent), fixed),
+      (True, ['A late fee starts at once. Amended: Only after 7 days']))
+fake = FakeTelegram([tap('sheet|done'), tap('sheet|none')])
+fixed.clear(); start.handover({'repo': repo}, ch(fake), poll=1)
+check('a code sheet he accepts whole ends the hand-over with no fix round', (fixed, fake.sent[-1]['text']),
+      ([], '🎉 Very good. It is yours.'))
+start.apply_ruling, start._code_sheet = _apply, _sheet
+
 # 3l. "what does it mean?" is a question, not his answer (Gate 38): Hive reasons about the reply, explains the question
 # in plain words, and asks again; a real answer in his own words still counts
 _ask_json = explain.ask_json

@@ -9,7 +9,9 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
   - Tool fixes from it (all 203 checks pass): corrections amend the rule instead of replacing it; the terminal restates a rule before its correction; own words keep their detail.
   - **Gate 40 done:** asking about unusual input did not raise coverage (0.64 vs 0.76; +1.2 points); not shipped. Complete sheet 250/250 again. The sheet keeps only 0.69–0.76 of what was asked.
   - **Gate 41 done:** whole rulings beside the sheet cost 6.8 points (kill fired). The merge lost nothing; the loss is coverage (11/25) and answers about one case (7/11 whole). Complete sheet 250/250 a third time.
-  - **Gate 42 next** (or running): a rule sheet written from the built code, the owner marks what is wrong; see `gates/gate42/`.
+  - **Gate 42 done, the night's best result:** a rule sheet written from the first build's code, corrected by the synthetic owner, took fresh builders to 99.6% (interview 68.4%, complete sheet 100%). Shipped as Hive's hand-over (`hive/codesheet.py`).
+  - **Gate 43** (asked for by the user): talking swarm vs silent swarm on the scale project; see `gates/gate43/`.
+  - **Next with the founder (after Gate 38):** the code sheet on his phone for one real feature. Is a 50–80-rule sheet readable for a real owner?
 
 - **Gate 38 is running.** Predictions in `gates/gate38/prompts/PREDICTIONS.md` (`72a5726`).
   - Day 1 is done: Hive's interview (13 questions, one per decision) and the rule sheet; 13 rules confirmed, one corrected, 7.9 minutes.
@@ -40,9 +42,8 @@ Workers run shell commands, so run them in a container. Image: `node:22-bookworm
 
 ## Needs design first (write the config and predictions, push them, then run)
 
-### G42: a sheet complete by construction (synthetic owner, about $6)
-- Config `lab/experiments/g42_code_sheet.json`; predictions `gates/gate42/prompts/PREDICTIONS.md`.
-- Command: `python3 lab/run_gate.py lab/experiments/g42_code_sheet.json --max-parallel 6`, then `python3 gates/gate42/referee/analyze.py runs/g42`.
+### G43: talking swarm vs silent swarm (about $15)
+- Predictions `gates/gate43/prompts/PREDICTIONS.md`. Command: `python3 gates/gate43/referee/run43.py --workers 6`, then `python3 gates/gate43/referee/analyze.py runs/g43`.
 
 ### G9: intent interface v1 vs free asking
 - Arm A: free asking, 30 questions.

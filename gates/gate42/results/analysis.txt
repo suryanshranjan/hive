@@ -1,0 +1,34 @@
+hidden pass: N0 38.8%, H 68.4%, C 99.6%, R 100.0%
+H: fixes 0.72 of 213 N0 edge errors; breaks 30 of 236 N0-right edge calls
+C: fixes 1.00 of 213 N0 edge errors; breaks 1 of 236 N0-right edge calls
+R: fixes 1.00 of 213 N0 edge errors; breaks 0 of 236 N0-right edge calls
+C − H = +31.2 points (95% CI +15.2 to +49.6, bootstrap over functions)
+sheet D: right 2, partial 0, wrong 18, absent 5
+sheet C: right 23, partial 0, wrong 2, absent 0
+sheet H: right 18, partial 2, wrong 0, absent 5
+sheet R: right 25, partial 0, wrong 0, absent 0
+D: 68 rules; C: 69 rules; the owner marked 34 rules, 36 replies in review
+D addresses 0.80 of decisions; the review repaired 16 of 18 wrong or partial (0.89); spoiled 0 right ones; absent in D made right in C: 5
+
+per function: N0 edge errors, share fixed by H / C / R; labels D | C
+  age_years                  5  1.00 / 1.00 / 1.00   w | r
+  due_date                  20  0.70 / 1.00 / 1.00   a w w | r r r
+  initials                  28  0.36 / 1.00 / 1.00   a | r
+  invoice_check_digit       15  1.00 / 1.00 / 1.00   w w | r r
+  late_fee                  26  1.00 / 1.00 / 1.00   w a a w | r r r r
+  mask_card                 14  1.00 / 1.00 / 1.00   w w | w w
+  normalize_sku             30  0.00 / 1.00 / 1.00   w w | r r
+  nps_score                  4  1.00 / 1.00 / 1.00   r w r | r r r
+  rating_label              41  1.00 / 1.00 / 1.00   w w a | r r r
+  shipping_cost             30  0.80 / 1.00 / 1.00   w w w w | r r r r
+
+predictions
+C1 D addresses ≥ 0.90: 0.80 -> failed
+C2 C right ≥ 0.85 and H ≤ 0.60: 0.92, 0.72 -> failed
+C3 C − H ≥ +10: +31.2 -> held
+C4 C ≥ 90%: 99.6 -> held
+C5 R ≥ 95%: 100.0 -> held
+C6 review repairs ≥ 0.80 of D's wrong or partial: 0.89 -> held
+C7 N0 < 65%: 38.8 -> held
+Kill C ≤ H: did not fire
+Ship rule (C − H ≥ +5): FIRED

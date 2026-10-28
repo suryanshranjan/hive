@@ -1,0 +1,137 @@
+[03:38:55] predictions registered on origin/main: gates/gate42/prompts/PREDICTIONS.md
+[03:38:55] rule-giver writing private rules (headless Claude Code)...
+[03:41:43] rules checked: 10 functions, 136 calls, deterministic
+[03:41:43] declared decisions per function: 1:2, 2:3, 3:3, 4:2
+[03:41:43] starting repo and hidden suite built
+[03:41:43] pre-launch: python3 gates/gate42/referee/code_sheet.py pre {run} {oracle}
+[03:41:43] wind tunnel: documenter writing the owner's complete rule sheet...
+[03:42:17] wind tunnel: R: 53 rules ($0.14)
+[03:42:17] wind tunnel: interview starting (hive.interview as shipped, terminal mode)...
+[03:43:19] wind tunnel: H owner #1: 'B'
+[03:43:29] wind tunnel: H owner #2: 'Neither option matches. A term of 0 days, or a negative one, is not rejected and'
+[03:43:41] wind tunnel: H owner #3: 'C'
+[03:43:50] wind tunnel: H owner #4: 'None of these. Particles like van and der are skipped. Titles such as Dr. and su'
+[03:43:59] wind tunnel: H owner #5: 'B'
+[03:44:10] wind tunnel: H owner #6: "None of these. There's a 5-day grace period, so nothing is charged until an invo"
+[03:44:22] wind tunnel: H owner #7: 'A. A zero balance or a credit balance gets no late fee, however late the account'
+[03:44:34] wind tunnel: H owner #8: "C. The fee is always rounded up to the next whole cent in the business's favour,"
+[03:44:47] wind tunnel: H owner #9: 'None of these. Only the last 4 digits are shown, and every other digit is replac'
+[03:44:58] wind tunnel: H owner #10: "None of these. Spaces, dashes, letters and anything else that isn't a digit are "
+[03:45:19] wind tunnel: H owner #11: '4.4 would be labelled "Good", so none of these match. Excellent starts at 4.45, '
+[03:45:34] wind tunnel: H owner #12: "None of these. The zone's starting charge covers the first 500 g. After that, ev"
+[03:45:46] wind tunnel: H owner #13: 'None of these. Nothing is refused and there is no weight limit. A parcel of 0 g '
+[03:46:00] wind tunnel: H owner #14: "Neither option matches. Shipping depends only on the parcel's weight and zone, a"
+[03:46:11] wind tunnel: H owner #15: "B is closest in method (the 7s and 8s count in the total, so it isn't A or C), b"
+[03:46:23] wind tunnel: H owner #16: 'Neither option matches. The blank answer and the 11 are skipped. The 7.5 is not '
+[03:47:04] wind tunnel: H owner #17: 'Not quite: if the issue date falls on a Saturday or Sunday, the due date moves t'
+[03:47:10] wind tunnel: H owner #18: ''
+[03:47:16] wind tunnel: H owner #19: ''
+[03:47:21] wind tunnel: H owner #20: ''
+[03:47:25] wind tunnel: H owner #21: ''
+[03:47:30] wind tunnel: H owner #22: 'Not quite: with fewer than 12 digits, the receipt still prints one asterisk for '
+[03:47:37] wind tunnel: H owner #23: 'Not quite: the average is first rounded to one decimal place, with halves rounde'
+[03:47:45] wind tunnel: H owner #24: 'Not quite: a parcel over 20 kg also gets a flat ₹25 added on top, and the total '
+[03:47:53] wind tunnel: H owner #25: ''
+[03:47:57] wind tunnel: H owner #26: ''
+[03:48:03] wind tunnel: H owner #27: ''
+[03:48:09] wind tunnel: H owner #28: ''
+[03:48:53] wind tunnel: H owner #29: 'A. No late fee is charged when the balance is ₹0 or a credit, so the 5.00 minimu'
+[03:49:02] wind tunnel: H owner #30: '7'
+[03:49:08] wind tunnel: H owner #31: 'Order matters: out-of-range scores are "Invalid" even with fewer than 5 reviews.'
+[03:49:11] wind tunnel: H: 10 rules and 16 rulings from 19 questions (3 skipped as settled; 28 planned decisions), 31 owner replies, 6.9 min, owner $2.32
+[03:49:11] wind tunnel: ask texts for N0, H and R written
+[03:49:11] stage 1: N0 alone
+N0: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g42/upN0.git
+next: python3 lab/launch.py --run g42
+[03:49:11] launching workers...
+launched N0-w1
+launched N0-w2
+launched N0-w3
+N0-w2 finished: exit 0, 0.9 min, tokens 576771, cost 0.2148931
+N0-w1 finished: exit 0, 0.9 min, tokens 701099, cost 0.24108929999999998
+N0-w3 finished: exit 0, 1.0 min, tokens 603948, cost 0.2457206
+wrote /home/claude/hive/runs/g42/agents.csv
+[03:50:15] after N0: python3 gates/gate42/referee/code_sheet.py after {run} {oracle} {base}
+[03:50:16] wind tunnel: describer writing what N0's code does, as rules...
+[03:51:49] wind tunnel: D: 68 rules from the code ($0.34)
+[03:52:10] wind tunnel: review owner #1: '3, 7, 9, 10, 11, 12, 13, 16, 17, 22, 24, 27, 30, 31, 32, 33, 35, 36, 40, 43, 44,'
+[03:52:15] wind tunnel: review owner #2: 'A person born on 29 February has their birthday on 28 February in a year without'
+[03:52:22] wind tunnel: review owner #3: 'A date followed by a time is not accepted: if there is anything after the date o'
+[03:52:29] wind tunnel: review owner #4: 'If the due date lands on a Saturday or Sunday, it moves forward to the next Mond'
+[03:52:37] wind tunnel: review owner #5: 'With 0 days or negative days, the due date is the invoice date itself, because n'
+[03:52:45] wind tunnel: review owner #6: 'Days with a fractional part are rounded down to the whole day before the 0–365 c'
+[03:52:56] wind tunnel: review owner #7: "Days given as text, even numeric text like '30' or '2.9', make due_date return N"
+[03:53:03] wind tunnel: review owner #8: 'A true/false value for the days makes due_date return NULL, not 1 day. Binary da'
+[03:53:10] wind tunnel: review owner #9: 'An invoice date followed by a time, whether after a space or a "T", is not accep'
+[03:53:20] wind tunnel: review owner #10: 'There is no special rule for this. Days over 365 count as 365, so a huge number '
+[03:53:28] wind tunnel: review owner #11: 'Empty text, text made only of spaces, and NULL all give NULL. There is no initia'
+[03:53:37] wind tunnel: review owner #12: 'Only the last 12 digits of the code count, and any digits before them are ignore'
+[03:53:47] wind tunnel: review owner #13: 'Spaces, hyphens, letters, a minus sign, a decimal point and non-Western digits i'
+[03:53:54] wind tunnel: review owner #14: 'The fee is 2% of the balance for each 30-day period late, with a part period cou'
+[03:54:05] wind tunnel: review owner #15: 'Fractions of a day are compared exactly. Anything up to and including 5 days lat'
+[03:54:13] wind tunnel: review owner #16: 'Any fraction of a cent is rounded up to the next whole cent, not to the nearest.'
+[03:54:22] wind tunnel: review owner #17: 'A zero or negative balance, or zero or negative days late, charges nothing (0). '
+[03:54:29] wind tunnel: review owner #18: "Text for the balance or the days late, even numeric text such as '500' or '10', "
+[03:54:40] wind tunnel: review owner #19: 'A balance with a fractional cent (such as 10000.5) is accepted as a real number.'
+[03:54:49] wind tunnel: review owner #20: 'Every character that is not a digit 0-9 is thrown away before masking, so dots, '
+[03:54:57] wind tunnel: review owner #21: 'Leading and trailing spaces are removed, and each run of spaces, tabs or line br'
+[03:55:08] wind tunnel: review owner #22: "Hyphens at the start or end of a SKU are kept, not removed ('-abc-' gives '-ABC-"
+[03:55:16] wind tunnel: review owner #23: "Accented letters and letters from other alphabets are thrown away, so 'élan-ß' g"
+[03:55:23] wind tunnel: review owner #24: 'Underscores, slashes, dots and longer dashes are not kept. They are thrown away,'
+[03:55:33] wind tunnel: review owner #25: 'The score is first rounded to one decimal place, with halves rounded up. A round'
+[03:55:41] wind tunnel: review owner #26: 'With zero or fewer reviews the label is "Unrated", whatever the score is, so a s'
+[03:55:48] wind tunnel: review owner #27: 'A review count between 0 and 1, such as 0.5, does not count as having reviews. A'
+[03:55:55] wind tunnel: review owner #28: 'A score below 0 or above 5 gives the label "Invalid", whatever the review count '
+[03:56:04] wind tunnel: review owner #29: 'Base charge is 500 cents for zone 1, 800 for zone 2 and 1200 for zone 3. On top '
+[03:56:11] wind tunnel: review owner #30: 'A fraction of a gram still counts as a started 500 grams, so 0.5 grams is one st'
+[03:56:18] wind tunnel: review owner #31: 'A weight of zero or less is not charged at all: the shipping cost is 0, not NULL'
+[03:56:26] wind tunnel: review owner #32: 'A zone other than 1, 2 or 3 (such as 0, 4, a negative number or 1.5) is not reje'
+[03:56:32] wind tunnel: review owner #33: 'Heavy parcels are capped. Any parcel over 20 kilograms (20,000 grams) gets a sur'
+[03:56:40] wind tunnel: review owner #34: 'It returns NULL whenever there are fewer than 5 valid responses, not only when t'
+[03:56:50] wind tunnel: review owner #35: 'DISTINCT does change the result: only each different score is counted once, so d'
+[03:57:04] wind tunnel: review owner #36: 'Initials skip the lowercase name particles (van, von, de, da, di, la, del, der, '
+[03:57:04] wind tunnel: C: 69 rules; owner marked 34 of 68, 36 replies, 5.2 min, owner $3.36
+[03:57:04] wind tunnel: judge labelling every declared decision...
+[03:58:11] wind tunnel: judge: 25 labels ($0.29)
+[03:58:11] wind tunnel: C section appended to the ask texts
+[03:58:11] stage 2: H, C, R
+H: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g42/upH.git
+C: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g42/upC.git
+R: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g42/upR.git
+next: python3 lab/launch.py --run g42
+[03:58:12] launching workers...
+launched C-w1
+launched C-w2
+launched C-w3
+launched H-w1
+launched H-w2
+launched H-w3
+launched R-w1
+H-w1 finished: exit 0, 0.8 min, tokens 531214, cost 0.19349290000000002
+launched R-w2
+C-w2 finished: exit 0, 0.9 min, tokens 633645, cost 0.2274027
+launched R-w3
+H-w3 finished: exit 0, 0.9 min, tokens 613237, cost 0.22738360000000002
+H-w2 finished: exit 0, 1.0 min, tokens 580021, cost 0.20966980000000002
+C-w3 finished: exit 0, 1.1 min, tokens 592385, cost 0.2537665
+C-w1 finished: exit 0, 1.1 min, tokens 841928, cost 0.27513350000000003
+R-w1 finished: exit 0, 0.6 min, tokens 429458, cost 0.17681750000000004
+R-w2 finished: exit 0, 0.8 min, tokens 546368, cost 0.21153229999999998
+R-w3 finished: exit 0, 0.8 min, tokens 571855, cost 0.23424799999999998
+wrote /home/claude/hive/runs/g42/agents.csv
+[04:00:00] scoring every arm call by call...
+# g42: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 38.8% | 22.4%–55.6% |
+| H | 68.4% | 50.4%–84.4% |
+| C | 99.6% | 98.8%–100.0% |
+| R | 100.0% | 100.0%–100.0% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| H-N0 | +29.6 | +11.2 to +48.8 |
+| C-N0 | +60.8 | +42.8 to +77.2 |
+| R-N0 | +61.2 | +44.0 to +77.2 |
+[04:00:02] done. Next: write the gate RESULTS.md from runs/g42/summary.md, update BRAIN.md and lab/QUEUE.md, push.

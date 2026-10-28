@@ -1,0 +1,61 @@
+{
+ "name": "g42",
+ "arms": {
+  "N0": {
+   "hidden_pass": 0.388,
+   "ci95_by_function": [
+    0.224,
+    0.556
+   ],
+   "tests": 250
+  },
+  "H": {
+   "hidden_pass": 0.684,
+   "ci95_by_function": [
+    0.504,
+    0.844
+   ],
+   "tests": 250
+  },
+  "C": {
+   "hidden_pass": 0.996,
+   "ci95_by_function": [
+    0.988,
+    1.0
+   ],
+   "tests": 250
+  },
+  "R": {
+   "hidden_pass": 1.0,
+   "ci95_by_function": [
+    1.0,
+    1.0
+   ],
+   "tests": 250
+  }
+ },
+ "diffs": {
+  "H-N0": {
+   "points": 29.6,
+   "ci95": [
+    11.2,
+    48.8
+   ]
+  },
+  "C-N0": {
+   "points": 60.8,
+   "ci95": [
+    42.8,
+    77.2
+   ]
+  },
+  "R-N0": {
+   "points": 61.2,
+   "ci95": [
+    44.0,
+    77.2
+   ]
+  }
+ },
+ "allowance": {}
+}
