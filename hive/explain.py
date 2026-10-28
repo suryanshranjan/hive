@@ -40,6 +40,56 @@ Reply with JSON only, in this shape:
 # In experiments, Hive's own recommendation could sway the owner (anchoring), so HIVE_ADVICE=0 leaves it out.
 ADVICE = os.environ.get('HIVE_ADVICE', '1') != '0'
 
+BACKUP = os.path.join(os.path.expanduser('~'), '.hive', 'llm.json')   # {"base_url", "api_key", "model"}; never in a repo
+
+def _json_reply(text):
+    if isinstance(text, dict):
+        return text
+    return json.loads(text[text.index('{'):text.rindex('}') + 1])
+
+def _ask_claude(prompt):
+    p = subprocess.run(shlex.split(CMD), input=prompt, capture_output=True, text=True, timeout=300)
+    reply = json.loads(p.stdout)
+    if isinstance(reply, dict) and (reply.get('is_error') or 'result' not in reply and 'items' not in reply):
+        raise RuntimeError('claude call failed')
+    return _json_reply(reply.get('result', reply) if isinstance(reply, dict) else reply)
+
+def _ask_backup(prompt):
+    """Any OpenAI-compatible endpoint the owner configured (for example NVIDIA NIM), used only when Claude fails."""
+    if not os.path.exists(BACKUP):
+        return None
+    import urllib.request
+    cfg = json.load(open(BACKUP))
+    body = {'model': cfg['model'], 'temperature': 0.2, 'max_tokens': 4000,
+            'messages': [{'role': 'user', 'content': prompt}]}
+    req = urllib.request.Request(cfg['base_url'].rstrip('/') + '/chat/completions', data=json.dumps(body).encode(),
+                                 headers={'Content-Type': 'application/json', 'Authorization': f"Bearer {cfg['api_key']}"})
+    with urllib.request.urlopen(req, timeout=180) as r:
+        return _json_reply(json.load(r)['choices'][0]['message']['content'])
+
+def setup_backup():
+    """hive llm setup: store a backup model for the plain-words step (default: NVIDIA NIM). The key is typed hidden and
+    saved to ~/.hive/llm.json with owner-only permissions."""
+    import getpass
+    print("\nA backup model puts the builders' decisions into plain words when Claude can't be reached.\n"
+          "Note: it receives those decisions, which describe your business rules, so use a provider you trust.")
+    base = input('  Endpoint (Enter for NVIDIA NIM: https://integrate.api.nvidia.com/v1) > ').strip() or \
+        'https://integrate.api.nvidia.com/v1'
+    model = input('  Model (Enter for meta/llama-3.3-70b-instruct) > ').strip() or 'meta/llama-3.3-70b-instruct'
+    key = getpass.getpass('  API key (it will not be shown) > ').strip()
+    if not key:
+        print('  No key given; nothing saved.'); return 1
+    os.makedirs(os.path.dirname(BACKUP), exist_ok=True)
+    with open(BACKUP, 'w') as f:
+        json.dump({'base_url': base, 'api_key': key, 'model': model}, f)
+    os.chmod(BACKUP, 0o600)
+    try:
+        reply = _ask_backup('Reply with JSON only: {"ok": true}')
+        print('  Saved, and the backup model answered.' if reply.get('ok') else '  Saved, but the reply looked odd.')
+        return 0
+    except Exception as e:
+        print(f'  Saved, but a test call failed ({e}). Check the key and model with hive llm setup.'); return 1
+
 def _goal_summary(goal):
     text = re.sub(r'^#+\s*(goal:?)?\s*', '', goal.strip(), flags=re.I)
     return text[:3000]
@@ -54,13 +104,18 @@ def explain(owner_dir, goal, assumptions):
     if not assumptions:
         return fallback
     items = json.dumps([{'id': a['id'], 'assumption': a['text']} for a in assumptions], indent=1)
+    prompt = PROMPT.format(goal=_goal_summary(goal), items=items)
+    reply = None
+    for ask in (_ask_claude, _ask_backup):   # Claude Code's login first; the owner's own backup model if that fails
+        try:
+            reply = ask(prompt)
+            if reply:
+                break
+        except Exception:
+            continue
     try:
-        p = subprocess.run(shlex.split(CMD), input=PROMPT.format(goal=_goal_summary(goal), items=items),
-                           capture_output=True, text=True, timeout=300)
-        reply = json.loads(p.stdout)
-        reply = reply.get('result', reply) if isinstance(reply, dict) else reply
-        if isinstance(reply, str):
-            reply = json.loads(reply[reply.index('{'):reply.rindex('}') + 1])
+        if reply is None:
+            raise RuntimeError('no model reachable')
         by_id = {a['id']: a for a in assumptions}
         out = {'summary': reply.get('summary') or fallback['summary'], 'items': []}
         for it in reply.get('items', []):
@@ -73,6 +128,8 @@ def explain(owner_dir, goal, assumptions):
                                  'judge': bool(it.get('owner_can_judge', True))})
         seen = {i['id'] for i in out['items']}
         out['items'] += [i for i in fallback['items'] if i['id'] not in seen]   # never drop one silently
+        if not out['items'] or reply is None:
+            raise RuntimeError('no reply')
     except Exception:
         return dict(fallback, failed=True)   # not cached: try again next time
     json.dump(out, open(cache, 'w'), indent=1)
