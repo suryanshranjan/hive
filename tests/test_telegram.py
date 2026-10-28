@@ -226,13 +226,31 @@ fake = FakeTelegram([tap('tri|3'), tap('tri|3'), say('2 and 5'), tap('tri|next')
 rows = telegram.review(run, telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), goal='combine metrics', poll=1)
 pages = [m for m in fake.sent if m['text'].startswith('Page ')]
 check('every decision is listed, one line each, across pages', (len(pages), '9. Rule number 8' in pages[1]['text']), (2, True))
-full = [m for m in fake.sent if 'What should happen here?' in m['text']]
+full = [m for m in fake.sent if 'What would you do instead?' in m['text']]
 check('only the marked ones (2 and 5) are asked in full, openly first', len(full), 2)
+check('a marked one asks for his way first; keeping it is the last, separate button',
+      [b[0]['text'] for b in full[0]['reply_markup']['inline_keyboard']][:2], ['Show me some options', 'Actually, keep it as is'])
 check("the owner's words on #2 become the rule; #5 kept; the rest left as built",
       (json.load(open(os.path.join(d, 'reviews', ids[1] + '.json')))['correction'],
        json.load(open(os.path.join(d, 'reviews', ids[4] + '.json')))['ok'],
        sum(bool(json.load(open(os.path.join(d, 'reviews', i + '.json'))).get('auto')) for i in ids)), ('Do it my way', True, 8))
 check('one change goes to the builders', len(rows), 1)
+
+# 7d. marked four, then kept three in a row quickly: Hive checks; the owner goes back and answers properly
+run, d = make_run(); os.environ['HIVE_RUN'] = run
+for k in range(10):
+    owner.assume(f'Policy {k} of the shop works the obvious way.'); time.sleep(0.01)
+ids = [a['id'] for a in owner._assumptions(d, False)]
+fake = FakeTelegram([say('1 2 3 4'), tap('tri|next'), tap('tri|next'),
+                     tap(f'{ids[0]}|ok'), tap(f'{ids[1]}|ok'), tap(f'{ids[2]}|ok'), tap('auto|redo'),
+                     say('My way for one'), tap(f'{ids[1]}|ok'), say('My way for three'), say('My way for four'),
+                     tap('final|send')])
+rows = telegram.review(run, telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), goal='combine metrics', poll=1)
+check('three quick keeps of marked decisions prompt a check',
+      any("you've kept the last three" in m['text'] for m in fake.sent), True)
+check('going back lets the owner answer them properly',
+      [json.load(open(os.path.join(d, 'reviews', i + '.json'))).get('correction') for i in ids[:4]],
+      ['My way for one', None, 'My way for three', 'My way for four'])
 
 # 8. an open question gathers every reply until Done; situations get one-tap verdicts, with undo and own words
 fake = FakeTelegram([tap('collect|done'), tap('collect|more'),   # an accidental early Done, taken back

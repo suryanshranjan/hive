@@ -221,10 +221,14 @@ def _ask_one(ch, d, item, header, poll, can_undo):
     if options and item.get('impact', 2) >= 3:
         # High stakes: ask openly first, so a menu cannot frame the owner's own rule (Gate 30: offered options led the
         # founder away from his free-text verdict). The options come only if he asks for them.
-        first = [[('Keep it as is', f'{k}|ok')], [('Show me some options', f'{k}|show')]]
+        if item.get('marked'):   # the owner marked it as one to change: ask for his way; keeping it is the exception
+            first = [[('Show me some options', f'{k}|show')], [('Actually, keep it as is', f'{k}|ok')]]
+            question = "You marked this one. What would you do instead? Tell me in your own words."
+        else:
+            first = [[('Keep it as is', f'{k}|ok')], [('Show me some options', f'{k}|show')]]
+            question = "What should happen here? Tell me in your own words, or keep it as is."
         first.append([('↩ Undo last', f'{k}|undo')] if can_undo else [])
-        msg = ch.send(f"{header}\n\n{item['text']}\n\nWhat should happen here? Tell me in your own words, or keep it "
-                      "as is.", buttons=[r for r in first if r])
+        msg = ch.send(f"{header}\n\n{item['text']}\n\n{question}", buttons=[r for r in first if r])
         kind, got = _wait(ch, poll, {data for row in first for _, data in row})
         if got == f'{k}|undo':
             return 'undo'
@@ -260,17 +264,33 @@ def _ask_one(ch, d, item, header, poll, can_undo):
         ch.send('Very good. I\'ll see to it.' if followed else "Understood. I'll have it done that way.")
 
 def _walk(ch, d, items, label, poll):
-    """Ask each item in turn; "Undo last" takes the previous answer back and asks it again."""
-    i = 0
+    """Ask each item in turn; "Undo last" takes the previous answer back and asks it again.
+    If the owner keeps three decisions in a row, quickly, that he had marked as ones to change, check he meant it
+    (Gate 31: the founder marked 22 decisions and then kept all 22, 2 to 12 seconds each)."""
+    i, streak, checked = 0, 0, False
     while i < len(items):
         ch.note = lambda: (f"We're on decision {i + 1} of {len(items)}{' (the minor ones)' if label else ''}. Once you've "
                            "answered, the builders make your changes and I'll report back.")
         if _ask_one(ch, d, items[i], f'{label} {i + 1} of {len(items)}'.strip(), poll, can_undo=i > 0) == 'undo':
-            i -= 1
+            i -= 1; streak = 0
             os.remove(os.path.join(d, 'reviews', items[i]['id'] + '.json'))
             ch.send('Of course. Back to the previous one.')
-        else:
-            i += 1
+            continue
+        r = json.load(open(os.path.join(d, 'reviews', items[i]['id'] + '.json')))
+        streak = streak + 1 if items[i].get('marked') and r['ok'] and r['seconds'] < 8 else 0
+        i += 1
+        if streak == 3 and not checked:
+            checked = True
+            ch.send("A quick check: you marked these as ones you'd change, but you've kept the last three as they are. "
+                    "Did you mean to?", buttons=[[("Let me answer them properly", 'auto|redo')],
+                                                  [("Yes, keep them", 'auto|keep')]])
+            if _wait(ch, poll, {'auto|redo', 'auto|keep'})[1] == 'auto|redo':
+                for it in items[i - 3:i]:
+                    os.remove(os.path.join(d, 'reviews', it['id'] + '.json'))
+                i -= 3; streak = 0
+                ch.send('Of course. Back to the first of those three.')
+            else:
+                ch.send('Very good.')
 
 def _resolve_conflicts(ch, d, items, poll, rulings=None):
     """Before anything is sent: if two of the owner's decisions contradict each other, or a new one contradicts a ruling
@@ -336,8 +356,9 @@ def _triage_review(ch, d, items, technical, summary, check, poll, greeting, who,
     pages = [items[i:i + PAGE] for i in range(0, len(items), PAGE)]
     ch.send(f"{greeting}{', ' + who if who else ''}. While you were away, the builders finished this: {summary}\n\n"
             + (f"{check}\n\n" if check else '')
-            + f"They made {len(items)} calls your instructions didn't cover. I'll list them one line each; tap the "
-              "number of any you'd do differently, and I'll ask you about just those. About a minute to scan.")
+            + f"They made {len(items)} calls your instructions didn't cover. I'll list them one line each. Tap only "
+              "the ones you would CHANGE (most owners mark a few), and I'll ask you how. Anything you don't tap stays "
+              "as it is. About a minute to scan.")
     flagged = []
     for p, page in enumerate(pages):
         base = p * PAGE
@@ -360,7 +381,7 @@ def _triage_review(ch, d, items, technical, summary, check, poll, greeting, who,
                         flagged.remove(k); ch.send(f'{k} unmarked.')
                     else:
                         flagged.append(k); ch.send(f'{k} marked. Tap more, or {"Done" if last else "Next"}.')
-    chosen = [dict(items[k - 1], impact=3) for k in sorted(flagged)]   # asked openly first, in full
+    chosen = [dict(items[k - 1], impact=3, marked=True) for k in sorted(flagged)]   # asked openly first, in full
     for k, it in enumerate(items, 1):
         if k not in flagged:
             _auto(d, it, 'not marked on the list')

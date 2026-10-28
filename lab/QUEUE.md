@@ -6,7 +6,7 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 
 - Tool: `hive start` (overnight, `hive morning`), Telegram (questions, reviews with alternatives, status, undo, contradiction check, open questions and verdicts), plain-words review, memory of rulings (`hive rules`), NIM backup for plain words. All tool tests pass.
 - Gates 27–29 tied; Gate 30 gave the first measured gain from the owner on surprising rules (+17 points, 3/6 vs 2/6), short of the +30 predicted.
-- Next (tool, then Gate 31): rank the review by where the owner is likely to differ (his past rulings and topics, not impact); ask open first on high-stakes decisions before offering a menu; check new answers against earlier rulings. Then rerun Gate 30's design on a fresh feature with the same founder.
+- Gate 31 done: the one-line list found 8 of 9 surprising rules, but all 22 marked decisions were kept (0 changes; kill fired). The answering step is fixed. Next: Gate 32, the same design on another fresh feature (needs the founder, about 15 minutes on Telegram).
 - Private material: `D:\Suryansh\Programming\hive_private\` and `/home/node/g30` in the container.
 
 ## Needs the user
