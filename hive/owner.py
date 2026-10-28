@@ -127,9 +127,10 @@ def assumptions():
     print('\n'.join(f"- ({a['worker']}){' [technical]' if a.get('technical') else ''} {a['text']}" for a in rows)
           if rows else 'no assumptions recorded yet'); return 0
 
-def review(run, width=72, intro=True):
+def review(run, width=72, intro=True, goal=None):
     """The owner's check after the build: each recorded default, right or wrong. Wrong ones, with the owner's rule, go to
-    <run>/owner/corrections.md for the workers who fix them (Gate 27: builders never ask about defaults they feel sure of)."""
+    <run>/owner/corrections.md for the workers who fix them (Gate 27: builders never ask about defaults they feel sure of).
+    With the goal, each one is first put in plain words with an example, most important first (hive/explain.py)."""
     import textwrap
     d = _dir(run)
     tech = _assumptions(d, True)
@@ -137,6 +138,11 @@ def review(run, width=72, intro=True):
         '# Technical choices the builders made (for engineers; the owner is not asked)\n\n' +
         ('\n'.join(f"- ({a['worker']}) {a['text']}" for a in tech) if tech else 'None.') + '\n')
     todo = [a for a in _assumptions(d, False) if not os.path.exists(os.path.join(d, 'reviews', a['id'] + '.json'))]
+    if goal and todo:
+        from . import explain
+        _, shown, aside = explain.plan(d, goal, todo)
+        by_id = {a['id']: a for a in todo}
+        todo = [dict(by_id[i['id']], text=i['text'], shown_as=i['text']) for i in shown + aside if i['id'] in by_id]
     if intro:
         print(f"\nThe builders made {len(todo)} assumption(s) your instructions did not cover. For each one, press Enter\n"
               "if it is right, or type what should happen instead. Ctrl+C to stop and come back later.", flush=True)
@@ -148,8 +154,8 @@ def review(run, width=72, intro=True):
             t0 = time.time(); print('\n'.join(lines), end='', flush=True)
             ans = sys.stdin.readline().strip()
             ok = ans.lower() in ('', 'y', 'yes', 'right', 'ok', 'correct')
-            json.dump({'id': a['id'], 'ok': ok, 'correction': None if ok else ans, 'seconds': int(time.time() - t0)},
-                      open(os.path.join(d, 'reviews', a['id'] + '.json'), 'w'))
+            json.dump({'id': a['id'], 'ok': ok, 'correction': None if ok else ans, 'seconds': int(time.time() - t0),
+                       'shown_as': a.get('shown_as')}, open(os.path.join(d, 'reviews', a['id'] + '.json'), 'w'))
             print('  Kept.' if ok else '  Noted: the builders will change this.', flush=True)
     except KeyboardInterrupt:
         print('\nStopped; run hive review again to finish.')
@@ -167,7 +173,8 @@ def write_corrections(d):
         r = json.load(open(p))
         if not r['ok']:
             a = json.load(open(os.path.join(d, 'assumptions', r['id'] + '.json')))
-            rows.append(f"- The builders assumed: {a['text']}\n  **The owner says:** {r['correction']}")
+            shown = f"\n  (The owner saw it as: {r['shown_as']})" if r.get('shown_as') and r['shown_as'] != a['text'] else ''
+            rows.append(f"- The builders assumed: {a['text']}{shown}\n  **The owner says:** {r['correction']}")
     open(os.path.join(d, 'corrections.md'), 'w').write(
         "# The owner's corrections\n\nThe owner reviewed the defaults the builders applied, and each item below was wrong. "
         "Change the code to follow the owner, encode each correction as a test, and do not stretch it into rules it does not "

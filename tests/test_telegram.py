@@ -13,14 +13,20 @@ def check(name, got, want):
 
 class FakeTelegram:
     """Records what Hive sends; replies with the owner's scripted taps and messages, one batch per poll."""
-    def __init__(self, script):
-        self.sent, self.script, self.uid = [], list(script), 0
+    def __init__(self, script, stale=()):
+        self.sent, self.script, self.uid, self.stale = [], list(script), 0, list(stale)
     def __call__(self, method, **p):
         if method == 'sendMessage':
             self.sent.append(p); return {'message_id': len(self.sent)}
         if method == 'answerCallbackQuery':
             return True
+        if method == 'getChat':
+            return {'first_name': 'Suryansh'}
         if method == 'getUpdates':
+            if p.get('timeout') == 0:   # Hive skipping what was sent before it started listening
+                batch = [lambda f, s=s: [s] for s in self.stale][:1] and [self.stale.pop(0)] if self.stale else []
+                return [{'update_id': self._next(), 'message': {'message_id': 1, 'chat': {'id': c}, 'text': t}}
+                        for c, t, _, _ in batch]
             if not self.script:
                 return []
             batch = self.script.pop(0)(self)
@@ -37,6 +43,8 @@ class FakeTelegram:
                     out.append({'update_id': self.uid, 'message': m})
             return out
         raise AssertionError(method)
+    def _next(self):
+        self.uid += 1; return self.uid
 
 def make_run():
     run = tempfile.mkdtemp(); d = owner._dir(run)
@@ -51,7 +59,7 @@ run, d = make_run()
 question(d, 'q1', 'w2', 'Priya lives in Navi Mumbai and the campaign wants Mumbai. Show her? A) Yes B) No C) something else (please say)')
 fake = FakeTelegram([lambda f: [(STRANGER, 'A', None, None)], lambda f: [(ME, None, 'q1|B', 1)]])
 ch = telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake)
-telegram.bridge_questions(run, ch, until=lambda: True, poll=0)
+telegram.bridge_questions(run, ch, until=lambda: True, poll=1)
 check('the question reached the phone', 'Navi Mumbai' in fake.sent[0]['text'], True)
 check('it came with letter buttons', [b['text'] for b in fake.sent[0]['reply_markup']['inline_keyboard'][0]], ['A', 'B', 'C'])
 a = json.load(open(os.path.join(d, 'answers', 'q1.json')))
@@ -63,27 +71,45 @@ run, d = make_run()
 question(d, 'q1', 'w1', 'A deal is cut by Rs 500. Must both accept again? A) Yes B) No')
 question(d, 'q2', 'w3', 'A typo is fixed in the brief. Must both accept again? A) Yes B) No')
 fake = FakeTelegram([lambda f: [(ME, 'Yes, any cut needs both', None, None)], lambda f: [(ME, 'No', None, 2)]])
-telegram.bridge_questions(run, telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), until=lambda: True, poll=0)
+telegram.bridge_questions(run, telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), until=lambda: True, poll=1)
 check('a typed reply answers the oldest question', json.load(open(os.path.join(d, 'answers', 'q1.json')))['answer'],
       'Yes, any cut needs both')
 check('a reply to a message answers that question', json.load(open(os.path.join(d, 'answers', 'q2.json')))['answer'], 'No')
 
-# 3. the review: only business assumptions go to the phone; Right / Wrong plus the owner's rule
+# 3. the review: a greeting by name; business assumptions in plain words, most important first; the one an owner cannot
+#    judge set aside unless asked; an old "hi" from before is not taken as an answer
+from hive import explain
+explain.CMD = '"' + sys.executable.replace('\\', '/') + '" tests/fake_explain.py'   # shlex would eat Windows backslashes
 run, d = make_run()
 os.environ['HIVE_RUN'] = run; os.environ['HIVE_WORKER'] = 'w1'
 owner.assume('If two sources disagree on a total, the total shows as not available.')
 time.sleep(0.01)
 owner.assume('If the same account is imported twice, its followers are counted twice.')
 time.sleep(0.01)
+owner.assume('If a creator has no follower count on a platform, that platform shows as not available.')
+time.sleep(0.01)
 owner.assume('aggregate() throws TypeError on a non-array input.', technical=True)
-fake = FakeTelegram([lambda f: [(ME, None, f"{owner._assumptions(d, False)[0]['id']}|ok", 1)],
-                     lambda f: [(ME, None, f"{owner._assumptions(d, False)[1]['id']}|no", 2)],
-                     lambda f: [(ME, 'Count each account once.', None, None)]])
-rows = telegram.review(run, telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), poll=0)
-check('only the 2 business assumptions went to the phone', sum('Assumption' in m['text'] for m in fake.sent), 2)
+ids = [a['id'] for a in owner._assumptions(d, False)]
+fake = FakeTelegram([lambda f: [(ME, None, f"{ids[0]}|ok", 2)],
+                     lambda f: [(ME, None, f"{ids[1]}|no", 3)],
+                     lambda f: [(ME, 'Count each account once.', None, None)],
+                     lambda f: [(ME, None, 'aside|leave', 6)]], stale=[(ME, 'hi', None, None)])
+rows = telegram.review(run, telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), goal='# Goal: combine metrics',
+                       check='419 tests, all passing.', poll=1)
+check('it greets the owner by name and says what was built',
+      'Good morning, Suryansh. While you were away, I built this: A report that adds up campaign results.' in fake.sent[0]['text'], True)
+check('the greeting says how things stand', '419 tests, all passing.' in fake.sent[0]['text'], True)
+decisions = [m for m in fake.sent if m.get('reply_markup') and "Yes, that's right" in str(m['reply_markup'])]
+check('2 decisions in plain words with an example, not the builders\' words',
+      [('In the brand report' in m['text'], 'Priya' in m['text']) for m in decisions], [(True, True), (True, True)])
+check('the most important one came first', decisions[0]['text'].startswith('1 of 2\n\nIn the brand report (item 0)'), True)
+check('the one an owner cannot judge was offered, not pushed', any('smaller one' in m['text'] for m in fake.sent), True)
 check('the technical choice never reached the owner', any('TypeError' in m['text'] for m in fake.sent), False)
-check('one kept, one corrected', len(rows), 1)
-check("the correction carries the owner's words", 'Count each account once.' in open(os.path.join(d, 'corrections.md')).read(), True)
+check('the old "hi" did not count as an answer', json.load(open(os.path.join(d, 'reviews', ids[0] + '.json')))['ok'], True)
+check('one corrected', len(rows), 1)
+text = open(os.path.join(d, 'corrections.md')).read()
+check("the correction carries the owner's words and what the owner saw",
+      ('Count each account once.' in text, 'The owner saw it as: In the brand report' in text), (True, True))
 
 # 4. not connected: hive behaves as before
 os.environ['HIVE_TELEGRAM'] = '0'
