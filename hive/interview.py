@@ -114,6 +114,22 @@ def _rule(situation, answer):
     got = explain.ask_json(READ.format(situation=situation, answer=answer)) or {}
     return (got.get('rule') or f'{situation} -> {answer}').strip()
 
+AMEND = """Hive showed a business owner one of his rules, as it will be built:
+{rule}
+
+He replied: {reply}
+
+Amend his rule as he now means it. Keep every part of the shown rule he did not object to, and apply his correction or
+addition exactly. If his reply restates the whole rule, use his reply. Plain words a builder can implement and test;
+add nothing of your own. Reply with JSON only: {{"rule": "..."}}"""
+
+def _amend(rule, reply):
+    """His reply to a rule he was shown ("mostly right, but you left out a minimum") amends it; it does not replace it.
+    Gate 39: the correction alone became the rule, and the fee's rate and cap he had just confirmed were lost."""
+    got = explain.ask_json(AMEND.format(rule=rule, reply=reply)) or {}
+    return (got.get('rule') or f'{rule} Correction from the owner, which overrides anything above that it contradicts: '
+            f'{reply}').strip()
+
 def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll=20, save=None, sheet=True):
     """Run the interview. Returns the owner's rules, one plain sentence each. On the phone if `ch` is given, otherwise
     in the terminal (`ask(prompt)` returns his typed answer). With `save` (a file path), the questions, his answers and
@@ -185,8 +201,10 @@ def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll
             asked = d.get('asked', '')
             if v == 'Yes, exactly' or is_yes(v):
                 rules.append(d['situation'])
-            elif not no_rule(v):
-                rules.append(f"{asked} -> {d['own'] if v == 'Not quite' else v}" if asked else v)
+            elif v == 'Not quite':   # his own words stand
+                rules.append(f"{asked} -> {d['own']}" if asked else d['own'])
+            elif not no_rule(v):   # "mostly right, but ...": the reading, amended (Gate 39)
+                rules.append(_amend(d['situation'], v))
     if sheet and len(rules) >= 2:
         rules = rule_sheet(rules, ch, ask, poll, save)
     if rulings and rules:
@@ -248,7 +266,7 @@ def rule_sheet(rules, ch=None, ask=None, poll=20, save=None):
         for k in wrong:
             ch.send(f"✍️ <b>Rule {k}:</b> {telegram.esc(general[k - 1])}\n\n<b>What should it be?</b> <i>Your own words, "
                     "or 🎙 a voice note.</i>", html=True)
-            general[k - 1] = _rule(general[k - 1], telegram._wait(ch, poll, set())[1])
+            general[k - 1] = _amend(general[k - 1], telegram._wait(ch, poll, set())[1])
         ch.send('✅ Thank you. These are your rules now; the builders will encode every one as a test.')
     else:
         print('\nYour rules for this feature, as the builders will follow them (each applies to every case like it):')
@@ -256,7 +274,8 @@ def rule_sheet(rules, ch=None, ask=None, poll=20, save=None):
             print(f'  {n}. {r}')
         for k in [int(x) for x in re.findall(r'\d+', (ask or input)("  Numbers of any that are wrong (Enter = all correct) > "))]:
             if 1 <= k <= len(general):
-                general[k - 1] = _rule(general[k - 1], (ask or input)(f"  Rule {k}: what should it be? > ").strip())
+                general[k - 1] = _amend(general[k - 1], (ask or input)(   # restated, as on the phone (Gate 39)
+                    f"  Rule {k}: {general[k - 1]}\n  What should it be? > ").strip())
     telegram._save(path, {'draft': got, 'done': True, 'rules': general})
     return general
 

@@ -32,6 +32,8 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 | Repeated and near-duplicate questions tire him (2–5 s per answer after the 12th) | Gate 37 | One question per decision; same-decision pairs dropped; any answer that settles a later question skips it | `hive/interview.py` |
 | "What does it mean?" was taken as his rule | Gate 38 | Each reply is reasoned about: a question about the question gets a plain explanation; a choice said in words counts as that choice | `hive/telegram.py` (`understand`) |
 | His answers to two framings of one decision agree 1 of 8 (same session), 3 of 6 (next day) | Gates 36–37 | **The rule sheet**: answers become one general rule per decision, disagreeing answers are put to him, he confirms the whole sheet; **the hand-over**: "here is what it does now; looks right?" | `hive/interview.py` (`rule_sheet`), `hive/start.py` (`handover`) |
+| With a perfect owner, a complete rule sheet gives 250/250 and breaks nothing; Hive's interview 76% (tour 76%) | Gate 39 | Builders are not the bottleneck: the target of every intent channel is each decision stated whole | `hive/interview.py` |
+| "Mostly right, but you left out a minimum" replaced the whole rule (rate and cap lost); a choice said in words dropped his label ("void") | Gate 39 | **A correction amends the rule it answers**; the terminal restates a rule before its correction; own words count as a choice only if they add nothing | `hive/interview.py` (`_amend`), `hive/explain.py` (`UNDERSTAND`) |
 | A new answer can contradict an earlier ruling | Gate 30 | Contradictions with earlier rulings are put to him before the builders get both | `hive/interview.py` (`_settle`), `hive/telegram.py` |
 | A menu of alternatives led him away from his own rule | Gate 30 | High-stakes decisions in the review ask open first ("what would you do instead?") | `hive/telegram.py` |
 | Rulings kept between builds stop repeat questions (25 → 13 decisions to review) | Gate 29 | Rulings are remembered per project and reminded to every build | `hive/memory.py` |
@@ -50,6 +52,8 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 | The cloud copy died on a 15-minute-old tap; replies took over a minute | Live cloud test | Old taps and failing messages are survived; "typing…" at once; "hi" and "status" need no model; an 8-second limit on phrasing; the backup reasons briefly | `hive/telegram.py`, `hive/assistant.py`, `hive/explain.py` |
 
 ## Still to turn into the product
+
+- **Gate 40:** the interview never asked about unusual input (8 of 25 decisions in Gate 39). If asking about it adds ≥ 5 points, the planner lists it by default.
 
 - **Gate 38** (running): does a confirmed rule hold a day later? If not, the hand-over ("looks right?") becomes the main channel, and the interview shrinks.
 - Self-registering modules would cut collisions further (BRAIN §7); not yet needed at 8 builders.

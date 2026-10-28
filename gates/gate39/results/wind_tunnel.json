@@ -1,0 +1,494 @@
+{
+ "H": [
+  "Whenever a due date is counted in business days from a start date, counting begins on the first business day after the start date, so a Saturday order promised in 2 business days has Monday as day 1 and is due Tuesday. Saturdays, Sundays, January 1, December 25 and December 26 are skipped. No other date is skipped, so Diwali and Republic Day count as normal working days.",
+  "Round each score to the nearest whole number, with halves rounding up; if the rounded score is below 0 or above 10, the answer is \"invalid\" (not detractor or promoter), otherwise the answer is determined from the rounded score.",
+  "Whenever a card number is shown on a receipt, the customer and staff see only the last 4 digits and everything else is hidden. Whenever the card number staff entered is invalid, for example it has only 3 digits or contains a letter, the receipt prints the word INVALID in place of the card number, shows no part of what was typed, and the system neither refuses the entry nor shows a warning.",
+  "Whenever a customer scores the survey from 0 to 6 out of 10, count them as a Detractor, so a score of 6 is a Detractor.",
+  "Whenever a parcel is priced, never refuse the order. The price is the base charge for its zone plus a set amount for each extra 500g, with the weight rounded up to the next 500g. Whenever the delivery zone is unknown, charge it as a standard zone with a flat 12.00 base rate. Whenever a parcel weighs 0 g, charge only the base rate for its zone. Whenever a parcel weighs over 20 kg, add a flat 25.00 heavy-parcel surcharge to the normal weight-rule price, so a 60 kg parcel pays the normal weight-rule price plus 25.00.",
+  "Whenever a bill is split between people and it cannot divide evenly, everyone pays the same amount, rounded up, so the restaurant is never short and may collect a little extra. Whenever a bill is split between 0 people, show no amount and leave it blank.",
+  "Whenever the middle value of a group of orders is needed, ignore any orders whose amount is blank. If an even number of amounts remains, the middle value is the lower of the two middle amounts, so for \u20b9100, \u20b9200, \u20b9300 and \u20b9400 it is \u20b9200. If no amounts remain, because the group has none or all are blank, show nothing.",
+  "Whenever a sale is labelled with its financial year (April to March), the label is FY followed by the two-digit calendar year in which that financial year ends, then a hyphen, then Q and the quarter number counted from April as Q1, so a sale on 15 May 2026 is labelled FY27-Q1.",
+  "Whenever a late fee applies, which is only when payment is more than 5 days late, the fee is never less than \u20b92.50, even if the calculated fee (2% of a small invoice) would come to less.",
+  "Whenever a product code is entered, tidy it up and never reject it for being off-format. Trim spaces around the code, capitalise the two letters, and ignore any dashes or spaces after the letters. Among the digits, read O/o as 0 and I/l as 1. Pad the digits with zeros to four, or cut them to the last four if there are more. Whenever the code does not start with two letters, has no digits, or has some other stray character after the letters, it becomes XX-0000."
+ ],
+ "R": [
+  "Whenever late_fee gets a NULL or non-numeric amount_cents or days_late, it returns NULL; numeric text (surrounding whitespace allowed, no underscores, not nan or infinity) counts as a number.",
+  "Whenever late_fee is called with days_late of 5 or fewer, it returns 0 (a 5-day grace period; days_late must be strictly greater than 5 to be charged).",
+  "Whenever late_fee is called with an amount_cents of zero or less, it returns 0, whatever days_late is.",
+  "Whenever late_fee charges a fee, it is 2% of amount_cents for each started 30-day period of days_late (1-30 days is one period, 31-60 is two, and so on), including fractional days_late.",
+  "Whenever the late_fee computed fee is not a whole number of cents, late_fee rounds it up to the next cent.",
+  "Whenever late_fee charges a fee below 250 cents, it charges 250 instead (minimum fee).",
+  "Whenever late_fee charges a fee above 5000 cents, it charges 5000 instead (maximum fee).",
+  "Whenever ship_cost gets a NULL or non-numeric weight_g, or a NULL zone, it returns NULL; numeric text counts as a number.",
+  "Whenever ship_cost gets zone A, B or C, the base charge is 500, 800 or 1200 cents respectively.",
+  "Whenever ship_cost reads the zone, it ignores letter case (b is the same as B) but does not trim whitespace, so a zone with surrounding spaces is unknown.",
+  "Whenever ship_cost gets an unknown zone (including empty text, text with spaces, or a number), it charges the zone C base of 1200 cents.",
+  "Whenever ship_cost gets a weight_g of 500 or less, including zero and negative weights, it adds nothing to the base charge.",
+  "Whenever ship_cost gets a weight_g above 500, it adds 100 cents for each started 500 g beyond the first 500 g, so a partial step rounds up.",
+  "Whenever ship_cost gets a weight_g strictly above 20000, it adds a flat heavy surcharge of 2500 cents on top of the weight steps; exactly 20000 g has no surcharge.",
+  "Whenever loyalty_tier gets a NULL or non-numeric points value, it returns NULL; numeric text counts as a number.",
+  "Whenever loyalty_tier gets negative points (any value below 0, including fractions), it returns 'void'.",
+  "Whenever loyalty_tier gets points from 0 up to but not including 1000, it returns 'bronze'.",
+  "Whenever loyalty_tier gets points of at least 1000 and below 5000, it returns 'silver'; the lower bound is inclusive.",
+  "Whenever loyalty_tier gets points of at least 5000 and below 20000, it returns 'gold'; the lower bound is inclusive.",
+  "Whenever loyalty_tier gets points of 20000 or more, it returns 'platinum'.",
+  "Whenever loyalty_tier gets fractional points, it compares the exact value to the thresholds without rounding, so 999.9 is bronze.",
+  "Whenever fiscal_quarter gets NULL, it returns NULL.",
+  "Whenever fiscal_quarter gets text, it accepts only the exact form YYYY-MM-DD (four-digit year, two-digit month and day, dashes); any other text, such as a time suffix, slashes or a digits-only string, returns 'n/a'.",
+  "Whenever fiscal_quarter gets text that has the YYYY-MM-DD shape but is not a real calendar date, it returns 'n/a'.",
+  "Whenever fiscal_quarter gets an integer with exactly 8 digits, it reads it as YYYYMMDD; an integer of any other length, or one that is not a real date, returns 'n/a'.",
+  "Whenever fiscal_quarter gets a value that is neither text nor an integer (for example a decimal number), it returns 'n/a'.",
+  "Whenever fiscal_quarter gets a valid date with a year before 2000, it returns 'legacy'; validity is checked first, so an invalid date is 'n/a' even when the year is before 2000.",
+  "Whenever fiscal_quarter gets a valid date from 2000 onward, the fiscal year starts on April 1 and is named for the calendar year in which it ends, so April to December belong to the next calendar year's fiscal year.",
+  "Whenever fiscal_quarter labels a quarter, quarters are Q1 for April-June, Q2 for July-September, Q3 for October-December and Q4 for January-March.",
+  "Whenever fiscal_quarter builds its label, the format is 'FY' plus the fiscal year modulo 100 as two digits, a dash, then 'Q' and the quarter number.",
+  "Whenever biz_days_add gets a NULL start_date or a NULL or non-numeric n, it returns NULL; if start_date is NULL this applies before any date check.",
+  "Whenever biz_days_add gets a non-NULL start_date that is not exactly YYYY-MM-DD or not a real date, and n is numeric, it returns empty text.",
+  "Whenever biz_days_add counts business days, a business day is Monday to Friday that is not January 1, December 25 or December 26, in every year; holidays that fall on a weekend are not moved to another day.",
+  "Whenever biz_days_add moves by n business days (n not zero), it steps one calendar day at a time in the direction of the sign of n, counting only business days; the start date is not counted and may itself be a non-business day.",
+  "Whenever biz_days_add gets a negative n, it moves backward in time by that many business days.",
+  "Whenever biz_days_add gets n of zero, it returns the start date if that is a business day, otherwise the next business day after it (it always rolls forward, never back).",
+  "Whenever biz_days_add gets a fractional n, it drops the fraction toward zero first (2.9 becomes 2, -0.5 becomes 0).",
+  "Whenever biz_days_add gets an n whose whole part is more than 3650 in either direction, it returns empty text; exactly 3650 or -3650 is allowed.",
+  "Whenever biz_days_add would move outside the range of representable dates, it returns empty text.",
+  "Whenever biz_days_add returns a date, it is formatted as YYYY-MM-DD.",
+  "Whenever normalize_sku gets NULL, it returns NULL.",
+  "Whenever normalize_sku gets a value that is not text, it converts it to text first.",
+  "Whenever normalize_sku reads a code, it first trims leading and trailing whitespace.",
+  "Whenever normalize_sku gets a code whose first two characters are not both plain letters A-Z or a-z (including empty text and codes shorter than 2 characters), it returns 'XX-0000'.",
+  "Whenever normalize_sku reads the part after the first two letters, it ignores hyphens and spaces.",
+  "Whenever normalize_sku reads the part after the first two letters, it treats the letters O and o as 0 and the letters I and l as 1.",
+  "Whenever the part after the first two letters of a normalize_sku code contains any other character besides digits, hyphens, spaces and those four lookalike letters (including a third letter), it returns 'XX-0000'.",
+  "Whenever normalize_sku finds no digits after the first two letters, it returns 'XX-0000'.",
+  "Whenever normalize_sku has more than 4 digits, it keeps only the last 4 digits; whenever it has fewer than 4, it pads with leading zeros to 4.",
+  "Whenever normalize_sku returns a valid code, the format is the two letters in uppercase, a hyphen, and the 4 digits.",
+  "Whenever mask_card gets NULL, it returns NULL.",
+  "Whenever mask_card gets a value that is not text, it converts it to text first.",
+  "Whenever mask_card reads a card number, it removes all spaces and hyphens before checking it.",
+  "Whenever mask_card gets something that, after removing spaces and hyphens, is not made only of the digits 0-9 or whose length is not between 12 and 19 digits inclusive (including empty text), it returns 'INVALID'.",
+  "Whenever mask_card gets a valid card number, it returns every digit except the last 4 replaced by '*', with no spaces or hyphens in the result, so the output length equals the digit count.",
+  "Whenever nps_class gets a NULL or non-numeric score, it returns NULL; numeric text counts as a number.",
+  "Whenever nps_class gets a fractional score, it first rounds it to the nearest whole number with halves rounding up (6.5 becomes 7, -0.5 becomes 0).",
+  "Whenever the rounded nps_class score is below 0 or above 10, it returns 'invalid'.",
+  "Whenever the rounded nps_class score is 0 to 6, it returns 'detractor'.",
+  "Whenever the rounded nps_class score is 7 or 8, it returns 'passive'.",
+  "Whenever the rounded nps_class score is 9 or 10, it returns 'promoter'.",
+  "Whenever split_bill gets a NULL or non-numeric total_cents or people, it returns NULL; numeric text counts as a number.",
+  "Whenever split_bill gets a fractional people count, it drops the fraction toward zero first.",
+  "Whenever split_bill has a people count below 1 after dropping the fraction (zero, negative, or between 0 and 1), it returns NULL.",
+  "Whenever split_bill divides a total that does not split into whole cents, it rounds each share up to the next cent (toward positive infinity).",
+  "Whenever split_bill gets a total_cents of zero, it returns 0; whenever the total is negative, it still divides and rounds toward positive infinity (a share of -33.3 becomes -33).",
+  "Whenever mid_value gets values, it ignores NULLs and any value that is not numeric (numeric text counts as a number and is included).",
+  "Whenever mid_value has no numeric values in the group (empty group or all ignored), it returns NULL.",
+  "Whenever mid_value has an odd number of numeric values, it returns the middle one after sorting ascending.",
+  "Whenever mid_value has an even number of numeric values, it returns the lower of the two middle values, not their average."
+ ],
+ "questions": [
+  {
+   "id": "q01",
+   "situation": "Your team asks for an invoice to be due 5 business days after Monday 6 October. Which days should be skipped when counting?",
+   "options": [
+    "Only Saturdays and Sundays are skipped",
+    "Saturdays, Sundays and our listed public holidays are skipped (e.g. Diwali, Republic Day)",
+    "Sundays and public holidays are skipped, but Saturday is a working day for us"
+   ]
+  },
+  {
+   "id": "q02",
+   "situation": "An order is placed on Saturday and promised '2 business days' later. Where does the counting begin?",
+   "options": [
+    "Monday is day 1, so it is due Tuesday",
+    "Monday is day 0, so it is due Wednesday",
+    "Treat a weekend order as if it came in on Friday evening, so it is due Tuesday of the same week"
+   ]
+  },
+  {
+   "id": "q03",
+   "situation": "Your financial year runs April to March. A sale is made on 15 May 2026. How should it be labelled?",
+   "options": [
+    "FY2026-Q1 (the calendar year we start in, quarter counted from April)",
+    "FY2027-Q1 (named for the year the financial year ends)",
+    "Just Q1 with no year in the label"
+   ]
+  },
+  {
+   "id": "q04",
+   "situation": "Sharma Traders owes \u20b920,000 and pays 30 days late. How is the late fee worked out?",
+   "options": [
+    "A one-time 1.5% of the invoice, \u20b9300, once it is overdue",
+    "1.5% for every month late, so it grows the longer they wait",
+    "A fixed \u20b950 for each day late, no matter the invoice size"
+   ]
+  },
+  {
+   "id": "q05",
+   "situation": "Mr Iyer pays an invoice 3 days after the due date. Does he pay a fee?",
+   "options": [
+    "Yes, the fee applies from the first day late",
+    "No, the first 7 days late are free, fee starts after that",
+    "No, the first 15 days late are free, fee starts after that"
+   ]
+  },
+  {
+   "id": "q06",
+   "situation": "A very small invoice of \u20b9100 is 10 days late, and a very large invoice of \u20b910,00,000 is also late. Are there limits on the fee?",
+   "options": [
+    "No limits, the fee is just the percentage (\u20b91.50 and \u20b915,000 here)",
+    "There is a minimum fee of \u20b950, so even small invoices pay at least that",
+    "There is a minimum of \u20b950 and the fee never goes above \u20b95,000"
+   ]
+  },
+  {
+   "id": "q07",
+   "situation": "A customer has 5,000 points exactly. Which membership level are they?",
+   "options": [
+    "Gold, the higher level (5,000 and above is Gold)",
+    "Silver, they need to go above 5,000 to reach Gold",
+    "It depends on how much they spent this year, not points alone"
+   ]
+  },
+  {
+   "id": "q08",
+   "situation": "A customer returned a big order and their points balance dropped to minus 200. What level are they?",
+   "options": [
+    "Lowest level (Bronze), they stay a member",
+    "No level at all, they lose membership until points are positive",
+    "They keep the level they had before the return"
+   ]
+  },
+  {
+   "id": "q09",
+   "situation": "A receipt prints the card 4111 1111 1111 1234. What may the customer and staff see?",
+   "options": [
+    "Only the last 4 digits, everything else hidden",
+    "The first 6 and last 4 digits, the middle hidden",
+    "Only the last 2 digits"
+   ]
+  },
+  {
+   "id": "q10",
+   "situation": "Staff type a card number with only 3 digits, or with a letter in it, by mistake. What should the receipt show?",
+   "options": [
+    "Hide everything, show nothing from what was typed",
+    "Refuse to print and show a warning to the staff member",
+    "Show whatever was typed so staff can spot the mistake"
+   ]
+  },
+  {
+   "id": "q11",
+   "situation": "A staff member types the product code ' ab 123_x ' into the till. How should it be tidied up for the catalogue?",
+   "options": [
+    "AB-123-X (trimmed, capitals, dashes in place of spaces and underscores)",
+    "AB123X (all spaces and dashes removed)",
+    "AB-123-X, plus always add our company prefix in front, such as KR-AB-123-X"
+   ]
+  },
+  {
+   "id": "q12",
+   "situation": "A staff member types a code containing the letter O where the catalogue only has zeros (e.g. 'AB-1O0'), or leaves it blank. What happens?",
+   "options": [
+    "Blank gives no code, odd characters are refused, and O is never silently swapped for 0",
+    "Letter O and zero, and letter I and one, are treated as the same and fixed automatically",
+    "Any code that doesn't match the catalogue is refused, including blank ones, with a message to staff"
+   ]
+  },
+  {
+   "id": "q13",
+   "situation": "A customer scores the survey 6 out of 10. How do you count them?",
+   "options": [
+    "Detractor (0 to 6 are detractors)",
+    "Passive (we treat 6 as neutral)",
+    "Detractor only up to 5, so 6 and 7 are passive and 8 and above promoters"
+   ]
+  },
+  {
+   "id": "q14",
+   "situation": "A 1.2 kg parcel goes to Zone B. How is the price built up?",
+   "options": [
+    "A base charge for the zone plus a set amount for each extra 500g, rounded up to the next 500g",
+    "A different fixed price for each weight band and zone, from our rate card",
+    "One flat price per zone regardless of weight, up to a limit"
+   ]
+  },
+  {
+   "id": "q15",
+   "situation": "Someone enters a delivery zone we do not serve, a parcel of 0 g, or a 60 kg parcel. What should happen?",
+   "options": [
+    "Unknown zone or zero weight is refused, but very heavy parcels are priced by the same rule",
+    "Unknown zone or zero weight is refused, and anything over 30 kg is also refused",
+    "Heavy parcels over 30 kg are accepted but charged as freight at a higher rate per kg"
+   ]
+  },
+  {
+   "id": "q16",
+   "situation": "Four friends split a \u20b91,000.10 bill at your restaurant. It cannot divide evenly. Who covers the leftover paise?",
+   "options": [
+    "Everyone pays the same, rounded up, so the restaurant is never short (may collect a little extra)",
+    "Everyone pays the rounded-down amount and the restaurant absorbs the difference",
+    "Three pay the lower amount and one person (the first) pays the extra paise so the total is exact"
+   ]
+  },
+  {
+   "id": "q17",
+   "situation": "A waiter enters a bill split between 0 people by mistake. What should happen?",
+   "options": [
+    "Refuse with an error message",
+    "Treat it as 1 person, so the whole bill shows",
+    "Show no amount and leave it blank"
+   ]
+  },
+  {
+   "id": "q18",
+   "situation": "Five orders in a group are worth \u20b9100, \u20b9200, \u20b9300 and \u20b9400. What is the 'middle value' of the four?",
+   "options": [
+    "\u20b9250, the average of the two middle orders",
+    "\u20b9200, the lower of the two middle orders",
+    "\u20b9300, the higher of the two middle orders"
+   ]
+  },
+  {
+   "id": "q19",
+   "situation": "A group of orders has some with the amount left blank, or every amount in the group is blank. What is the middle value?",
+   "options": [
+    "Blanks are ignored, and a group with no amounts at all shows nothing",
+    "Blanks count as \u20b90, and a group with no amounts shows \u20b90",
+    "If any amount in the group is blank, no middle value is shown for that group"
+   ]
+  }
+ ],
+ "answers": {},
+ "interview_minutes": 4.9,
+ "owner_replies": 24,
+ "cost_usd": {
+  "documenter": 0.166459,
+  "owner": 1.6469445999999999,
+  "judge": 0.1970901
+ },
+ "labels": [
+  {
+   "function": "late_fee",
+   "decision": 0,
+   "label": "right",
+   "asked": true,
+   "H": "right",
+   "R": "right",
+   "note": "H: only when >5 days late"
+  },
+  {
+   "function": "late_fee",
+   "decision": 1,
+   "label": "right",
+   "asked": true,
+   "H": "right",
+   "R": "right",
+   "note": "H has 2.50 minimum"
+  },
+  {
+   "function": "late_fee",
+   "decision": 2,
+   "label": "absent",
+   "asked": true,
+   "H": "absent",
+   "R": "right",
+   "note": "H omits the cap"
+  },
+  {
+   "function": "late_fee",
+   "decision": 3,
+   "label": "absent",
+   "asked": false,
+   "H": "absent",
+   "R": "right",
+   "note": "H silent on rounding"
+  },
+  {
+   "function": "ship_cost",
+   "decision": 0,
+   "label": "right",
+   "asked": true,
+   "H": "right",
+   "R": "right",
+   "note": ""
+  },
+  {
+   "function": "ship_cost",
+   "decision": 1,
+   "label": "absent",
+   "asked": false,
+   "H": "absent",
+   "R": "right",
+   "note": "H silent on case"
+  },
+  {
+   "function": "ship_cost",
+   "decision": 2,
+   "label": "right",
+   "asked": true,
+   "H": "right",
+   "R": "right",
+   "note": "H: unknown zone 12.00 base"
+  },
+  {
+   "function": "ship_cost",
+   "decision": 3,
+   "label": "right",
+   "asked": true,
+   "H": "right",
+   "R": "right",
+   "note": "25.00 over 20kg"
+  },
+  {
+   "function": "loyalty_tier",
+   "decision": 0,
+   "label": "absent",
+   "asked": true,
+   "H": "absent",
+   "R": "right",
+   "note": "H has no loyalty rule"
+  },
+  {
+   "function": "loyalty_tier",
+   "decision": 1,
+   "label": "absent",
+   "asked": true,
+   "H": "absent",
+   "R": "right",
+   "note": "H has no loyalty rule"
+  },
+  {
+   "function": "fiscal_quarter",
+   "decision": 0,
+   "label": "absent",
+   "asked": false,
+   "H": "absent",
+   "R": "right",
+   "note": "not asked"
+  },
+  {
+   "function": "fiscal_quarter",
+   "decision": 1,
+   "label": "absent",
+   "asked": false,
+   "H": "absent",
+   "R": "right",
+   "note": "not asked"
+  },
+  {
+   "function": "fiscal_quarter",
+   "decision": 2,
+   "label": "absent",
+   "asked": false,
+   "H": "absent",
+   "R": "right",
+   "note": "not asked"
+  },
+  {
+   "function": "biz_days_add",
+   "decision": 0,
+   "label": "right",
+   "asked": true,
+   "H": "right",
+   "R": "right",
+   "note": ""
+  },
+  {
+   "function": "biz_days_add",
+   "decision": 1,
+   "label": "absent",
+   "asked": false,
+   "H": "absent",
+   "R": "right",
+   "note": "n=0 not asked"
+  },
+  {
+   "function": "biz_days_add",
+   "decision": 2,
+   "label": "absent",
+   "asked": false,
+   "H": "absent",
+   "R": "right",
+   "note": "not asked"
+  },
+  {
+   "function": "normalize_sku",
+   "decision": 0,
+   "label": "right",
+   "asked": true,
+   "H": "right",
+   "R": "right",
+   "note": ""
+  },
+  {
+   "function": "normalize_sku",
+   "decision": 1,
+   "label": "right",
+   "asked": true,
+   "H": "right",
+   "R": "right",
+   "note": ""
+  },
+  {
+   "function": "normalize_sku",
+   "decision": 2,
+   "label": "right",
+   "asked": true,
+   "H": "right",
+   "R": "right",
+   "note": ""
+  },
+  {
+   "function": "mask_card",
+   "decision": 0,
+   "label": "absent",
+   "asked": false,
+   "H": "absent",
+   "R": "right",
+   "note": "stripping not stated in H"
+  },
+  {
+   "function": "mask_card",
+   "decision": 1,
+   "label": "partial",
+   "asked": true,
+   "H": "partial",
+   "R": "right",
+   "note": "H: INVALID but no 12-19 range"
+  },
+  {
+   "function": "nps_class",
+   "decision": 0,
+   "label": "right",
+   "asked": true,
+   "H": "right",
+   "R": "right",
+   "note": "via follow-up"
+  },
+  {
+   "function": "nps_class",
+   "decision": 1,
+   "label": "right",
+   "asked": true,
+   "H": "right",
+   "R": "right",
+   "note": "via follow-up"
+  },
+  {
+   "function": "split_bill",
+   "decision": 0,
+   "label": "right",
+   "asked": true,
+   "H": "right",
+   "R": "right",
+   "note": ""
+  },
+  {
+   "function": "mid_value",
+   "decision": 0,
+   "label": "right",
+   "asked": true,
+   "H": "right",
+   "R": "right",
+   "note": ""
+  }
+ ]
+}

@@ -1,0 +1,86 @@
+[02:28:48] predictions registered on origin/main: gates/gate39/prompts/PREDICTIONS.md
+[02:28:48] rule-giver writing private rules (headless Claude Code)...
+[02:31:37] rules checked: 10 functions, 144 calls, deterministic
+[02:31:37] declared decisions per function: 1:2, 2:3, 3:3, 4:2
+[02:31:38] starting repo and hidden suite built
+[02:31:38] decision tour built (without contrasts): 25 examples in 12 visible tests
+[02:31:38] pre-launch: python3 gates/gate39/referee/wind_tunnel.py {run} {oracle}
+[02:31:39] wind tunnel: documenter writing the owner's complete rule sheet...
+[02:32:24] wind tunnel: R: 70 rules ($0.17)
+[02:32:24] wind tunnel: interview starting (hive.interview, terminal mode)...
+[02:33:13] wind tunnel: owner answered #1: "Saturdays and Sundays are skipped, along with three fixed holidays: New Year's Day (Jan 1)"
+[02:33:23] wind tunnel: owner answered #2: 'A'
+[02:33:32] wind tunnel: owner answered #3: 'The label is FY27-Q1. The year is the one the financial year ends in, written as two digit'
+[02:33:44] wind tunnel: owner answered #4: 'None of these. The fee is 2% of the invoice for each month or part-month late, with no fee'
+[02:33:57] wind tunnel: owner answered #5: 'A'
+[02:34:05] wind tunnel: owner answered #6: 'They have no level. A balance below zero is marked "void" instead of Bronze, and they go b'
+[02:34:13] wind tunnel: owner answered #7: 'A'
+[02:34:19] wind tunnel: owner answered #8: 'Print the word INVALID in place of the card number. Show nothing of what was typed, and do'
+[02:34:32] wind tunnel: owner answered #9: "Neither. Our catalogue format is two letters, a dash, then four digits. A code that doesn'"
+[02:34:42] wind tunnel: owner answered #10: 'A'
+[02:34:49] wind tunnel: owner answered #11: 'A'
+[02:34:57] wind tunnel: owner answered #12: "None of those. We don't refuse any of them. An unknown zone is charged as a standard zone "
+[02:35:07] wind tunnel: owner answered #13: 'A'
+[02:35:13] wind tunnel: owner answered #14: 'C'
+[02:35:23] wind tunnel: owner answered #15: 'For an even count, the policy returns v[n//2 - 1], the lower middle value, which is ₹200.\n'
+[02:35:33] wind tunnel: owner answered #16: 'A'
+[02:35:55] wind tunnel: owner answered #17: ''
+[02:36:00] wind tunnel: owner answered #18: ''
+[02:36:05] wind tunnel: owner answered #19: 'Mostly right, but you left out a minimum: once a fee applies (more than 5 days late), it i'
+[02:36:11] wind tunnel: owner answered #20: ''
+[02:36:19] wind tunnel: owner answered #21: 'Not quite: codes are tidied up, not rejected for being off-format. Spaces around the code '
+[02:36:26] wind tunnel: owner answered #22: ''
+[02:36:56] wind tunnel: owner answered #23: '2'
+[02:37:15] wind tunnel: owner answered #24: 'Scores are rounded to the nearest whole number first, with halves going up. If the rounded'
+[02:37:17] wind tunnel: H: 10 rules from 19 questions, 24 owner replies, 4.9 min, owner $1.65
+[02:37:17] wind tunnel: judge labelling every declared decision...
+[02:37:44] wind tunnel: judge: 25 labels ($0.20)
+[02:37:44] wind tunnel: ask texts written: /home/claude/hive/runs/g39/ask_texts.md
+N0: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g39/upN0.git
+H: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g39/upH.git
+R: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g39/upR.git
+next: python3 lab/launch.py --run g39
+T: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g39/upT.git
+next: python3 lab/launch.py --run g39
+[02:37:46] launching workers...
+launched H-w1
+launched H-w2
+launched H-w3
+launched N0-w1
+launched N0-w2
+launched N0-w3
+launched R-w1
+H-w1 finished: exit 0, 0.7 min, tokens 546735, cost 0.19608810000000002
+launched R-w2
+N0-w1 finished: exit 0, 0.7 min, tokens 471601, cost 0.188631
+launched R-w3
+H-w3 finished: exit 0, 0.8 min, tokens 404624, cost 0.1693782
+launched T-w1
+N0-w2 finished: exit 0, 0.8 min, tokens 510058, cost 0.1780045
+launched T-w2
+N0-w3 finished: exit 0, 0.9 min, tokens 570003, cost 0.1992903
+launched T-w3
+R-w3 finished: exit 0, 0.2 min, tokens 204262, cost 0.11006500000000001
+H-w2 finished: exit 0, 1.1 min, tokens 729263, cost 0.2548883
+R-w1 finished: exit 0, 0.6 min, tokens 431402, cost 0.17635900000000002
+T-w1 finished: exit 0, 1.0 min, tokens 486314, cost 0.21696520000000002
+R-w2 finished: exit 0, 1.1 min, tokens 522513, cost 0.25274120000000005
+T-w2 finished: exit 0, 1.1 min, tokens 480749, cost 0.2366502
+T-w3 finished: exit 0, 2.2 min, tokens 234314, cost 0.0920204
+wrote /home/claude/hive/runs/g39/agents.csv
+[02:41:02] scoring every arm call by call...
+# g39: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 38.4% | 23.2%–54.0% |
+| H | 76.0% | 57.2%–92.0% |
+| R | 100.0% | 100.0%–100.0% |
+| T | 75.6% | 65.6%–84.4% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| H-N0 | +37.6 | +19.2 to +57.2 |
+| R-N0 | +61.6 | +45.2 to +76.8 |
+| T-N0 | +37.2 | +23.6 to +50.8 |
+[02:41:03] done. Next: write the gate RESULTS.md from runs/g39/summary.md, update BRAIN.md and lab/QUEUE.md, push.

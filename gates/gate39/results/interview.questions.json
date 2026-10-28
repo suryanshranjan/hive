@@ -1,0 +1,175 @@
+{
+ "qs": [
+  {
+   "id": "q01",
+   "situation": "Your team asks for an invoice to be due 5 business days after Monday 6 October. Which days should be skipped when counting?",
+   "options": [
+    "Only Saturdays and Sundays are skipped",
+    "Saturdays, Sundays and our listed public holidays are skipped (e.g. Diwali, Republic Day)",
+    "Sundays and public holidays are skipped, but Saturday is a working day for us"
+   ]
+  },
+  {
+   "id": "q02",
+   "situation": "An order is placed on Saturday and promised '2 business days' later. Where does the counting begin?",
+   "options": [
+    "Monday is day 1, so it is due Tuesday",
+    "Monday is day 0, so it is due Wednesday",
+    "Treat a weekend order as if it came in on Friday evening, so it is due Tuesday of the same week"
+   ]
+  },
+  {
+   "id": "q03",
+   "situation": "Your financial year runs April to March. A sale is made on 15 May 2026. How should it be labelled?",
+   "options": [
+    "FY2026-Q1 (the calendar year we start in, quarter counted from April)",
+    "FY2027-Q1 (named for the year the financial year ends)",
+    "Just Q1 with no year in the label"
+   ]
+  },
+  {
+   "id": "q04",
+   "situation": "Sharma Traders owes \u20b920,000 and pays 30 days late. How is the late fee worked out?",
+   "options": [
+    "A one-time 1.5% of the invoice, \u20b9300, once it is overdue",
+    "1.5% for every month late, so it grows the longer they wait",
+    "A fixed \u20b950 for each day late, no matter the invoice size"
+   ]
+  },
+  {
+   "id": "q05",
+   "situation": "Mr Iyer pays an invoice 3 days after the due date. Does he pay a fee?",
+   "options": [
+    "Yes, the fee applies from the first day late",
+    "No, the first 7 days late are free, fee starts after that",
+    "No, the first 15 days late are free, fee starts after that"
+   ]
+  },
+  {
+   "id": "q06",
+   "situation": "A very small invoice of \u20b9100 is 10 days late, and a very large invoice of \u20b910,00,000 is also late. Are there limits on the fee?",
+   "options": [
+    "No limits, the fee is just the percentage (\u20b91.50 and \u20b915,000 here)",
+    "There is a minimum fee of \u20b950, so even small invoices pay at least that",
+    "There is a minimum of \u20b950 and the fee never goes above \u20b95,000"
+   ]
+  },
+  {
+   "id": "q07",
+   "situation": "A customer has 5,000 points exactly. Which membership level are they?",
+   "options": [
+    "Gold, the higher level (5,000 and above is Gold)",
+    "Silver, they need to go above 5,000 to reach Gold",
+    "It depends on how much they spent this year, not points alone"
+   ]
+  },
+  {
+   "id": "q08",
+   "situation": "A customer returned a big order and their points balance dropped to minus 200. What level are they?",
+   "options": [
+    "Lowest level (Bronze), they stay a member",
+    "No level at all, they lose membership until points are positive",
+    "They keep the level they had before the return"
+   ]
+  },
+  {
+   "id": "q09",
+   "situation": "A receipt prints the card 4111 1111 1111 1234. What may the customer and staff see?",
+   "options": [
+    "Only the last 4 digits, everything else hidden",
+    "The first 6 and last 4 digits, the middle hidden",
+    "Only the last 2 digits"
+   ]
+  },
+  {
+   "id": "q10",
+   "situation": "Staff type a card number with only 3 digits, or with a letter in it, by mistake. What should the receipt show?",
+   "options": [
+    "Hide everything, show nothing from what was typed",
+    "Refuse to print and show a warning to the staff member",
+    "Show whatever was typed so staff can spot the mistake"
+   ]
+  },
+  {
+   "id": "q11",
+   "situation": "A staff member types the product code ' ab 123_x ' into the till. How should it be tidied up for the catalogue?",
+   "options": [
+    "AB-123-X (trimmed, capitals, dashes in place of spaces and underscores)",
+    "AB123X (all spaces and dashes removed)",
+    "AB-123-X, plus always add our company prefix in front, such as KR-AB-123-X"
+   ]
+  },
+  {
+   "id": "q12",
+   "situation": "A staff member types a code containing the letter O where the catalogue only has zeros (e.g. 'AB-1O0'), or leaves it blank. What happens?",
+   "options": [
+    "Blank gives no code, odd characters are refused, and O is never silently swapped for 0",
+    "Letter O and zero, and letter I and one, are treated as the same and fixed automatically",
+    "Any code that doesn't match the catalogue is refused, including blank ones, with a message to staff"
+   ]
+  },
+  {
+   "id": "q13",
+   "situation": "A customer scores the survey 6 out of 10. How do you count them?",
+   "options": [
+    "Detractor (0 to 6 are detractors)",
+    "Passive (we treat 6 as neutral)",
+    "Detractor only up to 5, so 6 and 7 are passive and 8 and above promoters"
+   ]
+  },
+  {
+   "id": "q14",
+   "situation": "A 1.2 kg parcel goes to Zone B. How is the price built up?",
+   "options": [
+    "A base charge for the zone plus a set amount for each extra 500g, rounded up to the next 500g",
+    "A different fixed price for each weight band and zone, from our rate card",
+    "One flat price per zone regardless of weight, up to a limit"
+   ]
+  },
+  {
+   "id": "q15",
+   "situation": "Someone enters a delivery zone we do not serve, a parcel of 0 g, or a 60 kg parcel. What should happen?",
+   "options": [
+    "Unknown zone or zero weight is refused, but very heavy parcels are priced by the same rule",
+    "Unknown zone or zero weight is refused, and anything over 30 kg is also refused",
+    "Heavy parcels over 30 kg are accepted but charged as freight at a higher rate per kg"
+   ]
+  },
+  {
+   "id": "q16",
+   "situation": "Four friends split a \u20b91,000.10 bill at your restaurant. It cannot divide evenly. Who covers the leftover paise?",
+   "options": [
+    "Everyone pays the same, rounded up, so the restaurant is never short (may collect a little extra)",
+    "Everyone pays the rounded-down amount and the restaurant absorbs the difference",
+    "Three pay the lower amount and one person (the first) pays the extra paise so the total is exact"
+   ]
+  },
+  {
+   "id": "q17",
+   "situation": "A waiter enters a bill split between 0 people by mistake. What should happen?",
+   "options": [
+    "Refuse with an error message",
+    "Treat it as 1 person, so the whole bill shows",
+    "Show no amount and leave it blank"
+   ]
+  },
+  {
+   "id": "q18",
+   "situation": "Five orders in a group are worth \u20b9100, \u20b9200, \u20b9300 and \u20b9400. What is the 'middle value' of the four?",
+   "options": [
+    "\u20b9250, the average of the two middle orders",
+    "\u20b9200, the lower of the two middle orders",
+    "\u20b9300, the higher of the two middle orders"
+   ]
+  },
+  {
+   "id": "q19",
+   "situation": "A group of orders has some with the amount left blank, or every amount in the group is blank. What is the middle value?",
+   "options": [
+    "Blanks are ignored, and a group with no amounts at all shows nothing",
+    "Blanks count as \u20b90, and a group with no amounts shows \u20b90",
+    "If any amount in the group is blank, no middle value is shown for that group"
+   ]
+  }
+ ]
+}
