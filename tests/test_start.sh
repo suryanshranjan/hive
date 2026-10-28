@@ -4,7 +4,7 @@
 set -u
 python3 -c '' 2>/dev/null && PY=python3 || PY=python; export PY   # Windows has python, not python3
 [ "$PY" = python ] && export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false   # Windows: test repos keep LF
-HIVE=$(pwd); T=$(mktemp -d); export PYTHONPATH=$HIVE HOME=$T HIVE_WORKER_CMD="sh $HIVE/tests/fake_assuming_worker.sh" HIVE_EXPLAIN_CMD="$PY $HIVE/tests/fake_explain.py"
+HIVE=$(pwd); T=$(mktemp -d); export PYTHONPATH=$HIVE HOME=$T USERPROFILE=$T HIVE_WORKER_CMD="sh $HIVE/tests/fake_assuming_worker.sh" HIVE_EXPLAIN_CMD="$PY $HIVE/tests/fake_explain.py"
 fail=0; check() { if [ "$2" = "$3" ]; then echo "ok   $1"; else echo "FAIL $1 (got $2, expected $3)"; fail=1; fi; }
 cd $T && git init -q -b main project && cd project && git config user.email t@t && git config user.name t
 printf 'from fees import fee\ndef test_fee(): assert fee(10000, 2000) == 1200\n' > test_fees.py

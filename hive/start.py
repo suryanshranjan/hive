@@ -76,6 +76,13 @@ def run_tests(root, cmd, junit_rel='.hive/junit.xml'):
     subprocess.run(cmd, shell=True, cwd=root, capture_output=True)
     return junit.results(path) if os.path.exists(path) else {}
 
+def _rmtree(path):
+    """Delete a folder, including git's read-only files (Windows refuses those: found running Hive natively there)."""
+    import stat
+    def writable(func, p, *_):
+        os.chmod(p, stat.S_IWRITE); func(p)
+    shutil.rmtree(path, onerror=writable)
+
 def _link(src_root, dst_root, links):
     for link in links:
         src, dst = os.path.join(src_root, link), os.path.join(dst_root, link)
@@ -368,7 +375,7 @@ def _deliver(state):
     say('\nLet me check the result.')
     result = os.path.join(state['home'], 'result')
     if os.path.exists(result):
-        shutil.rmtree(result)
+        _rmtree(result)
     sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', state['b'], os.path.join(state['final'], 'up.git'), result)
     _link(state['repo'], result, state['links'])
     before = state['before']; passed = sum(before.values())

@@ -4,7 +4,7 @@
 set -u
 python3 -c '' 2>/dev/null && PY=python3 || PY=python; export PY   # Windows has python, not python3
 [ "$PY" = python ] && export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false   # Windows: test repos keep LF
-HIVE=$(pwd); T=$(mktemp -d); export HOME=$T
+HIVE=$(pwd); T=$(mktemp -d); export HOME=$T USERPROFILE=$T
 mkdir -p $T/bin && printf '#!/bin/sh\necho OK\n' > $T/bin/claude && chmod +x $T/bin/claude
 export PATH=$T/bin:$PATH   # a stand-in Claude Code (the login probe is skipped)
 fail=0; check() { if [ "$2" = "$3" ]; then echo "ok   $1"; else echo "FAIL $1 (got $2, expected $3)"; fail=1; fi; }

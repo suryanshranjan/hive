@@ -12,6 +12,7 @@ import glob, json, os, time
 from . import explain, memory, telegram
 
 RUNS = os.path.join(os.path.expanduser('~'), '.hive', 'runs')   # where `hive start` keeps its builds
+PIDFILE = os.path.join(os.path.expanduser('~'), '.hive', 'listen.pid')   # the listener running on this computer
 
 CLASSIFY = """You are Hive, a business owner's software assistant, reading his newest message in the context of your
 conversation. The conversation so far (oldest first):
@@ -296,6 +297,10 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
             print('Not connected yet: run hive telegram setup.'); return 1
         ch = telegram.Channel(cfg, listener=True)
     CURRENT['ch'] = ch   # a background build reports its problems here
+    try:   # so a move to the cloud can stop this listener: one Hive reads his chat at a time
+        os.makedirs(os.path.dirname(PIDFILE), exist_ok=True); open(PIDFILE, 'w').write(str(os.getpid()))
+    except OSError:
+        pass
     print("Listening on Telegram. Tell Hive anything, any time: a change of mind, a new rule, or 'status'. Ctrl+C to stop.",
           flush=True)
     try:

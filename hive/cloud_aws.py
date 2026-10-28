@@ -109,7 +109,7 @@ def new(repo='.', size='t3.large', region=None, profile=None, with_login=True, s
     say(f"  Ready at {m['ip']}.")
     return cloud.go(repo, target, with_login, start, say, key=None if local else m['key'])
 
-def stop(ask=input, say=print, repo='.'):
+def stop(ask=input, say=print, repo='.', relisten=True):
     """Bring the work done in the cloud back to this computer, then delete the machine `hive cloud --new` made, with its
     key and firewall rule (the owner: "when we close the instance, the development must come back to local")."""
     if not os.path.exists(STATE()):   # e.g. asked on the cloud machine itself, which never holds the owner's AWS keys
@@ -140,4 +140,24 @@ def stop(ask=input, say=print, repo='.'):
     if os.path.exists(cfg) and json.load(open(cfg)).get('to', '').endswith(m.get('ip', '-')):
         os.remove(cfg)
     say("Deleted: the machine, its key and its firewall rule. Nothing is left running.")
+    if relisten:
+        _home(repo, say)
     return 0
+
+def _home(repo, say=print):
+    """Hive is back on this computer: start listening on his Telegram again and tell him, so his phone has no gap."""
+    from . import telegram
+    cfg = telegram.load()
+    if not cfg or os.environ.get('HIVE_NO_RELISTEN'):
+        return
+    import sys
+    log = os.path.join(os.path.expanduser('~'), '.hive', 'listen.log')
+    kw = {'creationflags': 0x00000008 | 0x00000200} if os.name == 'nt' else {'start_new_session': True}   # outlives this
+    subprocess.Popen([sys.executable, '-m', 'hive', 'listen'], cwd=os.path.abspath(repo), stdout=open(log, 'a'),
+                     stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, **kw)
+    say("Hive is back on this computer and listening on your Telegram (log: ~/.hive/listen.log).")
+    try:
+        telegram.Channel(cfg).send("🏠 <b>I'm back on your computer.</b> Everything built in the cloud is here, and so "
+                                   "is our conversation. Carry on whenever you like.", html=True)
+    except Exception:
+        pass
