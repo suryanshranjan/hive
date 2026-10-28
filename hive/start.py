@@ -5,7 +5,7 @@ and their assumptions to the owner in plain words, sends back what the owner cor
 over a branch. The owner's own branches are never changed: the result arrives as a new branch, hive/<name>."""
 import csv, glob, json, os, re, shlex, shutil, subprocess, threading, time
 
-from . import junit, memory, owner, swarm, telegram
+from . import interview, junit, memory, owner, swarm, telegram
 from .guard import sh
 
 RUNS = os.path.join(os.path.expanduser('~'), '.hive', 'runs')
@@ -132,7 +132,7 @@ def _phase(source, run, workers, goal, minutes, questions, assumptions, narrate_
     narrator.tick(); log.close()
     return meta['branch'], result.get('code', 1)
 
-def start(repo='.', workers=4, goal=None, minutes=40, overnight=False):
+def start(repo='.', workers=4, goal=None, minutes=40, overnight=False, interview_first=True):
     repo = os.path.abspath(repo)
     say("\nHive here. What are we building today?")
     goal = goal or _ask("(Describe it in a sentence or two, or give the path of a file that describes it.)")
@@ -213,6 +213,14 @@ def start(repo='.', workers=4, goal=None, minutes=40, overnight=False):
     if rules:
         k = len(memory.load(repo))
         say(f"I'll remind them of your {_n(k, 'earlier ruling')} on this project, so you won't be asked those again.")
+    if interview_first and (phone or not overnight):   # the owner is here: ask him first (Gates 30-35)
+        say("\nFirst, a few quick situations where your own rules matter" + (", on your phone." if phone else ":"))
+        asked = interview.interview(goal_text, phone, [r['text'] for r in memory.load(repo)], ask=lambda p: _ask(p, ''))
+        if asked:
+            for r in asked:
+                memory.add(repo, r, 'interview')
+            rules += interview.instructions(asked)
+            say(f"  Thank you. The builders will encode your {_n(len(asked), 'rule')} as tests before anything lands.")
     say(f'\n[{_now()}] Starting.')
     state = dict(repo=repo, branch=branch, name=name, home=home, test_cmd=test_cmd, links=links, goal=goal_text,
                  rules=rules, workers=workers, minutes=minutes, before=before, started=time.time(), overnight=overnight)

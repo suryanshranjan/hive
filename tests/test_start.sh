@@ -9,10 +9,15 @@ printf 'from fees import fee\ndef test_fee(): assert fee(10000, 2000) == 1200\n'
 printf 'from payouts import payout\ndef test_payout(): assert payout(10000, 2000) == 12000\n' > test_payouts.py
 printf '__pycache__/\n.pytest_cache/\n' > .gitignore
 git add -A && git commit -qm "tests for fees and payouts"; before=$(git rev-parse HEAD)
-# the owner: types the goal, then corrects the one assumption in the review
-printf 'Implement creator fees and payouts.\nNo: with no bonus, the fee is 10 percent of the cash.\n' | \
+# the owner: types the goal; answers the interview (a letter, then his own words, then confirms the reading);
+# then corrects the one assumption in the review
+printf 'Implement creator fees and payouts.\nA\nOnly charge a late fee after a week.\n\nNo: with no bonus, the fee is 10 percent of the cash.\n' | \
   python3 -m hive start --workers 2 > $T/out.txt 2>&1
 check "hive exits cleanly" $? 0
+check "it interviews the owner before building" "$(grep -c 'First, a few quick situations' $T/out.txt)" 1
+check "both answers become rules the builders must encode" "$(grep -c 'encode your 2 rules as tests' $T/out.txt)" 1
+check "the builders' instructions carry his rules" \
+  "$(grep -c -e 'No fee on a tip' -e 'A late fee is charged only after 7 days' $(ls -td $T/.hive/runs/*/ | head -1)build/prompts/w1.md)" 2
 check "it found the tests on its own" "$(grep -c 'Your tests: pytest. 2 tests, 0 passing' $T/out.txt)" 1
 check "it narrated the builders' work" "$(grep -c 'landed: implement' $T/out.txt)" 3
 check "it asked the owner about the assumption" "$(grep -c "assumption your description didn't cover" $T/out.txt)" 1
@@ -50,9 +55,10 @@ check "a change of mind runs one fix round on the latest build and re-checks eve
 check "the owner's ruling is kept for this project, once" "$(python3 -m hive rules | grep -c '10 percent of the cash')" 1
 git checkout -q main
 printf 'Implement creator fees and payouts.\n' | python3 -m hive start --workers 1 --overnight > $T/third.txt 2>&1
-check "the next build says it will remind the builders" "$(grep -c 'remind them of your 1 earlier ruling' $T/third.txt)" 1
+check "the next build says it will remind the builders (2 from the interview, 1 from the review)" \
+  "$(grep -c 'remind them of your 3 earlier rulings' $T/third.txt)" 1
 check "and the builders' instructions carry the ruling" \
   "$(grep -c '10 percent of the cash' $(ls -td $T/.hive/runs/*/ | head -1)build/prompts/w1.md)" 1
 check "a ruling can be forgotten" "$(python3 -m hive rules forget 1 | grep -c 'Forgotten')" 1
-check "and then none are kept" "$(python3 -m hive rules | grep -c 'No rulings kept')" 1
+check "and then one fewer is kept" "$(python3 -m hive rules | grep -c '^[0-9]*\. ')" 2
 rm -rf $T; exit $fail

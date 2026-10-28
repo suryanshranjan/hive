@@ -120,3 +120,7 @@ Every experiment (a *gate*) pushes its predictions and kill conditions to GitHub
 ## Privacy
 
 Gates 7, 18, 20 and 25–35 used a real company's code and rules (Company X). Its name, code, rules, examples, documents and the founder's answers are not in this repository; those gates publish aggregate numbers only. Hive keeps an owner's Telegram link, backup-model key and rulings in `~/.hive/` on their own machine, never in a repository.
+
+## License
+
+MIT. See [`LICENSE`](LICENSE).
