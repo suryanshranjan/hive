@@ -78,12 +78,19 @@ def facts(repo, ch=None):
 
 def speak(ch, repo, task, fallback):
     """One message in Hive's own voice (the owner: "like Jarvis handles Tony"); the plain fallback if no model."""
-    got = explain.ask_json(VOICE.format(who=_who(ch) or 'sir', facts=facts(repo, ch), task=task)) or {}
-    reply = (got.get('reply') or '').strip()
+    import threading
+    box = {}
+    t = threading.Thread(target=lambda: box.update(got=explain.ask_json(
+        VOICE.format(who=_who(ch) or 'sir', facts=facts(repo, ch), task=task)) or {}), daemon=True)
+    t.start(); t.join(float(os.environ.get('HIVE_VOICE_SECONDS', 8)))   # he is waiting: never long for a nice phrasing
+    reply = ((box.get('got') or {}).get('reply') or '').strip()
     if reply:
         ch.send('🐝 ' + telegram.esc(reply), html=True)
     else:
         ch.send(fallback, html=True)
+
+GREETINGS = {'hi', 'hii', 'hello', 'hey', 'hey hive', 'hi hive', 'hello hive', 'yo', 'hola', 'namaste', 'good morning',
+             'good evening', 'good afternoon', 'jarvis', 'hive'}
 
 def coalesce(texts):
     """Messages that arrived together are understood together: repeats once, and a bare greeting next to a real request
@@ -93,9 +100,8 @@ def coalesce(texts):
         k = ' '.join(t.lower().split()).strip(' ?!.')
         if k and k not in seen:
             seen.add(k); out.append(t)
-    greet = {'hi', 'hello', 'hey', 'hey hive', 'hii', 'yo', 'hola', 'namaste'}
     if len(out) > 1:
-        out = [t for t in out if t.lower().strip(' ?!.') not in greet] or out[-1:]
+        out = [t for t in out if t.lower().strip(' ?!.') not in GREETINGS] or out[-1:]
     return out, len(out) < len(texts)
 
 def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=None):
@@ -103,8 +109,15 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     start_build(repo, goal) runs a new build that reports to the phone (hive.start.start, overnight style);
     cloud(repo, on) makes a cloud machine and moves Hive there (on=True), or deletes it (hive.cloud_aws)."""
     low = text.lower().strip()
+    typing = getattr(ch, 'typing', None)
+    if callable(typing):
+        typing()   # "typing..." at once, as a person would (the owner found it slow)
     if low.startswith('build:') or low.startswith('build '):   # an explicit request needs no model to recognise it
         got = {'intent': 'build', 'rule': text.split(':', 1)[1] if ':' in text else text[6:]}
+    elif low.strip(' !.?') in GREETINGS:   # the obvious needs no model: one call less, seconds sooner
+        got = {'intent': 'greeting'}
+    elif telegram.is_status(text):
+        got = {'intent': 'status'}
     else:
         got = explain.ask_json(CLASSIFY.format(text=text)) or {}
     intent, rule = got.get('intent', 'other'), (got.get('rule') or text).strip()

@@ -88,6 +88,13 @@ class Channel:
                     raise
                 time.sleep(wait)
 
+    def typing(self):
+        """Show "typing..." in the owner's chat while Hive works on a reply (best effort)."""
+        try:
+            self.api('sendChatAction', chat_id=self.chat, action='typing')
+        except Exception:
+            pass
+
     def fetch(self, file_path, local):
         """Download a file the owner sent (a voice note) from Telegram's file storage."""
         with urllib.request.urlopen(f'https://api.telegram.org/file/bot{self._token}/{file_path}', timeout=60) as r, \

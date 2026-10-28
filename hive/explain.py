@@ -56,10 +56,19 @@ def _json_reply(text):
         return text
     return json.loads(text[text.index('{'):text.rindex('}') + 1])
 
+_CLAUDE_DOWN = [0.0]   # when Claude last failed: skip it for a while instead of waiting on it for every message
+
 def _ask_claude(prompt):
-    p = subprocess.run(shlex.split(CMD), input=prompt, capture_output=True, text=True, timeout=300)
-    reply = json.loads(p.stdout)
+    import time
+    if time.time() - _CLAUDE_DOWN[0] < 600:
+        raise RuntimeError('claude failed recently; using the backup')
+    try:
+        p = subprocess.run(shlex.split(CMD), input=prompt, capture_output=True, text=True, timeout=300)
+        reply = json.loads(p.stdout)
+    except Exception:
+        _CLAUDE_DOWN[0] = time.time(); raise
     if isinstance(reply, dict) and (reply.get('is_error') or 'result' not in reply and 'items' not in reply):
+        _CLAUDE_DOWN[0] = time.time()
         raise RuntimeError('claude call failed')
     return _json_reply(reply.get('result', reply) if isinstance(reply, dict) else reply)
 
@@ -67,14 +76,24 @@ def _ask_backup(prompt):
     """Any OpenAI-compatible endpoint the owner configured (for example NVIDIA NIM), used only when Claude fails."""
     if not os.path.exists(BACKUP):
         return None
-    import urllib.request
+    import urllib.error, urllib.request
     cfg = json.load(open(BACKUP))
     body = {'model': cfg['model'], 'temperature': 0.2, 'max_tokens': 4000,
-            'messages': [{'role': 'user', 'content': prompt}]}
-    req = urllib.request.Request(cfg['base_url'].rstrip('/') + '/chat/completions', data=json.dumps(body).encode(),
-                                 headers={'Content-Type': 'application/json', 'Authorization': f"Bearer {cfg['api_key']}"})
-    with urllib.request.urlopen(req, timeout=180) as r:
-        return _json_reply(json.load(r)['choices'][0]['message']['content'])
+            'messages': [{'role': 'user', 'content': prompt}],
+            # reasoning models think at length unless told not to: 7.6 s against 2.1 s for one chat reply (and 36 s
+            # was seen on a cloud machine); an endpoint that does not know the setting is asked again without it
+            'reasoning_effort': cfg.get('reasoning', 'low')}
+    def call(b):
+        req = urllib.request.Request(cfg['base_url'].rstrip('/') + '/chat/completions', data=json.dumps(b).encode(),
+                                     headers={'Content-Type': 'application/json', 'Authorization': f"Bearer {cfg['api_key']}"})
+        with urllib.request.urlopen(req, timeout=180) as r:
+            return _json_reply(json.load(r)['choices'][0]['message']['content'])
+    try:
+        return call(body)
+    except urllib.error.HTTPError as e:
+        if e.code != 400:
+            raise
+        body.pop('reasoning_effort'); return call(body)
 
 def setup_backup():
     """hive llm setup: store a backup model for the plain-words step (default: NVIDIA NIM). The key is typed hidden and
