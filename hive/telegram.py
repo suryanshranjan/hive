@@ -394,7 +394,14 @@ def collect(ch, question, poll=20):
     while True:
         kind, got = _wait(ch, poll, {'collect|done'})
         if got == 'collect|done' or (kind == 'text' and got.lower().strip('. !') in ('done', 'that is all', "that's all")):
-            break
+            if lines:
+                break
+            ch.send("I haven't had any points from you yet. Finish anyway?",   # an accidental tap must not end it
+                    buttons=[('Yes, finish', 'collect|empty'), ("No, I'll write them", 'collect|more')])
+            if _wait(ch, poll, {'collect|empty', 'collect|more'})[1] == 'collect|empty':
+                break
+            ch.send('Of course. Send your points whenever you are ready.')
+            continue
         new = [l.strip(' -•*\t') for l in got.splitlines() if l.strip(' -•*\t')]
         lines += new
         ch.send(f"Noted ({len(lines)} so far). Anything else? Tap Done when you've finished.",
