@@ -16,6 +16,7 @@ class Endpoint(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
         body = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
         seen['auth'], seen['model'] = self.headers.get('Authorization'), body['model']
+        seen['prompt'] = body['messages'][0]['content']
         reply = {'summary': 'A report that adds up daily shop orders.', 'items': [
             {'id': 'a1', 'context': 'The shop sees this on every report.', 'example': 'Asha has 3 orders.',
              'advice': "I'd keep it.", 'alternative': '', 'impact': 3, 'owner_can_judge': True}]}
@@ -48,5 +49,11 @@ check('when Claude fails, the backup model puts it in plain words', (summary, sh
 check('the suggestion comes through', shown[0]['advice'], "I'd keep it.")
 check('the key and model went to the endpoint', (seen['auth'], seen['model']), ('Bearer test-key', 'meta/llama-3.3-70b-instruct'))
 check('the plain words are cached for this build', os.path.exists(os.path.join(d, 'explained.json')), True)
+
+d2 = tempfile.mkdtemp()
+explain.plan(d2, 'combine metrics', assumptions, rulings=['A late post is never paid less.'])
+check("the owner's earlier rulings reach the model, to judge where he is likely to differ",
+      ("earlier rulings" in seen['prompt'], 'A late post is never paid less.' in seen['prompt'], '"differs"' in seen['prompt']),
+      (True, True, True))
 srv.shutdown()
 sys.exit(fail)

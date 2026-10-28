@@ -127,7 +127,7 @@ def assumptions():
     print('\n'.join(f"- ({a['worker']}){' [technical]' if a.get('technical') else ''} {a['text']}" for a in rows)
           if rows else 'no assumptions recorded yet'); return 0
 
-def review(run, width=72, intro=True, goal=None):
+def review(run, width=72, intro=True, goal=None, rulings=None):
     """The owner's check after the build: each recorded default, right or wrong. Wrong ones, with the owner's rule, go to
     <run>/owner/corrections.md for the workers who fix them (Gate 27: builders never ask about defaults they feel sure of).
     With the goal, each one is first put in plain words with an example, most important first (hive/explain.py)."""
@@ -140,7 +140,7 @@ def review(run, width=72, intro=True, goal=None):
     todo = [a for a in _assumptions(d, False) if not os.path.exists(os.path.join(d, 'reviews', a['id'] + '.json'))]
     if goal and todo:
         from . import explain
-        _, shown, aside = explain.plan(d, goal, todo)
+        _, shown, aside = explain.plan(d, goal, todo, rulings)
         by_id = {a['id']: a for a in todo}
         todo = [dict(by_id[i['id']], text=i['text'], shown_as=i['text']) for i in shown + aside if i['id'] in by_id]
     if intro:

@@ -18,7 +18,7 @@ The feature that was built:
 
 The builders' assumptions (decisions the instructions did not cover), as JSON:
 {items}
-
+{rulings}
 Write like a composed, courteous, quietly confident assistant briefing the founder: short, warm, a step ahead, never
 flustered or chatty, no hedging. The owner should
 be able to decide each one in a few seconds. For each assumption:
@@ -33,13 +33,16 @@ be able to decide each one in a few seconds. For each assumption:
   Recommend what most well-run businesses would want here, and what fits the feature's stated rules.
 - "advice": your recommendation in the first person, in one short sentence ("I'd keep it." or "I'd go with ...").
 - "impact": 3 if it changes money or what customers see often, 2 if it matters sometimes, 1 if it is a rare edge case.
+- "differs": how likely THIS owner is to want something other than what the product does now: 3 likely, 2 unsure, 1
+  unlikely. Judge it from the owner's earlier rulings when there are any (topics where he has overridden the obvious
+  choice before, or rulings this behaviour seems to contradict); without evidence, use 2.
 - "owner_can_judge": false if it is really a technical detail a business owner cannot meaningfully decide.
 Never use technical words (numerator, denominator, null, array, field, error, input, function, string, parse, record).
 Also write "summary": one plain sentence saying what was built, as you would tell the owner over coffee.
 
 Reply with JSON only, in this shape:
 {{"summary": "...", "items": [{{"id": "...", "context": "...", "example": "...",
-"options": [{{"label": "...", "text": "..."}}], "recommend": 0, "advice": "...", "impact": 3, "owner_can_judge": true}}]}}"""
+"options": [{{"label": "...", "text": "..."}}], "recommend": 0, "advice": "...", "impact": 3, "differs": 2, "owner_can_judge": true}}]}}"""
 
 # In experiments, Hive's own recommendation could sway the owner (anchoring), so HIVE_ADVICE=0 leaves it out.
 ADVICE = os.environ.get('HIVE_ADVICE', '1') != '0'
@@ -98,7 +101,7 @@ def _goal_summary(goal):
     text = re.sub(r'^#+\s*(goal:?)?\s*', '', goal.strip(), flags=re.I)
     return text[:3000]
 
-def explain(owner_dir, goal, assumptions):
+def explain(owner_dir, goal, assumptions, rulings=None):
     """{'summary': str, 'items': [{id, text, impact, judge}]} for the owner, cached; falls back to the builders' words."""
     cache = os.path.join(owner_dir, 'explained.json')
     if os.path.exists(cache):
@@ -108,7 +111,9 @@ def explain(owner_dir, goal, assumptions):
     if not assumptions:
         return fallback
     items = json.dumps([{'id': a['id'], 'assumption': a['text']} for a in assumptions], indent=1)
-    prompt = PROMPT.format(goal=_goal_summary(goal), items=items)
+    past = ("\nThe owner's earlier rulings on this product (what he decided before):\n" +
+            '\n'.join(f'- {r}' for r in rulings[-40:]) + '\n') if rulings else ''
+    prompt = PROMPT.format(goal=_goal_summary(goal), items=items, rulings=past)
     reply = None
     for ask in (_ask_claude, _ask_backup):   # Claude Code's login first; the owner's own backup model if that fails
         try:
@@ -134,7 +139,8 @@ def explain(owner_dir, goal, assumptions):
             rec = rec if 0 <= rec <= len(options) else 0
             out['items'].append({'id': it['id'], 'text': text or by_id[it['id']]['text'], 'options': options,
                                  'recommend': rec if ADVICE else None, 'advice': (it.get('advice') or '') if ADVICE else '',
-                                 'impact': int(it.get('impact') or 2), 'judge': bool(it.get('owner_can_judge', True))})
+                                 'impact': int(it.get('impact') or 2), 'differs': int(it.get('differs') or 2),
+                                 'judge': bool(it.get('owner_can_judge', True))})
         seen = {i['id'] for i in out['items']}
         out['items'] += [i for i in fallback['items'] if i['id'] not in seen]   # never drop one silently
         if not out['items'] or reply is None:
@@ -144,14 +150,15 @@ def explain(owner_dir, goal, assumptions):
     json.dump(out, open(cache, 'w'), indent=1)
     return out
 
-def plan(owner_dir, goal, assumptions):
+def plan(owner_dir, goal, assumptions, rulings=None):
     """(summary, items to show the owner, most important first, at most SHOW; the rest, set aside).
     Raises RuntimeError when the plain-words step could not run, so the owner is never handed the builders' raw list."""
-    ex = explain(owner_dir, goal, assumptions)
+    ex = explain(owner_dir, goal, assumptions, rulings)
     if ex.get('failed'):
         raise RuntimeError("I couldn't put the builders' decisions into plain words just now (the model could not be "
                            "reached). Nothing was sent; try again in a few minutes.")
-    ranked = sorted((i for i in ex['items'] if i['judge']), key=lambda i: -i['impact'])
+    # where the owner is likely to differ comes first, then impact (Gate 30: impact alone hid half his surprising rules)
+    ranked = sorted((i for i in ex['items'] if i['judge']), key=lambda i: (-i.get('differs', 2), -i['impact']))
     shown = ranked[:SHOW]
     aside = [i for i in ex['items'] if i not in shown]
     return ex['summary'], shown, aside
