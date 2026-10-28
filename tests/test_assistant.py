@@ -3,7 +3,7 @@ Hive finds the ruling it overrides, confirms, updates the kept rulings and offer
 usage: python3 tests/test_assistant.py   (run from the hive repo root)"""
 import json, os, subprocess, sys, tempfile, time
 sys.path.insert(0, os.getcwd())
-home = tempfile.mkdtemp(); os.environ['HOME'] = home
+home = tempfile.mkdtemp(); os.environ['HOME'] = os.environ['USERPROFILE'] = home   # Windows: USERPROFILE
 from hive import assistant, explain, memory, telegram
 explain.CMD = '"' + sys.executable.replace(chr(92), '/') + '" tests/fake_explain.py'
 memory.DIR = os.path.join(home, '.hive', 'rules')
@@ -276,6 +276,13 @@ assistant.handle(ch(fake), repo, 'status?', poll=1)
 explain.ask_json = _ask_json
 check("status is said in Hive's own voice, from the project's real facts",
       (fake.sent[-1]['text'], 'Latest build: branch hive/b1' in seen[0]), ('🐝 All quiet on the build front, sir.', True))
+
+# 3o. the conversation survives a restart: the real chat keeps its thread on disk (and moves with Hive)
+c1 = telegram.Channel({'chat_id': ME, 'token': 'x'})
+c1.remember('owner', 'build: a page for creators'); c1.remember('hive', 'Shall I build this?')
+c2 = telegram.Channel({'chat_id': ME, 'token': 'x'})   # a new process: the listener restarted, or Hive moved
+check('the conversation survives a restart', c2.history[-2:], [('owner', 'build: a page for creators'), ('hive', 'Shall I build this?')])
+check('only for the real chat (test fakes never touch it)', ch(FakeTelegram([])).history, [])
 
 # 4. the listener steps aside while a build or review is talking to the owner
 json.dump({'pid': os.getppid(), 'at': time.time()}, open(telegram.BUSY, 'w'))

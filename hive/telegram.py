@@ -25,6 +25,7 @@ def bar(done, total, width=10):
     k = round(width * done / max(total, 1))
     return '▰' * k + '▱' * (width - k)
 BUSY = os.path.join(os.path.expanduser('~'), '.hive', 'telegram.busy')   # who is talking to the owner right now
+CONVERSATION = os.path.join(os.path.expanduser('~'), '.hive', 'conversation.json')   # the thread, kept across restarts
 
 def _alive(pid):
     try:
@@ -70,6 +71,12 @@ class Channel:
         self.note = None   # what to say when the owner asks for status (set by whoever is running)
         self.listener = listener   # the always-on listener never claims the chat; builds and reviews do
         self.history = []   # the conversation so far, (who, text), so a reply is read in context: "yes" to what?
+        self.keep = api is None   # the real chat keeps its thread on disk (restarts, moves to the cloud and back)
+        if self.keep:
+            try:
+                self.history = [tuple(x) for x in json.load(open(CONVERSATION))][-16:]
+            except Exception:
+                pass
 
     def send(self, text, buttons=None, reply_to=None, html=False):
         """Every message goes out formatted; plain text is escaped first, so nothing the builders or the owner wrote can
@@ -92,6 +99,13 @@ class Channel:
 
     def remember(self, who, text, keep=16):
         self.history = (self.history + [(who, (text or '').strip()[:600])])[-keep:]
+        if self.keep:   # private, next to the owner's other Hive settings
+            try:
+                os.makedirs(os.path.dirname(CONVERSATION), exist_ok=True)
+                json.dump(self.history, open(CONVERSATION + '.tmp', 'w')); os.replace(CONVERSATION + '.tmp', CONVERSATION)
+                os.chmod(CONVERSATION, 0o600)
+            except Exception:
+                pass
 
     def recent(self, n=10):
         """The last few turns, as plain lines, for a model reading his next message in context."""

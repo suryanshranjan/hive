@@ -2,6 +2,7 @@
 usage: python3 tests/test_telegram.py   (run from the hive repo root)"""
 import json, os, sys, tempfile, time
 sys.path.insert(0, os.getcwd())
+os.environ['HOME'] = os.environ['USERPROFILE'] = tempfile.mkdtemp()   # never the owner's real Hive folder
 from hive import owner, telegram
 
 ME, STRANGER = 111, 999

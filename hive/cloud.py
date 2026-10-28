@@ -36,6 +36,15 @@ class Target:
             self.run(f'mkdir -p {shlex.quote(os.path.dirname(dst))}')
             subprocess.run(['scp', '-q'] + self.opts + [src, f'{self.to}:{dst}'], check=True)
 
+    def get(self, src, dst):
+        """Copy a file back from there; False if it is not there."""
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        if self.local:
+            if not os.path.exists(src):
+                return False
+            shutil.copy2(src, dst); return True
+        return subprocess.run(['scp', '-q'] + self.opts + [f'{self.to}:{src}', dst], capture_output=True).returncode == 0
+
     def home(self):
         return os.path.join(self.to, 'hive-cloud') if self.local else REMOTE_HOME
 
@@ -78,7 +87,8 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
     rules = os.path.join(memory.DIR, memory.project_key(repo) + '.json')
     sent = []
     for src, dst in ((rules, f'{dst_hive}/rules/{os.path.basename(rules)}'), (telegram.PATH, f'{dst_hive}/telegram.json'),
-                     (os.path.join(hive_dir, 'llm.json'), f'{dst_hive}/llm.json')):
+                     (os.path.join(hive_dir, 'llm.json'), f'{dst_hive}/llm.json'),
+                     (telegram.CONVERSATION, f'{dst_hive}/conversation.json')):   # the thread goes too: "yes" stays in context
         if os.path.exists(src):
             t.put(src, dst); sent.append(os.path.basename(src))
     if with_login:
@@ -114,7 +124,8 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
     if start:
         t.run(f'cd {proj} && (nohup {py} -m hive listen > {t.home() if t.local else "$HOME/hive-cloud"}/listen.log 2>&1 &)',
               check=False)
-        say("  Hive is listening there. Stop the listener on this machine, so only one Hive reads your Telegram.")
+        say("  Hive is listening there.")
+        _stop_local_listener(say)
         cfg = telegram.load()
         if cfg:
             try:
@@ -129,6 +140,26 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
     say(f"Done. Bring results back any time with: hive cloud pull --from {t.to}")
     return 0
 
+def _stop_local_listener(say=print):
+    """Only one Hive may read his chat: the listener on this computer stands down once the cloud copy is listening."""
+    from .assistant import PIDFILE
+    try:
+        pid = int(open(PIDFILE).read().strip())
+    except (OSError, ValueError):
+        return
+    if pid == os.getpid():
+        return   # this is the listener itself (a move from the phone): it stands down on its own
+    try:
+        import signal
+        os.kill(pid, signal.SIGTERM)
+        say("  Stopped the listener on this computer: Hive now reads your Telegram in the cloud.")
+    except (OSError, ProcessLookupError):
+        pass
+    try:
+        os.remove(PIDFILE)
+    except OSError:
+        pass
+
 def pull(repo='.', frm=None, say=print):
     """Fetch the hive/... result branches built in the cloud into this repository (your branches are not touched)."""
     repo = os.path.abspath(repo)
@@ -140,7 +171,7 @@ def pull(repo='.', frm=None, say=print):
             frm, key = saved['to'], saved.get('key')
     if not frm:
         say('Tell me where from: hive cloud pull --from user@host'); return 2
-    t = Target(frm); proj = f'{t.home()}/{_project(repo)}'
+    t = Target(frm, key); proj = f'{t.home()}/{_project(repo)}'
     url = proj if t.local else f'{t.to}:{proj}'
     env = dict(os.environ, GIT_SSH_COMMAND='ssh ' + ' '.join(shlex.quote(o) for o in Target(frm, key).opts)) if key else None
     p = subprocess.run(['git', '-C', repo, 'fetch', url, '+refs/heads/hive/*:refs/heads/hive/*'], capture_output=True,
@@ -149,4 +180,12 @@ def pull(repo='.', frm=None, say=print):
         say(f'Could not fetch: {p.stderr.strip()[:300]}'); return 1
     got = subprocess.run(['git', '-C', repo, 'branch', '--list', 'hive/*'], capture_output=True, text=True).stdout.split()
     say(f"Brought back {len([g for g in got if g != '*'])} result branch(es): " + ', '.join(g for g in got if g != '*'))
+    # and what he said there: rules given while Hive was in the cloud, and the conversation, so nothing is lost coming home
+    src_hive = f'{t.home()}/.hive' if t.local else '.hive'
+    rules = memory.project_key(repo) + '.json'
+    back = [name for name, src, dst in (
+        ('rules', f'{src_hive}/rules/{rules}', os.path.join(memory.DIR, rules)),
+        ('conversation', f'{src_hive}/conversation.json', telegram.CONVERSATION)) if t.get(src, dst)]
+    if back:
+        say('  Also brought back: your ' + ' and '.join(back) + ' from there.')
     return 0
