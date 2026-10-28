@@ -41,8 +41,10 @@ class Channel:
 
     def send(self, text, buttons=None, reply_to=None):
         p = {'chat_id': self.chat, 'text': text}
-        if buttons:
-            p['reply_markup'] = {'inline_keyboard': [[{'text': label, 'callback_data': data} for label, data in buttons]]}
+        if buttons:   # a flat list is one row; a list of lists is one row each
+            rows = buttons if isinstance(buttons[0], list) else [buttons]
+            p['reply_markup'] = {'inline_keyboard': [[{'text': label, 'callback_data': data} for label, data in row]
+                                                     for row in rows]}
         if reply_to:
             p['reply_to_message_id'] = reply_to
         return self.api('sendMessage', **p)['message_id']
@@ -201,20 +203,28 @@ def _wait(ch, poll, want):
                 return 'text', text
 
 def _ask_one(ch, d, item, header, poll, can_undo):
-    """One decision, answered in a tap: take Hive's suggestion, keep what the builders did, or say something else.
-    Returns 'undo' when the owner wants the previous decision back; otherwise records the review."""
-    k = item['id']; alt = item.get('alternative')
-    buttons = ([('As you suggest', f'{k}|alt')] if alt else []) + [('Keep it', f'{k}|ok'), ('Something else', f'{k}|no')]
-    if can_undo:
-        buttons.append(('↩ Undo last', f'{k}|undo'))
+    """One decision, answered in a tap: keep what the builders did, pick one of the real alternatives, or say
+    something else. Disagreeing costs the same one tap as agreeing (Gate 29: rulings that only accept Hive's
+    suggestion add nothing a builder would not reach alone). Returns 'undo' to go back; otherwise records the review."""
+    k = item['id']
+    options = item.get('options') or ([{'label': 'As you suggest', 'text': item['alternative']}]
+                                      if item.get('alternative') else [])
+    rec = item.get('recommend')
+    star = lambda n, label: ('★ ' if rec == n else '') + label
+    rows = [[(star(0, 'Keep it as is'), f'{k}|ok')]] + [[(star(n, o['label'] or f'Option {n}'), f'{k}|o{n}')]
+                                                        for n, o in enumerate(options, 1)]
+    rows.append([('Something else', f'{k}|no')] + ([('↩ Undo last', f'{k}|undo')] if can_undo else []))
+    choices = ''.join(f"\n{n}. {o['text']}" for n, o in enumerate(options, 1))
     advice = f"\n\n{item['advice']}" if item.get('advice') else ''
-    msg = ch.send(f"{header}\n\n{item['text']}{advice}", buttons=buttons)
+    shown = item['text'] + (f"\n\nOther ways to do it:{choices}" if choices else '') + advice
+    msg = ch.send(f"{header}\n\n{shown}", buttons=rows)
     t0 = time.time()
-    kind, got = _wait(ch, poll, {data for _, data in buttons})
+    kind, got = _wait(ch, poll, {data for row in rows for _, data in row})
     if got == f'{k}|undo':
         return 'undo'
-    if got == f'{k}|alt':
-        ok, correction = False, alt
+    picked = got[len(k) + 2:] if kind == 'tap' and got.startswith(f'{k}|o') else ''
+    if picked.isdigit() and 1 <= int(picked) <= len(options):
+        ok, correction = False, options[int(picked) - 1]['text']
     elif got == f'{k}|ok' or (kind == 'text' and got.lower().strip('. !') in YES):
         ok, correction = True, None
     elif kind == 'text':
@@ -223,10 +233,12 @@ def _ask_one(ch, d, item, header, poll, can_undo):
         ch.send('Of course. What would you prefer?', reply_to=msg)
         _, words = _wait(ch, poll, set())
         ok, correction = False, words
+    followed = (ok and rec == 0) or (picked.isdigit() and rec == int(picked))
     json.dump({'id': k, 'ok': ok, 'correction': correction, 'seconds': int(time.time() - t0), 'via': 'telegram',
-               'shown_as': item['text'] + advice}, open(os.path.join(d, 'reviews', k + '.json'), 'w'))
+               'shown_as': shown, 'followed_suggestion': followed if rec is not None else None},
+              open(os.path.join(d, 'reviews', k + '.json'), 'w'))
     if not ok:
-        ch.send('Very good. I\'ll see to it.' if got == f'{k}|alt' else "Understood. I'll have it done that way.")
+        ch.send('Very good. I\'ll see to it.' if followed else "Understood. I'll have it done that way.")
 
 def _walk(ch, d, items, label, poll):
     """Ask each item in turn; "Undo last" takes the previous answer back and asks it again."""

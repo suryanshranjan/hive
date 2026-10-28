@@ -9,6 +9,7 @@ if 'contradict each other' in prompt:   # the contradiction check: decisions 1 a
     sys.exit(0)
 ids = [i for i in re.findall(r'"id": "([^"]+)"', prompt) if i != '...']
 items = [{'id': i, 'context': f'In the shop report (item {k}).', 'example': f'For example, Asha with 3 orders.',
-          'advice': "I'd change it: count each order once." if k == 0 else "I'd keep it.", 'alternative': 'count each order once' if k == 0 else '', 'impact': 3 if k == 0 else 1, 'owner_can_judge': k < len(ids) - 1}
+          'options': [{'label': 'Count once', 'text': 'count each order once'}, {'label': 'Count every time', 'text': 'count it every time it appears'}] if k == 0 else [{'label': 'Hide it', 'text': 'hide it from the report'}],
+          'recommend': 1 if k == 0 else 0, 'advice': "I'd go with counting each order once." if k == 0 else "I'd keep it.", 'impact': 3 if k == 0 else 1, 'owner_can_judge': k < len(ids) - 1}
          for k, i in enumerate(ids)]
 print(json.dumps({'result': json.dumps({'summary': 'A report that adds up daily shop orders.', 'items': items})}))
