@@ -2,7 +2,7 @@
 
 Read this first. It is the shared memory for anyone working on Hive, human or agent: what we know, how sure we are, what is being tested, and exactly how to continue. When you learn something, update this file in the same commit as the evidence.
 
-Last updated: Oct 28 2026, after Gate 31.
+Last updated: Oct 28 2026, after Gate 33.
 
 ## 1. The question
 
@@ -32,6 +32,7 @@ The deeper limit is intent, and Gates 3 to 17 have now mapped it. On rules a mod
 - **Kept rulings did not separate the arms (Gate 29, kill fired), and memory halved the review list:** with and without the founder's 15 kept rulings, both swarms passed 5 of 5 cases built from them. The founder's 4 changes had all been Hive's own suggestions, which a builder reaches without memory. Memory cut the owner's business assumptions from 25 to 13. Three gates now agree: intent channels add value only where the owner differs from the model's default (model).
 - **First measured gain from the owner on surprising rules (Gate 30), smaller than predicted:** on 6 cases where the founder differs from a cold model's default (blind-judged), his phone review raised the code from 2/6 to 3/6 (+17 points; predicted ≥ +30; kill < +10 not fired). Builders recorded assumptions touching all 6 rules, but only 3 ranked into the 8 he saw. On one, a menu of alternatives led him to a rule contradicting his own verdict from an hour earlier.
 - **Scanning every decision fixes coverage; the answering step then failed (Gate 31, kill fired):** with all 29 decisions listed in one line, the founder marked a matching decision for 8 of his 9 surprising rules (Gate 30: 3 of 6 shown). Then he kept all 22 he had marked, in 2 to 12 s each, so nothing changed (3/9 both arms). Marked decisions now ask for his way first, and three quick keeps prompt a check.
+- **A model of the founder cannot stand in for him (Gate 33):** given his business and his past verdicts, a model predicted 7 of his 20 surprising rules on held-out gates (35%; the cold default gets 0%) and 79% of ordinary ones. His surprising rules are mostly new in each area. Gate 32 was not run: only 5 surprising cases in selection and invitations (credits had 9), so how surprising an owner is depends on the area.
 - **Open:** an assumption review (builders list the defaults they applied, the owner marks the wrong ones); all 5 Gate 27 misses trace to defaults stated in the builders' own commit messages (post hoc). Also larger features with persistence and endpoints, and more founders and companies.
 
 ## 3. The law and how sure we are of each part
@@ -108,6 +109,8 @@ Status tags: **established** means outside theory or our data on real agents; **
 | Gate 7 | Oct 27 | A real company's 10 rules (Company X, name withheld), checked against its internal documents; no questions vs 15 questions answered from the documented policy | 32.8% → 49.6% hidden (+16.8, CI +6 to +31); the same team gained +21 from its answers; the biggest losses came from never being told the allowed input values; rules kept private |
 | Gate 6 | Oct 27 | Second independent rule-giver; 0 questions, 30 free, and 0 / 1 / 3 questions per function assigned at random | Questions cause the gain (3 vs 0: +36 pts, CI +20 to +51); one question adds little (+12 vs +8); 'first question worth most' failed; concentration beats spreading (model); +25-point gain from 30 questions replicated a fourth time |
 | Gate 20 | Oct 27 | Real rules (private): founder-written examples vs 19 questions vs both vs both + the company's Notion policy pages | 23.6 / 72.4 / 59.2 / 83.6 / 84.8%; examples/questions 1.17×; documents covered 2 of 10 functions and fixed all their errors; O2–O5, O7 held, O1, O6 failed |
+| Gate 32 | Oct 28 | Selection and invitations | Not run: 5 surprising (6 required) |
+| Gate 33 | Oct 28 | A model of the founder, leave one gate out on Gates 30-32 | Surprising 7/20 (35%), ordinary 11/14 (79%); P1 and P3 failed; kill not fired |
 | Gate 31 | Oct 28 | Gate 30 design on AI credits with the rebuilt review (scan all, mark, open first) | Coverage 8/9 marked (C1 held); 0 changes from 22 marked; surprising 3/9 both arms; ordinary 3/3; 384/384; kill fired |
 | Gate 30 | Oct 28 | Founder's surprising rules (6 surprising, 4 ordinary, blind-judged vs a cold probe); phone review with alternatives, suggestions off, vs no owner, one shared build | Surprising 3/6 vs 2/6 (+17); ordinary 3/4 each; 384/384; review 7 min; coverage 6/6 recorded, 3/6 shown; S1, S2 failed; kill not fired |
 | Gate 29 | Oct 28 | Memory of the founder's rulings vs none, on a new related feature (5 cases from the rulings) | Both 5/5; 384/384 both; business assumptions 13 vs 25; kill fired; M2 failed |
