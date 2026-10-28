@@ -14,7 +14,8 @@ PLAN = """Software builders are about to build this feature for a business:
 List the decisions the code for this feature must take that the business owner could rule on (business outcomes, not
 technical choices): each one a case the product must handle, in plain words, with the outcome a careful builder would
 pick if nobody told him. If the description names the cases (a table, a list of situations, an interface), cover every
-one of them. Reply with JSON only: {{"decisions": [{{"case": "...", "default": "..."}}]}}"""
+one of them. One entry per decision: when the outcome depends on a number (days late, days waited, rounds used), that
+is still one decision, not one per number. Reply with JSON only: {{"decisions": [{{"case": "...", "default": "..."}}]}}"""
 
 WRITE = """You are preparing a short interview with a busy, non-technical business owner before his software builders start
 work. The feature to build:
@@ -32,7 +33,8 @@ These are the decisions the builders' code must take, each with the outcome they
 {listing}
 Ask only about these decisions, one situation for every decision, in this order (even ones that look minor: an
 owner's surprising rules are often there, Gate 36). In each situation, one option is the builders' outcome in plain
-words; the others are real alternatives.
+words; the others are real alternatives. Never write two situations about the same decision: where a number matters,
+ask once and let the options name the cut-off (for example "Accepted up to 3 days late, refused after that").
 """
 
 READ = """An owner answered a question about how his product should behave.
@@ -43,7 +45,46 @@ His answer, in his own words: {answer}
 Write his rule as one clear sentence a software builder can implement and test. Keep his meaning exactly; add nothing.
 Reply with JSON only: {{"rule": "..."}}"""
 
+SAME = """These questions will be put to a busy business owner, one after another:
+{listing}
+
+Which of them ask about the same decision, so that his answer to one would settle the other (for example the same case
+with a different number of days)? Reply with JSON only: {{"same": [[1, 2], ...]}} (groups of question numbers; an empty
+list if none)."""
+
+SETTLED = """A business owner is answering questions about how his product should behave. He just answered:
+Question: {situation}
+His answer, in his own words: {answer}
+
+These questions are still to come:
+{listing}
+
+Which of them does his answer already decide, so asking would make him repeat himself? Only count a question if his
+answer clearly settles it. Reply with JSON only: {{"settled": [numbers]}} (an empty list if none)."""
+
 MAX_QUESTIONS = 20   # about 5 minutes on a phone
+
+def _dedupe(qs):
+    """Drop questions that ask the same decision as an earlier one (Gate 37: the founder found the interview redundant;
+    one decision had been asked at 3 and at 7 days, another at 2 and 9 days late)."""
+    if len(qs) < 2:
+        return qs
+    listing = '\n'.join(f"{k}. {q['situation']}" for k, q in enumerate(qs, 1))
+    got = explain.ask_json(SAME.format(listing=listing)) or {}
+    drop = set()
+    for group in got.get('same', []):
+        nums = sorted(n for n in group if isinstance(n, int) and 1 <= n <= len(qs))
+        drop |= set(nums[1:])
+    kept = [q for k, q in enumerate(qs, 1) if k not in drop]
+    return [dict(q, id=f'q{k:02d}') for k, q in enumerate(kept, 1)]
+
+def settled_by(situation, answer, remaining):
+    """Which of the remaining questions his own-words answer already decides (ids), so he is not asked twice."""
+    if not remaining:
+        return []
+    listing = '\n'.join(f"{k}. {q['situation']}" for k, q in enumerate(remaining, 1))
+    got = explain.ask_json(SETTLED.format(situation=situation, answer=answer, listing=listing)) or {}
+    return [remaining[n - 1]['id'] for n in got.get('settled', []) if isinstance(n, int) and 1 <= n <= len(remaining)]
 
 def decisions(goal):
     """The business decisions the build must take, each with the builders' default (Gate 36: questions written from the
@@ -65,7 +106,7 @@ def write_situations(goal, rulings=None, n=12):
         opts = [o for o in s.get('options', []) if isinstance(o, str) and o.strip()][:3]
         if s.get('situation') and len(opts) >= 2:
             out.append({'id': f'q{k:02d}', 'situation': s['situation'].strip(), 'options': opts})
-    return out
+    return _dedupe(out)
 
 def _rule(situation, answer):
     got = explain.ask_json(READ.format(situation=situation, answer=answer)) or {}
@@ -85,7 +126,7 @@ def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll
                                               "matter. Tap what should happen at your company, or tell me in your own "
                                               f"words. About {max(2, round(len(qs) / 4))} minutes; it saves you checking "
                                               "their work afterwards.",
-                              poll=poll, save=save and save + '.answers.json')
+                              poll=poll, save=save and save + '.answers.json', after_text=settled_by)
     else:
         got = {}
         for k, q in enumerate(qs, 1):
@@ -96,7 +137,7 @@ def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll
     rules, free = [], []
     for q in qs:
         a = got.get(q['id'], '')
-        if not a or no_rule(a):   # "whatever you feel like": no rule, the builders decide (and record it)
+        if not a or a == telegram.SETTLED or no_rule(a):   # settled by an earlier answer, or "whatever you feel like"
             continue
         if a in q['options']:
             rules.append(f"{q['situation']} -> {a}")
