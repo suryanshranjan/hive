@@ -12,10 +12,15 @@ python3 -m hive assume "If creator.city is null, hardGates() returns eligible: t
 check "a code-worded assumption is refused" $? 5
 python3 -m hive assume "If a deal is cut by Rs 500, both sides must accept again." >/dev/null
 check "a second plain assumption is recorded" $? 0
-check "workers can list them" "$(python3 -m hive assumptions | grep -c '^- (w2)')" 2
+python3 -m hive assume --technical "termsChange() throws TypeError when cashPaise is not a BigInt." >/dev/null
+check "a technical choice is recorded for engineers, code words allowed" $? 0
+check "workers can list them" "$(python3 -m hive assumptions | grep -c '^- (w2)')" 3
+python3 -c "from hive import owner; t = owner.setup('$T/run2', None, 5, True); assert 'beyond the one asked' in t"
+check "with questions on, workers must record any answer they stretch" $? 0
 printf 'No, a creator without a city is left out when a city is required.\n\n' | python3 -m hive review --run $T/run > $T/review.out 2>&1
 check "review exits cleanly" $? 0
 check "one correction, one kept" "$(grep -c 'The owner says' $T/run/owner/corrections.md)" 1
 check "the correction carries the owner's words" "$(grep -c 'left out when a city is required' $T/run/owner/corrections.md)" 1
-check "both reviews are recorded" "$(ls $T/run/owner/reviews | wc -l | tr -d ' ')" 2
+check "only the two business defaults reached the owner" "$(ls $T/run/owner/reviews | wc -l | tr -d ' ')" 2
+check "the technical choice went to the engineers' list" "$(grep -c 'TypeError' $T/run/owner/technical_assumptions.md)" 1
 rm -rf $T; exit $fail
