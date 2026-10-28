@@ -4,6 +4,7 @@ usage:
   python -m hive                                            # just start: Hive asks what to build and does the rest
   python -m hive start [--workers 4] [--goal <text or file>] [--minutes 40] [--overnight]
   python -m hive morning                                    # after an overnight build: check its assumptions
+  python -m hive telegram setup                             # once: questions and reviews come to your phone
   python -m hive init --test-cmd "<command that runs all tests and writes JUnit XML to .hive/junit.xml>"
   python -m hive claim <short_name> <area>[,<area>...] "<what you will build>"
   python -m hive land <short_name> "<commit message>"      # or: python -m hive land <short_name> --continue
@@ -18,7 +19,7 @@ usage:
 """
 import argparse, json, os, sys
 
-from . import claims, guard, owner, start, swarm
+from . import claims, guard, owner, start, swarm, telegram
 
 def init(test_cmd, junit):
     os.makedirs('.hive', exist_ok=True); os.makedirs(guard.LOCK_DIR, exist_ok=True)
@@ -39,6 +40,7 @@ def main(argv=None):
     st.add_argument('--minutes', type=int, default=40)
     st.add_argument('--overnight', action='store_true')   # no questions; check the assumptions later with `hive morning`
     mo = sub.add_parser('morning'); mo.add_argument('name', nargs='?')
+    tg = sub.add_parser('telegram'); tg.add_argument('action', choices=['setup', 'test'])
     i = sub.add_parser('init'); i.add_argument('--test-cmd', required=True); i.add_argument('--junit', default='.hive/junit.xml')
     c = sub.add_parser('claim'); c.add_argument('name'); c.add_argument('areas'); c.add_argument('desc')
     l = sub.add_parser('land'); l.add_argument('name'); l.add_argument('message', nargs='?')
@@ -60,6 +62,8 @@ def main(argv=None):
                            getattr(a, 'overnight', False))
     if a.cmd == 'morning':
         return start.morning(a.name)
+    if a.cmd == 'telegram':
+        return telegram.setup() if a.action == 'setup' else telegram.test()
     if a.cmd == 'init':
         return init(a.test_cmd, a.junit)
     if a.cmd == 'claim':
