@@ -2,9 +2,9 @@
 
 **A team of AI builders you direct by talking. It asks in plain words, never breaks what already works, and hands back a tested branch.**
 
-You describe a feature. Hive puts several coding agents (the *builders*) to work on copies of your repository. They coordinate only through git, and a guard lets in nothing that breaks a passing test. When the builders hit a decision only you can make, Hive asks you in plain words, in the terminal or on your phone. At the end it shows you the calls they made, you correct the ones you would make differently, and Hive delivers the result as a new branch. Your own branches are never touched.
+You describe a feature. Before building, Hive lists the business decisions the code will have to take and asks you about each one, in plain words, in the terminal or on your phone (tap, type, or send a voice note). Then it puts several coding agents (the *builders*) to work on copies of your repository. They coordinate only through git, and a guard lets in nothing that breaks a passing test. Your answers become tests they must pass. At the end it shows you the calls they made on their own, you correct the ones you would make differently, and Hive delivers the result as a new branch. Your own branches are never touched.
 
-Hive is a research project as much as a tool: **35 pre-registered experiments**, each scored against predictions pushed before it ran, failures included. Start with [`BRAIN.md`](BRAIN.md) for what is known and how sure we are.
+Hive is a research project as much as a tool: **37 pre-registered experiments**, each scored against predictions pushed before it ran, failures included. Start with [`BRAIN.md`](BRAIN.md) for what is known and how sure we are.
 
 ---
 
@@ -56,6 +56,8 @@ On your phone, Hive speaks like a capable assistant and asks one thing at a time
 > A brand on Pro has unused AI credits when the month renews. What should happen?
 > **[They carry over] [They reset] [Up to a limit] [Something else]**
 
+Answer with a tap, in your own words, or with a voice note. Voice is transcribed on your own machine with Whisper, so your voice never leaves it. Hive reads your words back as a rule for you to confirm.
+
 You can also message it any time: *"status"*, *"build: a refund page for brands"*, or *"actually, I've changed my mind about…"*. Hive finds the earlier ruling, asks whether to replace it, and offers to update the latest build.
 
 ## Commands
@@ -74,10 +76,12 @@ Lower-level commands for scripts and experiments (`hive init`, `run`, `owner`, `
 
 ## How it works
 
+- **It asks first.** Hive lists the business decisions the build will take (each with the default a builder would pick) and asks you one concrete situation per decision. Your answers become rules the builders encode as tests. An answer that contradicts an earlier ruling is put back to you.
 - **Builders work in parallel and never talk.** Each claims an area of the code with a lock file, works in its own clone, and lands through the **guard**. The guard refuses a landing that breaks a passing test, duplicates a definition, or commits a secret.
 - **Your intent reaches them as tests.** Your answers, your corrections and your standing rulings each become a test the code must keep passing.
 - **The review is built around where you differ.** Builders record every business decision your description didn't cover. Hive rewrites each in plain words with an example. You scan them all in one line each and mark only what you'd change; for each marked one it asks *"what would you do instead?"*. After the fix round, each change comes back as one line for your final yes.
 - **It remembers.** Your rulings carry into every future build of the project, and contradictions with earlier ones are caught before anything is sent.
+- **It picks up again.** If Claude's usage limit is reached or its login expires mid-build, Hive tells you when it will continue, and each builder carries on in its own copy. If a conversation on your phone is cut off, it resumes at the first unanswered question.
 - **Safety by default.** It refuses to start on unsaved changes, works only on copies, never commits `.env` files or keys, and re-checks every test before handing over a branch.
 
 ## What the evidence says
@@ -97,7 +101,10 @@ Every result below was predicted on GitHub before the run. Real-company results 
 | A model of the founder cannot stand in for him | It predicts 35% of his surprising rules | Gate 33 |
 | The review mechanism, with an owner who answers | Unusual rules 0/8 → 7/8; all 384 tests kept (synthetic owner) | Gate 34b |
 | `hive cloud` on a real EC2 server | Project, tests and result branch round-trip; 3 bugs found and fixed | [`BRAIN.md`](BRAIN.md) |
-| **Open:** the real founder with the fixed review | In progress | Gate 35 |
+| The real founder audits a list of the builders' decisions | He marked 0 of 27; his rules come out in situations (48 of 48 answered), not audits | Gate 35 |
+| Interview written from the feature description | Covered 4 of 9 of his surprising rules; no gain (2/7 both arms). On both covered cases his answers changed with the framing | Gate 36 |
+| Interview written from the decisions the code takes | Covered 7 of 9 of the same rules (3 of 9 from the description), with no founder time spent | Gate 37 pilot |
+| **Open:** the decisions-first interview with the founder, and how stable his own rules are | In progress | Gate 37 |
 
 **Also kept:** the failed and withdrawn ideas, each with its evidence. These include asking in blocks of 3, a one-constant law for questions, contrast examples, coverage-planned questions and largest-first claiming ([`BRAIN.md`](BRAIN.md) §6). The worked examples are **Specification by Example**, an established practice; what this work adds is measurement ([`docs/related_work.md`](docs/related_work.md)).
 
