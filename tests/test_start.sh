@@ -2,7 +2,7 @@
 # hive start, end to end with stand-in builders (no tokens): one conversation from a goal to a tested branch.
 # usage: sh tests/test_start.sh   (needs git, python3 and pytest; run from the hive repo root)
 set -u
-HIVE=$(pwd); T=$(mktemp -d); export PYTHONPATH=$HIVE HOME=$T HIVE_WORKER_CMD="sh $HIVE/tests/fake_assuming_worker.sh"
+HIVE=$(pwd); T=$(mktemp -d); export PYTHONPATH=$HIVE HOME=$T HIVE_WORKER_CMD="sh $HIVE/tests/fake_assuming_worker.sh" HIVE_EXPLAIN_CMD="python3 $HIVE/tests/fake_explain.py"
 fail=0; check() { if [ "$2" = "$3" ]; then echo "ok   $1"; else echo "FAIL $1 (got $2, expected $3)"; fail=1; fi; }
 cd $T && git init -q -b main project && cd project && git config user.email t@t && git config user.name t
 printf 'from fees import fee\ndef test_fee(): assert fee(10000, 2000) == 1200\n' > test_fees.py
