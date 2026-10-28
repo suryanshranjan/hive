@@ -1,0 +1,32 @@
+hidden pass: N0 41.6%, H 63.2%, H2 64.4%, R 100.0%, T 84.0%
+H: fixes 0.55 of 193 N0 edge errors; breaks 21 of 253 N0-right edge calls
+H2: fixes 0.42 of 193 N0 edge errors; breaks 15 of 253 N0-right edge calls
+R: fixes 1.00 of 193 N0 edge errors; breaks 0 of 253 N0-right edge calls
+T: fixes 0.83 of 193 N0 edge errors; breaks 18 of 253 N0-right edge calls
+H2 − H = +1.2 points (95% CI -11.6 to +15.2, bootstrap over functions)
+H: 23 planned decisions, 19 questions, 29 owner replies, 11 rules; asked 19 of 25 (0.76); of those stated right 0.74; sheet: right 14, partial 4, wrong 0, absent 7
+H2: 40 planned decisions, 27 questions, 28 owner replies, 11 rules; asked 16 of 25 (0.64); of those stated right 0.69; sheet: right 11, partial 1, wrong 0, absent 13
+R sheet: right 25, partial 0, wrong 0, absent 0; 64 rules
+
+per function: N0 edge errors, share fixed by H / H2 / R / T, labels H | H2
+  add_bdays                 31  0.68 / 0.68 / 1.00 / 1.00   r a r a | r a r a
+  age_years                  0    –  /   –  /   –  /   –    r | r
+  avg_stars                 13  1.00 / 1.00 / 1.00 / 1.00   p r r | p r r
+  bmi_value                 14  0.00 / 1.00 / 1.00 / 0.00   a | r
+  late_fee                  18  1.00 / 1.00 / 1.00 / 1.00   r r | r r
+  letter_grade              23  0.43 / 0.00 / 1.00 / 1.00   p a | a a
+  mask_card                 27  0.44 / 0.00 / 1.00 / 1.00   r r p | a a a
+  net_price                  5  1.00 / 0.00 / 1.00 / 1.00   r a | a a
+  ship_cost                 35  0.57 / 0.46 / 1.00 / 0.49   r r p a | r a r a
+  slugify                   27  0.26 / 0.00 / 1.00 / 1.00   a r r | a r a
+
+predictions
+G1 coverage H2 ≥ 0.85 and H ≤ 0.75: 0.64, 0.76 -> failed
+G2 H2 − H ≥ +8: +1.2 -> failed
+G3 transfer ≥ 0.85 in H and H2: 0.74, 0.69 -> failed
+G4 R ≥ 95%: 100.0 -> held
+G5 R − T ≥ +10: +16.0 -> held
+G6 owner replies H2 ≤ 1.6 × H: 28 vs 29 (0.97×) -> held
+G7 N0 < 65%: 41.6 -> held
+Kill H2 ≤ H: did not fire
+Ship rule (H2 − H ≥ +5 and coverage up): did not fire

@@ -1,0 +1,147 @@
+[
+ {
+  "prompt": "\n1 of 19. A customer orders on Friday 20 December and you promise delivery in 5 working days. Christmas Day and New Year's Day fall inside that period.\n  A) Only Saturdays and Sundays are days off, so the holidays still count as working days  B) Saturdays, Sundays and national public holidays are days off  C) Saturdays, Sundays, public holidays and our own shop closure days are all days off\n  Your answer (a letter, or your own words) > ",
+  "reply": "B",
+  "typed": "B"
+ },
+ {
+  "prompt": "\n2 of 19. An order arrives on Saturday 14 June and the promise is '1 working day'.\n  A) Promised for Monday 16 June, with the count starting from the next working day  B) Promised for Tuesday 17 June, because Saturday orders are treated as received on Monday  C) Staff must pick the date by hand for weekend orders\n  Your answer (a letter, or your own words) > ",
+  "reply": "B",
+  "typed": "B"
+ },
+ {
+  "prompt": "\n4 of 19. A staff member types a birth date or order date that is impossible (30 February) or leaves it blank in a customer record, and a report is running.\n  A) A blank gives a blank result, while an impossible date stops the report with an error message  B) Both a blank and an impossible date give a blank result and the report carries on  C) Any blank or impossible date stops the whole report with an error message\n  Your answer (a letter, or your own words) > ",
+  "reply": "B",
+  "typed": "B"
+ },
+ {
+  "prompt": "\n5 of 19. A customer was born on 29 February 2000 and wants to buy an age-restricted item (18+) in a year with no 29 February.\n  A) They turn 18 on 1 March  B) They turn 18 on 28 February  C) Staff decide each case by hand\n  Your answer (a letter, or your own words) > ",
+  "reply": "A",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n6 of 19. A $1,000 invoice is paid 60 days late.\n  A) 1.5% for every 30 days late, counted day by day, so $30 with no cap and no minimum  B) A single flat $25 fee, however many days late  C) 2% for each month started, with a $10 minimum and a cap of 10% of the invoice\n  Your answer (a letter, or your own words) > ",
+  "reply": "The fee is 1% of the invoice for each day late, with a $5 minimum and a cap of 25% of the invoice. A $1,000 invoice 60 days late therefore pays the cap of $250.",
+  "typed": "The fee is 1% of the invoice for each day late, with a $5 minimum and a cap of 25% of the invoice. A $1,000 invoice 60 days late therefore pays the cap of $250."
+ },
+ {
+  "prompt": "\n7 of 19. A student scores 89.5 out of 100 on a course.\n  A) B, because A starts at 90, with 80, 70 and 60 for B, C and D and no plus or minus grades  B) B+, because we use plus and minus grades  C) A, because we round up to the nearest whole mark, or our cut-offs are lower (for example A from 85)\n  Your answer (a letter, or your own words) > ",
+  "reply": "C. A student on 89.5 gets an A because we round the score to the nearest whole mark first, so 89.5 becomes 90.",
+  "typed": "C. A student on 89.5 gets an A because we round the score to the nearest whole mark first, so 89.5 becomes 90."
+ },
+ {
+  "prompt": "\n8 of 19. A student scores 105 out of 100 thanks to bonus questions.\n  A) Gets an A, because bonus marks are fine  B) Gets an A, but the record is flagged for a teacher to check  C) No grade is given, because a score over the maximum is treated as a data entry mistake\n  Your answer (a letter, or your own words) > ",
+  "reply": "A. A score over the maximum still gets an A, and nothing is flagged.",
+  "typed": "A. A score over the maximum still gets an A, and nothing is flagged."
+ },
+ {
+  "prompt": "\n9 of 19. A receipt is printed for the card 4111 1111 1111 1234.\n  A) Only the last 4 digits are shown, and every other digit is hidden  B) The first 6 and the last 4 digits are shown  C) Only the last 2 digits are shown\n  Your answer (a letter, or your own words) > ",
+  "reply": "A. Only the last 4 digits are shown and every other digit is hidden with a star. The spaces are dropped, so the printed result is 12 stars followed by 1234.",
+  "typed": "A. Only the last 4 digits are shown and every other digit is hidden with a star. The spaces are dropped, so the printed result is 12 stars followed by 1234."
+ },
+ {
+  "prompt": "\n10 of 19. A cashier types a card number with dashes (4111-1111-1111-1234), or a number that is too short, or one that contains letters.\n  A) Dashes and spaces are ignored; a short number or one with letters is fully hidden  B) Dashes are kept in the printout; a short number or one with letters is fully hidden  C) Anything that is not a clean card number is refused and nothing is printed\n  Your answer (a letter, or your own words) > ",
+  "reply": "Dashes and spaces are ignored. A number that is too short (under 8 digits) is fully hidden with stars. A number containing letters gets no printout at all, so the result is blank.",
+  "typed": "Dashes and spaces are ignored. A number that is too short (under 8 digits) is fully hidden with stars. A number containing letters gets no printout at all, so the result is blank."
+ },
+ {
+  "prompt": "\n11 of 19. A staff member enters a 120% discount by mistake on a $50 item.\n  A) The entry is refused with an error message  B) It is treated as 100% off, so the item is free  C) It is ignored and the item is sold at full price\n  Your answer (a letter, or your own words) > ",
+  "reply": "The discount is capped at 50%, so a 120% entry is treated as 50% off. The $50 item sells for $25.",
+  "typed": "The discount is capped at 50%, so a 120% entry is treated as 50% off. The $50 item sells for $25."
+ },
+ {
+  "prompt": "\n12 of 19. A 2.3 kg parcel is going to zone B.\n  A) Charged as 3 kg, with partial kilograms rounded up, at a base fee plus a rate per kg (cheapest A, then B, then C)  B) Charged for exactly 2.3 kg  C) Charged by weight band: up to 1 kg, up to 5 kg and up to 10 kg, each at one flat price\n  Your answer (a letter, or your own words) > ",
+  "reply": "A. A 2.3 kg parcel to zone B is charged as 3 kg, because we round partial kilograms up. That comes to $12.50, a base fee plus a rate per kg, with zone A cheapest, then B, then C.",
+  "typed": "A. A 2.3 kg parcel to zone B is charged as 3 kg, because we round partial kilograms up. That comes to $12.50, a base fee plus a rate per kg, with zone A cheapest, then B, then C."
+ },
+ {
+  "prompt": "\n13 of 19. A parcel is booked for delivery zone 'D', which has no rates, or a zone typed in lowercase ('b').\n  A) Lowercase is accepted; an unknown zone gives an error and no charge  B) Lowercase is accepted; an unknown zone is charged at the zone C rate  C) Lowercase is accepted; for an unknown zone the shipping charge is left blank so staff quote by hand\n  Your answer (a letter, or your own words) > ",
+  "reply": "Lowercase is not accepted. A zone typed as 'b' is not treated as zone B. Any zone that isn't exactly A, B or C, lowercase letters included, is charged at the zone C rate. For a 2.3 kg parcel that is $16.50.",
+  "typed": "Lowercase is not accepted. A zone typed as 'b' is not treated as zone B. Any zone that isn't exactly A, B or C, lowercase letters included, is charged at the zone C rate. For a 2.3 kg parcel that is $16.50."
+ },
+ {
+  "prompt": "\n14 of 19. A customer wants to send an 80 kg item, or a very light 0.4 kg parcel.\n  A) No weight limit and no free shipping: the same formula applies to everything  B) Over 30 kg we do not ship it, and staff give a manual quote  C) Parcels under 0.5 kg ship free as a promotion\n  Your answer (a letter, or your own words) > ",
+  "reply": "There is no weight limit and nothing ships free. An 80 kg item is charged the normal way, with partial kilograms rounded up, and a 0.4 kg parcel is charged as 1 kg, so to zone B it costs $9.50. Parcels over 30 kg also carry an extra heavy-parcel surcharge on top of the normal charge.",
+  "typed": "There is no weight limit and nothing ships free. An 80 kg item is charged the normal way, with partial kilograms rounded up, and a 0.4 kg parcel is charged as 1 kg, so to zone B it costs $9.50. Parcels over 30 kg also carry an extra heavy-parcel surcharge on top of the normal charge."
+ },
+ {
+  "prompt": "\n15 of 19. A product is titled 'Caf\u00e9 Cr\u00e8me \u2013 50% Off!' and needs a web address ending.\n  A) cafe-creme-50-off, lowercase with accents removed and symbols dropped  B) caf\u00e9-cr\u00e8me-50-off, keeping the accents  C) cafe-creme-50-percent-off, with the % sign spelled out\n  Your answer (a letter, or your own words) > ",
+  "reply": "A",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n16 of 19. A product title is written entirely in Hindi script (or is just symbols), so no usable Latin letters are left.\n  A) The web address ending is left empty  B) The original script is kept in the web address ending  C) A generic word with a number is used instead, such as 'product-1234'\n  Your answer (a letter, or your own words) > ",
+  "reply": "When no usable Latin letters are left, the web address ending is the single word \"untitled\".",
+  "typed": "When no usable Latin letters are left, the web address ending is the single word \"untitled\"."
+ },
+ {
+  "prompt": "\n17 of 19. A product has three ratings: 5, 4 and 4 stars (average 4.33).\n  A) Shows 4.3, rounded to one decimal  B) Shows 4.5, rounded to the nearest half star  C) Shows 4 stars, rounded to a whole number\n  Your answer (a letter, or your own words) > ",
+  "reply": "Rounds to nearest half star: 4.33 \u2192 4.5.\n\nB",
+  "typed": "Rounds to nearest half star: 4.33 \u2192 4.5.\n\nB"
+ },
+ {
+  "prompt": "\n18 of 19. One product has ratings of 5, 4 and a glitch entry of 9 stars, and a second product has no ratings at all.\n  A) The glitch and blank entries are ignored, and a product with no ratings shows 'no rating yet'  B) The 9 is counted as 5 stars, and a product with no ratings shows 0 stars  C) A product with any invalid entry shows no headline rating until staff check it\n  Your answer (a letter, or your own words) > ",
+  "reply": "Invalid entries like the 9 are ignored, and a headline rating is only shown once a product has at least 3 valid ratings. The first product has only two valid ratings (5 and 4), so it shows no rating, and the product with no ratings also shows no rating, left blank.",
+  "typed": "Invalid entries like the 9 are ignored, and a headline rating is only shown once a product has at least 3 valid ratings. The first product has only two valid ratings (5 and 4), so it shows no rating, and the product with no ratings also shows no rating, left blank."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: The late fee equals 1% of the invoice amount for each day the invoice is late, but never less than $5 and never more than 25% of the invoice amount, so a $1,000 invoice paid 60 days late is charged the 25% cap of $250.\n  Right? (Enter = yes, or say what's off) > ",
+  "reply": "Not quite: an invoice that isn't late, or has nothing due, is charged no fee at all, so the $5 minimum only applies once the invoice is at least one day late.",
+  "typed": "Not quite: an invoice that isn't late, or has nothing due, is charged no fee at all, so the $5 minimum only applies once the invoice is at least one day late."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When a receipt is printed for a card number, the output must show only the card's last 4 digits and replace every other digit with a star, with all spaces removed, so that 4111 1111 1111 1234 prints as 12 stars followed by 1234.\n  Right? (Enter = yes, or say what's off) > ",
+  "reply": "ENTER",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When a card number is printed, dashes and spaces in the input are ignored; if the number contains any letters, nothing is printed and the result is blank; otherwise, if it has fewer than 8 digits, it is printed fully hidden with stars.\n  Right? (Enter = yes, or say what's off) > ",
+  "reply": "ENTER",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A discount entered above 50% is capped at 50%, so any discount over 50% (for example a mistaken 120% entry) is applied as 50% off, and a $50 item with a 120% discount entered sells for $25.\n  Right? (Enter = yes, or say what's off) > ",
+  "reply": "ENTER",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A parcel's weight is rounded up to the next whole kilogram (partial kilograms round up, so 2.3 kg is charged as 3 kg), and the price is a base fee plus a per-kg rate times the rounded weight, with zone A cheapest, then zone B, then zone C; a 2.3 kg parcel to zone B is charged as 3 kg and costs $12.50.\n  Right? (Enter = yes, or say what's off) > ",
+  "reply": "ENTER",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: Any delivery zone that is not exactly the uppercase letter A, B or C (including lowercase letters such as 'b' and zones with no rates such as 'D') is charged at the zone C rate, which for a 2.3 kg parcel is $16.50.\n  Right? (Enter = yes, or say what's off) > ",
+  "reply": "ENTER",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: There is no maximum weight and no free shipping: every parcel, including an 80 kg item, is charged the normal rate with the weight rounded up to the next whole kilogram (so a 0.4 kg parcel is charged as 1 kg, which costs $9.50 to zone B), and any parcel over 30 kg is additionally charged a heavy-parcel surcharge on top of that normal charge.\n  Right? (Enter = yes, or say what's off) > ",
+  "reply": "ENTER",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When a product title contains no usable Latin letters (for example, it is written entirely in Hindi script or consists only of symbols), the web address ending (slug) must be the single word \"untitled\".\n  Right? (Enter = yes, or say what's off) > ",
+  "reply": "ENTER",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A product's displayed rating is its average star rating rounded to the nearest half star, so an average of 4.33 (from ratings of 5, 4 and 4) displays as 4.5.\n  Right? (Enter = yes, or say what's off) > ",
+  "reply": "ENTER",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: Ignore invalid ratings (such as a 9 on a star scale), and show a product's headline rating only if it has at least 3 valid ratings; otherwise show no rating, leaving it blank (e.g., ratings of 5, 4 and an invalid 9 give no rating, and a product with no ratings gives no rating).\n  Right? (Enter = yes, or say what's off) > ",
+  "reply": "ENTER",
+  "typed": ""
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "reply": "1",
+  "typed": "1"
+ },
+ {
+  "prompt": "  Rule 1: Whenever a delivery date is promised in working days, count Saturdays, Sundays and national public holidays as days off (so Christmas Day and New Year's Day are not counted). Whenever an order arrives on a Saturday, treat it as received on Monday, so an order received on Saturday 14 June with a promise of 1 working day is promised for Tuesday 17 June.\n  What should it be? > ",
+  "reply": "Only Saturdays, Sundays, Christmas Day (25 Dec) and New Year's Day (1 Jan) are days off. We have no other public holidays. Any order that arrives on a day off, which includes Sundays and those two holidays as well as Saturdays, is treated as received on the next working day. The count starts from that day.",
+  "typed": "Only Saturdays, Sundays, Christmas Day (25 Dec) and New Year's Day (1 Jan) are days off. We have no other public holidays. Any order that arrives on a day off, which includes Sundays and those two holidays as well as Saturdays, is treated as received on the next working day. The count starts from that day."
+ }
+]

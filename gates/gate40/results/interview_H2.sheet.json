@@ -1,0 +1,99 @@
+{
+ "draft": {
+  "rules": [
+   {
+    "rule": "Whenever working days are counted (for example a '5 working days' promise from today), skip only Saturdays, Sundays, December 25 and January 1; every other day, including public holidays like next Wednesday, counts as a working day, and no national or company holiday list is used. Whenever an order comes in on a day that is not a working day (for example a Saturday with a '1 working day' promise), the clock starts on the next working day, so a Saturday order promised in 1 working day is due Tuesday.",
+    "from": [
+     1,
+     13
+    ]
+   },
+   {
+    "rule": "Whenever a customer's age is shown, the age counts only birthdays that have already happened, so someone born on 29 February 2000 is 23 on 28 February 2024 and turns 24 on 1 March in years with no 29 February. Whenever the birth date is in the future (for example entered as next year by mistake), the age is blank so someone checks the entry.",
+    "from": [
+     2,
+     3
+    ]
+   },
+   {
+    "rule": "Whenever an invoice is late, the late fee is 1% of the invoice amount for each day late, charged in full from day 1 with no grace period (even for a long-standing friend of the business), but never less than 5 dollars and never more than 25% of the invoice amount. For example, a 1,000 dollar invoice 10 days late is charged 100 dollars.",
+    "from": [
+     4,
+     15
+    ]
+   },
+   {
+    "rule": "Whenever a student's score is turned into a letter grade, use no plus or minus: A for 90 and above, B for 80 and above, C for 70 and above, D for 60 and above, and F for below 60, so 85 out of 100 is a B.",
+    "from": [
+     6
+    ]
+   },
+   {
+    "rule": "Whenever a card number is shown on a receipt, only its last 4 digits can be seen.",
+    "from": [
+     7
+    ]
+   },
+   {
+    "rule": "Whenever a product's price is negative (for example -20 dollars from a refund or data error), the price is invalid and nothing is shown (blank).",
+    "from": [
+     8
+    ]
+   },
+   {
+    "rule": "Whenever a product page title is turned into a web address (slug), make it lowercase, turn accents into plain letters, drop characters with no plain-English letters (such as Japanese), convert each apostrophe to a hyphen, and remove \"&\" and \"%\" entirely without spelling them out, so \"Caf\u00e9 \u65e5\u672c Tea\" becomes \"cafe-tea\" and \"Bob's Fish & Chips -- 50% Off!\" becomes \"bob-s-fish-chips-50-off\". Whenever two different products end up with the same web address, both get the same address and the team makes them unique by hand.",
+    "from": [
+     9,
+     10,
+     18
+    ]
+   },
+   {
+    "rule": "Whenever a product's headline rating is shown, use only ratings from 1 to 5 (ignore any outside that range, such as 0 or 7) and round their average to the nearest half star, so ratings of 5, 4 and 4 (average 4.33) show 4.5. Whenever the product has fewer than 3 valid ratings (including no ratings or only blank ratings), the rating display is blank: not shown at all, and never shown as zero stars.",
+    "from": [
+     11,
+     12,
+     19
+    ]
+   },
+   {
+    "rule": "Whenever a body mass index is displayed, show exactly one decimal place by cutting off every digit after the first decimal place, never rounding, so 24.96 is displayed as 24.9 and not 25.0.",
+    "from": [
+     14
+    ]
+   },
+   {
+    "rule": "Whenever a parcel's shipping charge is worked out, it is the zone's base charge (5 dollars for zone A, 8 dollars for zone B, 12 dollars for zone C) plus 1.50 dollars for every kilogram of weight, where any part of a kilogram counts as a full kilogram. Whenever a parcel is over 30 kg, add a flat 20 dollar heavy-parcel surcharge on top. There is no weight limit and no parcel is ever refused. For example, an 80 kg parcel to zone B costs 8 + (80 \u00d7 1.50) + 20 = 148 dollars.",
+    "from": [
+     16,
+     17
+    ]
+   }
+  ],
+  "disagree": [
+   {
+    "from": [
+     5,
+     15
+    ],
+    "question": "When a late invoice belongs to a customer who has a credit on their account (they are owed money), is the late fee zero, or does the minimum fee of 5 dollars still apply?",
+    "option_a": "No penalty at all: the fee is 0.00.",
+    "option_b": "The fee is never less than 5 dollars, so the minimum 5 dollar fee is still charged."
+   }
+  ]
+ },
+ "done": true,
+ "rules": [
+  "Whenever working days are counted (for example a '5 working days' promise from today), skip only Saturdays, Sundays, December 25 and January 1; every other day, including public holidays like next Wednesday, counts as a working day, and no national or company holiday list is used. Whenever an order comes in on a day that is not a working day (for example a Saturday with a '1 working day' promise), the clock starts on the next working day, so a Saturday order promised in 1 working day is due Tuesday.",
+  "Whenever a customer's age is shown, the age counts only birthdays that have already happened, so someone born on 29 February 2000 is 23 on 28 February 2024 and turns 24 on 1 March in years with no 29 February. Whenever the birth date is in the future (for example entered as next year by mistake), the age is blank so someone checks the entry.",
+  "Whenever an invoice is late, the late fee is 1% of the invoice amount for each day late, charged in full from day 1 with no grace period (even for a long-standing friend of the business), but never less than 5 dollars and never more than 25% of the invoice amount. For example, a 1,000 dollar invoice 10 days late is charged 100 dollars.",
+  "Whenever a student's score is turned into a letter grade, use no plus or minus: A for 90 and above, B for 80 and above, C for 70 and above, D for 60 and above, and F for below 60, so 85 out of 100 is a B.",
+  "Whenever a card number is shown on a receipt, only its last 4 digits can be seen.",
+  "Whenever a product's price is negative (for example -20 dollars from a refund or data error), the price is invalid and nothing is shown (blank).",
+  "Whenever a product page title is turned into a web address (slug), make it lowercase, turn accents into plain letters, drop characters with no plain-English letters (such as Japanese), convert each apostrophe to a hyphen, and remove \"&\" and \"%\" entirely without spelling them out, so \"Caf\u00e9 \u65e5\u672c Tea\" becomes \"cafe-tea\" and \"Bob's Fish & Chips -- 50% Off!\" becomes \"bob-s-fish-chips-50-off\". Whenever two different products end up with the same web address, both get the same address and the team makes them unique by hand.",
+  "Whenever a product's headline rating is shown, use only ratings from 1 to 5 (ignore any outside that range, such as 0 or 7) and round their average to the nearest half star, so ratings of 5, 4 and 4 (average 4.33) show 4.5. Whenever the product has fewer than 3 valid ratings (including no ratings or only blank ratings), the rating display is blank: not shown at all, and never shown as zero stars.",
+  "Whenever a body mass index is displayed, show exactly one decimal place by cutting off every digit after the first decimal place, never rounding, so 24.96 is displayed as 24.9 and not 25.0.",
+  "Whenever a parcel's shipping charge is worked out, it is the zone's base charge (5 dollars for zone A, 8 dollars for zone B, 12 dollars for zone C) plus 1.50 dollars for every kilogram of weight, where any part of a kilogram counts as a full kilogram. Whenever a parcel is over 30 kg, add a flat 20 dollar heavy-parcel surcharge on top. There is no weight limit and no parcel is ever refused. For example, an 80 kg parcel to zone B costs 8 + (80 \u00d7 1.50) + 20 = 148 dollars.",
+  "When a late invoice belongs to a customer who has a credit on their account (they are owed money), is the late fee zero, or does the minimum fee of 5 dollars still apply? -> No penalty at all: the fee is 0.00."
+ ]
+}

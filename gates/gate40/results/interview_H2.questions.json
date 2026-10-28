@@ -1,0 +1,247 @@
+{
+ "qs": [
+  {
+   "id": "q01",
+   "situation": "A customer's order is promised '5 working days' from today. Next Wednesday is a public holiday and your office is shut.",
+   "options": [
+    "Only Saturdays and Sundays are days off; the holiday still counts as a working day",
+    "Public holidays are also skipped, using the national holiday list",
+    "Public holidays are skipped, using our own company holiday list"
+   ]
+  },
+  {
+   "id": "q02",
+   "situation": "An order comes in on a Saturday and the promise is '1 working day'. When does the clock start?",
+   "options": [
+    "It starts from the next working day, Monday, so the answer is Tuesday",
+    "Saturday counts as a day on the clock, so the answer is Monday",
+    "It is treated as if the order came in on Friday, so the answer is Monday"
+   ]
+  },
+  {
+   "id": "q03",
+   "situation": "A manager asks for the date 3 working days BEFORE a Wednesday deadline, to know when work must start.",
+   "options": [
+    "Count back normally, giving the previous Friday",
+    "Counting backwards is not allowed; no date is given",
+    "Count back but never land earlier than today"
+   ]
+  },
+  {
+   "id": "q04",
+   "situation": "A customer was born on 29 February 2000. On 28 February 2024 (not yet a birthday), how old do you say they are?",
+   "options": [
+    "23, since the birthday has not come yet; they turn 24 on 1 March in years with no 29 February",
+    "23 until 29 February arrives; in years with no 29 February they turn older on 28 February",
+    "Treated as a birthday on 28 February, so 24"
+   ]
+  },
+  {
+   "id": "q05",
+   "situation": "Someone's birth date is entered as next year by mistake, so they appear not yet born.",
+   "options": [
+    "Show nothing (blank) so someone checks the entry",
+    "Show an age of 0",
+    "Show a clear warning instead of an age"
+   ]
+  },
+  {
+   "id": "q06",
+   "situation": "A wellness report shows a staff member's body mass index as 24.96.",
+   "options": [
+    "Show 25.0, rounded to one decimal place",
+    "Show 25, a whole number",
+    "Show 24.96, two decimal places"
+   ]
+  },
+  {
+   "id": "q07",
+   "situation": "A wrong entry gives a height of 5 cm for a 70 kg person, producing a body mass index of 2800.",
+   "options": [
+    "Show the silly number as is; the data entry is the problem",
+    "Show nothing (blank) when the numbers are not believable (for example height under 100 cm or over 250 cm)",
+    "Show a clear warning that the entry looks wrong"
+   ]
+  },
+  {
+   "id": "q08",
+   "situation": "A client's invoice of 1,000 dollars is 10 days late. What penalty do you charge?",
+   "options": [
+    "A one-time 5% fee, so 50 dollars, however many days late",
+    "1.5% for every 30 days late, spread out day by day, never more than the invoice itself",
+    "A flat 25 dollars no matter the amount or the days"
+   ]
+  },
+  {
+   "id": "q09",
+   "situation": "An invoice is only 2 days late and the client is a long-standing friend of the business.",
+   "options": [
+    "Charge the full penalty from day 1; no grace period",
+    "Allow a grace of 5 days, no penalty until after that",
+    "Allow a grace of 15 days, no penalty until after that"
+   ]
+  },
+  {
+   "id": "q10",
+   "situation": "A customer has a credit of 200 dollars on their account (they are owed money) and the invoice shows as late.",
+   "options": [
+    "No penalty: 0.00",
+    "Penalty is worked out on the invoice anyway",
+    "Nothing is shown (blank) so someone looks at the account"
+   ]
+  },
+  {
+   "id": "q11",
+   "situation": "A student scores 89.6 out of 100 and the cut-off for an A is 90.",
+   "options": [
+    "B: the exact score is used and not rounded up",
+    "A: the score is rounded to the nearest whole mark first",
+    "A: anything within one mark of the cut-off is lifted up"
+   ]
+  },
+  {
+   "id": "q12",
+   "situation": "A student scores 85 out of 100. Does your school use plus and minus grades?",
+   "options": [
+    "No: A 90+, B 80+, C 70+, D 60+, F below 60, so 85 is a B",
+    "Yes: for example 87+ is B+, 83 to 86 is B, below 83 is B-",
+    "Different cut-offs: A 85+, B 70+, C 55+, D 40+, F below 40"
+   ]
+  },
+  {
+   "id": "q13",
+   "situation": "A student scores 105 out of 100 because of extra credit.",
+   "options": [
+    "A: anything above full marks is an A",
+    "A, but the score is first capped at 100",
+    "Nothing is shown (blank) because the score looks like an error"
+   ]
+  },
+  {
+   "id": "q14",
+   "situation": "A receipt shows a customer's card number. How much of it can be seen?",
+   "options": [
+    "Only the last 4 digits",
+    "The first 6 and last 4 digits",
+    "Only the last 2 digits"
+   ]
+  },
+  {
+   "id": "q15",
+   "situation": "A card number is entered with only 3 digits, for example a mistyped code.",
+   "options": [
+    "Mask all of it, never show anything",
+    "Show it exactly as typed, since it is too short to be a real card",
+    "Show nothing at all (blank)"
+   ]
+  },
+  {
+   "id": "q16",
+   "situation": "A 50 dollar item has a promotion of 120% off because someone mistyped the discount.",
+   "options": [
+    "Price is 0.00; any discount above 100% counts as 100%",
+    "Nothing is shown (blank) so someone fixes the promotion",
+    "Price is the full 50 dollars; the odd discount is ignored"
+   ]
+  },
+  {
+   "id": "q17",
+   "situation": "The price on a product is negative, for example -20 dollars, because of a refund or data error.",
+   "options": [
+    "Nothing is shown (blank); a negative price is invalid",
+    "Show the negative price after discount as given",
+    "Treat it as 0.00"
+   ]
+  },
+  {
+   "id": "q18",
+   "situation": "Shipping a parcel to zone B. What is the charge structure?",
+   "options": [
+    "5.00 base plus 1.00 per kg for A, 2.00 for B, 3.00 for C",
+    "A flat price per zone, whatever the weight",
+    "Different base charges per zone, which we will give you"
+   ]
+  },
+  {
+   "id": "q19",
+   "situation": "A parcel weighs 1.2 kg.",
+   "options": [
+    "Charged as 2 kg: always rounded up to the next whole kilo",
+    "Charged as 1 kg: part kilos are dropped",
+    "Charged by the exact weight, 1.2 kg"
+   ]
+  },
+  {
+   "id": "q20",
+   "situation": "A customer wants to ship a 80 kg crate, heavier than any parcel you normally take.",
+   "options": [
+    "Price it by the same formula, no weight limit",
+    "Refuse; nothing is shown above 30 kg",
+    "Refuse above 30 kg and ask for a special quote"
+   ]
+  },
+  {
+   "id": "q21",
+   "situation": "A product page is titled \"Bob's Fish & Chips -- 50% Off!\"",
+   "options": [
+    "bobs-fish-chips-50-off: apostrophes removed, & and symbols become hyphens",
+    "bob-s-fish-and-chips-50-off: apostrophes become hyphens and & becomes 'and'",
+    "bobs-fish-and-chips-50-percent-off: & and % are spelled out as words"
+   ]
+  },
+  {
+   "id": "q22",
+   "situation": "A product is called \"Caf\u00e9 \u65e5\u672c Tea\" and the Japanese characters have no plain-English letters.",
+   "options": [
+    "cafe-tea: accents become plain letters and the Japanese is dropped",
+    "cafe-ri-ben-tea: Japanese is spelled out in English letters",
+    "The whole title is left alone and the web address keeps the original characters"
+   ]
+  },
+  {
+   "id": "q23",
+   "situation": "Two different products, \"Blue Shirt\" and \"Blue-Shirt!\", end up with the same web address.",
+   "options": [
+    "Both get the same address; the team makes them unique by hand",
+    "The second one gets a number added, like blue-shirt-2",
+    "Refuse the second; someone must retitle it"
+   ]
+  },
+  {
+   "id": "q24",
+   "situation": "A product has ratings of 5, 4 and 4, an average of 4.33. What is the headline rating?",
+   "options": [
+    "4.3: rounded to one decimal place, half up",
+    "4.5: rounded to the nearest half star",
+    "4: rounded to a whole star"
+   ]
+  },
+  {
+   "id": "q25",
+   "situation": "A product gets a rating of 0 and another of 7, both outside the 1 to 5 range.",
+   "options": [
+    "Ignore them and use only ratings from 1 to 5",
+    "Count a 0 as 1 and a 7 as 5",
+    "Show nothing (blank) for the product until someone checks the data"
+   ]
+  },
+  {
+   "id": "q26",
+   "situation": "A new product has no ratings yet, or only blank ones.",
+   "options": [
+    "Show nothing (blank), not zero stars",
+    "Show 0 stars",
+    "Show a default of 3 stars until real ratings arrive"
+   ]
+  },
+  {
+   "id": "q27",
+   "situation": "A brand new product has just one review, a single 5-star rating.",
+   "options": [
+    "Show 5.0 as it is",
+    "Show nothing until there are at least 3 ratings",
+    "Pull it toward the store average until more ratings come in"
+   ]
+  }
+ ]
+}

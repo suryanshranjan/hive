@@ -1,0 +1,130 @@
+[02:57:46] predictions registered on origin/main: gates/gate40/prompts/PREDICTIONS.md
+[02:57:46] rule-giver writing private rules (headless Claude Code)...
+[02:59:52] rules checked: 10 functions, 125 calls, deterministic
+[02:59:52] declared decisions per function: 1:2, 2:3, 3:3, 4:2
+[02:59:52] starting repo and hidden suite built
+[02:59:53] decision tour built (without contrasts): 25 examples in 14 visible tests
+[02:59:53] pre-launch: python3 gates/gate40/referee/wind_tunnel.py {run} {oracle}
+[02:59:53] wind tunnel: documenter writing the owner's complete rule sheet...
+[03:00:26] wind tunnel: R: 64 rules ($0.14)
+[03:00:26] wind tunnel: interview H starting (hive.interview, terminal mode, inputs=False)...
+[03:01:44] wind tunnel: H owner #1: 'B'
+[03:01:53] wind tunnel: H owner #2: 'B'
+[03:02:01] wind tunnel: H owner #3: 'B'
+[03:02:08] wind tunnel: H owner #4: 'A'
+[03:02:18] wind tunnel: H owner #5: 'The fee is 1% of the invoice for each day late, with a $5 minimum and a cap of 2'
+[03:02:29] wind tunnel: H owner #6: 'C. A student on 89.5 gets an A because we round the score to the nearest whole m'
+[03:02:39] wind tunnel: H owner #7: 'A. A score over the maximum still gets an A, and nothing is flagged.'
+[03:02:50] wind tunnel: H owner #8: 'A. Only the last 4 digits are shown and every other digit is hidden with a star.'
+[03:03:03] wind tunnel: H owner #9: 'Dashes and spaces are ignored. A number that is too short (under 8 digits) is fu'
+[03:03:14] wind tunnel: H owner #10: 'The discount is capped at 50%, so a 120% entry is treated as 50% off. The $50 it'
+[03:03:25] wind tunnel: H owner #11: 'A. A 2.3 kg parcel to zone B is charged as 3 kg, because we round partial kilogr'
+[03:03:37] wind tunnel: H owner #12: "Lowercase is not accepted. A zone typed as 'b' is not treated as zone B. Any zon"
+[03:03:47] wind tunnel: H owner #13: 'There is no weight limit and nothing ships free. An 80 kg item is charged the no'
+[03:03:55] wind tunnel: H owner #14: 'A'
+[03:04:01] wind tunnel: H owner #15: 'When no usable Latin letters are left, the web address ending is the single word'
+[03:04:11] wind tunnel: H owner #16: 'Rounds to nearest half star: 4.33 → 4.5.\n\nB'
+[03:04:21] wind tunnel: H owner #17: 'Invalid entries like the 9 are ignored, and a headline rating is only shown once'
+[03:04:55] wind tunnel: H owner #18: "Not quite: an invoice that isn't late, or has nothing due, is charged no fee at "
+[03:05:00] wind tunnel: H owner #19: ''
+[03:05:05] wind tunnel: H owner #20: ''
+[03:05:09] wind tunnel: H owner #21: ''
+[03:05:14] wind tunnel: H owner #22: ''
+[03:05:19] wind tunnel: H owner #23: ''
+[03:05:25] wind tunnel: H owner #24: ''
+[03:05:29] wind tunnel: H owner #25: ''
+[03:05:36] wind tunnel: H owner #26: ''
+[03:05:42] wind tunnel: H owner #27: ''
+[03:06:11] wind tunnel: H owner #28: '1'
+[03:06:17] wind tunnel: H owner #29: "Only Saturdays, Sundays, Christmas Day (25 Dec) and New Year's Day (1 Jan) are d"
+[03:06:20] wind tunnel: H: 11 rules from 19 questions (23 planned decisions), 29 owner replies, 5.9 min, owner $2.10
+[03:06:20] wind tunnel: interview H2 starting (hive.interview, terminal mode, inputs=True)...
+[03:07:29] wind tunnel: H2 owner #1: 'Only Saturdays and Sundays are days off, plus two fixed holidays, December 25 an'
+[03:07:39] wind tunnel: H2 owner #2: 'A'
+[03:07:46] wind tunnel: H2 owner #3: 'A'
+[03:07:53] wind tunnel: H2 owner #4: 'A'
+[03:08:02] wind tunnel: H2 owner #5: 'Our policy is to show one decimal place, but we cut it off instead of rounding. '
+[03:08:16] wind tunnel: H2 owner #6: 'None of those options. We charge 1% of the invoice for each day late, so a 1,000'
+[03:08:26] wind tunnel: H2 owner #7: 'A'
+[03:08:33] wind tunnel: H2 owner #8: 'A) No penalty: 0.00. When the account is in credit, nothing is owed, so we charg'
+[03:08:42] wind tunnel: H2 owner #9: 'A'
+[03:08:49] wind tunnel: H2 owner #10: 'A) Only the last 4 digits are shown, and every other digit is replaced with an a'
+[03:08:57] wind tunnel: H2 owner #11: 'A) Nothing is shown (blank) for a negative price; we treat it as invalid.'
+[03:09:06] wind tunnel: H2 owner #12: 'Each zone has its own base charge: 5 dollars for zone A, 8 for B and 12 for C. O'
+[03:09:15] wind tunnel: H2 owner #13: 'A) Price it by the same formula; we have no weight limit, so an 80 kg crate to z'
+[03:09:24] wind tunnel: H2 owner #14: 'Apostrophes become hyphens, and "&" and "%" are dropped rather than spelled out.'
+[03:09:33] wind tunnel: H2 owner #15: 'A) The accent becomes a plain letter and the Japanese characters are dropped, so'
+[03:09:43] wind tunnel: H2 owner #16: 'A'
+[03:09:50] wind tunnel: H2 owner #17: 'B'
+[03:09:57] wind tunnel: H2 owner #18: 'A) Ignore them and use only ratings from 1 to 5.'
+[03:10:09] wind tunnel: H2 owner #19: 'Nothing is shown (blank), not zero stars. We also show nothing for a product wit'
+[03:10:37] wind tunnel: H2 owner #20: ''
+[03:10:43] wind tunnel: H2 owner #21: ''
+[03:10:50] wind tunnel: H2 owner #22: ''
+[03:10:55] wind tunnel: H2 owner #23: 'Not quite: any parcel over 30 kg also gets a flat 20 dollar heavy-parcel surchar'
+[03:11:01] wind tunnel: H2 owner #24: 'Not quite: any parcel over 30 kg gets a flat 20 dollar heavy-parcel surcharge on'
+[03:11:06] wind tunnel: H2 owner #25: ''
+[03:11:12] wind tunnel: H2 owner #26: ''
+[03:11:41] wind tunnel: H2 owner #27: 'A'
+[03:11:49] wind tunnel: H2 owner #28: ''
+[03:11:49] wind tunnel: H2: 11 rules from 27 questions (40 planned decisions), 28 owner replies, 5.5 min, owner $2.04
+[03:11:49] wind tunnel: judge labelling every declared decision...
+[03:12:35] wind tunnel: judge: 25 labels ($0.23)
+[03:12:35] wind tunnel: ask texts written: /home/claude/hive/runs/g40/ask_texts.md
+N0: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g40/upN0.git
+H: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g40/upH.git
+H2: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g40/upH2.git
+R: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g40/upR.git
+next: python3 lab/launch.py --run g40
+T: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g40/upT.git
+next: python3 lab/launch.py --run g40
+[03:12:38] launching workers...
+launched H-w1
+launched H-w2
+launched H-w3
+launched H2-w1
+launched H2-w2
+launched H2-w3
+launched N0-w1
+H-w2 finished: exit 0, 0.6 min, tokens 468703, cost 0.174247
+launched N0-w2
+H-w1 finished: exit 0, 0.7 min, tokens 469368, cost 0.17806149999999998
+launched N0-w3
+H2-w1 finished: exit 0, 0.9 min, tokens 606041, cost 0.21411809999999995
+launched R-w1
+H-w3 finished: exit 0, 1.1 min, tokens 560867, cost 0.2416278
+launched R-w2
+H2-w3 finished: exit 0, 1.1 min, tokens 642568, cost 0.2238797
+launched R-w3
+N0-w3 finished: exit 0, 0.2 min, tokens 138470, cost 0.0766438
+launched T-w1
+H2-w2 finished: exit 0, 1.1 min, tokens 771415, cost 0.25418750000000007
+launched T-w2
+N0-w1 finished: exit 0, 0.8 min, tokens 374216, cost 0.19170999999999996
+launched T-w3
+R-w3 finished: exit 0, 0.7 min, tokens 492912, cost 0.19215430000000006
+R-w1 finished: exit 0, 0.8 min, tokens 555379, cost 0.213004
+T-w3 finished: exit 0, 0.2 min, tokens 139235, cost 0.07956840000000001
+R-w2 finished: exit 0, 0.9 min, tokens 795807, cost 0.25709
+T-w1 finished: exit 0, 0.9 min, tokens 505040, cost 0.24096339999999997
+T-w2 finished: exit 0, 0.9 min, tokens 540234, cost 0.21692679999999998
+N0-w2 finished: exit 0, 2.9 min, tokens 639327, cost 0.23177350000000002
+wrote /home/claude/hive/runs/g40/agents.csv
+[03:16:20] scoring every arm call by call...
+# g40: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 41.6% | 25.2%–60.0% |
+| H | 63.2% | 48.4%–80.0% |
+| H2 | 64.4% | 44.4%–84.4% |
+| R | 100.0% | 100.0%–100.0% |
+| T | 84.0% | 67.6%–96.8% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| H-N0 | +21.6 | +4.8 to +37.6 |
+| H2-N0 | +22.8 | +6.0 to +40.4 |
+| R-N0 | +58.4 | +39.6 to +74.8 |
+| T-N0 | +42.4 | +24.4 to +60.8 |
+[03:16:21] done. Next: write the gate RESULTS.md from runs/g40/summary.md, update BRAIN.md and lab/QUEUE.md, push.
