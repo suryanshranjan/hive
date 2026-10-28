@@ -112,6 +112,13 @@ rules = interview.interview('Fees', ch(fake), situations=qs, poll=1)
 check('a yes in his own words keeps the reading; "whatever" leaves it to the builders; a correction keeps its situation',
       rules, ['A late fee is charged only after 7 days.', 'Case 3. -> Shut the campaign off'])
 
+# 3g. an interview answer that contradicts an earlier ruling: he is asked which holds now, and his choice goes in
+fake = FakeTelegram([tap('q01|1'), tap('q02|0'), tap('set|0|1')])
+rules = interview.interview('Fees', ch(fake), rulings=['CONFLICT-ME: a tip carries no fee'], poll=1)
+check('a contradiction with an earlier ruling is put to him, and his choice settles it',
+      (any('pulls against an earlier ruling' in m['text'] for m in fake.sent), rules[-1].endswith('-> Total from the others')),
+      (True, True))
+
 # 4. the listener steps aside while a build or review is talking to the owner
 json.dump({'pid': os.getppid(), 'at': time.time()}, open(telegram.BUSY, 'w'))
 check('another live process talking: the listener steps aside', telegram.busy_elsewhere(), True)
