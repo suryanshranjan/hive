@@ -24,7 +24,8 @@ Optional:
 hive telegram setup    # questions, reviews and status on your phone
 pip install "hive-swarm[voice] @ git+https://github.com/suryanshranjan/hive"   # answer by voice note
 hive llm setup         # a backup model (e.g. NVIDIA NIM) if Claude can't be reached
-hive cloud --to user@host   # run Hive on a server and drive it from your phone
+hive cloud --new        # one step: a machine on your AWS account, Hive moved there, run from your phone
+hive cloud --stop       # delete that machine; nothing left running or billing
 ```
 
 Builders run shell commands, so for code you don't fully trust run Hive in a container or a spare VM.
@@ -59,7 +60,7 @@ On your phone, Hive speaks like a capable assistant and asks one thing at a time
 
 Answer with a tap, in your own words, or with a voice note. Voice is transcribed on your own machine with Whisper, so your voice never leaves it. Hive reads your words back as a rule for you to confirm.
 
-You can also message it any time: *"status"*, *"build: a refund page for brands"*, or *"actually, I've changed my mind about…"*. Hive finds the earlier ruling, asks whether to replace it, and offers to update the latest build.
+You can also message it any time: *"status"*, *"build: a refund page for brands"*, *"move to the cloud"*, or *"actually, I've changed my mind about…"*. Hive finds the earlier ruling, asks whether to replace it, and offers to update the latest build.
 
 ## Commands
 
@@ -70,7 +71,8 @@ You can also message it any time: *"status"*, *"build: a refund page for brands"
 | `hive morning [--phone]` | Check an overnight build's decisions; Hive fixes what you correct |
 | `hive listen` | Stay on Telegram: change your mind, start builds, ask for status |
 | `hive rules` | Your standing rulings for this project (`hive rules forget 3` drops one) |
-| `hive cloud --to user@host` / `hive cloud pull` | Move a project's Hive to a server; bring results back |
+| `hive cloud --new` / `--stop` | Make a machine on your AWS account and move Hive there; delete it when done |
+| `hive cloud --to user@host` / `hive cloud pull` | Move Hive to a server you already have; bring results back |
 | `hive setup` | First run: checks, then your phone, voice notes and a backup model |
 | `hive doctor` | Check that everything is ready |
 

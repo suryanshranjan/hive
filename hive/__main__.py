@@ -11,7 +11,9 @@ For the owner:
   hive doctor                            check this machine and project are ready
   hive telegram setup | test | call <name>   connect your phone; how Hive addresses you
   hive llm setup                         optional: a backup model (e.g. NVIDIA NIM) for plain words
-  hive cloud --to user@host [--with-login]   move this project's Hive to a server
+  hive cloud --new [--size t3.large]     one step: make a machine on your AWS account and move Hive there
+  hive cloud --stop                      delete that machine (nothing left running or billing)
+  hive cloud --to user@host [--with-login]   move this project's Hive to a server you already have
   hive cloud pull [--from user@host]     bring the result branches back
 
 Step by step (scripts and experiments):
@@ -53,6 +55,8 @@ def main(argv=None):
     sub.add_parser('listen')
     cl = sub.add_parser('cloud'); cl.add_argument('action', nargs='?', choices=['pull']); cl.add_argument('--to')
     cl.add_argument('--from', dest='frm'); cl.add_argument('--with-login', action='store_true'); cl.add_argument('--no-start', action='store_true')
+    cl.add_argument('--new', action='store_true'); cl.add_argument('--stop', action='store_true')   # make / delete an AWS machine
+    cl.add_argument('--size', default='t3.large'); cl.add_argument('--region'); cl.add_argument('--profile')
     mo = sub.add_parser('morning'); mo.add_argument('name', nargs='?'); mo.add_argument('--phone', action='store_true')
     tg = sub.add_parser('telegram'); tg.add_argument('action', choices=['setup', 'test', 'call', 'ask', 'verdicts'])
     tg.add_argument('address', nargs='?'); tg.add_argument('--out'); tg.add_argument('--intro')
@@ -79,12 +83,17 @@ def main(argv=None):
                            getattr(a, 'overnight', False), not getattr(a, 'no_interview', False))
     if a.cmd == 'listen':
         from . import assistant
+        from . import cloud_aws
         return assistant.listen('.', apply_build=start.apply_ruling,
-                                start_build=lambda repo, goal: start.start(repo, 4, goal, 40, overnight=True))
+                                start_build=lambda repo, goal: start.start(repo, 4, goal, 40, overnight=True),
+                                cloud=lambda repo, on: cloud_aws.new(repo) if on else cloud_aws.stop(ask=lambda q: 'y'))
     if a.cmd == 'cloud':
         from . import cloud
         if a.action == 'pull':
             return cloud.pull('.', a.frm)
+        if a.new or a.stop:
+            from . import cloud_aws
+            return cloud_aws.stop() if a.stop else cloud_aws.new('.', a.size, a.region, a.profile, a.with_login, not a.no_start)
         return cloud.go('.', a.to, a.with_login, not a.no_start)
     if a.cmd in ('doctor', 'setup'):
         from . import doctor
