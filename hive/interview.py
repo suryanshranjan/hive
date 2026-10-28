@@ -42,17 +42,20 @@ def _rule(situation, answer):
     got = explain.ask_json(READ.format(situation=situation, answer=answer)) or {}
     return (got.get('rule') or f'{situation} -> {answer}').strip()
 
-def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll=20):
+def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll=20, save=None):
     """Run the interview. Returns the owner's rules, one plain sentence each. On the phone if `ch` is given, otherwise
-    in the terminal (`ask(prompt)` returns his typed answer)."""
-    qs = situations or write_situations(goal, rulings, n)
+    in the terminal (`ask(prompt)` returns his typed answer). With `save` (a file path), the questions, his answers and
+    the readings are kept as they come, so a rerun after a stop picks up where he left off."""
+    kept = telegram._load(save and save + '.questions.json')
+    qs = situations or kept.get('qs') or write_situations(goal, rulings, n)
+    telegram._save(save and save + '.questions.json', {'qs': qs})
     if not qs:
         return []
     if ch:
         got = telegram.verdicts(ch, qs, intro=f"Before the builders start, {len(qs)} quick situations where your rules "
                                               "matter. Tap what should happen at your company, or tell me in your own "
                                               "words. About 3 minutes; it saves you checking their work afterwards.",
-                              poll=poll)
+                              poll=poll, save=save and save + '.answers.json')
     else:
         got = {}
         for k, q in enumerate(qs, 1):
@@ -63,27 +66,54 @@ def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll
     rules, free = [], []
     for q in qs:
         a = got.get(q['id'], '')
-        if not a:
+        if not a or no_rule(a):   # "whatever you feel like": no rule, the builders decide (and record it)
             continue
         if a in q['options']:
             rules.append(f"{q['situation']} -> {a}")
         else:
             free.append((q, a))
     if free:   # his own words: write each as a rule and let him confirm it
-        drafts = [{'id': q['id'], 'situation': _rule(q['situation'], a), 'own': a, 'options': ["Yes, exactly", 'Not quite']}
+        old = {d['id']: d for d in telegram._load(save and save + '.drafts.json').get('drafts', [])}
+        drafts = [old[q['id']] if q['id'] in old and old[q['id']]['own'] == a else
+                  {'id': q['id'], 'situation': _rule(q['situation'], a), 'own': a, 'asked': q['situation'],
+                   'options': ["Yes, exactly", 'Not quite']}
                   for q, a in free]
+        telegram._save(save and save + '.drafts.json', {'drafts': drafts})
         if ch:
             ok = telegram.verdicts(ch, [{'id': d['id'], 'situation': f"Your rule, as I'll build it: {d['situation']}",
                                          'options': d['options']} for d in drafts],
                                    intro='Thank you. A few you answered in your own words; here is how I read them.',
-                                   poll=poll)
+                                   poll=poll, save=save and save + '.readings.json')
         else:
             ok = {d['id']: (ask or input)(f"\nYour rule, as I'll build it: {d['situation']}\n  Right? (Enter = yes, or "
                                          "say what's off) > ").strip() or 'Yes, exactly' for d in drafts}
-        for d in drafts:
-            v = ok.get(d['id'], 'Yes, exactly')
-            rules.append(d['situation'] if v == 'Yes, exactly' else d['own'] if v == 'Not quite' else v)
+        for d in drafts:   # Gate 36: "It's exactly that's the thing I want" became a rule, and corrections lost
+            v = ok.get(d['id'], 'Yes, exactly')   # the situation they were about
+            asked = d.get('asked', '')
+            if v == 'Yes, exactly' or is_yes(v):
+                rules.append(d['situation'])
+            elif not no_rule(v):
+                rules.append(f"{asked} -> {d['own'] if v == 'Not quite' else v}" if asked else v)
     return rules
+
+YES_WORDS = ('exactly', "that's it", 'thats it', "that's right", 'thats right', 'correct', 'yes', 'yep', 'yeah',
+             'haan', 'perfect', 'spot on', 'the thing i want', 'what i want', 'what i meant')
+NO_RULE = re.compile(r"(nothing|none|no rule|no preference|skip|pass|anything|any|no idea|i don'?t know|"
+                     r"(it )?doesn'?t matter|(it'?s )?up to you|you decide|your call|you choose|as you (like|wish|feel)|"
+                     r"whatever( you| u)?( feel like| think| want| like| wish| prefer)?( is (best|right))?)"
+                     r"( sir| bro| man| yaar)?")
+
+def is_yes(text):
+    """His own words agree with the reading ("yes", "it's exactly that", "spot on"); not "yes, but ...". """
+    t = ' ' + re.sub(r"[^a-z' ]", ' ', text.lower()) + ' '
+    if text.strip().lower().strip('.! ') in telegram.YES:
+        return True
+    return (len(t) < 60 and any(f' {w} ' in re.sub(' +', ' ', t) for w in YES_WORDS)
+            and not any(f' {w} ' in t for w in ('not', 'no', 'but', 'except', 'only', 'wrong')))
+
+def no_rule(text):
+    """The whole reply leaves it to the builders ("whatever you feel like", "nothing", "up to you"): no rule."""
+    return bool(NO_RULE.fullmatch(re.sub(r"[^a-z' ]", ' ', text.lower()).strip().replace('  ', ' ')))
 
 def instructions(rules):
     """The rules as they go into the builders' goal: each must be encoded as a test before landing."""

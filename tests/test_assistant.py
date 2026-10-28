@@ -83,6 +83,35 @@ texts = telegram._wait(ch(fake), 1, set())
 check('without Whisper installed, it asks him to type, and takes the typed answer',
       (any('pip install faster-whisper' in m['text'] for m in fake.sent), texts), (True, ('text', 'Typed instead')))
 
+# 3e. stopped partway (a lost process, a usage limit): a rerun picks up at the first unanswered one, nothing asked twice
+class Stop(Exception): pass
+def stop(fake): raise Stop()
+save = os.path.join(home, 'iv')
+qs = [{'id': f'q{k}', 'situation': f'Situation {k}.', 'options': ['Yes', 'No']} for k in (1, 2, 3)]
+fake = FakeTelegram([tap('q1|0'), stop])
+try:
+    interview.interview('Fees', ch(fake), situations=qs, poll=1, save=save)
+except Stop:
+    pass
+fake = FakeTelegram([tap('q1|1'), tap('q2|1'), tap('q3|0')])   # the old button first: answered, then the real ones
+rules = interview.interview('Fees', ch(fake), situations=qs, poll=1, save=save)
+texts = [m['text'] for m in fake.sent]
+check('after a stop, it picks up at the first unanswered question',
+      (any('Picking up where we left off: 1 of 3 answered' in t for t in texts), any('1 of 3' in t and 'Situation 1' in t for t in texts)),
+      (True, False))
+check('a tap on an earlier message is answered, not dropped in silence',
+      any('That button is from an earlier message' in t for t in texts), True)
+check('the answers from before the stop are kept', rules, ['Situation 1. -> Yes', 'Situation 2. -> No', 'Situation 3. -> Yes'])
+
+# 3f. his own words on a reading: a yes in any words keeps it; "whatever you feel like" is no rule; a correction keeps
+# the situation it is about (Gate 36: "It's exactly that's the thing I want" itself became a rule)
+qs = [{'id': f'r{k}', 'situation': f'Case {k}.', 'options': ['Yes', 'No']} for k in (1, 2, 3)]
+fake = FakeTelegram([say('Only after a week'), say('whatever you feel like'), say('Refund it'),
+                     say("It's exactly that's the thing I want."), say('Shut the campaign off')])
+rules = interview.interview('Fees', ch(fake), situations=qs, poll=1)
+check('a yes in his own words keeps the reading; "whatever" leaves it to the builders; a correction keeps its situation',
+      rules, ['A late fee is charged only after 7 days.', 'Case 3. -> Shut the campaign off'])
+
 # 4. the listener steps aside while a build or review is talking to the owner
 json.dump({'pid': os.getppid(), 'at': time.time()}, open(telegram.BUSY, 'w'))
 check('another live process talking: the listener steps aside', telegram.busy_elsewhere(), True)

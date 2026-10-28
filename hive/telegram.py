@@ -284,13 +284,18 @@ def listen(run, ch, until, poll=2, tick=None):
             answer_status(ch, text)
     ch.note = None
 
-def _wait(ch, poll, want):
+def _wait(ch, poll, want, current=None):
     """Block until the owner taps one of `want` (button data) or types something: ('tap', data) or ('text', words).
-    A request for status is answered on the spot and the wait goes on."""
+    A request for status is answered on the spot and the wait goes on. A tap on an older message's button is answered
+    too, pointing at the question being asked (Gate 36: such taps were dropped in silence and the owner kept waiting)."""
     while True:
         for text, data, _ in ch.updates(timeout=poll):
             if data in want:
                 return 'tap', data
+            if data and want:
+                ch.send("👆 That button is from an earlier message. I'm on this one now: tap here, or reply in your "
+                        "own words.", reply_to=current)
+                continue
             if text and answer_status(ch, text):
                 continue
             if text:
@@ -632,13 +637,31 @@ def collect(ch, question, poll=20):
     ch.send(f"🙏 Thank you. I have {len(lines)} point{'s' if len(lines) != 1 else ''}. I'll take it from here.")
     return lines
 
-def verdicts(ch, cases, poll=20, intro=None):
+def _load(path):
+    try:
+        return json.load(open(path)) if path else {}
+    except Exception:
+        return {}
+
+def _save(path, data):
+    if path:
+        os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+        json.dump(data, open(path + '.tmp', 'w'), indent=1); os.replace(path + '.tmp', path)
+
+def verdicts(ch, cases, poll=20, intro=None, save=None):
     """Put situations to the owner, each with outcome buttons (and "Something else"); undo goes back one.
-    cases: [{id, situation, options: [text, ...]}]. Returns {id: chosen outcome in the owner's terms}."""
+    cases: [{id, situation, options: [text, ...]}]. Returns {id: chosen outcome in the owner's terms}.
+    With `save`, every answer is kept in that file as it comes, and a rerun picks up at the first unanswered one: a
+    stopped process, a lost connection or a usage limit never costs the owner his answers."""
     ch.drain()
-    if intro:
+    out = {k: v for k, v in _load(save).items() if k in {c['id'] for c in cases}}
+    i = next((n for n, c in enumerate(cases) if c['id'] not in out), len(cases))
+    if i == len(cases) and out:
+        return out
+    if i:
+        ch.send(f"🐝 <b>Picking up where we left off:</b> {i} of {len(cases)} answered already.", html=True)
+    elif intro:
         ch.send(f'🐝 {esc(intro)}', html=True)
-    out, i = {}, 0
     while i < len(cases):
         c = cases[i]
         ch.note = lambda: f"We're on situation {i + 1} of {len(cases)}."
@@ -655,9 +678,10 @@ def verdicts(ch, cases, poll=20, intro=None):
         msg = ch.send(f"📋 <b>{i + 1} of {len(cases)}</b>   {bar(i + 1, len(cases))}\n\n{esc(c['situation'])}{listed}\n\n"
                       f"<i>What should happen? {'Tap a number' if listed else 'Tap an option'}, or reply in your own words. "
                       "🎙 Voice notes work too.</i>", buttons=rows, html=True)
-        kind, got = _wait(ch, poll, {d for row in rows for _, d in row})
+        kind, got = _wait(ch, poll, {d for row in rows for _, d in row}, current=msg)
         if got == f"{c['id']}|undo":
-            i -= 1; out.pop(cases[i]['id'], None); ch.send('↩️ Of course. Back to the previous one.'); continue
+            i -= 1; out.pop(cases[i]['id'], None); _save(save, out)
+            ch.send('↩️ Of course. Back to the previous one.'); continue
         if kind == 'tap' and got.split('|')[-1].isdigit():
             out[c['id']] = c['options'][int(got.split('|')[-1])]
         elif kind == 'text':
@@ -665,6 +689,7 @@ def verdicts(ch, cases, poll=20, intro=None):
         else:
             ch.send('✏️ Of course. What should happen?', reply_to=msg)
             out[c['id']] = _wait(ch, poll, set())[1]
+        _save(save, out)
         i += 1
     ch.note = None
     ch.send(f"✅ <b>That's all {len(cases)}.</b> Thank you{', ' + esc(ch.name()) if ch.name() else ''}.", html=True)

@@ -23,6 +23,31 @@ def _usage(path):
     tok = sum(int(u.get(k) or 0) for k in ('input_tokens', 'output_tokens', 'cache_creation_input_tokens', 'cache_read_input_tokens'))
     return tok or '', d.get('total_cost_usd', ''), d.get('api_error_status') or ''
 
+RESUME = ("\n\n# You are picking up again\n\nYou were stopped partway by Claude's usage limit; it has reset now. Your clone "
+          "still has everything you did, and others may have landed work since. Read the end of your log, commit or "
+          "discard anything half-done, pull, check your lock, and carry on from where you stopped. Do not redo work "
+          "that has already landed.\n")
+
+def _limit_hit(path):
+    """When a worker stopped on Claude's usage limit: the time it resets (a Unix time; 0 if not said), else None."""
+    try:
+        d = json.load(open(path))
+    except Exception:
+        return None
+    text = str(d.get('result') or '')
+    if str(d.get('api_error_status') or '') != '429' and 'limit' not in text.lower():
+        return None
+    if not (d.get('is_error') or d.get('api_error_status')):
+        return None
+    import re
+    m = re.search(r'\|(\d{10})\b', text)   # the CLI says "usage limit reached|<reset time>"
+    return int(m.group(1)) if m else 0
+
+def _resume_at(reset, attempt):
+    """When to try again: just after the reset time if Claude said it, else waits growing from 5 minutes to an hour."""
+    floor = float(os.environ.get('HIVE_RESUME_MIN', 60))
+    return max(reset + 60, time.time() + floor) if reset else time.time() + max(floor, min(3600, 300 * 2 ** attempt))
+
 def _areas_text(cfg):
     areas = cfg.get('areas', {})
     if not areas:
@@ -70,31 +95,52 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
     meta = json.load(open(os.path.join(run, 'run.json'))); meta['started'] = int(time.time())
     json.dump(meta, open(os.path.join(run, 'run.json'), 'w'), indent=1)
 
+    tries = int(os.environ.get('HIVE_RESUME_TRIES', 8))   # about 6 hours of waiting at most
+    attempts, spent, first = {}, {}, {}   # per worker: limit stops so far, tokens and cost of earlier attempts, start
+
     def start(me):
         out = open(os.path.join(run, 'out', f'{me}.json'), 'w')
         p = subprocess.Popen(cmd, cwd=os.path.join(run, 'work', me), stdin=subprocess.PIPE, stdout=out,
                              stderr=subprocess.STDOUT, text=True, env=dict(env, HIVE_WORKER=me))
         try:
-            p.stdin.write(open(os.path.join(run, 'prompts', f'{me}.md')).read()); p.stdin.close()
+            p.stdin.write(open(os.path.join(run, 'prompts', f'{me}.md')).read() + (RESUME if attempts.get(me) else ''))
+            p.stdin.close()
         except BrokenPipeError:
             pass
-        say(f'launched {me}')
+        say(f'{"picked up" if attempts.get(me) else "launched"} {me}')
+        first.setdefault(me, time.time())
         return [me, time.time(), p, out]
 
-    cap = max_parallel or len(queue); live = []; rows = []
+    cap = max_parallel or len(queue); live = []; rows = []; waiting = []   # waiting: [(when, worker)]
     while queue and len(live) < cap:
         live.append(start(queue.pop(0)))
-    while live:
+    while live or waiting:
+        for when, me in list(waiting):   # usage limit has reset: the worker carries on in its own clone
+            if time.time() >= when:
+                waiting.remove((when, me)); live.append(start(me))
         for item in list(live):
             me, t0, p, out = item
             if p.poll() is None:
                 continue
             live.remove(item); out.close()
+            path = os.path.join(run, 'out', f'{me}.json')
+            tok, cost, err = _usage(path)
+            reset = _limit_hit(path)
+            if reset is not None and attempts.get(me, 0) < tries:
+                n = attempts[me] = attempts.get(me, 0) + 1
+                t, c = spent.get(me, (0, 0.0)); spent[me] = (t + int(tok or 0), c + float(cost or 0))
+                shutil.copy(path, os.path.join(run, 'out', f'{me}.limit{n}.json'))
+                when = _resume_at(reset, n - 1); waiting.append((when, me))
+                say(f"{me} stopped: Claude's usage limit was reached. I'll pick up again at "
+                    f"{time.strftime('%H:%M', time.localtime(when))}; its work so far is kept.")
+                continue
             if queue:
                 live.append(start(queue.pop(0)))
-            tok, cost, err = _usage(os.path.join(run, 'out', f'{me}.json'))
-            rows.append(dict(worker=me, start=int(t0), end=int(time.time()), minutes=round((time.time() - t0) / 60, 1),
-                             exit=p.returncode, tokens=tok, cost_usd=cost, api_error=err))
+            t, c = spent.get(me, (0, 0.0))
+            tok = (int(tok or 0) + t) or tok; cost = round(float(cost or 0) + c, 6) if (cost or c) else cost
+            rows.append(dict(worker=me, start=int(first[me]), end=int(time.time()),
+                             minutes=round((time.time() - first[me]) / 60, 1), exit=p.returncode, tokens=tok,
+                             cost_usd=cost, api_error=err, limit_stops=attempts.get(me, 0)))
             say(f'{me} finished: exit {p.returncode}, {rows[-1]["minutes"]} min, cost {cost}' + (f', API ERROR {err}' if err else ''))
         time.sleep(2)
     with open(os.path.join(run, 'agents.csv'), 'w', newline='') as f:
