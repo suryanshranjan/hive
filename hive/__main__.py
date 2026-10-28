@@ -57,6 +57,7 @@ def main(argv=None):
     cl = sub.add_parser('cloud'); cl.add_argument('action', nargs='?', choices=['pull']); cl.add_argument('--to')
     cl.add_argument('--from', dest='frm'); cl.add_argument('--with-login', action='store_true'); cl.add_argument('--no-start', action='store_true')
     cl.add_argument('--new', action='store_true'); cl.add_argument('--stop', action='store_true')   # make / delete an AWS machine
+    cl.add_argument('--no-login', action='store_true')   # --new brings the Claude login (builders work there) unless this
     cl.add_argument('--size', default='t3.large'); cl.add_argument('--region'); cl.add_argument('--profile')
     mo = sub.add_parser('morning'); mo.add_argument('name', nargs='?'); mo.add_argument('--phone', action='store_true')
     tg = sub.add_parser('telegram'); tg.add_argument('action', choices=['setup', 'test', 'call', 'ask', 'verdicts'])
@@ -87,14 +88,15 @@ def main(argv=None):
         from . import cloud_aws
         return assistant.listen('.', apply_build=start.apply_ruling,
                                 start_build=lambda repo, goal: start.start(repo, None, goal, 40, overnight=True),
-                                cloud=lambda repo, on: cloud_aws.new(repo) if on else cloud_aws.stop(ask=lambda q: 'y'))
+                                cloud=lambda repo, on, login=True: cloud_aws.new(repo, with_login=login) if on else
+                                cloud_aws.stop(ask=lambda q: 'y'))
     if a.cmd == 'cloud':
         from . import cloud
         if a.action == 'pull':
             return cloud.pull('.', a.frm)
         if a.new or a.stop:
             from . import cloud_aws
-            return cloud_aws.stop() if a.stop else cloud_aws.new('.', a.size, a.region, a.profile, a.with_login, not a.no_start)
+            return cloud_aws.stop() if a.stop else cloud_aws.new('.', a.size, a.region, a.profile, not a.no_login, not a.no_start)
         return cloud.go('.', a.to, a.with_login, not a.no_start)
     if a.cmd in ('doctor', 'setup'):
         from . import doctor

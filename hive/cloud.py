@@ -85,6 +85,7 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
         cred = os.path.join(os.path.expanduser('~'), '.claude', '.credentials.json')
         if os.path.exists(cred):
             t.put(cred, (f'{t.home()}/.claude' if t.local else '.claude') + '/.credentials.json'); sent.append('Claude login')
+            t.run('chmod 700 .claude 2>/dev/null; chmod 600 .claude/.credentials.json 2>/dev/null || true', check=False)
     t.run(f'chmod -R go-rwx {dst_hive} 2>/dev/null || true', check=False)
     # dependencies, installed fresh there
     for pj in subprocess.run(['git', '-C', repo, 'ls-files', 'package-lock.json', '*/package-lock.json'],
@@ -100,7 +101,15 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
     json.dump({'to': t.to, 'project': proj, 'branch': branch, 'key': key}, open(os.path.join(hive_dir if os.path.isdir(hive_dir) else tmp,
                                                                                   'cloud.json'), 'w'))
     say(f"  Copied: the project ({branch}), " + (', '.join(sent) if sent else 'no Hive settings yet') + '.')
-    if not with_login:
+    # can builders work there? They run on Claude Code: check it answers (the owner: "else how will development continue")
+    ready = None
+    if not t.local:
+        p = t.run('timeout 120 claude -p "Reply with the single word OK" 2>&1 | tail -1', check=False)
+        ready = 'OK' in (p.stdout or '').upper()
+        say('  Builders are ready there: Claude answers.' if ready else
+            "  Builders can't work there yet: Claude isn't logged in on that machine. Run `claude` there once to log in, "
+            "or move again with the login.")
+    elif not with_login:
         say("  The Claude login did not go over. On that machine, run `claude` once to log in (or rerun with --with-login).")
     if start:
         t.run(f'cd {proj} && (nohup {py} -m hive listen > {t.home() if t.local else "$HOME/hive-cloud"}/listen.log 2>&1 &)',
@@ -111,7 +120,10 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
             try:
                 telegram.Channel(cfg).send(
                     f"☁️ <b>I'm now running in the cloud</b>, with your project <b>{telegram.esc(name)}</b>. Your computer "
-                    "can be off. Message me any time: \"build: ...\", a change of mind, or \"status\".", html=True)
+                    "can be off. " + ("Builders are ready there. " if ready else
+                                      "I can talk with you there, but builders can't work there until Claude is logged in "
+                                      "on that machine. " if ready is False else '') +
+                    "Message me any time: \"build: ...\", a change of mind, or \"status\".", html=True)
             except Exception:
                 pass
     say(f"Done. Bring results back any time with: hive cloud pull --from {t.to}")

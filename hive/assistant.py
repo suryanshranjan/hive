@@ -134,15 +134,21 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     if intent in ('cloud_on', 'cloud_off') and cloud:
         on = intent == 'cloud_on'
         ch.send("☁️ <b>Shall I move to the cloud?</b>\n\nI'll make a machine on your AWS account (about $0.09 an hour "
-                "while it runs), move this project there, and keep working while your computer is off."
+                "while it runs), move this project there, and keep working while your computer is off.\n\n<i>With your "
+                "Claude login, builders can work there too; without it, I can only talk with you there.</i>"
                 if on else "☁️ <b>Shall I delete the cloud machine?</b>\n\nBring results back first if you need them; "
                 "after this nothing is left running or billing.", html=True,
-                buttons=[[('✅ Yes' if on else '🗑 Yes, delete it', 'cld|yes')], [('Not now', 'cld|no')]])
-        if telegram._wait(ch, poll, {'cld|yes', 'cld|no'})[1] != 'cld|yes':
+                buttons=([[('⭐ Yes, with my Claude login', 'cld|yes')], [('Yes, without it (chat only)', 'cld|bare')],
+                          [('Not now', 'cld|no')]] if on else [[('🗑 Yes, delete it', 'cld|yes')], [('Not now', 'cld|no')]]))
+        choice = telegram._wait(ch, poll, {'cld|yes', 'cld|bare', 'cld|no'})[1]
+        if choice not in ('cld|yes', 'cld|bare'):
             ch.send('Very good. Just say the word.'); return 'not_moved'
         if on:   # (for a delete, say nothing until it is known to be possible: it said "Deleting it now", then that it can't)
             ch.send("🛠 On it. This takes about 5 minutes; I'll tell you when I'm there.")
-        rc = cloud(repo, on)
+        try:
+            rc = cloud(repo, on, choice == 'cld|yes')   # with the login: builders can work there
+        except TypeError:
+            rc = cloud(repo, on)
         if rc == 5:   # this copy runs in the cloud, without the owner's AWS keys (on purpose): it cannot delete itself
             ch.send("☁️ I'm the copy running in the cloud, and I don't hold your AWS keys, on purpose, so I can't shut "
                     "myself down. On your computer, run <code>hive cloud --stop</code>: it deletes this machine and "
