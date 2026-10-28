@@ -69,7 +69,7 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
         py = '"$HOME/hive-cloud/venv/bin/python"'
         say('  Installing Hive there (its own Python environment)...')
         t.run(f'mkdir -p {t.home()} && (test -x {t.home()}/venv/bin/python || python3 -m venv {t.home()}/venv)')
-        p = t.run(f'{py} -m pip install -q --upgrade git+https://github.com/suryanshranjan/hive', check=False)
+        p = t.run(f'{py} -m pip install -q --upgrade pytest git+https://github.com/suryanshranjan/hive', check=False)
         if p.returncode != 0:
             say(f'  Could not install Hive there: {p.stderr.strip()[-300:]}'); return 4
     # the owner's context: rulings for this project, the Telegram link, the backup model (never in the repository)
