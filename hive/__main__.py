@@ -42,7 +42,8 @@ def main(argv=None):
     st.add_argument('--minutes', type=int, default=40)
     st.add_argument('--overnight', action='store_true')   # no questions; check the assumptions later with `hive morning`
     mo = sub.add_parser('morning'); mo.add_argument('name', nargs='?'); mo.add_argument('--phone', action='store_true')
-    tg = sub.add_parser('telegram'); tg.add_argument('action', choices=['setup', 'test', 'call']); tg.add_argument('address', nargs='?')
+    tg = sub.add_parser('telegram'); tg.add_argument('action', choices=['setup', 'test', 'call', 'ask', 'verdicts'])
+    tg.add_argument('address', nargs='?'); tg.add_argument('--out'); tg.add_argument('--intro')
     lm = sub.add_parser('llm'); lm.add_argument('action', choices=['setup'])
     ru = sub.add_parser('rules'); ru.add_argument('action', nargs='?', choices=['forget']); ru.add_argument('n', nargs='?', type=int)
     i = sub.add_parser('init'); i.add_argument('--test-cmd', required=True); i.add_argument('--junit', default='.hive/junit.xml')
@@ -75,6 +76,10 @@ def main(argv=None):
     if a.cmd == 'telegram':
         if a.action == 'call':
             return telegram.call(a.address or '')
+        if a.action == 'ask':
+            return telegram.ask_cli(a.address or '', a.out or 'answers.json')
+        if a.action == 'verdicts':
+            return telegram.verdicts_cli(a.address, a.out or 'verdicts.json', a.intro)
         return telegram.setup() if a.action == 'setup' else telegram.test()
     if a.cmd == 'init':
         return init(a.test_cmd, a.junit)
