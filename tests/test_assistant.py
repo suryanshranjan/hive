@@ -240,6 +240,21 @@ texts = [m['text'] for m in fake.sent]
 check('an old tap and a failing message do not stop the listener; it says sorry and answers the next',
       (any('something went wrong' in t for t in texts), any('The latest build' in t for t in texts)), (True, True))
 
+# 3n. like Jarvis with Tony: messages that came together are read together, repeats are answered once with an apology,
+# and a bare "hi" next to a real request gets no reply of its own; replies are in Hive's own voice, from real facts only
+check('repeats are answered once, and a bare hi beside a request is folded in',
+      assistant.coalesce(['Status', 'Hi', 'Status', 'status?', 'Hi']), (['Status'], True))
+check('a lone hi is still answered', assistant.coalesce(['hi']), (['hi'], False))
+_ask_json = explain.ask_json
+seen = []
+explain.ask_json = lambda prompt: (seen.append(prompt) or {'reply': 'All quiet on the build front, sir.'}
+                                   if 'J.A.R.V.I.S.' in prompt else _ask_json(prompt))
+fake = FakeTelegram([])
+assistant.handle(ch(fake), repo, 'status?', poll=1)
+explain.ask_json = _ask_json
+check("status is said in Hive's own voice, from the project's real facts",
+      (fake.sent[-1]['text'], 'Latest build: branch hive/b1' in seen[0]), ('🐝 All quiet on the build front, sir.', True))
+
 # 4. the listener steps aside while a build or review is talking to the owner
 json.dump({'pid': os.getppid(), 'at': time.time()}, open(telegram.BUSY, 'w'))
 check('another live process talking: the listener steps aside', telegram.busy_elsewhere(), True)
