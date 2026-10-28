@@ -109,15 +109,21 @@ def new(repo='.', size='t3.large', region=None, profile=None, with_login=True, s
     say(f"  Ready at {m['ip']}.")
     return cloud.go(repo, target, with_login, start, say, key=None if local else m['key'])
 
-def stop(ask=input, say=print):
-    """Delete the machine `hive cloud --new` made, with its key and firewall rule."""
+def stop(ask=input, say=print, repo='.'):
+    """Bring the work done in the cloud back to this computer, then delete the machine `hive cloud --new` made, with its
+    key and firewall rule (the owner: "when we close the instance, the development must come back to local")."""
     if not os.path.exists(STATE()):   # e.g. asked on the cloud machine itself, which never holds the owner's AWS keys
         say("There is no Hive machine made from this computer to delete."); return 5
     m = json.load(open(STATE()))
     what = m.get('instance') or m.get('name')
-    if ask(f"Delete the Hive machine {what} and everything on it? Bring results back first with `hive cloud pull`. "
-           "[y/N] > ").strip().lower() not in ('y', 'yes'):
+    if ask(f"Delete the Hive machine {what}? Everything built there comes back to this computer first. [y/N] > "
+           ).strip().lower() not in ('y', 'yes'):
         say('Kept.'); return 0
+    if m.get('ip') and os.path.isdir(os.path.join(repo, '.git')):
+        say('  Bringing your results back first...')
+        if cloud.pull(repo, say=say) != 0 and ask("  I couldn't bring the results back, so the machine is kept. Delete it "
+                                                  "anyway, losing what was built there? [y/N] > ").strip().lower() not in ('y', 'yes'):
+            say('Kept. Run `hive cloud pull` to try again, then `hive cloud --stop`.'); return 6
     p, r = m.get('profile'), m.get('region')
     if m.get('instance'):
         _aws(['ec2', 'terminate-instances', '--instance-ids', m['instance']], p, r, check=False)

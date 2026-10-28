@@ -39,7 +39,11 @@ check "the machine sets itself up on first boot (Claude Code included)" \
   "$(grep -c 'run-instances .*--user-data file://' $T/aws.log) $(grep -c 'claude-code' $T/.hive/cloud/*.boot.sh)" "1 1"
 printf 'n\n' | PATH=$T/bin:$PATH $PY -m hive cloud --stop > $T/keep.txt 2>&1
 check "--stop asks first, and keeps the machine on no" "$(grep -c 'Kept.' $T/keep.txt) $(grep -c terminate $T/aws.log)" "1 0"
+P2=$T/box2/hive-cloud/project
+git -C $P2 checkout -q -b hive/ratings && echo x > $P2/ratings.py && git -C $P2 add ratings.py
+git -C $P2 -c user.name=h -c user.email=h@h commit -qm "built in the cloud" && git -C $P2 checkout -q main
 printf 'y\n' | PATH=$T/bin:$PATH $PY -m hive cloud --stop > $T/stop.txt 2>&1
+check "--stop brings the cloud's work back to this computer before deleting" "$(git branch --list 'hive/ratings' | tr -d ' *')" "hive/ratings"
 check "--stop deletes the machine, its firewall rule and its key; nothing is left" \
   "$(grep -c 'terminate-instances --instance-ids i-0hive' $T/aws.log) $(grep -c 'delete-security-group --group-id sg-0hive' $T/aws.log) $(grep -c 'delete-key-pair' $T/aws.log) $(ls $T/.hive/cloud | wc -l | tr -d ' ')" "1 1 1 0"
 rm -rf $T; exit $fail
