@@ -27,3 +27,11 @@ Kill: **R beats N by < 10 points on surprising cases.**
 **Honest prior.** S1 about 50%. A1 about 65%. A change must also be built right: the fix round has to turn his words into the tested behaviour.
 
 **Cost.** About $7 at list price, plus about 15 minutes of the founder's time on Telegram.
+
+## Amendment before any verdict (Oct 28 2026): a stand-in owner
+
+At the founder's request, **the founder model from Gate 33 plays the owner throughout**: it gives the verdicts, confirms the readings and does the phone review, through a simulated chat that drives the same review code. The founder gave no verdict for this gate.
+
+- **What this measures:** the mechanism. Does the fixed review (scan and mark, then "what would you do instead?") carry an owner's divergent rules into the code? Here "surprising" means the stand-in's verdict differs from the cold default.
+- **What it cannot measure:** real owners. Gate 33 found the model matches only 35% of the founder's surprising rules, and it does not tire or skim like a person on a phone (Gate 31). Results here count for the tool, not as evidence about founders.
+- Predictions and the kill condition are unchanged, now about the stand-in owner. The 6-surprising minimum still applies.
