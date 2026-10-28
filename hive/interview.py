@@ -40,7 +40,7 @@ ask once and let the options name the cut-off (for example "Accepted up to 3 day
 READ = """An owner answered a question about how his product should behave.
 
 Situation: {situation}
-His answer, in his own words: {answer}
+His answer: {answer}
 
 Write his rule as one clear sentence a software builder can implement and test. Keep his meaning exactly; add nothing.
 Reply with JSON only: {{"rule": "..."}}"""
@@ -54,13 +54,13 @@ list if none)."""
 
 SETTLED = """A business owner is answering questions about how his product should behave. He just answered:
 Question: {situation}
-His answer, in his own words: {answer}
+His answer: {answer}
 
 These questions are still to come:
 {listing}
 
-Which of them does his answer already decide, so asking would make him repeat himself? Only count a question if his
-answer clearly settles it. Reply with JSON only: {{"settled": [numbers]}} (an empty list if none)."""
+Think like his assistant: which of them does his answer already decide, given what it tells you about how he runs his
+business, so asking would make him repeat himself? Only count a question if his answer clearly settles it. Reply with JSON only: {{"settled": [numbers]}} (an empty list if none)."""
 
 MAX_QUESTIONS = 20   # about 5 minutes on a phone
 
@@ -79,7 +79,8 @@ def _dedupe(qs):
     return [dict(q, id=f'q{k:02d}') for k, q in enumerate(kept, 1)]
 
 def settled_by(situation, answer, remaining):
-    """Which of the remaining questions his own-words answer already decides (ids), so he is not asked twice."""
+    """Which of the remaining questions his answer (a tap or his own words) already decides (ids), so he is not asked
+    twice (the founder: "Hive should understand the context from one situation and not ask similar questions")."""
     if not remaining:
         return []
     listing = '\n'.join(f"{k}. {q['situation']}" for k, q in enumerate(remaining, 1))
@@ -131,6 +132,8 @@ def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll
     else:
         got = {}
         for k, q in enumerate(qs, 1):
+            if got.get(q['id']) == telegram.SETTLED:
+                continue
             opts = '  '.join(f'{chr(65 + i)}) {o}' for i, o in enumerate(q['options']))
             a = (ask or input)(f"\n{k} of {len(qs)}. {q['situation']}\n  {opts}\n  Your answer (a letter, or your own words) > ").strip()
             for _ in range(3):   # "what does this mean?" gets an explanation, not taken as his answer
@@ -143,6 +146,14 @@ def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll
                 a = (ask or input)(f"  {why}\n  So, what should happen? (a letter, or your own words) > ").strip()
             m = re.fullmatch(r'([A-Ca-c])[).]?', a)
             got[q['id']] = q['options'][ord(m.group(1).upper()) - 65] if m and ord(m.group(1).upper()) - 65 < len(q['options']) else a
+            rest = [x for x in qs[k:] if x['id'] not in got]
+            if got[q['id']] and rest:   # his answer may already settle what comes next
+                done = settled_by(q['situation'], got[q['id']], rest)
+                for i in done:
+                    got[i] = telegram.SETTLED
+                if done:
+                    print(f"  (Your answer also settles {len(done)} of the coming question{'s' if len(done) != 1 else ''}; "
+                          "I'll skip " + ('it.)' if len(done) == 1 else 'them.)'))
     rules, free = [], []
     for q in qs:
         a = got.get(q['id'], '')
