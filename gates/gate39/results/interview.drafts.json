@@ -1,0 +1,64 @@
+{
+ "drafts": [
+  {
+   "id": "q01",
+   "situation": "When counting business days from a start date (e.g., 5 business days after Monday 6 October for an invoice due date), skip Saturdays, Sundays, and the three fixed holidays January 1, December 25 and December 26; no other dates are skipped, so Diwali and Republic Day count as normal working days.",
+   "own": "Saturdays and Sundays are skipped, along with three fixed holidays: New Year's Day (Jan 1), Dec 25 and Dec 26. Nothing else is skipped, so Diwali and Republic Day count as normal working days.",
+   "asked": "Your team asks for an invoice to be due 5 business days after Monday 6 October. Which days should be skipped when counting?",
+   "options": [
+    "Yes, exactly",
+    "Not quite"
+   ]
+  },
+  {
+   "id": "q03",
+   "situation": "Label a sale as FY followed by the two-digit calendar year in which its financial year (April to March) ends, then a hyphen and Q followed by the quarter number counted from April as Q1, so a sale on 15 May 2026 is labelled FY27-Q1.",
+   "own": "The label is FY27-Q1. The year is the one the financial year ends in, written as two digits, and the quarter counts from April.",
+   "asked": "Your financial year runs April to March. A sale is made on 15 May 2026. How should it be labelled?",
+   "options": [
+    "Yes, exactly",
+    "Not quite"
+   ]
+  },
+  {
+   "id": "q04",
+   "situation": "The late fee is 2% of the invoice amount for each month or part-month the payment is late, with no fee for the first 5 days, and the fee is capped at \u20b950 in total (for example, a \u20b920,000 invoice paid 30 days late has a fee of \u20b950, because 2% of \u20b920,000 would be \u20b9400).",
+   "own": "None of these. The fee is 2% of the invoice for each month or part-month late, with no fee for the first 5 days. It is capped at \u20b950, so Sharma Traders pays \u20b950, because 2% of \u20b920,000 would be \u20b9400.",
+   "asked": "Sharma Traders owes \u20b920,000 and pays 30 days late. How is the late fee worked out?",
+   "options": [
+    "Yes, exactly",
+    "Not quite"
+   ]
+  },
+  {
+   "id": "q10",
+   "situation": "When a card number entered by staff is invalid (for example, it has only 3 digits or contains a letter), the receipt prints the word INVALID in place of the card number, shows no part of what was typed, and the system neither refuses the entry nor shows a warning.",
+   "own": "Print the word INVALID in place of the card number. Show nothing of what was typed, and don't refuse or warn.",
+   "asked": "Staff type a card number with only 3 digits, or with a letter in it, by mistake. What should the receipt show?",
+   "options": [
+    "Yes, exactly",
+    "Not quite"
+   ]
+  },
+  {
+   "id": "q11",
+   "situation": "A product code entered at the till is accepted only if it is in the catalogue format of two letters, a dash, then four digits; any code that does not fit that format (for example ' ab 123_x ', which ends in the letter \"x\") is not tidied up and is instead replaced with the placeholder code XX-0000.",
+   "own": "Neither. Our catalogue format is two letters, a dash, then four digits. A code that doesn't fit that, like this one with a letter \"x\" at the end, isn't tidied up. It is replaced with the placeholder code XX-0000.",
+   "asked": "A staff member types the product code ' ab 123_x ' into the till. How should it be tidied up for the catalogue?",
+   "options": [
+    "Yes, exactly",
+    "Not quite"
+   ]
+  },
+  {
+   "id": "q15",
+   "situation": "Never refuse an order for an unknown delivery zone, a 0 g parcel, or a 60 kg parcel: an unknown zone is charged as a standard zone at a flat 12.00 base rate, a 0 g parcel is charged only the base rate for its zone, and any parcel is priced by the normal weight rule with a flat 25.00 heavy-parcel surcharge added when it weighs over 20 kg (so a 60 kg parcel gets the normal weight-rule price plus 25.00).",
+   "own": "None of those. We don't refuse any of them. An unknown zone is charged as a standard zone at a flat 12.00 base rate. A 0 g parcel is charged just the base rate for its zone. A 60 kg parcel is priced by the normal weight rule, with a flat 25.00 heavy-parcel surcharge added on anything over 20 kg.",
+   "asked": "Someone enters a delivery zone we do not serve, a parcel of 0 g, or a 60 kg parcel. What should happen?",
+   "options": [
+    "Yes, exactly",
+    "Not quite"
+   ]
+  }
+ ]
+}

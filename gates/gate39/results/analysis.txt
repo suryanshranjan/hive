@@ -1,0 +1,32 @@
+hidden pass: N0 38.4%, H 76.0%, R 100.0%, T 75.6%
+H: fixes 0.65 of 217 N0 edge errors; breaks 2 of 221 N0-right edge calls
+R: fixes 1.00 of 217 N0 edge errors; breaks 0 of 221 N0-right edge calls
+T: fixes 0.85 of 217 N0 edge errors; breaks 20 of 221 N0-right edge calls
+K = (H − N0)/(T − N0) = 1.01 (95% CI 0.53 to 1.60, bootstrap over functions)
+R keeps 1.66 of the tour gain
+interview: 19 questions, 24 owner replies, 4.9 min; 10 H rules, 70 R rules
+coverage: asked about 17 of 25 declared decisions (0.68); of those, H states 13 right (0.76)
+sheet H: right 13, partial 1, wrong 0, absent 11
+sheet R: right 25, partial 0, wrong 0, absent 0
+H fixes 0.92 of 74 N0 edge errors on functions whose decisions H states all right (4), 0.51 of 143 elsewhere
+
+per function: N0 edge errors, share fixed by H / R / T, H labels
+  biz_days_add              33  0.52 / 1.00 / 0.85   r a a
+  fiscal_quarter            35  0.00 / 1.00 / 0.83   a a a
+  late_fee                  14  0.71 / 1.00 / 1.00   r r a a
+  loyalty_tier              14  0.00 / 1.00 / 1.00   a a
+  mask_card                 18  1.00 / 1.00 / 1.00   a p
+  mid_value                  6  1.00 / 1.00 / 1.00   r
+  normalize_sku             41  1.00 / 1.00 / 0.78   r r r
+  nps_class                 21  1.00 / 1.00 / 0.71   r r
+  ship_cost                 29  0.97 / 1.00 / 0.76   r a r r
+  split_bill                 6  0.00 / 1.00 / 1.00   r
+
+predictions
+W1 T fixes ≥ 0.85: 0.85 -> failed
+W2 R ≥ T − 5: +24.4 -> held
+W3 0.40 ≤ K ≤ 0.80: 1.01 -> failed
+W4 0.50 ≤ coverage ≤ 0.85 and transfer ≥ 0.80: 0.68, 0.76 -> failed
+W5 N0 < 65%: 38.4 -> held
+Kill K < 0.25: did not fire
+Rules: K ≥ 0.85: the interview is not the leak with a consistent owner

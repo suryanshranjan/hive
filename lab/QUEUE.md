@@ -4,6 +4,11 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 
 ## Where we left off (Oct 29 2026, night before Gate 38 day 2)
 
+- **Overnight, separate from Gate 38 (no Gate 38 file, container or Telegram touched):**
+  - **Gate 39 done** (wind tunnel, synthetic owner): complete rule sheet 250/250, Hive's interview 76.0%, tour 75.6%, none 38.4%. Leak: 8 of 25 decisions never asked (all unusual input), 4 lost before the sheet. See `gates/gate39/RESULTS.md`.
+  - Tool fixes from it (all 203 checks pass): corrections amend the rule instead of replacing it; the terminal restates a rule before its correction; own words keep their detail.
+  - **Gate 40 next** (or running): unusual input as owner decisions; see its card below and `gates/gate40/`.
+
 - **Gate 38 is running.** Predictions in `gates/gate38/prompts/PREDICTIONS.md` (`72a5726`).
   - Day 1 is done: Hive's interview (13 questions, one per decision) and the rule sheet; 13 rules confirmed, one corrected, 7.9 minutes.
   - Day 2 is scheduled in the container: `/home/node/g38/day2.py` waits until 06:40 UTC on Oct 29, then puts the 12 referee situations (`cases.json`, cold probe unanimous 12/12) to the founder on Telegram. Log: `day2.log`; answers saved to `verdicts.json`.
@@ -32,6 +37,10 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 Workers run shell commands, so run them in a container. Image: `node:22-bookworm` plus `python3 sqlite3 git` and `npm i -g @anthropic-ai/claude-code`, run as user `node`. Mount the repo read-write at `/host/hive` and `~/.claude/.credentials.json` read-only; copy the credentials into the container's `~/.claude/`; work in a fresh clone inside the container (a Windows checkout has CRLF line endings), with `origin` pointed at GitHub. Copy results back out and push from the host.
 
 ## Needs design first (write the config and predictions, push them, then run)
+
+### G40: unusual input as owner decisions (synthetic owner, about $10)
+- Config `lab/experiments/g40_coverage.json`; predictions `gates/gate40/prompts/PREDICTIONS.md`.
+- Command: `python3 lab/run_gate.py lab/experiments/g40_coverage.json --max-parallel 6`, then `python3 gates/gate40/referee/analyze.py runs/g40`.
 
 ### G9: intent interface v1 vs free asking
 - Arm A: free asking, 30 questions.

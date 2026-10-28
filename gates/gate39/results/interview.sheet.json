@@ -1,0 +1,86 @@
+{
+ "draft": {
+  "rules": [
+   {
+    "rule": "Whenever a due date is counted in business days from a start date, counting begins on the first business day after the start date, so a Saturday order promised in 2 business days has Monday as day 1 and is due Tuesday. Saturdays, Sundays, January 1, December 25 and December 26 are skipped. No other date is skipped, so Diwali and Republic Day count as normal working days.",
+    "from": [
+     1,
+     11
+    ]
+   },
+   {
+    "rule": "Whenever a customer has 5,000 points or more, they are Gold, so a customer with exactly 5,000 points is Gold. Whenever a customer's points balance is negative, for example minus 200 after a returned order, they have no membership level and lose membership until their points are positive.",
+    "from": [
+     2,
+     3
+    ]
+   },
+   {
+    "rule": "Whenever a card number is shown on a receipt, the customer and staff see only the last 4 digits and everything else is hidden. Whenever the card number staff entered is invalid, for example it has only 3 digits or contains a letter, the receipt prints the word INVALID in place of the card number, shows no part of what was typed, and the system neither refuses the entry nor shows a warning.",
+    "from": [
+     4,
+     14
+    ]
+   },
+   {
+    "rule": "Whenever a customer scores the survey from 0 to 6 out of 10, count them as a Detractor, so a score of 6 is a Detractor.",
+    "from": [
+     5
+    ]
+   },
+   {
+    "rule": "Whenever a parcel is priced, never refuse the order. The price is the base charge for its zone plus a set amount for each extra 500g, with the weight rounded up to the next 500g. Whenever the delivery zone is unknown, charge it as a standard zone with a flat 12.00 base rate. Whenever a parcel weighs 0 g, charge only the base rate for its zone. Whenever a parcel weighs over 20 kg, add a flat 25.00 heavy-parcel surcharge to the normal weight-rule price, so a 60 kg parcel pays the normal weight-rule price plus 25.00.",
+    "from": [
+     6,
+     16
+    ]
+   },
+   {
+    "rule": "Whenever a bill is split between people and it cannot divide evenly, everyone pays the same amount, rounded up, so the restaurant is never short and may collect a little extra. Whenever a bill is split between 0 people, show no amount and leave it blank.",
+    "from": [
+     7,
+     8
+    ]
+   },
+   {
+    "rule": "Whenever the middle value of a group of orders is needed, ignore any orders whose amount is blank. If an even number of amounts remains, the middle value is the lower of the two middle amounts, so for \u20b9100, \u20b9200, \u20b9300 and \u20b9400 it is \u20b9200. If no amounts remain, because the group has none or all are blank, show nothing.",
+    "from": [
+     9,
+     10
+    ]
+   },
+   {
+    "rule": "Whenever a sale is labelled with its financial year (April to March), the label is FY followed by the two-digit calendar year in which that financial year ends, then a hyphen, then Q and the quarter number counted from April as Q1, so a sale on 15 May 2026 is labelled FY27-Q1.",
+    "from": [
+     12
+    ]
+   },
+   {
+    "rule": "Whenever a late fee applies, which is only when payment is more than 5 days late, the fee is never less than \u20b92.50, even if the calculated fee (2% of a small invoice) would come to less.",
+    "from": [
+     13
+    ]
+   },
+   {
+    "rule": "Whenever a product code is entered, tidy it up and never reject it for being off-format. Trim spaces around the code, capitalise the two letters, and ignore any dashes or spaces after the letters. Among the digits, read O/o as 0 and I/l as 1. Pad the digits with zeros to four, or cut them to the last four if there are more. Whenever the code does not start with two letters, has no digits, or has some other stray character after the letters, it becomes XX-0000.",
+    "from": [
+     15
+    ]
+   }
+  ],
+  "disagree": []
+ },
+ "done": true,
+ "rules": [
+  "Whenever a due date is counted in business days from a start date, counting begins on the first business day after the start date, so a Saturday order promised in 2 business days has Monday as day 1 and is due Tuesday. Saturdays, Sundays, January 1, December 25 and December 26 are skipped. No other date is skipped, so Diwali and Republic Day count as normal working days.",
+  "Round each score to the nearest whole number, with halves rounding up; if the rounded score is below 0 or above 10, the answer is \"invalid\" (not detractor or promoter), otherwise the answer is determined from the rounded score.",
+  "Whenever a card number is shown on a receipt, the customer and staff see only the last 4 digits and everything else is hidden. Whenever the card number staff entered is invalid, for example it has only 3 digits or contains a letter, the receipt prints the word INVALID in place of the card number, shows no part of what was typed, and the system neither refuses the entry nor shows a warning.",
+  "Whenever a customer scores the survey from 0 to 6 out of 10, count them as a Detractor, so a score of 6 is a Detractor.",
+  "Whenever a parcel is priced, never refuse the order. The price is the base charge for its zone plus a set amount for each extra 500g, with the weight rounded up to the next 500g. Whenever the delivery zone is unknown, charge it as a standard zone with a flat 12.00 base rate. Whenever a parcel weighs 0 g, charge only the base rate for its zone. Whenever a parcel weighs over 20 kg, add a flat 25.00 heavy-parcel surcharge to the normal weight-rule price, so a 60 kg parcel pays the normal weight-rule price plus 25.00.",
+  "Whenever a bill is split between people and it cannot divide evenly, everyone pays the same amount, rounded up, so the restaurant is never short and may collect a little extra. Whenever a bill is split between 0 people, show no amount and leave it blank.",
+  "Whenever the middle value of a group of orders is needed, ignore any orders whose amount is blank. If an even number of amounts remains, the middle value is the lower of the two middle amounts, so for \u20b9100, \u20b9200, \u20b9300 and \u20b9400 it is \u20b9200. If no amounts remain, because the group has none or all are blank, show nothing.",
+  "Whenever a sale is labelled with its financial year (April to March), the label is FY followed by the two-digit calendar year in which that financial year ends, then a hyphen, then Q and the quarter number counted from April as Q1, so a sale on 15 May 2026 is labelled FY27-Q1.",
+  "Whenever a late fee applies, which is only when payment is more than 5 days late, the fee is never less than \u20b92.50, even if the calculated fee (2% of a small invoice) would come to less.",
+  "Whenever a product code is entered, tidy it up and never reject it for being off-format. Trim spaces around the code, capitalise the two letters, and ignore any dashes or spaces after the letters. Among the digits, read O/o as 0 and I/l as 1. Pad the digits with zeros to four, or cut them to the last four if there are more. Whenever the code does not start with two letters, has no digits, or has some other stray character after the letters, it becomes XX-0000."
+ ]
+}

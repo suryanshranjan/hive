@@ -135,7 +135,8 @@ Think about what he means. Did he answer (pick a choice, give his own rule, or l
 the question means (he is confused by a word, the situation, or the choices)? If he is asking, explain in 2 or 3 short
 plain sentences what is being asked and what each choice would mean in practice for his business, using everyday words
 and the same names, without recommending one. If he answered by picking one of the choices in his own words (for
-example "the second one" or a few words of it), give its number; if he gave his own rule, the number is null.
+example "the second one" or a few words of it) and added nothing the choice lacks, give its number; if he gave his own
+rule, or added any detail the choice lacks (a name or label, an amount, a limit, an exception), the number is null.
 Reply with JSON only: {{"kind": "answer" | "question", "choice": number or null, "explanation": "..." (only for a
 question)}}"""
 

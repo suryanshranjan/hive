@@ -146,8 +146,9 @@ qs = [{'id': f'r{k}', 'situation': f'Case {k}.', 'options': ['Yes', 'No']} for k
 fake = FakeTelegram([say('Only after a week'), say('whatever you feel like'), say('Refund it'),
                      say("It's exactly that's the thing I want."), say('Shut the campaign off')])
 rules = interview.interview('Fees', ch(fake), situations=qs, poll=1)
-check('a yes in his own words keeps the reading; "whatever" leaves it to the builders; a correction keeps its situation',
-      rules, ['A late fee is charged only after 7 days.', 'Case 3. -> Shut the campaign off'])
+check('a yes in his own words keeps the reading; "whatever" leaves it to the builders; a correction amends the reading '
+      'of its situation, keeping what he did not object to (Gate 39)',
+      rules, ['A late fee is charged only after 7 days.', 'A late fee is charged only after 7 days. Amended: Shut the campaign off'])
 
 # 3g. an interview answer that contradicts an earlier ruling: he is asked which holds now, and his choice goes in
 fake = FakeTelegram([tap('q01|1'), tap('q02|0'), tap('set|0|1')])
@@ -202,9 +203,9 @@ qs = [{'id': f'w{k}', 'situation': f'Case {k}.', 'options': ['Yes', 'No']} for k
 fake = FakeTelegram([tap('w1|0'), tap('w2|1'), tap('dis|0|0'), tap('sheet|2'), tap('sheet|done'), say('Only after a week')])
 rules = interview.interview('Fees', ch(fake), situations=qs, poll=1)
 explain.ask_json = _ask_json
-check('the rule sheet: general rules, a disagreement settled by him, a wrong rule rewritten in his words',
+check('the rule sheet: general rules, a disagreement settled by him, a wrong rule amended by his words',
       (rules, any('Your rules for this feature' in m['text'] for m in fake.sent)),
-      (['Whenever a tip is paid, no fee is charged.', 'A late fee is charged only after 7 days.',
+      (['Whenever a tip is paid, no fee is charged.', 'Whenever a fee is late, the brand is reminded. Amended: Only after a week',
         'Is a late tip charged a fee? -> No fee'], True))
 
 # 3k. the hand-over: he sees what it does now by his rules; what he changes goes to a fix round; then his yes

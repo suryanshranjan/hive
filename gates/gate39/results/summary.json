@@ -1,0 +1,61 @@
+{
+ "name": "g39",
+ "arms": {
+  "N0": {
+   "hidden_pass": 0.384,
+   "ci95_by_function": [
+    0.232,
+    0.54
+   ],
+   "tests": 250
+  },
+  "H": {
+   "hidden_pass": 0.76,
+   "ci95_by_function": [
+    0.572,
+    0.92
+   ],
+   "tests": 250
+  },
+  "R": {
+   "hidden_pass": 1.0,
+   "ci95_by_function": [
+    1.0,
+    1.0
+   ],
+   "tests": 250
+  },
+  "T": {
+   "hidden_pass": 0.756,
+   "ci95_by_function": [
+    0.656,
+    0.844
+   ],
+   "tests": 250
+  }
+ },
+ "diffs": {
+  "H-N0": {
+   "points": 37.6,
+   "ci95": [
+    19.2,
+    57.2
+   ]
+  },
+  "R-N0": {
+   "points": 61.6,
+   "ci95": [
+    45.2,
+    76.8
+   ]
+  },
+  "T-N0": {
+   "points": 37.2,
+   "ci95": [
+    23.6,
+    50.8
+   ]
+  }
+ },
+ "allowance": {}
+}

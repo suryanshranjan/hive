@@ -11,6 +11,11 @@ if 'short interview with a busy' in prompt:   # the interview: two situations
         {'situation': 'Asha tips a creator Rs 500 after a great post.', 'options': ['No fee on a tip', 'The usual 10% fee']},
         {'situation': 'A brand pays the fee late by 3 days.', 'options': ['Remind them', 'Charge a late fee']}]})}))
     sys.exit(0)
+if 'Amend his rule as he now means it' in prompt:   # keeps the shown rule and adds his correction
+    shown = prompt.split('as it will be built:\n')[1].split('\n\nHe replied: ')[0]
+    reply = prompt.split('He replied: ')[1].split('\n\nAmend his rule')[0]
+    print(json.dumps({'result': json.dumps({'rule': f'{shown} Amended: {reply}'})}))
+    sys.exit(0)
 if 'Write his rule as one clear sentence' in prompt:
     print(json.dumps({'result': json.dumps({'rule': 'A late fee is charged only after 7 days.'})}))
     sys.exit(0)
