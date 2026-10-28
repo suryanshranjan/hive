@@ -2,8 +2,13 @@
 ranks them by their position, and marks the last one as something an owner cannot judge."""
 import json, re, sys
 prompt = sys.stdin.read()
+if 'contradict each other' in prompt:   # the contradiction check: decisions 1 and 2 clash when the owner's words say so
+    clash = 'CONFLICT-ME' in prompt
+    print(json.dumps({'result': json.dumps({'conflicts': [{'a': 1, 'b': 2, 'question': 'Should a missing price hide the day total?',
+                      'option_a': 'Hide the total', 'option_b': 'Total from the others'}] if clash else []})}))
+    sys.exit(0)
 ids = [i for i in re.findall(r'"id": "([^"]+)"', prompt) if i != '...']
-items = [{'id': i, 'context': f'In the brand report (item {k}).', 'example': f'For example, Priya with 1,000 followers.',
-          'advice': "I'd change it: count each account once." if k == 0 else "I'd keep it.", 'alternative': 'count each account once' if k == 0 else '', 'impact': 3 if k == 0 else 1, 'owner_can_judge': k < len(ids) - 1}
+items = [{'id': i, 'context': f'In the shop report (item {k}).', 'example': f'For example, Asha with 3 orders.',
+          'advice': "I'd change it: count each order once." if k == 0 else "I'd keep it.", 'alternative': 'count each order once' if k == 0 else '', 'impact': 3 if k == 0 else 1, 'owner_can_judge': k < len(ids) - 1}
          for k, i in enumerate(ids)]
-print(json.dumps({'result': json.dumps({'summary': 'A report that adds up campaign results.', 'items': items})}))
+print(json.dumps({'result': json.dumps({'summary': 'A report that adds up daily shop orders.', 'items': items})}))

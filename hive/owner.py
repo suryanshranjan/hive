@@ -182,6 +182,10 @@ def write_corrections(d):
             a = json.load(open(os.path.join(d, 'assumptions', r['id'] + '.json')))
             shown = f"\n  (The owner saw it as: {r['shown_as']})" if r.get('shown_as') and r['shown_as'] != a['text'] else ''
             rows.append(f"- The builders assumed: {a['text']}{shown}\n  **The owner says:** {r['correction']}")
+    res = os.path.join(d, 'resolutions.json')
+    for c in (json.load(open(res)) if os.path.exists(res) else []):   # contradictions the owner settled; these win
+        rows.append(f"- Two of the owner's answers contradicted each other: {c['question']}\n"
+                    f"  **The owner decided:** {c['chosen']} (this overrides whichever answer above disagrees)")
     open(os.path.join(d, 'corrections.md'), 'w').write(
         "# The owner's corrections\n\nThe owner reviewed the defaults the builders applied, and each item below was wrong. "
         "Change the code to follow the owner, encode each correction as a test, and do not stretch it into rules it does not "
