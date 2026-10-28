@@ -215,7 +215,8 @@ def start(repo='.', workers=4, goal=None, minutes=40, overnight=False, interview
         say(f"I'll remind them of your {_n(k, 'earlier ruling')} on this project, so you won't be asked those again.")
     if interview_first and (phone or not overnight):   # the owner is here: ask him first (Gates 30-35)
         say("\nFirst, a few quick situations where your own rules matter" + (", on your phone." if phone else ":"))
-        asked = interview.interview(goal_text, phone, [r['text'] for r in memory.load(repo)], ask=lambda p: _ask(p, ''))
+        asked = interview.interview(goal_text, phone, [r['text'] for r in memory.load(repo)], ask=lambda p: _ask(p, ''),
+                                    save=os.path.join(home, 'interview'))   # a stop never costs him his answers
         if asked:
             for r in asked:
                 memory.add(repo, r, 'interview')
