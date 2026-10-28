@@ -196,7 +196,8 @@ check("picking the option Hive did not recommend is one tap, recorded as the own
 check('the stored wording is the decision itself, not the "1 of 1" header', r['shown_as'].startswith('In the shop report'), True)
 
 # 8. an open question gathers every reply until Done; situations get one-tap verdicts, with undo and own words
-fake = FakeTelegram([say('- they treat goods like cash\n- they promise dates'), say("status"), say('they skip the brief'),
+fake = FakeTelegram([tap('collect|done'), tap('collect|more'),   # an accidental early Done, taken back
+                     say('- they treat goods like cash\n- they promise dates'), say("status"), say('they skip the brief'),
                      tap('collect|done')])
 lines = telegram.collect(telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), 'What do new people get wrong?', poll=1)
 check('an open question gathers every point until Done, ignoring a status request',
