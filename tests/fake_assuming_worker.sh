@@ -8,4 +8,6 @@ echo "$code" > "$area.py"
 [ "$HIVE_WORKER" = w1 ] && echo "$prompt" | grep -q "Recording your assumptions" && \
   python3 -m hive assume "If a creator has no bonus, the fee is still taken on the cash alone." >&2
 python3 -m hive land "$HIVE_WORKER-$area-$$" "implement $area" >&2
+[ "$HIVE_WORKER" = w1 ] && echo "$prompt" | grep -q "Record each change as built" && \
+  python3 -m hive assume "As built: with no bonus, the fee is 10 percent of the cash." >&2
 echo '{"total_cost_usd": 0.01, "usage": {"input_tokens": 0}, "result": "done"}'
