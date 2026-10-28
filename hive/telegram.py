@@ -12,7 +12,7 @@ ever stored as an answer or a correction, never run.
 
 Voice: a composed, courteous, quietly confident assistant that is a step ahead: short sentences, a clear recommendation,
 never flustered or chatty, and every message leaves the owner one easy thing to do."""
-import getpass, html as _html, json, os, time, urllib.request
+import getpass, html as _html, http.client, json, os, time, urllib.error, urllib.request
 
 PATH = os.path.join(os.path.expanduser('~'), '.hive', 'telegram.json')
 
@@ -43,8 +43,14 @@ def busy_elsewhere(stale=90):
 def _call(token, method, **params):
     req = urllib.request.Request(f'https://api.telegram.org/bot{token}/{method}', data=json.dumps(params).encode(),
                                  headers={'Content-Type': 'application/json'})
-    with urllib.request.urlopen(req, timeout=params.get('timeout', 0) + 30) as r:
-        body = json.load(r)
+    try:
+        with urllib.request.urlopen(req, timeout=params.get('timeout', 0) + 30) as r:
+            body = json.load(r)
+    except urllib.error.HTTPError as e:   # Telegram explains refusals (409 Conflict, 400 bad formatting) in the body
+        try:
+            body = json.load(e)
+        except Exception:
+            body = {'ok': False, 'description': f'HTTP {e.code}'}
     if not body.get('ok'):
         raise RuntimeError(f"Telegram {method}: {body.get('description')}")
     return body['result']
@@ -74,7 +80,13 @@ class Channel:
                                                      for row in rows]}
         if reply_to:
             p['reply_to_message_id'] = reply_to
-        return self.api('sendMessage', **p)['message_id']
+        for wait in (2, 5, 15, None):   # a dropped connection must not lose the owner's question
+            try:
+                return self.api('sendMessage', **p)['message_id']
+            except (OSError, http.client.HTTPException):
+                if wait is None:
+                    raise
+                time.sleep(wait)
 
     def fetch(self, file_path, local):
         """Download a file the owner sent (a voice note) from Telegram's file storage."""
@@ -88,7 +100,13 @@ class Channel:
             p = {'timeout': 0}
             if self.offset is not None:
                 p['offset'] = self.offset
-            batch = self.api('getUpdates', **p)
+            for wait in (2, 5, 15, None):   # another reader at the same moment, or a dropped connection: try again
+                try:
+                    batch = self.api('getUpdates', **p); break
+                except (OSError, http.client.HTTPException, RuntimeError) as e:
+                    if wait is None or (isinstance(e, RuntimeError) and 'onflict' not in str(e)):
+                        raise
+                    time.sleep(wait)
             if not batch:
                 return
             self.offset = batch[-1]['update_id'] + 1
@@ -120,6 +138,8 @@ class Channel:
             if 'onflict' not in str(e):
                 raise
             time.sleep(2); return []
+        except (OSError, http.client.HTTPException):   # a dropped connection while waiting: the owner is still there
+            time.sleep(3); return []   # (Gate 36: one of these ended an interview before its first question)
         for u in batch:
             self.offset = u['update_id'] + 1
             if 'callback_query' in u:

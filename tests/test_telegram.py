@@ -277,6 +277,20 @@ check('long options are written out in full and numbered; the buttons are just n
        [b['text'] for b in q['reply_markup']['inline_keyboard'][0]], got['L1'].startswith('The upload is accepted')),
       (True, ['1', '2'], True))
 
+# 8b. a dropped connection is retried, not fatal (Gate 36: one ended an interview before its first question)
+import http.client
+calls = []
+def flaky(method, **p):
+    calls.append(method)
+    if len(calls) <= 2:
+        raise http.client.RemoteDisconnected('Remote end closed connection without response')
+    return {'message_id': 7} if method == 'sendMessage' else []
+_sleep, telegram.time.sleep = telegram.time.sleep, lambda s: None
+ch = telegram.Channel({'chat_id': ME, 'token': 'x'}, api=flaky)
+check('a dropped connection while waiting for a reply is retried, not a crash', ch.updates(timeout=1), [])
+check('a message is sent again after a dropped connection', ch.send('hello'), 7)
+telegram.time.sleep = _sleep
+
 # 9. not connected: hive behaves as before
 os.environ['HIVE_TELEGRAM'] = '0'
 check('without a connection, nothing is sent', telegram.load(), None)
