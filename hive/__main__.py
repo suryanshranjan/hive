@@ -2,6 +2,8 @@
 
 usage:
   python -m hive                                            # just start: Hive asks what to build and does the rest
+  python -m hive cloud --to user@host [--with-login]        # move this project's Hive to a cloud machine
+  python -m hive cloud pull                                 # bring the result branches back
   python -m hive listen                                     # stay on Telegram: change your mind any time
   python -m hive doctor                                     # check this machine and project are ready
   python -m hive start [--workers 4] [--goal <text or file>] [--minutes 40] [--overnight]
@@ -45,6 +47,8 @@ def main(argv=None):
     st.add_argument('--overnight', action='store_true')   # no questions; check the assumptions later with `hive morning`
     sub.add_parser('doctor')
     sub.add_parser('listen')
+    cl = sub.add_parser('cloud'); cl.add_argument('action', nargs='?', choices=['pull']); cl.add_argument('--to')
+    cl.add_argument('--from', dest='frm'); cl.add_argument('--with-login', action='store_true'); cl.add_argument('--no-start', action='store_true')
     mo = sub.add_parser('morning'); mo.add_argument('name', nargs='?'); mo.add_argument('--phone', action='store_true')
     tg = sub.add_parser('telegram'); tg.add_argument('action', choices=['setup', 'test', 'call', 'ask', 'verdicts'])
     tg.add_argument('address', nargs='?'); tg.add_argument('--out'); tg.add_argument('--intro')
@@ -71,7 +75,13 @@ def main(argv=None):
                            getattr(a, 'overnight', False))
     if a.cmd == 'listen':
         from . import assistant
-        return assistant.listen('.', apply_build=start.apply_ruling)
+        return assistant.listen('.', apply_build=start.apply_ruling,
+                                start_build=lambda repo, goal: start.start(repo, 4, goal, 40, overnight=True))
+    if a.cmd == 'cloud':
+        from . import cloud
+        if a.action == 'pull':
+            return cloud.pull('.', a.frm)
+        return cloud.go('.', a.to, a.with_login, not a.no_start)
     if a.cmd == 'doctor':
         from . import doctor
         return doctor.main('.')

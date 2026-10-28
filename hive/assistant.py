@@ -16,8 +16,9 @@ RUNS = os.path.join(os.path.expanduser('~'), '.hive', 'runs')   # where `hive st
 CLASSIFY = """A business owner sent this message to his software assistant, Hive:
 "{text}"
 
-Classify it. Reply with JSON only: {{"intent": "change" | "rule" | "status" | "greeting" | "other",
-"rule": "the rule he now wants, in one plain sentence, or empty"}}
+Classify it. Reply with JSON only: {{"intent": "build" | "change" | "rule" | "status" | "greeting" | "other",
+"rule": "the rule he now wants, or for a build, what to build, in plain sentences; otherwise empty"}}
+- "build": he asks Hive to build, add or make something in the product.
 - "change": he says he has changed his mind, or now wants something different from before.
 - "rule": he states a new rule for how the product should behave.
 - "status": he asks how things are going.
@@ -45,11 +46,24 @@ def latest_build(repo):
             return st
     return None
 
-def handle(ch, repo, text, poll=20, apply_build=None):
-    """Answer one message from the owner. apply_build(state, rule) updates a build (hive.start.apply_ruling)."""
-    got = explain.ask_json(CLASSIFY.format(text=text)) or {}
+def handle(ch, repo, text, poll=20, apply_build=None, start_build=None):
+    """Answer one message from the owner. apply_build(state, rule, ch) updates a build (hive.start.apply_ruling);
+    start_build(repo, goal) runs a new build that reports to the phone (hive.start.start, overnight style)."""
+    low = text.lower().strip()
+    if low.startswith('build:') or low.startswith('build '):   # an explicit request needs no model to recognise it
+        got = {'intent': 'build', 'rule': text.split(':', 1)[1] if ':' in text else text[6:]}
+    else:
+        got = explain.ask_json(CLASSIFY.format(text=text)) or {}
     intent, rule = got.get('intent', 'other'), (got.get('rule') or text).strip()
     who = _who(ch)
+    if intent == 'build' and start_build:
+        ch.send(f"Shall I build this?\n\n{rule}\n\nI'll work on copies, then bring you the decisions to check.",
+                buttons=[[('Yes, build it', 'bld|yes')], [('Not now', 'bld|no')]])
+        if telegram._wait(ch, poll, {'bld|yes', 'bld|no'})[1] != 'bld|yes':
+            ch.send('Very good. Just say the word.'); return 'not_built'
+        ch.send("Right away. I'll message you as it goes; text 'status' any time.")
+        start_build(repo, rule)
+        return 'built'
     if intent == 'greeting':
         ch.send(f"At your service{', ' + who if who else ''}. Tell me if you've changed your mind about anything, give me "
                 "a new rule, or ask for the status.")
@@ -93,7 +107,7 @@ def handle(ch, repo, text, poll=20, apply_build=None):
     ch.send('Very good. The builders will follow it from the next build.')
     return 'kept'
 
-def listen(repo='.', poll=10, apply_build=None, until=None):
+def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None):
     """Stay on the owner's Telegram between builds and handle whatever he sends. Ctrl+C to stop."""
     cfg = telegram.load()
     if not cfg:
@@ -107,7 +121,7 @@ def listen(repo='.', poll=10, apply_build=None, until=None):
                 time.sleep(poll); continue   # a build or review is talking to the owner: step aside
             for text, data, _ in ch.updates(timeout=poll):
                 if text:
-                    handle(ch, repo, text, apply_build=apply_build)
+                    handle(ch, repo, text, apply_build=apply_build, start_build=start_build)
     except KeyboardInterrupt:
         pass
     return 0
