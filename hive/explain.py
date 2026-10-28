@@ -25,18 +25,21 @@ be able to decide each one in a few seconds. For each assumption:
 - "context": one short sentence on where this shows up and who notices it (a customer, a partner, the team).
 - "example": one short sentence with a concrete made-up case: a real-sounding name, simple numbers (rupees,
   counts, dates), and exactly what the product does now.
-- "advice": your recommendation in the first person, in one short sentence: "I'd keep it." or "I'd change it: <what>."
+- "options": 2 or 3 genuine alternatives to what the product does now, the choices a thoughtful business might really
+  make here, clearly different from each other and from the current behaviour. Each is {{"label": "a button label of
+  at most 4 words", "text": "one plain sentence saying what would happen instead"}}. Owners often decide differently
+  from the obvious choice, so make the alternatives real, not straw men.
+- "recommend": 0 if you would keep what the product does now, or the number (1, 2 or 3) of the option you recommend.
   Recommend what most well-run businesses would want here, and what fits the feature's stated rules.
-- "alternative": if you advise a change, the change itself in a few plain words (it becomes the owner's answer if they
-  accept); otherwise "".
+- "advice": your recommendation in the first person, in one short sentence ("I'd keep it." or "I'd go with ...").
 - "impact": 3 if it changes money or what customers see often, 2 if it matters sometimes, 1 if it is a rare edge case.
 - "owner_can_judge": false if it is really a technical detail a business owner cannot meaningfully decide.
 Never use technical words (numerator, denominator, null, array, field, error, input, function, string, parse, record).
 Also write "summary": one plain sentence saying what was built, as you would tell the owner over coffee.
 
 Reply with JSON only, in this shape:
-{{"summary": "...", "items": [{{"id": "...", "context": "...", "example": "...", "advice": "...", "alternative": "",
-"impact": 3, "owner_can_judge": true}}]}}"""
+{{"summary": "...", "items": [{{"id": "...", "context": "...", "example": "...",
+"options": [{{"label": "...", "text": "..."}}], "recommend": 0, "advice": "...", "impact": 3, "owner_can_judge": true}}]}}"""
 
 # In experiments, Hive's own recommendation could sway the owner (anchoring), so HIVE_ADVICE=0 leaves it out.
 ADVICE = os.environ.get('HIVE_ADVICE', '1') != '0'
@@ -123,10 +126,15 @@ def explain(owner_dir, goal, assumptions):
             if it.get('id') not in by_id:
                 continue
             text = ' '.join(x for x in (it.get('context'), it.get('example')) if x)
-            advice, alt = (it.get('advice') or '', it.get('alternative') or '') if ADVICE else ('', '')
-            out['items'].append({'id': it['id'], 'text': text or by_id[it['id']]['text'], 'advice': advice,
-                                 'alternative': alt, 'impact': int(it.get('impact') or 2),
-                                 'judge': bool(it.get('owner_can_judge', True))})
+            options = [{'label': str(o.get('label', ''))[:30], 'text': o.get('text', '')} for o in it.get('options') or []
+                       if isinstance(o, dict) and o.get('text')][:3]
+            if not options and it.get('alternative'):   # older replies: a single suggested change
+                options = [{'label': 'As you suggest', 'text': it['alternative']}]; it.setdefault('recommend', 1)
+            rec = int(it.get('recommend') or 0)
+            rec = rec if 0 <= rec <= len(options) else 0
+            out['items'].append({'id': it['id'], 'text': text or by_id[it['id']]['text'], 'options': options,
+                                 'recommend': rec if ADVICE else None, 'advice': (it.get('advice') or '') if ADVICE else '',
+                                 'impact': int(it.get('impact') or 2), 'judge': bool(it.get('owner_can_judge', True))})
         seen = {i['id'] for i in out['items']}
         out['items'] += [i for i in fallback['items'] if i['id'] not in seen]   # never drop one silently
         if not out['items'] or reply is None:

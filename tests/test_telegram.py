@@ -94,7 +94,7 @@ ids = [a['id'] for a in owner._assumptions(d, False)]
 # words; leaves the smaller one; at the final check undoes #2 and answers it again in his own words; then sends.
 tap = lambda data: (lambda f: [(ME, None, data, 2)])
 say = lambda words: (lambda f: [(ME, words, None, None)])
-fake = FakeTelegram([tap(f'{ids[0]}|alt'), tap(f'{ids[1]}|undo'), tap(f'{ids[0]}|ok'),
+fake = FakeTelegram([tap(f'{ids[0]}|o1'), tap(f'{ids[1]}|undo'), tap(f'{ids[0]}|ok'),
                      tap(f'{ids[1]}|no'), say('Show it per customer instead.'), tap('aside|leave'),
                      tap('final|undo'), tap(f'{ids[1]}|no'), say('Count each order once.'), tap('final|send')],
                     stale=[(ME, 'hi', None, None)])
@@ -108,8 +108,9 @@ check('the greeting says how things stand and that a tap is enough',
 decisions = [m for m in fake.sent if m.get('reply_markup') and 'Keep it' in str(m['reply_markup'])]
 check('each decision is in plain words with an example',
       all('In the shop report' in m['text'] and 'Asha' in m['text'] for m in decisions), True)
-check("the first comes with Hive's suggestion and a one-tap 'As you suggest'",
-      ("I'd change it" in decisions[0]['text'], 'As you suggest' in str(decisions[0]['reply_markup'])), (True, True))
+check("the first offers real alternatives, each one tap, with Hive's pick starred",
+      ('Other ways to do it:' in decisions[0]['text'], '★ Count once' in str(decisions[0]['reply_markup']),
+       'Count every time' in str(decisions[0]['reply_markup']), "I'd go with" in decisions[0]['text']), (True, True, True, True))
 check('the first decision has no undo; later ones do',
       ('Undo' in str(decisions[0]['reply_markup']), 'Undo' in str(decisions[1]['reply_markup'])), (False, True))
 check('undo took the suggestion back: #1 ended as kept', json.load(open(os.path.join(d, 'reviews', ids[0] + '.json')))['ok'], True)
@@ -182,7 +183,19 @@ text = open(os.path.join(d, 'corrections.md')).read()
 check("the owner's ruling on it reaches the builders and overrides", ('Total from the others' in text, 'overrides' in text),
       (True, True))
 
-# 7. not connected: hive behaves as before
+# 7. disagreeing with Hive costs one tap too, and is recorded as the owner's own call
+run, d = make_run(); os.environ['HIVE_RUN'] = run
+owner.assume('If the same order is imported twice, it is counted twice.'); time.sleep(0.01)
+owner.assume('If a platform name differs only by capital letters, it counts as the same platform.')
+ids = [a['id'] for a in owner._assumptions(d, False)]
+fake = FakeTelegram([tap(f'{ids[0]}|o2'), tap('aside|leave'), tap('final|send')])
+telegram.review(run, telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), goal='combine metrics', poll=1)
+r = json.load(open(os.path.join(d, 'reviews', ids[0] + '.json')))
+check("picking the option Hive did not recommend is one tap, recorded as the owner's own call",
+      (r['correction'], r['followed_suggestion']), ('count it every time it appears', False))
+check('the stored wording is the decision itself, not the "1 of 1" header', r['shown_as'].startswith('In the shop report'), True)
+
+# 8. not connected: hive behaves as before
 os.environ['HIVE_TELEGRAM'] = '0'
 check('without a connection, nothing is sent', telegram.load(), None)
 sys.exit(fail)
