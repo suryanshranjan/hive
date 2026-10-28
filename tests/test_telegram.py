@@ -90,26 +90,40 @@ owner.assume('If a creator has no follower count on a platform, that platform sh
 time.sleep(0.01)
 owner.assume('aggregate() throws TypeError on a non-array input.', technical=True)
 ids = [a['id'] for a in owner._assumptions(d, False)]
-fake = FakeTelegram([lambda f: [(ME, None, f"{ids[0]}|ok", 2)],
-                     lambda f: [(ME, None, f"{ids[1]}|no", 3)],
-                     lambda f: [(ME, 'Count each account once.', None, None)],
-                     lambda f: [(ME, None, 'aside|leave', 6)]], stale=[(ME, 'hi', None, None)])
+# the owner: takes the suggestion on #1, then undoes it and keeps #1 as built; on #2 says "something else" in his own
+# words; leaves the smaller one; at the final check undoes #2 and answers it again in his own words; then sends.
+tap = lambda data: (lambda f: [(ME, None, data, 2)])
+say = lambda words: (lambda f: [(ME, words, None, None)])
+fake = FakeTelegram([tap(f'{ids[0]}|alt'), tap(f'{ids[1]}|undo'), tap(f'{ids[0]}|ok'),
+                     tap(f'{ids[1]}|no'), say('Show it per creator instead.'), tap('aside|leave'),
+                     tap('final|undo'), tap(f'{ids[1]}|no'), say('Count each account once.'), tap('final|send')],
+                    stale=[(ME, 'hi', None, None)])
 rows = telegram.review(run, telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), goal='# Goal: combine metrics',
                        check='419 tests, all passing.', poll=1)
 check('it greets the owner by name and says what was built',
       'Good morning, Suryansh. While you were away, I built this: A report that adds up campaign results.' in fake.sent[0]['text'], True)
-check('the greeting says how things stand', '419 tests, all passing.' in fake.sent[0]['text'], True)
-decisions = [m for m in fake.sent if m.get('reply_markup') and "Yes, that's right" in str(m['reply_markup'])]
-check('2 decisions in plain words with an example, not the builders\' words',
-      [('In the brand report' in m['text'], 'Priya' in m['text']) for m in decisions], [(True, True), (True, True)])
-check('the most important one came first', decisions[0]['text'].startswith('1 of 2\n\nIn the brand report (item 0)'), True)
+check('the greeting says how things stand and that one tap is enough',
+      ('419 tests, all passing.' in fake.sent[0]['text'], 'one tap is enough' in fake.sent[0]['text']), (True, True))
+decisions = [m for m in fake.sent if m.get('reply_markup') and 'Keep it' in str(m['reply_markup'])]
+check('each decision is in plain words with an example',
+      all('In the brand report' in m['text'] and 'Priya' in m['text'] for m in decisions), True)
+check("the first comes with Hive's suggestion and a one-tap 'As you suggest'",
+      ("I'd change it" in decisions[0]['text'], 'As you suggest' in str(decisions[0]['reply_markup'])), (True, True))
+check('the first decision has no undo; later ones do',
+      ('Undo' in str(decisions[0]['reply_markup']), 'Undo' in str(decisions[1]['reply_markup'])), (False, True))
+check('undo took the suggestion back: #1 ended as kept', json.load(open(os.path.join(d, 'reviews', ids[0] + '.json')))['ok'], True)
+check('a final check came before anything was sent', any('Send it' in str(m.get('reply_markup')) for m in fake.sent), True)
+check('the final undo let the owner change #2', json.load(open(os.path.join(d, 'reviews', ids[1] + '.json')))['correction'],
+      'Count each account once.')
 check('the one an owner cannot judge was offered, not pushed', any('smaller one' in m['text'] for m in fake.sent), True)
 check('the technical choice never reached the owner', any('TypeError' in m['text'] for m in fake.sent), False)
-check('the old "hi" did not count as an answer', json.load(open(os.path.join(d, 'reviews', ids[0] + '.json')))['ok'], True)
-check('one corrected', len(rows), 1)
+check('the old "hi" did not count as an answer', sum('hi' == m.get('text') for m in fake.sent), 0)
+check('one change goes to the builders', len(rows), 1)
 text = open(os.path.join(d, 'corrections.md')).read()
-check("the correction carries the owner's words and what the owner saw",
-      ('Count each account once.' in text, 'The owner saw it as: In the brand report' in text), (True, True))
+check("the change carries the owner's final words and what the owner saw",
+      ('Count each account once.' in text, 'Show it per creator' in text, 'The owner saw it as: In the brand report' in text),
+      (True, False, True))
+check('the reply sounds like an assistant on it', fake.sent[-1]['text'].startswith('Right away.'), True)
 
 # 4. not connected: hive behaves as before
 os.environ['HIVE_TELEGRAM'] = '0'

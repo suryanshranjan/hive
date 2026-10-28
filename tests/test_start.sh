@@ -31,7 +31,7 @@ check "it tells the owner to come back with hive morning" "$(grep -c 'hive morni
 night=$(git rev-parse $(git branch --list 'hive/*' | tr -d ' *'))
 printf 'No: with no bonus, the fee is 10 percent of the cash.\n' | python3 -m hive morning > $T/morning.txt 2>&1
 check "morning review exits cleanly" $? 0
-check "morning greets and fixes the correction" "$(grep -c 'Good morning\|Sending the builders back to fix 1 thing' $T/morning.txt)" 2
+check "morning greets and fixes the correction" "$(grep -c -e 'Welcome back' -e 'Sending the builders back to fix 1 thing' $T/morning.txt)" 2
 [ "$(git rev-parse $(git branch --list 'hive/*' | tr -d ' *'))" != "$night" ]
 check "the same branch was updated with the fix" $? 0
 check "nothing is left for a second morning" "$(python3 -m hive morning | grep -c 'nothing left')" 1
