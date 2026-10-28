@@ -65,8 +65,8 @@ Reply with JSON only: {{"reply": "..."}}"""
 def facts(repo, ch=None):
     """What Hive knows about this owner's project right now, in plain lines, for its replies."""
     st = latest_build(repo)
-    lines = [f"Project: {os.path.basename(os.path.abspath(repo))}",
-             ('Running in the cloud; his computer can be off.' if os.environ.get('HIVE_IN_CLOUD') or
+    # (no folder name in the facts: given one, it said "your shop project")
+    lines = [('Running in the cloud; his computer can be off.' if os.environ.get('HIVE_IN_CLOUD') or
               os.path.abspath(repo).startswith(os.path.join(os.path.expanduser('~'), 'hive-cloud')) else
               'Running on his computer.'),
              (f"Latest build: branch hive/{st['name']}. {st.get('check', '')}" if st else 'Nothing built on this project yet.'),
