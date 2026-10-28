@@ -330,10 +330,16 @@ def no_rule(text):
     """The whole reply leaves it to the builders ("whatever you feel like", "nothing", "up to you"): no rule."""
     return bool(NO_RULE.fullmatch(re.sub(r"[^a-z' ]", ' ', text.lower()).strip().replace('  ', ' ')))
 
-def instructions(rules):
-    """The rules as they go into the builders' goal: each must be encoded as a test before landing."""
+def instructions(rules, rulings=None):
+    """The rules as they go into the builders' goal: each must be encoded as a test before landing. With `rulings` (his
+    answers to each situation, before they were merged into the sheet), those follow, kept whole (Gate 41)."""
     if not rules:
         return ''
-    return ("\n\n## The owner's rules for this feature (from his interview)\nThe owner decided each of these himself. Encode "
+    text = ("\n\n## The owner's rules for this feature (from his interview)\nThe owner decided each of these himself. Encode "
             "every one that touches your area as a test before you land, follow it exactly, and do not stretch it beyond "
             "the situation it describes.\n\n" + '\n'.join(f'- {r}' for r in rules) + '\n')
+    extra = [r for r in (rulings or []) if r not in rules]
+    if extra:
+        text += ("\nHis answers to each situation, word for word (the rules above were written from them). Where an answer "
+                 "says more than the rules, the answer holds; encode it as a test too.\n\n" + '\n'.join(f'- {r}' for r in extra) + '\n')
+    return text

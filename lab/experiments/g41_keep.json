@@ -1,0 +1,13 @@
+{
+ "name": "g41",
+ "predictions": "gates/gate41/prompts/PREDICTIONS.md",
+ "rulegiver_brief": "gates/gate41/prompts/rulegiver_brief.md",
+ "require_decisions": true,
+ "prompt": "gates/gate41/prompts/prompt_builder.md",
+ "ask_texts": "runs/g41/ask_texts.md",
+ "visible_seed": 41100,
+ "hidden_seed": 41200000,
+ "baseline": "N0",
+ "pre_launch": ["python3 gates/gate41/referee/wind_tunnel.py {run} {oracle}"],
+ "arms": ["N0:3:none", "H:3:none", "K:3:none", "R:3:none"]
+}

@@ -104,6 +104,9 @@ rules = interview.interview('Fees and tips for a shop', ch(fake), poll=1)
 check('the interview turns a tap and confirmed own words into rules',
       rules, ['Asha tips a creator Rs 500 after a great post. -> No fee on a tip', 'A late fee is charged only after 7 days.'])
 check("his rules go into the builders' instructions as tests to encode", 'Encode every one' in interview.instructions(rules), True)
+t = interview.instructions(['Whenever a tip is paid, no fee.'], ['Whenever a tip is paid, no fee.', 'Asha tips Rs 500 -> No fee, even when late'])
+check('with his rulings, the ones not already on the sheet follow, kept whole (Gate 41)',
+      (t.count('Whenever a tip is paid'), 'Asha tips Rs 500 -> No fee, even when late' in t), (1, True))
 
 # 3d. a voice note: transcribed on this machine, shown back to the owner, and used as his answer
 from hive import voice
