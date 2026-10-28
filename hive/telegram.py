@@ -146,7 +146,10 @@ class Channel:
                 cq = u['callback_query']
                 if cq.get('message', {}).get('chat', {}).get('id') != self.chat:
                     continue
-                self.api('answerCallbackQuery', callback_query_id=cq['id'])
+                try:   # a courtesy only: Telegram refuses it for a tap over 15 minutes old, which must not be fatal
+                    self.api('answerCallbackQuery', callback_query_id=cq['id'])
+                except Exception:   # (the cloud listener died on the move-to-cloud tap the laptop had not marked read)
+                    pass
                 out.append((None, cq.get('data'), cq.get('message', {}).get('message_id')))
             elif 'message' in u:
                 m = u['message']

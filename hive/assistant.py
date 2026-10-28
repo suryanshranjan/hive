@@ -135,23 +135,40 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     ch.send('✅ Very good. The builders will follow it from the next build.')
     return 'kept'
 
-def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cloud=None):
+def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cloud=None, ch=None):
     """Stay on the owner's Telegram between builds and handle whatever he sends. Ctrl+C to stop."""
-    cfg = telegram.load()
-    if not cfg:
-        print('Not connected yet: run hive telegram setup.'); return 1
-    ch = telegram.Channel(cfg, listener=True)
+    if ch is None:
+        cfg = telegram.load()
+        if not cfg:
+            print('Not connected yet: run hive telegram setup.'); return 1
+        ch = telegram.Channel(cfg, listener=True)
     print("Listening on Telegram. Tell Hive anything, any time: a change of mind, a new rule, or 'status'. Ctrl+C to stop.",
           flush=True)
     try:
         while not (until and until()):
             if telegram.busy_elsewhere():
                 time.sleep(poll); continue   # a build or review is talking to the owner: step aside
-            for text, data, _ in ch.updates(timeout=poll):
-                if text and handle(ch, repo, text, apply_build=apply_build, start_build=start_build,
-                                   cloud=cloud) == 'moved':
-                    print('Hive now runs in the cloud and reads Telegram there; this listener stops.', flush=True)
-                    return 0   # one reader of the owner's chat at a time
+            try:
+                batch = ch.updates(timeout=poll)
+            except Exception as e:   # never go silent on the owner: report, wait, listen again
+                print(f'Telegram error, retrying: {e}', flush=True); time.sleep(poll); continue
+            for text, data, _ in batch:
+                try:
+                    if text and handle(ch, repo, text, apply_build=apply_build, start_build=start_build,
+                                       cloud=cloud) == 'moved':
+                        print('Hive now runs in the cloud and reads Telegram there; this listener stops.', flush=True)
+                        try:   # mark what this listener handled as read, so the cloud copy starts clean
+                            ch.api('getUpdates', offset=ch.offset, timeout=0)
+                        except Exception:
+                            pass
+                        return 0   # one reader of the owner's chat at a time
+                except Exception as e:   # one message going wrong must not stop the listener
+                    print(f'Could not handle "{text}": {e!r}', flush=True)
+                    try:
+                        ch.send("⚠️ Sorry, something went wrong with that one. I'm still here; try again, or say it "
+                                "another way.")
+                    except Exception:
+                        pass
     except KeyboardInterrupt:
         pass
     return 0
