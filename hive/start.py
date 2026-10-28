@@ -279,7 +279,47 @@ def _review_and_fix(state, phone=None):
     state.update(final=run2, cost=state['cost'] + _cost(run2))
     json.dump(state, open(os.path.join(state['home'], 'state.json'), 'w'), indent=1)
     say(f'[{_now()}] Fixed.')
+    _confirm_as_built(state, run2, phone)
     return True
+
+def _confirm_as_built(state, run2, phone=None):
+    """Gate 34b: the fix round can read an owner's sentence two ways. Each change comes back as one line of what the
+    product now does; anything the owner says isn't quite right goes to one more short round."""
+    built = owner._assumptions(os.path.join(run2, 'owner'), False)
+    if not built:
+        return
+    lines = [a['text'] for a in built]
+    if phone:
+        cases = [{'id': a['id'], 'situation': f"As built: {a['text']}", 'options': ["Yes, that's it", 'Not quite']}
+                 for a in built]
+        got = telegram.verdicts(phone, cases, intro="One last look: here is what the product now does for each change "
+                                                    "you asked for. Tap Yes, or tell me what isn't quite right.")
+        wrong = [(a['text'], got[a['id']]) for a in built if got.get(a['id']) not in ("Yes, that's it", None)]
+        wrong = [(t, '' if w == 'Not quite' else w) for t, w in wrong]
+    else:
+        say('\nOne last look: here is what the product now does for each change you asked for.')
+        wrong = []
+        for t in lines:
+            say(f'  {t}')
+            ans = _ask('  Right? Press Enter if yes, or say what is not quite right.', '')
+            if ans and ans.lower().strip('. !') not in ('y', 'yes', 'ok', 'right'):
+                wrong.append((t, ans))
+    if not wrong:
+        say('  All confirmed.'); return
+    say(f'\n[{_now()}] One more short round for {_n(len(wrong), "change")}.')
+    note = ("\n\n# The owner checked the changes as built\n\nThese are not quite right yet. Make the product do what the "
+            "owner says, update the tests, leave everything else alone:\n\n" +
+            '\n'.join(f'- Built: {t}\n  **The owner says:** {w or "Not quite right; follow the earlier correction exactly."}'
+                      for t, w in wrong) + '\n')
+    src = os.path.join(state['home'], 'fix2_source'); run3 = os.path.join(state['home'], 'fix2')
+    sh('git', 'clone', '-q', '--branch', state['b'], os.path.join(run2, 'up.git'), src)
+    _link(state['repo'], src, state['links'])
+    corrections = open(os.path.join(state['home'], 'build', 'owner', 'corrections.md')).read()
+    _phase(src, run3, 1, state['goal'] + state.get('rules', '') + '\n\n' + corrections + note, state['minutes'], 0,
+           False, False, phone)
+    state.update(final=run3, cost=state['cost'] + _cost(run3))
+    json.dump(state, open(os.path.join(state['home'], 'state.json'), 'w'), indent=1)
+    say(f'[{_now()}] Done.')
 
 def _deliver(state):
     """Check every test on the result and hand it over as the branch hive/<name> (updated in place after a fix round)."""

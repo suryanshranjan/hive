@@ -22,6 +22,8 @@ check "the owner's branch was not touched" "$(git rev-parse main)" "$before"
 git checkout -q $(git branch --list 'hive/*' | tr -d ' *') && python3 -m pytest -q -p no:cacheprovider >/dev/null 2>&1
 check "the handed-over branch passes every test" $? 0
 check "it reported every test passing" "$(grep -c '2 tests, all passing' $T/out.txt)" 1
+check "after the fix, each change comes back as built for a final yes" \
+  "$(grep -c 'As built: with no bonus' $T/out.txt) $(grep -c 'All confirmed' $T/out.txt)" "1 1"
 # overnight: no questions, no review until morning; then `hive morning` reviews, fixes and updates the same branch
 cd $T/project && git checkout -q main && git branch -D -q $(git branch --list 'hive/*' | tr -d ' *')
 printf 'Implement creator fees and payouts.\n' | python3 -m hive start --workers 2 --overnight > $T/night.txt 2>&1
@@ -29,8 +31,10 @@ check "overnight run exits cleanly" $? 0
 check "overnight run asks nothing and hands over a branch" "$(git branch --list 'hive/*' | wc -l | tr -d ' ')" 1
 check "it tells the owner to come back with hive morning" "$(grep -c 'hive morning' $T/night.txt)" 1
 night=$(git rev-parse $(git branch --list 'hive/*' | tr -d ' *'))
-printf 'No: with no bonus, the fee is 10 percent of the cash.\n' | python3 -m hive morning > $T/morning.txt 2>&1
+printf 'No: with no bonus, the fee is 10 percent of the cash.\nNot quite: say the fee is on cash plus any bonus.\n' | \
+  python3 -m hive morning > $T/morning.txt 2>&1
 check "morning review exits cleanly" $? 0
+check "a change the owner says isn't quite right gets one more short round" "$(grep -c 'One more short round for 1 change' $T/morning.txt)" 1
 check "morning greets and fixes the correction" "$(grep -c -e 'Welcome back' -e 'Sending the builders back to fix 1 thing' $T/morning.txt)" 2
 [ "$(git rev-parse $(git branch --list 'hive/*' | tr -d ' *'))" != "$night" ]
 check "the same branch was updated with the fix" $? 0
