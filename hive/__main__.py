@@ -3,7 +3,7 @@ and hands back a tested branch.
 
 For the owner:
   hive                                   start: Hive asks what to build and does the rest
-  hive start [--overnight] [--no-interview] [--workers 4] [--goal <text or file>] [--minutes 40]
+  hive start [--docs <folder>] [--overnight] [--no-interview] [--workers N] [--goal <text or file>] [--minutes 40]
   hive morning [--phone]                 after an overnight build: check its decisions (on Telegram with --phone)
   hive listen                            stay on Telegram: change your mind, "build: ...", "status"
   hive rules [forget <n>]                your standing rulings for this project
@@ -48,8 +48,9 @@ def init(test_cmd, junit):
 def main(argv=None):
     ap = argparse.ArgumentParser(prog='hive', description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest='cmd')
-    st = sub.add_parser('start'); st.add_argument('--workers', type=int, default=4); st.add_argument('--goal')
+    st = sub.add_parser('start'); st.add_argument('--workers', type=int)   # default: the swarm law decides; st.add_argument('--goal')
     st.add_argument('--minutes', type=int, default=40)
+    st.add_argument('--docs')   # the company's own documents: a file or a folder
     st.add_argument('--overnight', action='store_true'); st.add_argument('--no-interview', action='store_true')   # no questions; check the assumptions later with `hive morning`
     sub.add_parser('doctor'); sub.add_parser('setup')
     sub.add_parser('listen')
@@ -79,13 +80,13 @@ def main(argv=None):
     sub.add_parser('assumptions')
     a = ap.parse_args(argv)
     if a.cmd in (None, 'start'):
-        return start.start('.', getattr(a, 'workers', 4), getattr(a, 'goal', None), getattr(a, 'minutes', 40),
-                           getattr(a, 'overnight', False), not getattr(a, 'no_interview', False))
+        return start.start('.', getattr(a, 'workers', None), getattr(a, 'goal', None), getattr(a, 'minutes', 40),
+                           getattr(a, 'overnight', False), not getattr(a, 'no_interview', False), getattr(a, 'docs', None))
     if a.cmd == 'listen':
         from . import assistant
         from . import cloud_aws
         return assistant.listen('.', apply_build=start.apply_ruling,
-                                start_build=lambda repo, goal: start.start(repo, 4, goal, 40, overnight=True),
+                                start_build=lambda repo, goal: start.start(repo, None, goal, 40, overnight=True),
                                 cloud=lambda repo, on: cloud_aws.new(repo) if on else cloud_aws.stop(ask=lambda q: 'y'))
     if a.cmd == 'cloud':
         from . import cloud

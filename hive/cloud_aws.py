@@ -110,8 +110,8 @@ def new(repo='.', size='t3.large', region=None, profile=None, with_login=False, 
 
 def stop(ask=input, say=print):
     """Delete the machine `hive cloud --new` made, with its key and firewall rule."""
-    if not os.path.exists(STATE()):
-        say("There is no Hive machine to delete."); return 0
+    if not os.path.exists(STATE()):   # e.g. asked on the cloud machine itself, which never holds the owner's AWS keys
+        say("There is no Hive machine made from this computer to delete."); return 5
     m = json.load(open(STATE()))
     what = m.get('instance') or m.get('name')
     if ask(f"Delete the Hive machine {what} and everything on it? Bring results back first with `hive cloud pull`. "

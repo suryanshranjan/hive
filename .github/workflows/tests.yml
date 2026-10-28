@@ -24,7 +24,7 @@ jobs:
       - name: Python tests (fake Telegram, stand-in model; no tokens)
         run: |
           set -e
-          for t in tests/test_telegram.py tests/test_assistant.py tests/test_explain.py; do
+          for t in tests/test_telegram.py tests/test_assistant.py tests/test_explain.py tests/test_law.py; do
             echo "== $t"; timeout 600 python3 $t
           done
       - name: Shell tests (stand-in builders; no tokens)

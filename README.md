@@ -82,6 +82,8 @@ Lower-level commands for scripts and experiments (`hive init`, `run`, `owner`, `
 
 - **It asks first.** Hive lists the business decisions the build will take (each with the default a builder would pick) and asks you one concrete situation per decision. Then it shows your answers back as **one general rule per decision** (the rule sheet): you fix any that's wrong, and any two answers that disagree are put to you. The confirmed rules are what the builders encode as tests. An answer that contradicts an earlier ruling is put back to you.
 - **It ends with your yes.** At hand-over it lists what the product now does by your rules; anything you say is different goes straight to a fix round on the same branch.
+- **It sizes the team from your project.** The number of builders comes from Hive's swarm law, using your test suite's speed, your computer's cores and the size of the job. It tells you which limit set it.
+- **It reads your documents.** `hive start --docs <folder>`: your policies settle what they cover, so you are asked only about the rest.
 - **Builders work in parallel and never talk.** Each claims an area of the code with a lock file, works in its own clone, and lands through the **guard**. The guard refuses a landing that breaks a passing test, duplicates a definition, or commits a secret.
 - **Your intent reaches them as tests.** Your answers, your corrections and your standing rulings each become a test the code must keep passing.
 - **The review is built around where you differ.** Builders record every business decision your description didn't cover. Hive rewrites each in plain words with an example. You scan them all in one line each and mark only what you'd change; for each marked one it asks *"what would you do instead?"*. After the fix round, each change comes back as one line for your final yes.
@@ -115,6 +117,8 @@ Every result below was predicted on GitHub before the run. Real-company results 
 **Also kept:** the failed and withdrawn ideas, each with its evidence. These include asking in blocks of 3, a one-constant law for questions, contrast examples, coverage-planned questions and largest-first claiming ([`BRAIN.md`](BRAIN.md) §6). The worked examples are **Specification by Example**, an established practice; what this work adds is measurement ([`docs/related_work.md`](docs/related_work.md)).
 
 ## How the research works
+
+Every finding that should change Hive is mapped to the code that acts on it in [`docs/research_to_product.md`](docs/research_to_product.md).
 
 Every experiment (a *gate*) pushes its predictions and kill conditions to GitHub **before** it runs (`lab/run_gate.py` refuses to start otherwise), then scores them in its `RESULTS.md`, failures included. Hidden test suites are never committed. Lab flaws found later are written up, not hidden ([`gates/LAB_NOTE_guard_python.md`](gates/LAB_NOTE_guard_python.md)).
 
