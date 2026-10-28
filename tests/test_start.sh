@@ -35,4 +35,13 @@ check "morning greets and fixes the correction" "$(grep -c -e 'Welcome back' -e 
 [ "$(git rev-parse $(git branch --list 'hive/*' | tr -d ' *'))" != "$night" ]
 check "the same branch was updated with the fix" $? 0
 check "nothing is left for a second morning" "$(python3 -m hive morning | grep -c 'nothing left')" 1
+# memory: the owner's ruling is kept (once, though given in two builds), reminded to the next build, and can be forgotten
+check "the owner's ruling is kept for this project, once" "$(python3 -m hive rules | grep -c '10 percent of the cash')" 1
+git checkout -q main
+printf 'Implement creator fees and payouts.\n' | python3 -m hive start --workers 1 --overnight > $T/third.txt 2>&1
+check "the next build says it will remind the builders" "$(grep -c 'remind them of your 1 earlier ruling' $T/third.txt)" 1
+check "and the builders' instructions carry the ruling" \
+  "$(grep -c '10 percent of the cash' $(ls -td $T/.hive/runs/*/ | head -1)build/prompts/w1.md)" 1
+check "a ruling can be forgotten" "$(python3 -m hive rules forget 1 | grep -c 'Forgotten')" 1
+check "and then none are kept" "$(python3 -m hive rules | grep -c 'No rulings kept')" 1
 rm -rf $T; exit $fail
