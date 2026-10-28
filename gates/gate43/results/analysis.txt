@@ -1,0 +1,17 @@
+hidden categories left out (local SQLite disagrees with stored answers): ['median', 'percentile', 'transactions']
+team  finish  wall  cost   landings  visible     hidden   messages(posters)  conflicts  blocks  logged LAND
+S1      3.5    5.5 $ 4.21     20   1340/1340    99.7%      0 (0)           2      0      3
+T1      3.6    5.6 $ 4.18     17   1340/1340    99.8%      5 (4)           0      0      0
+T2      3.5    5.2 $ 4.22     19   1340/1340    99.8%      4 (4)           1      0      2
+S2      3.4    5.5 $ 4.10     17   1340/1340    99.8%      0 (0)           0      0      0
+
+means: finish S 3.5 vs T 3.6 min (ratio 1.03); cost S $4.15 vs T $4.20 (ratio 1.01); hidden S 99.7% vs T 99.8%
+
+predictions
+T1 0.85 ≤ finish ratio ≤ 1.15: 1.03 -> held
+T2 cost ratio ≥ 1.10: 1.01 -> failed
+T3 |hidden T − S| ≤ 2: +0.1 -> held
+T4 each talking team ≥ 6 messages: 5, 4 -> failed
+T5 (conflicts + blocks) per logged landing T ≤ S: 0.50 vs 0.67 -> held
+Ship (T ≥ 20% faster in both pairings, cost ≤ 1.10×): did not fire
+Kill for talking (not faster and costlier): FIRED

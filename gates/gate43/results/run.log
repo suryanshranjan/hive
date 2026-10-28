@@ -1,0 +1,70 @@
+[04:02:46] predictions registered on origin/main: gates/gate43/prompts/PREDICTIONS.md
+S1: 6 workers, tools/ask.py port None, repo /home/claude/hive/runs/g43/upS1.git
+next: python3 lab/launch.py --run g43
+T1: 6 workers, tools/ask.py port None, repo /home/claude/hive/runs/g43/upT1.git
+next: python3 lab/launch.py --run g43
+T2: 6 workers, tools/ask.py port None, repo /home/claude/hive/runs/g43/upT2.git
+next: python3 lab/launch.py --run g43
+S2: 6 workers, tools/ask.py port None, repo /home/claude/hive/runs/g43/upS2.git
+next: python3 lab/launch.py --run g43
+[04:02:48] launching S1 alone (6 workers)
+launched S1-w1
+launched S1-w2
+launched S1-w3
+launched S1-w4
+launched S1-w5
+launched S1-w6
+S1-w3 finished: exit 0, 3.7 min, tokens 2824778, cost 0.8288329
+S1-w2 finished: exit 0, 3.8 min, tokens 2219861, cost 0.5822483999999999
+S1-w6 finished: exit 0, 4.1 min, tokens 2291423, cost 0.6206380999999999
+S1-w4 finished: exit 0, 4.9 min, tokens 3306743, cost 0.7235961000000004
+S1-w5 finished: exit 0, 5.0 min, tokens 2506914, cost 0.6685383000000003
+S1-w1 finished: exit 0, 5.5 min, tokens 2941362, cost 0.7897709000000003
+wrote /home/claude/hive/runs/g43/agents.csv
+[04:08:19] launching T1 alone (6 workers)
+launched T1-w1
+launched T1-w2
+launched T1-w3
+launched T1-w4
+launched T1-w5
+launched T1-w6
+T1-w2 finished: exit 0, 3.8 min, tokens 3792954, cost 0.9240243999999999
+T1-w1 finished: exit 0, 4.7 min, tokens 2002354, cost 0.5686821
+T1-w6 finished: exit 0, 4.9 min, tokens 2236910, cost 0.6498053
+T1-w5 finished: exit 0, 5.3 min, tokens 2449178, cost 0.7271288999999999
+T1-w4 finished: exit 0, 5.5 min, tokens 3208015, cost 0.8367961999999999
+T1-w3 finished: exit 0, 5.6 min, tokens 1197767, cost 0.47642950000000006
+wrote /home/claude/hive/runs/g43/agents.csv
+[04:13:59] launching T2 alone (6 workers)
+launched T2-w1
+launched T2-w2
+launched T2-w3
+launched T2-w4
+launched T2-w5
+launched T2-w6
+T2-w1 finished: exit 0, 3.7 min, tokens 3217488, cost 0.8806658
+T2-w3 finished: exit 0, 3.8 min, tokens 1479798, cost 0.5299240000000001
+T2-w2 finished: exit 0, 4.3 min, tokens 2339085, cost 0.7111345999999998
+T2-w5 finished: exit 0, 4.8 min, tokens 2640960, cost 0.7381324
+T2-w6 finished: exit 0, 5.1 min, tokens 2558999, cost 0.7084158
+T2-w4 finished: exit 0, 5.2 min, tokens 2210328, cost 0.6533942
+wrote /home/claude/hive/runs/g43/agents.csv
+[04:19:13] launching S2 alone (6 workers)
+launched S2-w1
+launched S2-w2
+launched S2-w3
+launched S2-w4
+launched S2-w5
+launched S2-w6
+S2-w5 finished: exit 0, 3.5 min, tokens 3766026, cost 0.8693681999999999
+S2-w2 finished: exit 0, 4.4 min, tokens 2439418, cost 0.6261860999999999
+S2-w3 finished: exit 0, 4.4 min, tokens 1298054, cost 0.4602780000000001
+S2-w6 finished: exit 0, 5.0 min, tokens 2325858, cost 0.6588773000000001
+S2-w4 finished: exit 0, 5.0 min, tokens 2840387, cost 0.7466749000000003
+S2-w1 finished: exit 0, 5.5 min, tokens 2595688, cost 0.733869
+wrote /home/claude/hive/runs/g43/agents.csv
+[04:24:48] S1: visible 1340/1340, hidden 2253/2260
+[04:24:51] T1: visible 1340/1340, hidden 2256/2260
+[04:24:53] T2: visible 1340/1340, hidden 2256/2260
+[04:24:56] S2: visible 1340/1340, hidden 2255/2260
+[04:24:56] done: python3 gates/gate43/referee/analyze.py runs/g43

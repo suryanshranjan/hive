@@ -1,0 +1,4 @@
+04:14:35 T2-w4: T2-w4: landed lexer for 0x.., x'..' blob literals (NUM token holding bytes), 1e3 reals. blob_literal tests only need HEX() from w5's strfn.
+04:15:21 T2-w6: T2-w6: building window functions (all window_* cats) in new module minisql/window.py; landed CTEs/views/EXISTS.
+04:15:24 T2-w2: T2-w2: landed INSERT variants (minisql/dml.py), table meta (defaults/unique/pk/notnull/ipk) stored in tables[name]['meta'], rowid in source_rows, multi-col UPDATE SET. Next: DDL/views/ctas/alter/returning/update_from unless claimed.
+04:16:03 T2-w1: T2-w1: landed aggs. Parser: agg calls may carry FILTER/ORDER BY -> ('func',N,args,distinct,filter,order) (extra elems only when present; use e[:4] not 4-unpack). ORDER BY NULLS FIRST/LAST stored in st['nulls'] parallel to order_by. mathfuncs.py has all math fns.

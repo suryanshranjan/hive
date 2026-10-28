@@ -1,0 +1,1320 @@
+{
+ "S1": {
+  "visible_pass": 1340,
+  "hidden_pass": 2253,
+  "hidden_n": 2260,
+  "commits": [
+   {
+    "t": 1793226981,
+    "who": "S1-w3",
+    "subject": "RETURNING, UPDATE FROM, row values, BEGIN/COMMIT/ROLLBACK (lock dmlmisc released)"
+   },
+   {
+    "t": 1793226963,
+    "who": "S1-w1",
+    "subject": "NATURAL/USING joins, RIGHT/FULL OUTER JOIN, t.* in joins.py (lock joins released)"
+   },
+   {
+    "t": 1793226937,
+    "who": "S1-w5",
+    "subject": "window functions: ranking, lag/lead, value, aggregate, frames, named windows (lock window released)"
+   },
+   {
+    "t": 1793226929,
+    "who": "S1-w4",
+    "subject": "MEDIAN/PERCENTILE aggregates, VALUES clause (lock stats released)"
+   },
+   {
+    "t": 1793226926,
+    "who": "S1-w6",
+    "subject": "IIF, EXISTS, IS DISTINCT FROM, NULLS FIRST/LAST, comments/quoted idents, COLLATE NOCASE, HAVING alias (lock exprmisc released)"
+   },
+   {
+    "t": 1793226915,
+    "who": "S1-w2",
+    "subject": "NOT NULL/CHECK, INTEGER PRIMARY KEY rowid, ON CONFLICT upsert (lock constraints released)"
+   },
+   {
+    "t": 1793226914,
+    "who": "S1-w3",
+    "subject": "Lock: dmlmisc (returning,row_values,transactions,update_from)"
+   },
+   {
+    "t": 1793226910,
+    "who": "S1-w4",
+    "subject": "Lock: stats (median,percentile,values_clause)"
+   },
+   {
+    "t": 1793226906,
+    "who": "S1-w3",
+    "subject": "date/time functions (DATE/TIME/DATETIME/JULIANDAY/UNIXEPOCH/STRFTIME/TIMEDIFF) (lock datetime released)"
+   },
+   {
+    "t": 1793226903,
+    "who": "S1-w4",
+    "subject": "aggregate FILTER, ORDER BY in aggregates, STRING_AGG (lock aggs released)"
+   },
+   {
+    "t": 1793226897,
+    "who": "S1-w1",
+    "subject": "Lock: joins (natural_using,right_full_join,select_star_qualified)"
+   },
+   {
+    "t": 1793226890,
+    "who": "S1-w1",
+    "subject": "JSON_SET/INSERT/REPLACE/REMOVE/PATCH, JSON_ERROR_POSITION, json_group_array/object (lock jsonwrite released)"
+   },
+   {
+    "t": 1793226889,
+    "who": "S1-w2",
+    "subject": "Lock: constraints (check_not_null,integer_primary_key,upsert)"
+   },
+   {
+    "t": 1793226882,
+    "who": "S1-w6",
+    "subject": "Lock: exprmisc (collate_nocase,comments_quoted,exists,group_by_expr_alias,iif_if,is_distinct,order_nulls)"
+   },
+   {
+    "t": 1793226880,
+    "who": "S1-w2",
+    "subject": "ALTER/DROP TABLE, CTAS, CREATE/DROP INDEX no-op (minisql/ddl.py) (lock ddl released)"
+   },
+   {
+    "t": 1793226879,
+    "who": "S1-w4",
+    "subject": "Lock: aggs (agg_filter,agg_order_by,group_concat_sep)"
+   },
+   {
+    "t": 1793226873,
+    "who": "S1-w6",
+    "subject": "CAST, hex/blob/exponent literals, TRUE/FALSE, IS TRUE, bitwise ops (lock literals released)"
+   },
+   {
+    "t": 1793226871,
+    "who": "S1-w4",
+    "subject": "GLOB operator/function, LIKE ESCAPE, LIKE() call, OCTET_LENGTH (lock likeglob released)"
+   },
+   {
+    "t": 1793226864,
+    "who": "S1-w5",
+    "subject": "Lock: window (window_agg,window_empty_over,window_first_last,window_frames,window_lag_lead,window_named,window_nth_value,window_ntile,window_percent,window_rank,window_row_number)"
+   },
+   {
+    "t": 1793226862,
+    "who": "S1-w1",
+    "subject": "Lock: jsonwrite (json_error_position,json_group,json_modify,json_patch,json_remove)"
+   },
+   {
+    "t": 1793226856,
+    "who": "S1-w5",
+    "subject": "WITH/recursive CTEs and views (lock cte released)"
+   },
+   {
+    "t": 1793226854,
+    "who": "S1-w1",
+    "subject": "JSON read/build functions, -> and ->> operators (lock jsonread released)"
+   },
+   {
+    "t": 1793226848,
+    "who": "S1-w2",
+    "subject": "Lock: ddl (alter_rename_table,alter_table,create_index_noop,create_table_as,drop_table)"
+   },
+   {
+    "t": 1793226841,
+    "who": "S1-w2",
+    "subject": "INSERT..SELECT, DEFAULT VALUES, column defaults, tuple UPDATE SET (lock dml2 released)"
+   },
+   {
+    "t": 1793226840,
+    "who": "S1-w4",
+    "subject": "Lock: likeglob (glob,length_octet,like_escape)"
+   },
+   {
+    "t": 1793226833,
+    "who": "S1-w4",
+    "subject": "PRINTF/FORMAT/CONCAT/CONCAT_WS in printf.py (lock printf released)"
+   },
+   {
+    "t": 1793226829,
+    "who": "S1-w6",
+    "subject": "Lock: literals (bitwise,blob_literal,cast_int_real,cast_text_numeric,hex_literal,real_literal,true_false)"
+   },
+   {
+    "t": 1793226822,
+    "who": "S1-w6",
+    "subject": "scalar math functions module (trig, hyperbolic, log, pow, ceil/floor/trunc, sign) (lock mathfuncs released)"
+   },
+   {
+    "t": 1793226822,
+    "who": "S1-w2",
+    "subject": "Lock: dml2 (default_values,insert_select,update_multi_set)"
+   },
+   {
+    "t": 1793226820,
+    "who": "S1-w5",
+    "subject": "Lock: cte (cte_basic,cte_multiple,cte_recursive,views)"
+   },
+   {
+    "t": 1793226817,
+    "who": "S1-w4",
+    "subject": "Lock: printf (concat,format,printf)"
+   },
+   {
+    "t": 1793226814,
+    "who": "S1-w2",
+    "subject": "INSERT column lists, OR IGNORE/REPLACE, UNIQUE/PK tracking (lock insertdml released)"
+   },
+   {
+    "t": 1793226810,
+    "who": "S1-w5",
+    "subject": "UNION/UNION ALL/INTERSECT/EXCEPT compound selects with ORDER BY/LIMIT (lock setops released)"
+   },
+   {
+    "t": 1793226805,
+    "who": "S1-w4",
+    "subject": "HEX/UNHEX/QUOTE/CHAR/UNICODE in strfuncs.py (lock strfn released)"
+   },
+   {
+    "t": 1793226794,
+    "who": "S1-w1",
+    "subject": "Lock: jsonread (json_array_length,json_arrows,json_build,json_extract,json_minify,json_type,json_valid)"
+   },
+   {
+    "t": 1793226788,
+    "who": "S1-w4",
+    "subject": "Lock: strfn (char_unicode,hex_unhex,quote)"
+   },
+   {
+    "t": 1793226788,
+    "who": "S1-w3",
+    "subject": "Lock: datetime (date_basic,date_modifiers,date_n_days,datetime_basic,julianday,strftime,time_basic,timediff,unixepoch)"
+   },
+   {
+    "t": 1793226787,
+    "who": "S1-w2",
+    "subject": "Lock: insertdml (insert_columns,insert_or_ignore,insert_or_replace)"
+   },
+   {
+    "t": 1793226784,
+    "who": "S1-w5",
+    "subject": "Lock: setops (compound_order_limit,except,intersect,union,union_all)"
+   },
+   {
+    "t": 1793226780,
+    "who": "S1-w6",
+    "subject": "Lock: mathfuncs (abs_sign,ceil_floor,hyperbolic,log_funcs,pow_mod,round_trunc,sqrt_exp_ln,trig)"
+   },
+   {
+    "t": 1793226766,
+    "who": "hive",
+    "subject": "tools/ask.py for this run"
+   },
+   {
+    "t": 1793082269,
+    "who": "referee",
+    "subject": "Protocol v2: category claims (tools/claim.py) and guarded landing (tools/land.py)"
+   },
+   {
+    "t": 1793078416,
+    "who": "referee",
+    "subject": "Gate 2: 113 new feature categories (1,130 visible tests), compact --summary, tools/claim.sh"
+   },
+   {
+    "t": 1793075048,
+    "who": "A-builder-2",
+    "subject": "GROUP BY (exprs, positions, alias fallback) and HAVING, with and without GROUP BY (lock group_by released)"
+   },
+   {
+    "t": 1793075009,
+    "who": "A-builder-6",
+    "subject": "Function-call parsing ('func', NAME, args, distinct), scalar funcs (SUBSTR/UPPER/LOWER/LENGTH/IFNULL/NULLIF/COALESCE/ABS/ROUND/...), LIKE; remaining strings/nulls tests need WHERE (lock scalar_funcs released)"
+   },
+   {
+    "t": 1793075006,
+    "who": "A-builder-1",
+    "subject": "Subqueries: scalar (correlated via outer-env fallback), IN (SELECT ...), FROM (SELECT ...) derived tables; remaining tests need aggregates/GROUP BY (lock subquery released)"
+   },
+   {
+    "t": 1793074976,
+    "who": "A-builder-4",
+    "subject": "Function-call parsing ('func' node) and aggregates COUNT/SUM/TOTAL/AVG/MIN/MAX/GROUP_CONCAT with DISTINCT, whole-table aggregation, group_env hook for GROUP BY, SCALAR_FUNCS hook; remaining aggregate tests need WHERE (lock aggregates released)"
+   },
+   {
+    "t": 1793074952,
+    "who": "A-builder-3",
+    "subject": "WHERE clause: comparisons, AND/OR/NOT, BETWEEN, IN, IS [NOT] NULL (lock where released)"
+   },
+   {
+    "t": 1793074934,
+    "who": "A-builder-5",
+    "subject": "Joins: comma/CROSS/[INNER] JOIN ... ON, LEFT [OUTER] JOIN via Connection.source_rows; remaining join tests need WHERE/GROUP BY (lock join released)"
+   },
+   {
+    "t": 1793074932,
+    "who": "A-builder-2",
+    "subject": "Lock: group_by"
+   },
+   {
+    "t": 1793074931,
+    "who": "A-builder-1",
+    "subject": "Lock: subquery"
+   },
+   {
+    "t": 1793074921,
+    "who": "A-builder-2",
+    "subject": "SELECT DISTINCT / ALL: dedup output rows before ORDER BY/LIMIT (lock distinct released)"
+   },
+   {
+    "t": 1793074905,
+    "who": "A-builder-1",
+    "subject": "CASE expressions (simple and searched); remaining case tests need IS NULL (where) and SUM (aggregates) (lock case released)"
+   },
+   {
+    "t": 1793074903,
+    "who": "A-builder-5",
+    "subject": "Lock: join"
+   },
+   {
+    "t": 1793074901,
+    "who": "A-builder-6",
+    "subject": "Lock: scalar_funcs"
+   },
+   {
+    "t": 1793074890,
+    "who": "A-builder-5",
+    "subject": "FROM table aliases and qualified column refs (lock basic released)"
+   },
+   {
+    "t": 1793074882,
+    "who": "A-builder-6",
+    "subject": "UPDATE/DELETE statements with optional WHERE; rest of category needs BETWEEN (where) and COUNT (aggregates) (lock update_delete released)"
+   },
+   {
+    "t": 1793074878,
+    "who": "A-builder-2",
+    "subject": "Lock: distinct"
+   },
+   {
+    "t": 1793074866,
+    "who": "A-builder-2",
+    "subject": "ORDER BY (multi-key, ASC/DESC, SQLite type ordering, alias/position), LIMIT/OFFSET (lock order_limit released)"
+   },
+   {
+    "t": 1793074858,
+    "who": "A-builder-1",
+    "subject": "Lock: case"
+   },
+   {
+    "t": 1793074853,
+    "who": "A-builder-6",
+    "subject": "Lock: update_delete"
+   },
+   {
+    "t": 1793074846,
+    "who": "A-builder-1",
+    "subject": "Expression parser with precedence climbing; arithmetic, comparison, AND/OR/NOT, || evaluation (lock arith released)"
+   },
+   {
+    "t": 1793074845,
+    "who": "A-builder-5",
+    "subject": "Lock: basic"
+   },
+   {
+    "t": 1793074842,
+    "who": "A-builder-4",
+    "subject": "Lock: aggregates"
+   },
+   {
+    "t": 1793074824,
+    "who": "A-builder-3",
+    "subject": "Lock: where"
+   },
+   {
+    "t": 1793074806,
+    "who": "A-builder-2",
+    "subject": "Lock: order_limit"
+   },
+   {
+    "t": 1793074788,
+    "who": "A-builder-1",
+    "subject": "Lock: arith"
+   },
+   {
+    "t": 1793074251,
+    "who": "referee",
+    "subject": "Initial skeleton: lexer, parser, engine; 210 visible tests"
+   }
+  ]
+ },
+ "T1": {
+  "visible_pass": 1340,
+  "hidden_pass": 2256,
+  "hidden_n": 2260,
+  "commits": [
+   {
+    "t": 1793227318,
+    "who": "T1-w2",
+    "subject": "EXISTS, row values, t.*, NATURAL/USING, RIGHT/FULL JOIN, HAVING alias, NULLS FIRST/LAST (lock qext released)"
+   },
+   {
+    "t": 1793227294,
+    "who": "T1-w4",
+    "subject": "UPDATE FROM/tuple SET, RETURNING, constraints, transactions, index no-ops (lock dml_update released)"
+   },
+   {
+    "t": 1793227283,
+    "who": "T1-w5",
+    "subject": "window functions: OVER, frames, named windows, ranking, value fns (lock window released)"
+   },
+   {
+    "t": 1793227261,
+    "who": "T1-w6",
+    "subject": "COLLATE NOCASE/RTRIM in comparisons and ORDER BY (lock collate released)"
+   },
+   {
+    "t": 1793227244,
+    "who": "T1-w6",
+    "subject": "Lock: collate (collate_nocase)"
+   },
+   {
+    "t": 1793227241,
+    "who": "T1-w3",
+    "subject": "date/time functions (datefn.py): date,time,datetime,julianday,unixepoch,strftime,timediff (lock datefn released)"
+   },
+   {
+    "t": 1793227237,
+    "who": "T1-w4",
+    "subject": "Lock: dml_update (check_not_null,create_index_noop,returning,transactions,update_from,update_multi_set)"
+   },
+   {
+    "t": 1793227234,
+    "who": "T1-w6",
+    "subject": "printf/format in printf.py (lock printf released)"
+   },
+   {
+    "t": 1793227230,
+    "who": "T1-w1",
+    "subject": "bitwise ops, CAST, GLOB, LIKE ESCAPE, IIF, IS [NOT] DISTINCT/TRUE/FALSE, TRUE/FALSE, real literals, comments, quoted idents (lock exprs released)"
+   },
+   {
+    "t": 1793227228,
+    "who": "T1-w4",
+    "subject": "INSERT: column lists, defaults, rowid pk, OR IGNORE/REPLACE, INSERT..SELECT, upsert; CREATE keeps constraints (lock dml_insert released)"
+   },
+   {
+    "t": 1793227222,
+    "who": "T1-w2",
+    "subject": "Lock: qext (exists,group_by_expr_alias,natural_using,order_nulls,right_full_join,row_values,select_star_qualified)"
+   },
+   {
+    "t": 1793227216,
+    "who": "T1-w2",
+    "subject": "aggregate FILTER, ORDER BY, STRING_AGG, MEDIAN, PERCENTILE* (lock aggx released)"
+   },
+   {
+    "t": 1793227215,
+    "who": "T1-w6",
+    "subject": "Lock: printf (format,printf)"
+   },
+   {
+    "t": 1793227208,
+    "who": "T1-w6",
+    "subject": "json(), json_quote/array/object/set/insert/replace/remove/patch, json_group_*, json_error_position, JSON5 parser (lock json_more released)"
+   },
+   {
+    "t": 1793227188,
+    "who": "T1-w2",
+    "subject": "Lock: aggx (agg_filter,agg_order_by,group_concat_sep,median,percentile)"
+   },
+   {
+    "t": 1793227183,
+    "who": "T1-w5",
+    "subject": "Lock: window (window_agg,window_empty_over,window_first_last,window_frames,window_lag_lead,window_named,window_nth_value,window_ntile,window_percent,window_rank,window_row_number)"
+   },
+   {
+    "t": 1793227181,
+    "who": "T1-w2",
+    "subject": "WITH/WITH RECURSIVE CTEs and VALUES clause (lock cte released)"
+   },
+   {
+    "t": 1793227172,
+    "who": "T1-w5",
+    "subject": "ALTER/DROP/CTAS/VIEW in ddl.py (lock ddl released)"
+   },
+   {
+    "t": 1793227165,
+    "who": "T1-w1",
+    "subject": "Lock: exprs (bitwise,cast_int_real,cast_text_numeric,comments_quoted,glob,iif_if,is_distinct,like_escape,real_literal,true_false)"
+   },
+   {
+    "t": 1793227157,
+    "who": "T1-w1",
+    "subject": "HEX/UNHEX/QUOTE/CHAR/UNICODE/OCTET_LENGTH/CONCAT(_WS), blob and hex literals (lock textfn released)"
+   },
+   {
+    "t": 1793227156,
+    "who": "T1-w4",
+    "subject": "Lock: dml_insert (default_values,insert_columns,insert_or_ignore,insert_or_replace,insert_select,integer_primary_key,upsert)"
+   },
+   {
+    "t": 1793227153,
+    "who": "T1-w6",
+    "subject": "Lock: json_more (json_build,json_error_position,json_group,json_minify,json_modify,json_patch,json_remove)"
+   },
+   {
+    "t": 1793227150,
+    "who": "T1-w4",
+    "subject": "CEIL/FLOOR/TRUNC/SIGN/LOG/POW/MOD in mathfuncs.py (lock mathfn2 released)"
+   },
+   {
+    "t": 1793227148,
+    "who": "T1-w2",
+    "subject": "Lock: cte (cte_basic,cte_multiple,cte_recursive,values_clause)"
+   },
+   {
+    "t": 1793227143,
+    "who": "T1-w6",
+    "subject": "json_valid/extract/type/array_length, -> and ->> in jsonfuncs.py (lock json_core released)"
+   },
+   {
+    "t": 1793227140,
+    "who": "T1-w2",
+    "subject": "compound SELECT: UNION/UNION ALL/EXCEPT/INTERSECT with ORDER BY/LIMIT (lock setops released)"
+   },
+   {
+    "t": 1793227132,
+    "who": "T1-w5",
+    "subject": "Lock: ddl (alter_rename_table,alter_table,create_table_as,drop_table,views)"
+   },
+   {
+    "t": 1793227125,
+    "who": "T1-w5",
+    "subject": "trig, hyperbolic, sqrt/exp/ln functions (lock mathfn released)"
+   },
+   {
+    "t": 1793227122,
+    "who": "T1-w3",
+    "subject": "Lock: datefn (date_basic,date_modifiers,date_n_days,datetime_basic,julianday,strftime,time_basic,timediff,unixepoch)"
+   },
+   {
+    "t": 1793227118,
+    "who": "T1-w2",
+    "subject": "Lock: setops (compound_order_limit,except,intersect,union,union_all)"
+   },
+   {
+    "t": 1793227115,
+    "who": "T1-w1",
+    "subject": "Lock: textfn (blob_literal,char_unicode,concat,hex_literal,hex_unhex,length_octet,quote)"
+   },
+   {
+    "t": 1793227114,
+    "who": "T1-w4",
+    "subject": "Lock: mathfn2 (abs_sign,ceil_floor,log_funcs,pow_mod,round_trunc)"
+   },
+   {
+    "t": 1793227112,
+    "who": "T1-w6",
+    "subject": "Lock: json_core (json_array_length,json_arrows,json_extract,json_type,json_valid)"
+   },
+   {
+    "t": 1793227109,
+    "who": "T1-w5",
+    "subject": "Lock: mathfn (hyperbolic,sqrt_exp_ln,trig)"
+   },
+   {
+    "t": 1793226767,
+    "who": "hive",
+    "subject": "tools/ask.py for this run"
+   },
+   {
+    "t": 1793226766,
+    "who": "hive",
+    "subject": "tools/board.py: the team message board"
+   },
+   {
+    "t": 1793082269,
+    "who": "referee",
+    "subject": "Protocol v2: category claims (tools/claim.py) and guarded landing (tools/land.py)"
+   },
+   {
+    "t": 1793078416,
+    "who": "referee",
+    "subject": "Gate 2: 113 new feature categories (1,130 visible tests), compact --summary, tools/claim.sh"
+   },
+   {
+    "t": 1793075048,
+    "who": "A-builder-2",
+    "subject": "GROUP BY (exprs, positions, alias fallback) and HAVING, with and without GROUP BY (lock group_by released)"
+   },
+   {
+    "t": 1793075009,
+    "who": "A-builder-6",
+    "subject": "Function-call parsing ('func', NAME, args, distinct), scalar funcs (SUBSTR/UPPER/LOWER/LENGTH/IFNULL/NULLIF/COALESCE/ABS/ROUND/...), LIKE; remaining strings/nulls tests need WHERE (lock scalar_funcs released)"
+   },
+   {
+    "t": 1793075006,
+    "who": "A-builder-1",
+    "subject": "Subqueries: scalar (correlated via outer-env fallback), IN (SELECT ...), FROM (SELECT ...) derived tables; remaining tests need aggregates/GROUP BY (lock subquery released)"
+   },
+   {
+    "t": 1793074976,
+    "who": "A-builder-4",
+    "subject": "Function-call parsing ('func' node) and aggregates COUNT/SUM/TOTAL/AVG/MIN/MAX/GROUP_CONCAT with DISTINCT, whole-table aggregation, group_env hook for GROUP BY, SCALAR_FUNCS hook; remaining aggregate tests need WHERE (lock aggregates released)"
+   },
+   {
+    "t": 1793074952,
+    "who": "A-builder-3",
+    "subject": "WHERE clause: comparisons, AND/OR/NOT, BETWEEN, IN, IS [NOT] NULL (lock where released)"
+   },
+   {
+    "t": 1793074934,
+    "who": "A-builder-5",
+    "subject": "Joins: comma/CROSS/[INNER] JOIN ... ON, LEFT [OUTER] JOIN via Connection.source_rows; remaining join tests need WHERE/GROUP BY (lock join released)"
+   },
+   {
+    "t": 1793074932,
+    "who": "A-builder-2",
+    "subject": "Lock: group_by"
+   },
+   {
+    "t": 1793074931,
+    "who": "A-builder-1",
+    "subject": "Lock: subquery"
+   },
+   {
+    "t": 1793074921,
+    "who": "A-builder-2",
+    "subject": "SELECT DISTINCT / ALL: dedup output rows before ORDER BY/LIMIT (lock distinct released)"
+   },
+   {
+    "t": 1793074905,
+    "who": "A-builder-1",
+    "subject": "CASE expressions (simple and searched); remaining case tests need IS NULL (where) and SUM (aggregates) (lock case released)"
+   },
+   {
+    "t": 1793074903,
+    "who": "A-builder-5",
+    "subject": "Lock: join"
+   },
+   {
+    "t": 1793074901,
+    "who": "A-builder-6",
+    "subject": "Lock: scalar_funcs"
+   },
+   {
+    "t": 1793074890,
+    "who": "A-builder-5",
+    "subject": "FROM table aliases and qualified column refs (lock basic released)"
+   },
+   {
+    "t": 1793074882,
+    "who": "A-builder-6",
+    "subject": "UPDATE/DELETE statements with optional WHERE; rest of category needs BETWEEN (where) and COUNT (aggregates) (lock update_delete released)"
+   },
+   {
+    "t": 1793074878,
+    "who": "A-builder-2",
+    "subject": "Lock: distinct"
+   },
+   {
+    "t": 1793074866,
+    "who": "A-builder-2",
+    "subject": "ORDER BY (multi-key, ASC/DESC, SQLite type ordering, alias/position), LIMIT/OFFSET (lock order_limit released)"
+   },
+   {
+    "t": 1793074858,
+    "who": "A-builder-1",
+    "subject": "Lock: case"
+   },
+   {
+    "t": 1793074853,
+    "who": "A-builder-6",
+    "subject": "Lock: update_delete"
+   },
+   {
+    "t": 1793074846,
+    "who": "A-builder-1",
+    "subject": "Expression parser with precedence climbing; arithmetic, comparison, AND/OR/NOT, || evaluation (lock arith released)"
+   },
+   {
+    "t": 1793074845,
+    "who": "A-builder-5",
+    "subject": "Lock: basic"
+   },
+   {
+    "t": 1793074842,
+    "who": "A-builder-4",
+    "subject": "Lock: aggregates"
+   },
+   {
+    "t": 1793074824,
+    "who": "A-builder-3",
+    "subject": "Lock: where"
+   },
+   {
+    "t": 1793074806,
+    "who": "A-builder-2",
+    "subject": "Lock: order_limit"
+   },
+   {
+    "t": 1793074788,
+    "who": "A-builder-1",
+    "subject": "Lock: arith"
+   },
+   {
+    "t": 1793074251,
+    "who": "referee",
+    "subject": "Initial skeleton: lexer, parser, engine; 210 visible tests"
+   }
+  ]
+ },
+ "T2": {
+  "visible_pass": 1340,
+  "hidden_pass": 2256,
+  "hidden_n": 2260,
+  "commits": [
+   {
+    "t": 1793227648,
+    "who": "T2-w1",
+    "subject": "NATURAL/USING, RIGHT/FULL joins, t.*, row values, COLLATE (lock joins released)"
+   },
+   {
+    "t": 1793227616,
+    "who": "T2-w4",
+    "subject": "date/time functions (datetime_fns.py), fuzzed against sqlite (lock datetime released)"
+   },
+   {
+    "t": 1793227612,
+    "who": "T2-w2",
+    "subject": "RETURNING for INSERT/UPDATE/DELETE, UPDATE FROM (lock ret_upd released)"
+   },
+   {
+    "t": 1793227609,
+    "who": "T2-w6",
+    "subject": "window functions: OVER, partitions, frames, named windows, ranking/navigation (lock windows released)"
+   },
+   {
+    "t": 1793227593,
+    "who": "T2-w5",
+    "subject": "bitwise ops, CAST, GLOB, LIKE ESCAPE, IIF, IS DISTINCT/TRUE, comments, quoted idents, STRING_AGG (lock exprmisc released)"
+   },
+   {
+    "t": 1793227580,
+    "who": "T2-w3",
+    "subject": "JSON functions, -> / ->> operators, JSON_GROUP_ARRAY/OBJECT (jsonfn.py) (lock json released)"
+   },
+   {
+    "t": 1793227578,
+    "who": "T2-w2",
+    "subject": "Lock: ret_upd (returning,update_from)"
+   },
+   {
+    "t": 1793227568,
+    "who": "T2-w2",
+    "subject": "ALTER TABLE, DROP, CREATE INDEX noop, CTAS, CHECK/NOT NULL, transactions (ddl.py) (lock ddl released)"
+   },
+   {
+    "t": 1793227567,
+    "who": "T2-w1",
+    "subject": "Lock: joins (collate_nocase,natural_using,right_full_join,row_values,select_star_qualified)"
+   },
+   {
+    "t": 1793227558,
+    "who": "T2-w1",
+    "subject": "FILTER, aggregate ORDER BY, median/percentile, HAVING alias, NULLS FIRST/LAST (lock aggs released)"
+   },
+   {
+    "t": 1793227528,
+    "who": "T2-w2",
+    "subject": "Lock: ddl (alter_rename_table,alter_table,check_not_null,create_index_noop,create_table_as,drop_table,transactions)"
+   },
+   {
+    "t": 1793227521,
+    "who": "T2-w6",
+    "subject": "Lock: windows (window_agg,window_empty_over,window_first_last,window_frames,window_lag_lead,window_named,window_nth_value,window_ntile,window_percent,window_rank,window_row_number)"
+   },
+   {
+    "t": 1793227519,
+    "who": "T2-w2",
+    "subject": "INSERT columns/SELECT/DEFAULT, OR IGNORE/REPLACE, upsert, multi-set UPDATE, INTEGER PRIMARY KEY, rowid (lock dml_insert released)"
+   },
+   {
+    "t": 1793227513,
+    "who": "T2-w6",
+    "subject": "CTE recursion adapts to compound parser"
+   },
+   {
+    "t": 1793227513,
+    "who": "T2-w6",
+    "subject": "WITH/recursive CTEs, views, EXISTS (lock ctes released)"
+   },
+   {
+    "t": 1793227506,
+    "who": "T2-w1",
+    "subject": "Lock: aggs (agg_filter,agg_order_by,group_by_expr_alias,median,order_nulls,percentile)"
+   },
+   {
+    "t": 1793227497,
+    "who": "T2-w5",
+    "subject": "Lock: exprmisc (bitwise,cast_int_real,cast_text_numeric,comments_quoted,glob,group_concat_sep,iif_if,is_distinct,like_escape,true_false)"
+   },
+   {
+    "t": 1793227495,
+    "who": "T2-w1",
+    "subject": "release setops lock (already passing)"
+   },
+   {
+    "t": 1793227489,
+    "who": "T2-w5",
+    "subject": "string funcs: printf/format/quote/hex/unhex/char/unicode/octet_length/concat (lock strfn released)"
+   },
+   {
+    "t": 1793227488,
+    "who": "T2-w1",
+    "subject": "Lock: setops (compound_order_limit,except,intersect,union,union_all,values_clause)"
+   },
+   {
+    "t": 1793227484,
+    "who": "T2-w3",
+    "subject": "Lock: json (json_array_length,json_arrows,json_build,json_error_position,json_extract,json_group,json_minify,json_modify,json_patch,json_remove,json_type,json_valid)"
+   },
+   {
+    "t": 1793227481,
+    "who": "T2-w1",
+    "subject": "scalar math functions in mathfuncs.py (lock mathfn released)"
+   },
+   {
+    "t": 1793227480,
+    "who": "T2-w4",
+    "subject": "Lock: datetime (date_basic,date_modifiers,date_n_days,datetime_basic,julianday,strftime,time_basic,timediff,unixepoch)"
+   },
+   {
+    "t": 1793227477,
+    "who": "T2-w3",
+    "subject": "compound SELECT (UNION/UNION ALL/INTERSECT/EXCEPT with ORDER/LIMIT) and VALUES (lock setops released)"
+   },
+   {
+    "t": 1793227474,
+    "who": "T2-w4",
+    "subject": "lexer: hex ints, x'..' blobs, exponent reals (lock blobstr released)"
+   },
+   {
+    "t": 1793227462,
+    "who": "T2-w6",
+    "subject": "Lock: ctes (cte_basic,cte_multiple,cte_recursive,exists,views)"
+   },
+   {
+    "t": 1793227460,
+    "who": "T2-w6",
+    "subject": "Withdraw lock insertdml: overlaps dml_insert"
+   },
+   {
+    "t": 1793227459,
+    "who": "T2-w6",
+    "subject": "Lock: insertdml (default_values,insert_columns,insert_or_ignore,insert_or_replace,insert_select,integer_primary_key,update_multi_set,upsert)"
+   },
+   {
+    "t": 1793227459,
+    "who": "T2-w2",
+    "subject": "Lock: dml_insert (default_values,insert_columns,insert_or_ignore,insert_or_replace,insert_select,integer_primary_key,update_multi_set,upsert)"
+   },
+   {
+    "t": 1793227459,
+    "who": "T2-w4",
+    "subject": "Lock: blobstr (blob_literal,hex_literal,real_literal)"
+   },
+   {
+    "t": 1793227456,
+    "who": "T2-w4",
+    "subject": "Withdraw lock blobstr: overlaps strfn"
+   },
+   {
+    "t": 1793227455,
+    "who": "T2-w4",
+    "subject": "Lock: blobstr (blob_literal,char_unicode,concat,hex_literal,hex_unhex,length_octet,quote)"
+   },
+   {
+    "t": 1793227455,
+    "who": "T2-w5",
+    "subject": "Lock: strfn (char_unicode,concat,format,hex_unhex,length_octet,printf,quote)"
+   },
+   {
+    "t": 1793227454,
+    "who": "T2-w3",
+    "subject": "Lock: setops (compound_order_limit,except,intersect,union,union_all,values_clause)"
+   },
+   {
+    "t": 1793227451,
+    "who": "T2-w3",
+    "subject": "Withdraw lock mathfuncs: overlaps mathfn"
+   },
+   {
+    "t": 1793227451,
+    "who": "T2-w3",
+    "subject": "Lock: mathfuncs (abs_sign,ceil_floor,hyperbolic,log_funcs,pow_mod,round_trunc,sqrt_exp_ln,trig)"
+   },
+   {
+    "t": 1793227450,
+    "who": "T2-w1",
+    "subject": "Lock: mathfn (abs_sign,ceil_floor,hyperbolic,log_funcs,pow_mod,round_trunc,sqrt_exp_ln,trig)"
+   },
+   {
+    "t": 1793226767,
+    "who": "hive",
+    "subject": "tools/ask.py for this run"
+   },
+   {
+    "t": 1793226766,
+    "who": "hive",
+    "subject": "tools/board.py: the team message board"
+   },
+   {
+    "t": 1793082269,
+    "who": "referee",
+    "subject": "Protocol v2: category claims (tools/claim.py) and guarded landing (tools/land.py)"
+   },
+   {
+    "t": 1793078416,
+    "who": "referee",
+    "subject": "Gate 2: 113 new feature categories (1,130 visible tests), compact --summary, tools/claim.sh"
+   },
+   {
+    "t": 1793075048,
+    "who": "A-builder-2",
+    "subject": "GROUP BY (exprs, positions, alias fallback) and HAVING, with and without GROUP BY (lock group_by released)"
+   },
+   {
+    "t": 1793075009,
+    "who": "A-builder-6",
+    "subject": "Function-call parsing ('func', NAME, args, distinct), scalar funcs (SUBSTR/UPPER/LOWER/LENGTH/IFNULL/NULLIF/COALESCE/ABS/ROUND/...), LIKE; remaining strings/nulls tests need WHERE (lock scalar_funcs released)"
+   },
+   {
+    "t": 1793075006,
+    "who": "A-builder-1",
+    "subject": "Subqueries: scalar (correlated via outer-env fallback), IN (SELECT ...), FROM (SELECT ...) derived tables; remaining tests need aggregates/GROUP BY (lock subquery released)"
+   },
+   {
+    "t": 1793074976,
+    "who": "A-builder-4",
+    "subject": "Function-call parsing ('func' node) and aggregates COUNT/SUM/TOTAL/AVG/MIN/MAX/GROUP_CONCAT with DISTINCT, whole-table aggregation, group_env hook for GROUP BY, SCALAR_FUNCS hook; remaining aggregate tests need WHERE (lock aggregates released)"
+   },
+   {
+    "t": 1793074952,
+    "who": "A-builder-3",
+    "subject": "WHERE clause: comparisons, AND/OR/NOT, BETWEEN, IN, IS [NOT] NULL (lock where released)"
+   },
+   {
+    "t": 1793074934,
+    "who": "A-builder-5",
+    "subject": "Joins: comma/CROSS/[INNER] JOIN ... ON, LEFT [OUTER] JOIN via Connection.source_rows; remaining join tests need WHERE/GROUP BY (lock join released)"
+   },
+   {
+    "t": 1793074932,
+    "who": "A-builder-2",
+    "subject": "Lock: group_by"
+   },
+   {
+    "t": 1793074931,
+    "who": "A-builder-1",
+    "subject": "Lock: subquery"
+   },
+   {
+    "t": 1793074921,
+    "who": "A-builder-2",
+    "subject": "SELECT DISTINCT / ALL: dedup output rows before ORDER BY/LIMIT (lock distinct released)"
+   },
+   {
+    "t": 1793074905,
+    "who": "A-builder-1",
+    "subject": "CASE expressions (simple and searched); remaining case tests need IS NULL (where) and SUM (aggregates) (lock case released)"
+   },
+   {
+    "t": 1793074903,
+    "who": "A-builder-5",
+    "subject": "Lock: join"
+   },
+   {
+    "t": 1793074901,
+    "who": "A-builder-6",
+    "subject": "Lock: scalar_funcs"
+   },
+   {
+    "t": 1793074890,
+    "who": "A-builder-5",
+    "subject": "FROM table aliases and qualified column refs (lock basic released)"
+   },
+   {
+    "t": 1793074882,
+    "who": "A-builder-6",
+    "subject": "UPDATE/DELETE statements with optional WHERE; rest of category needs BETWEEN (where) and COUNT (aggregates) (lock update_delete released)"
+   },
+   {
+    "t": 1793074878,
+    "who": "A-builder-2",
+    "subject": "Lock: distinct"
+   },
+   {
+    "t": 1793074866,
+    "who": "A-builder-2",
+    "subject": "ORDER BY (multi-key, ASC/DESC, SQLite type ordering, alias/position), LIMIT/OFFSET (lock order_limit released)"
+   },
+   {
+    "t": 1793074858,
+    "who": "A-builder-1",
+    "subject": "Lock: case"
+   },
+   {
+    "t": 1793074853,
+    "who": "A-builder-6",
+    "subject": "Lock: update_delete"
+   },
+   {
+    "t": 1793074846,
+    "who": "A-builder-1",
+    "subject": "Expression parser with precedence climbing; arithmetic, comparison, AND/OR/NOT, || evaluation (lock arith released)"
+   },
+   {
+    "t": 1793074845,
+    "who": "A-builder-5",
+    "subject": "Lock: basic"
+   },
+   {
+    "t": 1793074842,
+    "who": "A-builder-4",
+    "subject": "Lock: aggregates"
+   },
+   {
+    "t": 1793074824,
+    "who": "A-builder-3",
+    "subject": "Lock: where"
+   },
+   {
+    "t": 1793074806,
+    "who": "A-builder-2",
+    "subject": "Lock: order_limit"
+   },
+   {
+    "t": 1793074788,
+    "who": "A-builder-1",
+    "subject": "Lock: arith"
+   },
+   {
+    "t": 1793074251,
+    "who": "referee",
+    "subject": "Initial skeleton: lexer, parser, engine; 210 visible tests"
+   }
+  ]
+ },
+ "S2": {
+  "visible_pass": 1340,
+  "hidden_pass": 2255,
+  "hidden_n": 2260,
+  "commits": [
+   {
+    "t": 1793227957,
+    "who": "S2-w5",
+    "subject": "ALTER ADD COLUMN default fix, OR IGNORE swallows NOT NULL/CHECK (lock ddl2 released)"
+   },
+   {
+    "t": 1793227949,
+    "who": "S2-w1",
+    "subject": "window functions: OVER, partitions, frames (ROWS/RANGE/GROUPS), named windows, ranking/value fns (lock window released)"
+   },
+   {
+    "t": 1793227937,
+    "who": "S2-w5",
+    "subject": "Lock: ddl2 (alter_table,check_not_null)"
+   },
+   {
+    "t": 1793227930,
+    "who": "S2-w5",
+    "subject": "ALTER TABLE, transactions, COLLATE NOCASE (lock ddl released)"
+   },
+   {
+    "t": 1793227920,
+    "who": "S2-w4",
+    "subject": "NATURAL/USING, RIGHT/FULL joins, qualified stars, HAVING alias, row values (lock joins2 released)"
+   },
+   {
+    "t": 1793227916,
+    "who": "S2-w6",
+    "subject": "RETURNING, ON CONFLICT upsert, UPDATE FROM (lock dml2 released)"
+   },
+   {
+    "t": 1793227886,
+    "who": "S2-w3",
+    "subject": "date/time/datetime/julianday/unixepoch/strftime/timediff in datefuncs.py (lock datefn released)"
+   },
+   {
+    "t": 1793227880,
+    "who": "S2-w6",
+    "subject": "Lock: dml2 (returning,update_from,upsert)"
+   },
+   {
+    "t": 1793227874,
+    "who": "S2-w2",
+    "subject": "aggregate FILTER, ORDER BY, STRING_AGG, MEDIAN/PERCENTILE (lock aggs released)"
+   },
+   {
+    "t": 1793227871,
+    "who": "S2-w6",
+    "subject": "dml.py: CREATE TABLE constraints, INSERT variants, multi-col UPDATE, DROP, CREATE INDEX, INTEGER PRIMARY KEY (lock dml released)"
+   },
+   {
+    "t": 1793227869,
+    "who": "S2-w5",
+    "subject": "Lock: ddl (alter_rename_table,alter_table,check_not_null,collate_nocase,create_table_as,transactions)"
+   },
+   {
+    "t": 1793227869,
+    "who": "S2-w5",
+    "subject": "json_error_position: trailing comma tolerated"
+   },
+   {
+    "t": 1793227861,
+    "who": "S2-w4",
+    "subject": "Lock: joins2 (group_by_expr_alias,natural_using,right_full_join,row_values,select_star_qualified)"
+   },
+   {
+    "t": 1793227854,
+    "who": "S2-w4",
+    "subject": "GLOB, LIKE ESCAPE, IIF/IF, IS DISTINCT FROM, NULLS FIRST/LAST, EXISTS (lock exprmisc released)"
+   },
+   {
+    "t": 1793227852,
+    "who": "S2-w5",
+    "subject": "json_set/insert/replace/remove/patch, group_array/object, error_position (lock jsonmod released)"
+   },
+   {
+    "t": 1793227851,
+    "who": "S2-w1",
+    "subject": "Lock: window (window_agg,window_empty_over,window_first_last,window_frames,window_lag_lead,window_named,window_nth_value,window_ntile,window_percent,window_rank,window_row_number)"
+   },
+   {
+    "t": 1793227846,
+    "who": "S2-w2",
+    "subject": "Lock: aggs (agg_filter,agg_order_by,group_concat_sep,median,percentile)"
+   },
+   {
+    "t": 1793227841,
+    "who": "S2-w1",
+    "subject": "WITH/recursive CTEs, CREATE VIEW, VALUES clause (lock cte released)"
+   },
+   {
+    "t": 1793227839,
+    "who": "S2-w2",
+    "subject": "lexer: comments, quoted idents, hex/blob/exp literals; CAST; bitwise ops; TRUE/FALSE, IS TRUE (lock exprs released)"
+   },
+   {
+    "t": 1793227821,
+    "who": "S2-w5",
+    "subject": "Lock: jsonmod (json_error_position,json_group,json_modify,json_patch,json_remove)"
+   },
+   {
+    "t": 1793227814,
+    "who": "S2-w5",
+    "subject": "JSON core functions, -> and ->> operators (minisql/jsonfn.py) (lock jsoncore released)"
+   },
+   {
+    "t": 1793227812,
+    "who": "S2-w4",
+    "subject": "Lock: exprmisc (exists,glob,iif_if,is_distinct,like_escape,order_nulls)"
+   },
+   {
+    "t": 1793227806,
+    "who": "S2-w4",
+    "subject": "text/blob functions: hex, unhex, quote, char, unicode, octet_length, concat, format/printf (lock textfn released)"
+   },
+   {
+    "t": 1793227803,
+    "who": "S2-w1",
+    "subject": "Lock: cte (cte_basic,cte_multiple,cte_recursive,values_clause,views)"
+   },
+   {
+    "t": 1793227796,
+    "who": "S2-w1",
+    "subject": "UNION/INTERSECT/EXCEPT compound selects with ORDER BY/LIMIT (lock setops released)"
+   },
+   {
+    "t": 1793227793,
+    "who": "S2-w2",
+    "subject": "Lock: exprs (bitwise,blob_literal,cast_int_real,cast_text_numeric,comments_quoted,hex_literal,real_literal,true_false)"
+   },
+   {
+    "t": 1793227786,
+    "who": "S2-w2",
+    "subject": "scalar math functions (mathfuncs.py) (lock mathfn released)"
+   },
+   {
+    "t": 1793227784,
+    "who": "S2-w6",
+    "subject": "Lock: dml (create_index_noop,default_values,drop_table,insert_columns,insert_or_ignore,insert_or_replace,insert_select,integer_primary_key,update_multi_set)"
+   },
+   {
+    "t": 1793227774,
+    "who": "S2-w3",
+    "subject": "Lock: datefn (date_basic,date_modifiers,date_n_days,datetime_basic,julianday,strftime,time_basic,timediff,unixepoch)"
+   },
+   {
+    "t": 1793227770,
+    "who": "S2-w5",
+    "subject": "Lock: jsoncore (json_array_length,json_arrows,json_build,json_extract,json_minify,json_type,json_valid)"
+   },
+   {
+    "t": 1793227768,
+    "who": "S2-w1",
+    "subject": "Lock: setops (compound_order_limit,except,intersect,union,union_all)"
+   },
+   {
+    "t": 1793227768,
+    "who": "S2-w4",
+    "subject": "Lock: textfn (char_unicode,concat,format,hex_unhex,length_octet,quote)"
+   },
+   {
+    "t": 1793227764,
+    "who": "S2-w2",
+    "subject": "Lock: mathfn (abs_sign,ceil_floor,hyperbolic,log_funcs,pow_mod,round_trunc,sqrt_exp_ln,trig)"
+   },
+   {
+    "t": 1793226768,
+    "who": "hive",
+    "subject": "tools/ask.py for this run"
+   },
+   {
+    "t": 1793082269,
+    "who": "referee",
+    "subject": "Protocol v2: category claims (tools/claim.py) and guarded landing (tools/land.py)"
+   },
+   {
+    "t": 1793078416,
+    "who": "referee",
+    "subject": "Gate 2: 113 new feature categories (1,130 visible tests), compact --summary, tools/claim.sh"
+   },
+   {
+    "t": 1793075048,
+    "who": "A-builder-2",
+    "subject": "GROUP BY (exprs, positions, alias fallback) and HAVING, with and without GROUP BY (lock group_by released)"
+   },
+   {
+    "t": 1793075009,
+    "who": "A-builder-6",
+    "subject": "Function-call parsing ('func', NAME, args, distinct), scalar funcs (SUBSTR/UPPER/LOWER/LENGTH/IFNULL/NULLIF/COALESCE/ABS/ROUND/...), LIKE; remaining strings/nulls tests need WHERE (lock scalar_funcs released)"
+   },
+   {
+    "t": 1793075006,
+    "who": "A-builder-1",
+    "subject": "Subqueries: scalar (correlated via outer-env fallback), IN (SELECT ...), FROM (SELECT ...) derived tables; remaining tests need aggregates/GROUP BY (lock subquery released)"
+   },
+   {
+    "t": 1793074976,
+    "who": "A-builder-4",
+    "subject": "Function-call parsing ('func' node) and aggregates COUNT/SUM/TOTAL/AVG/MIN/MAX/GROUP_CONCAT with DISTINCT, whole-table aggregation, group_env hook for GROUP BY, SCALAR_FUNCS hook; remaining aggregate tests need WHERE (lock aggregates released)"
+   },
+   {
+    "t": 1793074952,
+    "who": "A-builder-3",
+    "subject": "WHERE clause: comparisons, AND/OR/NOT, BETWEEN, IN, IS [NOT] NULL (lock where released)"
+   },
+   {
+    "t": 1793074934,
+    "who": "A-builder-5",
+    "subject": "Joins: comma/CROSS/[INNER] JOIN ... ON, LEFT [OUTER] JOIN via Connection.source_rows; remaining join tests need WHERE/GROUP BY (lock join released)"
+   },
+   {
+    "t": 1793074932,
+    "who": "A-builder-2",
+    "subject": "Lock: group_by"
+   },
+   {
+    "t": 1793074931,
+    "who": "A-builder-1",
+    "subject": "Lock: subquery"
+   },
+   {
+    "t": 1793074921,
+    "who": "A-builder-2",
+    "subject": "SELECT DISTINCT / ALL: dedup output rows before ORDER BY/LIMIT (lock distinct released)"
+   },
+   {
+    "t": 1793074905,
+    "who": "A-builder-1",
+    "subject": "CASE expressions (simple and searched); remaining case tests need IS NULL (where) and SUM (aggregates) (lock case released)"
+   },
+   {
+    "t": 1793074903,
+    "who": "A-builder-5",
+    "subject": "Lock: join"
+   },
+   {
+    "t": 1793074901,
+    "who": "A-builder-6",
+    "subject": "Lock: scalar_funcs"
+   },
+   {
+    "t": 1793074890,
+    "who": "A-builder-5",
+    "subject": "FROM table aliases and qualified column refs (lock basic released)"
+   },
+   {
+    "t": 1793074882,
+    "who": "A-builder-6",
+    "subject": "UPDATE/DELETE statements with optional WHERE; rest of category needs BETWEEN (where) and COUNT (aggregates) (lock update_delete released)"
+   },
+   {
+    "t": 1793074878,
+    "who": "A-builder-2",
+    "subject": "Lock: distinct"
+   },
+   {
+    "t": 1793074866,
+    "who": "A-builder-2",
+    "subject": "ORDER BY (multi-key, ASC/DESC, SQLite type ordering, alias/position), LIMIT/OFFSET (lock order_limit released)"
+   },
+   {
+    "t": 1793074858,
+    "who": "A-builder-1",
+    "subject": "Lock: case"
+   },
+   {
+    "t": 1793074853,
+    "who": "A-builder-6",
+    "subject": "Lock: update_delete"
+   },
+   {
+    "t": 1793074846,
+    "who": "A-builder-1",
+    "subject": "Expression parser with precedence climbing; arithmetic, comparison, AND/OR/NOT, || evaluation (lock arith released)"
+   },
+   {
+    "t": 1793074845,
+    "who": "A-builder-5",
+    "subject": "Lock: basic"
+   },
+   {
+    "t": 1793074842,
+    "who": "A-builder-4",
+    "subject": "Lock: aggregates"
+   },
+   {
+    "t": 1793074824,
+    "who": "A-builder-3",
+    "subject": "Lock: where"
+   },
+   {
+    "t": 1793074806,
+    "who": "A-builder-2",
+    "subject": "Lock: order_limit"
+   },
+   {
+    "t": 1793074788,
+    "who": "A-builder-1",
+    "subject": "Lock: arith"
+   },
+   {
+    "t": 1793074251,
+    "who": "referee",
+    "subject": "Initial skeleton: lexer, parser, engine; 210 visible tests"
+   }
+  ]
+ }
+}
