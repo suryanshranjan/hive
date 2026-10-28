@@ -1,0 +1,14 @@
+{
+ "name": "g40",
+ "predictions": "gates/gate40/prompts/PREDICTIONS.md",
+ "rulegiver_brief": "gates/gate40/prompts/rulegiver_brief.md",
+ "require_decisions": true,
+ "prompt": "gates/gate40/prompts/prompt_builder.md",
+ "ask_texts": "runs/g40/ask_texts.md",
+ "visible_seed": 40100,
+ "hidden_seed": 40200000,
+ "baseline": "N0",
+ "tour_arms": {"T": "tour"},
+ "pre_launch": ["python3 gates/gate40/referee/wind_tunnel.py {run} {oracle}"],
+ "arms": ["N0:3:none", "H:3:none", "H2:3:none", "R:3:none", "T:3:none"]
+}

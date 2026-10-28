@@ -164,6 +164,11 @@ qs = interview.write_situations('Fees and tips for a shop')
 explain.ask_json = _ask_json
 check("the questions are written from the build's own decisions and their defaults",
       (len(qs), any("A tip is paid (builders' outcome: the usual fee)" in p for p in seen)), (2, True))
+plain = list(seen); seen.clear(); explain.ask_json = lambda prompt: (seen.append(prompt), _ask_json(prompt))[1]
+interview.write_situations('Fees and tips for a shop', inputs=True)
+explain.ask_json = _ask_json
+check('with inputs, the plan also lists what the product shows for unusual input (Gate 40); by default it does not',
+      [any('Unusual input is a business decision' in p for p in ps) for ps in (seen, plain)], [True, False])
 
 # 3i. no redundant questions (Gate 37: the founder found the interview repetitive): two questions on the same decision
 # become one, and an answer in his own words that already settles a later question skips it

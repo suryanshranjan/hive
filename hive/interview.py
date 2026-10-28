@@ -64,6 +64,14 @@ Think like his assistant: which of them does his answer already decide, given wh
 business, so asking would make him repeat himself? Only count a question if his answer clearly settles it. Reply with JSON only: {{"settled": [numbers]}} (an empty list if none)."""
 
 MAX_QUESTIONS = 20   # about 5 minutes on a phone
+MAX_WITH_INPUTS = 30   # when unusual input is asked too (Gate 40)
+
+INPUTS = """
+Unusual input is a business decision too: what the customer, the staff or the report sees when a value is missing,
+blank or unreadable, in the wrong format, in another letter case or with extra spaces or separators, out of the usual
+range (zero, negative, very large), or when a calculation leaves a fraction to round. List the business outcomes first,
+then every such case the code must handle, each as its own decision with the outcome a careful builder would pick.
+"""   # Gate 39: all 8 decisions the interview never asked were of this kind
 
 def _dedupe(qs):
     """Drop questions that ask the same decision as an earlier one (Gate 37: the founder found the interview redundant;
@@ -88,18 +96,20 @@ def settled_by(situation, answer, remaining):
     got = explain.ask_json(SETTLED.format(situation=situation, answer=answer, listing=listing)) or {}
     return [remaining[n - 1]['id'] for n in got.get('settled', []) if isinstance(n, int) and 1 <= n <= len(remaining)]
 
-def decisions(goal):
+def decisions(goal, inputs=False):
     """The business decisions the build must take, each with the builders' default (Gate 36: questions written from the
-    description alone covered 4 of 9 of the owner's surprising rules; most asked about things the code never decides)."""
-    got = explain.ask_json(PLAN.format(goal=re.sub(r'^#+\s*(goal:?)?\s*', '', goal.strip(), flags=re.I)[:24000])) or {}
+    description alone covered 4 of 9 of the owner's surprising rules; most asked about things the code never decides).
+    With `inputs`, what the product shows for unusual input is listed too (Gate 40)."""
+    plan = PLAN.replace('Reply with JSON only', INPUTS.strip() + ' Reply with JSON only') if inputs else PLAN
+    got = explain.ask_json(plan.format(goal=re.sub(r'^#+\s*(goal:?)?\s*', '', goal.strip(), flags=re.I)[:24000])) or {}
     return [d for d in got.get('decisions', []) if isinstance(d, dict) and d.get('case')][:40]
 
-def write_situations(goal, rulings=None, n=12):
+def write_situations(goal, rulings=None, n=12, inputs=False):
     past = ("\nRules he has already given (don't ask about these again):\n" + '\n'.join(f'- {r}' for r in rulings[-40:])
             + '\n') if rulings else ''
-    ds = decisions(goal)
+    ds = decisions(goal, inputs)
     if ds:   # cover every decision the code takes, up to MAX_QUESTIONS: ranking cut 2 of the owner's 9 surprises (Gate 37 pilot)
-        n = min(max(n, len(ds)), MAX_QUESTIONS)
+        n = min(max(n, len(ds)), MAX_WITH_INPUTS if inputs else MAX_QUESTIONS)
     plan = FROM_DECISIONS.format(listing='\n'.join(f"- {d['case']} (builders' outcome: {d.get('default') or 'unsure'})"
                                                     for d in ds)) if ds else ''
     got = explain.ask_json(WRITE.format(goal=explain._goal_summary(goal), rulings=past, decisions=plan, n=n)) or {}
@@ -130,12 +140,12 @@ def _amend(rule, reply):
     return (got.get('rule') or f'{rule} Correction from the owner, which overrides anything above that it contradicts: '
             f'{reply}').strip()
 
-def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll=20, save=None, sheet=True):
+def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll=20, save=None, sheet=True, inputs=False):
     """Run the interview. Returns the owner's rules, one plain sentence each. On the phone if `ch` is given, otherwise
     in the terminal (`ask(prompt)` returns his typed answer). With `save` (a file path), the questions, his answers and
     the readings are kept as they come, so a rerun after a stop picks up where he left off."""
     kept = telegram._load(save and save + '.questions.json')
-    qs = situations or kept.get('qs') or write_situations(goal, rulings, n)
+    qs = situations or kept.get('qs') or write_situations(goal, rulings, n, inputs)
     telegram._save(save and save + '.questions.json', {'qs': qs})
     if not qs:
         return []
