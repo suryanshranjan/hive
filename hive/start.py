@@ -234,15 +234,15 @@ def start(repo='.', workers=4, goal=None, minutes=40, overnight=False, interview
     if overnight and phone:
         rc = _deliver(state)
         if not found:
-            phone.send(f"Welcome back{', ' + phone.name() if phone.name() else ''}. The build is finished. "
+            phone.send(f"🐝 Welcome back{', ' + phone.name() if phone.name() else ''}. The build is finished. "
                        f"{state['check']} Nothing needs your attention. It's ready on branch hive/{name}.")
             return rc
         say(f'\n[{_now()}] Sent {_n(len(found), "assumption")} to your phone; waiting for your replies.')
         if _review_and_fix(state, phone):
             rc = _deliver(state)
-            phone.send(f"Done{', ' + phone.name() if phone.name() else ''}. Your changes are in. {state['check']} It's ready on branch hive/{name} whenever you are.")
+            phone.send(f"🎉 Done{', ' + phone.name() if phone.name() else ''}. Your changes are in. {state['check']} It's ready on branch hive/{name} whenever you are.")
         else:
-            phone.send(f"All set. It's ready on branch hive/{name} whenever you are.")
+            phone.send(f"✅ All set. It's ready on branch hive/{name} whenever you are.")
         return rc
     if overnight:
         rc = _deliver(state)
@@ -395,7 +395,7 @@ def morning(name=None, phone=False):
         say(str(e)); return 1
     rc = _deliver(state)
     if ch:
-        ch.send((f"Done{', ' + ch.name() if ch.name() else ''}. Your changes are in. {state['check']}" if fixed else 'All set.') +
+        ch.send((f"🎉 Done{', ' + ch.name() if ch.name() else ''}. Your changes are in. {state['check']}" if fixed else '✅ All set.') +
                 f" It's ready on branch hive/{state['name']} whenever you are.")
     return rc
 
@@ -413,5 +413,5 @@ def apply_ruling(state, rule, ch=None):
     state.update(final=run, cost=state.get('cost', 0) + _cost(run), started=time.time())
     rc = _deliver(state)
     if ch:
-        ch.send(f"Done. The build now follows your new ruling. {state['check']} It's on branch hive/{state['name']}.")
+        ch.send(f"🎉 Done. The build now follows your new ruling. {state['check']} It's on branch hive/{state['name']}.")
     return rc

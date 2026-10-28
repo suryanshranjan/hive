@@ -46,6 +46,9 @@ def checks(repo='.', claude_probe=True):
                 'Optional: run Hive inside Docker or a spare VM for code you do not fully trust.'))
     out.append((bool(telegram.load()), False, "the owner's phone is connected (Telegram)",
                 'Optional: hive telegram setup, so questions and reviews reach your phone.'))
+    from . import voice
+    out.append((voice.available(), False, 'voice notes (answer Hive by talking on Telegram)',
+                'Optional: pip install faster-whisper (transcribes on this machine; your voice never leaves it).'))
     out.append((os.path.exists(explain.BACKUP), False, 'a backup model for plain words',
                 'Optional: hive llm setup (for example NVIDIA NIM), used only if Claude cannot be reached.'))
     return out

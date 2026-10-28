@@ -31,7 +31,7 @@ texts = [x['text'] for x in fake.sent]
 check('it quotes the earlier ruling it would replace', any('Earlier you ruled:\n- A late post is paid in full.' in t for t in texts), True)
 check('the earlier ruling is replaced by the new one', [x['text'] for x in memory.load(repo)],
       ['Followers are counted once per account.', 'a late post loses 2% per day'])
-check('with no build yet, it says the next build will follow it', (r, texts[-1]), ('kept', 'Very good. The builders will follow it from the next build.'))
+check('with no build yet, it says the next build will follow it', (r, texts[-1]), ('kept', '✅ Very good. The builders will follow it from the next build.'))
 
 # 2. with a build on record, it offers to update that build, and does so on Yes
 runs = os.path.join(home, '.hive', 'runs', 'b1'); os.makedirs(runs)
@@ -45,11 +45,11 @@ check('"keep both" keeps the earlier ruling too', len(memory.load(repo)), 3)
 
 # 3. a hello, a status request, and a new rule
 fake = FakeTelegram([])
-check('waking it up gets a greeting', (assistant.handle(ch(fake), repo, 'hi', poll=1), fake.sent[-1]['text'].startswith('At your service, Sir')),
+check('waking it up gets a greeting', (assistant.handle(ch(fake), repo, 'hi', poll=1), fake.sent[-1]['text'].startswith('🐝 At your service, Sir')),
       ('greeting', True))
 fake = FakeTelegram([])
 assistant.handle(ch(fake), repo, 'status?', poll=1)
-check('status reports the latest build', fake.sent[-1]['text'], 'The latest build is on branch hive/b1. 12 tests, all passing.')
+check('status reports the latest build', fake.sent[-1]['text'], '📊 The latest build is on branch hive/b1. 12 tests, all passing.')
 fake = FakeTelegram([tap('as|rule'), tap('upd|no')])
 assistant.handle(ch(fake), repo, 'Brands must see a creator rating before inviting', poll=1)
 check('anything else can be kept as a standing rule', 'Brands must see a creator rating before inviting' in [x['text'] for x in memory.load(repo)], True)
@@ -67,6 +67,21 @@ rules = interview.interview('Fees and tips for a shop', ch(fake), poll=1)
 check('the interview turns a tap and confirmed own words into rules',
       rules, ['Asha tips a creator Rs 500 after a great post. -> No fee on a tip', 'A late fee is charged only after 7 days.'])
 check("his rules go into the builders' instructions as tests to encode", 'Encode every one' in interview.instructions(rules), True)
+
+# 3d. a voice note: transcribed on this machine, shown back to the owner, and used as his answer
+from hive import voice
+voice.available = lambda: True
+voice.transcribe = lambda path: 'Only after a week, and tell the brand first'
+telegram.Channel.fetch = lambda self, file_path, local: open(local, 'wb').write(b'OggS')
+fake = FakeTelegram([tap('q01|0'), say('VOICE:note1'), tap('q02|0')])
+rules = interview.interview('Fees and tips for a shop', ch(fake), poll=1)
+check('a spoken answer is transcribed, shown back, and taken as his own words',
+      (any(m['text'] == '🎙 I heard: "Only after a week, and tell the brand first"' for m in fake.sent), len(rules)), (True, 2))
+voice.available = lambda: False
+fake = FakeTelegram([say('VOICE:note2'), say('Typed instead')])
+texts = telegram._wait(ch(fake), 1, set())
+check('without Whisper installed, it asks him to type, and takes the typed answer',
+      (any('pip install faster-whisper' in m['text'] for m in fake.sent), texts), (True, ('text', 'Typed instead')))
 
 # 4. the listener steps aside while a build or review is talking to the owner
 json.dump({'pid': os.getppid(), 'at': time.time()}, open(telegram.BUSY, 'w'))

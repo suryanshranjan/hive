@@ -57,24 +57,25 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None):
     intent, rule = got.get('intent', 'other'), (got.get('rule') or text).strip()
     who = _who(ch)
     if intent == 'build' and start_build:
-        ch.send(f"Shall I build this?\n\n{rule}\n\nI'll work on copies, then bring you the decisions to check.",
-                buttons=[[('Yes, build it', 'bld|yes')], [('Not now', 'bld|no')]])
+        ch.send(f"🏗 <b>Shall I build this?</b>\n\n{telegram.esc(rule)}\n\n"
+                "<i>I'll work on copies, then bring you the decisions to check.</i>", html=True,
+                buttons=[[('🚀 Yes, build it', 'bld|yes')], [('Not now', 'bld|no')]])
         if telegram._wait(ch, poll, {'bld|yes', 'bld|no'})[1] != 'bld|yes':
             ch.send('Very good. Just say the word.'); return 'not_built'
-        ch.send("Right away. I'll message you as it goes; text 'status' any time.")
+        ch.send("🛠 Right away. I'll message you as it goes; text 'status' any time.")
         start_build(repo, rule)
         return 'built'
     if intent == 'greeting':
-        ch.send(f"At your service{', ' + who if who else ''}. Tell me if you've changed your mind about anything, give me "
-                "a new rule, or ask for the status.")
+        ch.send(f"🐝 <b>At your service{', ' + telegram.esc(who) if who else ''}.</b>\n\nTell me if you've changed your mind "
+                "about anything, give me a new rule, or ask for the status. 🎙 Voice notes work too.", html=True)
         return 'greeting'
     if intent == 'status':
         st = latest_build(repo)
-        ch.send((f"The latest build is on branch hive/{st['name']}. {st.get('check', '')}".strip()) if st else
+        ch.send('📊 ' + (f"The latest build is on branch hive/{st['name']}. {st.get('check', '')}".strip()) if st else
                 'Nothing has been built on this project yet.')
         return 'status'
     if intent not in ('change', 'rule'):
-        ch.send("Noted. Shall I keep this as a standing rule for the builders?",
+        ch.send("📝 Noted. Shall I keep this as a standing rule for the builders?",
                 buttons=[[('Yes, keep it as a rule', 'as|rule')], [('No, just a note', 'as|note')]])
         if telegram._wait(ch, poll, {'as|rule', 'as|note'})[1] != 'as|rule':
             ch.send('Very good.'); return 'note'
@@ -84,8 +85,9 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None):
     old = [n - 1 for n in found if isinstance(n, int) and 1 <= n <= len(rulings)]
     if old:
         before = '\n'.join(f'- {rulings[i]["text"]}' for i in old)
-        ch.send(f"Understood. Earlier you ruled:\n{before}\n\nNow: {rule}\n\nShall I replace the earlier ruling with this?",
-                buttons=[[('Replace it', 'chg|replace')], [('Keep both', 'chg|both')], [('Cancel', 'chg|cancel')]])
+        ch.send(f"🔄 <b>Understood. Earlier you ruled:</b>\n{telegram.esc(before)}\n\n<b>Now:</b> {telegram.esc(rule)}\n\n"
+                "Shall I replace the earlier ruling with this?", html=True,
+                buttons=[[('🔄 Replace it', 'chg|replace')], [('Keep both', 'chg|both')], [('Cancel', 'chg|cancel')]])
         choice = telegram._wait(ch, poll, {'chg|replace', 'chg|both', 'chg|cancel'})[1]
         if choice == 'chg|cancel':
             ch.send('Of course. Nothing changed.'); return 'cancelled'
@@ -95,16 +97,16 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None):
             memory.add(repo, rule, 'changed')
     else:
         memory.add(repo, rule, 'owner')
-        ch.send(f"Noted as a standing rule: {rule}")
+        ch.send(f"📌 Noted as a standing rule: {rule}")
     st = latest_build(repo)
     if st and apply_build:
         ch.send(f"Shall I update the latest build (branch hive/{st['name']}) to follow it?",
                 buttons=[[('Yes, update it', 'upd|yes')], [('Not now', 'upd|no')]])
         if telegram._wait(ch, poll, {'upd|yes', 'upd|no'})[1] == 'upd|yes':
-            ch.send("Right away. I'll let you know the moment it's done.")
+            ch.send("🛠 Right away. I'll let you know the moment it's done.")
             apply_build(st, rule, ch)
             return 'applied'
-    ch.send('Very good. The builders will follow it from the next build.')
+    ch.send('✅ Very good. The builders will follow it from the next build.')
     return 'kept'
 
 def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None):
