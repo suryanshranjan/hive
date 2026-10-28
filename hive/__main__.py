@@ -1,27 +1,30 @@
-"""hive: run silent coding-agent swarms on any repository with tests.
+"""hive: a team of AI builders you direct by talking. It asks in plain words, never breaks what works,
+and hands back a tested branch.
 
-usage:
-  python -m hive                                            # just start: Hive asks what to build and does the rest
-  python -m hive cloud --to user@host [--with-login]        # move this project's Hive to a cloud machine
-  python -m hive cloud pull                                 # bring the result branches back
-  python -m hive listen                                     # stay on Telegram: change your mind any time
-  python -m hive doctor                                     # check this machine and project are ready
-  python -m hive start [--workers 4] [--goal <text or file>] [--minutes 40] [--overnight]
-  python -m hive morning                                    # after an overnight build: check its assumptions (--phone: on Telegram)
-  python -m hive telegram setup                             # once: questions and reviews come to your phone
-  python -m hive rules [forget <n>]                         # your standing rulings for this project
-  python -m hive llm setup                                  # optional: a backup model (e.g. NVIDIA NIM) for plain words
-  python -m hive init --test-cmd "<command that runs all tests and writes JUnit XML to .hive/junit.xml>"
-  python -m hive claim <short_name> <area>[,<area>...] "<what you will build>"
-  python -m hive land <short_name> "<commit message>"      # or: python -m hive land <short_name> --continue
-  python -m hive areas                                      # every area and who holds it
-  python -m hive run --repo <repo> --run <new folder> --workers N --goal <goal.md or text> [--minutes 40] [--max-parallel N]
-                    [--examples <examples.md>] [--questions N]     # the owner's examples; the team's question budget (0: none)
-                    [--assumptions]                                # workers record every default they apply
-  python -m hive owner --run <run>                          # the owner answers questions live
-  python -m hive review --run <run>                         # the owner checks the workers' assumptions; writes corrections.md
-  python -m hive ask "<question>"   /   python -m hive answers   (workers, inside a run)
-  python -m hive assume [--technical] "<default>" / python -m hive assumptions   (workers, inside a run)
+For the owner:
+  hive                                   start: Hive asks what to build and does the rest
+  hive start [--overnight] [--workers 4] [--goal <text or file>] [--minutes 40]
+  hive morning [--phone]                 after an overnight build: check its decisions (on Telegram with --phone)
+  hive listen                            stay on Telegram: change your mind, "build: ...", "status"
+  hive rules [forget <n>]                your standing rulings for this project
+  hive doctor                            check this machine and project are ready
+  hive telegram setup | test | call <name>   connect your phone; how Hive addresses you
+  hive llm setup                         optional: a backup model (e.g. NVIDIA NIM) for plain words
+  hive cloud --to user@host [--with-login]   move this project's Hive to a server
+  hive cloud pull [--from user@host]     bring the result branches back
+
+Step by step (scripts and experiments):
+  hive init --test-cmd "<runs all tests, writes JUnit XML to .hive/junit.xml>"
+  hive run --repo <repo> --run <new folder> --workers N --goal <goal.md or text> [--minutes 40]
+           [--max-parallel N] [--examples <examples.md>] [--questions N] [--assumptions]
+  hive owner --run <run>                 answer the builders' questions live
+  hive review --run <run>                check the builders' decisions; writes corrections.md
+
+For the builders, inside a run:
+  hive claim <name> <area>[,<area>...] "<what you will build>"     hive areas
+  hive land <name> "<commit message>"    (or: hive land <name> --continue)
+  hive ask "<question>"                  hive answers
+  hive assume [--technical] "<default>"  hive assumptions
 """
 import argparse, json, os, sys
 
