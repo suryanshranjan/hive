@@ -89,7 +89,7 @@ def main(argv=None):
         return assistant.listen('.', apply_build=start.apply_ruling,
                                 start_build=lambda repo, goal: start.start(repo, None, goal, 40, overnight=True),
                                 cloud=lambda repo, on, login=True: cloud_aws.new(repo, with_login=login) if on else
-                                cloud_aws.stop(ask=lambda q: 'y'))
+                                cloud_aws.stop(ask=lambda q: 'y' if q.startswith('Delete the Hive machine') else 'n'))   # never 'lose the work'
     if a.cmd == 'cloud':
         from . import cloud
         if a.action == 'pull':
