@@ -80,6 +80,11 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
             ch.send('Very good. Just say the word.'); return 'not_moved'
         ch.send("🛠 On it. This takes about 5 minutes; I'll tell you when I'm there." if on else '🛠 Deleting it now.')
         rc = cloud(repo, on)
+        if rc == 5:   # this copy runs in the cloud, without the owner's AWS keys (on purpose): it cannot delete itself
+            ch.send("☁️ I'm the copy running in the cloud, and I don't hold your AWS keys, on purpose, so I can't shut "
+                    "myself down. On your computer, run <code>hive cloud --stop</code>: it deletes this machine and "
+                    "everything on it.", html=True)
+            return 'cloud_elsewhere'
         if rc != 0:
             ch.send("⚠️ That didn't work. On your computer, run `hive cloud --new` (or `--stop`) to see why.")
             return 'cloud_failed'

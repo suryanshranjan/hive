@@ -8,7 +8,7 @@ Workers run $HIVE_WORKER_CMD (default: headless Claude Code) inside their clone 
 shell commands, so run swarms in a container or a throwaway VM."""
 import csv, json, os, shlex, shutil, subprocess, sys, time
 
-from . import config, owner
+from . import PY, config, owner
 from .guard import sh
 
 DEFAULT_CMD = 'claude -p --output-format json --permission-mode acceptEdits --allowedTools Bash Read Edit Write Glob Grep'
@@ -72,13 +72,13 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
         os.makedirs(os.path.join(run, d))
     owner_text = owner.setup(run, examples, questions, assumptions)
     up = os.path.join(run, 'up.git')
-    sh('git', 'clone', '-q', '--bare', '--branch', b, repo, up)
+    sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--bare', '--branch', b, repo, up)
     sh('git', '-C', up, 'symbolic-ref', 'HEAD', f'refs/heads/{b}')
     template = open(os.path.join(HIVE_ROOT, 'hive', 'templates', 'worker.md')).read()
     goal_text = open(goal).read().strip() if os.path.exists(goal) else goal
     for k in range(1, workers + 1):
         me = f'w{k}'; work = os.path.join(run, 'work', me)
-        sh('git', 'clone', '-q', up, work)
+        sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', up, work)
         sh('git', '-C', work, 'config', 'user.name', me); sh('git', '-C', work, 'config', 'user.email', f'{me}@hive.local')
         for link in cfg.get('snapshot_links', []):   # dependency folders, shared read-only from the source checkout
             src, dst = os.path.join(repo, link), os.path.join(work, link)
@@ -88,7 +88,7 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
                 .replace('{LOG}', os.path.join(run, 'logs', f'{me}.log')).replace('{GOAL}', goal_text)
                 .replace('{TEST_CMD}', cfg['test_cmd']).replace('{AREAS}', _areas_text(cfg)).replace('{OWNER}', owner_text)
                 .replace('{MINUTES}', str(minutes)))
-        open(os.path.join(run, 'prompts', f'{me}.md'), 'w').write(text)
+        open(os.path.join(run, 'prompts', f'{me}.md'), 'w').write(text.replace('python3 -m hive', f'{PY} -m hive'))
     json.dump(dict(repo=repo, branch=b, workers=workers, started=None), open(os.path.join(run, 'run.json'), 'w'), indent=1)
     return run
 

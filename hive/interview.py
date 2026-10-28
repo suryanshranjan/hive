@@ -14,7 +14,8 @@ PLAN = """Software builders are about to build this feature for a business:
 List the decisions the code for this feature must take that the business owner could rule on (business outcomes, not
 technical choices): each one a case the product must handle, in plain words, with the outcome a careful builder would
 pick if nobody told him. If the description names the cases (a table, a list of situations, an interface), cover every
-one of them. One entry per decision: when the outcome depends on a number (days late, days waited, rounds used), that
+one of them. Leave out any decision the company's own documents (if included) already settle clearly; a document
+that only says "as usual" or "the standard" does not settle it. One entry per decision: when the outcome depends on a number (days late, days waited, rounds used), that
 is still one decision, not one per number. Reply with JSON only: {{"decisions": [{{"case": "...", "default": "..."}}]}}"""
 
 WRITE = """You are preparing a short interview with a busy, non-technical business owner before his software builders start
@@ -90,7 +91,7 @@ def settled_by(situation, answer, remaining):
 def decisions(goal):
     """The business decisions the build must take, each with the builders' default (Gate 36: questions written from the
     description alone covered 4 of 9 of the owner's surprising rules; most asked about things the code never decides)."""
-    got = explain.ask_json(PLAN.format(goal=re.sub(r'^#+\s*(goal:?)?\s*', '', goal.strip(), flags=re.I)[:8000])) or {}
+    got = explain.ask_json(PLAN.format(goal=re.sub(r'^#+\s*(goal:?)?\s*', '', goal.strip(), flags=re.I)[:24000])) or {}
     return [d for d in got.get('decisions', []) if isinstance(d, dict) and d.get('case')][:40]
 
 def write_situations(goal, rulings=None, n=12):

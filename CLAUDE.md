@@ -17,6 +17,7 @@ This repo is the shared brain of the Hive research project. It holds evidence an
 - **After a run:**
   - Write `gates/gate<k>/RESULTS.md` (predictions scored, failures included).
   - Update `BRAIN.md` (evidence log, scorecard, constants, open questions, changelog) and `lab/QUEUE.md` ("Where we left off").
+  - Turn the finding into the product: change Hive where the evidence says so, and add its row to `docs/research_to_product.md` (or say why it changes nothing).
   - Commit and push in one go.
 - **Before stopping for the day:** make sure "Where we left off" says exactly what is done and what is next, and push.
 - **Real companies:** never commit a real company's name, rules or data. Use mock names in anything public.

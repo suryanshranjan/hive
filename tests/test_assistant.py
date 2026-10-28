@@ -70,6 +70,10 @@ check('"move to the cloud" asks once, then moves (and the local listener stops)'
 fake = FakeTelegram([tap('cld|no')])
 r = assistant.handle(ch(fake), repo, 'delete the cloud machine', poll=1, cloud=lambda rp, on: moves.append(on) or 0)
 check('"not now" leaves the cloud machine alone', (r, moves), ('not_moved', [True]))
+fake = FakeTelegram([tap('cld|yes')])
+r = assistant.handle(ch(fake), repo, 'delete the cloud machine', poll=1, cloud=lambda rp, on: 5)
+check('the cloud copy says it cannot delete itself, and how to (no AWS keys there)',
+      (r, 'hive cloud --stop' in fake.sent[-1]['text']), ('cloud_elsewhere', True))
 
 # 3c. the interview on the phone: a tap, his own words, his confirmation of the reading -> rules for the builders
 from hive import interview

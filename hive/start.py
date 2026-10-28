@@ -5,7 +5,7 @@ and their assumptions to the owner in plain words, sends back what the owner cor
 over a branch. The owner's own branches are never changed: the result arrives as a new branch, hive/<name>."""
 import csv, glob, json, os, re, shlex, shutil, subprocess, threading, time
 
-from . import interview, junit, memory, owner, swarm, telegram
+from . import PY, docs as docs_mod, interview, junit, law, memory, owner, swarm, telegram
 from .guard import sh
 
 RUNS = os.path.join(os.path.expanduser('~'), '.hive', 'runs')
@@ -55,7 +55,7 @@ def detect_tests(root):
         dirs[:] = [x for x in dirs if x not in skip]
         py += sum(1 for f in files if re.match(r'(test_.*|.*_test)\.py$', f))
     if py:
-        found.append((py, 'python3 -m pytest -q -p no:cacheprovider --junitxml=.hive/junit.xml', 'pytest'))
+        found.append((py, f'{PY} -m pytest -q -p no:cacheprovider --junitxml=.hive/junit.xml', 'pytest'))
     if not found:
         return None, None
     _, cmd, how = max(found, key=lambda x: x[0])
@@ -142,13 +142,19 @@ def _phase(source, run, workers, goal, minutes, questions, assumptions, narrate_
     narrator.tick(); log.close()
     return meta['branch'], result.get('code', 1)
 
-def start(repo='.', workers=4, goal=None, minutes=40, overnight=False, interview_first=True):
+def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interview_first=True, docs=None):
     repo = os.path.abspath(repo)
     say("\nHive here. What are we building today?")
     goal = goal or _ask("(Describe it in a sentence or two, or give the path of a file that describes it.)")
     if not goal:
         say('Nothing to build; come back any time.'); return 0
     goal_text = open(goal).read().strip() if os.path.exists(goal) else goal
+    papers = docs_mod.read(docs)
+    if papers:   # the company's own documents: the interview skips what they settle; builders follow them
+        say(f"  I'll read your documents ({len(papers) // 1000 or 1}k characters) and only ask about what they don't settle.")
+        goal_text += docs_mod.instructions(papers)
+    elif docs:
+        say(f'  I found no text documents at {docs} (I read .md, .txt and .csv files); carrying on without them.')
 
     say('\nGot it. Let me look at your project.')
     if sh('git', '-C', repo, 'rev-parse', '--is-inside-work-tree').returncode != 0:
@@ -178,10 +184,10 @@ def start(repo='.', workers=4, goal=None, minutes=40, overnight=False, interview
         name = f'{base}-{k}'; k += 1
     home = os.path.join(RUNS, name); os.makedirs(home)
     source = os.path.join(home, 'source')
-    sh('git', 'clone', '-q', '--branch', branch, repo, source)
+    sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', branch, repo, source)
     sh('git', '-C', source, 'config', 'user.name', 'hive'); sh('git', '-C', source, 'config', 'user.email', 'hive@local')
     _link(repo, source, links)
-    before = run_tests(source, test_cmd)
+    t0 = time.time(); before = run_tests(source, test_cmd); t_g = time.time() - t0   # the gate term of the law
     passed, total = sum(before.values()), len(before)
     if total >= 20 and passed < 0.5 * total and how != 'your command':   # a fresh feature's few failing tests are normal
         say(f'  {total - passed} of your {total} tests fail before anyone has touched the code. That often means they need '
@@ -207,7 +213,13 @@ def start(repo='.', workers=4, goal=None, minutes=40, overnight=False, interview
     sh('git', '-C', source, 'add', '.hive/config.json', 'current_tasks/.keep', '.gitignore')
     sh('git', '-C', source, 'commit', '-q', '-m', 'hive: settings for this build')
 
-    say(f"\nI'll put {workers} builders on it. They work on copies, so your branches stay exactly as they are.")
+    auto = workers is None   # the swarm law picks the number from this project's measurements (hive/law.py)
+    if auto:
+        workers, why = law.builders(t_g)
+        say(f"\nI'll put {_n(workers, 'builder')} on it ({why}). They work on copies, so your branches stay exactly "
+            "as they are.")
+    else:
+        say(f"\nI'll put {workers} builders on it. They work on copies, so your branches stay exactly as they are.")
     cfg_phone = telegram.load()
     phone = telegram.Channel(cfg_phone) if cfg_phone else None
     if overnight:
@@ -233,6 +245,11 @@ def start(repo='.', workers=4, goal=None, minutes=40, overnight=False, interview
                 memory.add(repo, r, 'interview')
             rules += interview.instructions(asked)
             say(f"  Thank you. The builders will encode your {_n(len(asked), 'rule')} as tests before anything lands.")
+            if auto:
+                n, why = law.builders(t_g, decisions=len(asked))
+                if n < workers:
+                    workers = n
+                    say(f"  For a job this size I'll use {_n(n, 'builder')} ({why}).")
     say(f'\n[{_now()}] Starting.')
     state = dict(repo=repo, branch=branch, name=name, home=home, test_cmd=test_cmd, links=links, goal=goal_text,
                  rules=rules, workers=workers, minutes=minutes, before=before, started=time.time(), overnight=overnight,
@@ -295,7 +312,7 @@ def _review_and_fix(state, phone=None):
         return False
     say(f'\n[{_now()}] Sending the builders back to fix {_n(len(fixes), "thing")}.')
     fsrc = os.path.join(state['home'], 'fix_source')
-    sh('git', 'clone', '-q', '--branch', state['b'], os.path.join(run1, 'up.git'), fsrc)
+    sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', state['b'], os.path.join(run1, 'up.git'), fsrc)
     _link(state['repo'], fsrc, state['links'])
     corrections = open(os.path.join(run1, 'owner', 'corrections.md')).read()
     run2 = os.path.join(state['home'], 'fix')
@@ -337,7 +354,7 @@ def _confirm_as_built(state, run2, phone=None):
             '\n'.join(f'- Built: {t}\n  **The owner says:** {w or "Not quite right; follow the earlier correction exactly."}'
                       for t, w in wrong) + '\n')
     src = os.path.join(state['home'], 'fix2_source'); run3 = os.path.join(state['home'], 'fix2')
-    sh('git', 'clone', '-q', '--branch', state['b'], os.path.join(run2, 'up.git'), src)
+    sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', state['b'], os.path.join(run2, 'up.git'), src)
     _link(state['repo'], src, state['links'])
     corrections = open(os.path.join(state['home'], 'build', 'owner', 'corrections.md')).read()
     _phase(src, run3, 1, state['goal'] + state.get('rules', '') + '\n\n' + corrections + note, state['minutes'], 0,
@@ -352,7 +369,7 @@ def _deliver(state):
     result = os.path.join(state['home'], 'result')
     if os.path.exists(result):
         shutil.rmtree(result)
-    sh('git', 'clone', '-q', '--branch', state['b'], os.path.join(state['final'], 'up.git'), result)
+    sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', state['b'], os.path.join(state['final'], 'up.git'), result)
     _link(state['repo'], result, state['links'])
     before = state['before']; passed = sum(before.values())
     after = run_tests(result, state['test_cmd'])
@@ -451,7 +468,7 @@ def apply_ruling(state, rule, ch=None):
     re-check every test and update the same branch (used by `hive listen`)."""
     home = state['home']; n = len(glob.glob(os.path.join(home, 'change*'))) + 1
     src = os.path.join(home, f'change{n}_source'); run = os.path.join(home, f'change{n}')
-    sh('git', 'clone', '-q', '--branch', state['b'], os.path.join(state['final'], 'up.git'), src)
+    sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', state['b'], os.path.join(state['final'], 'up.git'), src)
     _link(state['repo'], src, state['links'])
     note = ("\n\n# The owner changed his mind\n\nAfter this was built, the owner gave this ruling. Change the code to "
             "follow it, encode it as a test, change any existing test that asserts the old behaviour, and leave "
