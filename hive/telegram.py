@@ -42,6 +42,23 @@ class Channel:
             p['reply_to_message_id'] = reply_to
         return self.api('sendMessage', **p)['message_id']
 
+    def drain(self):
+        """Skip anything sent before now (an old "hi" from setup must not count as an answer)."""
+        while True:
+            p = {'timeout': 0}
+            if self.offset is not None:
+                p['offset'] = self.offset
+            batch = self.api('getUpdates', **p)
+            if not batch:
+                return
+            self.offset = batch[-1]['update_id'] + 1
+
+    def name(self):
+        try:
+            return self.api('getChat', chat_id=self.chat).get('first_name') or ''
+        except Exception:
+            return ''
+
     def updates(self, timeout=20):
         """New replies from the owner's chat only: (text or None, button data or None, id of the message replied to)."""
         p = {'timeout': timeout, 'allowed_updates': ['message', 'callback_query']}
@@ -102,32 +119,69 @@ def bridge_questions(run, ch, until, poll=2, tick=None):
                        'via': 'telegram'}, open(path, 'w'))
             ch.send(f"Got it. Sent to builder {q['worker']}.", reply_to=sent.get(qid))
 
-def review(run, ch, poll=20):
-    """The owner checks the business assumptions on the phone, one at a time: Right, or Wrong plus the owner's rule."""
-    from . import owner
+def _ask_one(ch, d, item, header, poll):
+    """One decision on the phone: Yes, or No plus the owner's own words. Records the review."""
+    msg = ch.send(f"{header}\n\n{item['text']}", buttons=[("Yes, that's right", f"{item['id']}|ok"),
+                                                          ('No, change it', f"{item['id']}|no")])
+    t0 = time.time(); verdict = None
+    while verdict is None:
+        for text, data, reply_to in ch.updates(timeout=poll):
+            if data == f"{item['id']}|ok":
+                verdict = (True, None)
+            elif data == f"{item['id']}|no":
+                ch.send('What should happen instead? Tell me in your own words.', reply_to=msg)
+            elif text:
+                low = text.lower().strip('. !')
+                verdict = (True, None) if low in ('right', 'yes', 'ok', 'correct', 'y', 'yes thats right') else (False, text)
+            if verdict:
+                break
+    ok, correction = verdict
+    json.dump({'id': item['id'], 'ok': ok, 'correction': correction, 'seconds': int(time.time() - t0), 'via': 'telegram',
+               'shown_as': item['text']}, open(os.path.join(d, 'reviews', item['id'] + '.json'), 'w'))
+    if not ok:
+        ch.send("Got it. I'll have that changed.")
+
+def review(run, ch, goal='', check='', poll=20, greeting='Good morning'):
+    """The owner checks the builders' business assumptions on the phone: rewritten with context and an example, most
+    important first, at most a handful; the smaller ones only if the owner asks to see them."""
+    from . import explain, owner
     d = os.path.join(run, 'owner')
     todo = [a for a in owner._assumptions(d, False) if not os.path.exists(os.path.join(d, 'reviews', a['id'] + '.json'))]
-    for n, a in enumerate(todo, 1):
-        msg = ch.send(f"Assumption {n} of {len(todo)}:\n\n{a['text']}\n\nIs that right?",
-                      buttons=[('Right', f"{a['id']}|ok"), ('Wrong', f"{a['id']}|no")])
-        t0 = time.time(); verdict = None
-        while verdict is None:
-            for text, data, reply_to in ch.updates(timeout=poll):
-                if data == f"{a['id']}|ok":
-                    verdict = (True, None)
-                elif data == f"{a['id']}|no":
-                    ch.send('What should happen instead? Reply in a few words.', reply_to=msg)
+    ch.drain()
+    summary, shown, aside = explain.plan(d, goal, todo)
+    who = ch.name()
+    mins = max(1, round(len(shown) * 0.4))
+    ch.send(f"{greeting}{', ' + who if who else ''}. While you were away, I built this: {summary}\n\n"
+            + (f"{check}\n\n" if check else '')
+            + (f"My builders made a few calls your instructions didn't cover. I'd like your judgement on {len(shown)} of "
+               f"them, about {mins} minute{'s' if mins != 1 else ''}. Most important first." if shown else
+               "Nothing needs your judgement."))
+    for n, item in enumerate(shown, 1):
+        _ask_one(ch, d, item, f"{n} of {len(shown)}", poll)
+    if aside:
+        ch.send(f"There {'is' if len(aside) == 1 else 'are'} {len(aside)} smaller one{'s' if len(aside) != 1 else ''} I'd "
+                "leave as the builders had them. Want to see them?",
+                buttons=[('Show me', 'aside|show'), ("Leave them", 'aside|leave')])
+        choice = None
+        while choice is None:
+            for text, data, _ in ch.updates(timeout=poll):
+                if data in ('aside|show', 'aside|leave'):
+                    choice = data.split('|')[1]
                 elif text:
-                    low = text.lower().strip('. !')
-                    verdict = (True, None) if low in ('right', 'yes', 'ok', 'correct', 'y') else (False, text)
-                if verdict:
+                    choice = 'show' if text.lower().startswith(('show', 'yes', 'see')) else 'leave'
+                if choice:
                     break
-        ok, correction = verdict
-        json.dump({'id': a['id'], 'ok': ok, 'correction': correction, 'seconds': int(time.time() - t0), 'via': 'telegram'},
-                  open(os.path.join(d, 'reviews', a['id'] + '.json'), 'w'))
+        for n, item in enumerate(aside, 1):
+            if choice == 'show':
+                _ask_one(ch, d, item, f"Smaller one {n} of {len(aside)}", poll)
+            else:
+                json.dump({'id': item['id'], 'ok': True, 'correction': None, 'seconds': 0, 'via': 'telegram',
+                           'auto': 'left as built at the owner\'s choice', 'shown_as': item['text']},
+                          open(os.path.join(d, 'reviews', item['id'] + '.json'), 'w'))
     rows = owner.write_corrections(d)
-    ch.send('Thanks. ' + ('Everything they assumed was right.' if not rows else
-                          f"{len(rows)} to fix. I'm sending the builders back now; I'll message you when it's done."))
+    ch.send('Thank you. ' + ('Everything they decided stands; nothing to change.' if not rows else
+                             f"{len(rows)} to change. I'm sending the builders back now and will message you when it's "
+                             "done."))
     return rows
 
 def setup():

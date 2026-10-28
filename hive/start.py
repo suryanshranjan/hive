@@ -218,17 +218,16 @@ def start(repo='.', workers=4, goal=None, minutes=40, overnight=False):
     found = owner._assumptions(os.path.join(run1, 'owner'), False)   # business defaults only; technical ones go to engineers
     if overnight and phone:
         rc = _deliver(state)
-        phone.send(f"Hive: the overnight build is done. {state['check']}\n\n" +
-                   (f"The builders made {_n(len(found), 'assumption')} you should check. Here they come, one at a time."
-                    if found else 'Nothing needs you. The result is on branch hive/' + name + '.'))
         if not found:
+            phone.send(f"Hello{', ' + phone.name() if phone.name() else ''}. While you were away, I finished the build. "
+                       f"{state['check']} Nothing needs your judgement. It's on branch hive/{name}.")
             return rc
         say(f'\n[{_now()}] Sent {_n(len(found), "assumption")} to your phone; waiting for your replies.')
         if _review_and_fix(state, phone):
             rc = _deliver(state)
-            phone.send(f"Fixed. {state['check']} The result is on branch hive/{name}.")
+            phone.send(f"Done. I've made your changes. {state['check']} It's ready on branch hive/{name} whenever you want it.")
         else:
-            phone.send(f"All set. The result is on branch hive/{name}.")
+            phone.send(f"All set. It's ready on branch hive/{name} whenever you want it.")
         return rc
     if overnight:
         rc = _deliver(state)
@@ -249,9 +248,11 @@ def _review_and_fix(state, phone=None):
     for one fix round. Returns True when a fix round ran."""
     run1 = os.path.join(state['home'], 'build')
     if phone:
-        telegram.review(run1, phone)
+        hour = time.localtime().tm_hour
+        telegram.review(run1, phone, goal=state['goal'], check=state.get('check', ''),
+                        greeting='Good morning' if 4 <= hour < 12 else 'Good afternoon' if hour < 17 else 'Good evening')
     else:
-        owner.review(run1, intro=False)
+        owner.review(run1, intro=False, goal=state['goal'])
     fixes = [r for r in (json.load(open(p)) for p in glob.glob(os.path.join(run1, 'owner', 'reviews', '*.json'))) if not r['ok']]
     if not fixes:
         return False
@@ -284,6 +285,7 @@ def _deliver(state):
                       ('' if not passed else f' All {passed} that passed before still pass.' if not broken else
                        f' {_n(len(broken), "test")} that passed before now fail: look before you merge.'))
     say('  ' + state['check'])
+    json.dump(state, open(os.path.join(state['home'], 'state.json'), 'w'), indent=1)
     out = f"hive/{state['name']}"
     sh('git', '-C', state['repo'], 'fetch', '-q', '-f', os.path.join(state['final'], 'up.git'), f"+{state['b']}:{out}")
     mins = round((time.time() - state['started']) / 60)
@@ -319,14 +321,13 @@ def morning(name=None, phone=False):
         if not cfg:
             say('Telegram is not connected yet: run hive telegram setup first.'); return 1
         ch = telegram.Channel(cfg)
-        ch.send(f"Good morning. Overnight, the builders worked on: {state['goal'][:200]}\n\nThey made "
-                f"{_n(len(todo), 'assumption')} you should check. Here they come, one at a time.")
-        say(f"Sent {_n(len(todo), 'assumption')} to your phone; waiting for your replies.")
+        say("I'm preparing the decisions for your phone (putting them in plain words, most important first)...")
     else:
         say(f"They made {_n(len(todo), 'assumption')} your description didn't cover. Press Enter if one is right, or say "
             "what should happen instead.")
     fixed = _review_and_fix(state, ch)
     rc = _deliver(state)
     if ch:
-        ch.send((f"Fixed. {state['check']}" if fixed else 'All set.') + f" The result is on branch hive/{state['name']}.")
+        ch.send((f"Done. I've made your changes. {state['check']}" if fixed else 'All set.') +
+                f" It's ready on branch hive/{state['name']} whenever you want it.")
     return rc
