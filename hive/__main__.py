@@ -41,7 +41,7 @@ def main(argv=None):
     st.add_argument('--minutes', type=int, default=40)
     st.add_argument('--overnight', action='store_true')   # no questions; check the assumptions later with `hive morning`
     mo = sub.add_parser('morning'); mo.add_argument('name', nargs='?'); mo.add_argument('--phone', action='store_true')
-    tg = sub.add_parser('telegram'); tg.add_argument('action', choices=['setup', 'test'])
+    tg = sub.add_parser('telegram'); tg.add_argument('action', choices=['setup', 'test', 'call']); tg.add_argument('address', nargs='?')
     lm = sub.add_parser('llm'); lm.add_argument('action', choices=['setup'])
     i = sub.add_parser('init'); i.add_argument('--test-cmd', required=True); i.add_argument('--junit', default='.hive/junit.xml')
     c = sub.add_parser('claim'); c.add_argument('name'); c.add_argument('areas'); c.add_argument('desc')
@@ -68,6 +68,8 @@ def main(argv=None):
         from . import explain
         return explain.setup_backup()
     if a.cmd == 'telegram':
+        if a.action == 'call':
+            return telegram.call(a.address or '')
         return telegram.setup() if a.action == 'setup' else telegram.test()
     if a.cmd == 'init':
         return init(a.test_cmd, a.junit)
