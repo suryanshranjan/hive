@@ -35,3 +35,19 @@ At the founder's request, **the founder model from Gate 33 plays the owner throu
 - **What this measures:** the mechanism. Does the fixed review (scan and mark, then "what would you do instead?") carry an owner's divergent rules into the code? Here "surprising" means the stand-in's verdict differs from the cold default.
 - **What it cannot measure:** real owners. Gate 33 found the model matches only 35% of the founder's surprising rules, and it does not tire or skim like a person on a phone (Gate 31). Results here count for the tool, not as evidence about founders.
 - Predictions and the kill condition are unchanged, now about the stand-in owner. The 6-surprising minimum still applies.
+
+## Result of the stand-in verdicts, and amendment 2 (Oct 28 2026, before any build)
+
+- **The stand-in owner gave 1 surprising verdict of 12** (blind judge; it matched the cold default on the other 11). So Gate 34 as amended is **not run**: the 6-surprising minimum is not met. This confirms Gate 33 from another side: a model of the founder does not invent his surprises in a fresh area.
+- **Gate 34b instead: a synthetic owner with known, unusual rules,** to measure the review mechanism's ceiling without a person.
+  - **Rules:** the experimenter fixes 8 of the 12 rules to a non-default option (surprising by construction) and 4 to the cold default (ordinary). They are written down before the build.
+  - **The owner:** a model plays this owner throughout, knowing its rules. It drives Hive's real review code through a simulated chat, the same code as on the phone.
+  - **Arms:** one shared build. N is the build with no owner; R is the same build after the simulated review (scan and mark, then "what would you do instead?", suggestions off) and one fix round.
+- **Predictions for 34b:**
+  - S1: on the 8 surprising rules, R beats N by ≥ 30 points.
+  - C1: the owner marks a matching decision for ≥ 80% of the surprising rules with one recorded.
+  - A1: of those marked, it changes ≥ 60%.
+  - S2: ordinary ≥ 75% in both arms.
+  - S3: existing tests pass.
+  - Kill: R − N < 10 points.
+- **What 34b measures:** whether the pipeline (assumptions → scan → answer → fix) carries known, unusual rules into code when the owner answers well. It is an upper bound for the tool, not evidence about real owners.
