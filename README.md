@@ -104,7 +104,7 @@ Every result below was predicted on GitHub before the run. Real-company results 
 | The real founder audits a list of the builders' decisions | He marked 0 of 27; his rules come out in situations (48 of 48 answered), not audits | Gate 35 |
 | Interview written from the feature description | Covered 4 of 9 of his surprising rules; no gain (2/7 both arms). On both covered cases his answers changed with the framing | Gate 36 |
 | Interview written from the decisions the code takes | Covered 7 of 9 of the same rules (3 of 9 from the description), with no founder time spent | Gate 37 pilot |
-| **Open:** the decisions-first interview with the founder, and how stable his own rules are | In progress | Gate 37 |
+| The decisions-first interview with the founder | Coverage 6 of 6, but his answers to two framings of a decision agree only 1 of 8 (same session), 3 of 6 a day apart; no gain | Gate 37 |
 
 **Also kept:** the failed and withdrawn ideas, each with its evidence. These include asking in blocks of 3, a one-constant law for questions, contrast examples, coverage-planned questions and largest-first claiming ([`BRAIN.md`](BRAIN.md) §6). The worked examples are **Specification by Example**, an established practice; what this work adds is measurement ([`docs/related_work.md`](docs/related_work.md)).
 

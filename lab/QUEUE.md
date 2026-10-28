@@ -2,7 +2,7 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 28 2026, after Gate 36)
+## Where we left off (Oct 28 2026, after Gate 37)
 
 - **Done:** Gate 36 scored and written up (`gates/gate36/RESULTS.md`). Kill fired: interview first, with questions written from the description alone, gave 2/7 surprising cases in both arms. Coverage was 4/9, and on both covered cases the founder's interview answer contradicted his hidden-set verdict.
 - **Tool**, all tests passing:
@@ -12,10 +12,15 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
   - **Picking up again:** interview answers are saved and resumed; taps on old buttons are answered; a builder stopped by a usage limit or an expired login resumes, and the owner is told.
   - `hive doctor`, `pip install`, `hive cloud` (tested on a real EC2 instance).
 - **Gate 37 pilot done** (`gates/gate37/PILOT_RESULTS.md`, no founder time): an interview written from the code's decisions covered 7 of 9 of Gate 36's surprising situations, against 3 from the description. Hive now asks about every decision the code takes, up to 20.
-- **In progress: Gate 37** (registered in `a033cd9`): content approval and revisions.
-  - Hive's 20 interview questions were written before the founder's session.
-  - The founder's session runs in the container (`/home/node/g37/session.py`, log `session.log`): 12 hidden situations, then the 20 interview questions, then 6 retest situations. Every answer is saved, so rerunning `session.py` picks up where he stopped.
-  - After it ends: cold probe (done: unanimous 10/12), blind judge labels, his confirmation of free-text readings, hidden tests plus a private reference, the amendment, `build37.sh` (arms N and I), score, coverage judge (C2), retest judge (K1), RESULTS, BRAIN.
+- **Done: Gate 37** (`gates/gate37/RESULTS.md`), kill fired.
+  - Coverage is solved: 6 of 6 from the code's decisions.
+  - The builders followed his answers.
+  - But his answers to two framings of a decision agree only 1 of 8 (same session) and 3 of 6 (a day apart), so the score did not move.
+  - The interview was redundant; fixed in `f5fccc1`.
+- **Next: Gate 38, decide once, as a rule** (`BRAIN.md` §9).
+  - Build the rule sheet first: after the interview, Hive shows one general rule per decision, flags disagreeing answers, and the owner confirms or edits each.
+  - Then register predictions and run it over two days with the founder (about 15 minutes).
+- **Private:** Gate 37's material is in `hive_private\g37priv` and `/home/node/g37` in the container.
 - **Private material:** `D:\Suryansh\Programming\hive_private\` (`g36priv`: hidden tests, reference, scripts) and `/home/node/g3x` in the container.
 
 ## Needs the user
