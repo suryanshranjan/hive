@@ -377,6 +377,20 @@ def main():
             say(f'allowance for {arm} (stratified, {len(pairs)} pairs): ' + ', '.join(f'{q}:{sum(1 for v in al.values() if v == q)}' for q in sorted(set(al.values()))))
         say(f'stage 2: ' + ', '.join(s.split(':')[0] for s in cfg['arms'] if s not in base_specs))
         run_arms(cfg, name, run, oracle_path, [s for s in cfg['arms'] if s not in base_specs], a.max_parallel)
+    elif cfg.get('after_baseline'):
+        # stage 1: the base arm alone; then gate-specific steps that read its code (Gate 42: a rule sheet written from
+        # the built code, corrected by the owner); then every other arm
+        base_specs = [s for s in cfg['arms'] if s.split(':')[0] == cfg['baseline']]
+        say(f'stage 1: {cfg["baseline"]} alone')
+        run_arms(cfg, name, run, oracle_path, base_specs, a.max_parallel)
+        final = os.path.join(run, f'final_{cfg["baseline"]}'); shutil.rmtree(final, ignore_errors=True)
+        sh('git', 'clone', '-q', os.path.join(run, f'up{cfg["baseline"]}.git'), final)
+        for cmd in cfg['after_baseline']:
+            say(f'after {cfg["baseline"]}: {cmd}')
+            r = subprocess.run(cmd.format(root=ROOT, run=run, name=name, oracle=oracle_path, base=final), shell=True, cwd=ROOT)
+            if r.returncode: sys.exit(f'after-baseline step failed: {cmd}')
+        say('stage 2: ' + ', '.join(s.split(':')[0] for s in cfg['arms'] if s not in base_specs))
+        run_arms(cfg, name, run, oracle_path, [s for s in cfg['arms'] if s not in base_specs], a.max_parallel)
     else:
         run_arms(cfg, name, run, oracle_path, cfg['arms'], a.max_parallel)
     score(cfg, name, oracle_path, [s.split(':')[0] for s in cfg['arms']], run, allowance)

@@ -216,6 +216,13 @@ check('the rule sheet: general rules, a disagreement settled by him, a wrong rul
       (['Whenever a tip is paid, no fee is charged.', 'Whenever a fee is late, the brand is reminded. Amended: Only after a week',
         'Is a late tip charged a fee? -> No fee'], True))
 
+# 3j2. a sheet written from the built code (Gate 42): he marks the wrong rule, says it right, and adds what is missing
+answers = iter(['2', 'Only after 7 days', 'Tips are never charged'])
+got = interview.confirm_sheet(['A tip pays the usual fee.', 'A late fee starts at once.'], ask=lambda p: next(answers),
+                              title='What the built code does now', missing=True)
+check('a code sheet: the marked rule is amended, and what is missing is added',
+      got, ['A tip pays the usual fee.', 'A late fee starts at once. Amended: Only after 7 days', 'Tips are never charged'])
+
 # 3k. the hand-over: he sees what it does now by his rules; what he changes goes to a fix round; then his yes
 from hive import start
 fixed = []

@@ -258,12 +258,23 @@ def rule_sheet(rules, ch=None, ask=None, poll=20, save=None):
                                f"{c['question']}\n  A) {opts[0]}  B) {opts[1]}\n  > ").strip()
             chosen = opts[0] if a.upper() in ('A', '1') else opts[1] if a.upper() in ('B', '2') else a
         general.append(f"{c['question']} -> {chosen}")
+    general = confirm_sheet(general, ch, ask, poll)
+    telegram._save(path, {'draft': got, 'done': True, 'rules': general})
+    return general
+
+SHEET_TITLE = 'Your rules for this feature, as the builders will follow them'
+SHEET_NOTE = 'Each one applies to every case like it, not just the example.'
+
+def confirm_sheet(general, ch=None, ask=None, poll=20, title=SHEET_TITLE, note=SHEET_NOTE, missing=False):
+    """Show the whole sheet; he marks the numbers of any wrong rules and says each one right; each is amended, not
+    replaced (Gate 39). With `missing`, he is then asked what the builders should know that is not on it (Gate 42: a
+    sheet written from the built code). Returns the confirmed rules."""
+    general = list(general)
     listing = '\n'.join(f'<b>{n}.</b> {telegram.esc(r)}' for n, r in enumerate(general, 1))
     if ch:
         nums = [(str(n), f'sheet|{n}') for n in range(1, len(general) + 1)]
         rows = [nums[i:i + 5] for i in range(0, len(nums), 5)] + [[('✅ All correct', 'sheet|done')]]
-        ch.send(f"📜 <b>Your rules for this feature, as the builders will follow them</b>\n\n{listing}\n\n<i>Each one "
-                "applies to every case like it, not just the example. Tap the number of any rule that is wrong, then "
+        ch.send(f"📜 <b>{title}</b>\n\n{listing}\n\n<i>{note} Tap the number of any rule that is wrong, then "
                 "All correct.</i>", html=True, buttons=rows)
         wrong = []
         while True:
@@ -277,16 +288,25 @@ def rule_sheet(rules, ch=None, ask=None, poll=20, save=None):
             ch.send(f"✍️ <b>Rule {k}:</b> {telegram.esc(general[k - 1])}\n\n<b>What should it be?</b> <i>Your own words, "
                     "or 🎙 a voice note.</i>", html=True)
             general[k - 1] = _amend(general[k - 1], telegram._wait(ch, poll, set())[1])
+        if missing:
+            ch.send("➕ <b>Anything the builders should know that is not on this list?</b> <i>Say it in your own words, "
+                    "or tap All correct.</i>", html=True, buttons=[[('✅ Nothing to add', 'sheet|none')]])
+            kind, a = telegram._wait(ch, poll, {'sheet|none'})
+            if kind == 'text' and a.strip() and not no_rule(a) and not is_yes(a):
+                general.append(a.strip())
         ch.send('✅ Thank you. These are your rules now; the builders will encode every one as a test.')
     else:
-        print('\nYour rules for this feature, as the builders will follow them (each applies to every case like it):')
+        print(f'\n{title} ({note[0].lower() + note[1:].rstrip(".")}):')
         for n, r in enumerate(general, 1):
             print(f'  {n}. {r}')
         for k in [int(x) for x in re.findall(r'\d+', (ask or input)("  Numbers of any that are wrong (Enter = all correct) > "))]:
             if 1 <= k <= len(general):
                 general[k - 1] = _amend(general[k - 1], (ask or input)(   # restated, as on the phone (Gate 39)
                     f"  Rule {k}: {general[k - 1]}\n  What should it be? > ").strip())
-    telegram._save(path, {'draft': got, 'done': True, 'rules': general})
+        if missing:
+            a = (ask or input)("  Anything the builders should know that is not on this list? (Enter = nothing) > ").strip()
+            if a and not no_rule(a) and not is_yes(a):
+                general.append(a)
     return general
 
 def _settle(rules, rulings, ch=None, ask=None, poll=20):
