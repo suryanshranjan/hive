@@ -1,0 +1,46 @@
+{
+ "name": "g56",
+ "arms": {
+  "N0": {
+   "hidden_pass": 0.352,
+   "ci95_by_function": [
+    0.208,
+    0.504
+   ],
+   "tests": 250
+  },
+  "SF": {
+   "hidden_pass": 0.424,
+   "ci95_by_function": [
+    0.252,
+    0.6
+   ],
+   "tests": 250
+  },
+  "SS": {
+   "hidden_pass": 0.42,
+   "ci95_by_function": [
+    0.256,
+    0.576
+   ],
+   "tests": 250
+  }
+ },
+ "diffs": {
+  "SF-N0": {
+   "points": 7.2,
+   "ci95": [
+    0.8,
+    16.8
+   ]
+  },
+  "SS-N0": {
+   "points": 6.8,
+   "ci95": [
+    -0.4,
+    16.0
+   ]
+  }
+ },
+ "allowance": {}
+}

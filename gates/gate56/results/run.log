@@ -1,0 +1,76 @@
+[05:00:29] predictions registered on origin/main: gates/gate56/prompts/PREDICTIONS.md
+[05:00:29] reusing oracle private/g55/oracle.py (test mode)
+[05:00:29] rules checked: 10 functions, 138 calls, deterministic
+[05:00:29] declared decisions per function: 1:2, 2:3, 3:3, 4:2
+[05:00:29] starting repo and hidden suite built
+[05:00:29] pre-launch: python3 gates/gate56/referee/review56.py pre {run} {oracle}
+[05:00:29] wind tunnel: documenter writing the owner's policy in prose...
+[05:01:11] wind tunnel: R: 73 rules; ask text for N0 written
+[05:01:11] stage 1: N0 alone
+N0: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g56/upN0.git
+next: python3 lab/launch.py --run g56
+[05:01:11] launching workers...
+launched N0-w1 
+launched N0-w2 
+launched N0-w3 
+N0-w1 finished: exit 0, 0.6 min, tokens 400400, cost 0.1566104
+N0-w3 finished: exit 0, 0.6 min, tokens 404142, cost 0.1713276
+N0-w2 finished: exit 0, 0.9 min, tokens 757342, cost 0.2436573
+wrote /home/claude/hive/runs/g56/agents.csv
+[05:02:07] after N0: python3 gates/gate56/referee/review56.py after {run} {oracle} {base}
+[05:05:02] wind tunnel: D: 74 rules in full; DS: 30 business choices
+[05:05:09] wind tunnel: SF owner #1: '46 should cap at 23:59 instead of wrapping past midnight. 26 is missing the 5-da'
+[05:05:12] wind tunnel: SF owner #2: 'Cap at 23:59, never wrap to the next day.'
+[05:05:17] wind tunnel: SF owner #3: 'Ignore letters and other non-digits and use only the digits, never NULL.'
+[05:05:23] wind tunnel: SF owner #4: "That's fine, leave it as is."
+[05:05:28] wind tunnel: SF owner #5: "No fee for the first 5 days. After that it's 2% per 30 days late, with a $5 mini"
+[05:05:37] wind tunnel: SF owner #6: 'Negative should give 0, not NULL.'
+[05:05:44] wind tunnel: SF owner #7: ''
+[05:05:50] wind tunnel: SF owner #8: 'Add platinum at 20000 and up.'
+[05:05:56] wind tunnel: SF owner #9: ''
+[05:05:56] wind tunnel: SF: 74 rules shown, 74 after review, 9 replies, 0.9 min
+[05:06:02] wind tunnel: SS owner #1: '4, 5, 7, 9, 11, 13, 23: wrong money, no 5-day grace, no 500 minimum fee, no plat'
+[05:06:04] wind tunnel: SS owner #2: 'Round to the nearest 5 cents, halves up, not the nearest cent.'
+[05:06:13] wind tunnel: SS owner #3: 'Charge the fraction too: 2.5 units at 1000 cents should be 2500.'
+[05:06:20] wind tunnel: SS owner #4: 'Nothing is charged for the first 5 days late. The 2% starts at day 6, and the mi'
+[05:06:28] wind tunnel: SS owner #5: 'Wrong: it keeps adding 2% for every extra 30 days, up to a cap of 20% of the inv'
+[05:06:35] wind tunnel: SS owner #6: 'Rule 11: Minimum fee 500 cents, but never more than 20% of the invoice, so small'
+[05:06:43] wind tunnel: SS owner #7: 'Gold is 5000 to 19999; 20000 and up is platinum.'
+[05:06:49] wind tunnel: SS owner #8: 'Cap it at 23:59, no wrapping past midnight.'
+[05:06:55] wind tunnel: SS owner #9: ''
+[05:07:02] wind tunnel: SS owner #10: ''
+[05:07:02] wind tunnel: SS: 30 rules shown, 30 after review, 10 replies, 1.1 min
+[05:07:02] wind tunnel: judge labelling every declared decision...
+[05:08:03] wind tunnel: ask texts for SF and SS written
+[05:08:03] stage 2: SF, SS
+SF: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g56/upSF.git
+SS: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g56/upSS.git
+next: python3 lab/launch.py --run g56
+[05:08:04] launching workers...
+launched SF-w1 
+launched SF-w2 
+launched SF-w3 
+launched SS-w1 
+launched SS-w2 
+launched SS-w3 
+SS-w3 finished: exit 0, 0.8 min, tokens 635939, cost 0.2069444
+SS-w2 finished: exit 0, 0.8 min, tokens 531631, cost 0.20127939999999997
+SF-w3 finished: exit 0, 1.0 min, tokens 650572, cost 0.24917809999999999
+SF-w2 finished: exit 0, 1.0 min, tokens 601800, cost 0.2564668
+SS-w1 finished: exit 0, 1.0 min, tokens 882353, cost 0.2609013
+SF-w1 finished: exit 0, 1.1 min, tokens 596515, cost 0.2762969
+wrote /home/claude/hive/runs/g56/agents.csv
+[05:09:14] scoring every arm call by call...
+# g56: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 35.2% | 20.8%–50.4% |
+| SF | 42.4% | 25.2%–60.0% |
+| SS | 42.0% | 25.6%–57.6% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| SF-N0 | +7.2 | +0.8 to +16.8 |
+| SS-N0 | +6.8 | -0.4 to +16.0 |
+[05:09:15] done. Next: write the gate RESULTS.md from runs/g56/summary.md, update BRAIN.md and lab/QUEUE.md, push.
