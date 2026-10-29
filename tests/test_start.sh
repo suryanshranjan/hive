@@ -57,7 +57,8 @@ check "a change of mind runs one fix round on the latest build and re-checks eve
 # memory: the owner's ruling is kept (once, though given in two builds), reminded to the next build, and can be forgotten
 check "the owner's ruling is kept for this project, once" "$($PY -m hive rules | grep -c '10 percent of the cash')" 1
 git checkout -q main
-printf 'Implement creator fees and payouts.\n' | $PY -m hive start --workers 1 --overnight > $T/third.txt 2>&1
+printf 'Implement creator fees and payouts.\n' > $T/goal.md   # --goal, as a build from the phone uses it (it once stopped parsing)
+$PY -m hive start --workers 1 --overnight --goal $T/goal.md < /dev/null > $T/third.txt 2>&1
 check "the next build says it will remind the builders (2 from the interview, 1 from the review)" \
   "$(grep -c 'remind them of your 3 earlier rulings' $T/third.txt)" 1
 check "and the builders' instructions carry the ruling" \

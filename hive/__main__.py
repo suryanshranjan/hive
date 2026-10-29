@@ -49,7 +49,8 @@ def init(test_cmd, junit):
 def main(argv=None):
     ap = argparse.ArgumentParser(prog='hive', description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest='cmd')
-    st = sub.add_parser('start'); st.add_argument('--workers', type=int)   # default: the swarm law decides; st.add_argument('--goal')
+    st = sub.add_parser('start'); st.add_argument('--goal')
+    st.add_argument('--workers', type=int)   # default: the swarm law decides (a comment here once swallowed --goal)
     st.add_argument('--minutes', type=int, default=40)
     st.add_argument('--docs')   # the company's own documents: a file or a folder
     st.add_argument('--overnight', action='store_true'); st.add_argument('--no-interview', action='store_true')   # no questions; check the assumptions later with `hive morning`
