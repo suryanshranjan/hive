@@ -33,3 +33,12 @@ Kill: **confirmed rules match day 2 on < 50% of the decisions they cover.** If s
 **Honest prior.** A1 about 45%, A2 about 50%, S1 about 40%. A general rule is easier to remember than an answer to one example, but nothing yet shows he will hold it a day later.
 
 **Cost.** About $7 at list price for both arms, plus about 10 minutes of the founder on day 1 and 5 on day 2.
+
+## Amendment, Oct 29 2026, after day 2 and before any build (counts only)
+
+- **Day 2:** the founder gave verdicts on all 12 situations. A blind judge (3 votes) labelled 6 surprising and 6 ordinary; all were taps on the offered options, so no free-text readings needed confirming. The cold probe had agreed 12/12. These are the hidden tests (12) with a private reference that passes 12/12.
+- **Stability, judged blind (3 votes), 11 situations covered by a day-1 decision (one was covered by none):**
+  - confirmed rules vs day 2: 2 same, 7 different, 2 unclear;
+  - raw day-1 answers vs day 2: 2 same, 8 different, 1 unclear.
+- So A1 (≥ 70%) fails and **the kill fires** (2 of 11 = 18% < 50%, and 36% even if both unclear cases count as matches). A2 fails (0 points apart).
+- The arms are still built and scored as registered (N and I, 4 workers each, the frozen Hive of the day-1 commit), so S1 to S3 are measured. Expected after the stability result: I does not beat N on the surprising cases, and may lose ordinary ones where his day-1 rule disagrees with day 2.
