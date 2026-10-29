@@ -35,7 +35,7 @@ check('builders are told silence is unknown, not "the standard" (Gate 16)', 'tre
 check('no documents, nothing added', (docs.read(os.path.join(d, 'none')), docs.instructions('')), ('', ''))
 from hive import law
 check('team notes stay off for small swarms that rarely collide (Gates 43-44)', law.notes(6)[0], False)
-check('team notes switch on for a large swarm', law.notes(12)[0], True)
+check('size alone does not switch notes on (Gate 51: not faster at 12 builders)', law.notes(12)[0], False)
 check('team notes switch on when this swarm keeps colliding, not on one early collision',
       (law.notes(4, 3, 5)[0], law.notes(4, 1, 1)[0]), (True, False))
 sys.exit(fail)

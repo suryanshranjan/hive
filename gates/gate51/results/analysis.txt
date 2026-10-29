@@ -1,0 +1,15 @@
+team  t95(min)  landings  breaks  notes  hidden   cost    mean load (peak)
+S1       6.6      42      1      0    99.8%  $ 8.94     3.2 (7.8)
+T1       5.2      42      0     18    99.8%  $ 9.31     2.8 (6.3)
+T2      10.8      30      1     16    99.8%  $ 9.32     1.2 (2.8)
+S2       3.9      36      0      0    99.8%  $ 8.97     1.1 (2.0)
+
+means: t95 S 5.2 vs T 8.0 (ratio 1.53); cost S $8.96 vs T $9.32 (ratio 1.04); load S 2.2 vs T 2.0
+
+predictions
+F1 notes not ≥ 15% faster: ratio 1.53 -> held
+F2 cost within ±10%: 1.04 -> held
+F3 mean load ≥ 2.0: 1.1–3.2 -> failed
+F4 each notes team ≥ 5 notes: 18, 16 -> held
+Keep notes at 10+ builders: did not fire
+Turn the size trigger off (notes not faster): FIRED
