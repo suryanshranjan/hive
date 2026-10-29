@@ -57,6 +57,8 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 
 | A code sheet of 60-80 rules is too much for an owner to read in one go (the founder; Gates 30-35: he does not audit long lists) | The founder, Oct 29; Gates 42, 44 sheets were 66-68 rules | Long sheets come in short pages by area (at most 8 rules), each with "this section is fine"; a wrong rule is put right on its page; rules that only repeat his own are not shown again. Whether a real owner reads it well is Gate 45 | `hive/interview.py` (`_confirm_pages`), `hive/codesheet.py` (`areas`, `split_known`) |
 
+| The founder answers carefully only when a question feels important; random-seeming questions get fast taps (Gate 37: 2-5 s per answer once they felt repetitive) | The founder, Oct 29; Gate 37 | Every interview question carries one line on why it matters to his business, every page of the code sheet carries its area's stakes, and the sheet opens with what the time saves him | `hive/interview.py`, `hive/codesheet.py` (`stakes`), `hive/telegram.py` |
+
 ## Still to turn into the product
 
 - **The code sheet with a real owner:** Gate 42's result is with a synthetic owner who reads every rule. Test the founder on one real feature before relying on it.

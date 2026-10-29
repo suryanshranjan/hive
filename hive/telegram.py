@@ -754,7 +754,8 @@ def verdicts(ch, cases, poll=20, intro=None, save=None, after_text=None, context
             rows = [[(str(n + 1), f"{c['id']}|{n}") for n in range(len(c['options']))]]
             listed = '\n\n' + '\n'.join(f'<b>{n + 1}.</b> {esc(o)}' for n, o in enumerate(c['options']))
         rows.append([('✏️ Something else', f"{c['id']}|x")] + ([('↩ Undo last', f"{c['id']}|undo")] if i else []))
-        msg = ch.send(f"📋 <b>{i + 1} of {len(cases)}</b>   {bar(i + 1, len(cases))}\n\n{esc(c['situation'])}{listed}\n\n"
+        why = f"\n\n💡 <i>Why it matters: {esc(c['why'])}</i>" if c.get('why') else ''   # so he sees it is worth his time
+        msg = ch.send(f"📋 <b>{i + 1} of {len(cases)}</b>   {bar(i + 1, len(cases))}\n\n{esc(c['situation'])}{why}{listed}\n\n"
                       f"<i>What should happen? {'Tap a number' if listed else 'Tap an option'}, or reply in your own words. "
                       "🎙 Voice notes work too.</i>", buttons=rows, html=True)
         about = (c['situation'], c['options'], context)

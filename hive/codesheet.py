@@ -80,3 +80,28 @@ def areas(sheet, page=8):
             part = (f' ({i // page + 1})' if len(items) > page else '')
             out.append(((a or 'Other rules') + part, items[i:i + page]))
     return out
+
+STAKES = """A business owner is about to check, area by area, what his newly built product does. The product:
+{goal}
+
+The areas, each with its rules:
+{areas}
+
+For each area, write one short line telling him why it is worth his attention: what it costs his business if a rule
+there is wrong (money paid out wrongly, an angry customer or partner, a legal risk, abuse). Plain words, no technical
+terms, at most 20 words. Reply with JSON only: {{"why": {{"<area>": "..."}}}}"""
+
+def stakes(pages, goal=''):
+    """{area: why it matters to his business}, so he sees each page is worth his time (the founder: questions must feel
+    important, not random). Best effort: {} if no model answers."""
+    from . import explain
+    names = []
+    for a, _ in pages:
+        base = a.split(' (')[0]
+        if base not in names:
+            names.append(base)
+    listing = '\n'.join(f"{a}: " + ' | '.join(r[:120] for p, items in pages if p.split(' (')[0] == a for _, r in items[:3])
+                        for a in names)
+    got = explain.ask_json(STAKES.format(goal=(goal or '')[:1500], areas=listing)) or {}
+    why = got.get('why') if isinstance(got.get('why'), dict) else {}
+    return {a: str(w).strip() for a, w in why.items() if str(w).strip()}
