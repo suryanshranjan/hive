@@ -42,8 +42,13 @@ def describe(code_dir, goal, timeout=1800):
         shutil.copytree(code_dir, code, ignore=shutil.ignore_patterns('.git', 'node_modules', '__pycache__'))
         out = os.path.join(work, 'rules.json')
         try:
-            subprocess.run(argv(CMD), cwd=work, input=BRIEF.format(code=code, goal=goal.strip()[:6000], out=out),
-                           capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=timeout)
+            p = subprocess.run(argv(CMD), cwd=work, input=BRIEF.format(code=code, goal=goal.strip()[:6000], out=out),
+                               capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=timeout)
+            try:   # its cost counts with Hive's own model calls (Gates 52-54: it was not reported)
+                from . import explain
+                explain.SPENT[0] += float(json.loads(p.stdout).get('total_cost_usd') or 0)
+            except Exception:
+                pass
             got = json.load(open(out, encoding='utf-8'))
         except Exception:
             return []

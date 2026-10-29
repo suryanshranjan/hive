@@ -57,6 +57,7 @@ def _json_reply(text):
         return text
     return json.loads(text[text.index('{'):text.rindex('}') + 1])
 
+SPENT = [0.0]   # dollars spent on Hive's own model calls in this process (Gates 52-54: they were not in the cost reported)
 _CLAUDE_DOWN = [0.0]   # when Claude last failed: skip it for a while instead of waiting on it for every message
 
 def _ask_claude(prompt):
@@ -70,6 +71,11 @@ def _ask_claude(prompt):
         reply = json.loads(p.stdout)
     except Exception:
         _CLAUDE_DOWN[0] = time.time(); raise
+    if isinstance(reply, dict):
+        try:
+            SPENT[0] += float(reply.get('total_cost_usd') or 0)
+        except (TypeError, ValueError):
+            pass
     if isinstance(reply, dict) and reply.get('is_error'):   # Claude itself failed (login, limit): skip it a while
         _CLAUDE_DOWN[0] = time.time()
         raise RuntimeError('claude call failed')
