@@ -38,6 +38,22 @@ json.dump({'w1': {'agent': 'claude', 'state': 'finished', 'started': int(time.ti
            'w2': {'agent': 'codex', 'state': 'working', 'pid': p.pid, 'started': int(time.time()) - 540}},
           open(os.path.join(run, 'builders.json'), 'w'))
 
+# speaking up unprompted: a builder working 20 minutes with nothing new landed is reported once; new work resets it
+seen = {}
+t0 = time.time()
+check('nobody is stuck at the first look', team.stuck(run, seen, now=t0), [])
+check('after 20 minutes with nothing landed, the working builder is reported',
+      [r['name'] for r in team.stuck(run, seen, now=t0 + 21 * 60)], ['w2'])
+check('...and only once', team.stuck(run, seen, now=t0 + 40 * 60), [])
+os.environ.update(HIVE_WATCH_SECONDS='0.2', HIVE_STUCK_MINUTES='0.005', HIVE_BUILD_CMD=f'"{sys.executable}" -c "import time; time.sleep(3)"')
+fake = FakeTelegram([])
+assistant.background_build(seed, 'a refund page', ch(fake))
+time.sleep(3.5)
+for k in ('HIVE_WATCH_SECONDS', 'HIVE_STUCK_MINUTES', 'HIVE_BUILD_CMD'):
+    os.environ.pop(k)
+assistant.BUILD.clear()
+check('during a build, he is told unprompted when a builder seems stuck, and what he can do',
+      sum('w2 (codex) may be stuck, sir.' in m['text'] and 'stop w2' in m['text'] for m in fake.sent), 1)
 text = team.board_text(run)
 check('the board says each builder, its agent, and what it is doing', (
     'w1 (claude): finished' in text, 'landed 1 piece of work (latest: Platform fee of 10% on every campaign)' in text,

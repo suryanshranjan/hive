@@ -55,6 +55,23 @@ def board(run):
                         landed=len(landed.get(n, [])), last=(landed.get(n) or [''])[0]))
     return out
 
+def stuck(run, seen, now=None, minutes=None):
+    """Builders that have worked for `minutes` (default HIVE_STUCK_MINUTES, 20) without landing anything new, each told
+    about once. `seen` is the caller's memory between checks: {name: [landed count, since when, told]}. Returns the
+    board rows of builders to tell him about now."""
+    now = now or time.time()
+    minutes = minutes or float(os.environ.get('HIVE_STUCK_MINUTES', 20))
+    out = []
+    for r in board(run):
+        mark = seen.get(r['name'])
+        if r['state'] != 'working':
+            seen.pop(r['name'], None); continue
+        if not mark or mark[0] != r['landed']:   # new work landed: the clock starts again
+            seen[r['name']] = [r['landed'], now, False]; continue
+        if not mark[2] and now - mark[1] >= minutes * 60:
+            mark[2] = True; out.append(r)
+    return out
+
 def board_text(run):
     """The board in plain lines, for Jarvis's facts and for "who's doing what"."""
     rows = board(run)

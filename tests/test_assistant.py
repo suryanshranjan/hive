@@ -147,6 +147,18 @@ check('while a build runs, only greetings and status are decided fast', [(assist
       for t in ('kitna hua', 'shukriya')], ['status', None])
 p4.kill(); p4.wait(); assistant.BUILD.clear(); fastread.read = _fr
 
+# 3a8. Jarvis remembers his business: a lasting fact from a chat is kept per project and is in mind from then on
+_aj2 = explain.ask_json
+explain.ask_json = lambda prompt: ({'note': 'Sunny Shop launches in Mumbai first, in January.'}
+                                   if 'worth remembering' in prompt and 'Mumbai' in prompt else
+                                   {'note': ''} if 'worth remembering' in prompt else _aj2(prompt))
+assistant.remember(ch(FakeTelegram([])), repo, "btw we're launching in Mumbai first, in January").join(5)
+assistant.remember(ch(FakeTelegram([])), repo, 'thanks').join(5)
+explain.ask_json = _aj2
+check('a lasting fact is kept, small talk is not, and it is in mind for every answer',
+      (memory.notes(repo), 'Sunny Shop launches in Mumbai first, in January.' in assistant.facts(repo)),
+      (['Sunny Shop launches in Mumbai first, in January.'], True))
+
 # 3b. "build: ..." from the phone starts a build after one confirmation
 started = []
 fake = FakeTelegram([tap('bld|yes')])
@@ -572,6 +584,9 @@ fake = FakeTelegram([])
 r = assistant.handle(ch(fake), repo, 'How do refunds work in my app?', poll=1)
 check('"how do refunds work?" is answered from the code, not guessed', (r, fake.sent[-1]['text']),
       ('answered', '🐝 Refunds go back to the brand within 7 days, sir.'))
+check('it works in a throwaway copy: anything it runs never touches his folder, and the copy is gone afterwards',
+      (os.path.exists(os.path.join(repo, 'tried_it.txt')), [d for d in os.listdir(tempfile.gettempdir()) if d.startswith('hive_look_')]),
+      (False, []))
 check('a question during the sheet review is answered by reading the built code, with an example',
       interview._explain(ch(FakeTelegram([])), 'what does rule 6 mean?', '6. Brand invites brand: 500 rupees.', '', code=repo),
       'In the code, a brand that invites another brand gets 500 rupees once the new brand pays.')

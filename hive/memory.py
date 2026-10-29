@@ -57,6 +57,29 @@ def set_name(repo, name):
 def _path(repo):
     return os.path.join(DIR, project_key(repo) + '.json')
 
+def _notes_path(repo):
+    return os.path.join(DIR, project_key(repo) + '.notes.json')
+
+def notes(repo):
+    """What he has told Hive about his business that is not a rule for the product: who his customers are, what matters
+    most this month, how he likes to work. Kept per project, oldest first (the owner: no gaps)."""
+    p = _notes_path(repo)
+    try:
+        return json.load(open(p, encoding='utf-8')) if os.path.exists(p) else []
+    except (OSError, ValueError):
+        return []
+
+def add_note(repo, text):
+    """Keep one fact about his business (not repeated; at most the latest 60)."""
+    text = ' '.join((text or '').split())
+    if not text:
+        return
+    kept = [n for n in notes(repo) if n.lower() != text.lower()] + [text]
+    os.makedirs(DIR, exist_ok=True)
+    with open(_notes_path(repo), 'w', encoding='utf-8') as f:
+        json.dump(kept[-60:], f, indent=1, ensure_ascii=False)
+    os.chmod(_notes_path(repo), 0o600)
+
 def load(repo):
     p = _path(repo)
     return json.load(open(p)) if os.path.exists(p) else []

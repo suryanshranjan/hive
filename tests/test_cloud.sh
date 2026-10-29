@@ -32,6 +32,7 @@ check "pull brings the cloud's result branch back, without touching main" \
 export HIVE_AWS="$PY $HIVE/tests/fake_aws.py"   # a stand-in aws, run by Python (Windows runs no shell scripts as programs)
 export FAKE_AWS_LOG=$T/aws.log HIVE_NO_RELISTEN=1
 printf '[["owner", "build: a ratings page"]]' > $T/.hive/conversation.json
+$PY -c "from hive import memory; memory.add_note('.', 'Brands are the priority this quarter.')"   # what he told Hive about his business
 HIVE_CLOUD_LOCAL=$T/box2 HIVE_MY_IP=198.51.100.7 $PY -m hive cloud --new --no-start > $T/new.txt 2>&1
 keymode() {   # private: mode 600 on Linux/macOS; on Windows, no group of other users on the file's access list
   if [ "$PY" = python ]; then n=$(icacls "$(cd $T/.hive/cloud && pwd -W)/$(ls $T/.hive/cloud | grep pem)" | grep -c -E 'Everyone|BUILTIN.Users|Authenticated Users'); [ "$n" = 0 ] && echo 600 || echo open
@@ -49,10 +50,12 @@ P2=$T/box2/hive-cloud/project
 git -C $P2 checkout -q -b hive/ratings && echo x > $P2/ratings.py && git -C $P2 add ratings.py
 git -C $P2 -c user.name=h -c user.email=h@h commit -qm "built in the cloud" && git -C $P2 checkout -q main
 check "the conversation went to the cloud with Hive" "$(grep -c 'a ratings page' $T/box2/hive-cloud/.hive/conversation.json)" 1
+check "so did what he told Hive about his business" "$(cat $T/box2/hive-cloud/.hive/rules/*.notes.json | grep -c 'Brands are the priority')" 1
 $PY - <<'P'
 import json, glob, os
 T = os.environ['T']
-r = glob.glob(T + '/box2/hive-cloud/.hive/rules/*.json')[0]; d = json.load(open(r))
+r = [g for g in glob.glob(T + '/box2/hive-cloud/.hive/rules/*.json') if not g.endswith('.notes.json')][0]; d = json.load(open(r))
+n = glob.glob(T + '/box2/hive-cloud/.hive/rules/*.notes.json')[0]; json.dump(json.load(open(n)) + ['Launch is in Mumbai first.'], open(n, 'w'))
 d.append({'text': 'Ratings show after both sides review.', 'kind': 'owner', 'when': '2026-10-29', 'feature': ''})
 json.dump(d, open(r, 'w'))
 c = T + '/box2/hive-cloud/.hive/conversation.json'; h = json.load(open(c)); h.append(['owner', 'said in the cloud']); json.dump(h, open(c, 'w'))
@@ -70,6 +73,7 @@ check "--stop brings the cloud's work back to this computer before deleting" "$(
 check "every other branch comes home too, kept apart from his own, and the build records" \
   "$(git rev-parse -q --verify refs/remotes/hive-cloud/experiment >/dev/null && echo yes) $(ls $T/.hive/runs-from-cloud/project/runs/ratings-1/state.json 2>/dev/null | wc -l | tr -d ' ') $(grep -c 'Checked: all' $T/stop.txt)" "yes 1 1"
 check "and the rules and conversation from the cloud come home too"   "$($PY -m hive rules | grep -c 'Ratings show after both sides review') $(grep -c 'said in the cloud' $T/.hive/conversation.json)" "1 1"
+check "and what he told Hive there about his business" "$($PY -c "from hive import memory; print(memory.notes('.'))" | grep -c 'Mumbai')" 1
 check "--stop deletes the machine (2 tries: the expired one, then this), its firewall rule and its key; nothing is left" \
   "$(grep -c 'terminate-instances --instance-ids i-0hive' $T/aws.log) $(grep -c 'delete-security-group --group-id sg-0hive' $T/aws.log) $(grep -c 'delete-key-pair' $T/aws.log) $(ls $T/.hive/cloud | wc -l | tr -d ' ')" "2 1 1 0"
 # from the phone, on the cloud machine itself (no AWS keys there): it powers itself off, never mid-build
