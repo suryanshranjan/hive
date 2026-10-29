@@ -42,3 +42,41 @@ def describe(code_dir, goal, timeout=1800):
         return [r.strip() for r in got if isinstance(r, str) and r.strip()] if isinstance(got, list) else []
     finally:
         shutil.rmtree(work, ignore_errors=True)
+
+KNOWN = """A business owner already gave these rules for his product:
+{known}
+
+Below are rules written from what the built code does, numbered:
+{sheet}
+
+Which of the numbered rules only say again what one of his rules already says (the same case, the same outcome)? A rule
+that adds any case or detail his rules do not state is not a repeat. Reply with JSON only: {{"repeats": [numbers]}}"""
+
+def split_known(sheet, known):
+    """(to show, already his): the sheet's rules that only repeat a rule he already gave need not be read again (the
+    owner: "60-80 rules is too much to review"). Best effort: everything is shown if no model answers."""
+    from . import explain
+    if not sheet or not known:
+        return list(sheet), []
+    got = explain.ask_json(KNOWN.format(known='\n'.join(f'- {k}' for k in known[-60:]),
+                                        sheet='\n'.join(f'{n}. {r}' for n, r in enumerate(sheet, 1)))) or {}
+    rep = {n for n in got.get('repeats', []) if isinstance(n, int) and 1 <= n <= len(sheet)}
+    return [r for n, r in enumerate(sheet, 1) if n not in rep], [r for n, r in enumerate(sheet, 1) if n in rep]
+
+def areas(sheet, page=8):
+    """The sheet in pages a person can take in at once: by the part of the product each rule names ("fees: ..."), at
+    most `page` rules a page. Returns [(area, [(number, rule)])], numbered across the whole sheet."""
+    groups, order = {}, []
+    for n, r in enumerate(sheet, 1):
+        head, _, rest = r.partition(':')
+        area = head.strip() if rest and 0 < len(head.strip()) <= 40 and '.' not in head else ''
+        if area not in groups:
+            groups[area] = []; order.append(area)
+        groups[area].append((n, r))
+    out = []
+    for a in order:
+        items = groups[a]
+        for i in range(0, len(items), page):
+            part = (f' ({i // page + 1})' if len(items) > page else '')
+            out.append(((a or 'Other rules') + part, items[i:i + page]))
+    return out

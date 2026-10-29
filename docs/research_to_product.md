@@ -55,6 +55,8 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 | Read alone, each message went wrong: a correction while Hive asked became "no", a later "Yes" had no context, a complaint was saved as a rule, and a build that stopped was only in the server's log | Live cloud test, Oct 29 | Hive reads every message with the recent conversation; a typed answer to "Shall I build?" is understood as yes, no or a corrected request; complaints are answered, never kept as rules; builds run in the background, "status" reports them, and a stop is told at once with its reason | `hive/assistant.py` (`read`, `background_build`) |
 | The cloud copy died on a 15-minute-old tap; replies took over a minute | Live cloud test | Old taps and failing messages are survived; "typing…" at once; "hi" and "status" need no model; an 8-second limit on phrasing; the backup reasons briefly | `hive/telegram.py`, `hive/assistant.py`, `hive/explain.py` |
 
+| A code sheet of 60-80 rules is too much for an owner to read in one go (the founder; Gates 30-35: he does not audit long lists) | The founder, Oct 29; Gates 42, 44 sheets were 66-68 rules | Long sheets come in short pages by area (at most 8 rules), each with "this section is fine"; a wrong rule is put right on its page; rules that only repeat his own are not shown again. Whether a real owner reads it well is Gate 45 | `hive/interview.py` (`_confirm_pages`), `hive/codesheet.py` (`areas`, `split_known`) |
+
 ## Still to turn into the product
 
 - **The code sheet with a real owner:** Gate 42's result is with a synthetic owner who reads every rule. Test the founder on one real feature before relying on it.

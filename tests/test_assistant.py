@@ -316,6 +316,25 @@ c2 = telegram.Channel({'chat_id': ME, 'token': 'x'})   # a new process: the list
 check('the conversation survives a restart', c2.history[-2:], [('owner', 'build: a page for creators'), ('hive', 'Shall I build this?')])
 check('only for the real chat (test fakes never touch it)', ch(FakeTelegram([])).history, [])
 
+# 3p. a long code sheet comes in short pages by area, each with "this section is fine" (the owner: "60-80 rules is too
+# much to review"); a wrong rule is put right on its own page; what only repeats his own rules is not shown again
+from hive import codesheet
+sheet20 = [f'fees: rule {k}.' for k in range(1, 11)] + [f'payouts: rule {k}.' for k in range(11, 21)]
+fake = FakeTelegram([tap('pg|2'), tap('pg|ok'), say('Only after a week'), tap('pg|ok'), tap('pg|ok'), tap('pg|ok'),
+                     tap('sheet|none')])
+done = interview.confirm_sheet(list(sheet20), ch(fake), poll=1, missing=True)
+pages = [m['text'] for m in fake.sent if m['text'].startswith('📋')]
+check('20 rules come as 4 short pages by area, and a wrong rule is amended on its page',
+      (len(pages), pages[0].split('\n')[0].startswith('📋 fees'), done[1].startswith('fees: rule 2.'), done[1] != sheet20[1],
+       done[2:] == sheet20[2:]), (4, True, True, True, True))
+_ask_json = explain.ask_json
+explain.ask_json = lambda prompt: {'repeats': [1]} if 'only say again' in prompt else _ask_json(prompt)
+show, his = codesheet.split_known(['fees: a tip carries no fee.', 'fees: late fees start after 7 days.'],
+                                  ['A tip carries no fee.'])
+explain.ask_json = _ask_json
+check('a rule that only repeats his own is not shown again', (show, his),
+      (['fees: late fees start after 7 days.'], ['fees: a tip carries no fee.']))
+
 # 4. the listener steps aside while a build or review is talking to the owner
 json.dump({'pid': os.getppid(), 'at': time.time()}, open(telegram.BUSY, 'w'))
 check('another live process talking: the listener steps aside', telegram.busy_elsewhere(), True)
