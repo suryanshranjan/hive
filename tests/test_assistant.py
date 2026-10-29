@@ -562,6 +562,16 @@ explain.ask_json = _aj
 check('"show the detailed rules" opens the page, one tap away',
       sum(m['text'].startswith('📋') for m in fake.sent), 1)
 
+# 3q5. with no model to ask, a question still gets the rules that answer it, and a note is filed under its own area
+vr = [(6, 'Verification: rewards wait until the newcomer verifies, for up to 30 days after joining.'),
+      (7, 'Verification: after 30 days unverified, the referral is cancelled and nobody is paid.'),
+      (4, 'Referral limit: at most 10 referrals.')]
+check('no model: "what happens if they verify on day 31?" shows the two verification rules',
+      [n for n, _ in interview.related(vr, 'what happens if they verify on day 31?')], [6, 7])
+check('a note from a shared page is filed under the area it is about',
+      interview._area_of(vr, 'make the verification window 45 days', 'Referral rewards · Referral limit · Verification'),
+      'Verification')
+
 # 3r. "stop the build" in the middle of a build's questions stops it cleanly; it is not taken as his answer; and an
 # answer that merely contains "stop" is still an answer
 fake = FakeTelegram([say('stop the build')])
