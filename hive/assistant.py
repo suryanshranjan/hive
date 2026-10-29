@@ -170,8 +170,9 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     typing = getattr(ch, 'typing', None)
     if callable(typing):
         typing()   # "typing..." at once, as a person would (the owner found it slow)
-    if low.startswith('build:') or low.startswith('build '):   # an explicit request needs no model to recognise it
-        got = {'intent': 'build', 'rule': text.split(':', 1)[1] if ':' in text else text[6:]}
+    said = text.split(':', 1)[1].strip() if low.startswith('build:') else ''
+    if len(said.split()) >= 3:   # "build: <a real description>" needs no model; "build again" is read in context
+        got = {'intent': 'build', 'rule': said}   # (it once took "again" as the thing to build)
     elif low.strip(' !.?') in GREETINGS:   # the obvious needs no model: one call less, seconds sooner
         got = {'intent': 'greeting'}
     elif telegram.is_status(text):
