@@ -1,0 +1,20 @@
+hidden pass: N0 45.2%, NT 49.2%, C 100.0%, CT 100.0%
+builder cost: N0 $0.59, NT $0.60, C $0.73, CT $0.70
+messages: NT 5, CT 5
+NT: fixes 0.09 of 176 N0 edge errors; breaks 0 of 287
+C: fixes 1.00 of 176 N0 edge errors; breaks 0 of 287
+CT: fixes 1.00 of 176 N0 edge errors; breaks 0 of 287
+NT − N0 = +4.0 points (95% CI +0.0 to +11.6)
+CT − C = +0.0 points (95% CI +0.0 to +0.0)
+C − N0 = +54.8 points (95% CI +40.4 to +68.8)
+CT − NT = +50.8 points (95% CI +34.4 to +66.4)
+code sheet: 66 rules, owner marked 40, 67 after review
+
+predictions
+P1 C ≥ 95%: 100.0 -> held
+P2 |CT − C| ≤ 3: +0.0 -> held
+P3 |NT − N0| ≤ 8: +4.0 -> held
+P4 each talking team ≥ 3 messages: 5, 5 -> held
+P5 cost CT ≤ 1.10 × C: 0.96× -> held
+Ship talking (CT − C ≥ +3 and NT − N0 ≥ +5): did not fire
+Kill for talking (no gain with or without rules): did not fire

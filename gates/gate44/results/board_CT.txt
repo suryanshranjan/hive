@@ -1,0 +1,5 @@
+10:00:37 CT-w2: CT-w2 claimed late_fee,ship_cost,split_bill,star_rating. Numeric text: strip spaces, whole-number parse else NULL; use Decimal-free half-up rounding.
+10:00:38 CT-w3: CT-w3 claimed split_bill, star_rating, trim_avg (will take sku_clean, ship_cost after if free). Suggest w1: age_band,fiscal_qtr,next_bday; w2: late_fee,mask_card,sku_clean
+10:00:42 CT-w2: CT-w2 re-claimed: ship_cost, sku_clean only (w1 has late_fee, w3 split_bill/star_rating). w1 still has next_bday? not mine.
+10:00:42 CT-w1: CT-w1: my lock ct1 holds age_band,fiscal_qtr,late_fee,mask_card (got it first, w2 please take ship_cost,sku_clean,next_bday instead). Conventions: numeric text = strip spaces, whole-string float parse; non-numeric -> per owner rules.
+10:01:11 CT-w3: CT-w3: landed split_bill,star_rating,trim_avg; claimed next_bday
