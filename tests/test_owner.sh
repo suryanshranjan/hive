@@ -29,4 +29,14 @@ check "the answer was recorded with its response time" "$(ls $T/run/owner/answer
 check "the second question was refused (budget 1)" "$(cat $T/run/second_ask_exit)" 3
 git clone -q $T/run/up.git $T/result && cd $T/result && $PY -m pytest -q -p no:cacheprovider > /dev/null 2>&1
 check "the answer became a passing test on the shared branch" "$?.$(ls test_fees_owner.py 2>/dev/null)" "0.test_fees_owner.py"
+# Gate 54: with no one at the keyboard (input closed), the question is not shown again and again; the builder is told
+# to decide and record its assumption, and the run finishes
+$PY -m hive owner --run $T/run2 < /dev/null > $T/owner2.out 2>&1 &
+OWNER=$!
+HIVE_WORKER_CMD="sh $HIVE/tests/fake_asking_worker.sh" $PY -m hive run --repo $T/project --run $T/run2 --workers 1 \
+  --goal "Implement creator fees (fees.py)." --examples $T/examples.md --questions 1 > $T/run2.out 2>&1
+check "with the input closed, the run still finishes" $? 0
+kill $OWNER 2>/dev/null
+check "the builder is told to decide and record its assumption" "$(grep -c 'not at the keyboard' $T/run2/got_answer)" 1
+check "the question is not shown again and again" "$(grep -c 'show it again' $T/owner2.out) $(grep -c 'No one can answer here' $T/owner2.out)" "0 1"
 rm -rf $T; exit $fail

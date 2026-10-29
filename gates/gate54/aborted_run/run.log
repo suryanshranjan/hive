@@ -1,0 +1,2732 @@
+[03:59:54] predictions registered on origin/main: gates/gate54/prompts/PREDICTIONS.md
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: pytest. 2 tests, all passing.
+
+I'll put 3 builders on it (the job has 3 parts that can be built at the same time): about 1.9× the speed of one builder, for about 1.8× the cost. They work on copies, so your branches stay exactly as they are.
+If they need a decision only you can make, the question will appear right here.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+
+First, a few quick situations where your own rules matter:
+
+1 of 15. Meena received a ₹2,000 kurta and reports it damaged 45 days after delivery. How long after delivery can a customer still ask for a refund, and what happens after that?
+  A) Refund possible up to 30 days after delivery; after that she gets nothing  B) Refund possible up to 15 days after delivery; after that she gets nothing  C) Refund possible up to 30 days, and after that you decide case by case (damaged items may still get a refund)
+  Your answer (a letter, or your own words) > 
+  > Damaged goods get a full refund up to 90 days after delivery, and after that nothing. So Meena at 45 days still gets her full ₹2,000 back, and the shipping fee too.
+
+2 of 15. Anita returns a ₹1,000 unused item because she changed her mind, within the allowed days. Do you keep any part of the money as a handling charge?
+  A) No charge: she gets the full item price back  B) You keep 10% (₹100) as a handling fee  C) You keep a fixed ₹150 regardless of price
+  Your answer (a letter, or your own words) > 
+  > A) No charge: she gets the full item price back, minus the discount code if she used one. I only hold back the shipping fee, and the shipping fee is refunded only if the goods were damaged.
+  (Your answer also settles 2 of the coming questions; I'll skip them.)
+
+4 of 15. Priya's refund of ₹1,200 is approved. Does the money go back to her bank card or as shop credit to spend with you?
+  A) Damaged: back to her card. Changed mind: shop credit only  B) Always back to her card  C) Always shop credit, unless the customer insists and you approve
+  Your answer (a letter, or your own words) > 
+  > The money goes back the way it was paid: card orders go back to the card, and store credit orders go back as store credit. So none of these options is exactly right.
+
+5 of 15. Karan says his refund reason is 'wrong colour sent', 'arrived very late', or just leaves the reason blank. How should each be treated?
+  A) Shop's mistake (wrong item, etc.): treated like damaged, full refund to card; unclear or blank: treated like changed mind  B) Everything other than 'damaged' is treated like changed mind  C) Any blank or unclear reason is held for you to decide personally
+  Your answer (a letter, or your own words) > 
+  > Wrong colour sent or arrived very late: I'd treat it like damaged, so full refund including shipping, up to 90 days. A blank reason is treated like a normal change of mind, so the 14 and 30 day rules apply and shipping is not refunded.
+
+7 of 15. A customer asks for a refund on an order that was already refunded once, or one that was cancelled, or one that has not been delivered yet. What happens?
+  A) Already refunded: nothing more is paid. Not yet delivered: full refund to the card  B) Already refunded: nothing. Not yet delivered: refund only after the parcel comes back to you  C) Any such request goes to you for a decision, with no automatic payment
+  Your answer (a letter, or your own words) > 
+  > Not exactly any of those. If an order was already refunded, nothing more is paid. I haven't set a rule for cancelled or not-yet-delivered orders, so nothing should be paid automatically on those.
+
+8 of 15. A customer spends ₹1,250 on an order. How many loyalty points does she earn?
+  A) 1 point for every full ₹100, so 12 points (the leftover ₹50 earns nothing)  B) 1 point for every ₹10, so 125 points  C) 1 point for every ₹100 but rounded to the nearest, so 13 points
+  Your answer (a letter, or your own words) > 
+  > A) 1 point for every full ₹100 of items paid, after the discount code. So ₹1,250 gives 12 points, but only if the items come to ₹500 or more, and not for store credit orders.
+  (Your answer also settles 1 of the coming question; I'll skip it.)
+
+10 of 15. Deepa earns points on a ₹1,000 order, then returns it for a refund. Another customer pays ₹1,000 half with store credit. What happens to the points?
+  A) Refunded or cancelled orders earn 0 points, and the part paid with store credit earns none  B) Points stay with the customer even after a refund  C) Points are given first, then taken back when the refund is made, and store credit earns points like cash
+  Your answer (a letter, or your own words) > 
+  > Orders paid with store credit earn no points, and orders that are refunded earn nothing either. I haven't set a rule for the half-and-half payment, so please don't guess.
+
+11 of 15. A customer who has bought from you for 5 years, or someone buying one of your special products, spends ₹5,000. Do they earn more points than a new customer?
+  A) No: everybody earns at the same rate  B) Regular or VIP customers earn extra (for example 1.5 times the points)  C) Certain products earn double points, as chosen by you
+  Your answer (a letter, or your own words) > 
+  > A) No: everybody earns at the same rate. I only give one point for every full ₹100 of items paid, after the discount code, with the other rules I already told you (₹500 minimum, no points on store credit, double points on final-sale orders).
+
+12 of 15. On your daily sales summary, there are 10 orders: 7 paid, 1 cancelled, 1 refunded after delivery, and 1 not yet paid. Which count?
+  A) Only paid, non-cancelled orders; refunded amounts are subtracted from revenue  B) All orders placed that day, whatever happened to them  C) Only paid orders; refunds are ignored until the day they are processed in a separate report
+  Your answer (a letter, or your own words) > 
+  > Orders counts every order in the list, including cancelled and refunded ones. Revenue is only the money that came in from card orders: items after discount plus shipping. Store-credit orders bring in no new money. I haven't set any rule for subtracting refunds, so please don't guess on that.
+  (Your answer also settles 1 of the coming question; I'll skip it.)
+
+14 of 15. On Diwali morning there are no orders at all by the time you open the daily summary. What should it show?
+  A) 0 orders, ₹0 revenue, ₹0 average  B) A message saying 'No sales today' instead of numbers  C) The previous day's numbers, marked as old
+  Your answer (a letter, or your own words) > 
+  > A) 0 orders, ₹0 revenue, ₹0 average. With no orders, the average is 0 as well.
+
+15 of 15. Three orders today total ₹1,000, so the average per order is ₹333.33. How should the average be shown?
+  A) Rounded to the nearest rupee: ₹333  B) Always rounded down: ₹333 (and ₹333.67 would also show ₹333)  C) Always rounded up: ₹334
+  Your answer (a letter, or your own words) > 
+  > B) Always rounded down, to whole rupees. ₹333.33 shows ₹333, and ₹333.67 would also show ₹333.
+
+Your rule, as I'll build it: A customer who reports damaged goods within 90 days of delivery gets a full refund of the item price plus the shipping fee (e.g. a ₹2,000 kurta reported damaged at 45 days gets ₹2,000 plus the shipping fee back), and a damaged-goods refund request made after 90 days of delivery gets nothing.
+  Right? (Enter = yes, or say what's off) > 
+  > Not quite. Damaged goods get the full amount up to 90 days, and nothing after 90 days. But the full refund is the item price after any discount code, plus the shipping fee. Also, if the order was final-sale, damaged still gets the full refund. For the ₹2,000 kurta, that's ₹2,000 (minus any discount code) plus shipping.
+
+Your rule, as I'll build it: When a customer returns an unused item within the allowed return days because they changed their mind, refund the full item price (e.g., ₹1,000 for a ₹1,000 item) minus any discount code amount they used, charge no handling fee, and withhold the shipping fee, refunding it only if the goods were damaged.
+  Right? (Enter = yes, or say what's off) > 
+  > Right, except one thing: the shipping fee is refunded only for damaged goods, and a damaged refund also has to follow the same rules I already told you, like the 90 days. For a normal change of mind it's the item price minus the discount code, full within 14 days and half from day 15 to 30, nothing after that, and the refund goes back the way it was paid.
+
+Your rule, as I'll build it: An approved refund is returned the way the order was paid: if the order was paid by card, the refund amount goes back to that card, and if it was paid with store credit, the refund amount goes back as store credit.
+  Right? (Enter = yes, or say what's off) > 
+  > Right, but one addition: a refund of a store credit order goes back as store credit, and a card order goes back to the card, in every case, including damaged goods.
+
+Your rule, as I'll build it: A refund request with the reason 'wrong colour sent' or 'arrived very late' is treated like a damaged item and gets a full refund including shipping if made within 90 days, while a request with a blank reason is treated like a normal change of mind, so the existing 14-day and 30-day rules apply and shipping is not refunded.
+  Right? (Enter = yes, or say what's off) > 
+  > Right for the main idea. But for those two reasons, the refund must also follow the same damaged rules: item price after any discount code, plus shipping, up to 90 days, and nothing after 90 days. It goes back the way it was paid, and a final-sale order still gets the full refund.
+
+Your rule, as I'll build it: If an order has already been refunded, no further refund is paid on it; for orders that are cancelled or not yet delivered, no refund is paid automatically.
+  Right? (Enter = yes, or say what's off) > 
+  > Right. Already refunded means nothing more is paid, and cancelled or not-yet-delivered orders get no automatic payment since I haven't set a rule for them.
+
+Your rule, as I'll build it: A customer earns 1 loyalty point for every full ₹100 of items paid after the discount code is applied (so ₹1,250 earns 12 points), but only when the items come to ₹500 or more, and no points are earned on store credit orders.
+  Right? (Enter = yes, or say what's off) > 
+  > Not quite. One point for every full ₹100 of items paid after the discount code, only if the items come to ₹500 or more after the discount, and no points on store credit orders. Also, final-sale orders earn double points.
+
+Your rule, as I'll build it: An order paid entirely with store credit earns no points, and an order that is refunded earns no points; no rule has been set for an order paid partly with store credit and partly by another method, so that case is undefined and must not be implemented or tested until the owner specifies it.
+  Right? (Enter = yes, or say what's off) > 
+  > Not quite. An order paid entirely with store credit earns no points. A refunded order earns nothing either. I haven't set a rule for half store credit and half card, so please don't guess on that.
+
+Your rule, as I'll build it: Every customer earns points at the same rate regardless of how long they have been a customer or whether the product is special: an order earns 1 point for every full ₹100 of items paid after the discount code is applied, subject to the ₹500 minimum, no points on the portion paid with store credit, and double points on final-sale orders.
+  Right? (Enter = yes, or say what's off) > 
+  > Not quite. Points are 1 per full ₹100 of items paid after the discount code, only if the items come to ₹500 or more after the discount, and none on store credit orders. Final-sale orders earn double points. I haven't set any rule for part store credit and part card, so please don't guess on that.
+
+Your rule, as I'll build it: The daily sales summary's Orders count includes every order in the list regardless of status (paid, cancelled, refunded or not yet paid), while Revenue is the sum, over card orders only, of item totals after discount plus shipping; store-credit orders add nothing to Revenue, and no refund amounts are subtracted from Revenue because no refund rule has been set.
+  Right? (Enter = yes, or say what's off) > 
+  > Right. Orders counts every order in the list, and Revenue is only card orders: items after discount plus shipping. Store-credit orders add nothing, and nothing is subtracted for refunds since I haven't set a rule for that.
+
+Two of your answers pull different ways on one decision. Which is your policy?
+For damaged-goods refunds, and for 'wrong colour sent' and 'arrived very late' requests that follow the same rules, does the 90-day limit count from the day the order was delivered or from the day the order was placed?
+  A) The 90 days count from delivery. A request made within 90 days of delivery gets the full refund, and a request after 90 days of delivery gets nothing.  B) The 90 days count from the order. A request made within 90 days of the order gets the full refund, and a request after 90 days of the order gets nothing.
+  > 
+  > A) The 90 days count from delivery, as I said earlier: full amount within 90 days of delivery, nothing after.
+
+Your rules for this feature, as the builders will follow them (each one applies to every case like it, not just the example):
+  1. Whenever the daily sales summary is shown, its Orders count includes every order in the list, whatever its status (paid, cancelled, refunded or not yet paid).
+  2. Whenever the daily sales summary calculates Revenue, it adds up only card orders, counting each one's item total after the discount code plus shipping. Store-credit orders add nothing to Revenue, and no refund amounts are subtracted from Revenue.
+  3. Whenever there are no orders at all when the daily summary is opened, it shows 0 orders, ₹0 revenue and ₹0 average.
+  4. Whenever the daily summary shows the average per order, it is always rounded down to a whole rupee (₹333.33 shows ₹333, and ₹333.67 also shows ₹333).
+  5. Whenever a refund request is for damaged goods, or has the reason 'wrong colour sent' or 'arrived very late', and it is made inside the allowed time window, the customer gets the item price after any discount code plus the shipping fee. This applies to final-sale orders too.
+  6. Whenever a customer returns an unused item because they changed their mind, or the refund request has a blank reason, the refund is the item price minus any discount code amount. It is the full amount if the return is within 14 days, half of it from day 15 to day 30, and nothing after day 30. No handling fee is charged, and the shipping fee is withheld.
+  7. Whenever a refund is approved, in every case including damaged goods, it goes back the way the order was paid: to the card if paid by card, and as store credit if paid with store credit.
+  8. Whenever an order has already been refunded, no further refund is paid on it. Whenever an order is cancelled or not yet delivered, no refund is paid automatically.
+  9. Whenever an order's items come to ₹500 or more after the discount code, the customer earns 1 loyalty point for every full ₹100 of items paid after the discount code, and final-sale orders earn double points. Whenever the items come to less than ₹500 after the discount, the order earns no points. Whenever an order is paid entirely with store credit, or is refunded, it earns no points. Orders paid partly with store credit and partly by another method are not covered by this rule, and nothing is to be assumed or built for them.
+  10. For damaged-goods refunds, and for 'wrong colour sent' and 'arrived very late' requests that follow the same rules, does the 90-day limit count from the day the order was delivered or from the day the order was placed? -> A) The 90 days count from delivery, as I said earlier: full amount within 90 days of delivery, nothing after.
+  Numbers of any that are wrong (Enter = all correct) > 
+  > 6. It's missing that final-sale orders get no refund unless the goods are damaged. It also needs two more rules: refunds under ₹50 are not paid (the amount is 0), and amounts are rounded down to whole rupees. Everything else is right.
+  Rule 6: Whenever a customer returns an unused item because they changed their mind, or the refund request has a blank reason, the refund is the item price minus any discount code amount. It is the full amount if the return is within 14 days, half of it from day 15 to day 30, and nothing after day 30. No handling fee is charged, and the shipping fee is withheld.
+  What should it be? > 
+  > Whenever a customer returns an item because they changed their mind, or the reason is blank, the refund is the item price minus the discount code, full within 14 days of delivery, half from day 15 to 30, and nothing after day 30. The shipping fee is never refunded here. Final-sale orders get no refund unless the goods arrived damaged. A refund under ₹50 is not paid (the amount is 0), except for damaged goods. Amounts are rounded down to whole rupees. A negative number of days is treated as day 0. It goes back the way it was paid.
+  Thank you. The builders will encode your 10 rules as tests before anything lands.
+
+[04:04] Starting.
+  [04:04] Builder w1 picked up: all.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:02 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:04 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:06 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:08 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:10 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:12 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:14 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:16 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:18 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:20 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:22 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:24 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:26 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:28 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:30 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:32 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:34 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:36 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:38 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:40 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:42 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:44 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:46 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:48 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:50 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:52 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:54 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:56 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 0:58 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:00 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:02 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:04 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:06 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:08 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:10 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:12 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:14 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:16 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:18 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:20 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:22 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:24 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:26 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:28 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:30 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:32 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:34 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:36 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:38 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:40 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:42 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:44 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:46 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:48 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:50 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:52 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:54 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:56 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 1:58 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:00 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:02 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:04 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:06 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:08 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:10 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:12 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:14 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:16 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:18 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:20 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+  [04:06] Builder w1 landed: Add refunds, loyalty points, sales summary
+  [04:06] Builder w1 landed: refunds, loyalty, report; added status field to Order; unknown reasons get no refund...
+  [04:06] Builder w1 landed: hive: leave build output and dependencies out of the shared branch
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:22 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:24 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:26 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:28 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:30 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:32 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:34 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:36 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:38 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:40 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:42 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:44 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:46 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:48 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:50 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:52 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:54 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:56 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 2:58 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:00 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:02 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:04 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:06 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:08 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:10 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:12 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:14 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:16 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:18 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:20 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:22 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:24 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:26 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:28 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:30 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:32 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:34 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:36 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:38 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:40 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:42 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:44 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:46 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:48 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:50 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:52 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:54 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:56 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 3:58 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:00 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:02 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:04 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:06 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:08 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:10 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:12 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:14 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:16 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:18 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:20 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:22 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:24 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:26 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:28 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:30 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:32 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:34 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:36 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:38 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:40 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:42 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:44 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:46 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:48 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:50 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:52 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:54 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:56 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 4:58 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:00 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:02 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:04 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:06 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:08 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:10 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:12 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:14 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:16 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:18 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:20 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:22 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:24 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:26 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:28 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:30 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:32 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:34 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:36 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:38 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:40 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:42 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:44 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
+
+========================================================================
+ Question 1 of up to 12  -  from builder w1  -  asked 5:46 ago
+========================================================================
+
+  Priya bought a Rs 1000 jacket, delivered 10 days ago, and asks for a
+  refund because it was the wrong size, which is none of your usual
+  reasons. What should we do?
+
+    A) treat it like changing her mind (full refund of the item
+       price after discount, no shipping)
+    B) no refund at all
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   OK, I will show it again shortly.
