@@ -24,7 +24,7 @@ What does he mean? Read it as a person would, using the conversation: "yes" or "
 proposed; "I already told you" or "that one" points back to what he said before; a short correction ("no, Sunny Shop
 Creators") changes what you just proposed. Reply with JSON only:
 {{"intent": "build" | "stop_build" | "change" | "rule" | "status" | "team" | "set_team" | "stop_builder" | "greeting" |
-"cloud_on" | "cloud_off" | "reply",
+"instruct" | "cloud_on" | "cloud_off" | "reply",
 "rule": "for a build, exactly what to build (taken from the conversation if he points back to it); for a change or a
 rule, the rule he now wants; otherwise empty",
 "confirmed": true if he is agreeing to do what you just proposed (or clearly telling you to go ahead now), else false,
@@ -33,7 +33,8 @@ rule, the rule he now wants; otherwise empty",
 "agent": for set_team, the coding agent(s) he wants: "claude", "codex", "gemini", "antigravity", or a mix such as
 "claude,codex"; else "",
 "workers": for set_team, how many builders he wants (a number), else 0,
-"builder": for stop_builder, the builder he means, as he said it ("w2", "the codex one"); else ""}}
+"builder": for stop_builder or instruct, the builder he means, as he said it ("w2", "the codex one"); else "",
+"drop_work": for stop_builder, true if he says he does not want the work that builder was doing; else false}}
 - "build": he wants something built, added or made in the product (including agreeing to, or correcting, a build you
   proposed).
 - "stop_build": he wants the build that is running stopped or cancelled.
@@ -43,6 +44,9 @@ rule, the rule he now wants; otherwise empty",
 - "team": he asks about the builders themselves: who is doing what, which agents they run on, what one of them did.
 - "set_team": he chooses the builders for his builds: which agents (Claude, Codex, ...) or how many.
 - "stop_builder": he wants one particular builder stopped (not the whole build).
+- "instruct": while a build is running, he tells the builders to do something different or extra in this build (a
+  change of direction, more work, or a new job for one builder); "rule" carries the instruction, "builder" the builder
+  if he names one. Not a separate new build, and not a standing rule for every build.
 - "greeting": a hello, with no request yet.
 - "cloud_on" / "cloud_off": move Hive to the cloud / shut the cloud machine down.
 - "reply": anything else: a question, a complaint, frustration, small talk. Never a rule."""
@@ -82,7 +86,8 @@ How you speak:
 - Deference with a spine: if what he asks is risky, say so once, briefly, then do it his way, within what you can do.
 - What you can do from his phone: build something new from his description; stop a build; say how a build is going
   and why one stopped; say which builder is doing what, on which agent (Claude, Codex, Gemini, Antigravity), stop one
-  builder, and choose the team for his next builds (which agents, how many); answer questions about his product from its code; keep a rule he gives for every build; move to
+  builder, give the running builders a new instruction mid-build, and choose the team for his next builds (which
+  agents, how many: the swarm law has its say first, then it is his call); answer questions about his product from its code; keep a rule he gives for every build; move to
   the cloud and back. Hard limits, whatever he asks: you never change his own main version and never skip the tests;
   every build arrives as a separate tested copy that he looks at and merges himself. Say so plainly if he asks for it.
 - Own your mistakes plainly ("My error, sir; it is fixed."), without grovelling.
@@ -175,14 +180,37 @@ def coalesce(texts):
 
 STOP_WORDS = ('stop', 'cancel', 'abort', 'kill', 'halt', 'band', 'roko', 'ruko', 'rok do')
 
-def _team(ch, repo, text, got):
-    """Who is doing what; choose the team for the next build; stop one builder."""
+def _team(ch, repo, text, got, poll=20, again=None):
+    """Who is doing what; choose the team for the next build (the swarm law has its say first); stop one builder.
+    again(text) answers a message that turned out to be about something else."""
     run = team.current_run()
     live = bool(run) and any(r['state'] in ('working', 'waiting', 'queued') for r in team.board(run))
     intent = got.get('intent')
     if intent == 'set_team':
+        workers = got.get('workers') or None
+        if not workers and re.search(r"\b(the law|you decide|your call|aap decide|tum decide)\b", text.lower()):
+            workers = 'auto'   # "let the law decide": the number is picked per build again
         try:
-            t = team.choose(got.get('agent') or None, got.get('workers') or None)
+            int(workers) if workers not in (None, 'auto') else None
+        except (TypeError, ValueError):
+            workers = None
+        advice = team.law_advice(repo, workers) if workers not in (None, 'auto') else None
+        if advice:   # the law is at the top of the chain: he hears it once, plainly, then it is his call (the owner)
+            n, why = advice
+            ch.send(f"⚖️ <b>Very good, sir. One thing first.</b> For this project the law says {n} builder"
+                    f"{'s' if n != 1 else ''}: {telegram.esc(why)}. " +
+                    (f"{workers} won't finish any sooner, and will cost more." if int(workers) > n else
+                     f"{workers} will take longer.") + f" Shall I use {n}, or {workers} as you said?", html=True,
+                    buttons=[[(f'⚖️ Use {n}, the law', 'law|n')], [(f'Use {workers}, as I said', 'law|mine')]])
+            choice, other = choose(ch, poll, [('law|n', ('the law', 'use the law', f'use {n}', 'your way', 'theek hai')),
+                                              ('law|mine', ('as i said', f'use {workers}', 'my way', 'mine'))])
+            if other is not None and again:
+                ch.send("Very good, I've left the team as it was.")
+                return again(other)
+            if choice == 'law|n':
+                workers = n
+        try:
+            t = team.choose(got.get('agent') or None, workers)
         except SystemExit as e:
             ch.send(f"🤔 {telegram.esc(str(e))}", html=True); return 'team_unknown'
         ch.send(f"👥 Very good: from the next build, {telegram.esc(team.describe(t))}." +
@@ -198,9 +226,17 @@ def _team(ch, repo, text, got):
         row = next(r for r in team.board(run) if r['name'] == me)
         if not team.stop_builder(run, me):
             ch.send(f"{me} isn't working at the moment, so there was nothing to stop."); return 'not_working'
-        ch.send(f"🛑 Stopped {me} ({row['agent']})." + (f" It was on: {telegram.esc('; '.join(row['holding'])[:200])}; that "
-                "work is free again for the others." if row['holding'] else '') + f" What it landed ({row['landed']}) stays.",
-                html=True)
+        doing = '; '.join(row['holding'])[:200]
+        if doing and got.get('drop_work'):   # he does not want it: the others must not pick it up either (the Jarvis bench)
+            team.instruct(run, f'The owner no longer wants this; do not build it: {doing}')
+        others = [r['name'] for r in team.board(run) if r['state'] == 'working' and r['name'] != me]
+        ch.send(f"🛑 Stopped {me} ({row['agent']})" + (f", which was building {telegram.esc(doing)}" if doing else '') + '. ' +
+                (("I've told the others to leave that out. " if got.get('drop_work') else
+                  "Another builder can take that work up. ") if doing else '') +
+                (f"{', '.join(others)} carr{'y' if len(others) > 1 else 'ies'} on with the rest." if others else
+                 "No other builder is working now.") +
+                (f" The {row['landed']} piece{'s' if row['landed'] != 1 else ''} of work it finished stay." if row['landed']
+                 else ''), html=True)
         return 'builder_stopped'
     if not run:
         ch.send(f"👥 No builders have worked on this yet. The next build: {telegram.esc(team.describe(team.chosen()))}.",
@@ -371,7 +407,23 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     intent, rule = got.get('intent', 'reply'), (got.get('rule') or text).strip()
     who = _who(ch)
     if intent in ('team', 'set_team', 'stop_builder'):   # the builders themselves, from his phone
-        return _team(ch, repo, text, got)
+        return _team(ch, repo, text, got, poll,
+                     lambda other: handle(ch, repo, other, poll, apply_build, start_build, cloud))
+    if intent == 'instruct':   # mid-build: a new direction for the builders working now
+        run = team.current_run()
+        live = bool(run) and _building() and _building().startswith('A build is running')
+        say_it = (got.get('rule') or text).strip()
+        if not live:   # nothing running to redirect: it is a request for a build
+            intent, rule = 'build', say_it
+        else:
+            me = team.find(run, got['builder']) if got.get('builder') else None
+            if team.instruct(run, say_it, me):
+                ch.send(f"📝 Passed to {me if me else 'the builders'}: {telegram.esc(say_it[:300])}. They pick it up at "
+                        "their next sync, usually within a few minutes; ask \"who's doing what\" to see it taken up.",
+                        html=True)
+                return 'instructed'
+            ch.send("⚠️ I couldn't reach the builders just now. Say it again in a moment, or \"stop the build\" and "
+                    "start it afresh with this."); return 'instruct_failed'
     if intent == 'stop_build':   # he can stop a build from his phone, as he can start one
         p = BUILD.get('proc')
         if p is not None and p.poll() is None:
@@ -528,7 +580,10 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
             memory.add(repo, rule, 'changed')
     else:
         memory.add(repo, rule, 'owner')
-        ch.send(f"📌 Noted as a standing rule: {rule}")
+        run = team.current_run()
+        live = bool(run) and _building() and _building().startswith('A build is running')
+        sent = live and team.instruct(run, f'A new standing rule from the owner: {rule}')   # it reaches the builders now
+        ch.send(f"📌 Noted as a standing rule: {rule}" + (" The builders working now have it too." if sent else ''))
     st = latest_build(repo)
     if st and apply_build:
         ch.send(f"Shall I update the latest build (branch hive/{st['name']}) to follow it?",
