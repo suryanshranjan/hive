@@ -270,57 +270,169 @@ SHEET_NOTE = 'Each one applies to every case like it, not just the example.'
 
 PAGED_FROM = 10   # longer sheets go page by page
 
-def _confirm_pages(general, ch, poll, title, note, missing, goal=''):
+POSITIVE = ('👍', '👌', '✅', '🙂', '😊', '👏', '💯', '🆗', '✔')
+ASKING = re.compile(r"^(what|why|how|which|when|who|where|kya|kyu|kyon|kaise|matlab|meaning|explain|samjha|samajh)\b|\?\s*$|\b(mean|means|meaning|matlab|explain|samjh\w*|unclear|"
+                    r"confus\w*|don't understand|dont understand|nahi samjha)\b")
+NUMBERS_ONLY = re.compile(r"(rule|rules|no\.?|number|#|and|,|&|\s|\d)+")
+LEAD_FIX = re.compile(r"^(?:rule\s*|no\.?\s*|#\s*)?(\d+)\s*(?:[:.\-–)]|\s)\s*(.*\S.*)$", re.S | re.I)
+WRONG_WORDS = re.compile(r"\b(is|are|both|seems?|looks?)?\s*(wrong|incorrect|not right|galat( hai| h)?|theek nahi)\b")
+KEEP = re.compile(r"^(no[, ]+)?(it'?s|its|that'?s|thats)?\s*(fine|right|correct|ok(ay)?)\b|^(keep|leave)( it| that)?\b|"
+                  r"^(actually )?(it'?s|its) (fine|right|correct)\b|^(theek|sahi) (hai|h)\b")
+
+def page_reply(kind, a, valid):
+    """What his reply on a page of the sheet means, in every form it has come in. ('fine', None) | ('marks', [n]) |
+    ('fix', (n, words)) | ('out', [n]) | ('question', words) | ('note', words). Gate 45: a question was filed as a
+    correction, and "what does rule 6 mean?" would have marked rule 6 wrong."""
+    if kind == 'tap':
+        return ('fine', None) if a == 'pg|ok' else ('marks', [int(a.split('|')[1])])
+    t = (a or '').strip()
+    letters = re.sub(r'[^\w]', '', t)
+    if not letters:   # "??", "👍", "✅"
+        return ('fine', None) if any(e in t for e in POSITIVE) else ('question', t)
+    low = ' '.join(t.lower().split())
+    if ASKING.search(low):   # a question first, even with a number in it
+        return 'question', t
+    if is_yes(t) or no_rule(t) or section_fine(t):
+        return 'fine', None
+    bare = WRONG_WORDS.sub(' ', low).strip(' .!')   # "3 and 5 are wrong", "rule 6 is wrong": marks, not a fix
+    if bare != low and NUMBERS_ONLY.fullmatch(bare or 'x'):
+        low = bare
+    if NUMBERS_ONLY.fullmatch(low):   # "3", "3 and 5", "rule 3, 4"
+        nums = [int(x) for x in re.findall(r'\d+', low)]
+        bad = [n for n in nums if n not in valid]
+        return ('out', bad) if bad else ('marks', nums)
+    m = LEAD_FIX.match(t)
+    if m and int(m.group(1)) in valid:   # "6 should be 7 days", "rule 6: only for brands"
+        return 'fix', (int(m.group(1)), m.group(2).strip())
+    if m:
+        return 'out', [int(m.group(1))]
+    return 'note', t
+
+def _explain(ch, a, rules_text, goal, code=None):
+    """His question about rules on the sheet, answered in context. With `code` (the build's own folder), Claude reads
+    the code and answers what it does, with an example (the owner: "agentic level contextual answers"); otherwise, or
+    if that fails, from the rules and the goal."""
+    if code and os.path.isdir(code):
+        from .assistant import look
+        got = look(ch, code, f'He is checking these rules, which say what the newly built code does:\n{rules_text}\n\n'
+                             f'He asks: "{a}". Read the code and tell him what the rule means in practice, with one '
+                             'concrete example (real amounts or names), in at most 3 plain sentences.')
+        if got:
+            return got
+    k, meaning = telegram.understand(a, (rules_text, [], explain._goal_summary(goal)[:1500] if goal else ''))
+    return meaning if k == 'question' and meaning else None
+
+def _ask_fix(ch, poll, k, rule, goal, code=None):
+    """His words for a wrong rule, put right: a question about it is answered first, "it's fine after all" keeps it,
+    and an empty reply is asked again. Returns the rule as it now stands."""
+    for _ in range(4):
+        kind, a = telegram._wait(ch, poll, {'fx|keep'})
+        if a == 'fx|keep' or (kind == 'text' and KEEP.search(' '.join(a.lower().split()))):
+            ch.send(f'Very good: rule {k} stays as it was.'); return rule
+        if kind != 'text' or not a.strip(' ?!.'):
+            ch.send(f'What should rule {k} say instead? <i>Your own words, or 🎙 a voice note.</i>', html=True,
+                    buttons=[[('↩️ Keep it as it was', 'fx|keep')]]); continue
+        if ASKING.search(' '.join(a.lower().split())):
+            meaning = _explain(ch, a, f'{k}. {rule}', goal, code) or 'It is the rule shown above, exactly as the builders made it.'
+            ch.send(f"💬 {telegram.esc(meaning)}\n\n<b>So, what should rule {k} say?</b>", html=True,
+                    buttons=[[('↩️ Keep it as it was', 'fx|keep')]]); continue
+        return _amend(rule, a)
+    return rule
+
+def _confirm_pages(general, ch, poll, title, note, missing, goal='', save=None, code=None):
     """The sheet one area at a time, at most 8 rules a page: he taps a wrong rule's number, or "this section is fine";
-    each wrong rule is put right on its own page, while the context is fresh."""
+    each wrong rule is put right on its own page, while the context is fresh. With `save`, progress is kept after every
+    page, so a review cut off midway picks up at the page it stopped on."""
     from .codesheet import areas, stakes
-    pages = areas(general)
+    kept = telegram._load(save)
+    if kept.get('pages') and len(kept.get('general', [])) >= len(general):
+        general = kept['general']
+        pages = [(a, [(n, general[n - 1]) for n in ns]) for a, ns in kept['pages']]
+        done = kept.get('done', 0)
+    else:
+        pages, done = areas(general), 0
     why = stakes(pages, goal)
+    def keep(p):
+        telegram._save(save, {'general': general, 'pages': [(a, [n for n, _ in items]) for a, items in pages], 'done': p})
     mins = max(3, round(len(general) * 8 / 60))   # about 8 seconds a rule, most of them a glance
-    ch.send(f"📜 <b>{telegram.esc(title)}</b>\n\n{len(general)} rules in {len(pages)} short sections, about {mins} minutes. "
-            "Every rule here is something the builders decided on their own; a wrong one costs far more to find once "
-            f"customers hit it. <i>{telegram.esc(note)} Most will be right: tap \"this section is fine\" to move on.</i>",
-            html=True)
+    ch.send((f"📜 <b>{telegram.esc(title)}</b>\n\n{len(general)} rules in {len(pages)} short sections, about {mins} minutes. "
+             "Every rule here is something the builders decided on their own; a wrong one costs far more to find once "
+             f"customers hit it. <i>{telegram.esc(note)} Most will be right: tap \"this section is fine\" to move on. If a "
+             "rule is unclear, just ask.</i>") if not done else
+            f"📜 <b>Picking up where we stopped:</b> section {done + 1} of {len(pages)}.", html=True)
     for p, (area, items) in enumerate(pages, 1):
+        if p <= done:
+            continue
+        items = [(n, general[n - 1]) for n, _ in items]
         listing = '\n'.join(f'<b>{n}.</b> {telegram.esc(r)}' for n, r in items)
         nums = [(str(n), f'pg|{n}') for n, _ in items]
         rows = [nums[i:i + 4] for i in range(0, len(nums), 4)] + [[('✅ This section is fine', 'pg|ok')]]
         stake = why.get(area.split(' (')[0])
         stake = f"💡 <i>Why it matters: {telegram.esc(stake)}</i>\n\n" if stake else ''
         ch.send(f"📋 <b>{telegram.esc(area)}</b>   {p} of {len(pages)}   {telegram.bar(p, len(pages))}\n\n{stake}{listing}\n\n"
-                "<i>Tap the number of any rule that is wrong, or tell me.</i>", html=True, buttons=rows)
-        wrong, valid = [], {n for n, _ in items}
+                "<i>Tap the number of any rule that is wrong, or tell me. Ask if anything is unclear.</i>", html=True,
+                buttons=rows)
+        wrong, valid = [], [n for n, _ in items]
+        again = "<i>Tap the number of any rule that is wrong, or ✅ This section is fine.</i>"
         while True:
             kind, a = telegram._wait(ch, poll, {d for row in rows for _, d in row})
-            if a == 'pg|ok' or (kind == 'text' and (is_yes(a) or no_rule(a))):
+            what, x = page_reply(kind, a, valid)
+            if what == 'fine':
                 break
-            picks = [int(a.split('|')[1])] if kind == 'tap' else [int(x) for x in re.findall(r'\d+', a)]
-            if kind == 'text' and not picks:   # his words without a number: a correction to this section as a whole
-                general.append(f'{area}: {a.strip()}'); ch.send('📝 Noted for this section.'); continue
-            for k in picks:
-                if k in valid and k not in wrong:
+            if what == 'question':   # Gate 45: answered, never filed as a correction
+                meaning = _explain(ch, a, '\n'.join(f'{n}. {r}' for n, r in items), goal, code)
+                ch.send(f"💬 {telegram.esc(meaning or 'Which rule here is unclear? Tell me its number and I will explain it in plain words.')}"
+                        f"\n\n{again}", html=True, buttons=rows)
+                continue
+            if what == 'out':
+                ch.send(f"Rule {', '.join(map(str, x))} isn't on this page; here it's {valid[0]} to {valid[-1]}. {again}",
+                        html=True, buttons=rows)
+                continue
+            if what == 'fix':   # he said which rule and how, in one go: no need to ask again
+                k, words = x
+                general[k - 1] = _amend(general[k - 1], words)
+                ch.send(f"✍️ Rule {k} is now: {telegram.esc(general[k - 1])}\n\n<i>Anything else here? Tap a number, "
+                        "or ✅ This section is fine.</i>", html=True, buttons=rows)
+                continue
+            if what == 'note':   # his words without a rule number: a correction to this section as a whole
+                general.append(f'{area}: {x}')
+                ch.send(f"📝 Noted for this section. Anything else here? {again}", html=True, buttons=rows)
+                continue
+            for k in x:
+                if k not in wrong:
                     wrong.append(k); ch.send(f'🔖 {k} marked. Tap more, or "this section is fine" when done.')
         for k in wrong:
             ch.send(f"✍️ <b>Rule {k}:</b> {telegram.esc(general[k - 1])}\n\n<b>What should it be?</b> <i>Your own words, "
-                    "or 🎙 a voice note.</i>", html=True)
-            general[k - 1] = _amend(general[k - 1], telegram._wait(ch, poll, set())[1])
+                    "or 🎙 a voice note.</i>", html=True, buttons=[[('↩️ Keep it as it was', 'fx|keep')]])
+            general[k - 1] = _ask_fix(ch, poll, k, general[k - 1], goal, code)
+        keep(p)
     if missing:
         ch.send("➕ <b>Anything the builders should know that is not on these pages?</b> <i>Say it in your own words, "
                 "or tap Nothing to add.</i>", html=True, buttons=[[('✅ Nothing to add', 'sheet|none')]])
-        kind, a = telegram._wait(ch, poll, {'sheet|none'})
-        if kind == 'text' and a.strip() and not no_rule(a) and not is_yes(a):
-            general.append(a.strip())
+        for _ in range(4):
+            kind, a = telegram._wait(ch, poll, {'sheet|none'})
+            t = ' '.join((a or '').lower().split())
+            if kind != 'text' or not t.strip(' ?!.') or no_rule(a) or is_yes(a) or re.fullmatch(r"(no|nope|nah|nothing|nahi|kuch nahi|none)\W*", t):
+                break
+            if ASKING.search(t):
+                ch.send("💬 Anything the builders should follow that none of the pages said: a case they missed, a limit, "
+                        "a rule of your business. <i>Say it, or tap Nothing to add.</i>", html=True,
+                        buttons=[[('✅ Nothing to add', 'sheet|none')]])
+                continue
+            general.append(a.strip()); break
+    keep(len(pages))
     ch.send('✅ Thank you. These are your rules now; the builders will encode every one as a test.')
     return general
 
-def confirm_sheet(general, ch=None, ask=None, poll=20, title=SHEET_TITLE, note=SHEET_NOTE, missing=False, goal=''):
+def confirm_sheet(general, ch=None, ask=None, poll=20, title=SHEET_TITLE, note=SHEET_NOTE, missing=False, goal='',
+                  save=None, code=None):
     """Show the whole sheet; he marks the numbers of any wrong rules and says each one right; each is amended, not
     replaced (Gate 39). With `missing`, he is then asked what the builders should know that is not on it (Gate 42: a
     sheet written from the built code). Returns the confirmed rules."""
     general = list(general)
     listing = '\n'.join(f'<b>{n}.</b> {telegram.esc(r)}' for n, r in enumerate(general, 1))
     if ch and len(general) > PAGED_FROM:   # a long sheet in pages by area (the owner: "60-80 rules is too much")
-        return _confirm_pages(general, ch, poll, title, note, missing, goal)
+        return _confirm_pages(general, ch, poll, title, note, missing, goal, save, code)
     if ch:
         nums = [(str(n), f'sheet|{n}') for n in range(1, len(general) + 1)]
         rows = [nums[i:i + 5] for i in range(0, len(nums), 5)] + [[('✅ All correct', 'sheet|done')]]
@@ -395,6 +507,16 @@ def is_yes(text):
         return True
     return (len(t) < 60 and any(f' {w} ' in re.sub(' +', ' ', t) for w in YES_WORDS)
             and not any(f' {w} ' in t for w in ('not', 'no', 'but', 'except', 'only', 'wrong')))
+
+FINE = re.compile(r"(good|fine|ok(ay)?|all good|looks (good|fine|right)|correct|right|perfect|theek( hai)?|sahi( hai)?|"
+                  r"badhiya|go ahead|proceed|carry on|continue|next|done|do (the )?rest|move on|aage|chalo)\b")
+
+def section_fine(text):
+    """His words pass the page ("good, do the rest", "looks fine", "theek hai, next"); not "good, but ...". Gate 45:
+    "Good i think do rest of the work as required" was filed as a correction."""
+    t = ' '.join(re.sub(r"[^a-z' ]", ' ', text.lower()).split())
+    return bool(FINE.match(t)) and len(t) < 80 and not any(f' {w} ' in f' {t} ' for w in (
+        'but', 'except', 'not', 'wrong', 'change', 'should', 'instead', 'only', 'nahi', 'galat', 'lekin', 'magar'))
 
 def no_rule(text):
     """The whole reply leaves it to the builders ("whatever you feel like", "nothing", "up to you"): no rule."""

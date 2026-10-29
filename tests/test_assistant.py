@@ -414,6 +414,68 @@ check('each page of the sheet says why its area matters, and the opening says wh
       ('Why it matters: Fees decide what you earn on every deal.' in pages[0], 'Payouts decide' in pages[2],
        any('about 3 minutes' in m['text'] and 'costs far more to find' in m['text'] for m in fake.sent)), (True, True, True))
 
+# 3q2. Gate 45, live: 46 rules came out as 40 pages (each rule's heading had its own detail in brackets); a question
+# ("What does this means", "??") was filed as a correction and the page waited; "Good, do the rest" was filed too
+from hive import codesheet
+real = ([f'Referral rewards ({d}): rule {k}.' for k, d in enumerate(('amounts', 'reward types', 'situation names',
+         'brand invites brand', 'amounts', 'limits', 'reward types', 'limits', 'timing', 'timing'), 1)] +
+        [f'Invites ({d}): rule {k}.' for k, d in enumerate(('codes', 'expiry', 'codes', 'self-invites'), 11)])
+pg = codesheet.areas(real)
+check('rules with details in brackets share their area\'s pages (14 rules: 3 pages, not 13)',
+      ([a for a, _ in pg], [len(i) for _, i in pg]), (['Referral rewards (1)', 'Referral rewards (2)', 'Invites'], [8, 2, 4]))
+_aj = explain.ask_json
+explain.ask_json = lambda prompt: ({'kind': 'question', 'explanation': 'Rule 3 means a capitalised name counts the same.'}
+                                   if 'What does this means' in prompt or '??' in prompt else _aj(prompt))
+fake = FakeTelegram([say('What does this means'), say('??'), say('Good i think do rest of the work as required'),
+                     tap('pg|ok'), tap('pg|ok'), tap('sheet|none')])
+done = interview.confirm_sheet(list(real), ch(fake), poll=1, missing=True)
+explain.ask_json = _aj
+texts = [m['text'] for m in fake.sent]
+check('a question about a page is answered, never filed as a correction; "good, do the rest" passes the page',
+      (sum('Rule 3 means a capitalised name counts the same.' in t for t in texts), any('Noted for this section' in t for t in texts),
+       done == real), (2, False, True))
+check('a page that took a note says what to tap next', interview.section_fine('theek hai next'), True)
+check('"good, but ..." is not a pass', [interview.section_fine(t) for t in ('good but make it 5%', 'fine, except brands',
+      'ok nahi')], [False, False, False])
+
+# 3q3. every way he has replied, or might, on a page of the sheet (Gate 45 live: a question was filed as a correction)
+v = [5, 6, 7, 8]
+cases = [('What does this means', 'question'), ('??', 'question'), ('what does rule 6 mean?', 'question'),
+         ('kya matlab hai 6 ka', 'question'), ('6 should be 7 days', 'fix'), ('Rule 6: only for brands', 'fix'),
+         ('rule 6 is wrong', 'marks'), ('6 and 8 are wrong', 'marks'), ('7 galat hai', 'marks'), ('6', 'marks'),
+         ('9', 'out'), ('12 should be 3 days', 'out'), ('👍', 'fine'), ('theek hai', 'fine'), ('do the rest', 'fine'),
+         ('Good i think do rest of the work as required', 'fine'), ('brands should get double', 'note')]
+check('each reply on a page is read for what it is', [interview.page_reply('text', a, v)[0] for a, _ in cases],
+      [w for _, w in cases])
+check('"6 should be 7 days" carries the fix itself', interview.page_reply('text', '6 should be 7 days', v), ('fix', (6, 'should be 7 days')))
+# one page lived through: a question with a number, a wrong number, a fix in one go, a mark answered with a question,
+# then "it's fine after all"; cut off and resumed, the finished page is not asked again
+sheet8 = [f'Referral rewards ({d}): rule {k}.' for k, d in enumerate(('amounts',) * 4 + ('limits',) * 4, 1)] + \
+         [f'Invites: rule {k}.' for k in range(9, 13)]
+explain.ask_json = lambda prompt: ({'kind': 'question', 'explanation': 'Rule 2 caps the reward at 500 rupees.'}
+                                   if 'rule 2 mean' in prompt or 'what is a cap' in prompt.lower() else
+                                   {'rule': 'Rule 3, with the reward doubled for brands.'} if 'double for brands' in prompt
+                                   else _aj(prompt))
+saved = os.path.join(home, 'review.json')
+fake = FakeTelegram([say('what does rule 2 mean?'), say('20'), say('3: double for brands'), say('5'), tap('pg|ok'),
+                     say('what is a cap?'), say("no it's fine")])
+try:
+    interview.confirm_sheet(list(sheet8), ch(fake), poll=1, missing=True, save=saved)
+except RuntimeError:
+    pass   # he went quiet after the first page
+texts = [m['text'] for m in fake.sent]
+kept = json.load(open(saved))
+check('one page lived through: explained, out of range said, fixed in one go, a question while fixing answered, "fine" keeps it',
+      (sum('Rule 2 caps the reward at 500 rupees.' in t for t in texts), any("Rule 20 isn't on this page; here it's 1 to 8" in t for t in texts),
+       kept['general'][2], kept['general'][4], kept['done']),
+      (2, True, 'Rule 3, with the reward doubled for brands.', sheet8[4], 1))
+fake = FakeTelegram([tap('pg|ok'), say('nothing')])
+done = interview.confirm_sheet(list(sheet8), ch(fake), poll=1, missing=True, save=saved)
+check('a review cut off midway picks up at the page it stopped on, with what he said kept',
+      (any('Picking up where we stopped: section 2 of 2' in m['text'] for m in fake.sent),
+       sum(m['text'].startswith('📋') for m in fake.sent), done[2]), (True, 1, 'Rule 3, with the reward doubled for brands.'))
+explain.ask_json = _aj
+
 # 3r. "stop the build" in the middle of a build's questions stops it cleanly; it is not taken as his answer; and an
 # answer that merely contains "stop" is still an answer
 fake = FakeTelegram([say('stop the build')])
@@ -436,6 +498,9 @@ fake = FakeTelegram([])
 r = assistant.handle(ch(fake), repo, 'How do refunds work in my app?', poll=1)
 check('"how do refunds work?" is answered from the code, not guessed', (r, fake.sent[-1]['text']),
       ('answered', '🐝 Refunds go back to the brand within 7 days, sir.'))
+check('a question during the sheet review is answered by reading the built code, with an example',
+      interview._explain(ch(FakeTelegram([])), 'what does rule 6 mean?', '6. Brand invites brand: 500 rupees.', '', code=repo),
+      'In the code, a brand that invites another brand gets 500 rupees once the new brand pays.')
 
 # 4. the listener steps aside while a build or review is talking to the owner
 json.dump({'pid': os.getppid(), 'at': time.time()}, open(telegram.BUSY, 'w'))

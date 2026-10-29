@@ -456,6 +456,8 @@ def handover(state, ch=None, poll=20, rounds=3):
     different goes straight to a fix round on the same branch (Gate 37: his answer to one framing of a decision is not
     a settled rule, so he sees the whole result as rules and confirms it)."""
     sheet = _code_sheet(state)
+    if not sheet and state.get('sheet_source'):
+        shutil.rmtree(state.pop('sheet_source'), ignore_errors=True)
     if sheet:   # Gate 42: the sheet from the built code is complete by construction; he marks only what is wrong
         known = (state.get('asked') or []) + [r['text'] for r in memory.load(state['repo'])]
         show, his = codesheet.split_known(sheet, known)   # what only repeats his own rules is not read again
@@ -468,7 +470,10 @@ def handover(state, ch=None, poll=20, rounds=3):
         done = interview.confirm_sheet(show, ch, None if ch else (lambda p: _ask(p, '')), poll,
                                        title='What the build does now, as rules',
                                        note='Each one is what the product will do. Mark any that is not your policy.',
-                                       missing=True, goal=state.get('goal', ''))
+                                       missing=True, goal=state.get('goal', ''), code=state.get('sheet_source'),
+                                       save=state.get('home') and os.path.join(state['home'], 'sheet_review.json'))   # resumes
+        if state.get('sheet_source'):
+            shutil.rmtree(state.pop('sheet_source'), ignore_errors=True)
         changed = [r for r in done if r not in sheet]
         if not changed:
             if ch:
@@ -512,10 +517,8 @@ def _code_sheet(state):
         sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', state['b'], os.path.join(state['final'], 'up.git'), src)
     except Exception:
         return []
-    try:
-        return codesheet.describe(src, state.get('goal', ''))
-    finally:
-        shutil.rmtree(src, ignore_errors=True)
+    state['sheet_source'] = src   # kept for the review: his questions about a rule are answered from this code
+    return codesheet.describe(src, state.get('goal', ''))
 
 def apply_ruling(state, rule, ch=None):
     """The owner changed his mind after a build: one fix round on the latest build so it follows the new ruling, then

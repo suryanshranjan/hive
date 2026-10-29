@@ -70,7 +70,9 @@ def areas(sheet, page=8):
     groups, order = {}, []
     for n, r in enumerate(sheet, 1):
         head, _, rest = r.partition(':')
-        area = head.strip() if rest and 0 < len(head.strip()) <= 40 and '.' not in head else ''
+        area = head.strip() if rest and 0 < len(head.strip()) <= 60 and '.' not in head else ''
+        area = area.split(' (')[0].strip()   # "Referral rewards (amounts)": one area, not one page per rule (Gate 45:
+        # 46 rules came out as 40 pages; each rule still names its detail)
         if area not in groups:
             groups[area] = []; order.append(area)
         groups[area].append((n, r))
@@ -104,5 +106,6 @@ def stakes(pages, goal=''):
     listing = '\n'.join(f"{a}: " + ' | '.join(r[:120] for p, items in pages if p.split(' (')[0] == a for _, r in items[:3])
                         for a in names)
     got = explain.ask_json(STAKES.format(goal=(goal or '')[:1500], areas=listing)) or {}
+    got = got if isinstance(got, dict) else {}   # a model may answer in another shape: no reasons, no crash
     why = got.get('why') if isinstance(got.get('why'), dict) else {}
     return {a: str(w).strip() for a, w in why.items() if str(w).strip()}
