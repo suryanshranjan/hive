@@ -4,7 +4,8 @@ and hands back a tested branch.
 For the owner:
   hive                                   start: Hive asks what to build and does the rest
   hive start [--docs <folder>] [--overnight] [--no-interview] [--workers N] [--goal <text or file>] [--minutes 40]
-             [--agent claude|codex|gemini|antigravity] [--save-agent]   which coding agent builds (default Claude Code)
+             [--agent claude|codex|gemini|antigravity] [--save-agent]   which coding agent builds (default Claude Code);
+                                         a mix such as --agent claude,codex gives the builders each in turn
   hive morning [--phone]                 after an overnight build: check its decisions (on Telegram with --phone)
   hive listen                            stay on Telegram: change your mind, "build: ...", "status"
   hive rules [forget <n>]                your standing rulings for this project
@@ -92,6 +93,20 @@ def existing(text):
         raise argparse.ArgumentTypeError(f"there is no file or folder at '{text}'")
     return text
 
+def agent_choice(text):
+    """One coding agent, or a mix (claude,codex): the builders take them in turn."""
+    from . import swarm
+    names = [n.strip().lower() for n in text.replace('+', ',').split(',') if n.strip()]
+    bad = [n for n in names if n not in swarm.AGENTS]
+    if not names or bad:
+        import difflib
+        close = difflib.get_close_matches(bad[0], list(swarm.AGENTS), n=1, cutoff=0.5) if bad else []
+        fixed = ','.join(close[0] if n == bad[0] else n for n in names) if close else ''
+        raise argparse.ArgumentTypeError(f"'{bad[0] if bad else text}' is not an agent Hive knows; choose from "
+                                         f"{', '.join(swarm.AGENTS)}, or a mix such as claude,codex" +
+                                         (f". Did you mean `hive start --agent {fixed}`?" if fixed else ''))
+    return ','.join(names)
+
 def init(test_cmd, junit):
     os.makedirs('.hive', exist_ok=True); os.makedirs(guard.LOCK_DIR, exist_ok=True)
     path = os.path.join('.hive', 'config.json')
@@ -120,7 +135,7 @@ def build_parser():
     st.add_argument('--workers', type=positive)   # default: the swarm law decides (a comment here once swallowed --goal)
     st.add_argument('--minutes', type=positive, default=40)
     st.add_argument('--docs', type=existing)   # the company's own documents: a file or a folder
-    st.add_argument('--agent', choices=['claude', 'codex', 'gemini', 'antigravity'])   # which coding agent builds
+    st.add_argument('--agent', type=agent_choice)   # which coding agent builds, or a mix (claude,codex)
     st.add_argument('--save-agent', action='store_true')   # remember --agent for every build on this computer
     st.add_argument('--overnight', action='store_true'); st.add_argument('--no-interview', action='store_true')   # no questions; check the assumptions later with `hive morning`
     sub.add_parser('doctor'); sub.add_parser('setup')

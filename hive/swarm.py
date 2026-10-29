@@ -25,15 +25,29 @@ AGENTS = {
     'antigravity': ("""sh -c 'agy --output-format json --approve all -p "$(cat)"'""", 'agy'),
 }
 
-def builder_cmd(agent=None):
-    """The command that runs one builder: HIVE_WORKER_CMD if set, else the chosen agent's preset (default Claude Code)."""
+def agents(spec=None):
+    """The chosen agents, in order: 'claude', or a mix such as 'claude,codex' (the builders take them in turn)."""
+    spec = (spec or os.environ.get('HIVE_AGENT') or config_agent() or 'claude').lower()
+    names = [s.strip() for s in spec.replace('+', ',').split(',') if s.strip()] or ['claude']
+    for n in names:
+        if n not in AGENTS:
+            raise SystemExit(f"Hive doesn't know the agent '{n}'. Choose one of: {', '.join(AGENTS)} (or a mix such as "
+                             "claude,codex), or set HIVE_WORKER_CMD to any command that reads its task on stdin.")
+    return names
+
+def builder_cmd(agent=None, k=1):
+    """The command that runs builder k (1-based): HIVE_WORKER_CMD if set, else its agent's preset (default Claude Code).
+    In a mixed swarm the builders take the agents in turn: with claude,codex, w1 is Claude, w2 Codex, w3 Claude..."""
     if os.environ.get('HIVE_WORKER_CMD'):
         return os.environ['HIVE_WORKER_CMD']
-    agent = (agent or os.environ.get('HIVE_AGENT') or config_agent() or 'claude').lower()
-    if agent not in AGENTS:
-        raise SystemExit(f"Hive doesn't know the agent '{agent}'. Choose one of: {', '.join(AGENTS)}, or set "
-                         "HIVE_WORKER_CMD to any command that reads its task on stdin.")
-    return AGENTS[agent][0]
+    return AGENTS[builder_agent(agent, k)][0]
+
+def builder_agent(agent=None, k=1):
+    """The agent builder k runs on ('custom' under HIVE_WORKER_CMD)."""
+    if os.environ.get('HIVE_WORKER_CMD'):
+        return 'custom'
+    names = agents(agent)
+    return names[(k - 1) % len(names)]
 
 def config_agent():
     """The builder agent saved in ~/.hive/agent (set with `hive start --agent ... --save-agent`)."""
@@ -138,8 +152,8 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
 def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
     """Run every worker (at most max_parallel at once), wait for all, and write <run>/agents.csv."""
     run = os.path.abspath(run)
-    cmd = argv(builder_cmd())
-    env = dict(os.environ, PYTHONPATH=HIVE_ROOT + os.pathsep + os.environ.get('PYTHONPATH', ''),
+    agents(); kth = lambda me: int(me[1:]) if me[1:].isdigit() else 1   # an unknown agent stops here, before any start
+    env =dict(os.environ, PYTHONPATH=HIVE_ROOT + os.pathsep + os.environ.get('PYTHONPATH', ''),
                HIVE_GUARD_CACHE=os.path.join(run, 'guard_cache'), HIVE_RUN=run)
     queue = sorted(f[:-3] for f in os.listdir(os.path.join(run, 'prompts')) if f.endswith('.md'))
     meta = json.load(open(os.path.join(run, 'run.json'))); meta['started'] = int(time.time())
@@ -150,7 +164,7 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
 
     def start(me):
         out = open(os.path.join(run, 'out', f'{me}.json'), 'w')
-        p = subprocess.Popen(cmd, cwd=os.path.join(run, 'work', me), stdin=subprocess.PIPE, stdout=out,
+        p = subprocess.Popen(argv(builder_cmd(k=kth(me))), cwd=os.path.join(run, 'work', me), stdin=subprocess.PIPE, stdout=out,
                              stderr=subprocess.STDOUT, text=True, encoding='utf-8', errors='replace',   # Windows: "₹" in a goal
                              env=dict(env, HIVE_WORKER=me, PYTHONIOENCODING='utf-8'))
         try:
@@ -158,7 +172,7 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
             p.stdin.close()
         except BrokenPipeError:
             pass
-        say(f'{"picked up" if attempts.get(me) else "launched"} {me}')
+        say(f'{"picked up" if attempts.get(me) else "launched"} {me}' + (f' ({builder_agent(k=kth(me))})' if len(agents()) > 1 else ''))
         first.setdefault(me, time.time())
         return [me, time.time(), p, out]
 
@@ -191,7 +205,7 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
                 live.append(start(queue.pop(0)))
             t, c = spent.get(me, (0, 0.0))
             tok = (int(tok or 0) + t) or tok; cost = round(float(cost or 0) + c, 6) if (cost or c) else cost
-            rows.append(dict(worker=me, start=int(first[me]), end=int(time.time()),
+            rows.append(dict(worker=me, agent=builder_agent(k=kth(me)), start=int(first[me]), end=int(time.time()),
                              minutes=round((time.time() - first[me]) / 60, 1), exit=p.returncode, tokens=tok,
                              cost_usd=cost, api_error=err, limit_stops=attempts.get(me, 0)))
             say(f'{me} finished: exit {p.returncode}, {rows[-1]["minutes"]} min, cost {cost}' + (f', API ERROR {err}' if err else ''))
