@@ -60,7 +60,7 @@ On your phone, Hive speaks like a capable assistant and asks one thing at a time
 
 Answer with a tap, in your own words, or with a voice note. Voice is transcribed on your own machine with Whisper, so your voice never leaves it. Hive reads your words back as a rule for you to confirm.
 
-You can also message it any time: *"status"*, *"build: a refund page for brands"*, *"move to the cloud"*, or *"actually, I've changed my mind about…"*. Hive finds the earlier ruling, asks whether to replace it, and offers to update the latest build.
+You can also message it any time: *"status"*, *"build: a refund page for brands"*, *"move to the cloud"*, or *"actually, I've changed my mind about…"*. While a build runs it knows what every builder is doing: ask *"who's doing what?"*, stop one (*"stop w2"*; what it had claimed goes back to the others), or choose the team for your next builds (*"use 2 Claude and 2 Codex"*). Hive finds the earlier ruling, asks whether to replace it, and offers to update the latest build.
 
 ## Commands
 

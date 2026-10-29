@@ -5,7 +5,8 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 ## Where we left off (Oct 29 2026, evening, after Gate 47)
 
 - **Gate 47 done** (asked for by the user): Claude and Codex builders in one swarm coordinate as well as one agent (both mixed teams 1,340/1,340, 100% hidden, 0 breaks; Codex 52% and 73% of landings); a Codex lead works like a Claude lead. Ship fired: `hive start --agent claude,codex`. Cloud power-off from the phone passed live on AWS (after a Windows key fix).
-- **Gate 48 running** (asked for by the user): can Laya (the open copy of Jev, a fast decision model) read the owner's messages for Jarvis? Registered v1 read 51/120 (43%); the catch-all "anything else" was almost never chosen and "stop" was over-called. Next: variants tuned on the separate practice set `gates/gate48/dev.jsonl`, registered as an amendment, then run once on the 120.
+- **Gate 48 done** (asked for by the user): Laya, the open copy of Jev, read 42.5–45.0% of 120 owner-style messages against Claude's 92.5% (Hindi or mixed 31–41%); fast once set to 2 threads (0.68 s vs 4.2 s); kill fired, Claude stays Jarvis's reader. Next card below: train Laya on the owner's style.
+- **Tool, from the phone (asked for by the user):** Jarvis knows the builders' board while a build runs; "who's doing what", "use 2 Claude and 2 Codex", "stop w2"; a stop it only inferred is confirmed first.
 - **Gate 46 done** (asked for by the user): a lead with a shared BRAIN.md over 6 builders lost to 7 flat builders on a deep project (95% at 6.4 vs 5.3 min on average, cost 1.09×, same correctness). Hive stays flat. A Codex lead can be rerun with `gates/gate46/` on the user's machine.
 
 - **Gate 38 is done, kill fired** (`gates/gate38/RESULTS.md`). The founder's 13 confirmed rules matched his next-day verdicts on 2 of 11 decisions (raw answers also 2 of 11). Builders followed the rules exactly: surprising 3/6 vs 0/6, ordinary 2/6 vs 5/6, a tie at 5/12. The hand-over (code sheet) is the main intent channel; the interview only seeds it.
@@ -36,6 +37,9 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 Workers run shell commands, so run them in a container. Image: `node:22-bookworm` plus `python3 sqlite3 git` and `npm i -g @anthropic-ai/claude-code`, run as user `node`. Mount the repo read-write at `/host/hive` and `~/.claude/.credentials.json` read-only; copy the credentials into the container's `~/.claude/`; work in a fresh clone inside the container (a Windows checkout has CRLF line endings), with `origin` pointed at GitHub. Copy results back out and push from the host.
 
 ## Needs design first (write the config and predictions, push them, then run)
+
+### Train the fast reader (after Gate 48)
+- Laya read 42.5–45.0% of the owner's messages untrained, but answers in 0.7 s. Write 300–500 labelled messages in the owner's style, separately from `gates/gate48/set.jsonl` (which stays the exam), train the multilingual checkpoint with Laya's trainer on 2–4 CPUs, and score it on the 120 with the registered hybrid rule. Ship only if Laya can answer ≥ 50% of messages within 3 points of Claude.
 
 ### Team notes on a large, coupled project (when one is available)
 - Hive now switches team notes on at 10+ builders or 0.5 collisions per landing (untested thresholds). Test them where they could matter: 12 builders on a codebase whose areas share machinery, notes on vs off, ABBA (`gates/gate43/referee/run43.py` as a template).

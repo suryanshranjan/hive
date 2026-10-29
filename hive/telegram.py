@@ -278,7 +278,10 @@ def status_of(run):
     except Exception:
         return "The builders haven't started yet."
     n = meta.get('workers', 0)
-    done = sum(1 for f in os.listdir(os.path.join(run, 'out')) if os.path.getsize(os.path.join(run, 'out', f)) > 0)
+    try:   # the swarm's own record; Codex writes its output as it goes, so a non-empty output file is not "finished"
+        done = sum(r.get('state') in ('finished', 'stopped') for r in json.load(open(os.path.join(run, 'builders.json'))).values())
+    except (OSError, ValueError):
+        done = sum(1 for f in os.listdir(os.path.join(run, 'out')) if os.path.getsize(os.path.join(run, 'out', f)) > 0)
     log = subprocess.run(['git', '-C', os.path.join(run, 'up.git'), 'log', '--format=%s', meta['branch']],
                          capture_output=True, text=True).stdout.splitlines()
     landed = [s for s in log if not s.startswith('Lock:') and not s.startswith('hive:')]

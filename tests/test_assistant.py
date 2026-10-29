@@ -83,6 +83,28 @@ check('while it builds, status says a build is running; when it stops, he is tol
       (True, True))
 del os.environ['HIVE_BUILD_CMD']; assistant.BUILD.clear()
 
+# 3a4. stopping a build: said plainly, it stops at once; only read as a stop (Gate 48: a fast reader called "stop" for
+# 22 messages, 9 of which meant it), it asks first, and "keep going" keeps the build
+check('plain stop requests are recognised', [assistant.is_stop_request(t) for t in
+      ('stop the build', 'ruko ruko build band karo', 'cancel it I changed my mind', 'stop', 'halt the build, wrong feature')],
+      [True] * 5)
+check('messages that only mention stopping are not', [assistant.is_stop_request(t) for t in
+      ('stop sending me so many messages', 'stop charging late fees after 7 days', "you're slow today", 'thanks')], [False] * 4)
+_ask_json = explain.ask_json
+explain.ask_json = lambda prompt: {'intent': 'stop_build'} if 'newest message' in prompt else _ask_json(prompt)
+for said, answer, how, want in (('this is all wrong, forget it', tap('stp|no'), 'a tap on "Keep going"', 'kept_building'),
+                                ('this is all wrong, forget it', say('yes stop it'), '"yes stop it"', 'stopped'),
+                                ('stop the build', None, 'nothing asked', 'stopped')):
+    p = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)'])
+    assistant.BUILD.update(proc=p, goal='a refund page for brands', started=time.time())
+    fake = FakeTelegram([answer] if answer else [])
+    r = assistant.handle(ch(fake), repo, said, poll=1)
+    asked = any('Stop the build?' in m['text'] for m in fake.sent)
+    check(f'"{said}", then {how}: {want}', (r, asked, p.poll() is None),
+          (want, answer is not None, want == 'kept_building'))
+    p.kill(); p.wait(); assistant.BUILD.clear()
+explain.ask_json = _ask_json
+
 # 3b. "build: ..." from the phone starts a build after one confirmation
 started = []
 fake = FakeTelegram([tap('bld|yes')])

@@ -9,7 +9,7 @@ Only one Hive process reads the bot at a time: while a build or review is talkin
 aside (see telegram.busy_elsewhere)."""
 import glob, json, os, re, subprocess, time
 
-from . import argv, explain, memory, telegram
+from . import argv, explain, memory, team, telegram
 
 RUNS = os.path.join(os.path.expanduser('~'), '.hive', 'runs')   # where `hive start` keeps its builds
 PIDFILE = os.path.join(os.path.expanduser('~'), '.hive', 'listen.pid')   # the listener running on this computer
@@ -23,18 +23,26 @@ His newest message: "{text}"
 What does he mean? Read it as a person would, using the conversation: "yes" or "go ahead" answers the last thing you
 proposed; "I already told you" or "that one" points back to what he said before; a short correction ("no, Sunny Shop
 Creators") changes what you just proposed. Reply with JSON only:
-{{"intent": "build" | "stop_build" | "change" | "rule" | "status" | "greeting" | "cloud_on" | "cloud_off" | "reply",
+{{"intent": "build" | "stop_build" | "change" | "rule" | "status" | "team" | "set_team" | "stop_builder" | "greeting" |
+"cloud_on" | "cloud_off" | "reply",
 "rule": "for a build, exactly what to build (taken from the conversation if he points back to it); for a change or a
 rule, the rule he now wants; otherwise empty",
 "confirmed": true if he is agreeing to do what you just proposed (or clearly telling you to go ahead now), else false,
 "clarify": for a build too vague to build ("make it better", "fix it"), one short question asking what exactly; else "",
-"about_product": true if he asks how his product works or what it does in some case (to be answered from its code)}}
+"about_product": true if he asks how his product works or what it does in some case (to be answered from its code),
+"agent": for set_team, the coding agent(s) he wants: "claude", "codex", "gemini", "antigravity", or a mix such as
+"claude,codex"; else "",
+"workers": for set_team, how many builders he wants (a number), else 0,
+"builder": for stop_builder, the builder he means, as he said it ("w2", "the codex one"); else ""}}
 - "build": he wants something built, added or made in the product (including agreeing to, or correcting, a build you
   proposed).
 - "stop_build": he wants the build that is running stopped or cancelled.
 - "change": he has changed his mind about an earlier rule.
 - "rule": he states, plainly and on purpose, a rule for how the product should behave from now on.
 - "status": he asks how things are going.
+- "team": he asks about the builders themselves: who is doing what, which agents they run on, what one of them did.
+- "set_team": he chooses the builders for his builds: which agents (Claude, Codex, ...) or how many.
+- "stop_builder": he wants one particular builder stopped (not the whole build).
 - "greeting": a hello, with no request yet.
 - "cloud_on" / "cloud_off": move Hive to the cloud / shut the cloud machine down.
 - "reply": anything else: a question, a complaint, frustration, small talk. Never a rule."""
@@ -73,7 +81,8 @@ How you speak:
   useful. Never at his expense, never slapstick, no exclamation marks, no emoji in the words.
 - Deference with a spine: if what he asks is risky, say so once, briefly, then do it his way, within what you can do.
 - What you can do from his phone: build something new from his description; stop a build; say how a build is going
-  and why one stopped; answer questions about his product from its code; keep a rule he gives for every build; move to
+  and why one stopped; say which builder is doing what, on which agent (Claude, Codex, Gemini, Antigravity), stop one
+  builder, and choose the team for his next builds (which agents, how many); answer questions about his product from its code; keep a rule he gives for every build; move to
   the cloud and back. Hard limits, whatever he asks: you never change his own main version and never skip the tests;
   every build arrives as a separate tested copy that he looks at and merges himself. Say so plainly if he asks for it.
 - Own your mistakes plainly ("My error, sir; it is fixed."), without grovelling.
@@ -109,6 +118,11 @@ def facts(repo, ch=None):
         lines.insert(0, f'His startup, and this project, is called {name}.')
     if _building():
         lines.append(_building())
+    run = team.current_run()
+    if run and _building() and _building().startswith('A build is running'):   # the context: who is doing what now
+        lines.append('The builders right now:\n' + team.board_text(run))
+    if team.chosen():
+        lines.append(f'The team he chose for builds: {team.describe(team.chosen())}.')
     note = ch.note() if ch is not None and callable(getattr(ch, 'note', None)) else None
     if note:
         lines.append(f'Happening now: {note}')
@@ -159,6 +173,54 @@ def coalesce(texts):
         out = [t for t in out if t.lower().strip(' ?!.') not in GREETINGS] or out[-1:]
     return out, len(out) < len(texts)
 
+STOP_WORDS = ('stop', 'cancel', 'abort', 'kill', 'halt', 'band', 'roko', 'ruko', 'rok do')
+
+def _team(ch, repo, text, got):
+    """Who is doing what; choose the team for the next build; stop one builder."""
+    run = team.current_run()
+    live = bool(run) and any(r['state'] in ('working', 'waiting', 'queued') for r in team.board(run))
+    intent = got.get('intent')
+    if intent == 'set_team':
+        try:
+            t = team.choose(got.get('agent') or None, got.get('workers') or None)
+        except SystemExit as e:
+            ch.send(f"🤔 {telegram.esc(str(e))}", html=True); return 'team_unknown'
+        ch.send(f"👥 Very good: from the next build, {telegram.esc(team.describe(t))}." +
+                (" The build running now keeps its team." if live else ''), html=True)
+        return 'team_set'
+    if intent == 'stop_builder':
+        me = team.find(run, got.get('builder') or text) if live else None
+        if not me:
+            working = [r for r in team.board(run)] if live else []
+            names = ', '.join(f"{r['name']} ({r['agent']})" for r in working if r['state'] == 'working')
+            ch.send(("Which builder, sir? Working now: " + names + '.') if names else "No builder is working right now.")
+            return 'which_builder'
+        row = next(r for r in team.board(run) if r['name'] == me)
+        if not team.stop_builder(run, me):
+            ch.send(f"{me} isn't working at the moment, so there was nothing to stop."); return 'not_working'
+        ch.send(f"🛑 Stopped {me} ({row['agent']})." + (f" It was on: {telegram.esc('; '.join(row['holding'])[:200])}; that "
+                "work is free again for the others." if row['holding'] else '') + f" What it landed ({row['landed']}) stays.",
+                html=True)
+        return 'builder_stopped'
+    if not run:
+        ch.send(f"👥 No builders have worked on this yet. The next build: {telegram.esc(team.describe(team.chosen()))}.",
+                html=True)
+        return 'team'
+    text_board = team.board_text(run)
+    speak(ch, repo, f'He asked: "{text}". Answer about the builders from the board below, briefly: who is doing what '
+          'right now (and on which agent) if he asked that, or exactly what he asked about one of them.\n\nThe builders:\n'
+          + text_board, '👥 ' + telegram.esc(text_board))
+    return 'team'
+
+def is_stop_request(text):
+    """He plainly said to stop the build ("stop the build", "build band karo", "cancel it", "stop"), as opposed to a
+    message that was only read as one. Short, with a stop word, and about the build or nothing else."""
+    t = ' ' + ' '.join(re.sub(r'[^\w\s]', ' ', text.lower()).split()) + ' '
+    words = t.split()
+    if not any(f' {w} ' in t for w in STOP_WORDS) or len(words) > 8:
+        return False
+    return 'build' in words or len(words) <= 3 or any(f' {w} ' in t for w in ('it', 'that', 'this', 'wo', 'woh', 'ye'))
+
 def read(ch, text):
     """What the owner means by his newest message, read in the context of the conversation (Gate 38 live test: "Yes",
     "I already told you" and a corrected request were each read alone, and went wrong)."""
@@ -177,7 +239,9 @@ def background_build(repo, goal, ch=None):
     log = os.path.join(os.path.expanduser('~'), '.hive', 'build.log')
     os.makedirs(os.path.dirname(log), exist_ok=True)
     cmd = (argv(os.environ['HIVE_BUILD_CMD']) if os.environ.get('HIVE_BUILD_CMD') else   # tests: a stand-in
-           [sys.executable, '-m', 'hive', 'start', '--overnight', '--goal', gf.name])
+           [sys.executable, '-m', 'hive', 'start', '--overnight', '--goal', gf.name] +
+           (['--agent', team.chosen()['agent']] if team.chosen().get('agent') else []) +   # the team he chose by phone
+           (['--workers', str(team.chosen()['workers'])] if team.chosen().get('workers') else []))
     proc = subprocess.Popen(cmd, cwd=repo, start_new_session=os.name != 'nt',   # so a stop ends its builders too
                             stdout=open(log, 'w'), stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL)
     BUILD.update(proc=proc, goal=goal, started=time.time(), log=log)
@@ -306,9 +370,22 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         got = read(ch, text)
     intent, rule = got.get('intent', 'reply'), (got.get('rule') or text).strip()
     who = _who(ch)
+    if intent in ('team', 'set_team', 'stop_builder'):   # the builders themselves, from his phone
+        return _team(ch, repo, text, got)
     if intent == 'stop_build':   # he can stop a build from his phone, as he can start one
         p = BUILD.get('proc')
         if p is not None and p.poll() is None:
+            if not is_stop_request(text):   # read as a stop, not said as one: a wrong stop loses the build (Gate 48)
+                ch.send(f"🛑 <b>Stop the build?</b>\n\n{telegram.esc(BUILD.get('goal', '')[:200])}\n\n<i>It is cancelled "
+                        "and nothing from it is handed over.</i>", html=True,
+                        buttons=[[('🛑 Stop it', 'stp|yes')], [('Keep going', 'stp|no')]])
+                choice, other = choose(ch, poll, [('stp|yes', ('stop it', 'cancel it', 'band karo', 'roko')),
+                                                  ('stp|no', ('keep going', 'keep it', 'continue', 'carry on'))])
+                if other is not None:
+                    ch.send("Very good, the build carries on.")
+                    return handle(ch, repo, other, poll, apply_build, start_build, cloud)
+                if choice != 'stp|yes':
+                    ch.send('Very good, the build carries on.'); return 'kept_building'
             _stop(p); BUILD['stopped'] = True
             ch.send("🛑 Stopped. The build is cancelled; nothing from it was handed over. Say the word when you want "
                     "another.")
