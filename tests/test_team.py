@@ -91,12 +91,75 @@ locks = subprocess.run(['git', '--git-dir', os.path.join(run, 'up.git'), 'ls-tre
                        capture_output=True, text=True).stdout.split()
 check('stopping one builder: it stops, its claimed work is freed, and he is told what it was on',
       (r, p.poll() is not None, 'refunds.txt' in locks, os.path.exists(os.path.join(run, 'stopped', 'w2')),
-       any('Stopped w2 (codex)' in m['text'] and 'free again' in m['text'] for m in fake.sent)),
+       any('Stopped w2 (codex), which was building the refund page for brands' in m['text'] and
+           'Another builder can take that work up.' in m['text'] for m in fake.sent)),
       ('builder_stopped', True, False, True, True))
+# "I don't need that": the stopped builder's work is not handed to the others; they are told to leave it out
+p3 = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)'])
+b = json.load(open(os.path.join(run, 'builders.json'))); b['w1'].update(state='working', pid=p3.pid)
+json.dump(b, open(os.path.join(run, 'builders.json'), 'w'))
+w3 = os.path.join(home, 'w3'); subprocess.run(['git', 'clone', '-q', os.path.join(run, 'up.git'), w3])
+open(os.path.join(w3, 'current_tasks', 'fees.txt'), 'w').write('w1: a fee report\nareas: fees\n')
+git(w3, 'add', '.'); git(w3, '-c', 'user.name=w1', '-c', 'user.email=w1@h', 'commit', '-qm', 'Lock: fees'); git(w3, 'push', '-q')
+reads(intent='stop_builder', builder='w1', drop_work=True)
+fake = FakeTelegram([])
+assistant.handle(ch(fake), seed, "stop w1, I don't need the fee report", poll=1)
+told = subprocess.run(['git', '--git-dir', os.path.join(run, 'up.git'), 'show', 'main:OWNER.md'], capture_output=True, text=True).stdout
+check('work he no longer wants is dropped, not handed to the others',
+      ('do not build it: a fee report' in told, any("told the others to leave that out" in m['text'] for m in fake.sent)),
+      (True, True))
+p3.wait()
 reads(intent='stop_builder', builder='')
 fake = FakeTelegram([])
 check('with no builder working, it says so rather than stopping anything',
       (assistant.handle(ch(fake), seed, 'stop that builder', poll=1), fake.sent[-1]['text']),
       ('which_builder', 'No builder is working right now.'))
+# the law at the top of the chain: his tests took 60 s last build, so the law says 2; asked for 12, he hears it first
+json.dump({'repo': seed, 't_g': 60}, open(os.path.join(team.RUNS, 'refunds-1029-1500', 'state.json'), 'w'))
+reads(intent='set_team', agent='', workers=12)
+fake = FakeTelegram([tap('law|n')])
+r = assistant.handle(ch(fake), seed, 'use 12 builders', poll=1)
+check('asked for 12, he first hears the law (2, from his 60 s tests); "use the law" takes 2',
+      (r, team.chosen().get('workers'), any('the law says 2 builders' in m['text'] and "won't finish any sooner" in m['text']
+                                             for m in fake.sent)), ('team_set', 2, True))
+fake = FakeTelegram([say('as I said')])
+assistant.handle(ch(fake), seed, 'use 12 builders', poll=1)
+check('...and if he insists, it is his call', team.chosen().get('workers'), 12)
+reads(intent='set_team', agent='', workers=2)
+fake = FakeTelegram([])
+assistant.handle(ch(fake), seed, 'use 2 builders', poll=1)
+check('a choice the law agrees with is simply taken', (team.chosen().get('workers'), any('law' in m['text'] for m in fake.sent)), (2, False))
+reads(intent='set_team', agent='', workers=0)
+assistant.handle(ch(FakeTelegram([])), seed, 'let the law decide how many', poll=1)
+check('"let the law decide" hands the number back to the law', 'workers' in team.chosen(), False)
+
+# a new direction mid-build reaches the running builders through the shared branch; so does a new standing rule
+p2 = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)'])
+assistant.BUILD.update(proc=p2, goal='a refund page for brands', started=time.time() - 300)
+reads(intent='instruct', rule='also show refunds per month on the page', builder='')
+fake = FakeTelegram([])
+r = assistant.handle(ch(fake), seed, 'also show refunds per month on the page', poll=1)
+owner_md = lambda: subprocess.run(['git', '--git-dir', os.path.join(run, 'up.git'), 'show', 'main:OWNER.md'],
+                                  capture_output=True, text=True).stdout
+check('a mid-build instruction goes to the builders (OWNER.md on the shared branch)',
+      (r, 'also show refunds per month on the page' in owner_md(), any('Passed to the builders' in m['text'] for m in fake.sent)),
+      ('instructed', True, True))
+reads(intent='instruct', rule='do the CSV export instead', builder='w1')
+r = assistant.handle(ch(FakeTelegram([])), seed, 'w1, do the CSV export instead', poll=1)
+check("one addressed to a builder names it, and the newest comes first",
+      owner_md().split(chr(10))[2].endswith('to w1: do the CSV export instead'), True)
+reads(intent='rule', rule='Refunds over 5,000 rupees need my approval')
+fake = FakeTelegram([tap('upd|no')])
+assistant.handle(ch(fake), seed, 'from now on refunds over 5,000 rupees need my approval', poll=1)
+check('a standing rule given mid-build reaches the builders working now',
+      ('A new standing rule from the owner: Refunds over 5,000 rupees need my approval' in owner_md(),
+       any('The builders working now have it too.' in m['text'] for m in fake.sent)), (True, True))
+p2.kill(); p2.wait(); assistant.BUILD.clear()
+reads(intent='instruct', rule='a page of refunds per month', builder='')
+started = []
+r = assistant.handle(ch(FakeTelegram([tap('bld|yes')])), seed, 'add a page of refunds per month', poll=1,
+                     start_build=lambda rp, goal: started.append(goal))
+check('with no build running, an instruction becomes a build request (confirmed first)', (r, started),
+      ('built', ['a page of refunds per month']))
 explain.ask_json = _ask_json; assistant.BUILD.clear()
 sys.exit(fail)

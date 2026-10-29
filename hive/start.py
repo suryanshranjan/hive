@@ -230,7 +230,13 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
         say(f"\nI'll put {_n(workers, 'builder')} on it ({why}). They work on copies, so your branches stay exactly "
             "as they are.")
     else:
-        say(f"\nI'll put {workers} builders on it. They work on copies, so your branches stay exactly as they are.")
+        say(f"\nI'll put {workers} builders on it, as you chose. They work on copies, so your branches stay exactly as "
+            "they are.")
+        n, why = law.builders(t_g)   # the law stays at the top: he hears it whenever his choice differs (the owner)
+        if n < workers:
+            say(f"  (The law would use {_n(n, 'builder')}: {why}. More won't finish sooner, and cost more.)")
+        elif n > workers:
+            say(f"  (The law would use {_n(n, 'builder')}: {why}. Fewer will take longer.)")
     cfg_phone = telegram.load()
     phone = telegram.Channel(cfg_phone) if cfg_phone else None
     if overnight:
@@ -262,7 +268,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
                     workers = n
                     say(f"  For a job this size I'll use {_n(n, 'builder')} ({why}).")
     say(f'\n[{_now()}] Starting.')
-    state = dict(repo=repo, branch=branch, name=name, home=home, test_cmd=test_cmd, links=links, goal=goal_text,
+    state = dict(repo=repo, branch=branch, name=name, home=home, test_cmd=test_cmd, links=links, goal=goal_text, t_g=t_g,
                  rules=rules, workers=workers, minutes=minutes, before=before, started=time.time(), overnight=overnight,
                  asked=asked)
     run1 = os.path.join(home, 'build')

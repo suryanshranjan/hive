@@ -128,6 +128,44 @@ def _release(run, me):
         if g('push', '-q', 'origin', f'HEAD:{b}').returncode == 0:
             return
 
+OWNER_FILE = 'OWNER.md'   # his instructions to a running swarm; builders read it at every sync (hive/templates/worker.md)
+
+def instruct(run, text, builder=None):
+    """Give the running builders a new instruction from him (a change of direction, more work, one builder's new job).
+    It is committed to OWNER.md on the shared branch, newest first, so every builder sees it at its next sync. True if
+    it reached the shared branch."""
+    meta = json.load(open(os.path.join(run, 'run.json'))); b = meta.get('branch', 'main')
+    line = f"- {time.strftime('%H:%M')} {'to ' + builder + ': ' if builder else ''}{text.strip()}"
+    tmp = tempfile.mkdtemp()
+    for k in range(5):   # builders push too: on a lost race, start again from the new tip
+        c = os.path.join(tmp, f'c{k}')
+        subprocess.run(['git', 'clone', '-q', '-b', b, os.path.join(run, 'up.git'), c], capture_output=True)
+        g = lambda *a: subprocess.run(['git', '-C', c, *a], capture_output=True, text=True)
+        path = os.path.join(c, OWNER_FILE)
+        old = open(path, encoding='utf-8').read().split('\n', 2)[2] if os.path.exists(path) else ''
+        open(path, 'w', encoding='utf-8').write("# The owner's instructions (newest first; they override the goal where "
+                                                 "they differ)\n\n" + line + '\n' + old)
+        g('add', OWNER_FILE)
+        g('-c', 'user.name=hive', '-c', 'user.email=hive@local', 'commit', '-q', '-m', f'hive: the owner says: {text.strip()[:80]}')
+        if g('push', '-q', 'origin', f'HEAD:{b}').returncode == 0:
+            return True
+    return False
+
+def law_advice(repo, workers):
+    """What the swarm law says about his chosen number of builders for this project: (n, why) when it would pick a
+    different number, else None. Uses the test time measured by his last build; None before any build measured it."""
+    from . import law
+    homes = sorted(glob.glob(os.path.join(RUNS, '*', 'state.json')), key=os.path.getmtime)
+    for h in reversed(homes):
+        try:
+            st = json.load(open(h))
+        except (OSError, ValueError):
+            continue
+        if os.path.abspath(st.get('repo', '')) == os.path.abspath(repo) and st.get('t_g'):
+            n, why = law.builders(st['t_g'])
+            return (n, why) if n != int(workers) else None
+    return None
+
 def chosen():
     """The team he chose for his next builds: {'agent': 'claude,codex', 'workers': 4}, either part optional."""
     try:
@@ -141,7 +179,9 @@ def choose(agent=None, workers=None):
     if agent:
         swarm.agents(agent)   # an agent Hive does not know is refused here, with the choices
         t['agent'] = ','.join(swarm.agents(agent))
-    if workers:
+    if workers == 'auto':   # the law picks the number for each build again
+        t.pop('workers', None)
+    elif workers:
         t['workers'] = max(1, min(int(workers), 24))
     os.makedirs(os.path.dirname(TEAM), exist_ok=True)
     json.dump(t, open(TEAM, 'w'))
@@ -153,4 +193,4 @@ def describe(t):
     agents = [names.get(a, a) for a in (t.get('agent') or 'claude').split(',')]
     who = agents[0] if len(agents) == 1 else ' and '.join([', '.join(agents[:-1]), agents[-1]]) + ' in turn'
     n = t.get('workers')
-    return (f"{n} builder{'s' if n != 1 else ''}" if n else 'as many builders as the job needs') + f', on {who}'
+    return (f"{n} builder{'s' if n != 1 else ''}" if n else 'as many builders as the law picks for each job') + f', on {who}'

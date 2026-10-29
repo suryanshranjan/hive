@@ -79,9 +79,15 @@ SCENARIOS = [
     ('hinglish team', ['build: a page with creator earnings', 'TAP:bld|yes', 'kaun kya kar raha hai?'],
      'Reads it as "who is doing what" and answers from the board: which builder on which agent is building what.'),
     ('stop one builder', ['build: a page with creator earnings', 'TAP:bld|yes', 'stop the codex one, I do not need the export'],
-     'Stops only the Codex builder, not the whole build; says what it was building and that the rest carries on.'),
+     'Stops only the Codex builder, not the whole build; makes sure the export he no longer wants is not picked up by '
+     'another builder; says plainly that the rest carries on.'),
     ('choose the team', ['from now on use 2 claude and 2 codex builders'],
      'Saves the team for the next builds (4 builders, Claude and Codex in turn) and confirms it in a sentence.'),
+    ('too many builders', ['use 12 builders from now on'],
+     'Before saving it, says once and briefly what the swarm law recommends for this project (2 builders, since its tests '
+     'take a minute) and why, then lets him choose; no lecture, and his choice is respected.'),
+    ('redirect mid-build', ['build: a page with creator earnings', 'TAP:bld|yes', 'also put a monthly total at the top'],
+     'Passes the addition to the builders working now (not a new separate build, not a standing rule), and says so briefly.'),
     ('vague request', ['make it better'], 'Asks one short clarifying question about what to improve; does not start a build '
      'on "make it better" alone.'),
 ]
@@ -97,6 +103,12 @@ def run(name, msgs):
     ch = telegram.Channel({'chat_id': ME, 'token': 'x', 'address': 'sir'}, api=fake, listener=True)
     started, runs = [], []
     if os.path.exists(team.TEAM): os.remove(team.TEAM)
+    measured = os.path.join(team.RUNS, 'earlier-build', 'state.json')   # an earlier build measured 60 s tests
+    if name == 'too many builders':
+        os.makedirs(os.path.dirname(measured), exist_ok=True)
+        json.dump({'repo': os.path.join(home, 'shop'), 'name': 'earlier-build', 't_g': 60, 'check': ''}, open(measured, 'w'))
+    elif os.path.exists(measured):
+        os.remove(measured)
     repo = os.path.join(home, 'shop')
     if not os.path.isdir(repo):
         subprocess.run(['git', 'init', '-q', '-b', 'main', repo])
@@ -116,10 +128,15 @@ def run(name, msgs):
         seen[0] = len(fake.sent)
     def owner(k, step):   # each scripted step, delivered to whoever polls next (the loop, or a question Hive is asking)
         def deliver(f):
-            if k in fails and assistant.BUILD.get('proc'):   # the build stops on "unsaved changes"
+            if k in fails and assistant.BUILD.get('proc'):   # the build stops on "unsaved changes", before any builder
                 assistant.BUILD['proc'].kill(); assistant.BUILD['proc'].wait()
+                for run, procs in runs[-1:]:   # it stopped before the builders started: no swarm, no board
+                    for q in procs: q.kill()
+                    shutil.rmtree(os.path.dirname(run), ignore_errors=True)
+                del runs[-1:]
                 open(assistant.BUILD['log'], 'w').write('You have unsaved changes. Commit or stash them first.\n')
-                ch.send("⚠️ The build stopped before it finished.\n\nYou have unsaved changes. Commit or stash them first.")
+                ch.send("⚠️ <b>The build stopped before it finished.</b>\n\nYou have unsaved changes. Commit or stash them "
+                        "first.\n\n<i>Tell me how you'd like to go on, or fix that and say \"build again\".</i>", html=True)   # as Hive says it
             flush()
             batch = step(f)
             for _, text, data, _ in batch:
@@ -127,6 +144,8 @@ def run(name, msgs):
             return batch
         return deliver
     fake.script = [owner(k, step) for k, step in enumerate(fake.script)]
+    real_stop = assistant._stop   # a real stop ends the build's whole process group, builders included
+    assistant._stop = lambda p: (real_stop(p), [q.kill() for _, procs in runs for q in procs])
     while fake.script:
         for text, data, _ in ch.updates(timeout=1):
             if text:
@@ -138,8 +157,10 @@ def run(name, msgs):
     flush()
     if assistant.BUILD.get('proc') and assistant.BUILD['proc'].poll() is None:
         assistant.BUILD['proc'].kill()
+    assistant._stop = real_stop
     actions = list(started)
-    for run, procs in runs:   # what happened to the builders
+    for run, procs in runs:   # what happened to the builders, and the board Hive could see
+        actions.append('the builders board Hive could read: ' + team.board_text(run).replace('\n', ' | '))
         actions += [f'builder w{k} ({a}) {"stopped" if p.poll() is not None else "still working"}'
                     for k, (a, p) in enumerate(zip(('claude', 'codex'), procs), 1)]
         for p in procs:
