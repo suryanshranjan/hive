@@ -12,6 +12,7 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
   - **Gate 42 done, the night's best result:** a rule sheet written from the first build's code, corrected by the synthetic owner, took fresh builders to 99.6% (interview 68.4%, complete sheet 100%). Shipped as Hive's hand-over (`hive/codesheet.py`).
   - **Gate 44 done** (asked for by the user): rules × talking. The code sheet gave 100% silent or talking; talking added 0 with it, +4 without. Hive stays silent.
   - **Gate 43 done** (asked for by the user): a talking swarm finished the same as a silent one (3.6 vs 3.5 min, cost 1.01×, same correctness). Hive stays silent. A harder, more coupled project is the only place left where talking might pay.
+  - **Tool:** team notes, gated by the law (`hive land --note`, `hive notes`): off below 10 builders unless a swarm's collisions reach 0.5 per landing; untested thresholds. 216 checks pass.
   - **Next with the founder (after Gate 38):** the code sheet on his phone for one real feature. Is a 50–80-rule sheet readable for a real owner?
 
 - **Gate 38 is running.** Predictions in `gates/gate38/prompts/PREDICTIONS.md` (`72a5726`).
