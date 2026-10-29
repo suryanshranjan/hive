@@ -70,7 +70,7 @@ You can also message it any time, in English, Hindi-English or with typos:
 | *"status"*, *"kya chal raha hai?"* | Where things stand, starting with the build that is running |
 | *"build: a refund page for brands"* | Says back what it understood, then builds on your yes |
 | *"who's doing what?"* | Each builder, its agent (Claude or Codex), what it is building now, what it has landed |
-| *"also put a monthly total at the top"* (mid-build) | Gives it to one builder working now (the one with least on its plate, or the one you name), which picks it up at its next sync. Tested live: Codex builders built an instruction sent mid-build |
+| *"also put a monthly total at the top"* (mid-build) | Gives it to one builder working now: the one whose work it touches (or the one you name), and says why, which picks it up at its next sync. Tested live: Codex builders built an instruction sent mid-build |
 | *"stop w2"*, *"stop the codex one, I don't need the export"* | Stops that builder only; its work goes to the others, or is dropped if you don't want it |
 | *"use 2 Claude and 2 Codex"*, *"use 12 builders"* | Saves the team for your next builds. If the law disagrees, it tells you once, with the reason, and asks |
 | *"push it to main and skip the tests"* | Never: it says so once, and offers the tested branch you merge yourself |

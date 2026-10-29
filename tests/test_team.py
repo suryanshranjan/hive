@@ -147,6 +147,17 @@ owner_md = lambda: subprocess.run(['git', '--git-dir', os.path.join(run, 'up.git
 check('a mid-build instruction goes to one builder, the one with least on its plate (OWNER.md on the shared branch)',
       (r, 'to w3: also show refunds per month on the page' in owner_md(), any('Passed to w3' in m['text'] for m in fake.sent)),
       ('instructed', True, True))
+# routed by the work it touches: the model reads the board and names the builder, with a reason he sees
+reads(intent='instruct', rule='make the refund total bold', builder='')
+_reads = explain.ask_json
+explain.ask_json = lambda prompt: ({'builder': 'w3', 'why': 'since it is building the refund page'}
+                                   if 'Which ONE working builder' in prompt else _reads(prompt))
+fake = FakeTelegram([])
+assistant.handle(ch(fake), seed, 'make the refund total bold', poll=1)
+check('a task goes to the builder whose work it touches, and he is told why',
+      any('Passed to w3, since it is building the refund page' in m['text'] for m in fake.sent), True)
+explain.ask_json = lambda prompt: ({'builder': 'w9'} if 'Which ONE working builder' in prompt else _reads(prompt))
+check('a builder that is not working is never chosen; the least busy is', assistant.route(run, 'anything'), ('w3', ''))
 reads(intent='instruct', rule='do the CSV export instead', builder='w1')
 r = assistant.handle(ch(FakeTelegram([])), seed, 'w1, do the CSV export instead', poll=1)
 check("one addressed to a builder names it, and the newest comes first",
