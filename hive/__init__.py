@@ -13,3 +13,12 @@ PY = ('"' + _sys.executable.replace(chr(92), '/') + '"') if (_os.name == 'nt' or
 # Copies Hive makes (the builders' clones, the shared upstream, results) are cloned with core.autocrlf=false: Windows
 # git rewrote line endings there, so fresh copies showed changes nobody made and the guard's rebase refused to land.
 # The owner's own checkout keeps his settings.
+
+def argv(cmd):
+    """A command line as a list for subprocess. On Windows `claude`, `codex` and other npm tools are .cmd files that
+    CreateProcess cannot find by bare name, so every model call failed there and Hive fell back to canned replies."""
+    import shlex, shutil
+    parts = shlex.split(cmd)
+    if parts and _os.name == 'nt':
+        parts[0] = shutil.which(parts[0]) or parts[0]
+    return parts

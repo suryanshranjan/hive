@@ -90,7 +90,8 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
     sent = []
     for src, dst in ((rules, f'{dst_hive}/rules/{os.path.basename(rules)}'), (telegram.PATH, f'{dst_hive}/telegram.json'),
                      (os.path.join(hive_dir, 'llm.json'), f'{dst_hive}/llm.json'),
-                     (telegram.CONVERSATION, f'{dst_hive}/conversation.json')):   # the thread goes too: "yes" stays in context
+                     (telegram.CONVERSATION, f'{dst_hive}/conversation.json'),
+                     (memory._names(), f'{dst_hive}/names.json')):   # the thread goes too: "yes" stays in context
         if os.path.exists(src):
             t.put(src, dst); sent.append(os.path.basename(src))
     if with_login:

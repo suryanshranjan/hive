@@ -56,4 +56,11 @@ check "a rebase conflict is reported" $code 5
 echo "$out" | grep -q "Recent team notes"; check "the conflict shows recent team notes" $? 0
 echo "$out" | grep -q "Team notes are now on"; check "frequent collisions switch notes on" $? 0
 git rebase --abort 2>/dev/null; unset HIVE_RUN
+# 8. what a builder commits itself, with plain git, is checked too (Gate 38: its own commit carried node_modules)
+git reset -q --hard origin/main && mkdir -p node_modules && echo x > node_modules/pkg.js && printf '\ndef sq(a):\n    return a * a\n' >> calc.py
+git add -f node_modules calc.py && git commit -qm "sq, with dependencies" && $PY -m hive land sq "sq" >/dev/null 2>&1
+git fetch -q origin; check "a dependency folder in the builder's own commit stays off the shared branch" \
+  "$(git ls-tree -r --name-only origin/main | grep -c node_modules) $(git show origin/main:calc.py | grep -c 'def sq')" "0 1"
+git reset -q --hard origin/main && echo "TOKEN=abc" > .env && git add -f .env && git commit -qm "a secret"
+$PY -m hive land secret "secret" >/dev/null 2>&1; check "a secret in the builder's own commit is refused" $? 8
 rm -rf $T; exit $fail

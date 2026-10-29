@@ -71,6 +71,7 @@ You can also message it any time: *"status"*, *"build: a refund page for brands"
 | `hive morning [--phone]` | Check an overnight build's decisions; Hive fixes what you correct |
 | `hive listen` | Stay on Telegram: change your mind, start builds, ask for status |
 | `hive rules` | Your standing rulings for this project (`hive rules forget 3` drops one) |
+| `hive name "Sunny Shop"` | What Hive calls this project: your startup's name (guessed from package.json or the README until you set it) |
 | `hive cloud --new` / `--stop` | Make a machine on your AWS account and move Hive there; delete it when done |
 | `hive cloud --to user@host` / `hive cloud pull` | Move Hive to a server you already have; bring results back |
 | `hive setup` | First run: checks, then your phone, voice notes and a backup model |

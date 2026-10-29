@@ -5,7 +5,7 @@ stub builds and stub cloud, so it never touches a real chat or AWS. A judge mode
 
 usage: python3 lab/jarvis_bench.py [out.json]      (needs Claude Code logged in; about $1 a run)
 Each scenario is a list of owner messages (a tap is "TAP:<data>"); the expectation is what a Jarvis would do."""
-import json, os, subprocess, sys, tempfile, time
+import json, os, shutil, subprocess, sys, tempfile, time
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT); sys.path.insert(0, os.path.join(ROOT, 'tests'))
 home = tempfile.mkdtemp()   # Hive's own files go here; HOME stays real, so Claude Code keeps its login
@@ -39,7 +39,10 @@ SCENARIOS = [
     ('thanks', ['thanks'], 'A one-line, natural reply; no lecture.'),
     ('rule', ['From now on, late posts lose 2% of the fee per day'],
      'Keeps it as a standing rule and says so plainly (maybe offers to apply it to the latest build).'),
-    ('repeats', ['status', 'status', 'status'], 'Answers once, not three times; may apologise for the wait.'),
+    ('repeats', ['status', 'status', 'status'],   # each arrives after Hive answered (sent together they are merged:
+     # tests/test_assistant.py); "answer once" was impossible here, so the expectation says what a person would do
+     'The first is answered in full; each repeat gets one short line in fresh words that nothing has changed, never the '
+     'same report again; by the third it checks whether its messages are reaching him.'),
     ('unrelated question', ['who are you?'], 'Says briefly what it is (the owner\'s builder assistant), in character.'),
     ('praise', ['thanks, good job today'], 'A short, warm reply; one light touch of dry wit is welcome; no gushing.'),
     ('criticism', ["you're slow today"], 'Owns it plainly, no defensive joke, says what it is doing about it or offers the '
@@ -74,24 +77,33 @@ def run(name, msgs):
         p = subprocess.Popen(['sh', '-c', 'sleep 600'])
         log = os.path.join(home, 'build.log'); open(log, 'w').write('Hive here.\n')
         assistant.BUILD.update(proc=p, goal=goal, started=time.time() - 120, log=log)
-    sent_before = 0
-    steps = list(fake.script)
-    fake.script = []
-    transcript = []
-    for k, step in enumerate(steps):
-        if k in fails and assistant.BUILD.get('proc'):   # the build stops on "unsaved changes"
-            assistant.BUILD['proc'].kill(); assistant.BUILD['proc'].wait()
-            open(assistant.BUILD['log'], 'w').write('You have unsaved changes. Commit or stash them first.\n')
-            ch.send("⚠️ The build stopped before it finished.\n\nYou have unsaved changes. Commit or stash them first.")
-        fake.script = [step]
-        for text, data, _ in ch.updates(timeout=1):
-            transcript.append(('Owner', text if text else f'[taps {data}]'))
-            if text:
-                assistant.handle(ch, repo, text, poll=1, start_build=start_build,
-                                 cloud=lambda rp, on, login=True: 0)
-        for m in fake.sent[sent_before:]:
+    transcript, seen = [], [0]
+    def flush():
+        for m in fake.sent[seen[0]:]:
             transcript.append(('Hive', m['text']))
-        sent_before = len(fake.sent)
+        seen[0] = len(fake.sent)
+    def owner(k, step):   # each scripted step, delivered to whoever polls next (the loop, or a question Hive is asking)
+        def deliver(f):
+            if k in fails and assistant.BUILD.get('proc'):   # the build stops on "unsaved changes"
+                assistant.BUILD['proc'].kill(); assistant.BUILD['proc'].wait()
+                open(assistant.BUILD['log'], 'w').write('You have unsaved changes. Commit or stash them first.\n')
+                ch.send("⚠️ The build stopped before it finished.\n\nYou have unsaved changes. Commit or stash them first.")
+            flush()
+            batch = step(f)
+            for _, text, data, _ in batch:
+                transcript.append(('Owner', text if text else f'[taps {data}]'))
+            return batch
+        return deliver
+    fake.script = [owner(k, step) for k, step in enumerate(fake.script)]
+    while fake.script:
+        for text, data, _ in ch.updates(timeout=1):
+            if text:
+                try:
+                    assistant.handle(ch, repo, text, poll=1, start_build=start_build,
+                                     cloud=lambda rp, on, login=True: 0)
+                except RuntimeError:   # Hive is still waiting on a question the script does not answer: fine, judge it
+                    pass
+    flush()
     if assistant.BUILD.get('proc') and assistant.BUILD['proc'].poll() is None:
         assistant.BUILD['proc'].kill()
     return transcript, started
@@ -114,7 +126,7 @@ Grade it. Reply with JSON only: {{"pass": true or false, "problems": ["each prob
 
 def judge(name, expect, transcript, started):
     t = '\n'.join(f'{w}: {x}' for w, x in transcript)
-    p = subprocess.run(['claude', '-p', '--output-format', 'json'], input=JUDGE.format(
+    p = subprocess.run([shutil.which('claude') or 'claude', '-p', '--output-format', 'json'], input=JUDGE.format(
         name=name, expect=expect, started=started or 'none', transcript=t), capture_output=True, text=True,
         encoding='utf-8', timeout=300)
     try:
@@ -136,4 +148,4 @@ if __name__ == '__main__':
               ('' if g.get('pass') else '\n   - ' + '\n   - '.join(g.get('problems', []))), flush=True)
     passed = sum(1 for o in out if o.get('pass'))
     print(f'\n{passed} of {len(out)} scenarios pass; mean score {sum(o.get("score", 0) for o in out) / max(1, len(out)):.1f}/10')
-    json.dump(out, open(sys.argv[1] if len(sys.argv) > 1 else 'jarvis_bench.json', 'w'), indent=1, ensure_ascii=False)
+    json.dump(out, open(sys.argv[1] if len(sys.argv) > 1 else 'jarvis_bench.json', 'w', encoding='utf-8'), indent=1, ensure_ascii=False)

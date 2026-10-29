@@ -7,9 +7,9 @@ one should be one message, not a new build.
 
 Only one Hive process reads the bot at a time: while a build or review is talking to the owner, the listener steps
 aside (see telegram.busy_elsewhere)."""
-import glob, json, os, subprocess, time
+import glob, json, os, re, subprocess, time
 
-from . import explain, memory, telegram
+from . import argv, explain, memory, telegram
 
 RUNS = os.path.join(os.path.expanduser('~'), '.hive', 'runs')   # where `hive start` keeps its builds
 PIDFILE = os.path.join(os.path.expanduser('~'), '.hive', 'listen.pid')   # the listener running on this computer
@@ -67,11 +67,15 @@ superbly competent, unflappable butler who happens to run his builders. Address 
 How you speak:
 - Calm and precise. Lead with the one thing that matters to him right now. At most 3 short sentences, then the single
   most useful next step. Talk like a person, not a report: no labels, no lists, no folder, branch or file names unless
-  he asks; call it "your project". No technical words.
+  he asks; call the project by his startup's name when you know it (below), else "your project". No technical words.
 - Dry, understated wit, used sparingly: at most one light touch, by understatement or gentle irony, and only when
   things are calm. Never a joke when something failed, money is at stake or he is frustrated; then be plain and
   useful. Never at his expense, never slapstick, no exclamation marks, no emoji in the words.
-- Deference with a spine: if what he asks is risky, say so once, briefly, then do it his way.
+- Deference with a spine: if what he asks is risky, say so once, briefly, then do it his way, within what you can do.
+- What you can do from his phone: build something new from his description; stop a build; say how a build is going
+  and why one stopped; answer questions about his product from its code; keep a rule he gives for every build; move to
+  the cloud and back. Hard limits, whatever he asks: you never change his own main version and never skip the tests;
+  every build arrives as a separate tested copy that he looks at and merges himself. Say so plainly if he asks for it.
 - Own your mistakes plainly ("My error, sir; it is fixed."), without grovelling.
 - Anticipate: offer the next step before he has to ask. Never "Great question", never filler, never servile.
 - Use only the facts below; never invent a build, a number, a feature or an event.
@@ -81,6 +85,8 @@ The tone, in examples (not to copy):
 - A build running: "Twenty minutes in, sir, and the builders are behaving. I will tell you the moment it lands."
 - A build failed: "The build stopped, sir: it found unsaved changes. Commit them and say 'build again', and I'll pick it up."
 - He thanks you: "A pleasure, sir. As ever."
+- He asks to skip the tests and push straight live: "That I won't do, sir: the tests are what stand between a mistake
+  and your customers. You'll have it as a tested copy to look over, and it goes live the moment you merge it."
 - He is cross: "Understood, sir. That one is on me. Here is where it stands."
 
 What you know right now:
@@ -92,12 +98,15 @@ Reply with JSON only: {{"reply": "..."}}"""
 def facts(repo, ch=None):
     """What Hive knows about this owner's project right now, in plain lines, for its replies."""
     st = latest_build(repo)
-    # (no folder name in the facts: given one, it said "your shop project")
+    # the startup's name, never the folder's (given the folder, it said "your shop project")
+    name = memory.project_name(repo)
     lines = [('Running in the cloud; his computer can be off.' if os.environ.get('HIVE_IN_CLOUD') or
               os.path.abspath(repo).startswith(os.path.join(os.path.expanduser('~'), 'hive-cloud')) else
               'Running on his computer.'),
              (f"Latest build: branch hive/{st['name']}. {st.get('check', '')}" if st else 'Nothing built on this project yet.'),
              f"Standing rules he has given for this project: {len(memory.load(repo))}."]
+    if name:
+        lines.insert(0, f'His startup, and this project, is called {name}.')
     if _building():
         lines.append(_building())
     note = ch.note() if ch is not None and callable(getattr(ch, 'note', None)) else None
@@ -109,9 +118,26 @@ def speak(ch, repo, task, fallback):
     """One message in Hive's own voice (the owner: "like Jarvis handles Tony"); the plain fallback if no model."""
     import threading
     box = {}
+    hist = list(getattr(ch, 'history', None) or [])
+    said = [re.sub(r'\W+', ' ', t).strip().lower() for w, t in hist if w == 'owner']
+    if len(hist) >= 3 and hist[-1][0] == 'owner' and hist[-2][0] == 'hive' and len(said) >= 2 and said[-1] == said[-2]:
+        # the same message again, after Hive answered (Jarvis bench: three "status" got three full reports)
+        times = next((k for k in range(1, len(said)) if said[-1 - k] != said[-1]), len(said))
+        task += (' He has just sent the same message again, after your last reply: in one short sentence, in fresh '
+                 'words (never your earlier opening), say nothing has changed since then (or only what has). '
+                 'Do not repeat your earlier reply or its closing offer.' +
+                 (f' This is the {times}th time in a row: he may not be seeing your replies, or he is impatient. Ask, '
+                  'briefly, whether your messages are reaching him, and offer the one most useful next step.'
+                  if times >= 3 else ''))
     t = threading.Thread(target=lambda: box.update(got=explain.ask_json(
         VOICE.format(who=_who(ch) or 'sir', facts=facts(repo, ch), task=task)) or {}), daemon=True)
-    t.start(); t.join(float(os.environ.get('HIVE_VOICE_SECONDS', 8)))   # he is waiting: never long for a nice phrasing
+    t.start()
+    # Claude Code takes ~5 s just to start (the model ~1-2 s): at 8 s most replies fell back to canned lines (Jarvis bench)
+    end = time.time() + float(os.environ.get('HIVE_VOICE_SECONDS', 20))
+    while t.is_alive() and time.time() < end:
+        if callable(getattr(ch, 'typing', None)):
+            ch.typing()   # "typing..." while it thinks, as a person would
+        t.join(min(4, max(0.1, end - time.time())))
     reply = ((box.get('got') or {}).get('reply') or '').strip()
     if reply:
         ch.send('🐝 ' + telegram.esc(reply), html=True)
@@ -150,8 +176,7 @@ def background_build(repo, goal, ch=None):
     gf = tempfile.NamedTemporaryFile('w', suffix='.md', delete=False); gf.write(goal); gf.close()
     log = os.path.join(os.path.expanduser('~'), '.hive', 'build.log')
     os.makedirs(os.path.dirname(log), exist_ok=True)
-    import shlex
-    cmd = (shlex.split(os.environ['HIVE_BUILD_CMD']) if os.environ.get('HIVE_BUILD_CMD') else   # tests: a stand-in
+    cmd = (argv(os.environ['HIVE_BUILD_CMD']) if os.environ.get('HIVE_BUILD_CMD') else   # tests: a stand-in
            [sys.executable, '-m', 'hive', 'start', '--overnight', '--goal', gf.name])
     proc = subprocess.Popen(cmd, cwd=repo, start_new_session=os.name != 'nt',   # so a stop ends its builders too
                             stdout=open(log, 'w'), stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL)
@@ -241,12 +266,12 @@ ASK_CMD = os.environ.get('HIVE_LOOK_CMD', 'claude -p --output-format json --allo
 def look(ch, repo, text):
     """Answer a question about his product by having Claude read the code (read-only): "how do refunds work?" gets what
     the code does, not a guess from a few facts. Shows "typing..." while it reads. None if Claude cannot answer."""
-    import shlex, threading
+    import threading
     box, done = {}, threading.Event()
 
     def run():
         try:
-            p = subprocess.run(shlex.split(ASK_CMD), cwd=repo, input=LOOK.format(
+            p = subprocess.run(argv(ASK_CMD), cwd=repo, input=LOOK.format(
                 who=_who(ch) or 'sir', history=ch.recent() if hasattr(ch, 'recent') else '', text=text),
                 capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=240)
             reply = json.loads(p.stdout)
@@ -355,6 +380,17 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
             rc = cloud(repo, on, choice == 'cld|yes')   # with the login: builders can work there
         except TypeError:
             rc = cloud(repo, on)
+        if rc == 9:   # the cloud copy powered its own machine off: no hourly bill, and nothing built there is lost
+            ch.send("☁️ <b>Done: the cloud machine is powering off.</b> It no longer bills by the hour. Its disk keeps "
+                    "everything built there (about $2.40 a month) until your computer brings it home: run "
+                    "<code>hive cloud --stop</code> there. It starts the machine, copies every branch back, checks each "
+                    "one, then deletes it completely.\n\nUntil then I'm not listening; on your computer, "
+                    "<code>hive listen</code> picks our conversation up again.", html=True)
+            return 'cloud_off'
+        if rc == 8:
+            ch.send("🛠 A build is still running there, so I've kept the machine: powering off now would lose it. "
+                    "I'll tell you when it's done, or say \"stop the build\" first.")
+            return 'cloud_kept'
         if rc == 5:   # this copy runs in the cloud, without the owner's AWS keys (on purpose): it cannot delete itself
             ch.send("☁️ I'm the copy running in the cloud, and I don't hold your AWS keys, on purpose, so I can't shut "
                     "myself down. On your computer, run <code>hive cloud --stop</code>: it brings everything built here "

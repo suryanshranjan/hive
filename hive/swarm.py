@@ -6,9 +6,9 @@ to: the swarm's result is the shared branch of <run>/up.git.
 
 Workers run $HIVE_WORKER_CMD (default: headless Claude Code) inside their clone with the prompt on stdin. They execute
 shell commands, so run swarms in a container or a throwaway VM."""
-import csv, json, os, shlex, shutil, subprocess, sys, time
+import csv, json, os, shutil, subprocess, sys, time
 
-from . import PY, config, law, owner
+from . import argv, PY, config, law, owner
 from .guard import sh
 
 DEFAULT_CMD = 'claude -p --output-format json --permission-mode acceptEdits --allowedTools Bash Read Edit Write Glob Grep'
@@ -47,7 +47,16 @@ def _usage(path):
     try:
         d = json.load(open(path))
     except Exception:
-        return '', '', ''
+        d = {}
+        try:   # Codex writes one event per line; its usage comes on "turn.completed" (cached input is part of input)
+            for line in open(path, encoding='utf-8', errors='replace'):
+                if line.startswith('{') and '"usage"' in line:
+                    u = json.loads(line).get('usage') or {}
+                    d = {'usage': {'input_tokens': u.get('input_tokens'), 'output_tokens': u.get('output_tokens')}}
+        except Exception:
+            pass
+        if not d:
+            return '', '', ''
     u = d.get('usage') or {}
     tok = sum(int(u.get(k) or 0) for k in ('input_tokens', 'output_tokens', 'cache_creation_input_tokens', 'cache_read_input_tokens'))
     err = d.get('api_error_status') or (('auth' if 'authenticat' in str(d.get('result', '')).lower() else 'error')
@@ -129,7 +138,7 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
 def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
     """Run every worker (at most max_parallel at once), wait for all, and write <run>/agents.csv."""
     run = os.path.abspath(run)
-    cmd = shlex.split(builder_cmd())
+    cmd = argv(builder_cmd())
     env = dict(os.environ, PYTHONPATH=HIVE_ROOT + os.pathsep + os.environ.get('PYTHONPATH', ''),
                HIVE_GUARD_CACHE=os.path.join(run, 'guard_cache'), HIVE_RUN=run)
     queue = sorted(f[:-3] for f in os.listdir(os.path.join(run, 'prompts')) if f.endswith('.md'))

@@ -3,7 +3,7 @@
 Hive asks what to build, finds the project's tests on its own, puts builders to work on copies, brings their questions
 and their assumptions to the owner in plain words, sends back what the owner corrects, checks the result, and hands
 over a branch. The owner's own branches are never changed: the result arrives as a new branch, hive/<name>."""
-import csv, glob, json, os, re, shlex, shutil, subprocess, threading, time
+import csv, glob, json, os, re, shlex, shutil, subprocess, sys, threading, time
 
 from . import PY, codesheet, docs as docs_mod, interview, junit, law, memory, owner, swarm, telegram
 from .guard import sh
@@ -182,6 +182,10 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
             say('  Builders need tests to know when the work is right. Add some and run me again.'); return 4
     links = cfg.get('snapshot_links') or detect_links(repo)
     say(f'  Git repository on branch {branch}, no unsaved changes.')
+    if not overnight and not memory.project_name(repo) and sys.stdin.isatty():   # asked once, then remembered
+        n = _ask("  What's your startup called? I'll use the name when I talk about this project (Enter to skip).")
+        if n:
+            memory.set_name(repo, n)
 
     words = [w for w in re.findall(r'[a-z0-9]+', goal_text.lower()) if w not in ('goal', 'the', 'a', 'an')]
     slug = '-'.join(words[:4])[:40] or 'build'

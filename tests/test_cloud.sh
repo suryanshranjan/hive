@@ -62,11 +62,20 @@ mkdir -p $T/box2/hive-cloud/.hive/runs/ratings-1 && echo '{"name": "ratings-1"}'
 printf 'y\ny\n' | FAKE_AWS_EXPIRED=1 $PY -m hive cloud --stop > $T/expired.txt 2>&1
 check "with expired AWS credentials, --stop says it could NOT delete, and keeps its record to try again" \
   "$? $(grep -c 'could NOT delete' $T/expired.txt) $(grep -c 'Nothing is left running' $T/expired.txt) $(ls $T/.hive/cloud/machine.json | wc -l | tr -d ' ')" "7 1 0 1"
-printf 'y\n' | $PY -m hive cloud --stop > $T/stop.txt 2>&1
+printf 'y\n' | FAKE_AWS_STOPPED=1 HIVE_CLOUD_LOCAL=$T/box2 $PY -m hive cloud --stop > $T/stop.txt 2>&1   # powered off from his phone meanwhile
+check "a machine powered off from the phone is started again, so its work can come home first" \
+  "$(grep -c 'start-instances --instance-ids i-0hive' $T/aws.log) $(grep -c 'powered off from your phone' $T/stop.txt)" "1 1"
 check "--stop brings the cloud's work back to this computer before deleting" "$(git branch --list 'hive/ratings' | tr -d ' *')" "hive/ratings"
 check "every other branch comes home too, kept apart from his own, and the build records" \
   "$(git rev-parse -q --verify refs/remotes/hive-cloud/experiment >/dev/null && echo yes) $(ls $T/.hive/runs-from-cloud/project/runs/ratings-1/state.json 2>/dev/null | wc -l | tr -d ' ') $(grep -c 'Checked: all' $T/stop.txt)" "yes 1 1"
 check "and the rules and conversation from the cloud come home too"   "$($PY -m hive rules | grep -c 'Ratings show after both sides review') $(grep -c 'said in the cloud' $T/.hive/conversation.json)" "1 1"
 check "--stop deletes the machine (2 tries: the expired one, then this), its firewall rule and its key; nothing is left" \
   "$(grep -c 'terminate-instances --instance-ids i-0hive' $T/aws.log) $(grep -c 'delete-security-group --group-id sg-0hive' $T/aws.log) $(grep -c 'delete-key-pair' $T/aws.log) $(ls $T/.hive/cloud | wc -l | tr -d ' ')" "2 1 1 0"
+# from the phone, on the cloud machine itself (no AWS keys there): it powers itself off, never mid-build
+touch $T/mark
+printf 'y\n' | HIVE_CLOUD_MARK=$T/mark HIVE_SHUTDOWN_CMD="$PY -c \"open('powered_off', 'w').write('off')\"" $PY -m hive cloud --stop > $T/self.txt 2>&1
+check "on the cloud machine, --stop powers it off (the disk keeps the work for the computer's --stop)" \
+  "$? $(cat powered_off 2>/dev/null; rm -f powered_off) $(grep -c 'hive cloud --stop. brings it home' $T/self.txt)" "9 off 1"
+printf 'y\n' | HIVE_CLOUD_MARK=$T/no-mark $PY -m hive cloud --stop > $T/none.txt 2>&1
+check "anywhere else, with no machine, it says so" "$? $(grep -c 'no Hive machine' $T/none.txt)" "5 1"
 rm -rf $T; exit $fail
