@@ -82,7 +82,14 @@ def areas(sheet, page=8):
         for i in range(0, len(items), page):
             part = (f' ({i // page + 1})' if len(items) > page else '')
             out.append(((a or 'Other rules') + part, items[i:i + page]))
-    return out
+    merged = []   # small neighbouring areas share a page (Gate 45: 7 of 15 pages held one or two rules)
+    for a, items in out:
+        if merged and len(merged[-1][1]) + len(items) <= page and len(items) <= 3 and len(merged[-1][1]) <= 5 \
+                and ' (' not in a and ' (' not in merged[-1][0]:
+            merged[-1] = (f'{merged[-1][0]} · {a}', merged[-1][1] + items)
+        else:
+            merged.append((a, items))
+    return merged
 
 STAKES = """A business owner is about to check, area by area, what his newly built product does. The product:
 {goal}
@@ -98,13 +105,17 @@ def stakes(pages, goal=''):
     """{area: why it matters to his business}, so he sees each page is worth his time (the founder: questions must feel
     important, not random). Best effort: {} if no model answers."""
     from . import explain
-    names = []
-    for a, _ in pages:
-        base = a.split(' (')[0]
-        if base not in names:
-            names.append(base)
-    listing = '\n'.join(f"{a}: " + ' | '.join(r[:120] for p, items in pages if p.split(' (')[0] == a for _, r in items[:3])
-                        for a in names)
+    names, rules = [], {}
+    for a, items in pages:
+        for _, r in items:   # a shared page ("Self-referral · Shared device") holds rules of several areas
+            base = a.split(' · ')[0].split(' (')[0]
+            head = r.partition(':')[0].split(' (')[0].strip()
+            if ':' in r and head in a:
+                base = head
+            if base not in names:
+                names.append(base)
+            rules.setdefault(base, []).append(r)
+    listing = '\n'.join(f"{a}: " + ' | '.join(r[:120] for r in rules[a][:3]) for a in names)
     got = explain.ask_json(STAKES.format(goal=(goal or '')[:1500], areas=listing)) or {}
     got = got if isinstance(got, dict) else {}   # a model may answer in another shape: no reasons, no crash
     why = got.get('why') if isinstance(got.get('why'), dict) else {}

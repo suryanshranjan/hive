@@ -423,6 +423,10 @@ real = ([f'Referral rewards ({d}): rule {k}.' for k, d in enumerate(('amounts', 
 pg = codesheet.areas(real)
 check('rules with details in brackets share their area\'s pages (14 rules: 3 pages, not 13)',
       ([a for a, _ in pg], [len(i) for _, i in pg]), (['Referral rewards (1)', 'Referral rewards (2)', 'Invites'], [8, 2, 4]))
+small = ['Self-referral: a.', 'Self-referral: b.', 'Shared device: c.', 'Existing users: d.', 'Two links: e.', 'Expiry: f.',
+         'Expiry: g.', 'Expiry: h.', 'Expiry: i.']
+check('small neighbouring areas share a page, at most 8 rules (Gate 45: 7 of 15 pages held one or two rules)',
+      [(a, len(i)) for a, i in codesheet.areas(small)], [(chr(183).join(['Self-referral ', ' Shared device ', ' Existing users ', ' Two links']), 5), ('Expiry', 4)])
 _aj = explain.ask_json
 explain.ask_json = lambda prompt: ({'kind': 'question', 'explanation': 'Rule 3 means a capitalised name counts the same.'}
                                    if 'What does this means' in prompt or '??' in prompt else _aj(prompt))
