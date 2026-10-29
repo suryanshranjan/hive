@@ -123,7 +123,7 @@ def power_off_here(ask=input, say=print):
     and no development may be lost). Returns 9 when powering off, 8 mid-build, 5 when this is not such a machine."""
     if not os.path.exists(MARK):
         say("There is no Hive machine made from this computer to delete."); return 5
-    if subprocess.run("pgrep -f 'hive start' >/dev/null", shell=True).returncode == 0:
+    if subprocess.run("pgrep -f '[h]ive start' >/dev/null", shell=True).returncode == 0:
         say('A build is still running here: powering off now would lose it. Wait for it, or stop it first.'); return 8
     if ask("Power this cloud machine off? Its disk keeps everything until your computer's `hive cloud --stop` brings it "
            "home and deletes it. [y/N] > ").strip().lower() not in ('y', 'yes'):

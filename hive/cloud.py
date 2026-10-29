@@ -177,7 +177,7 @@ def building(t):
     """True while a build is running on the cloud copy (deleting it then would lose the work in progress)."""
     if t.local:
         return False
-    return bool(t.run("pgrep -f 'hive start' >/dev/null && echo yes || true", check=False).stdout.strip())
+    return bool(t.run("pgrep -f '[h]ive start' >/dev/null && echo yes || true", check=False).stdout.strip())
 
 def pull(repo='.', frm=None, say=print, verify=False):
     """Bring everything done in the cloud to this computer: every branch (hive/... as your result branches, any other
