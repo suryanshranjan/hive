@@ -70,8 +70,8 @@ def new(repo='.', size='t3.large', region=None, profile=None, with_login=True, s
         key = _aws(['ec2', 'create-key-pair', '--key-name', name, '--key-type', 'ed25519', '--tag-specifications',
                     f'ResourceType=key-pair,Tags=[{{Key=hive,Value={name}}}]'], profile, region)
         m['key'] = os.path.join(HOME(), name + '.pem')
-        with open(m['key'], 'w') as f:
-            f.write(key['KeyMaterial'])
+        with open(m['key'], 'w', newline='\n') as f:   # Windows text mode wrote CRLF, which Git's ssh refuses to load
+            f.write(key['KeyMaterial'].rstrip('\n') + '\n')
         os.chmod(m['key'], 0o600)
         if os.name == 'nt':   # chmod does nothing on Windows, and Windows' ssh refuses a key others can read
             user = os.environ.get('USERNAME', '')
