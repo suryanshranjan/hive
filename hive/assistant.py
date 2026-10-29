@@ -284,6 +284,36 @@ def is_stop_request(text):
         return False
     return 'build' in words or len(words) <= 3 or any(f' {w} ' in t for w in ('it', 'that', 'this', 'wo', 'woh', 'ye'))
 
+INTENTS_V1 = {   # the 9 meanings the fast reader was trained on (Gate 48's v1, word for word; hive/fastread.py)
+    'build': 'he wants something built, added, fixed or made in the product, including agreeing to or correcting a build '
+             'Hive just proposed',
+    'stop_build': 'he wants the build that is running stopped or cancelled',
+    'change': 'he has changed his mind about an earlier rule',
+    'rule': 'he states, plainly and on purpose, a rule for how the product should behave from now on',
+    'status': 'he asks how things are going',
+    'greeting': 'a hello, with no request yet',
+    'cloud_on': 'move Hive to the cloud, to keep working while his computer is off',
+    'cloud_off': 'shut the cloud machine down',
+    'reply': 'anything else: a question, a complaint, thanks, frustration, small talk, or declining what Hive proposed',
+}
+TEAM_WORDS = re.compile(r"\bw\d+\b|\bbuilders?\b|\bcodex\b|\bclaude\b|\bgemini\b|\bteam\b|\binstead\b|\balso\b|\bjust\b")
+
+def fast_read(ch, text):
+    """The fast local reader's answer when it may decide alone (Gate 49), else None. While a build runs it answers only
+    greetings and status: it was trained before the builder commands, so "stop w2" could only read to it as stopping
+    everything."""
+    from . import fastread
+    if TEAM_WORDS.search(text.lower()):
+        return None
+    got = fastread.read(ch.recent() if hasattr(ch, 'recent') else '', text)
+    building = bool(_building()) and _building().startswith('A build is running')
+    if got and building and got['intent'] not in ('greeting', 'status'):
+        return None
+    if got and got['intent'] == 'reply' and re.search(r"\?|^(how|what|why|when|which|who|kya|kaise|kyu|kab)\b",
+                                                      text.lower().strip()):
+        return None   # a question may be about his product, which Claude answers by reading the code
+    return got
+
 def read(ch, text):
     """What the owner means by his newest message, read in the context of the conversation (Gate 38 live test: "Yes",
     "I already told you" and a corrected request were each read alone, and went wrong)."""
@@ -451,7 +481,7 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     elif is_risky(text):   # never a build, whatever the model reads (the Jarvis bench: once read as one)
         got = {'intent': 'reply'}
     else:
-        got = read(ch, text)
+        got = fast_read(ch, text) or read(ch, text)   # half a second when the trained reader is sure, else Claude
     intent, rule = got.get('intent', 'reply'), (got.get('rule') or text).strip()
     who = _who(ch)
     if intent in ('team', 'set_team', 'stop_builder'):   # the builders themselves, from his phone

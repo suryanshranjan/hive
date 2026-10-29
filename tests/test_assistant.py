@@ -127,6 +127,26 @@ check('an unknown error is kept for his engineer, with what he can do', (
       'for your engineer: KeyError' in assistant.plain_reason("KeyError: 'x'"), 'build again' in assistant.plain_reason("KeyError: 'x'"),
       assistant.plain_reason('').startswith('No reason was recorded')), (True, True, True))
 
+# 3a7. the fast local reader (Gate 49) decides alone only where it is safe; everything else goes to Claude
+from hive import fastread
+sys.path.insert(0, os.path.join(os.getcwd(), 'gates', 'gate48', 'referee'))
+from run48 import INTENTS as G48
+check('the fast reader is asked the exact 9 meanings it was trained on', assistant.INTENTS_V1, G48)
+check('without Laya and a trained reader installed, Claude reads everything', fastread.read('', 'kya chal raha hai'), None)
+_fr = fastread.read
+fastread.read = lambda history, text: {'intent': {'kitna hua': 'status', 'stop w2': 'stop_build', 'thanks': 'reply',
+                                                  'how do refunds work?': 'reply', 'shukriya': 'reply'}.get(text, 'reply'), 'fast': True}
+c = ch(FakeTelegram([]))
+check('no build running: it decides status and chat alone; a question, or a builder named, goes to Claude',
+      [(assistant.fast_read(c, t) or {}).get('intent') for t in ('kitna hua', 'shukriya', 'how do refunds work?', 'stop w2',
+                                                                  'use 2 codex builders')],
+      ['status', 'reply', None, None, None])
+p4 = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)'])
+assistant.BUILD.update(proc=p4, goal='a refund page', started=time.time())
+check('while a build runs, only greetings and status are decided fast', [(assistant.fast_read(c, t) or {}).get('intent')
+      for t in ('kitna hua', 'shukriya')], ['status', None])
+p4.kill(); p4.wait(); assistant.BUILD.clear(); fastread.read = _fr
+
 # 3b. "build: ..." from the phone starts a build after one confirmation
 started = []
 fake = FakeTelegram([tap('bld|yes')])

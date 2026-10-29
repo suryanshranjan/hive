@@ -1,0 +1,26 @@
+Fetching 5 files:   0%|          | 0/5 [00:00<?, ?it/s]Fetching 5 files: 100%|██████████| 5/5 [00:00<00:00, 797.46it/s]
+train items 400, calibration items 44, eval items 44 (calibration_slice), skipped {}, device cpu
+optimizer budget: 400 train item(s), effective batch up to 64 (micro_batch 4 x grad_accum 16), 28 optimizer updates over 4 epoch(s)
+epoch 1/4 step 100 loss 1.1365
+epoch 1/4 mean loss 1.4590
+epoch 2/4 step 100 loss 1.0077
+epoch 2/4 mean loss 0.7109
+epoch 3/4 step 100 loss 0.2192
+epoch 3/4 mean loss 0.4550
+epoch 4/4 step 100 loss -0.0012
+epoch 4/4 mean loss 0.4595
+/g49/gates/gate49/referee/run49.py:36: RuntimeWarning: laya.train: choice calibration: fitted on only 44 calibration items
+  summary = finetune(sys.argv[2], resolve_checkpoint_dir('multilingual'), sys.argv[3], cfg, device='cpu')
+
+=== Calibration Evidence (in-sample calibration slice, 44 items; not held-out) ===
+Metric                 Before         After          Delta         
+-----------------------------------------------------------------
+Accuracy               0.3182         0.6136         +0.2954       
+Loss                   2.5076         1.0325         -1.4751       
+ECE                    0.3744         0.1789         -0.1955       
+Brier (multi-class)    0.9534         0.4500         -0.5034       
+Brier (top-1)          0.3379         0.1420         -0.1959       
+Mean Confidence        0.6719         0.6787         +0.0068       
+-----------------------------------------------------------------
+
+trained in 1441 s; {'train_items': 400, 'calibration_items': 44, 'eval_items': 44, 'output_dir': '/g49/ckpt'}

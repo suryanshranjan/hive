@@ -32,7 +32,7 @@ def main():
     elif cmd == 'train':
         from laya.train import TrainConfig, finetune, resolve_checkpoint_dir
         t = time.time()
-        cfg = TrainConfig(epochs=4, shuffle_options=('choice',))   # the trainer's defaults otherwise
+        cfg = TrainConfig(epochs=4, shuffle_options=('choice',), micro_batch=4, grad_accum=16)   # same effective batch, half the memory
         summary = finetune(sys.argv[2], resolve_checkpoint_dir('multilingual'), sys.argv[3], cfg, device='cpu')
         print('trained in', int(time.time() - t), 's;', {k: v for k, v in (summary or {}).items() if not isinstance(v, (list, dict))})
     elif cmd == 'read':
