@@ -58,7 +58,22 @@ def trade(n):
         return 'one builder: the cheapest, and the slowest'
     return f'about {speedup(n):.1f}× the speed of one builder, for about {cost_vs_one(n):.1f}× the cost'
 
-def builders(t_g_seconds, cpus=None, decisions=None, cap=CAP):
+PARTS = """Software builders are about to work on this goal, in parallel, each in its own copy of the code:
+{goal}
+
+How many independent parts does it have: pieces different builders could build at the same time without changing the
+same function or file? A single function or a single small module is one part, however many rules it follows. Name
+each part in a few words. Reply with JSON only: {{"parts": ["...", "..."]}}"""
+
+def parts(goal):
+    """How many builders the work itself can use at once (Gate 52: one function got 8, then 4 builders, and one did it
+    all). None if no model answers."""
+    from . import explain
+    got = explain.ask_json(PARTS.format(goal=(goal or '').strip()[:4000])) or {}
+    p = [x for x in got.get('parts', []) if isinstance(x, str) and x.strip()]
+    return len(p) or None
+
+def builders(t_g_seconds, cpus=None, decisions=None, cap=CAP, parts=None):
     """(N, why): the number of builders for this project, and which limit set it, in plain words."""
     cpus = cpus or os.cpu_count() or 2
     t_g = max(t_g_seconds, 1) / 60
@@ -69,6 +84,8 @@ def builders(t_g_seconds, cpus=None, decisions=None, cap=CAP):
     }
     if decisions:
         limits['the size of the job'] = max(1, math.ceil(decisions / DECISIONS_PER_BUILDER))
+    if parts:
+        limits['the parts of the job'] = max(1, parts)
     # coupling: the team size where more builders stop adding speed (Gate 50's scalability fit)
     limits['builders getting in each other\'s way'] = max(range(1, 65), key=speedup)
     why = min(limits, key=lambda k: limits[k])
@@ -78,6 +95,8 @@ def builders(t_g_seconds, cpus=None, decisions=None, cap=CAP):
               'this computer': f'this computer has {cpus} cores, and each builder keeps about '
                                f'{core_share(t_g):.1f} of one busy',
               'the size of the job': f'the job has about {decisions} decisions, about {DECISIONS_PER_BUILDER} per builder',
+              'the parts of the job': (f'the job has {parts} parts that can be built at the same time' if parts and parts > 1
+                                       else 'the job is one piece of work, so more builders would only wait'),
               'the largest swarm tested on a real codebase': 'that is the most builders tested end to end so far',
               "builders getting in each other's way": 'more would mostly wait on each other'}[why]
     return n, f'{detail}'

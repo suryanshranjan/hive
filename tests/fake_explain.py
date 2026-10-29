@@ -2,6 +2,9 @@
 ranks them by their position, and marks the last one as something an owner cannot judge."""
 import json, re, sys
 prompt = sys.stdin.read()
+if 'How many independent parts does it have' in prompt:   # the law's estimate of parallel work: fees and payouts
+    print(json.dumps({'result': json.dumps({'parts': ['fees', 'payouts']})}))
+    sys.exit(0)
 if 'decisions the code for this feature must take' in prompt:   # the interview's plan: what the code must decide
     print(json.dumps({'result': json.dumps({'decisions': [{'case': 'A tip is paid', 'default': 'the usual fee'},
                                                           {'case': 'A fee is paid late', 'default': 'a reminder'}]})}))
