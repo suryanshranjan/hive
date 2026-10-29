@@ -25,7 +25,11 @@ if 'His newest message:' in prompt and 'What does he mean?' in prompt:   # the l
     low = said.lower().strip(' !.')
     asked = [l for l in history.splitlines() if l.startswith('Hive: ') and 'Shall I build this?' in l]
     last_build = (history.split('Shall I build this?')[-1].strip().splitlines() or [''])[0] if asked else ''
-    confirmed = low in ('yes', 'go ahead', 'yes build it', 'do it') or 'already told you' in low
+    confirmed = low in ('yes', 'go ahead', 'yes build it', 'do it', 'build again') or 'already told you' in low
+    if low == 'build again':   # points back to the last thing he asked to build
+        owner = [l for l in history.splitlines() if l.startswith('Owner: ') and 'build' in l.lower()]
+        if owner:
+            asked, last_build = owner, owner[-1].split(':', 2)[-1].strip()
     intent = ('build' if confirmed and asked or low.startswith('make ') or low.startswith('a page')
               else 'cloud_on' if 'move to the cloud' in low else 'cloud_off' if 'delete the cloud' in low
               else 'change' if 'changed my mind' in low or low.startswith('actually') else 'status' if 'status' in low

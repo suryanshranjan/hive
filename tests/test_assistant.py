@@ -63,6 +63,13 @@ r = assistant.handle(c, repo, 'build: a page with suny shop creators on it', pol
 check('a correction while Hive asks changes what it builds; "yes" then starts it (no "Just say the word")',
       (r, started), ('built', ['a page saying Sunny Shop Creators']))
 
+# 3a2b. "build again" after a failed build is read in context, never as a request to build "again" (the live test)
+started = []
+c = ch(FakeTelegram([]))
+c.remember('owner', 'build: a page showing creators their earnings'); c.remember('hive', 'The build stopped before it finished.')
+r = assistant.handle(c, repo, 'Build again', poll=1, start_build=lambda rp, goal: started.append(goal))
+check('"build again" builds the earlier request, not "again"', (r, started), ('built', ['a page showing creators their earnings']))
+
 # 3a3. a build runs in the background: "status" says it is running, and if it stops, he is told why at once
 # (the live cloud build stopped on "unsaved changes" and only the server's log knew)
 os.environ['HIVE_BUILD_CMD'] = 'sh -c "sleep 2; echo You have unsaved changes. Commit or stash them first.; exit 3"'
