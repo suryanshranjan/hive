@@ -1,0 +1,79 @@
+[01:16:57] predictions registered on origin/main: gates/gate50/prompts/PREDICTIONS.md
+N4: 4 workers, tools/ask.py port None, repo /home/claude/hive/runs/g50/upN4.git
+next: python3 lab/launch.py --run g50
+[01:17:00] launching N4 alone (4 builders)
+launched N4-w1 
+launched N4-w2 
+launched N4-w3 
+launched N4-w4 
+N4-w4 finished: exit 0, 6.5 min, tokens 6482964, cost 1.6428104000000006
+N4-w2 finished: exit 0, 7.5 min, tokens 5401598, cost 1.4149098
+N4-w1 finished: exit 0, 7.5 min, tokens 2386879, cost 0.8953484
+N4-w3 finished: exit 0, 8.3 min, tokens 6514543, cost 1.6603967
+wrote /home/claude/hive/runs/g50/agents.csv
+N1: 1 workers, tools/ask.py port None, repo /home/claude/hive/runs/g50/upN1.git
+next: python3 lab/launch.py --run g50
+[01:25:21] launching N1 alone (1 builders)
+launched N1-w1 
+N1-w1 finished: exit 0, 24.3 min, tokens 10060717, cost 2.9408535999999996
+wrote /home/claude/hive/runs/g50/agents.csv
+N12: 12 workers, tools/ask.py port None, repo /home/claude/hive/runs/g50/upN12.git
+next: python3 lab/launch.py --run g50
+[01:49:42] launching N12 alone (12 builders)
+launched N12-w1 
+launched N12-w10 
+launched N12-w11 
+launched N12-w12 
+launched N12-w2 
+launched N12-w3 
+launched N12-w4 
+launched N12-w5 
+launched N12-w6 
+launched N12-w7 
+launched N12-w8 
+launched N12-w9 
+N12-w10 finished: exit 0, 7.8 min, tokens 4481232, cost 0.9525576
+N12-w12 finished: exit 0, 8.3 min, tokens 3950051, cost 0.9178312999999998
+N12-w7 finished: exit 0, 8.3 min, tokens 2736490, cost 0.7275047
+N12-w11 finished: exit 0, 8.4 min, tokens 2488106, cost 0.7098772999999999
+N12-w3 finished: exit 0, 8.5 min, tokens 5014354, cost 1.0433333999999996
+N12-w4 finished: exit 0, 8.5 min, tokens 1934780, cost 0.5001764
+N12-w2 finished: exit 0, 9.0 min, tokens 3139265, cost 0.7940694
+N12-w8 finished: exit 0, 9.2 min, tokens 3406113, cost 0.8368903999999999
+N12-w5 finished: exit 0, 9.4 min, tokens 3784117, cost 0.8681776000000001
+N12-w9 finished: exit 0, 9.4 min, tokens 2518225, cost 0.5497447
+N12-w6 finished: exit 0, 9.5 min, tokens 4267411, cost 0.8897064000000003
+N12-w1 finished: exit 0, 9.7 min, tokens 5921833, cost 1.193757
+wrote /home/claude/hive/runs/g50/agents.csv
+N2: 2 workers, tools/ask.py port None, repo /home/claude/hive/runs/g50/upN2.git
+next: python3 lab/launch.py --run g50
+[01:59:28] launching N2 alone (2 builders)
+launched N2-w1 
+launched N2-w2 
+N2-w1 finished: exit 0, 12.7 min, tokens 7189857, cost 2.2048004
+N2-w2 finished: exit 0, 14.2 min, tokens 10416416, cost 2.5108904
+wrote /home/claude/hive/runs/g50/agents.csv
+N7: 7 workers, tools/ask.py port None, repo /home/claude/hive/runs/g50/upN7.git
+next: python3 lab/launch.py --run g50
+[02:13:41] launching N7 alone (7 builders)
+launched N7-w1 
+launched N7-w2 
+launched N7-w3 
+launched N7-w4 
+launched N7-w5 
+launched N7-w6 
+launched N7-w7 
+N7-w6 finished: exit 0, 6.4 min, tokens 1174531, cost 0.3077102
+N7-w2 finished: exit 0, 6.6 min, tokens 2882048, cost 0.8497339000000002
+N7-w7 finished: exit 0, 6.8 min, tokens 1606646, cost 0.49428730000000004
+N7-w3 finished: exit 0, 7.2 min, tokens 3964339, cost 0.9501015000000002
+N7-w5 finished: exit 0, 7.9 min, tokens 3884990, cost 0.9625939999999998
+N7-w4 finished: exit 0, 8.5 min, tokens 3023603, cost 0.8482622000000001
+N7-w1 finished: exit 0, 9.0 min, tokens 4097324, cost 1.1201974000000001
+wrote /home/claude/hive/runs/g50/agents.csv
+[02:22:46] N4: visible 1340/1340, hidden 2256/2260; replaying
+[02:23:10] N1: visible 1340/1340, hidden 2255/2260; replaying
+[02:23:24] N12: visible 1340/1340, hidden 2256/2260; replaying
+[02:24:09] N2: visible 1340/1340, hidden 2260/2260; replaying
+[02:24:27] N7: visible 1340/1340, hidden 2260/2260; replaying
+[02:24:49] done: python3 gates/gate50/referee/analyze.py runs/g50

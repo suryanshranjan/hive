@@ -1,0 +1,17 @@
+hidden categories left out: ['median', 'percentile', 'transactions']
+team  N   t95(min)  speedup  efficiency  last landing  landings  breaks  visible  hidden   cost    cost/N1
+N1    1     12.8    1.00     1.00        22.1         7      0    1340    99.8%  $ 2.94   1.00x
+N2    2     11.0    1.16     0.58        11.0        14      0    1340   100.0%  $ 4.72   1.60x
+N4    4      6.2    2.05     0.51         6.3        19      0    1340    99.8%  $ 5.61   1.91x
+N7    7      4.2    3.03     0.43         8.4        21      0    1340   100.0%  $ 5.53   1.88x
+N12  12      6.6    1.93     0.16         7.6        43      0    1340    99.8%  $ 9.98   3.39x
+
+USL fit: σ (serial share) = 0.25, κ (crosstalk) = 0.013; peak speedup at N* ≈ 7.6 builders
+
+predictions
+E1 one builder reaches 95% within 90 min: 12.8 min -> held
+E2 S(7) ≥ 2.0: 3.03 -> held
+E3 12 not > 10% faster than 7: 6.6 vs 4.2 -> held
+E4 cost N7 ≤ 1.5 × N1: 1.88× -> failed
+E5 hidden within 1 point: 99.8–100.0 -> held
+Rule S(7) < 1.25 (swarm barely beats one agent): did not fire
