@@ -1,0 +1,106 @@
+[09:49:49] predictions registered on origin/main: gates/gate44/prompts/PREDICTIONS.md
+[09:49:49] rule-giver writing private rules (headless Claude Code)...
+[09:51:37] rules checked: 10 functions, 133 calls, deterministic
+[09:51:37] declared decisions per function: 1:2, 2:3, 3:3, 4:2
+[09:51:38] starting repo and hidden suite built
+[09:51:38] pre-launch: python3 gates/gate44/referee/sheet44.py pre {run} {oracle}
+[09:51:38] wind tunnel: ask texts for N0 and NT written
+[09:51:38] stage 1: N0 alone
+N0: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g44/upN0.git
+next: python3 lab/launch.py --run g44
+[09:51:40] launching workers...
+launched N0-w1
+launched N0-w2
+launched N0-w3
+N0-w3 finished: exit 0, 0.7 min, tokens 516504, cost 0.1825057
+N0-w2 finished: exit 0, 0.8 min, tokens 462247, cost 0.1816732
+N0-w1 finished: exit 0, 0.9 min, tokens 644929, cost 0.2226292
+wrote /home/claude/hive/runs/g44/agents.csv
+[09:52:34] after N0: python3 gates/gate44/referee/sheet44.py after {run} {oracle} {base}
+[09:52:34] wind tunnel: describer writing what N0's code does, as rules...
+[09:54:09] wind tunnel: D: 66 rules from the code ($0.33)
+[09:54:30] wind tunnel: review owner #1: '3, 4, 5, 8, 9, 10, 13, 14, 15, 16, 18, 19, 23, 24, 25, 26, 28, 29, 31, 32, 33, 3'
+[09:54:34] wind tunnel: review owner #2: 'Whenever the age is below zero, missing, or not a number, the band is the text "'
+[09:54:45] wind tunnel: review owner #3: 'Spaces around a number in text are ignored and it is banded like the number (" 4'
+[09:54:52] wind tunnel: review owner #4: 'Any age over 120, including infinity, gets "unknown" rather than "65+". An age o'
+[09:55:00] wind tunnel: review owner #5: 'Whenever the date is empty, not a real calendar date (2024-02-30, 2023-02-29, mo'
+[09:55:09] wind tunnel: review owner #6: 'Whenever the date is written in any form other than exactly four-digit year, two'
+[09:55:17] wind tunnel: review owner #7: 'A date with spaces before or after it is not accepted. It gives the text "N/A", '
+[09:55:25] wind tunnel: review owner #8: 'When n is zero, a weekday date is returned as given, but a Saturday or Sunday mo'
+[09:55:33] wind tunnel: review owner #9: 'A negative n does not move the date back at all. It is handled like zero: a week'
+[09:55:43] wind tunnel: review owner #10: 'A fractional n is cut down to its whole part (2.9 counts as 2), and numeric text'
+[09:55:57] wind tunnel: review owner #11: 'Public holidays are not business days, but only two fixed dates count: 1 January'
+[09:56:07] wind tunnel: review owner #12: 'A date with spaces around it is not accepted, so the result is NULL. The result '
+[09:56:18] wind tunnel: review owner #13: 'Up to 5 days late there is no fee. After that, the fee is 2% of the amount for e'
+[09:56:29] wind tunnel: review owner #14: 'Text that isn\'t a number, like empty text or "abc", gives no fee amount at all. '
+[09:56:39] wind tunnel: review owner #15: 'Text that is a number is used as that number, and spaces around it are ignored ('
+[09:56:50] wind tunnel: review owner #16: 'Days late can have a fraction, and it is compared as is. Up to and including 5 d'
+[09:57:01] wind tunnel: review owner #17: 'A card number of 8 or more digits has every digit except the last four replaced '
+[09:57:11] wind tunnel: review owner #18: 'Four or fewer digits (after removing spaces and hyphens) is not masked. It gives'
+[09:57:19] wind tunnel: review owner #19: 'Empty text, or text with only spaces and hyphens, gives the text "INVALID", not '
+[09:57:31] wind tunnel: review owner #20: 'Any character other than digits, spaces and hyphens (dots, underscores, letters)'
+[09:57:38] wind tunnel: review owner #21: 'A number given as a number is treated as its digits: a whole number with 8 or mo'
+[09:57:48] wind tunnel: review owner #22: 'Two letters, an optional hyphen, then exactly four digits, for example "ab-1234"'
+[09:57:55] wind tunnel: review owner #23: 'Only a single hyphen or nothing at all may sit between the letters and the digit'
+[09:58:02] wind tunnel: review owner #24: 'Digits are never padded or kept longer: a code with more or fewer than four digi'
+[09:58:09] wind tunnel: review owner #25: 'Spaces or tabs at the start or end are not removed. They make the code invalid, '
+[09:58:16] wind tunnel: review owner #26: 'Any code that is not two letters, an optional single hyphen, then exactly four d'
+[09:58:24] wind tunnel: review owner #27: 'A missing (NULL) code gives NULL. Empty text or only spaces gives "BAD". A numbe'
+[09:58:32] wind tunnel: review owner #28: 'Zone A, B and C have base charges of 500, 800 and 1200 cents. The base covers th'
+[09:58:38] wind tunnel: review owner #29: 'Each further started 500 g beyond the first 500 g adds 100 cents (501 g to 1000 '
+[09:58:51] wind tunnel: review owner #30: 'A weight of exactly 0 g gets no charge at all, so the result is NULL. Any weight'
+[09:58:58] wind tunnel: review owner #31: 'Any zone other than A, B or C is charged at the zone C rate (1200 cents base), n'
+[09:59:05] wind tunnel: review owner #32: 'A fraction of a gram over a 500 g step counts as a started 500 g and is charged '
+[09:59:11] wind tunnel: review owner #33: 'Text that is a number is used as that number, and spaces around it are ignored ('
+[09:59:19] wind tunnel: review owner #34: 'Any parcel heavier than 30,000 g is charged a flat 9,999 cents, whatever the zon'
+[09:59:27] wind tunnel: review owner #35: 'Fewer than one person (zero, negative, or a fraction below 1 like 0.5) is treate'
+[09:59:36] wind tunnel: review owner #36: 'A total with a fraction or given as a decimal is divided by the people count, wh'
+[09:59:43] wind tunnel: review owner #37: 'Text that is wholly a number ("1000", with spaces around it ignored) is used as '
+[09:59:52] wind tunnel: review owner #38: 'The minimum is 5 votes, not 10. With fewer than 5 votes (4, 4.9, zero, negative)'
+[09:59:58] wind tunnel: review owner #39: 'Text that isn\'t wholly a number (empty text, "abc", "4abc") gives no rating at a'
+[10:00:06] wind tunnel: review owner #40: 'Fewer than three scores gives no result at all: with exactly two scores, or just'
+[10:00:15] wind tunnel: review owner #41: 'Text scores, including numeric text like "4", are ignored entirely, the same as '
+[10:00:27] wind tunnel: review owner #42: '- late_fee: An invoice with an amount of zero or below owes no fee, however late'
+[10:00:27] wind tunnel: C: 67 rules; owner marked 40 of 66, 42 replies, owner $3.91
+[10:00:27] stage 2: NT, C, CT
+C: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g44/upC.git
+next: python3 lab/launch.py --run g44
+NT: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g44/upNT.git
+CT: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g44/upCT.git
+next: python3 lab/launch.py --run g44
+[10:00:28] launching workers...
+launched C-w1
+launched C-w2
+launched C-w3
+launched CT-w1
+launched CT-w2
+launched CT-w3
+launched NT-w1
+C-w3 finished: exit 0, 0.7 min, tokens 515767, cost 0.2132837
+launched NT-w2
+CT-w1 finished: exit 0, 0.8 min, tokens 516871, cost 0.2165409
+launched NT-w3
+C-w1 finished: exit 0, 0.9 min, tokens 756422, cost 0.24761170000000002
+C-w2 finished: exit 0, 0.9 min, tokens 833389, cost 0.2723146
+CT-w3 finished: exit 0, 1.1 min, tokens 674264, cost 0.26910670000000003
+NT-w1 finished: exit 0, 0.8 min, tokens 682697, cost 0.21262189999999997
+NT-w2 finished: exit 0, 0.7 min, tokens 526184, cost 0.1965353
+NT-w3 finished: exit 0, 0.8 min, tokens 572074, cost 0.19462379999999996
+CT-w2 finished: exit 0, 2.7 min, tokens 571632, cost 0.21719449999999998
+wrote /home/claude/hive/runs/g44/agents.csv
+[10:03:12] scoring every arm call by call...
+# g44: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 45.2% | 31.2%–60.0% |
+| NT | 49.2% | 33.6%–65.6% |
+| C | 100.0% | 100.0%–100.0% |
+| CT | 100.0% | 100.0%–100.0% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| NT-N0 | +4.0 | +0.0 to +11.2 |
+| C-N0 | +54.8 | +40.4 to +68.8 |
+| CT-N0 | +54.8 | +40.8 to +68.4 |
+[10:03:13] done. Next: write the gate RESULTS.md from runs/g44/summary.md, update BRAIN.md and lab/QUEUE.md, push.
