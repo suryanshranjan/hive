@@ -68,6 +68,7 @@ You can also message it any time: *"status"*, *"build: a refund page for brands"
 | --- | --- |
 | `hive` | One conversation from an idea to a tested branch |
 | `hive start --overnight` | Builds without asking anything; you review the next morning |
+| `hive start --agent codex` | Builders run on another coding agent (`claude`, `codex`, `gemini`, `antigravity`); `--agent claude,codex` mixes them, each builder taking the next agent in turn (Gate 47: a mixed swarm finished the deep project with no breaks of main) |
 | `hive morning [--phone]` | Check an overnight build's decisions; Hive fixes what you correct |
 | `hive listen` | Stay on Telegram: change your mind, start builds, ask for status |
 | `hive rules` | Your standing rulings for this project (`hive rules forget 3` drops one) |

@@ -1,0 +1,96 @@
+[13:48:08] predictions registered on origin/main: gates/gate47/prompts/PREDICTIONS.md
+M1: 4 workers, tools/ask.py port None, repo /home/node/hive/runs/g47/upM1.git
+next: python3 lab/launch.py --run g47
+[13:48:13] launching M1 alone (4 workers: claude,codex)
+launched M1-w1 (claude)
+launched M1-w2 (codex)
+launched M1-w3 (claude)
+launched M1-w4 (codex)
+M1-w2 finished: exit 0, 11.7 min, tokens 1668257, cost 
+M1-w4 finished: exit 0, 11.9 min, tokens 2001890, cost 
+M1-w3 finished: exit 0, 12.3 min, tokens 7811492, cost 3.444761999999999
+M1-w1 finished: exit 0, 13.0 min, tokens 5678653, cost 3.2731580000000005
+wrote /home/node/hive/runs/g47/agents.csv
+[14:01:15] M1 done
+C: 4 workers, tools/ask.py port None, repo /home/node/hive/runs/g47/upC.git
+next: python3 lab/launch.py --run g47
+[14:01:16] launching C alone (4 workers: claude)
+launched C-w1 (claude)
+launched C-w2 (claude)
+launched C-w3 (claude)
+launched C-w4 (claude)
+C-w2 finished: exit 0, 9.0 min, tokens 205837, cost 2.6164359999999998
+C-w3 finished: exit 0, 9.4 min, tokens 4046129, cost 2.2018330000000006
+C-w4 finished: exit 0, 10.2 min, tokens 6146046, cost 3.0466837999999994
+C-w1 finished: exit 0, 10.3 min, tokens 6151975, cost 2.962458400000001
+wrote /home/node/hive/runs/g47/agents.csv
+[14:11:36] C done
+X: 4 workers, tools/ask.py port None, repo /home/node/hive/runs/g47/upX.git
+next: python3 lab/launch.py --run g47
+[14:11:37] launching X alone (4 workers: codex)
+launched X-w1 (codex)
+launched X-w2 (codex)
+launched X-w3 (codex)
+launched X-w4 (codex)
+X-w1 finished: exit 0, 10.8 min, tokens 2991119, cost 
+X-w2 finished: exit 0, 11.0 min, tokens 2933402, cost 
+X-w4 finished: exit 0, 11.1 min, tokens 2847513, cost 
+X-w3 finished: exit 0, 11.2 min, tokens 3153795, cost 
+wrote /home/node/hive/runs/g47/agents.csv
+[14:22:51] X done
+LX: 6 workers, tools/ask.py port None, repo /home/node/hive/runs/g47/upLX.git
+next: python3 lab/launch.py --run g47
+[14:22:52] LX: codex lead started; waiting for the plan on main
+[14:24:17] LX: plan on main after 85 s; launching 6 workers
+launched LX-w1 (claude)
+launched LX-w2 (claude)
+launched LX-w3 (claude)
+launched LX-w4 (claude)
+launched LX-w5 (claude)
+launched LX-w6 (claude)
+LX-w4 finished: exit 0, 7.3 min, tokens 112536, cost 2.4893032000000006
+LX-w1 finished: exit 0, 8.2 min, tokens 188419, cost 1.9765007999999995
+LX-w6 finished: exit 0, 8.2 min, tokens 116590, cost 2.598374599999999
+LX-w5 finished: exit 0, 8.4 min, tokens 3328800, cost 1.944195
+LX-w3 finished: exit 0, 9.3 min, tokens 219117, cost 2.5808612000000006
+LX-w2 finished: exit 0, 10.3 min, tokens 2663066, cost 1.7164798000000001
+wrote /home/node/hive/runs/g47/agents.csv
+[14:34:37] LX done
+LC: 6 workers, tools/ask.py port None, repo /home/node/hive/runs/g47/upLC.git
+next: python3 lab/launch.py --run g47
+[14:34:38] LC: claude lead started; waiting for the plan on main
+[14:35:53] LC: plan on main after 75 s; launching 6 workers
+launched LC-w1 (claude)
+launched LC-w2 (claude)
+launched LC-w3 (claude)
+launched LC-w4 (claude)
+launched LC-w5 (claude)
+launched LC-w6 (claude)
+LC-w6 finished: exit 0, 7.7 min, tokens 3186923, cost 1.9839485999999993
+LC-w1 finished: exit 0, 7.9 min, tokens 207770, cost 2.3910772000000002
+LC-w5 finished: exit 0, 9.4 min, tokens 3512657, cost 1.8834133999999998
+LC-w2 finished: exit 0, 9.8 min, tokens 3644219, cost 2.3192434
+LC-w3 finished: exit 0, 10.5 min, tokens 2630201, cost 1.5442568
+LC-w4 finished: exit 0, 10.8 min, tokens 3583502, cost 1.8906934000000004
+wrote /home/node/hive/runs/g47/agents.csv
+[14:46:43] LC done
+M2: 4 workers, tools/ask.py port None, repo /home/node/hive/runs/g47/upM2.git
+next: python3 lab/launch.py --run g47
+[14:46:44] launching M2 alone (4 workers: claude,codex)
+launched M2-w1 (claude)
+launched M2-w2 (codex)
+launched M2-w3 (claude)
+launched M2-w4 (codex)
+M2-w1 finished: exit 0, 11.0 min, tokens 4857483, cost 2.7900484
+M2-w4 finished: exit 0, 11.2 min, tokens 2421702, cost 
+M2-w2 finished: exit 0, 11.2 min, tokens 2906244, cost 
+M2-w3 finished: exit 0, 11.3 min, tokens 342518, cost 2.954053799999999
+wrote /home/node/hive/runs/g47/agents.csv
+[14:58:02] M2 done
+[14:58:09] M1: visible 1340/1340, hidden 2080/2080; replaying
+[14:59:17] C: visible 1340/1340, hidden 2080/2080; replaying
+[15:00:07] X: visible 1340/1340, hidden 2078/2080; replaying
+[15:01:19] LX: visible 1340/1340, hidden 2076/2080; replaying
+[15:02:10] LC: visible 1340/1340, hidden 2078/2080; replaying
+[15:03:52] M2: visible 1340/1340, hidden 2080/2080; replaying
+[15:04:54] done: python3 gates/gate47/referee/analyze.py runs/g47

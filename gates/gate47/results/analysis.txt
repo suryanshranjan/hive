@@ -1,0 +1,20 @@
+hidden categories left out: ['agg_order_by', 'concat', 'group_concat_sep', 'hex_unhex', 'iif_if', 'json_error_position', 'length_octet', 'median', 'percentile', 'timediff', 'transactions']
+team  t95(min)  finish  visible  hidden  claude$  codex tokens  landings by agent       breaks by agent  plan(s)  exits
+M1       9.2     9.8   1340   100.0%  $ 6.72    3,670,147  {'?': 15, 'codex': 17, 'claude': 16}  {'codex': 1}       None  {'0': 4}
+C        7.5     7.8   1340   100.0%  $10.83            0  {'?': 15, 'claude': 31}  {'claude': 1}      None  {'0': 4}
+X        8.3     8.6   1340    99.9%  $ 0.00   11,925,829  {'?': 15, 'codex': 51}  {'codex': 1}       None  {'0': 4}
+LX       8.0     8.2   1340    99.8%  $13.31      754,779  {'?': 15, 'claude': 23}  {'codex': 1}         85  {'0': 6}
+LC       8.3     8.3   1340    99.9%  $12.82            0  {'?': 15, 'claude': 38}  {'claude': 1}        75  {'0': 6}
+M2       8.1     8.7   1340   100.0%  $ 5.74    5,327,946  {'?': 15, 'codex': 36, 'claude': 13}  {'codex': 1}       None  {'0': 4}
+
+predictions
+P1 M teams reach 95% within 45 min: M1 9.2, M2 8.1 -> held
+P2 M teams break main at most once: M1 1, M2 1 -> held
+P3 each agent lands >= 25% in M: M1 codex 35%, M2 codex 56% -> held
+P4 mean t95 M 8.7 <= 1.15 x mean(C, X) 7.9 -> held
+P5 t95 X 8.3 >= 1.2 x C 7.5 -> failed
+P6 hidden spread 0.2 points -> held
+P7 Codex lead plan on main: 85 s -> held
+P8 t95 LX 8.0 vs LC 8.3 -> held
+Ship (mixed swarms supported): FIRED
+Kill (warn against mixing): did not fire

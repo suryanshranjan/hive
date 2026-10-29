@@ -1,0 +1,2349 @@
+{
+ "M1": {
+  "team_start": 1793281693,
+  "mix": "claude,codex",
+  "progress": [
+   {
+    "hash": "7c2f65ad0c7da37443c57ce317fbd7b3bd1a963c",
+    "t": 1793074251,
+    "who": "referee",
+    "subject": "Initial skeleton: lexer, parser, engine; 210 visible tests",
+    "visible": 9
+   },
+   {
+    "hash": "fac982b9d3d2bbcba0bb20ff8b9e75de06c50d95",
+    "t": 1793074846,
+    "who": "A-builder-1",
+    "subject": "Expression parser with precedence climbing; arithmetic, comparison, AND/OR/NOT, || evaluation (lock arith released)",
+    "visible": 31
+   },
+   {
+    "hash": "58502b5bc022ff290ae7bc6bb2cc02c45d8f79fe",
+    "t": 1793074866,
+    "who": "A-builder-2",
+    "subject": "ORDER BY (multi-key, ASC/DESC, SQLite type ordering, alias/position), LIMIT/OFFSET (lock order_limit released)",
+    "visible": 46
+   },
+   {
+    "hash": "43cd7099813038102340f943c553ae89cfef7fc2",
+    "t": 1793074882,
+    "who": "A-builder-6",
+    "subject": "UPDATE/DELETE statements with optional WHERE; rest of category needs BETWEEN (where) and COUNT (aggregates) (lock update",
+    "visible": 52
+   },
+   {
+    "hash": "d66efd532e0dc28da87f27f0e598c7636e37fe49",
+    "t": 1793074890,
+    "who": "A-builder-5",
+    "subject": "FROM table aliases and qualified column refs (lock basic released)",
+    "visible": 55
+   },
+   {
+    "hash": "4eefde39001318a45dc82c5b2ed5a28d77bf0be9",
+    "t": 1793074905,
+    "who": "A-builder-1",
+    "subject": "CASE expressions (simple and searched); remaining case tests need IS NULL (where) and SUM (aggregates) (lock case releas",
+    "visible": 58
+   },
+   {
+    "hash": "6004fa36782c339e2a42059c0350d43b93788bdc",
+    "t": 1793074921,
+    "who": "A-builder-2",
+    "subject": "SELECT DISTINCT / ALL: dedup output rows before ORDER BY/LIMIT (lock distinct released)",
+    "visible": 69
+   },
+   {
+    "hash": "888d758ea82acdc7234e574857753b1bc1ff65c0",
+    "t": 1793074934,
+    "who": "A-builder-5",
+    "subject": "Joins: comma/CROSS/[INNER] JOIN ... ON, LEFT [OUTER] JOIN via Connection.source_rows; remaining join tests need WHERE/GR",
+    "visible": 82
+   },
+   {
+    "hash": "dd66f00c86f9ea4eb39f93ab1e64861a474f93ad",
+    "t": 1793074952,
+    "who": "A-builder-3",
+    "subject": "WHERE clause: comparisons, AND/OR/NOT, BETWEEN, IN, IS [NOT] NULL (lock where released)",
+    "visible": 129
+   },
+   {
+    "hash": "e9019fdc87e01083e3ee3f9d255efbfc18d7f682",
+    "t": 1793074976,
+    "who": "A-builder-4",
+    "subject": "Function-call parsing ('func' node) and aggregates COUNT/SUM/TOTAL/AVG/MIN/MAX/GROUP_CONCAT with DISTINCT, whole-table a",
+    "visible": 156
+   },
+   {
+    "hash": "96f0e6ef7caa2703b5e1e092109de874755cb252",
+    "t": 1793075006,
+    "who": "A-builder-1",
+    "subject": "Subqueries: scalar (correlated via outer-env fallback), IN (SELECT ...), FROM (SELECT ...) derived tables; remaining tes",
+    "visible": 169
+   },
+   {
+    "hash": "f3d0ded1b02650adf13c9a19ea00c5988d70cc93",
+    "t": 1793075009,
+    "who": "A-builder-6",
+    "subject": "Function-call parsing ('func', NAME, args, distinct), scalar funcs (SUBSTR/UPPER/LOWER/LENGTH/IFNULL/NULLIF/COALESCE/ABS",
+    "visible": 183
+   },
+   {
+    "hash": "1b53f1083eb1b016c12b2595ced03f7b2417112a",
+    "t": 1793075048,
+    "who": "A-builder-2",
+    "subject": "GROUP BY (exprs, positions, alias fallback) and HAVING, with and without GROUP BY (lock group_by released)",
+    "visible": 210
+   },
+   {
+    "hash": "7da5a3cfeda41d7be4381b8a18b3bf0bca3cac54",
+    "t": 1793078416,
+    "who": "referee",
+    "subject": "Gate 2: 113 new feature categories (1,130 visible tests), compact --summary, tools/claim.sh",
+    "visible": 362
+   },
+   {
+    "hash": "18453385e40339e550a50d984ee71ecd4f206a49",
+    "t": 1793082269,
+    "who": "referee",
+    "subject": "Protocol v2: category claims (tools/claim.py) and guarded landing (tools/land.py)",
+    "visible": 362
+   },
+   {
+    "hash": "df47aacce1559b85588d0ee09c3afaba71d70933",
+    "t": 1793281907,
+    "who": "M1-w4",
+    "subject": "Support SQL comments quoted identifiers blobs and exponent literals",
+    "visible": 18
+   },
+   {
+    "hash": "01acd114ec1a62b53fde17456998ce923d0786d8",
+    "t": 1793281907,
+    "who": "M1-w4",
+    "subject": "Add blob conversion and storage class helpers",
+    "visible": 18
+   },
+   {
+    "hash": "8e24d01618e2fb1ab3c05f5bb21722a4f436cb73",
+    "t": 1793281921,
+    "who": "M1-w4",
+    "subject": "Lex SQLite signed hexadecimal integer literals",
+    "visible": 18
+   },
+   {
+    "hash": "95567d86a132f5be6602169508c64be7b5189ddc",
+    "t": 1793281946,
+    "who": "M1-w4",
+    "subject": "Implement JSON validation compact output and path extraction",
+    "visible": 18
+   },
+   {
+    "hash": "0223c5aa9fb237010630768df9f16a77c794f4e1",
+    "t": 1793281955,
+    "who": "M1-w1",
+    "subject": "Expression core: full lexer (comments, quoted idents, blobs, hex, exp), precedence parser for SELECT/DML/CTE/joins/windo",
+    "visible": 396
+   },
+   {
+    "hash": "98e65a5c09a6e75a7f65310707a03f03fc44423b",
+    "t": 1793281962,
+    "who": "M1-w1",
+    "subject": "tools/land.py: work on Python 3.11 without tarfile filter",
+    "visible": 396
+   },
+   {
+    "hash": "198339bf822b2b6b7a0291569334f5db329366fd",
+    "t": 1793281994,
+    "who": "M1-w3",
+    "subject": "Date/time functions (date, time, datetime, julianday, unixepoch, strftime, timediff, modifiers) in datetime_funcs.py, fo",
+    "visible": 476
+   },
+   {
+    "hash": "11658bae575542b32c34624b8909160dc0ce9862",
+    "t": 1793282026,
+    "who": "M1-w1",
+    "subject": "Aggregation core: minisql/aggregate.py with AGGREGATES registry (COUNT SUM TOTAL AVG MIN MAX GROUP_CONCAT), DISTINCT/FIL",
+    "visible": 614
+   },
+   {
+    "hash": "26bb8a025eb2a77c2d0521a9ed3b4d5979938878",
+    "t": 1793282032,
+    "who": "M1-w3",
+    "subject": "UPDATE (multi-column, row-value SET) and DELETE in minisql/dml.py; delete_all_count and 3 update_delete tests wait only ",
+    "visible": 649
+   },
+   {
+    "hash": "612b2ccfb2bc869a00b8782bf3f6cd25e14d2f65",
+    "t": 1793282044,
+    "who": "M1-w2",
+    "subject": "Implement scalar call expressions and initial numeric functions",
+    "visible": 679
+   },
+   {
+    "hash": "aa15d21968303c7aa58c9756e567a7cc17a6e251",
+    "t": 1793282044,
+    "who": "M1-w2",
+    "subject": "Register SQLite numeric scalar functions against shared evaluator (lock scalar_math released)",
+    "visible": 679
+   },
+   {
+    "hash": "a5c8a24b09077828a3d91b53e3a3899baa8753f7",
+    "t": 1793282066,
+    "who": "M1-w4",
+    "subject": "Add JSON constructors array length and JSON type functions",
+    "visible": 679
+   },
+   {
+    "hash": "f99cca81af09c673cfa64ed2f31f8db6f4b3b570",
+    "t": 1793282066,
+    "who": "M1-w4",
+    "subject": "Support HEX UNHEX and hexadecimal integers (lock blobtypes released)",
+    "visible": null
+   },
+   {
+    "hash": "f8775adcf6e6570c0c7d81f1010cd36b95519ed1",
+    "t": 1793282066,
+    "who": "M1-w4",
+    "subject": "Support JSON validation minification and extraction (lock jsonread released)",
+    "visible": null
+   },
+   {
+    "hash": "db723bc93a8c2c1520d976e7dbd80ae98ba39838",
+    "t": 1793282066,
+    "who": "M1-w4",
+    "subject": "Support JSON construction type inspection and array length (lock jsonconstruct released)",
+    "visible": 759
+   },
+   {
+    "hash": "c3b03957d3e0bced9c0afcccd0baf44efc1afbe2",
+    "t": 1793282080,
+    "who": "M1-w2",
+    "subject": "Implement trigonometric, hyperbolic and logarithmic scalar functions (lock math_more released)",
+    "visible": 789
+   },
+   {
+    "hash": "d9e46258564d8e9e2dbfd44b45c5dd23b248f53d",
+    "t": 1793282093,
+    "who": "M1-w1",
+    "subject": "Window functions: minisql/window.py with partitions, peer groups, ROWS/RANGE/GROUPS frames with EXCLUDE, named windows, ",
+    "visible": 899
+   },
+   {
+    "hash": "63e1bbde67c398a9c6d3737fd93a7513dc7e097d",
+    "t": 1793282097,
+    "who": "M1-w3",
+    "subject": "RETURNING for INSERT/UPDATE/DELETE, UPDATE ... FROM, INTEGER PRIMARY KEY auto-assign and rowid alias (rowids.py) (lock i",
+    "visible": 929
+   },
+   {
+    "hash": "932eb4b22a88e96fd7649445116e4ac57ee9a4db",
+    "t": 1793282107,
+    "who": "M1-w3",
+    "subject": "Release lock ipk (landed with dml2)",
+    "visible": 929
+   },
+   {
+    "hash": "ba4911249591902e5a53922942b0bcdad1efa823",
+    "t": 1793282113,
+    "who": "M1-w4",
+    "subject": "Implement JSON mutation removal and merge patch (lock jsonedit released)",
+    "visible": 959
+   },
+   {
+    "hash": "b7f9d11ca0b9d67c61778b7dae21e609a973bc68",
+    "t": 1793282120,
+    "who": "M1-w2",
+    "subject": "Implement power, modulo, round, truncation and scalar min/max (lock numeric_more released)",
+    "visible": 999
+   },
+   {
+    "hash": "2979653f30502501af0b2bbdae0fc8c71589f2d5",
+    "t": 1793282137,
+    "who": "M1-w1",
+    "subject": "CTEs: minisql/cte.py materializes WITH scopes (incl. RECURSIVE with UNION/UNION ALL and LIMIT); get_table consults CTE s",
+    "visible": 1029
+   },
+   {
+    "hash": "b3521c7b31133f92074383d9ec73e1a8aa1e3380",
+    "t": 1793282151,
+    "who": "M1-w3",
+    "subject": "UNIQUE/PRIMARY KEY conflicts (conflicts.py): INSERT OR IGNORE/REPLACE, REPLACE INTO, ON CONFLICT DO NOTHING/UPDATE with ",
+    "visible": 1056
+   },
+   {
+    "hash": "dc1118c7485e23ab16188afd000eb939ffb23483",
+    "t": 1793282157,
+    "who": "M1-w2",
+    "subject": "Implement string length, byte length, ASCII case, char/unicode and substring (lock string_base released)",
+    "visible": 1089
+   },
+   {
+    "hash": "6684f926c4f40413eeef522c20a43e2db7bae429",
+    "t": 1793282168,
+    "who": "M1-w4",
+    "subject": "Support JSON arrow operators group aggregates and error positions (lock jsonfinish released)",
+    "visible": 1119
+   },
+   {
+    "hash": "a72058dcae9da68594bfae2d99c01a5efcc12a38",
+    "t": 1793282180,
+    "who": "M1-w1",
+    "subject": "DDL: minisql/ddl.py with CREATE VIEW (materialized on read), CREATE [UNIQUE] INDEX (accepted, unused), DROP TABLE/VIEW/I",
+    "visible": 1149
+   },
+   {
+    "hash": "ad68639abc2fb19973d6721874bfe7610d056ed3",
+    "t": 1793282193,
+    "who": "M1-w3",
+    "subject": "NOT NULL and CHECK constraints on INSERT (OR IGNORE skips), column DEFAULTs and INSERT ... DEFAULT VALUES (lock constrai",
+    "visible": 1169
+   },
+   {
+    "hash": "ef2ed6694f644283d7e109bff6101317d71e0ed8",
+    "t": 1793282197,
+    "who": "M1-w4",
+    "subject": "Implement median and percentile aggregate functions (lock percentiles released)",
+    "visible": 1189
+   },
+   {
+    "hash": "df4662c185073b0581387aa2a35953748ee45683",
+    "t": 1793282211,
+    "who": "M1-w2",
+    "subject": "Implement LIKE wildcard and escape behavior plus GLOB patterns (lock patterns released)",
+    "visible": 1211
+   },
+   {
+    "hash": "2914e0ab8b0b56ce4f9703d0d260f46c1e89c06c",
+    "t": 1793282218,
+    "who": "M1-w1",
+    "subject": "ALTER TABLE: RENAME TO, RENAME COLUMN, ADD COLUMN (with DEFAULT), DROP COLUMN in minisql/ddl.py (lock alter released)",
+    "visible": 1231
+   },
+   {
+    "hash": "85d0bc2244d2481701ccfaddc3f8694b05a8c9a3",
+    "t": 1793282232,
+    "who": "M1-w3",
+    "subject": "Transactions (transactions.py): BEGIN/COMMIT/END/ROLLBACK, SAVEPOINT, ROLLBACK TO, RELEASE via state snapshots (lock txn",
+    "visible": 1241
+   },
+   {
+    "hash": "3e5a106248015308ff4e8aaac3159beb64be33fe",
+    "t": 1793282237,
+    "who": "M1-w2",
+    "subject": "Implement concat, concat_ws, instr and replace scalar functions (lock string_more released)",
+    "visible": 1271
+   },
+   {
+    "hash": "a5988426321809bf5f77b66583f5c36e244bdf15",
+    "t": 1793282246,
+    "who": "M1-w4",
+    "subject": "Implement printf format and SQL quote functions (lock formatting released)",
+    "visible": 1301
+   },
+   {
+    "hash": "401489385c619851a1c544c0b0a13e1f67ab9189",
+    "t": 1793282256,
+    "who": "M1-w1",
+    "subject": "SELECT * hides USING/NATURAL duplicate columns; row-value comparisons; IS [NOT] TRUE/FALSE (lock semantics released)",
+    "visible": 1321
+   },
+   {
+    "hash": "4742b2ce12adfd0aac11b0975b6b177e296b5549",
+    "t": 1793282279,
+    "who": "M1-w3",
+    "subject": "ORDER BY honours COLLATE (term or column), TRIM/LTRIM/RTRIM with char sets and NULLIF (trim_funcs.py) (lock misc release",
+    "visible": 1340
+   }
+  ],
+  "visible_pass": 1340,
+  "visible_n": 1340,
+  "hidden_pass": 2080,
+  "hidden_n": 2080
+ },
+ "C": {
+  "team_start": 1793282476,
+  "mix": "claude",
+  "progress": [
+   {
+    "hash": "7c2f65ad0c7da37443c57ce317fbd7b3bd1a963c",
+    "t": 1793074251,
+    "who": "referee",
+    "subject": "Initial skeleton: lexer, parser, engine; 210 visible tests",
+    "visible": 9
+   },
+   {
+    "hash": "fac982b9d3d2bbcba0bb20ff8b9e75de06c50d95",
+    "t": 1793074846,
+    "who": "A-builder-1",
+    "subject": "Expression parser with precedence climbing; arithmetic, comparison, AND/OR/NOT, || evaluation (lock arith released)",
+    "visible": 31
+   },
+   {
+    "hash": "58502b5bc022ff290ae7bc6bb2cc02c45d8f79fe",
+    "t": 1793074866,
+    "who": "A-builder-2",
+    "subject": "ORDER BY (multi-key, ASC/DESC, SQLite type ordering, alias/position), LIMIT/OFFSET (lock order_limit released)",
+    "visible": 46
+   },
+   {
+    "hash": "43cd7099813038102340f943c553ae89cfef7fc2",
+    "t": 1793074882,
+    "who": "A-builder-6",
+    "subject": "UPDATE/DELETE statements with optional WHERE; rest of category needs BETWEEN (where) and COUNT (aggregates) (lock update",
+    "visible": 52
+   },
+   {
+    "hash": "d66efd532e0dc28da87f27f0e598c7636e37fe49",
+    "t": 1793074890,
+    "who": "A-builder-5",
+    "subject": "FROM table aliases and qualified column refs (lock basic released)",
+    "visible": 55
+   },
+   {
+    "hash": "4eefde39001318a45dc82c5b2ed5a28d77bf0be9",
+    "t": 1793074905,
+    "who": "A-builder-1",
+    "subject": "CASE expressions (simple and searched); remaining case tests need IS NULL (where) and SUM (aggregates) (lock case releas",
+    "visible": 58
+   },
+   {
+    "hash": "6004fa36782c339e2a42059c0350d43b93788bdc",
+    "t": 1793074921,
+    "who": "A-builder-2",
+    "subject": "SELECT DISTINCT / ALL: dedup output rows before ORDER BY/LIMIT (lock distinct released)",
+    "visible": 69
+   },
+   {
+    "hash": "888d758ea82acdc7234e574857753b1bc1ff65c0",
+    "t": 1793074934,
+    "who": "A-builder-5",
+    "subject": "Joins: comma/CROSS/[INNER] JOIN ... ON, LEFT [OUTER] JOIN via Connection.source_rows; remaining join tests need WHERE/GR",
+    "visible": 82
+   },
+   {
+    "hash": "dd66f00c86f9ea4eb39f93ab1e64861a474f93ad",
+    "t": 1793074952,
+    "who": "A-builder-3",
+    "subject": "WHERE clause: comparisons, AND/OR/NOT, BETWEEN, IN, IS [NOT] NULL (lock where released)",
+    "visible": 129
+   },
+   {
+    "hash": "e9019fdc87e01083e3ee3f9d255efbfc18d7f682",
+    "t": 1793074976,
+    "who": "A-builder-4",
+    "subject": "Function-call parsing ('func' node) and aggregates COUNT/SUM/TOTAL/AVG/MIN/MAX/GROUP_CONCAT with DISTINCT, whole-table a",
+    "visible": 156
+   },
+   {
+    "hash": "96f0e6ef7caa2703b5e1e092109de874755cb252",
+    "t": 1793075006,
+    "who": "A-builder-1",
+    "subject": "Subqueries: scalar (correlated via outer-env fallback), IN (SELECT ...), FROM (SELECT ...) derived tables; remaining tes",
+    "visible": 169
+   },
+   {
+    "hash": "f3d0ded1b02650adf13c9a19ea00c5988d70cc93",
+    "t": 1793075009,
+    "who": "A-builder-6",
+    "subject": "Function-call parsing ('func', NAME, args, distinct), scalar funcs (SUBSTR/UPPER/LOWER/LENGTH/IFNULL/NULLIF/COALESCE/ABS",
+    "visible": 183
+   },
+   {
+    "hash": "1b53f1083eb1b016c12b2595ced03f7b2417112a",
+    "t": 1793075048,
+    "who": "A-builder-2",
+    "subject": "GROUP BY (exprs, positions, alias fallback) and HAVING, with and without GROUP BY (lock group_by released)",
+    "visible": 210
+   },
+   {
+    "hash": "7da5a3cfeda41d7be4381b8a18b3bf0bca3cac54",
+    "t": 1793078416,
+    "who": "referee",
+    "subject": "Gate 2: 113 new feature categories (1,130 visible tests), compact --summary, tools/claim.sh",
+    "visible": 362
+   },
+   {
+    "hash": "18453385e40339e550a50d984ee71ecd4f206a49",
+    "t": 1793082269,
+    "who": "referee",
+    "subject": "Protocol v2: category claims (tools/claim.py) and guarded landing (tools/land.py)",
+    "visible": 362
+   },
+   {
+    "hash": "efea5a2bd3bedb3bccd4bb95bbc9efe4c873ae04",
+    "t": 1793282544,
+    "who": "C-w3",
+    "subject": "DML statements: DELETE, UPDATE (incl. row-value SET), INSERT column lists in minisql/dml.py (lock dml released)",
+    "visible": 9
+   },
+   {
+    "hash": "28dcdbe44cc1a28380381930f8a232889d0e168f",
+    "t": 1793282552,
+    "who": "C-w3",
+    "subject": "land.py: extractall fallback for Python < 3.11.4",
+    "visible": 9
+   },
+   {
+    "hash": "d0ab572a8d01d1bbc299da8e566c3fadfcc125d4",
+    "t": 1793282572,
+    "who": "C-w2",
+    "subject": "SELECT pipeline in minisql/select.py: FROM list + INNER/CROSS JOIN, aliases, t.*, WHERE hook, DISTINCT, ORDER BY (positi",
+    "visible": 61
+   },
+   {
+    "hash": "3aeded30ecaa7b57e9da0060d791f622a418b48e",
+    "t": 1793282623,
+    "who": "C-w4",
+    "subject": "minisql/datefuncs.py: SQLite date/time/datetime/julianday/unixepoch/strftime/timediff with modifiers; func hook in evalu",
+    "visible": 126
+   },
+   {
+    "hash": "0e1ddc85d3c34fa3e5121f3cd3f775c29688e303",
+    "t": 1793282628,
+    "who": "C-w2",
+    "subject": "GROUP BY (exprs, positions, aliases) + HAVING + aggregates (count/sum/total/avg/min/max/group_concat, DISTINCT) in minis",
+    "visible": 139
+   },
+   {
+    "hash": "5f3e417408b788a58b4eb5fc471fc5a8a660f286",
+    "t": 1793282670,
+    "who": "C-w2",
+    "subject": "LEFT/RIGHT/FULL [OUTER] joins, NATURAL and USING (bare * hides right-hand USING columns); join categories otherwise wait",
+    "visible": 149
+   },
+   {
+    "hash": "d9546578c66f69adfab461192ca4f85d1b626692",
+    "t": 1793282674,
+    "who": "C-w2",
+    "subject": "Release lock using (natural_using passes, landed with joins)",
+    "visible": 149
+   },
+   {
+    "hash": "f3e8f9273102e1df4f32be294fa60810dfe17a10",
+    "t": 1793282692,
+    "who": "C-w3",
+    "subject": "minisql/ddl.py: full CREATE TABLE column defs (types, DEFAULT, NOT NULL, CHECK, PK/UNIQUE, IPK rowid alias), DROP TABLE,",
+    "visible": 199
+   },
+   {
+    "hash": "5e2d2f00dd1228e9a626b6af597ff87ae92f763f",
+    "t": 1793282703,
+    "who": "C-w3",
+    "subject": "release ddl: default_values, drop_table pass; check_not_null waits on the expression evaluator (CHECK parsed and enforce",
+    "visible": 199
+   },
+   {
+    "hash": "8c3d06d7cd8387e08a5215e1cd07a4b66b3779c2",
+    "t": 1793282709,
+    "who": "C-w2",
+    "subject": "Compound SELECT (UNION, UNION ALL, INTERSECT, EXCEPT) with ORDER BY/LIMIT over the result in minisql/compound.py; except",
+    "visible": 239
+   },
+   {
+    "hash": "ae6073f1663fc22b43f510b941e55f134654e553",
+    "t": 1793282722,
+    "who": "C-w4",
+    "subject": "minisql/jsonfuncs.py: JSON parse/dump with subtype, paths, json/valid/type/extract/array_length/array/object/quote/error",
+    "visible": 339
+   },
+   {
+    "hash": "f161a54e950d5de86ae9c104c809509a076e7e7b",
+    "t": 1793282760,
+    "who": "C-w1",
+    "subject": "Expression core: values.py (affinity, coercion, compare), expr.py (operators, NULL logic, IN/LIKE/GLOB/BETWEEN/CASE/CAST",
+    "visible": 747
+   },
+   {
+    "hash": "7482cc3323579663322a97cacb52e89b23d88712",
+    "t": 1793282776,
+    "who": "C-w4",
+    "subject": "minisql/mathfuncs.py: SQLite math functions (trig, hyperbolic, sqrt/exp/ln/log, pow/mod, ceil/floor/trunc, abs/sign, rou",
+    "visible": 835
+   },
+   {
+    "hash": "39802c807b8ee90a29839ef1129f9bd9f4be3ae2",
+    "t": 1793282782,
+    "who": "C-w2",
+    "subject": "WITH [RECURSIVE] CTEs and FROM subqueries (derived tables) in minisql/cte.py; run_query is the SELECT entry point; cte t",
+    "visible": 867
+   },
+   {
+    "hash": "1aa70c37e4d819f9490b63b27b7760ce9303303a",
+    "t": 1793282789,
+    "who": "C-w3",
+    "subject": "ALTER TABLE: RENAME TO, RENAME COLUMN, ADD COLUMN, DROP COLUMN",
+    "visible": 887
+   },
+   {
+    "hash": "61c7b2a8a2b3d038757a21422d5303e6600d65a6",
+    "t": 1793282789,
+    "who": "C-w3",
+    "subject": "ALTER TABLE (rename table/column, add/drop column); CREATE TABLE AS (lock alter released)",
+    "visible": 887
+   },
+   {
+    "hash": "6ab65acb77963aafb22cf126033ece774f99be7f",
+    "t": 1793282795,
+    "who": "C-w4",
+    "subject": "atanh(+-1) = +-inf; 'unixepoch' modifier rounding for negative times (lock mathfix released)",
+    "visible": 894
+   },
+   {
+    "hash": "46b938b6792ed827d4bb4f356e7007f774b75aec",
+    "t": 1793282802,
+    "who": "C-w1",
+    "subject": "substr/substring, instr, length in minisql/strfuncs.py (lock strfuncs released)",
+    "visible": 917
+   },
+   {
+    "hash": "d1dd853dd1998f18c25a547d0c8d685436af2e2d",
+    "t": 1793282828,
+    "who": "C-w1",
+    "subject": "like()/glob() functions, keyword LIKE/GLOB as function names, TRUE/FALSE literals, IS [NOT] TRUE/FALSE (lock exprfix rel",
+    "visible": 947
+   },
+   {
+    "hash": "32562c8cc005c632274693f7c5f19ff701597ab7",
+    "t": 1793282844,
+    "who": "C-w1",
+    "subject": "trim/ltrim/rtrim with char sets, replace, concat, concat_ws (lock strfuncs2 released)",
+    "visible": 977
+   },
+   {
+    "hash": "45aafa626b7383a3a118c1f940d47437e142ea7d",
+    "t": 1793282858,
+    "who": "C-w4",
+    "subject": "minisql/printf.py: SQLite printf/format (flags, width, precision, d/u/x/o/f/e/g/s/c/q/Q/w, half-up %f rounding) and quot",
+    "visible": 1007
+   },
+   {
+    "hash": "7bda1b37596e24c891e4c757d34b8e6222d9d927",
+    "t": 1793282869,
+    "who": "C-w1",
+    "subject": "typeof, iif/if (lazy, multi-branch), scalar min/max in minisql/scalarfuncs.py (lock scalars released)",
+    "visible": 1037
+   },
+   {
+    "hash": "e4673bb2712f651d3630bddf33bc59a115d77d89",
+    "t": 1793282874,
+    "who": "C-w3",
+    "subject": "INSERT ... ON CONFLICT DO NOTHING/UPDATE (excluded.*), RETURNING on INSERT/UPDATE/DELETE, CREATE INDEX no-op (lock upser",
+    "visible": 1067
+   },
+   {
+    "hash": "18cb5c7d623a59fe366b8817a72fd3f4bd891e50",
+    "t": 1793282886,
+    "who": "C-w2",
+    "subject": "Window functions in minisql/window.py: OVER (PARTITION BY/ORDER BY/ROWS|RANGE frames), WINDOW named windows, row_number/",
+    "visible": 1177
+   },
+   {
+    "hash": "4c3908eb66149bd22cc6df658fe7e32c6a991fe4",
+    "t": 1793282889,
+    "who": "C-w4",
+    "subject": "minisql/aggx.py: json_group_array/object, median, percentile, percentile_cont, percentile_disc hooked into aggregate.py ",
+    "visible": 1207
+   },
+   {
+    "hash": "fc7c200f5e2be85a007551f2382a8f853f651796",
+    "t": 1793282897,
+    "who": "C-w1",
+    "subject": "hex, unhex, octet_length (blob literals already lexed) (lock bytes released)",
+    "visible": 1237
+   },
+   {
+    "hash": "918ecdb2feb46a3498e3219709895297d4c6ee50",
+    "t": 1793282920,
+    "who": "C-w1",
+    "subject": "row-value comparisons (=, <>, <, <=, >, >=), char(), unicode() (lock rowvals released)",
+    "visible": 1257
+   },
+   {
+    "hash": "f0221877da3d03f7043db620a2d3bb4a8761d91c",
+    "t": 1793282929,
+    "who": "C-w2",
+    "subject": "Aggregate FILTER (WHERE ...) and ORDER BY inside aggregate calls; HAVING can name select-list aliases (lock aggx release",
+    "visible": 1287
+   },
+   {
+    "hash": "2dd15dc84e24d4c55f5c003f9f8d1235a7e903d2",
+    "t": 1793282934,
+    "who": "C-w4",
+    "subject": "ORDER BY ... NULLS FIRST/LAST (parser OrderDir) and collation-aware ORDER BY keys (COLLATE NOCASE/RTRIM) (lock nulls rel",
+    "visible": 1300
+   },
+   {
+    "hash": "f1f752cc0b168e1328f889d5f6db2e96ac102c24",
+    "t": 1793282941,
+    "who": "C-w1",
+    "subject": "VALUES as a top-level statement (lock valuesclause released)",
+    "visible": 1310
+   },
+   {
+    "hash": "9984a2b3fae332781a8f847c849fe61a018f3e80",
+    "t": 1793282945,
+    "who": "C-w3",
+    "subject": "Transactions (BEGIN/COMMIT/ROLLBACK, savepoints) in txn.py, UPDATE ... FROM, CREATE VIEW (resolved in FROM), CREATE TABL",
+    "visible": 1340
+   }
+  ],
+  "visible_pass": 1340,
+  "visible_n": 1340,
+  "hidden_pass": 2080,
+  "hidden_n": 2080
+ },
+ "X": {
+  "team_start": 1793283097,
+  "mix": "codex",
+  "progress": [
+   {
+    "hash": "7c2f65ad0c7da37443c57ce317fbd7b3bd1a963c",
+    "t": 1793074251,
+    "who": "referee",
+    "subject": "Initial skeleton: lexer, parser, engine; 210 visible tests",
+    "visible": 9
+   },
+   {
+    "hash": "fac982b9d3d2bbcba0bb20ff8b9e75de06c50d95",
+    "t": 1793074846,
+    "who": "A-builder-1",
+    "subject": "Expression parser with precedence climbing; arithmetic, comparison, AND/OR/NOT, || evaluation (lock arith released)",
+    "visible": 31
+   },
+   {
+    "hash": "58502b5bc022ff290ae7bc6bb2cc02c45d8f79fe",
+    "t": 1793074866,
+    "who": "A-builder-2",
+    "subject": "ORDER BY (multi-key, ASC/DESC, SQLite type ordering, alias/position), LIMIT/OFFSET (lock order_limit released)",
+    "visible": 46
+   },
+   {
+    "hash": "43cd7099813038102340f943c553ae89cfef7fc2",
+    "t": 1793074882,
+    "who": "A-builder-6",
+    "subject": "UPDATE/DELETE statements with optional WHERE; rest of category needs BETWEEN (where) and COUNT (aggregates) (lock update",
+    "visible": 52
+   },
+   {
+    "hash": "d66efd532e0dc28da87f27f0e598c7636e37fe49",
+    "t": 1793074890,
+    "who": "A-builder-5",
+    "subject": "FROM table aliases and qualified column refs (lock basic released)",
+    "visible": 55
+   },
+   {
+    "hash": "4eefde39001318a45dc82c5b2ed5a28d77bf0be9",
+    "t": 1793074905,
+    "who": "A-builder-1",
+    "subject": "CASE expressions (simple and searched); remaining case tests need IS NULL (where) and SUM (aggregates) (lock case releas",
+    "visible": 58
+   },
+   {
+    "hash": "6004fa36782c339e2a42059c0350d43b93788bdc",
+    "t": 1793074921,
+    "who": "A-builder-2",
+    "subject": "SELECT DISTINCT / ALL: dedup output rows before ORDER BY/LIMIT (lock distinct released)",
+    "visible": 69
+   },
+   {
+    "hash": "888d758ea82acdc7234e574857753b1bc1ff65c0",
+    "t": 1793074934,
+    "who": "A-builder-5",
+    "subject": "Joins: comma/CROSS/[INNER] JOIN ... ON, LEFT [OUTER] JOIN via Connection.source_rows; remaining join tests need WHERE/GR",
+    "visible": 82
+   },
+   {
+    "hash": "dd66f00c86f9ea4eb39f93ab1e64861a474f93ad",
+    "t": 1793074952,
+    "who": "A-builder-3",
+    "subject": "WHERE clause: comparisons, AND/OR/NOT, BETWEEN, IN, IS [NOT] NULL (lock where released)",
+    "visible": 129
+   },
+   {
+    "hash": "e9019fdc87e01083e3ee3f9d255efbfc18d7f682",
+    "t": 1793074976,
+    "who": "A-builder-4",
+    "subject": "Function-call parsing ('func' node) and aggregates COUNT/SUM/TOTAL/AVG/MIN/MAX/GROUP_CONCAT with DISTINCT, whole-table a",
+    "visible": 156
+   },
+   {
+    "hash": "96f0e6ef7caa2703b5e1e092109de874755cb252",
+    "t": 1793075006,
+    "who": "A-builder-1",
+    "subject": "Subqueries: scalar (correlated via outer-env fallback), IN (SELECT ...), FROM (SELECT ...) derived tables; remaining tes",
+    "visible": 169
+   },
+   {
+    "hash": "f3d0ded1b02650adf13c9a19ea00c5988d70cc93",
+    "t": 1793075009,
+    "who": "A-builder-6",
+    "subject": "Function-call parsing ('func', NAME, args, distinct), scalar funcs (SUBSTR/UPPER/LOWER/LENGTH/IFNULL/NULLIF/COALESCE/ABS",
+    "visible": 183
+   },
+   {
+    "hash": "1b53f1083eb1b016c12b2595ced03f7b2417112a",
+    "t": 1793075048,
+    "who": "A-builder-2",
+    "subject": "GROUP BY (exprs, positions, alias fallback) and HAVING, with and without GROUP BY (lock group_by released)",
+    "visible": 210
+   },
+   {
+    "hash": "7da5a3cfeda41d7be4381b8a18b3bf0bca3cac54",
+    "t": 1793078416,
+    "who": "referee",
+    "subject": "Gate 2: 113 new feature categories (1,130 visible tests), compact --summary, tools/claim.sh",
+    "visible": 362
+   },
+   {
+    "hash": "18453385e40339e550a50d984ee71ecd4f206a49",
+    "t": 1793082269,
+    "who": "referee",
+    "subject": "Protocol v2: category claims (tools/claim.py) and guarded landing (tools/land.py)",
+    "visible": 362
+   },
+   {
+    "hash": "32d232d93bc0c3e38dc8d1455642ca02383ef1c9",
+    "t": 1793283141,
+    "who": "X-w3",
+    "subject": "Clarify string function module interface and ORDER BY foundation ownership",
+    "visible": 9
+   },
+   {
+    "hash": "9ac5401bd0c04ab46a65b5cd704df90ed1d37f7a",
+    "t": 1793283147,
+    "who": "X-w4",
+    "subject": "Support hex, blob, and exponent literals with scalar call parsing (lock literals released)",
+    "visible": 42
+   },
+   {
+    "hash": "de636d046cb6ece6f105dd24d8a47113162c9207",
+    "t": 1793283162,
+    "who": "X-w2",
+    "subject": "Implement JSON extraction, types, validity and scalar call parsing (lock json_read released)",
+    "visible": 78
+   },
+   {
+    "hash": "6e7dd29d4e7383b494720461acb85ff970f056e6",
+    "t": 1793283178,
+    "who": "X-w4",
+    "subject": "Lex SQL comments and delimited identifiers",
+    "visible": 88
+   },
+   {
+    "hash": "65580356ef868733165b6d6b2c632b069f41dad2",
+    "t": 1793283183,
+    "who": "X-w4",
+    "subject": "Support comments and quoted SQL identifiers (lock quoted released)",
+    "visible": 88
+   },
+   {
+    "hash": "c9fb0e0dfb65bbd326b524cbc0e57c269349481d",
+    "t": 1793283189,
+    "who": "X-w1",
+    "subject": "Add scalar function dispatch, numeric math functions, and initial ORDER BY (lock math_funcs released)",
+    "visible": 118
+   },
+   {
+    "hash": "ef0836c1d66eb9a89a0196241ad62a2699822139",
+    "t": 1793283199,
+    "who": "X-w2",
+    "subject": "Implement JSON constructors, result subtype, array length and minification (lock json_build released)",
+    "visible": 148
+   },
+   {
+    "hash": "d3a7d798fb56027c51acabfbf2f00a94de52bddf",
+    "t": 1793283218,
+    "who": "X-w3",
+    "subject": "Implement string scalars and ORDER BY support",
+    "visible": 158
+   },
+   {
+    "hash": "6e3a142c5aad08c9db56cab182bb2b3e04751642",
+    "t": 1793283218,
+    "who": "X-w3",
+    "subject": "Add SQLite string scalar functions and ordered SELECT evaluation (lock string_funcs released)",
+    "visible": 188
+   },
+   {
+    "hash": "a782e8ad6a4731e560f3041bd87d28656b2e3c70",
+    "t": 1793283224,
+    "who": "X-w2",
+    "subject": "Implement JSON mutation, removal and recursive merge patch (lock json_modify released)",
+    "visible": 218
+   },
+   {
+    "hash": "6de5504794d41c37dfcfbe03e127d2034414d822",
+    "t": 1793283237,
+    "who": "X-w4",
+    "subject": "Implement expression precedence, SQL arithmetic and NULL logic, and WHERE (lock expr_core released)",
+    "visible": 303
+   },
+   {
+    "hash": "b5d120c9ce8b52b65fc1768ecd439ac8b3bcc11c",
+    "t": 1793283255,
+    "who": "X-w1",
+    "subject": "Add trigonometric, hyperbolic, and logarithmic scalar functions",
+    "visible": 331
+   },
+   {
+    "hash": "dada3588102e27142c744c84d6df9455d937dae4",
+    "t": 1793283255,
+    "who": "X-w1",
+    "subject": "Add trigonometric, hyperbolic, and logarithmic functions (lock math_more released)",
+    "visible": 331
+   },
+   {
+    "hash": "74a88ed8038a64113cbdc6b4892948df2bca396b",
+    "t": 1793283258,
+    "who": "X-w2",
+    "subject": "Implement DATE, TIME and DATETIME scalar functions (lock dates_basic released)",
+    "visible": 361
+   },
+   {
+    "hash": "8637ea80e610faf6b907e67a1dd955f227b49b1b",
+    "t": 1793283271,
+    "who": "X-w3",
+    "subject": "Implement substring indexing and text case/length functions",
+    "visible": 384
+   },
+   {
+    "hash": "391a5091d42aa01aa9145b54496c457a3727046c",
+    "t": 1793283271,
+    "who": "X-w3",
+    "subject": "Implement SQLite substr, text lengths, case conversion, and LIKE (lock text_more released)",
+    "visible": 386
+   },
+   {
+    "hash": "67940ac7c749c7ffa0895c77e1582856ef89e4a9",
+    "t": 1793283281,
+    "who": "X-w2",
+    "subject": "Implement date modifiers, calendar shifts and dynamic offsets (lock date_modifiers released)",
+    "visible": 406
+   },
+   {
+    "hash": "4ea830c3df3ca344e2dd055dd9ba12ea7d28c36c",
+    "t": 1793283285,
+    "who": "X-w1",
+    "subject": "Add round, trunc, power, modulo and correct hyperbolic endpoints (lock math_finish released)",
+    "visible": 428
+   },
+   {
+    "hash": "b5dc767a81a66b60ff28d754d4dc0c6b61d18352",
+    "t": 1793283291,
+    "who": "X-w4",
+    "subject": "Note COUNT and subquery foundations for SELECT core claim",
+    "visible": 428
+   },
+   {
+    "hash": "872054ebb3a942569fc9ae20418fb0130df3e32f",
+    "t": 1793283291,
+    "who": "X-w4",
+    "subject": "Implement SELECT aliases, DISTINCT, LIMIT/OFFSET, COUNT and scalar subqueries (lock select_core released)",
+    "visible": 506
+   },
+   {
+    "hash": "039b5c9cba9e99b20e5a414005cad3741f666670",
+    "t": 1793283301,
+    "who": "X-w3",
+    "subject": "Implement GLOB, LIKE escape and negation, and CONCAT functions (lock patterns released)",
+    "visible": 536
+   },
+   {
+    "hash": "84675194c865dbbae3828a19f43bf9a557c30205",
+    "t": 1793283312,
+    "who": "X-w2",
+    "subject": "Implement Julian day, unix epoch and strftime calendar functions (lock date_epochs released)",
+    "visible": 566
+   },
+   {
+    "hash": "26bbb8806a908f1e81067353fc7cd7c033dbb093",
+    "t": 1793283325,
+    "who": "X-w3",
+    "subject": "Implement character, hex decoding, and SQL literal quoting functions (lock literals_text released)",
+    "visible": 596
+   },
+   {
+    "hash": "23dd2ac7a5170d978c8a3b828ea33add4c1e2c1e",
+    "t": 1793283340,
+    "who": "X-w4",
+    "subject": "Build qualified row environments and inner/cross/left join execution",
+    "visible": 636
+   },
+   {
+    "hash": "358e97727b96e5f85dc834fb56536caaddb709a6",
+    "t": 1793283352,
+    "who": "X-w2",
+    "subject": "Implement TIMEDIFF, JSON_ERROR_POSITION and JSON arrow expressions (lock scalar_finish released)",
+    "visible": 666
+   },
+   {
+    "hash": "424139b55417c7e25adae8c9c8ab53f653e30e12",
+    "t": 1793283363,
+    "who": "X-w3",
+    "subject": "Implement UPDATE, DELETE and IN SELECT predicates (lock mutations released)",
+    "visible": 697
+   },
+   {
+    "hash": "11dd6de0694892a87fcb8ee98203c92728dbb457",
+    "t": 1793283377,
+    "who": "X-w4",
+    "subject": "Add natural/USING and right/full relational joins",
+    "visible": 717
+   },
+   {
+    "hash": "86d21c48c00c487e5701a84df5e9b119ec3ec546",
+    "t": 1793283377,
+    "who": "X-w4",
+    "subject": "Implement qualified relational joins including NATURAL USING and outer joins (lock join_kinds released)",
+    "visible": 717
+   },
+   {
+    "hash": "b9d1299ab461dad9bc2e22e05b616ac85d3bb987",
+    "t": 1793283380,
+    "who": "X-w2",
+    "subject": "Implement lazy CASE and IF/IIF expressions (lock conditionals released)",
+    "visible": 752
+   },
+   {
+    "hash": "99d3f1f137dcba4f58ae7ad8b6da21f9c333be1a",
+    "t": 1793283390,
+    "who": "X-w3",
+    "subject": "Support tuple assignments in UPDATE using original row values (lock update_affinity released)",
+    "visible": 762
+   },
+   {
+    "hash": "d7c6a4482b8214b3c6915b1c3a1f7c5593985e8b",
+    "t": 1793283407,
+    "who": "X-w2",
+    "subject": "Implement CAST affinities, boolean literals and IS TRUE/FALSE tests (lock casts released)",
+    "visible": 792
+   },
+   {
+    "hash": "9afce3f17e6e1d785b34119f151bc8ac6397ef1a",
+    "t": 1793283411,
+    "who": "X-w1",
+    "subject": "Implement grouped aggregation, HAVING and empty-input aggregate semantics (lock aggregate_core released)",
+    "visible": 832
+   },
+   {
+    "hash": "7bb27aecad526143214260d5f0a47a16bd34bc63",
+    "t": 1793283435,
+    "who": "X-w4",
+    "subject": "Add correlated scalar, EXISTS and IN subqueries and derived table sources",
+    "visible": 860
+   },
+   {
+    "hash": "6dc12dda07da2880aa86a558051fa0caaca2f748",
+    "t": 1793283435,
+    "who": "X-w4",
+    "subject": "Validate inner and left joins with grouped execution (lock joins released)",
+    "visible": 860
+   },
+   {
+    "hash": "f2076545e87bcf06478c9df050ed5981675a754d",
+    "t": 1793283438,
+    "who": "X-w4",
+    "subject": "Implement derived tables and correlated scalar EXISTS IN subqueries (lock subqueries released)",
+    "visible": 860
+   },
+   {
+    "hash": "60d4ea657f685cba9bc6cbf629e1e2c25d79a1bc",
+    "t": 1793283443,
+    "who": "X-w2",
+    "subject": "Implement COLLATE, IS DISTINCT FROM and row-value comparisons (lock comparisons released)",
+    "visible": 890
+   },
+   {
+    "hash": "e94cd8c58a6b23f409885b6c894693d161275eb4",
+    "t": 1793283453,
+    "who": "X-w3",
+    "subject": "Track table schema, insert defaults/columns, affinities and integer primary keys (lock table_schema released)",
+    "visible": 920
+   },
+   {
+    "hash": "42ec1afcd0b3d82dbadfadcc8faf8255abfc2ade",
+    "t": 1793283468,
+    "who": "X-w1",
+    "subject": "Add FILTER, aggregate ORDER BY and JSON group aggregates (lock aggregate_extensions released)",
+    "visible": 950
+   },
+   {
+    "hash": "f46460d34b429bb83119804c9c72886928415d7d",
+    "t": 1793283474,
+    "who": "X-w4",
+    "subject": "Implement compound SELECT set operations and final ordering and limits (lock compounds released)",
+    "visible": 1000
+   },
+   {
+    "hash": "b81a532bb03f21233c3d4dc7a089d8345f7fc729",
+    "t": 1793283490,
+    "who": "X-w3",
+    "subject": "Enforce insertion constraints and IGNORE/REPLACE conflict modes (lock constraints released)",
+    "visible": 1030
+   },
+   {
+    "hash": "24b389a4c894cb591e65ae2864b2ea495437dd19",
+    "t": 1793283504,
+    "who": "X-w2",
+    "subject": "Implement generic window OVER parsing, partitions, ranking and whole-partition aggregates (lock windows_core released)",
+    "visible": 1064
+   },
+   {
+    "hash": "46ed7a50909da0a597ed8b53c332631de1067ad9",
+    "t": 1793283511,
+    "who": "X-w1",
+    "subject": "Implement median, percentile aggregates and scalar min/max (lock stats released)",
+    "visible": 1094
+   },
+   {
+    "hash": "d818772ce9c6ad85d48af46b857ca1ca92de800e",
+    "t": 1793283516,
+    "who": "X-w4",
+    "subject": "Implement basic, chained and recursive WITH queries (lock ctes released)",
+    "visible": 1124
+   },
+   {
+    "hash": "4093804d14114a7af276dfd9bcf9a5b23f56f3fe",
+    "t": 1793283532,
+    "who": "X-w3",
+    "subject": "Implement ALTER TABLE additions/renames and DROP TABLE (lock schema_changes released)",
+    "visible": 1154
+   },
+   {
+    "hash": "5754874bdab45ecb0eb1ffe379e9726420e5d46b",
+    "t": 1793283538,
+    "who": "X-w2",
+    "subject": "Implement cumulative window aggregates, ROWS/RANGE/GROUPS frames and first/last values (lock windows_frames released)",
+    "visible": 1180
+   },
+   {
+    "hash": "b4fb4f34f60e09e550ab168feedeba58d8b57984",
+    "t": 1793283553,
+    "who": "X-w4",
+    "subject": "Implement CREATE TABLE AS, INSERT SELECT and dynamic views (lock materialize released)",
+    "visible": 1210
+   },
+   {
+    "hash": "ab10b907f8055ef75e1c325e0d8d7e5903ea5d6b",
+    "t": 1793283560,
+    "who": "X-w1",
+    "subject": "Add SQLite printf and format scalar functions (lock formatting released)",
+    "visible": 1230
+   },
+   {
+    "hash": "4ed9a267a53374c510f5dc5848971219d340a426",
+    "t": 1793283572,
+    "who": "X-w2",
+    "subject": "Implement LAG/LEAD, NTH_VALUE and NTILE window functions (lock window_navigation released)",
+    "visible": 1260
+   },
+   {
+    "hash": "34e08646f2a5b2c583a71e13ebbd880af37fa456",
+    "t": 1793283595,
+    "who": "X-w2",
+    "subject": "Implement percentage windows and named WINDOW specifications (lock window_finish released)",
+    "visible": 1280
+   },
+   {
+    "hash": "5651ca6610ecf845ed0574055f8402fb54dd6807",
+    "t": 1793283606,
+    "who": "X-w4",
+    "subject": "Implement VALUES, index declarations and transaction/savepoint control (lock statements released)",
+    "visible": 1310
+   },
+   {
+    "hash": "2f2db54606e071cb292323028363deb1234e1aba",
+    "t": 1793283612,
+    "who": "X-w3",
+    "subject": "Implement DML RETURNING, UPDATE FROM, and conflict-target UPSERT (lock dml_advanced released)",
+    "visible": 1340
+   }
+  ],
+  "visible_pass": 1340,
+  "visible_n": 1340,
+  "hidden_pass": 2078,
+  "hidden_n": 2080
+ },
+ "LX": {
+  "lead_agent": "codex",
+  "lead_start": 1793283772,
+  "plan_seconds": 85,
+  "lead_end": 1793284477,
+  "lead_cost": null,
+  "lead_tokens": 754779,
+  "team_start": 1793283772,
+  "mix": "claude",
+  "progress": [
+   {
+    "hash": "7c2f65ad0c7da37443c57ce317fbd7b3bd1a963c",
+    "t": 1793074251,
+    "who": "referee",
+    "subject": "Initial skeleton: lexer, parser, engine; 210 visible tests",
+    "visible": 9
+   },
+   {
+    "hash": "fac982b9d3d2bbcba0bb20ff8b9e75de06c50d95",
+    "t": 1793074846,
+    "who": "A-builder-1",
+    "subject": "Expression parser with precedence climbing; arithmetic, comparison, AND/OR/NOT, || evaluation (lock arith released)",
+    "visible": 31
+   },
+   {
+    "hash": "58502b5bc022ff290ae7bc6bb2cc02c45d8f79fe",
+    "t": 1793074866,
+    "who": "A-builder-2",
+    "subject": "ORDER BY (multi-key, ASC/DESC, SQLite type ordering, alias/position), LIMIT/OFFSET (lock order_limit released)",
+    "visible": 46
+   },
+   {
+    "hash": "43cd7099813038102340f943c553ae89cfef7fc2",
+    "t": 1793074882,
+    "who": "A-builder-6",
+    "subject": "UPDATE/DELETE statements with optional WHERE; rest of category needs BETWEEN (where) and COUNT (aggregates) (lock update",
+    "visible": 52
+   },
+   {
+    "hash": "d66efd532e0dc28da87f27f0e598c7636e37fe49",
+    "t": 1793074890,
+    "who": "A-builder-5",
+    "subject": "FROM table aliases and qualified column refs (lock basic released)",
+    "visible": 55
+   },
+   {
+    "hash": "4eefde39001318a45dc82c5b2ed5a28d77bf0be9",
+    "t": 1793074905,
+    "who": "A-builder-1",
+    "subject": "CASE expressions (simple and searched); remaining case tests need IS NULL (where) and SUM (aggregates) (lock case releas",
+    "visible": 58
+   },
+   {
+    "hash": "6004fa36782c339e2a42059c0350d43b93788bdc",
+    "t": 1793074921,
+    "who": "A-builder-2",
+    "subject": "SELECT DISTINCT / ALL: dedup output rows before ORDER BY/LIMIT (lock distinct released)",
+    "visible": 69
+   },
+   {
+    "hash": "888d758ea82acdc7234e574857753b1bc1ff65c0",
+    "t": 1793074934,
+    "who": "A-builder-5",
+    "subject": "Joins: comma/CROSS/[INNER] JOIN ... ON, LEFT [OUTER] JOIN via Connection.source_rows; remaining join tests need WHERE/GR",
+    "visible": 82
+   },
+   {
+    "hash": "dd66f00c86f9ea4eb39f93ab1e64861a474f93ad",
+    "t": 1793074952,
+    "who": "A-builder-3",
+    "subject": "WHERE clause: comparisons, AND/OR/NOT, BETWEEN, IN, IS [NOT] NULL (lock where released)",
+    "visible": 129
+   },
+   {
+    "hash": "e9019fdc87e01083e3ee3f9d255efbfc18d7f682",
+    "t": 1793074976,
+    "who": "A-builder-4",
+    "subject": "Function-call parsing ('func' node) and aggregates COUNT/SUM/TOTAL/AVG/MIN/MAX/GROUP_CONCAT with DISTINCT, whole-table a",
+    "visible": 156
+   },
+   {
+    "hash": "96f0e6ef7caa2703b5e1e092109de874755cb252",
+    "t": 1793075006,
+    "who": "A-builder-1",
+    "subject": "Subqueries: scalar (correlated via outer-env fallback), IN (SELECT ...), FROM (SELECT ...) derived tables; remaining tes",
+    "visible": 169
+   },
+   {
+    "hash": "f3d0ded1b02650adf13c9a19ea00c5988d70cc93",
+    "t": 1793075009,
+    "who": "A-builder-6",
+    "subject": "Function-call parsing ('func', NAME, args, distinct), scalar funcs (SUBSTR/UPPER/LOWER/LENGTH/IFNULL/NULLIF/COALESCE/ABS",
+    "visible": 183
+   },
+   {
+    "hash": "1b53f1083eb1b016c12b2595ced03f7b2417112a",
+    "t": 1793075048,
+    "who": "A-builder-2",
+    "subject": "GROUP BY (exprs, positions, alias fallback) and HAVING, with and without GROUP BY (lock group_by released)",
+    "visible": 210
+   },
+   {
+    "hash": "7da5a3cfeda41d7be4381b8a18b3bf0bca3cac54",
+    "t": 1793078416,
+    "who": "referee",
+    "subject": "Gate 2: 113 new feature categories (1,130 visible tests), compact --summary, tools/claim.sh",
+    "visible": 362
+   },
+   {
+    "hash": "18453385e40339e550a50d984ee71ecd4f206a49",
+    "t": 1793082269,
+    "who": "referee",
+    "subject": "Protocol v2: category claims (tools/claim.py) and guarded landing (tools/land.py)",
+    "visible": 362
+   },
+   {
+    "hash": "244d7357ac508c0523b9bea41070740dc104cb2a",
+    "t": 1793283852,
+    "who": "LX-lead",
+    "subject": "BRAIN: plan",
+    "visible": 9
+   },
+   {
+    "hash": "9abdd0f1d32db185b66cdc4136aa11ac6c2789f9",
+    "t": 1793283971,
+    "who": "LX-w3",
+    "subject": "functions.py: scalar registry + dispatcher, string/math/printf/quote/hex/like/glob functions (lock scalar released)",
+    "visible": 9
+   },
+   {
+    "hash": "854798c5633f5fe9cfecfb19fa05d0f69b0f6e28",
+    "t": 1793283998,
+    "who": "LX-lead",
+    "subject": "BRAIN: update",
+    "visible": 9
+   },
+   {
+    "hash": "ae98d4bda7e4e51cf97e2646e13b3e4445f67ca4",
+    "t": 1793284000,
+    "who": "LX-w5",
+    "subject": "functions_json.py: all JSON scalar functions, -> / ->> callables, group helpers (lock json released)",
+    "visible": 9
+   },
+   {
+    "hash": "350f7a9c3f6010ddc9d76c39b2e28b648ed43ba4",
+    "t": 1793284009,
+    "who": "LX-w2",
+    "subject": "SELECT core: full SELECT grammar, joins, ORDER BY/LIMIT/OFFSET, DISTINCT, grouping hooks, compound, delegation to parser",
+    "visible": 98
+   },
+   {
+    "hash": "1185a4143219422604e917b833280f6124cb402c",
+    "t": 1793284015,
+    "who": "LX-w2",
+    "subject": "tools/land.py: work on Python 3.11.2 (no tarfile filter)",
+    "visible": 98
+   },
+   {
+    "hash": "7975cc47ee382a264574107c2b82a8e2422131d7",
+    "t": 1793284017,
+    "who": "LX-w6",
+    "subject": "functions_datetime.py: date/time/datetime/julianday/unixepoch/strftime/timediff with SQLite date.c arithmetic (lock date",
+    "visible": 98
+   },
+   {
+    "hash": "ce15ad6b2b02825262fbc9fabc67177f8d6acaae",
+    "t": 1793284039,
+    "who": "LX-w3",
+    "subject": "functions.py: printf/format/pow/log/replace edge cases from sqlite differential test (lock scalar2 released)",
+    "visible": 98
+   },
+   {
+    "hash": "fadfa5f7d9de434dfc162215e8ac07c337635913",
+    "t": 1793284044,
+    "who": "LX-w6",
+    "subject": "functions_datetime: exact unixepoch rounding for negative seconds; date family verified (needs only call evaluation) (lo",
+    "visible": 98
+   },
+   {
+    "hash": "979f7248e01bd1e38379fc454922aeeb0f72f00c",
+    "t": 1793284073,
+    "who": "LX-w6",
+    "subject": "functions.py: ATANH(+-1) returns +-inf as in SQLite (lock hyper released)",
+    "visible": 98
+   },
+   {
+    "hash": "ba30a8be03e1dfd3f588ca8da78d3e9798d0ab3c",
+    "t": 1793284076,
+    "who": "LX-w4",
+    "subject": "storage.py + parser_dml.py: CREATE/INSERT/UPDATE/DELETE/DROP/ALTER/transactions, affinity, defaults, INTEGER PRIMARY KEY",
+    "visible": 158
+   },
+   {
+    "hash": "65ee2b9d70f3c4cb136ec67cfddc483c7b8bccf9",
+    "t": 1793284078,
+    "who": "LX-w5",
+    "subject": "aggregates.py: accumulator library for all aggregate functions (step/inverse/value, distinct) (lock agglib released)",
+    "visible": 158
+   },
+   {
+    "hash": "72ba633eb6c0da4c2b058e660ec0997745575c26",
+    "t": 1793284092,
+    "who": "LX-w2",
+    "subject": "grouping.py: GROUP BY/HAVING/aggregate substitution, built-in COUNT/SUM/TOTAL/AVG/MIN/MAX/GROUP_CONCAT",
+    "visible": 158
+   },
+   {
+    "hash": "5ef1aa4338c3140515f74f3908635a27e9522bdc",
+    "t": 1793284094,
+    "who": "LX-w1",
+    "subject": "Expression foundation: lexer (hex/blob/exp/comments/quoted idents), parser_expr.parse_expr, expressions.evaluate + SQLit",
+    "visible": 1057
+   },
+   {
+    "hash": "86974a9010fc6debc6e05d445d5f202a1ff81dd8",
+    "t": 1793284125,
+    "who": "LX-w5",
+    "subject": "JSON scalar categories pass after expression wiring; release lock (lock json2 released)",
+    "visible": 1057
+   },
+   {
+    "hash": "d5e96ce673fd2bde9980d8d107d2964b6ae84554",
+    "t": 1793284133,
+    "who": "LX-w1",
+    "subject": "Subqueries/EXISTS/IN-select: evaluate falls back to ctx.run_select (lock subq released)",
+    "visible": 1110
+   },
+   {
+    "hash": "721a7c3692a28c34cb4c17181c88b256322170a6",
+    "t": 1793284148,
+    "who": "LX-w4",
+    "subject": "storage: ON CONFLICT DO UPDATE/NOTHING, RETURNING for INSERT/UPDATE/DELETE (lock upsert released)",
+    "visible": 1130
+   },
+   {
+    "hash": "06339e2136f8630e48ab6aacfb960fa8900a9623",
+    "t": 1793284159,
+    "who": "LX-w1",
+    "subject": "Row value comparisons in expressions (lock rowval released)",
+    "visible": 1139
+   },
+   {
+    "hash": "bf098392a6edc0c095ad7c9cd392f413c6f1cd1f",
+    "t": 1793284167,
+    "who": "LX-lead",
+    "subject": "BRAIN: update",
+    "visible": 1139
+   },
+   {
+    "hash": "48ab1559387b7e6195dc95cea2f44f215a598ce6",
+    "t": 1793284169,
+    "who": "LX-w5",
+    "subject": "Aggregate FILTER (WHERE), ORDER BY and DISTINCT options in grouping; window calls excluded from group aggregation (lock ",
+    "visible": 1170
+   },
+   {
+    "hash": "5eed9e0550b4cc7625b537cdb9780bf303c20405",
+    "t": 1793284181,
+    "who": "LX-w4",
+    "subject": "storage: UPDATE ... FROM (last matching source row), CREATE VIEW stores select in conn.views (lock updfrom released)",
+    "visible": 1190
+   },
+   {
+    "hash": "0c0cf5b67576b7ec98837a2d3f5dfa9ff2fc1361",
+    "t": 1793284187,
+    "who": "LX-w1",
+    "subject": "SELECT * hides right-side USING/NATURAL columns (engine.Bindings.hidden) (lock natjoin released)",
+    "visible": 1195
+   },
+   {
+    "hash": "6b9e3d61038db0082e8196f1c22dc370a1070724",
+    "t": 1793284205,
+    "who": "LX-w3",
+    "subject": "Release lock aggopts (already landed by another worker)",
+    "visible": 1195
+   },
+   {
+    "hash": "6d29a5bef2bbbdb5864438cfa8f960ba6d847b65",
+    "t": 1793284205,
+    "who": "LX-w3",
+    "subject": "ORDER BY: COLLATE NOCASE sort keys, NULLS FIRST/LAST not inverted by DESC (lock order released)",
+    "visible": 1200
+   },
+   {
+    "hash": "5698fec9b8c5d6778e18289c2a662c08062393ba",
+    "t": 1793284254,
+    "who": "LX-w6",
+    "subject": "windows.py: window core (OVER/WINDOW parsing, partitions, frames, ranking/value/aggregate window functions); engine anno",
+    "visible": 1310
+   },
+   {
+    "hash": "3d5abef24936e845a4f10319d4710c549db0231b",
+    "t": 1793284265,
+    "who": "LX-w2",
+    "subject": "ctes.py: WITH / WITH RECURSIVE execution; release agg lock (aggregates/group_by pass) (lock cte released)",
+    "visible": 1340
+   },
+   {
+    "hash": "8a58050d58ad95958cc5ac69a5ee7093452b8d9f",
+    "t": 1793284352,
+    "who": "LX-lead",
+    "subject": "BRAIN: update",
+    "visible": 1340
+   }
+  ],
+  "visible_pass": 1340,
+  "visible_n": 1340,
+  "hidden_pass": 2076,
+  "hidden_n": 2080
+ },
+ "LC": {
+  "lead_agent": "claude",
+  "lead_start": 1793284478,
+  "plan_seconds": 75,
+  "lead_end": 1793285203,
+  "lead_cost": 0.8101826,
+  "lead_tokens": 175718,
+  "team_start": 1793284478,
+  "mix": "claude",
+  "progress": [
+   {
+    "hash": "7c2f65ad0c7da37443c57ce317fbd7b3bd1a963c",
+    "t": 1793074251,
+    "who": "referee",
+    "subject": "Initial skeleton: lexer, parser, engine; 210 visible tests",
+    "visible": 9
+   },
+   {
+    "hash": "fac982b9d3d2bbcba0bb20ff8b9e75de06c50d95",
+    "t": 1793074846,
+    "who": "A-builder-1",
+    "subject": "Expression parser with precedence climbing; arithmetic, comparison, AND/OR/NOT, || evaluation (lock arith released)",
+    "visible": 31
+   },
+   {
+    "hash": "58502b5bc022ff290ae7bc6bb2cc02c45d8f79fe",
+    "t": 1793074866,
+    "who": "A-builder-2",
+    "subject": "ORDER BY (multi-key, ASC/DESC, SQLite type ordering, alias/position), LIMIT/OFFSET (lock order_limit released)",
+    "visible": 46
+   },
+   {
+    "hash": "43cd7099813038102340f943c553ae89cfef7fc2",
+    "t": 1793074882,
+    "who": "A-builder-6",
+    "subject": "UPDATE/DELETE statements with optional WHERE; rest of category needs BETWEEN (where) and COUNT (aggregates) (lock update",
+    "visible": 52
+   },
+   {
+    "hash": "d66efd532e0dc28da87f27f0e598c7636e37fe49",
+    "t": 1793074890,
+    "who": "A-builder-5",
+    "subject": "FROM table aliases and qualified column refs (lock basic released)",
+    "visible": 55
+   },
+   {
+    "hash": "4eefde39001318a45dc82c5b2ed5a28d77bf0be9",
+    "t": 1793074905,
+    "who": "A-builder-1",
+    "subject": "CASE expressions (simple and searched); remaining case tests need IS NULL (where) and SUM (aggregates) (lock case releas",
+    "visible": 58
+   },
+   {
+    "hash": "6004fa36782c339e2a42059c0350d43b93788bdc",
+    "t": 1793074921,
+    "who": "A-builder-2",
+    "subject": "SELECT DISTINCT / ALL: dedup output rows before ORDER BY/LIMIT (lock distinct released)",
+    "visible": 69
+   },
+   {
+    "hash": "888d758ea82acdc7234e574857753b1bc1ff65c0",
+    "t": 1793074934,
+    "who": "A-builder-5",
+    "subject": "Joins: comma/CROSS/[INNER] JOIN ... ON, LEFT [OUTER] JOIN via Connection.source_rows; remaining join tests need WHERE/GR",
+    "visible": 82
+   },
+   {
+    "hash": "dd66f00c86f9ea4eb39f93ab1e64861a474f93ad",
+    "t": 1793074952,
+    "who": "A-builder-3",
+    "subject": "WHERE clause: comparisons, AND/OR/NOT, BETWEEN, IN, IS [NOT] NULL (lock where released)",
+    "visible": 129
+   },
+   {
+    "hash": "e9019fdc87e01083e3ee3f9d255efbfc18d7f682",
+    "t": 1793074976,
+    "who": "A-builder-4",
+    "subject": "Function-call parsing ('func' node) and aggregates COUNT/SUM/TOTAL/AVG/MIN/MAX/GROUP_CONCAT with DISTINCT, whole-table a",
+    "visible": 156
+   },
+   {
+    "hash": "96f0e6ef7caa2703b5e1e092109de874755cb252",
+    "t": 1793075006,
+    "who": "A-builder-1",
+    "subject": "Subqueries: scalar (correlated via outer-env fallback), IN (SELECT ...), FROM (SELECT ...) derived tables; remaining tes",
+    "visible": 169
+   },
+   {
+    "hash": "f3d0ded1b02650adf13c9a19ea00c5988d70cc93",
+    "t": 1793075009,
+    "who": "A-builder-6",
+    "subject": "Function-call parsing ('func', NAME, args, distinct), scalar funcs (SUBSTR/UPPER/LOWER/LENGTH/IFNULL/NULLIF/COALESCE/ABS",
+    "visible": 183
+   },
+   {
+    "hash": "1b53f1083eb1b016c12b2595ced03f7b2417112a",
+    "t": 1793075048,
+    "who": "A-builder-2",
+    "subject": "GROUP BY (exprs, positions, alias fallback) and HAVING, with and without GROUP BY (lock group_by released)",
+    "visible": 210
+   },
+   {
+    "hash": "7da5a3cfeda41d7be4381b8a18b3bf0bca3cac54",
+    "t": 1793078416,
+    "who": "referee",
+    "subject": "Gate 2: 113 new feature categories (1,130 visible tests), compact --summary, tools/claim.sh",
+    "visible": 362
+   },
+   {
+    "hash": "18453385e40339e550a50d984ee71ecd4f206a49",
+    "t": 1793082269,
+    "who": "referee",
+    "subject": "Protocol v2: category claims (tools/claim.py) and guarded landing (tools/land.py)",
+    "visible": 362
+   },
+   {
+    "hash": "d5075eed6ffb3675f13ad1d529da49b07bbea66f",
+    "t": 1793284550,
+    "who": "LC-lead",
+    "subject": "BRAIN: plan",
+    "visible": 9
+   },
+   {
+    "hash": "9afc5664d46a829aa094a60859fc9b8ae89e1d8b",
+    "t": 1793284618,
+    "who": "LC-w6",
+    "subject": "functions.py: scalar registry + core string/math functions",
+    "visible": 9
+   },
+   {
+    "hash": "e4daa533f35eb474c8e8b6b06745177971e6e442",
+    "t": 1793284618,
+    "who": "LC-w6",
+    "subject": "functions.py registry + core string/math functions (eval wiring pending B) (lock funcs released)",
+    "visible": 9
+   },
+   {
+    "hash": "1545f1a68503092263d070299853f7c5893c7b8c",
+    "t": 1793284627,
+    "who": "LC-w6",
+    "subject": "land.py: extractall fallback for Python 3.11.2",
+    "visible": 9
+   },
+   {
+    "hash": "6fbbe9153d698b9f6352a0ab3cf6350a60acc244",
+    "t": 1793284665,
+    "who": "LC-w4",
+    "subject": "aggregates.py + grouping.py group_rows (wiring into run_select pending C)",
+    "visible": 9
+   },
+   {
+    "hash": "1e8470f5120d72be3d573bb64b7f5d27ab04528e",
+    "t": 1793284682,
+    "who": "LC-w4",
+    "subject": "median/percentile/percentile_cont/percentile_disc aggregates",
+    "visible": 9
+   },
+   {
+    "hash": "247b6d763005ddff8945fd52e288dded21d032da",
+    "t": 1793284685,
+    "who": "LC-w6",
+    "subject": "functions_math.py: quote/char/unicode/hex/unhex/round/trunc/ceil/floor + math funcs",
+    "visible": 9
+   },
+   {
+    "hash": "9e49ac769621412437873ab4ca12b6d1ccb2902f",
+    "t": 1793284691,
+    "who": "LC-lead",
+    "subject": "BRAIN: update",
+    "visible": 9
+   },
+   {
+    "hash": "5d33b87d739b1705fb2e50614a8d88b67c997565",
+    "t": 1793284709,
+    "who": "LC-w3",
+    "subject": "SELECT core: statement parser (select/compound/WITH/VALUES/joins) + select_exec.run_select (lock selcore released)",
+    "visible": 105
+   },
+   {
+    "hash": "83fe3d0454ab806dbd442e5e13382237e2236a05",
+    "t": 1793284716,
+    "who": "LC-w1",
+    "subject": "Lexer (comments, quoted idents, hex, blobs, exponents) + full expression parser in parser_expr.py",
+    "visible": 125
+   },
+   {
+    "hash": "5eef091a7068f39f6ed2012cd49d568fae34502e",
+    "t": 1793284716,
+    "who": "LC-w1",
+    "subject": "Lexer + expression parser (parser_expr.py ExprMixin); eval pending B/C (lock exprparse released)",
+    "visible": 125
+   },
+   {
+    "hash": "60b4de4649c64dab2e8b6cda337f3f9f26a6dbe6",
+    "t": 1793284738,
+    "who": "LC-w6",
+    "subject": "functions_printf.py: printf/format",
+    "visible": 125
+   },
+   {
+    "hash": "494f2b19fee439cffbb8f7a62d9b711f26f83409",
+    "t": 1793284752,
+    "who": "LC-w2",
+    "subject": "values.py + evaluator.py: all expression kinds; typeof/concat/concat_ws",
+    "visible": 385
+   },
+   {
+    "hash": "65e584ba52b98624110fecf65287abf4b4c9275b",
+    "t": 1793284752,
+    "who": "LC-w2",
+    "subject": "values.py + evaluator.py: all expression kinds, Env, typeof/concat (my categories pass once parser+select core land) (lo",
+    "visible": 385
+   },
+   {
+    "hash": "99214be72a81f7cb173463174408c254a2e7e0f4",
+    "t": 1793284762,
+    "who": "LC-w1",
+    "subject": "functions_like.py: LIKE/GLOB matchers + like/glob/iif/if scalars",
+    "visible": 385
+   },
+   {
+    "hash": "6420974446378d6992f85affa6a7b0e0dc8fca11",
+    "t": 1793284762,
+    "who": "LC-w1",
+    "subject": "LIKE/GLOB matchers + like/glob/iif/if scalars (evaluator wiring pending B) (lock likeglob released)",
+    "visible": 385
+   },
+   {
+    "hash": "4145102cdd59f8fe4ced7d82ec520babc4bf3e68",
+    "t": 1793284789,
+    "who": "LC-w2",
+    "subject": "select_exec._walk: skip arg/opts tuples (function calls crashed)",
+    "visible": 647
+   },
+   {
+    "hash": "03c09d0b8d46abd2bfc51302ed3dd68b48bd1578",
+    "t": 1793284795,
+    "who": "LC-w5",
+    "subject": "schema.Table, CREATE TABLE/DROP, INSERT (columns, defaults, DEFAULT VALUES, IPK/rowid, OR IGNORE/REPLACE), UPDATE, DELET",
+    "visible": 759
+   },
+   {
+    "hash": "e5e6db3038dc8571cfd4e8530d896536c1d26425",
+    "t": 1793284812,
+    "who": "LC-w1",
+    "subject": "Release lock exprfix (case/nulls/blob_literal pass except agg wiring, held by aggs)",
+    "visible": 759
+   },
+   {
+    "hash": "0b1fc052e8288d671ee5e6a3ae32fab086f0f6bf",
+    "t": 1793284818,
+    "who": "LC-w6",
+    "subject": "functions_json.py: JSON parse/dump/path helpers + json/json_valid/json_quote/json_array/json_object/json_extract/json_ty",
+    "visible": 829
+   },
+   {
+    "hash": "4c03d12e712c76261dd75d27d31b3e07331447cc",
+    "t": 1793284818,
+    "who": "LC-w6",
+    "subject": "notes: LC-w6 json/math/printf",
+    "visible": 829
+   },
+   {
+    "hash": "81b720b542db3996f93f24a531370f3cbef1b4db",
+    "t": 1793284818,
+    "who": "LC-w6",
+    "subject": "lock funcs2: categories pass (lock funcs2 released)",
+    "visible": 829
+   },
+   {
+    "hash": "fc2c34e3ffea77b45acb329db3c95c5d1028fa82",
+    "t": 1793284831,
+    "who": "LC-w4",
+    "subject": "Aggregates + GROUP BY/HAVING wired; fix _walk on empty opts tuple and order_terms name clash (in-call/window ORDER BY) (",
+    "visible": 1010
+   },
+   {
+    "hash": "1832142559b4c63caece23206355ef86ecfe5d08",
+    "t": 1793284837,
+    "who": "LC-w6",
+    "subject": "lock mathfn: categories pass (lock mathfn released)",
+    "visible": 1010
+   },
+   {
+    "hash": "43762f7769d839faeb5d204c75f09b95198ecbe4",
+    "t": 1793284844,
+    "who": "LC-w6",
+    "subject": "lock printf: categories pass (lock printf released)",
+    "visible": 1010
+   },
+   {
+    "hash": "849bbf484a7c9288470fc29eb37aa586f189cf3e",
+    "t": 1793284851,
+    "who": "LC-w6",
+    "subject": "JSON core functions + -> ->> (json_extract/type/valid/array_length/build/minify/arrows pass) (lock json1 released)",
+    "visible": 1010
+   },
+   {
+    "hash": "47fa13eec95ce8eae90060cd24bbcea58cc3db0d",
+    "t": 1793284859,
+    "who": "LC-w4",
+    "subject": "median/percentile, group_concat sep, in-call ORDER BY pass (lock aggs2 released)",
+    "visible": 1010
+   },
+   {
+    "hash": "8af7085f237a246d325d7a75c304443c302024d8",
+    "t": 1793284872,
+    "who": "LC-lead",
+    "subject": "BRAIN: update",
+    "visible": 1010
+   },
+   {
+    "hash": "d990b82d3dd71e28010bba5dff0b82bb769930dd",
+    "t": 1793284877,
+    "who": "LC-w1",
+    "subject": "alter.py: ALTER TABLE rename/add/drop column, rename table; CREATE/DROP INDEX (unique enforced)",
+    "visible": 1040
+   },
+   {
+    "hash": "8f3c6d08aa914970bd533547739265af5038582e",
+    "t": 1793284877,
+    "who": "LC-w1",
+    "subject": "ALTER TABLE + CREATE/DROP INDEX (alter_rename_table waits on aggregate wiring) (lock altddl released)",
+    "visible": 1040
+   },
+   {
+    "hash": "43dfb772b66d77424c55565559277a202d1f9eb3",
+    "t": 1793284894,
+    "who": "LC-w5",
+    "subject": "UPDATE SET (a,b) = (row|subquery) multi-column assignment (lock dml2 released)",
+    "visible": 1050
+   },
+   {
+    "hash": "d79ab840a6dfb7834101d4d4297e5d73b3b2545d",
+    "t": 1793284901,
+    "who": "LC-w3",
+    "subject": "joins pass; select_exec uses grouping.needs_grouping/group_rows; parser st_order_terms (no override of ExprMixin.order_t",
+    "visible": 1050
+   },
+   {
+    "hash": "3253a6f63911f7e5f5c7cb769910c973c83dc6ac",
+    "t": 1793284916,
+    "who": "LC-w6",
+    "subject": "json_set/insert/replace/remove/patch/error_position (lock json2 released)",
+    "visible": 1090
+   },
+   {
+    "hash": "304f2c7d6ac291b49b239d0adb24e6b378e6eba6",
+    "t": 1793284926,
+    "who": "LC-w1",
+    "subject": "views_tx.py: CREATE/DROP VIEW, BEGIN/COMMIT/ROLLBACK/SAVEPOINT/RELEASE",
+    "visible": 1110
+   },
+   {
+    "hash": "3e4bf5194246fa765d318b448e320a63e6bd984d",
+    "t": 1793284926,
+    "who": "LC-w1",
+    "subject": "views + transactions (lock viewtx released)",
+    "visible": 1110
+   },
+   {
+    "hash": "d9dbe5a0bb3e50b5897ee17543303653210b2907",
+    "t": 1793284943,
+    "who": "LC-w3",
+    "subject": "json_group_array/json_group_object aggregates (aggregates_json.py) (lock jsongroup released)",
+    "visible": 1120
+   },
+   {
+    "hash": "7b47d23cf9a229cd559cc6f3de113e01b486c4c4",
+    "t": 1793284950,
+    "who": "LC-w5",
+    "subject": "upsert.py ON CONFLICT DO NOTHING/UPDATE with excluded.*, update_from.py (lock upsert released)",
+    "visible": 1140
+   },
+   {
+    "hash": "60dfe7f4682587a07ce338c28b4283e830aa864b",
+    "t": 1793284956,
+    "who": "LC-w4",
+    "subject": "windows.py: partitions, ORDER BY, ROWS/RANGE/GROUPS frames, EXCLUDE, named windows, ranking/nav funcs, aggregates OVER (",
+    "visible": 1250
+   },
+   {
+    "hash": "55e53e59d2eaf41983dc990ce40e651a6d70b96c",
+    "t": 1793284963,
+    "who": "LC-w4",
+    "subject": "window categories pass on windows.py core (lock win2 released)",
+    "visible": 1250
+   },
+   {
+    "hash": "5b4a7993aab52fa400658a9d3389ba17ed0c0c79",
+    "t": 1793284974,
+    "who": "LC-w2",
+    "subject": "functions_date.py: SQLite date.c port (all date/time functions and modifiers)",
+    "visible": 1340
+   },
+   {
+    "hash": "44084663ab9588fcb1272bece94fc3237e97979f",
+    "t": 1793284974,
+    "who": "LC-w2",
+    "subject": "functions_date.py: date/time/datetime/julianday/unixepoch/strftime/timediff + modifiers; all 10 date categories pass (lo",
+    "visible": 1340
+   },
+   {
+    "hash": "1204769178e617e8f9540b33a680664a2bcbffcf",
+    "t": 1793285035,
+    "who": "LC-lead",
+    "subject": "BRAIN: update",
+    "visible": 1340
+   }
+  ],
+  "visible_pass": 1340,
+  "visible_n": 1340,
+  "hidden_pass": 2078,
+  "hidden_n": 2080
+ },
+ "M2": {
+  "team_start": 1793285204,
+  "mix": "claude,codex",
+  "progress": [
+   {
+    "hash": "7c2f65ad0c7da37443c57ce317fbd7b3bd1a963c",
+    "t": 1793074251,
+    "who": "referee",
+    "subject": "Initial skeleton: lexer, parser, engine; 210 visible tests",
+    "visible": 9
+   },
+   {
+    "hash": "fac982b9d3d2bbcba0bb20ff8b9e75de06c50d95",
+    "t": 1793074846,
+    "who": "A-builder-1",
+    "subject": "Expression parser with precedence climbing; arithmetic, comparison, AND/OR/NOT, || evaluation (lock arith released)",
+    "visible": 31
+   },
+   {
+    "hash": "58502b5bc022ff290ae7bc6bb2cc02c45d8f79fe",
+    "t": 1793074866,
+    "who": "A-builder-2",
+    "subject": "ORDER BY (multi-key, ASC/DESC, SQLite type ordering, alias/position), LIMIT/OFFSET (lock order_limit released)",
+    "visible": 46
+   },
+   {
+    "hash": "43cd7099813038102340f943c553ae89cfef7fc2",
+    "t": 1793074882,
+    "who": "A-builder-6",
+    "subject": "UPDATE/DELETE statements with optional WHERE; rest of category needs BETWEEN (where) and COUNT (aggregates) (lock update",
+    "visible": 52
+   },
+   {
+    "hash": "d66efd532e0dc28da87f27f0e598c7636e37fe49",
+    "t": 1793074890,
+    "who": "A-builder-5",
+    "subject": "FROM table aliases and qualified column refs (lock basic released)",
+    "visible": 55
+   },
+   {
+    "hash": "4eefde39001318a45dc82c5b2ed5a28d77bf0be9",
+    "t": 1793074905,
+    "who": "A-builder-1",
+    "subject": "CASE expressions (simple and searched); remaining case tests need IS NULL (where) and SUM (aggregates) (lock case releas",
+    "visible": 58
+   },
+   {
+    "hash": "6004fa36782c339e2a42059c0350d43b93788bdc",
+    "t": 1793074921,
+    "who": "A-builder-2",
+    "subject": "SELECT DISTINCT / ALL: dedup output rows before ORDER BY/LIMIT (lock distinct released)",
+    "visible": 69
+   },
+   {
+    "hash": "888d758ea82acdc7234e574857753b1bc1ff65c0",
+    "t": 1793074934,
+    "who": "A-builder-5",
+    "subject": "Joins: comma/CROSS/[INNER] JOIN ... ON, LEFT [OUTER] JOIN via Connection.source_rows; remaining join tests need WHERE/GR",
+    "visible": 82
+   },
+   {
+    "hash": "dd66f00c86f9ea4eb39f93ab1e64861a474f93ad",
+    "t": 1793074952,
+    "who": "A-builder-3",
+    "subject": "WHERE clause: comparisons, AND/OR/NOT, BETWEEN, IN, IS [NOT] NULL (lock where released)",
+    "visible": 129
+   },
+   {
+    "hash": "e9019fdc87e01083e3ee3f9d255efbfc18d7f682",
+    "t": 1793074976,
+    "who": "A-builder-4",
+    "subject": "Function-call parsing ('func' node) and aggregates COUNT/SUM/TOTAL/AVG/MIN/MAX/GROUP_CONCAT with DISTINCT, whole-table a",
+    "visible": 156
+   },
+   {
+    "hash": "96f0e6ef7caa2703b5e1e092109de874755cb252",
+    "t": 1793075006,
+    "who": "A-builder-1",
+    "subject": "Subqueries: scalar (correlated via outer-env fallback), IN (SELECT ...), FROM (SELECT ...) derived tables; remaining tes",
+    "visible": 169
+   },
+   {
+    "hash": "f3d0ded1b02650adf13c9a19ea00c5988d70cc93",
+    "t": 1793075009,
+    "who": "A-builder-6",
+    "subject": "Function-call parsing ('func', NAME, args, distinct), scalar funcs (SUBSTR/UPPER/LOWER/LENGTH/IFNULL/NULLIF/COALESCE/ABS",
+    "visible": 183
+   },
+   {
+    "hash": "1b53f1083eb1b016c12b2595ced03f7b2417112a",
+    "t": 1793075048,
+    "who": "A-builder-2",
+    "subject": "GROUP BY (exprs, positions, alias fallback) and HAVING, with and without GROUP BY (lock group_by released)",
+    "visible": 210
+   },
+   {
+    "hash": "7da5a3cfeda41d7be4381b8a18b3bf0bca3cac54",
+    "t": 1793078416,
+    "who": "referee",
+    "subject": "Gate 2: 113 new feature categories (1,130 visible tests), compact --summary, tools/claim.sh",
+    "visible": 362
+   },
+   {
+    "hash": "18453385e40339e550a50d984ee71ecd4f206a49",
+    "t": 1793082269,
+    "who": "referee",
+    "subject": "Protocol v2: category claims (tools/claim.py) and guarded landing (tools/land.py)",
+    "visible": 362
+   },
+   {
+    "hash": "a1b8780787c1d9fb4a56c17c4d976b9dd1720d66",
+    "t": 1793285246,
+    "who": "M2-w2",
+    "subject": "Add scalar function evaluation and numeric functions (lock mathfuncs released)",
+    "visible": 45
+   },
+   {
+    "hash": "d043068a0868e90f3210a9e2782202fc05f1b8af",
+    "t": 1793285279,
+    "who": "M2-w3",
+    "subject": "DDL module: column defs with constraints/DEFAULT, INSERT column list + DEFAULT VALUES, DROP TABLE [IF EXISTS] (insert_co",
+    "visible": 75
+   },
+   {
+    "hash": "85b3e732427b778aca663a34a1a06fbc35dc4383",
+    "t": 1793285301,
+    "who": "M2-w4",
+    "subject": "Implement SELECT projection ordering and pagination core",
+    "visible": 109
+   },
+   {
+    "hash": "dc50a3796cfd1366b6335dfd5499750d5fdbb501",
+    "t": 1793285301,
+    "who": "M2-w4",
+    "subject": "Add SELECT aliases DISTINCT sorting pagination and distinct counts (lock selectcore released)",
+    "visible": 109
+   },
+   {
+    "hash": "5949dcf6f8fae3e8caeaf83fce16d6a35dd40520",
+    "t": 1793285302,
+    "who": "M2-w2",
+    "subject": "Adjust mathmore claim to independent hyperbolic functions",
+    "visible": 109
+   },
+   {
+    "hash": "33215ff38989a4f7a47768574037abbecc782a32",
+    "t": 1793285302,
+    "who": "M2-w2",
+    "subject": "Add logarithmic exponential and hyperbolic scalar functions (lock mathmore released)",
+    "visible": 135
+   },
+   {
+    "hash": "0f1fed27ea5d6498c3e7b49a42b35fa43bf03677",
+    "t": 1793285320,
+    "who": "M2-w3",
+    "subject": "String functions module: INSTR, TRIM/LTRIM/RTRIM, REPLACE (lock strfuncs released)",
+    "visible": 165
+   },
+   {
+    "hash": "c28970adc7d042f3f08efe50713997041e91af45",
+    "t": 1793285342,
+    "who": "M2-w3",
+    "subject": "strfuncs: SUBSTR/SUBSTRING, LENGTH/OCTET_LENGTH, CHAR/UNICODE (lock strfuncs2 released)",
+    "visible": 197
+   },
+   {
+    "hash": "ffa960f549214eb0049dfb08281b75bb9b4d8ec6",
+    "t": 1793285351,
+    "who": "M2-w4",
+    "subject": "Implement aggregate dispatch and basic accumulation semantics",
+    "visible": 214
+   },
+   {
+    "hash": "9d17cf0d3a5f8968046c933990ce491406e628b8",
+    "t": 1793285351,
+    "who": "M2-w4",
+    "subject": "Add basic aggregates with DISTINCT and empty input semantics (lock aggregate released)",
+    "visible": 214
+   },
+   {
+    "hash": "9d8c4c0a0773534080467d045af095aa4809011b",
+    "t": 1793285356,
+    "who": "M2-w2",
+    "subject": "Implement scalar min max rounding truncation and typeof",
+    "visible": 234
+   },
+   {
+    "hash": "143367ebbc709e6e305c13c85c52257723517df0",
+    "t": 1793285356,
+    "who": "M2-w2",
+    "subject": "Swap typeof claim for independent quote function",
+    "visible": 234
+   },
+   {
+    "hash": "533f3f05e710de9d66618b4833734f5dbc051128",
+    "t": 1793285364,
+    "who": "M2-w2",
+    "subject": "Add rounding truncation storage types scalar min max and quoting (lock scalar_misc released)",
+    "visible": 244
+   },
+   {
+    "hash": "04e394a06833ad483dd8fa3b1b8ce41f2791125f",
+    "t": 1793285377,
+    "who": "M2-w4",
+    "subject": "Support grouping keys, aliases and HAVING",
+    "visible": 252
+   },
+   {
+    "hash": "29e55b271a90e93ca1ef5dbceb7253c3bc14d2a8",
+    "t": 1793285377,
+    "who": "M2-w4",
+    "subject": "Add GROUP BY expressions aliases HAVING and separator aggregates (lock grouping released)",
+    "visible": 252
+   },
+   {
+    "hash": "2e89f6fcc0df7e0ee243b0254128e530ab8e1d38",
+    "t": 1793285394,
+    "who": "M2-w2",
+    "subject": "Add JSON minification validation quoting types and path framework (lock jsonbase released)",
+    "visible": 282
+   },
+   {
+    "hash": "3b2232e1e4d8e46305afa83fc09232bdbd4ccea4",
+    "t": 1793285412,
+    "who": "M2-w2",
+    "subject": "Add JSON extract array lengths and typed array object constructors (lock jsonvalues released)",
+    "visible": 312
+   },
+   {
+    "hash": "bcf5ce9aa7d3a2e123f29b1d731f0178179884f6",
+    "t": 1793285416,
+    "who": "M2-w3",
+    "subject": "datefuncs.py: DATE/TIME/DATETIME/JULIANDAY/UNIXEPOCH/STRFTIME/TIMEDIFF with SQLite modifiers (lock datetime released)",
+    "visible": 376
+   },
+   {
+    "hash": "12025d57c1b036ec0999cc38dd14405d27d50f36",
+    "t": 1793285422,
+    "who": "M2-w4",
+    "subject": "Add FROM sources and inner outer natural and using joins",
+    "visible": 386
+   },
+   {
+    "hash": "0dab8739ddfbdf02104ddde807c60b9618d98e6b",
+    "t": 1793285422,
+    "who": "M2-w4",
+    "subject": "Add FROM sources and inner outer NATURAL USING joins (lock joins released)",
+    "visible": 386
+   },
+   {
+    "hash": "9060fa9cb4b6f41c2e2b115508bfbca3834531e0",
+    "t": 1793285435,
+    "who": "M2-w2",
+    "subject": "Add JSON set insert replace remove and merge patch (lock jsonedit released)",
+    "visible": 416
+   },
+   {
+    "hash": "6e4962f111752aaee8cb0de47b50f1f95373f255",
+    "t": 1793285452,
+    "who": "M2-w3",
+    "subject": "datefuncs: TIMEDIFF follows SQLite's month-walk algorithm (unixepoch/date_n_days await * and ||) (lock datetime2 release",
+    "visible": 417
+   },
+   {
+    "hash": "3fe2b6adc62258335107856f8b1b9f1a1eb67034",
+    "t": 1793285455,
+    "who": "M2-w4",
+    "subject": "Implement compound select set operations with final ordering",
+    "visible": 457
+   },
+   {
+    "hash": "392a9947552111f11317cb25f1d6eb26a1222215",
+    "t": 1793285455,
+    "who": "M2-w4",
+    "subject": "Implement UNION ALL UNION EXCEPT INTERSECT and compound ordering (lock compounds released)",
+    "visible": 457
+   },
+   {
+    "hash": "ee4ff539668ee75a328cadc11ea1f707f4d23020",
+    "t": 1793285464,
+    "who": "M2-w2",
+    "subject": "Add JSON error positions and JSON array object aggregates (lock jsonfinish released)",
+    "visible": 477
+   },
+   {
+    "hash": "5b7a3c216b0723e97ab8f42d1a8ddc4af79fa2b7",
+    "t": 1793285502,
+    "who": "M2-w2",
+    "subject": "Add SQLite printf format and hex unhex conversions (lock formatting released)",
+    "visible": 507
+   },
+   {
+    "hash": "613df32a5afbcf892474060129165a665d998b65",
+    "t": 1793285510,
+    "who": "M2-w4",
+    "subject": "Add scalar exists and derived queries with outer environments",
+    "visible": 509
+   },
+   {
+    "hash": "4bc333884c5321b69222b15b892399ea5fc34627",
+    "t": 1793285510,
+    "who": "M2-w4",
+    "subject": "Add scalar EXISTS and derived table query execution (lock subqueries released)",
+    "visible": 509
+   },
+   {
+    "hash": "1d406b3838aa289e761ab7d643aba090016766fa",
+    "t": 1793285516,
+    "who": "M2-w3",
+    "subject": "dml.py: ALTER TABLE (rename, rename/add/drop column), CREATE/DROP INDEX no-ops, UPDATE/DELETE (await WHERE operators) (l",
+    "visible": 519
+   },
+   {
+    "hash": "1bbfbf07485b56d84aa3fc25949a5c390385c201",
+    "t": 1793285527,
+    "who": "M2-w2",
+    "subject": "Add median and continuous discrete percentile aggregates (lock stats released)",
+    "visible": 539
+   },
+   {
+    "hash": "481d8990b44bd3263c42d134044d34f01c6a427d",
+    "t": 1793285552,
+    "who": "M2-w4",
+    "subject": "Implement WITH named query scopes and recursive work queues",
+    "visible": 549
+   },
+   {
+    "hash": "f91bbbe06df2cd5fde709d6e015fb5d032e93902",
+    "t": 1793285553,
+    "who": "M2-w4",
+    "subject": "Implement WITH scopes multiple CTEs and recursive work queues (lock ctes released)",
+    "visible": 549
+   },
+   {
+    "hash": "4ee8bce6fc3035d606472c454e58746e8b9d683d",
+    "t": 1793285585,
+    "who": "M2-w3",
+    "subject": "constraints.py: rowid/INTEGER PRIMARY KEY, NOT NULL/CHECK/UNIQUE conflicts, INSERT OR IGNORE/REPLACE, REPLACE INTO; rowi",
+    "visible": 579
+   },
+   {
+    "hash": "8860f7928562c86d4436ae052d7cd326674d5bcf",
+    "t": 1793285594,
+    "who": "M2-w4",
+    "subject": "Add live views create table as query and VALUES derived sources",
+    "visible": 579
+   },
+   {
+    "hash": "9143e9290b0f5aec602b63f043ff7cf63230aa7d",
+    "t": 1793285594,
+    "who": "M2-w4",
+    "subject": "Add live views CREATE TABLE AS and derived VALUES support (lock querytables released)",
+    "visible": 579
+   },
+   {
+    "hash": "ff65a0f11fd8b23fb4b3a788a20d16f6cada0a31",
+    "t": 1793285607,
+    "who": "M2-w1",
+    "subject": "Expression core: full lexer (hex, blobs, quoted idents, comments), operator grammar (arith, comparison, logic, IS, IN, L",
+    "visible": 1058
+   },
+   {
+    "hash": "9dcea197df6bed59fb490a0e9ca2551e28dc5ef7",
+    "t": 1793285624,
+    "who": "M2-w4",
+    "subject": "Add aggregate argument ordering FILTER and distinct concatenation",
+    "visible": 1078
+   },
+   {
+    "hash": "8fbf176ef757cbe0c9c2eebe50993568d1c3c684",
+    "t": 1793285624,
+    "who": "M2-w4",
+    "subject": "Support aggregate FILTER argument ORDER BY and distinct concatenation (lock aggclauses released)",
+    "visible": 1078
+   },
+   {
+    "hash": "4b75c3444351cb49ff7a5d0bd92ba340f6422ae6",
+    "t": 1793285644,
+    "who": "M2-w3",
+    "subject": "INSERT ... SELECT, ON CONFLICT DO NOTHING/DO UPDATE with excluded.*, RETURNING (await arithmetic operators) (lock upsert",
+    "visible": 1108
+   },
+   {
+    "hash": "2ebf3c15bc183885b4cee40f0a0ddc483e15ba2b",
+    "t": 1793285651,
+    "who": "M2-w2",
+    "subject": "Add window partition ordering frame evaluation and window functions",
+    "visible": 1108
+   },
+   {
+    "hash": "5a0db9f166f66668a5ea5ff4780e57011cedb476",
+    "t": 1793285651,
+    "who": "M2-w2",
+    "subject": "Add window specifications partitions frames ranking and value functions (lock windowcore released)",
+    "visible": 1108
+   },
+   {
+    "hash": "368d76b58be81d0d48bdaa6b2885ba105c49f609",
+    "t": 1793285656,
+    "who": "M2-w4",
+    "subject": "Fix qualified stars subquery LIMIT scope and collation ordering (lock selectfix released)",
+    "visible": 1131
+   },
+   {
+    "hash": "e7add91df768fd84cb55479f4008684ae0f09b6d",
+    "t": 1793285666,
+    "who": "M2-w1",
+    "subject": "CONCAT, CONCAT_WS, LIKE()/GLOB() functions, IS [NOT] TRUE/FALSE (lock exprops released)",
+    "visible": 1167
+   },
+   {
+    "hash": "d58f213976cd81b1cbe58b70975f31ae21c87826",
+    "t": 1793285678,
+    "who": "M2-w3",
+    "subject": "UPDATE/DELETE row envs carry the connection for subqueries (lock dml released)",
+    "visible": 1177
+   },
+   {
+    "hash": "17e3d45ac43eb9a5e5d9ac755ce5177133fabef3",
+    "t": 1793285689,
+    "who": "M2-w2",
+    "subject": "Connect expression evaluator to prepared window values (lock windowfix released)",
+    "visible": 1287
+   },
+   {
+    "hash": "3d99d4e4ae850ac642f55782404391b3db476957",
+    "t": 1793285698,
+    "who": "M2-w1",
+    "subject": "IIF/IF functions and JSON -> / ->> operators (lock iifarrows released)",
+    "visible": 1307
+   },
+   {
+    "hash": "9666af126984e588917bb4b027dcde48017f708b",
+    "t": 1793285710,
+    "who": "M2-w4",
+    "subject": "Implement three valued row comparison and row IN membership (lock rowvalues released)",
+    "visible": 1317
+   },
+   {
+    "hash": "f0fd4c64996df17fad5bbe90b77a54ee35818c8a",
+    "t": 1793285718,
+    "who": "M2-w2",
+    "subject": "Handle atanh endpoint infinities and ASCII upper lower case conversion (lock scalarfix released)",
+    "visible": 1320
+   },
+   {
+    "hash": "fd1415adf4e1d062b6d6414eb678c97964511e4d",
+    "t": 1793285728,
+    "who": "M2-w3",
+    "subject": "transactions.py: BEGIN/COMMIT/ROLLBACK/SAVEPOINT via snapshots; UPDATE ... FROM (last match wins) (lock txn released)",
+    "visible": 1340
+   }
+  ],
+  "visible_pass": 1340,
+  "visible_n": 1340,
+  "hidden_pass": 2080,
+  "hidden_n": 2080
+ }
+}

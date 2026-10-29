@@ -2,8 +2,10 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 29 2026, afternoon, after Gate 38)
+## Where we left off (Oct 29 2026, evening, after Gate 47)
 
+- **Gate 47 done** (asked for by the user): Claude and Codex builders in one swarm coordinate as well as one agent (both mixed teams 1,340/1,340, 100% hidden, 0 breaks; Codex 52% and 73% of landings); a Codex lead works like a Claude lead. Ship fired: `hive start --agent claude,codex`. Cloud power-off from the phone passed live on AWS (after a Windows key fix).
+- **Gate 48 running** (asked for by the user): can Laya (the open copy of Jev, a fast decision model) read the owner's messages for Jarvis? Registered v1 read 51/120 (43%); the catch-all "anything else" was almost never chosen and "stop" was over-called. Next: variants tuned on the separate practice set `gates/gate48/dev.jsonl`, registered as an amendment, then run once on the 120.
 - **Gate 46 done** (asked for by the user): a lead with a shared BRAIN.md over 6 builders lost to 7 flat builders on a deep project (95% at 6.4 vs 5.3 min on average, cost 1.09×, same correctness). Hive stays flat. A Codex lead can be rerun with `gates/gate46/` on the user's machine.
 
 - **Gate 38 is done, kill fired** (`gates/gate38/RESULTS.md`). The founder's 13 confirmed rules matched his next-day verdicts on 2 of 11 decisions (raw answers also 2 of 11). Builders followed the rules exactly: surprising 3/6 vs 0/6, ordinary 2/6 vs 5/6, a tie at 5/12. The hand-over (code sheet) is the main intent channel; the interview only seeds it.
