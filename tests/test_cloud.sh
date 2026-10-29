@@ -40,6 +40,7 @@ check "--new makes the machine and moves the project there" "$? $(git -C $T/box2
 check "it says what it costs and how to delete it" "$(grep -c 'an hour while it runs). .hive cloud --stop. deletes it' $T/new.txt)" 1
 check "only this machine's IP may log in, with a key kept private" \
   "$(grep -c 'authorize-security-group-ingress .*--cidr 198.51.100.7/32' $T/aws.log) $(keymode)" "1 600"
+check "the key has Unix line endings (Git's ssh on Windows refused a CRLF key, so --new never reached a real machine)" "$(tr -cd '\r' < $T/.hive/cloud/*.pem | wc -c | tr -d ' ')" 0
 check "the machine sets itself up on first boot (Claude Code included)" \
   "$(grep -c 'run-instances .*--user-data file://' $T/aws.log) $(grep -c 'claude-code' $T/.hive/cloud/*.boot.sh)" "1 1"
 printf 'n\n' | $PY -m hive cloud --stop > $T/keep.txt 2>&1
