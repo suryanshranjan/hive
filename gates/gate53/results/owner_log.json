@@ -1,0 +1,102 @@
+[
+ {
+  "prompt": "\n1 of 11. Priya bought a kurta for \u20b92,000 and it arrived 20 days ago. She writes that she simply changed her mind and wants her money back. How long do customers have to return something they just don't want, and what happens after that?\n  A) Up to 30 days after delivery; after that, no refund at all  B) Up to 7 days after delivery; after that, no refund at all  C) Up to 15 days after delivery; after that, a reduced refund of half the price\n  Your answer (a letter, or your own words) > ",
+  "typed": "Day 20 is in the 15 to 30 day window, so none of the options is exactly right. Within 14 days of delivery it's the full amount, from day 15 to day 30 it's half, and after day 30 it's nothing."
+ },
+ {
+  "prompt": "\n3 of 11. Meena received a phone cover that arrived cracked, 40 days ago. She only noticed and complained today. Is a damaged item treated more generously than a change of mind?\n  A) Yes: damaged items can be returned for up to 60 days, and are refunded in full  B) Yes, but only within the same 30 days as everything else, and refunded in full  C) No: damaged items follow the same rules as change of mind\n  Your answer (a letter, or your own words) > ",
+  "typed": "Damaged goods are always refunded in full, up to 90 days after delivery, so none of these is exactly right. Her phone cover arrived 40 days ago, so she gets the full amount, and the shipping fee is refunded too."
+ },
+ {
+  "prompt": "\n4 of 11. Ravi's order was \u20b93,000 of goods plus \u20b9200 delivery. He returns the goods after changing his mind. Does he get the \u20b9200 delivery charge back?\n  A) No, the shop keeps the \u20b9200 delivery charge, but refunds it if the shop was at fault  B) Yes, the \u20b9200 is always refunded along with the goods  C) No, the \u20b9200 is never refunded, even when the shop was at fault\n  Your answer (a letter, or your own words) > ",
+  "typed": "No, the shipping fee is never refunded for a change of mind or anything like that. The only time the delivery charge comes back is when the goods arrived damaged."
+ },
+ {
+  "prompt": "\n5 of 11. Sunita's refund is approved. Where does the money go: back to her card, or as credit to spend in your shop?\n  A) Damaged goods and change of mind within the window go back to her card  B) Damaged goods go back to her card, but change of mind is always store credit  C) Everything is store credit unless the customer insists on a card and it was your fault\n  Your answer (a letter, or your own words) > ",
+  "typed": "The money goes back the way it was paid: orders paid with store credit are refunded as store credit, and card orders go back to the card. None of these is exactly right, because it doesn't depend on damaged or change of mind."
+ },
+ {
+  "prompt": "\n6 of 11. Farah wants to return a sale-price dress, a personalised name pendant and a downloaded e-book, all because she changed her mind. Which of these can be returned?\n  A) All of them, with no exceptions, like any other order  B) Not sale items, personalised items or downloads; everything else can be returned  C) Only personalised items and downloads are refused; sale items can be returned as store credit\n  Your answer (a letter, or your own words) > ",
+  "typed": "Nothing in my policy says sale items, personalised items or downloads can't be returned. The only no-refund case is orders marked final sale (unless they arrived damaged). Otherwise they follow the normal day rules."
+ },
+ {
+  "prompt": "\n7 of 11. Deepak bought a \u20b91,000 shirt with a \u20b9200 coupon, so he paid \u20b9800. He returns it within the window. What does he get back?\n  A) \u20b9800, only what he actually paid  B) \u20b91,000, the full list price  C) \u20b9800, but as store credit, because the coupon was a promotion\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) \u20b9800, only what he actually paid. The refund is based on the item price minus the discount code."
+ },
+ {
+  "prompt": "\n8 of 11. Lakshmi bought 3 items in one \u20b96,000 order (\u20b92,000 each) and wants to return just one, and later returns a second. What can she do?\n  A) Refunds are for the whole order only; partial and repeat returns are not accepted  B) She can return items one at a time, each refunded at what it cost, until the order is all returned  C) She can return only one item per order; anything further needs the owner's approval\n  Your answer (a letter, or your own words) > ",
+  "typed": "B) She can return items one at a time, each refunded at what it cost, until the order is all returned. Each item is refunded by the normal rules, based on what she paid for it after any discount code."
+ },
+ {
+  "prompt": "\n9 of 11. Rohit asks for a refund and writes 'item not as described', another customer writes 'late delivery', and a third leaves the reason blank. How are these treated?\n  A) 'Damaged', 'defective' and 'wrong item' count as damaged; anything else, even blank, is treated as change of mind  B) 'Not as described' is treated like damaged too (shop at fault); 'late delivery' and blank are treated as change of mind  C) Anything unclear, blank or unusual is not refunded automatically and goes to the owner to decide\n  Your answer (a letter, or your own words) > ",
+  "typed": "None of these is exactly right. Anything that isn't damaged is handled by the normal day rules, so \"late delivery\" and blank are treated like a change of mind. A reason is only treated as damaged if it says \"damaged\", and I haven't said that \"not as described\" counts, so it follows the normal rules too."
+ },
+ {
+  "prompt": "\n10 of 11. Neha's refund works out to \u20b91,333.60 after a 20% deduction. How many rupees does she get?\n  A) \u20b91,333, rounded down in the shop's favour  B) \u20b91,334, rounded up in the customer's favour  C) \u20b91,334, rounded to the nearest rupee\n  Your answer (a letter, or your own words) > ",
+  "typed": "Amounts are rounded down to whole rupees, so Neha gets \u20b91,333. A is right."
+ },
+ {
+  "prompt": "\n11 of 11. A refund request arrives for an order showing a total of \u20b90 (a missing figure), or with a delivery date in the future, so the days since delivery is below zero. What happens?\n  A) Treat a negative day count as the day of delivery, and refund \u20b90 when the total is missing  B) Refuse the request and flag it for a staff member to check before anything is paid  C) Treat a missing total as an error, stop, and tell the customer to contact the shop\n  Your answer (a letter, or your own words) > ",
+  "typed": "A negative number of days should be treated as day 0, so the full amount applies. A missing total means a refund of \u20b90. Nothing needs to go to staff."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: For a change-of-mind return, the refund is the full amount if the return is requested within 14 days of delivery, half the amount from day 15 through day 30 after delivery, and nothing after day 30.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite: it's the full amount within 14 days (day 14 included), half from day 15 to day 30, nothing after day 30. Also, a negative number of days counts as day 0, and the refund is worked out on what she paid (item prices times quantities, minus the discount code), with the shipping fee never included. Amounts under 50 rupees aren't paid, and the result is rounded down to whole rupees."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A damaged item is refunded in full, including the shipping fee, if the complaint is made within 90 days after delivery; for example, a phone cover that arrived cracked 40 days ago is refunded in full with its shipping fee.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite: damaged goods are refunded in full, including the shipping fee, up to 90 days after delivery, and after day 90 it's nothing. The refund is worked out on what she paid (item prices times quantities, minus the discount code), and the amount is rounded down to whole rupees. The under-50-rupee rule doesn't apply to damaged goods. Money goes back the way it was paid, card to the card and store credit as store credit."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: The delivery charge is refunded only when the goods arrived damaged; in every other case, including a return for change of mind, the delivery charge is not refunded (so Ravi, returning \u20b93,000 of goods because he changed his mind, does not get back the \u20b9200 delivery charge).\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: An approved refund is returned the way the order was paid: an order paid with store credit is refunded as store credit, and an order paid by card is refunded to the card, regardless of whether the reason was damage or change of mind.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: An item may be returned for a change-of-mind refund under the normal return-day rules whether or not it is on sale, personalised or a digital download; the only exception is an order marked final sale, which gets no refund unless the item arrived damaged.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A customer can return the items of a multi-item order one at a time, in separate returns, until every item in the order has been returned, and each item is refunded under the normal refund rules for the amount she paid for that item after any discount code (so in Lakshmi's \u20b96,000 order of 3 items at \u20b92,000 each, she can return one item now and a second later, each refunded based on what she paid for that item).\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A refund request is treated as damaged only if its reason text says \"damaged\"; every other request, including reasons of \"item not as described\", \"late delivery\" or a blank reason, is handled by the normal day rules, the same as a change of mind.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite: a reason counts as damaged if it says damaged, but \"item not as described\" and \"late delivery\" and blank are not damaged, so they follow the normal day rules like a change of mind. Otherwise that's right."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: Any rupee amount, such as a refund after a deduction, is rounded down to the nearest whole rupee, dropping the paise, so a refund that works out to \u20b91,333.60 is paid as \u20b91,333.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When a refund request has a negative number of days since delivery (a delivery date in the future), treat the days as 0 so the full amount applies, and when the order total is missing (shown as \u20b90), the refund is \u20b90; in both cases the request is handled automatically and nothing is sent to staff.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": "3, 10. A damaged item should also get the shipping fee back, and \"not damaged\" or \"undamaged\" must not count as damaged."
+ },
+ {
+  "prompt": "  Rule 3: Refunds: a damaged item returned on its own does not get any shipping fee back either, so a damaged 2,000 rupee item at 10% off returns 1,800 rupees even though the order had 100 rupees delivery.\n  What should it be? > ",
+  "typed": "A damaged item should get the shipping fee back too, in full: a damaged \u20b92,000 item at 10% off with \u20b9100 delivery should return \u20b91,900, not \u20b91,800."
+ },
+ {
+  "prompt": "  Rule 10: Messy or missing details: the word damaged is looked for anywhere inside the reason, so even 'undamaged' or 'not damaged' is treated as a damage claim and refunds in full.\n  What should it be? > ",
+  "typed": "Only the word \"damaged\" counts as damaged. \"Not damaged\" and \"undamaged\" are not damaged claims, so they follow the normal day rules like a change of mind."
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": "Nothing else, except one thing: the shipping fee is refunded only for damaged goods, and damaged refunds over 90 days get nothing."
+ },
+ {
+  "prompt": "Looks right? Press Enter, or say what should be different.",
+  "typed": ""
+ }
+]

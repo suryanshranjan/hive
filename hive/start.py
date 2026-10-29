@@ -24,6 +24,10 @@ def _ask(prompt, default=''):
         ans = ''
     return ans or default
 
+def _who(state):
+    """'They' for a team, 'The builder' for one (Gate 53: "They made 6 assumptions" after one builder)."""
+    return 'They' if (state or {}).get('workers', 2) > 1 else 'The builder'
+
 def _n(k, word):
     return f'{k} {word}' + ('' if k == 1 else 's')
 
@@ -228,8 +232,9 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     job_parts = law.parts(goal_text) if auto else None   # Gate 52: size the team by the work, not only the machine
     if auto:
         workers, why = law.builders(t_g, parts=job_parts)
-        say(f"\nI'll put {_n(workers, 'builder')} on it ({why}): {law.trade(workers)}. They work on copies, so your "
-            "branches stay exactly as they are.")   # the trade from Gate 50, so he knows what speed costs
+        say(f"\nI'll put {_n(workers, 'builder')} on it ({why}): {law.trade(workers)}. "
+            + ("They work on copies" if workers > 1 else "It works on a copy")
+            + ", so your branches stay exactly as they are.")   # the trade from Gate 50, so he knows what speed costs
     else:
         say(f"\nI'll put {workers} builders on it, as you chose. They work on copies, so your branches stay exactly as "
             "they are.")
@@ -297,13 +302,13 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     if overnight:
         rc = _deliver(state)
         if found:
-            say(f"\nThey made {_n(len(found), 'assumption')} your description didn't cover. When you're back, type "
+            say(f"\n{_who(state)} made {_n(len(found), 'assumption')} your description didn't cover. When you're back, type "
                 f"`hive morning` to check {'it' if len(found) == 1 else 'them'}; I'll fix anything you correct and update "
                 f"the branch.")
         return rc
     sheet = _code_sheet(state) if found else None   # Gate 52: one review, not two (20 assumptions, then the sheet)
     if found and sheet:
-        say(f"They made {_n(len(found), 'assumption')} your description didn't cover. Rather than going through them one "
+        say(f"{_who(state)} made {_n(len(found), 'assumption')} your description didn't cover. Rather than going through them one "
             "by one, I'll show you everything the build does, as rules: that covers them all.")
     elif found:
         n = len(found)
@@ -443,7 +448,7 @@ def morning(name=None, phone=False):
         ch = telegram.Channel(cfg)
         say("I'm preparing the decisions for your phone (putting them in plain words, most important first)...")
     else:
-        say(f"They made {_n(len(todo), 'assumption')} your description didn't cover. Press Enter if one is right, or say "
+        say(f"{_who(state)} made {_n(len(todo), 'assumption')} your description didn't cover. Press Enter if one is right, or say "
             "what should happen instead.")
     try:
         fixed = _review_and_fix(state, ch)
@@ -488,6 +493,10 @@ def handover(state, ch=None, poll=20, rounds=3, sheet=None):
             memory.add(state['repo'], r, 'handover')
         state.setdefault('asked', []).extend(changed)
         apply_ruling(state, '\n- '.join(changed), ch)
+        if not ch:   # he has just checked the whole build; a second list of his rules only repeats it (Gate 53)
+            say(f"\nYour {_n(len(changed), 'change')} {'is' if len(changed) == 1 else 'are'} in, and every test passes. "
+                "It's yours.")
+        return 0
     rules = state.get('asked') or [r['text'] for r in memory.load(state['repo'])][-12:]
     listing = '\n'.join(f'{n}. {r}' for n, r in enumerate(rules[:12], 1))
     for _ in range(rounds):

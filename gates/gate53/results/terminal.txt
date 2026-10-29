@@ -1,0 +1,191 @@
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: pytest. 2 tests, all passing.
+
+I'll put 1 builder on it (the job is one piece of work, so more builders would only wait): one builder: the cheapest, and the slowest. They work on copies, so your branches stay exactly as they are.
+If they need a decision only you can make, the question will appear right here.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+
+First, a few quick situations where your own rules matter:
+
+1 of 11. Priya bought a kurta for ₹2,000 and it arrived 20 days ago. She writes that she simply changed her mind and wants her money back. How long do customers have to return something they just don't want, and what happens after that?
+  A) Up to 30 days after delivery; after that, no refund at all  B) Up to 7 days after delivery; after that, no refund at all  C) Up to 15 days after delivery; after that, a reduced refund of half the price
+  Your answer (a letter, or your own words) > 
+  > Day 20 is in the 15 to 30 day window, so none of the options is exactly right. Within 14 days of delivery it's the full amount, from day 15 to day 30 it's half, and after day 30 it's nothing.
+  (Your answer also settles 1 of the coming question; I'll skip it.)
+
+3 of 11. Meena received a phone cover that arrived cracked, 40 days ago. She only noticed and complained today. Is a damaged item treated more generously than a change of mind?
+  A) Yes: damaged items can be returned for up to 60 days, and are refunded in full  B) Yes, but only within the same 30 days as everything else, and refunded in full  C) No: damaged items follow the same rules as change of mind
+  Your answer (a letter, or your own words) > 
+  > Damaged goods are always refunded in full, up to 90 days after delivery, so none of these is exactly right. Her phone cover arrived 40 days ago, so she gets the full amount, and the shipping fee is refunded too.
+
+4 of 11. Ravi's order was ₹3,000 of goods plus ₹200 delivery. He returns the goods after changing his mind. Does he get the ₹200 delivery charge back?
+  A) No, the shop keeps the ₹200 delivery charge, but refunds it if the shop was at fault  B) Yes, the ₹200 is always refunded along with the goods  C) No, the ₹200 is never refunded, even when the shop was at fault
+  Your answer (a letter, or your own words) > 
+  > No, the shipping fee is never refunded for a change of mind or anything like that. The only time the delivery charge comes back is when the goods arrived damaged.
+
+5 of 11. Sunita's refund is approved. Where does the money go: back to her card, or as credit to spend in your shop?
+  A) Damaged goods and change of mind within the window go back to her card  B) Damaged goods go back to her card, but change of mind is always store credit  C) Everything is store credit unless the customer insists on a card and it was your fault
+  Your answer (a letter, or your own words) > 
+  > The money goes back the way it was paid: orders paid with store credit are refunded as store credit, and card orders go back to the card. None of these is exactly right, because it doesn't depend on damaged or change of mind.
+
+6 of 11. Farah wants to return a sale-price dress, a personalised name pendant and a downloaded e-book, all because she changed her mind. Which of these can be returned?
+  A) All of them, with no exceptions, like any other order  B) Not sale items, personalised items or downloads; everything else can be returned  C) Only personalised items and downloads are refused; sale items can be returned as store credit
+  Your answer (a letter, or your own words) > 
+  > Nothing in my policy says sale items, personalised items or downloads can't be returned. The only no-refund case is orders marked final sale (unless they arrived damaged). Otherwise they follow the normal day rules.
+
+7 of 11. Deepak bought a ₹1,000 shirt with a ₹200 coupon, so he paid ₹800. He returns it within the window. What does he get back?
+  A) ₹800, only what he actually paid  B) ₹1,000, the full list price  C) ₹800, but as store credit, because the coupon was a promotion
+  Your answer (a letter, or your own words) > 
+  > A) ₹800, only what he actually paid. The refund is based on the item price minus the discount code.
+
+8 of 11. Lakshmi bought 3 items in one ₹6,000 order (₹2,000 each) and wants to return just one, and later returns a second. What can she do?
+  A) Refunds are for the whole order only; partial and repeat returns are not accepted  B) She can return items one at a time, each refunded at what it cost, until the order is all returned  C) She can return only one item per order; anything further needs the owner's approval
+  Your answer (a letter, or your own words) > 
+  > B) She can return items one at a time, each refunded at what it cost, until the order is all returned. Each item is refunded by the normal rules, based on what she paid for it after any discount code.
+
+9 of 11. Rohit asks for a refund and writes 'item not as described', another customer writes 'late delivery', and a third leaves the reason blank. How are these treated?
+  A) 'Damaged', 'defective' and 'wrong item' count as damaged; anything else, even blank, is treated as change of mind  B) 'Not as described' is treated like damaged too (shop at fault); 'late delivery' and blank are treated as change of mind  C) Anything unclear, blank or unusual is not refunded automatically and goes to the owner to decide
+  Your answer (a letter, or your own words) > 
+  > None of these is exactly right. Anything that isn't damaged is handled by the normal day rules, so "late delivery" and blank are treated like a change of mind. A reason is only treated as damaged if it says "damaged", and I haven't said that "not as described" counts, so it follows the normal rules too.
+
+10 of 11. Neha's refund works out to ₹1,333.60 after a 20% deduction. How many rupees does she get?
+  A) ₹1,333, rounded down in the shop's favour  B) ₹1,334, rounded up in the customer's favour  C) ₹1,334, rounded to the nearest rupee
+  Your answer (a letter, or your own words) > 
+  > Amounts are rounded down to whole rupees, so Neha gets ₹1,333. A is right.
+
+11 of 11. A refund request arrives for an order showing a total of ₹0 (a missing figure), or with a delivery date in the future, so the days since delivery is below zero. What happens?
+  A) Treat a negative day count as the day of delivery, and refund ₹0 when the total is missing  B) Refuse the request and flag it for a staff member to check before anything is paid  C) Treat a missing total as an error, stop, and tell the customer to contact the shop
+  Your answer (a letter, or your own words) > 
+  > A negative number of days should be treated as day 0, so the full amount applies. A missing total means a refund of ₹0. Nothing needs to go to staff.
+
+Your rule, as I'll build it: For a change-of-mind return, the refund is the full amount if the return is requested within 14 days of delivery, half the amount from day 15 through day 30 after delivery, and nothing after day 30.
+  Right? (Enter = yes, or say what's off) > 
+  > Not quite: it's the full amount within 14 days (day 14 included), half from day 15 to day 30, nothing after day 30. Also, a negative number of days counts as day 0, and the refund is worked out on what she paid (item prices times quantities, minus the discount code), with the shipping fee never included. Amounts under 50 rupees aren't paid, and the result is rounded down to whole rupees.
+
+Your rule, as I'll build it: A damaged item is refunded in full, including the shipping fee, if the complaint is made within 90 days after delivery; for example, a phone cover that arrived cracked 40 days ago is refunded in full with its shipping fee.
+  Right? (Enter = yes, or say what's off) > 
+  > Not quite: damaged goods are refunded in full, including the shipping fee, up to 90 days after delivery, and after day 90 it's nothing. The refund is worked out on what she paid (item prices times quantities, minus the discount code), and the amount is rounded down to whole rupees. The under-50-rupee rule doesn't apply to damaged goods. Money goes back the way it was paid, card to the card and store credit as store credit.
+
+Your rule, as I'll build it: The delivery charge is refunded only when the goods arrived damaged; in every other case, including a return for change of mind, the delivery charge is not refunded (so Ravi, returning ₹3,000 of goods because he changed his mind, does not get back the ₹200 delivery charge).
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: An approved refund is returned the way the order was paid: an order paid with store credit is refunded as store credit, and an order paid by card is refunded to the card, regardless of whether the reason was damage or change of mind.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: An item may be returned for a change-of-mind refund under the normal return-day rules whether or not it is on sale, personalised or a digital download; the only exception is an order marked final sale, which gets no refund unless the item arrived damaged.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: A customer can return the items of a multi-item order one at a time, in separate returns, until every item in the order has been returned, and each item is refunded under the normal refund rules for the amount she paid for that item after any discount code (so in Lakshmi's ₹6,000 order of 3 items at ₹2,000 each, she can return one item now and a second later, each refunded based on what she paid for that item).
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: A refund request is treated as damaged only if its reason text says "damaged"; every other request, including reasons of "item not as described", "late delivery" or a blank reason, is handled by the normal day rules, the same as a change of mind.
+  Right? (Enter = yes, or say what's off) > 
+  > Not quite: a reason counts as damaged if it says damaged, but "item not as described" and "late delivery" and blank are not damaged, so they follow the normal day rules like a change of mind. Otherwise that's right.
+
+Your rule, as I'll build it: Any rupee amount, such as a refund after a deduction, is rounded down to the nearest whole rupee, dropping the paise, so a refund that works out to ₹1,333.60 is paid as ₹1,333.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: When a refund request has a negative number of days since delivery (a delivery date in the future), treat the days as 0 so the full amount applies, and when the order total is missing (shown as ₹0), the refund is ₹0; in both cases the request is handled automatically and nothing is sent to staff.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rules for this feature, as the builders will follow them (each one applies to every case like it, not just the example):
+  1. Whenever a refund amount is worked out, it is based only on what the customer actually paid: item prices times quantities, minus the discount code. So a ₹1,000 item bought with a ₹200 coupon is refunded at most ₹800.
+  2. Whenever a refund request has a reason text that says "damaged", treat it as a damaged-goods request. Whenever the reason is anything else (including "item not as described", "late delivery" or a blank reason), treat it as not damaged and handle it by the normal day rules, the same as a change of mind.
+  3. Whenever the days since delivery are counted, count from the delivery date. Whenever that number is negative (a delivery date in the future), treat it as day 0.
+  4. Whenever a request is not damaged (a change of mind or any other reason) and the order is not marked final sale, refund the full amount paid if the return is requested within 14 days of delivery (day 14 included). Refund half the amount paid from day 15 through day 30 after delivery, and nothing after day 30. This applies whether or not the item is on sale, personalised or a digital download.
+  5. Whenever an order is marked final sale, give no refund, unless the item arrived damaged.
+  6. Whenever a damaged-goods complaint is made up to 90 days after delivery, refund the full amount paid, including the shipping fee. For example, a phone cover that arrived cracked 40 days ago is refunded in full with its shipping fee. Whenever the complaint is made after day 90, the refund is nothing.
+  7. Whenever a refund is worked out, the shipping (delivery) fee is refunded only when the goods arrived damaged. In every other case, including a change-of-mind return, the shipping fee is not refunded. For example, Ravi returns ₹3,000 of goods because he changed his mind and does not get back the ₹200 delivery charge.
+  8. Whenever a refund for a not-damaged request works out to under ₹50, do not pay it. This under-₹50 rule does not apply to damaged goods.
+  9. Whenever any rupee refund amount is worked out, including after a deduction or the half-refund, round it down to the nearest whole rupee and drop the paise. For example, ₹1,333.60 is paid as ₹1,333.
+  10. Whenever a refund is approved, return the money the way the order was paid: an order paid by card is refunded to the card, and an order paid with store credit is refunded as store credit. This is the same whether the reason was damage or a change of mind.
+  11. Whenever an order has more than one item, the customer may return its items one at a time, in separate returns, until every item in the order has been returned. Each item is refunded under the normal refund rules for the amount she paid for that item after any discount code. For example, in Lakshmi's ₹6,000 order of 3 items at ₹2,000 each, she can return one item now and a second later, each refunded based on what she paid for that item.
+  12. Whenever the order total on a refund request is missing (shown as ₹0), the refund is ₹0. Whenever the days since delivery are negative, the full amount applies as day 0. In both cases the request is handled automatically and nothing is sent to staff.
+  Numbers of any that are wrong (Enter = all correct) > 
+  > 
+  Thank you. The builders will encode your 12 rules as tests before anything lands.
+
+[03:48] Starting.
+  [03:49] Builder w1 picked up: refunds.
+  [03:49] Builder w1 landed: refund() with optional item param, tests (lock refunds released)
+  [03:49] Builder w1 landed: Round refund down after discount
+
+[03:49] The builder is done.
+They made 6 assumptions your description didn't cover. Rather than going through them one by one, I'll show you everything the build does, as rules: that covers them all.
+
+Let me check the result.
+  14 tests, all passing. All 2 that passed before still pass.
+
+Done in 1 minute, about $0.13. Your result is on branch hive/add-refunds-to-shop-1030-0345.
+  See what changed:  git diff main...hive/add-refunds-to-shop-1030-0345
+  Take it:           git merge hive/add-refunds-to-shop-1030-0345
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/add-refunds-to-shop-1030-0345.)
+
+Here is everything the build does now, written from its code (21 more only repeat your own rules, so I left them out).
+
+What the build does now, as rules (each one is what the product will do. Mark any that is not your policy):
+  1. Refunds: if the order was paid with store credit the refund goes back as store credit; every other order is refunded to the card.
+  2. Refunds: the way the money goes back is decided only by how the order was paid, so a refund of 0 rupees still shows card or store credit as the method.
+  3. Refunds: a damaged item returned on its own does not get any shipping fee back either, so a damaged 2,000 rupee item at 10% off returns 1,800 rupees even though the order had 100 rupees delivery.
+  4. Refunds: an order that costs nothing in total (no items and no delivery fee, or whose discount takes it to 0 or below) always refunds 0 rupees, even if damaged.
+  5. Refunds: an order whose items are fully discounted (100% off) but has a 100 rupee delivery fee still costs money, so a damaged return gets the 100 rupees delivery back while a change-of-mind return gets 0.
+  6. Refunds: a discount above 100% is not capped for the item part, so 120% off a 1,000 rupee order with 100 rupees delivery costs less than nothing and refunds 0 rupees.
+  7. Refunds: a very large order is refunded in full without any ceiling; a 1,000,000,000 rupee order within 14 days returns 1,000,000,000 rupees.
+  8. Messy or missing details: if the reason is typed in capitals or mixed case, such as 'DAMAGED' or 'Arrived Damaged', it still counts as damaged.
+  9. Messy or missing details: extra spaces or punctuation around the reason do not matter; '  Damaged!! ' still counts as damaged.
+  10. Messy or missing details: the word damaged is looked for anywhere inside the reason, so even 'undamaged' or 'not damaged' is treated as a damage claim and refunds in full.
+  11. Messy or missing details: if the reason is missing altogether, the refund is treated like an ordinary non-damage return, so day 1 on a 1,000 rupee order returns 1,000 rupees.
+  12. Messy or missing details: a reason that is not text (for example the number 5) is not understood and the refund fails with an error instead of giving an amount.
+  13. Messy or missing details: a fractional number of days is compared as is; 14.5 days counts as after day 14 and gets half, while 30.5 days gets 0.
+  14. Messy or missing details: if the number of days is missing or typed as text such as '5', the refund fails with an error and gives no amount.
+  15. Messy or missing details: the payment type must be exactly 'store_credit' to refund as store credit; any other value, including 'Store_Credit' with capitals, is refunded to the card.
+  16. Messy or missing details: an order with no items and no delivery fee returns 0 rupees and still shows the card.
+  17. Messy or missing details: an item bought with quantity 0 adds nothing to the order, but its delivery fee is still refunded for a damage claim (100 rupees returned).
+  18. Messy or missing details: a negative delivery fee reduces the order total; if that makes the total 0 or below, the refund is 0 rupees even for damage, and otherwise it is deducted from a damage refund.
+  Numbers of any that are wrong (Enter = all correct) > 
+  > 3, 10. A damaged item should also get the shipping fee back, and "not damaged" or "undamaged" must not count as damaged.
+  Rule 3: Refunds: a damaged item returned on its own does not get any shipping fee back either, so a damaged 2,000 rupee item at 10% off returns 1,800 rupees even though the order had 100 rupees delivery.
+  What should it be? > 
+  > A damaged item should get the shipping fee back too, in full: a damaged ₹2,000 item at 10% off with ₹100 delivery should return ₹1,900, not ₹1,800.
+  Rule 10: Messy or missing details: the word damaged is looked for anywhere inside the reason, so even 'undamaged' or 'not damaged' is treated as a damage claim and refunds in full.
+  What should it be? > 
+  > Only the word "damaged" counts as damaged. "Not damaged" and "undamaged" are not damaged claims, so they follow the normal day rules like a change of mind.
+  Anything the builders should know that is not on this list? (Enter = nothing) > 
+  > Nothing else, except one thing: the shipping fee is refunded only for damaged goods, and damaged refunds over 90 days get nothing.
+  [03:50] Builder w1 landed: Refund shipping on damaged single items; only 'damaged' word is a claim
+  [03:50] Builder w1 picked up: refunds.
+  [03:50] Builder w1 landed: damaged single-item returns include shipping; reason matches word 'damaged' not...
+
+Let me check the result.
+  16 tests, all passing. All 2 that passed before still pass.
+
+Done in under a minute, about $0.24. Your result is on branch hive/add-refunds-to-shop-1030-0345.
+  See what changed:  git diff main...hive/add-refunds-to-shop-1030-0345
+  Take it:           git merge hive/add-refunds-to-shop-1030-0345
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/add-refunds-to-shop-1030-0345.)
+
+What it does now, by your rules:
+  1. Whenever a refund amount is worked out, it is based only on what the customer actually paid: item prices times quantities, minus the discount code. So a ₹1,000 item bought with a ₹200 coupon is refunded at most ₹800.
+  2. Whenever a refund request has a reason text that says "damaged", treat it as a damaged-goods request. Whenever the reason is anything else (including "item not as described", "late delivery" or a blank reason), treat it as not damaged and handle it by the normal day rules, the same as a change of mind.
+  3. Whenever the days since delivery are counted, count from the delivery date. Whenever that number is negative (a delivery date in the future), treat it as day 0.
+  4. Whenever a request is not damaged (a change of mind or any other reason) and the order is not marked final sale, refund the full amount paid if the return is requested within 14 days of delivery (day 14 included). Refund half the amount paid from day 15 through day 30 after delivery, and nothing after day 30. This applies whether or not the item is on sale, personalised or a digital download.
+  5. Whenever an order is marked final sale, give no refund, unless the item arrived damaged.
+  6. Whenever a damaged-goods complaint is made up to 90 days after delivery, refund the full amount paid, including the shipping fee. For example, a phone cover that arrived cracked 40 days ago is refunded in full with its shipping fee. Whenever the complaint is made after day 90, the refund is nothing.
+  7. Whenever a refund is worked out, the shipping (delivery) fee is refunded only when the goods arrived damaged. In every other case, including a change-of-mind return, the shipping fee is not refunded. For example, Ravi returns ₹3,000 of goods because he changed his mind and does not get back the ₹200 delivery charge.
+  8. Whenever a refund for a not-damaged request works out to under ₹50, do not pay it. This under-₹50 rule does not apply to damaged goods.
+  9. Whenever any rupee refund amount is worked out, including after a deduction or the half-refund, round it down to the nearest whole rupee and drop the paise. For example, ₹1,333.60 is paid as ₹1,333.
+  10. Whenever a refund is approved, return the money the way the order was paid: an order paid by card is refunded to the card, and an order paid with store credit is refunded as store credit. This is the same whether the reason was damage or a change of mind.
+  11. Whenever an order has more than one item, the customer may return its items one at a time, in separate returns, until every item in the order has been returned. Each item is refunded under the normal refund rules for the amount she paid for that item after any discount code. For example, in Lakshmi's ₹6,000 order of 3 items at ₹2,000 each, she can return one item now and a second later, each refunded based on what she paid for that item.
+  12. Whenever the order total on a refund request is missing (shown as ₹0), the refund is ₹0. Whenever the days since delivery are negative, the full amount applies as day 0. In both cases the request is handled automatically and nothing is sent to staff.
+Looks right? Press Enter, or say what should be different.
+  > 
