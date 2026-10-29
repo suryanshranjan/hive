@@ -162,6 +162,26 @@ def _building():
     return (f"The last build finished {'successfully' if p.returncode == 0 else 'with a problem'}: "
             f"{BUILD['goal'][:200]}")
 
+NO_WORDS = ('no', 'nope', 'nah', 'not now', 'later', 'cancel', 'stop', 'wait', "don't", 'dont', 'never mind', 'leave it')
+
+def choose(ch, poll, options):
+    """Wait for his answer to a question with buttons; a typed answer counts as much as a tap (the live test: a typed
+    "yes" or a correction was taken as "no"). options: [(data, words that mean it)], the first being yes, the last no.
+    Returns (data, None), or (None, text) when he said something else, to be answered as a new message."""
+    from . import interview
+    kind, got = telegram._wait(ch, poll, {d for d, _ in options})
+    if kind == 'tap':
+        return got, None
+    t = ' ' + ' '.join(got.lower().replace("'", "'").split()).strip(' .!') + ' '
+    for d, words in options:   # his words name an option ("replace it", "without the login")
+        if any(f' {w} ' in t for w in words):
+            return d, None
+    if interview.is_yes(got):
+        return options[0][0], None
+    if any(f' {w} ' in t for w in NO_WORDS) or t.strip() in NO_WORDS:
+        return options[-1][0], None
+    return None, got
+
 def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=None):
     """Answer one message from the owner. apply_build(state, rule, ch) updates a build (hive.start.apply_ruling);
     start_build(repo, goal) runs a new build that reports to the phone (hive.start.start, overnight style);
@@ -218,7 +238,13 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
                 "after this nothing is left running or billing.", html=True,
                 buttons=([[('⭐ Yes, with my Claude login', 'cld|yes')], [('Yes, without it (chat only)', 'cld|bare')],
                           [('Not now', 'cld|no')]] if on else [[('🗑 Yes, delete it', 'cld|yes')], [('Not now', 'cld|no')]]))
-        choice = telegram._wait(ch, poll, {'cld|yes', 'cld|bare', 'cld|no'})[1]
+        choice, other = choose(ch, poll, [('cld|yes', ('with login', 'with my login', 'with my claude', 'yes')),
+                                          ('cld|bare', ('without', 'chat only', 'no login')),
+                                          ('cld|no', NO_WORDS)] if on else
+                               [('cld|yes', ('delete it', 'yes')), ('cld|no', NO_WORDS)])
+        if other is not None:   # something else entirely: hold this, and answer what he said
+            ch.send("Very good, I'll hold that for now.")
+            return handle(ch, repo, other, poll, apply_build, start_build, cloud)
         if choice not in ('cld|yes', 'cld|bare'):
             ch.send('Very good. Just say the word.'); return 'not_moved'
         if on:   # (for a delete, say nothing until it is known to be possible: it said "Deleting it now", then that it can't)
@@ -269,7 +295,11 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         ch.send(f"🔄 <b>Understood. Earlier you ruled:</b>\n{telegram.esc(before)}\n\n<b>Now:</b> {telegram.esc(rule)}\n\n"
                 "Shall I replace the earlier ruling with this?", html=True,
                 buttons=[[('🔄 Replace it', 'chg|replace')], [('Keep both', 'chg|both')], [('Cancel', 'chg|cancel')]])
-        choice = telegram._wait(ch, poll, {'chg|replace', 'chg|both', 'chg|cancel'})[1]
+        choice, other = choose(ch, poll, [('chg|replace', ('replace', 'new one', 'instead', 'the new')),
+                                          ('chg|both', ('both', 'keep both')), ('chg|cancel', NO_WORDS)])
+        if other is not None:
+            ch.send("Very good, I've left your rulings as they were.")
+            return handle(ch, repo, other, poll, apply_build, start_build, cloud)
         if choice == 'chg|cancel':
             ch.send('Of course. Nothing changed.'); return 'cancelled'
         if choice == 'chg|replace':
@@ -283,7 +313,11 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     if st and apply_build:
         ch.send(f"Shall I update the latest build (branch hive/{st['name']}) to follow it?",
                 buttons=[[('Yes, update it', 'upd|yes')], [('Not now', 'upd|no')]])
-        if telegram._wait(ch, poll, {'upd|yes', 'upd|no'})[1] == 'upd|yes':
+        upd, other = choose(ch, poll, [('upd|yes', ('update', 'yes')), ('upd|no', NO_WORDS)])
+        if other is not None:
+            ch.send('Very good. The builders will follow it from the next build.')
+            return handle(ch, repo, other, poll, apply_build, start_build, cloud)
+        if upd == 'upd|yes':
             ch.send("🛠 Right away. I'll let you know the moment it's done.")
             apply_build(st, rule, ch)
             return 'applied'

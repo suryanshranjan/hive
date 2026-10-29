@@ -104,6 +104,24 @@ r = assistant.handle(ch(fake), repo, 'delete the cloud machine', poll=1, cloud=l
 check('the cloud copy says it cannot delete itself, and how to (no AWS keys there)',
       (r, 'hive cloud --stop' in fake.sent[-1]['text']), ('cloud_elsewhere', True))
 
+# 3b3. every confirmation reads typed words as well as taps (the live test: typed answers were taken as "no")
+moves = []
+fake = FakeTelegram([say('yes please')])
+r = assistant.handle(ch(fake), repo, 'Please move to the cloud', poll=1, cloud=lambda rp, on, login=True: moves.append(login) or 0)
+check('a typed "yes" moves to the cloud (with the login, the recommended choice)', (r, moves), ('moved', [True]))
+fake = FakeTelegram([say('do it without the login')])
+moves.clear()
+assistant.handle(ch(fake), repo, 'Please move to the cloud', poll=1, cloud=lambda rp, on, login=True: moves.append(login) or 0)
+check('"without the login" picks that option', moves, [False])
+applied = []
+fake = FakeTelegram([say('replace it'), say('yes')])
+r = assistant.handle(ch(fake), repo, 'Actually, I changed my mind: a late post loses 9% per day', poll=1,
+                     apply_build=lambda st, rule, c: applied.append(rule))
+check('a typed "replace it" replaces the ruling, and a typed "yes" updates the build',
+      (r, applied, any('9% per day' in x['text'] for x in memory.load(repo))), ('applied', ['a late post loses 9% per day'], True))
+check('"update the fee to 5%" is not a status request', (telegram.is_status('update the fee to 5%'), telegram.is_status('any update?')),
+      (False, True))
+
 # 3c. the interview on the phone: a tap, his own words, his confirmation of the reading -> rules for the builders
 from hive import interview
 fake = FakeTelegram([tap('q01|0'), say('Only after a week'), tap('q02|0')])

@@ -264,8 +264,11 @@ STATUS = ('status', 'how is it going', "how's it going", 'hows it going', 'progr
           'any news', 'what is happening', "what's happening", 'how far')
 
 def is_status(text):
-    t = text.lower().strip(' ?!.')
-    return any(t == s or t.startswith(s) for s in STATUS)
+    """A short request for news ("status?", "how's it going"); not "update the fee to 5%", which starts the same way."""
+    t = ' '.join(text.lower().strip(' ?!.').split())
+    if t in STATUS or t in ('any update', 'any updates', 'status update', 'update?'):
+        return True
+    return len(t.split()) <= 4 and any(t.startswith(s) for s in STATUS if s != 'update')
 
 def status_of(run):
     """One plain paragraph on how a build is going, from the run folder alone."""
