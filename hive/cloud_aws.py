@@ -10,9 +10,9 @@ It uses the AWS command line (`aws`), logged in on this machine. What it makes, 
 - a firewall rule (security group) that lets SSH in from this machine's current IP address only;
 - one Ubuntu 24.04 machine that installs git, Python, Node.js and Claude Code by itself on first boot.
 Then the project moves there exactly as with `hive cloud --to` (only committed work; never .env files or keys)."""
-import json, os, shlex, subprocess, time, urllib.request
+import json, os, re, shlex, subprocess, time, urllib.request
 
-from . import cloud
+from . import cloud, memory
 
 AWS = os.environ.get('HIVE_AWS', 'aws')
 HOME = lambda: os.path.join(os.path.expanduser('~'), '.hive', 'cloud')
@@ -60,7 +60,8 @@ def new(repo='.', size='t3.large', region=None, profile=None, with_login=True, s
             "`aws configure` or `aws login`, and try again."); return 2
     region = region or subprocess.run(shlex.split(AWS) + ['configure', 'get', 'region'] + (['--profile', profile] if profile else []),
                                       capture_output=True, text=True).stdout.strip() or 'ap-south-1'
-    name = f"hive-{cloud._project(repo)}-{int(time.time()) % 100000}"
+    slug = re.sub(r'[^a-z0-9]+', '-', (memory.project_name(repo) or cloud._project(repo)).lower()).strip('-')[:30] or 'project'
+    name = f"hive-{slug}-{int(time.time()) % 100000}"   # named after his startup in the AWS console
     say(f"Making a cloud machine for Hive on AWS account {who.get('Account', '?')} ({region}, {size}, about "
         f"${PRICE.get(size, 0.1):.2f} an hour while it runs). `hive cloud --stop` deletes it.")
     os.makedirs(HOME(), exist_ok=True)
@@ -112,16 +113,69 @@ def new(repo='.', size='t3.large', region=None, profile=None, with_login=True, s
     say(f"  Ready at {m['ip']}.")
     return cloud.go(repo, target, with_login, start, say, key=None if local else m['key'])
 
+MARK = os.environ.get('HIVE_CLOUD_MARK', '/var/lib/hive-ready')   # made by FIRST_BOOT: this is a machine --new made
+SHUTDOWN = os.environ.get('HIVE_SHUTDOWN_CMD', 'sudo shutdown -h +1')   # a minute's grace: the phone gets its reply first
+
+def power_off_here(ask=input, say=print):
+    """From the phone, on the cloud machine itself. It holds no AWS keys (on purpose), so it cannot delete itself; but it
+    can power itself off. That ends the hourly bill, and its disk keeps every branch until his computer's
+    `hive cloud --stop` starts it again, brings everything home and deletes it (the owner: delete it from the phone,
+    and no development may be lost). Returns 9 when powering off, 8 mid-build, 5 when this is not such a machine."""
+    if not os.path.exists(MARK):
+        say("There is no Hive machine made from this computer to delete."); return 5
+    if subprocess.run("pgrep -f 'hive start' >/dev/null", shell=True).returncode == 0:
+        say('A build is still running here: powering off now would lose it. Wait for it, or stop it first.'); return 8
+    if ask("Power this cloud machine off? Its disk keeps everything until your computer's `hive cloud --stop` brings it "
+           "home and deletes it. [y/N] > ").strip().lower() not in ('y', 'yes'):
+        say('Kept.'); return 0
+    if subprocess.run(SHUTDOWN, shell=True).returncode != 0:
+        say('I could not power this machine off.'); return 7
+    say('Powering off in a minute. Its disk keeps everything; on your computer, `hive cloud --stop` brings it home '
+        'and deletes the machine.')
+    return 9
+
+def _wake(m, say=print):
+    """A machine powered off from the phone is started again, so its work can come home before it is deleted."""
+    p, r = m.get('profile'), m.get('region')
+    st = _aws(['ec2', 'describe-instances', '--instance-ids', m['instance']], p, r, check=False)
+    inst = (st.get('Reservations') or [{}])[0].get('Instances', [{}])[0]
+    state = inst.get('State', {}).get('Name')
+    if state not in ('stopped', 'stopping'):
+        return
+    say('  It was powered off from your phone; starting it again to bring its work home (about a minute)...')
+    if state == 'stopping':
+        _aws(['ec2', 'wait', 'instance-stopped', '--instance-ids', m['instance']], p, r)
+    _aws(['ec2', 'start-instances', '--instance-ids', m['instance']], p, r)
+    _aws(['ec2', 'wait', 'instance-running', '--instance-ids', m['instance']], p, r)
+    desc = _aws(['ec2', 'describe-instances', '--instance-ids', m['instance']], p, r)
+    old, m['ip'] = m.get('ip'), desc['Reservations'][0]['Instances'][0]['PublicIpAddress']   # new address after a restart
+    json.dump(m, open(STATE(), 'w'), indent=1)
+    cfg = os.path.join(os.path.expanduser('~'), '.hive', 'cloud.json')
+    if os.path.exists(cfg) and old and json.load(open(cfg)).get('to', '').endswith('@' + old):   # only where it pointed there
+        c = json.load(open(cfg)); c['to'] = f"ubuntu@{m['ip']}"; json.dump(c, open(cfg, 'w'), indent=1)
+    if not os.environ.get('HIVE_CLOUD_LOCAL'):
+        t = cloud.Target(f"ubuntu@{m['ip']}", m.get('key'))
+        for _ in range(30):
+            if t.run('true', check=False).returncode == 0:
+                break
+            time.sleep(5)
+
 def stop(ask=input, say=print, repo='.', relisten=True):
     """Bring the work done in the cloud back to this computer, then delete the machine `hive cloud --new` made, with its
     key and firewall rule (the owner: "when we close the instance, the development must come back to local")."""
     if not os.path.exists(STATE()):   # e.g. asked on the cloud machine itself, which never holds the owner's AWS keys
-        say("There is no Hive machine made from this computer to delete."); return 5
+        return power_off_here(ask, say)
     m = json.load(open(STATE()))
     what = m.get('instance') or m.get('name')
     if ask(f"Delete the Hive machine {what}? Everything built there comes back to this computer first. [y/N] > "
            ).strip().lower() not in ('y', 'yes'):
         say('Kept.'); return 0
+    if m.get('instance') and m.get('ip'):
+        try:
+            _wake(m, say)
+        except Exception as e:
+            say(f"  I could not start it again to bring its work home ({e}); I kept it. Check your AWS login (aws login), "
+                "then run `hive cloud --stop` again."); return 7
     if m.get('ip') and os.path.isdir(os.path.join(repo, '.git')):   # nothing built there may be lost (the owner)
         local = os.environ.get('HIVE_CLOUD_LOCAL')
         t = cloud.Target(local or f"ubuntu@{m['ip']}", None if local else m.get('key'))

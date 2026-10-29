@@ -16,6 +16,44 @@ def project_key(repo):
                            text=True).stdout.split()
     return (sorted(roots)[0][:12] if roots else os.path.basename(os.path.abspath(repo))) or 'project'
 
+GENERIC = {'backend', 'frontend', 'app', 'server', 'api', 'web', 'client', 'project', 'src', 'main', 'repo', 'code'}
+
+def _names():
+    return os.path.join(os.path.dirname(DIR), 'names.json')
+
+def project_name(repo):
+    """What the owner calls this project: the startup's name (the founder: "name the project {startupname}", not the
+    folder). Set with `hive name`; until then, a guess from package.json or the README's title; '' if neither helps."""
+    p = _names()
+    named = json.load(open(p)).get(project_key(repo)) if os.path.exists(p) else None
+    if named:
+        return named
+    guesses = []
+    try:
+        guesses.append(json.load(open(os.path.join(repo, 'package.json'), encoding='utf-8')).get('name') or '')
+    except (OSError, ValueError, AttributeError):
+        pass
+    for readme in ('README.md', 'readme.md', 'README'):
+        try:
+            first = open(os.path.join(repo, readme), encoding='utf-8', errors='replace').readline()
+        except OSError:
+            continue
+        if first.startswith('# '):
+            guesses.append(first[2:].strip())
+        break
+    for g in guesses:
+        g = (g or '').strip().lstrip('@').split('/')[-1]
+        if g and g.lower() not in GENERIC and len(g) <= 40:
+            return g.replace('-', ' ').title() if g.islower() else g
+    return ''
+
+def set_name(repo, name):
+    p = _names()
+    names = json.load(open(p)) if os.path.exists(p) else {}
+    names[project_key(repo)] = name.strip()
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    json.dump(names, open(p, 'w'), indent=1)
+
 def _path(repo):
     return os.path.join(DIR, project_key(repo) + '.json')
 

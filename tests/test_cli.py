@@ -32,6 +32,7 @@ ok = [
     (['telegram', 'setup'], {'action': 'setup'}), (['telegram', 'test'], {'action': 'test'}),
     (['telegram', 'call', 'sir'], {'action': 'call', 'address': 'sir'}),
     (['llm', 'setup'], {'action': 'setup'}),
+    (['name'], {'cmd': 'name', 'name': []}), (['name', 'Sunny', 'Shop'], {'name': ['Sunny', 'Shop']}),
     (['cloud', '--new', '--size', 't3.medium', '--region', 'ap-south-1', '--profile', 'p', '--no-login'],
      {'new': True, 'size': 't3.medium', 'region': 'ap-south-1', 'profile': 'p', 'no_login': True}),
     (['cloud', '--stop'], {'stop': True}),
@@ -84,4 +85,24 @@ try:
 except SystemExit as e:
     said = str(e)
 check('an unknown agent is refused with the choices', 'Choose one of: claude, codex, gemini, antigravity' in said, True)
+
+# the startup's name, not the folder's ("name the project {startupname}")
+import subprocess
+from hive import memory, argv
+proj = tempfile.mkdtemp(); memory.DIR = os.path.join(tempfile.mkdtemp(), 'rules')
+subprocess.run(['git', 'init', '-q', proj]); open(os.path.join(proj, 'README.md'), 'w').write('# sunny-shop' + chr(10))
+subprocess.run(['git', '-C', proj, 'add', '.']); subprocess.run(['git', '-C', proj, '-c', 'user.email=a@b', '-c', 'user.name=a', 'commit', '-qm', 'i'])
+check("until he names it, the README's title is the guess", memory.project_name(proj), 'Sunny Shop')
+open(os.path.join(proj, 'package.json'), 'w').write('{"name": "backend"}')
+check('a generic package name is not taken for his startup', memory.project_name(proj), 'Sunny Shop')
+memory.set_name(proj, 'Barter Co')
+check('the name he gives is the one used', memory.project_name(proj), 'Barter Co')
+empty = tempfile.mkdtemp(); subprocess.run(['git', 'init', '-q', empty])
+check('no name rather than the folder name', memory.project_name(empty), '')
+from hive import assistant
+check("Hive's replies know the startup's name", 'called Barter Co' in assistant.facts(proj), True)
+# Windows: claude and codex are .cmd files that subprocess cannot start by bare name; every model call failed there
+check('a command line keeps its words', argv('claude -p --output-format json')[1:], ['-p', '--output-format', 'json'])
+if os.name == 'nt':
+    check('on Windows the tool is found with its .cmd', argv('python -V')[0].lower().endswith('.exe'), True)
 sys.exit(fail)

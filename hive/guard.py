@@ -11,7 +11,7 @@ Main's results are cached by code content (Gate 23: lock commits change no code,
 Before committing it refuses secrets (.env files other than templates, private keys, credential files; projects can
 add patterns with "never_commit") and leaves build artifacts and dependency folders out of the commit.
 Exit codes: 0 landed; 2 push kept failing; 5 rebase conflict; 6 duplicate definitions; 7 regressions; 8 forbidden files."""
-import ast, fnmatch, hashlib, io, json, os, subprocess, sys, tarfile, tempfile, time
+import ast, fnmatch, hashlib, io, json, os, re, subprocess, sys, tarfile, tempfile, time
 
 from . import config, junit, law
 
@@ -189,7 +189,7 @@ def land(name, message, note=None):
             print('Delete them or add them to .gitignore, then run hive land again.'); return 8
         head, _, rest = message.partition('\n')
         r = sh('git', 'commit', '-q', '-m', f'{head} (lock {name} released)' + ('\n' + rest if rest else ''))
-        if r.returncode and 'nothing to commit' not in r.stdout + r.stderr:
+        if r.returncode and not re.search(r'nothing (added )?to commit', r.stdout + r.stderr):   # already committed by itself
             print(r.stdout, r.stderr); return 2
     for _ in range(8):
         if sh('git', 'pull', '--rebase', 'origin', b).returncode:
@@ -206,6 +206,18 @@ def land(name, message, note=None):
                 print(f'Team notes are now on for this swarm ({why}): run `hive notes` at each sync, and add '
                       '--note "<one line>" when you land something others must know about.')
             return 5
+        # what the builder committed by itself, with plain git, skipped the checks above (Gate 38: a builder's own
+        # commit carried the shared node_modules link onto main)
+        added = sh('git', 'diff', '--name-only', '--diff-filter=A', f'origin/{b}...HEAD').stdout.splitlines()
+        bad = sorted(f for f in added if f and forbidden(f, cfg.get('never_commit', [])))
+        if bad:
+            log(f'BLOCKED_FORBIDDEN {name} {len(bad)}')
+            print('Refused: your commits add files that must never be committed (secrets): ' + ', '.join(bad[:10]))
+            print(f'Undo them with `git reset --soft origin/{b}`, remove those files, then run hive land again.'); return 8
+        junk = [f for f in added if f and artifact(f)]
+        if junk:
+            sh('git', 'rm', '-r', '-q', '--cached', '--', *junk)
+            sh('git', 'commit', '-q', '-m', 'hive: leave build output and dependencies out of the shared branch')
         new_dups = dup_defs(python_sources('HEAD')) - dup_defs(python_sources(f'origin/{b}'))
         if new_dups:
             log(f'BLOCKED_DUP {name} {len(new_dups)}')

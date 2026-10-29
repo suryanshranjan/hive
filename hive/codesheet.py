@@ -7,7 +7,8 @@ the rules that are not his policy and says each one right, then adds anything mi
 Gate 42 (synthetic owner who knows his rules): the corrected code sheet took fresh builders to 99.6% hidden, against
 68.4% from Hive's interview and 100% from the owner's own complete sheet. The cost moved to the owner's reading: 68
 rules, 34 marked. A real owner reading such a sheet is not yet tested."""
-import json, os, shlex, shutil, subprocess, tempfile
+import json, os, shutil, subprocess, tempfile
+from . import argv
 
 CMD = os.environ.get('HIVE_DESCRIBE_CMD', 'claude -p --output-format json --permission-mode acceptEdits '
                                           '--allowedTools Bash Read Write Glob Grep')
@@ -34,7 +35,7 @@ def describe(code_dir, goal, timeout=1800):
         shutil.copytree(code_dir, code, ignore=shutil.ignore_patterns('.git', 'node_modules', '__pycache__'))
         out = os.path.join(work, 'rules.json')
         try:
-            subprocess.run(shlex.split(CMD), cwd=work, input=BRIEF.format(code=code, goal=goal.strip()[:6000], out=out),
+            subprocess.run(argv(CMD), cwd=work, input=BRIEF.format(code=code, goal=goal.strip()[:6000], out=out),
                            capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=timeout)
             got = json.load(open(out, encoding='utf-8'))
         except Exception:

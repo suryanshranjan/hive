@@ -8,6 +8,7 @@ For the owner:
   hive morning [--phone]                 after an overnight build: check its decisions (on Telegram with --phone)
   hive listen                            stay on Telegram: change your mind, "build: ...", "status"
   hive rules [forget <n>]                your standing rulings for this project
+  hive name ["Sunny Shop"]               what Hive calls this project (your startup's name)
   hive setup                             first run: checks, then your phone, voice and a backup model
   hive doctor                            check this machine and project are ready
   hive telegram setup | test | call <name>   connect your phone; how Hive addresses you
@@ -133,6 +134,7 @@ def build_parser():
     tg = sub.add_parser('telegram'); tg.add_argument('action', choices=['setup', 'test', 'call', 'ask', 'verdicts'])
     tg.add_argument('address', nargs='?'); tg.add_argument('--out'); tg.add_argument('--intro')
     lm = sub.add_parser('llm'); lm.add_argument('action', choices=['setup'])
+    sub.add_parser('name').add_argument('name', nargs='*')
     ru = sub.add_parser('rules'); ru.add_argument('action', nargs='?', choices=['forget']); ru.add_argument('n', nargs='?', type=int)
     i = sub.add_parser('init'); i.add_argument('--test-cmd', required=True); i.add_argument('--junit', default='.hive/junit.xml')
     c = sub.add_parser('claim'); c.add_argument('name'); c.add_argument('areas'); c.add_argument('desc')
@@ -167,7 +169,7 @@ def main(argv=None):
         return assistant.listen('.', apply_build=start.apply_ruling,
                                 start_build=lambda repo, goal: assistant.background_build(repo, goal),   # Hive keeps answering meanwhile
                                 cloud=lambda repo, on, login=True: cloud_aws.new(repo, with_login=login) if on else
-                                cloud_aws.stop(ask=lambda q: 'y' if q.startswith('Delete the Hive machine') else 'n',
+                                cloud_aws.stop(ask=lambda q: 'y' if q.startswith(('Delete the Hive machine', 'Power this')) else 'n',
                                                relisten=False))   # this listener is already here   # never 'lose the work'
     if a.cmd == 'cloud':
         from . import cloud
@@ -182,6 +184,12 @@ def main(argv=None):
         return doctor.main('.') if a.cmd == 'doctor' else doctor.setup('.')
     if a.cmd == 'morning':
         return start.morning(a.name, a.phone)
+    if a.cmd == 'name':
+        from . import memory
+        if a.name:
+            memory.set_name('.', ' '.join(a.name)); print(f"Got it: I'll call this project {' '.join(a.name)}."); return 0
+        n = memory.project_name('.')
+        print(f'This project is {n}.' if n else "No name yet. Tell me your startup's name: hive name \"Sunny Shop\""); return 0
     if a.cmd == 'rules':
         from . import memory
         return memory.forget('.', a.n or 0) if a.action == 'forget' else memory.show('.')

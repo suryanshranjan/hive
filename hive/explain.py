@@ -5,7 +5,8 @@ each one is rewritten with context (where in the product it shows up, who notice
 simple numbers, and a yes-or-no question; then they are ranked by how much they change what customers see or pay, and
 the ones an owner cannot meaningfully judge are set aside. The rewrite is done once per build by a headless model call
 and cached in <owner dir>/explained.json; if it fails, the builders' own words are used."""
-import json, os, re, shlex, subprocess
+import json, os, re, subprocess
+from . import argv
 
 CMD = os.environ.get('HIVE_EXPLAIN_CMD', 'claude -p --output-format json')
 SHOW = 8   # at most this many go to the owner, most important first
@@ -64,7 +65,7 @@ def _ask_claude(prompt):
         raise RuntimeError('claude failed recently; using the backup')
     try:
         # UTF-8 both ways: Windows' default encoding cannot carry "₹", emoji or curly quotes, so every model call failed there
-        p = subprocess.run(shlex.split(CMD), input=prompt, capture_output=True, text=True, encoding='utf-8',
+        p = subprocess.run(argv(CMD), input=prompt, capture_output=True, text=True, encoding='utf-8',
                            errors='replace', timeout=300, env=dict(os.environ, PYTHONIOENCODING='utf-8'))
         reply = json.loads(p.stdout)
     except Exception:
