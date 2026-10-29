@@ -1,0 +1,19 @@
+hidden pass: N0 36.0%, CC 100.0%, CS 65.2%, CT 66.4%
+CC − N0 = +64.0 points (95% CI +51.6 to +74.8)
+CS − N0 = +29.2 points (95% CI +11.6 to +47.6)
+CT − N0 = +30.4 points (95% CI +18.4 to +41.2)
+CT − CS = +1.2 points (95% CI -24.0 to +22.8)
+CC − CT = +33.6 points (95% CI +19.6 to +48.8)
+CC: right 25, partial 0, wrong 0, absent 0; repaired 19/19 (1.00); added 5/5; spoiled 0; 48 replies, 5.0 min
+CS: right 10, partial 0, wrong 14, absent 1; repaired 5/19 (0.26); added 4/5; spoiled 0; 13 replies, 1.1 min
+CT: right 9, partial 0, wrong 13, absent 3; repaired 6/19 (0.32); added 2/5; spoiled 0; 27 replies, 3.9 min
+R: right 25, partial 0, wrong 0, absent 0; repaired 19/19 (1.00); added 5/5; spoiled 0
+D: 83 rules; right 1, partial 0, wrong 19, absent 5
+
+predictions
+S1 careful list repairs ≥ 0.80: 1.00 -> held
+S2 skimming list repairs ≤ 0.50: 0.26 -> held
+S3 conversation repairs ≥ 0.15 more for the skimmer: +0.05 -> failed
+S4 CT ≥ CS + 5 points: +1.2 -> failed
+S5 CC ≥ 95%: 100.0 -> held
+Model check (skimming brief changed nothing, CS ≥ 0.80): did not fire

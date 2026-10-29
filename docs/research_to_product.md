@@ -77,6 +77,8 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 
 ## Still to turn into the product
 
+- **Gate 55:** a skimming owner repairs about a quarter of the code sheet's wrong rules, list or conversation alike. If a short sheet (only business choices) lets him catch more (Gate 56), the describer writes that by default.
+
 - **The code sheet with a real owner:** Gate 42's result is with a synthetic owner who reads every rule. Test the founder on one real feature before relying on it.
 
 - **Gate 45:** is a verdict given on the code sheet, looking at what was built, stable a day later? If it is, the hand-over is the channel; if not, Hive treats his latest word as the rule and makes changing it cheap.

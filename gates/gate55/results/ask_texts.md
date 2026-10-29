@@ -1,0 +1,288 @@
+# Gate 55 ask texts (gates/gate55/referee/review55.py)
+
+## N0
+There is no product owner to ask on this project: `tools/ask.py` will tell you so. Work from the spec and the examples.
+
+## CC
+There is no product owner to ask on this project: `tools/ask.py` will tell you so.
+
+### The owner's rules for this feature (from his interview)
+The owner decided each of these himself. Encode every one that touches your area as a test before you land, follow it exactly, and do not stretch it beyond the situation it describes.
+
+- Whenever bulk_price is given a unit price and a quantity, it returns unit price times quantity in cents, with no discount for fewer than 10 units.
+- Whenever bulk_price is given a quantity of 10 to 49 units, it takes 5% off the whole order total (10 units at 100 cents gives 950).
+- Whenever bulk_price is given a quantity of 50 to 99 units, it takes 10% off the whole order total, not just the units beyond 50.
+- Whenever bulk_price is given a quantity of 100 or more units, it takes 15% off the whole order total.
+- Whenever bulk_price produces a total with a fraction of a cent, it rounds the total to the nearest 5 cents, with exact halves (2.5 cents) rounding up (15 cents x 10 units with 5% off is 142.5 cents, which rounds to 145). After rounding, if the total is below 500 cents, charge the minimum of 500 cents.
+- Whenever bulk_price is given a unit price or quantity of zero, it returns 0.
+- Whenever bulk_price is given a unit price or a quantity that is zero or less, it returns 0 instead of a total, with no minimum applying. A negative unit price or a negative quantity is not an error.
+- Whenever bulk_price is given NULL for the unit price or the quantity, it returns NULL.
+- Whenever bulk_price is given a unit price or quantity that is text of any kind (including numeric text such as '10'), it does not convert it and returns NULL.
+- Whenever bulk_price is given a fractional quantity or price, it uses it as is (2.5 units at 100 cents gives 250), and the discount tiers use the exact quantity, so 9.9 units get no discount.
+- Whenever fiscal_label is given a valid date in YYYY-MM-DD form, it returns 'FY<year>-Q<n>', where the fiscal year starts on 1 April and is named for the calendar year in which it ends.
+- Whenever fiscal_label is given a date from April to June it returns Q1, July to September Q2, October to December Q3, and January to March Q4, written like 'FY2025-Q1' (2024-04-01 is FY2025-Q1). The exception is March 27 to March 31, which returns the year-end close label 'FY<year>-CLOSE' instead of Q4, so 2024-03-31 is 'FY2024-CLOSE', not FY2024-Q4; March 1 to 26 is still Q4.
+- Whenever fiscal_label is given a date from 1 January to 31 March, it names the fiscal year after that same calendar year (2025-01-01 is FY2025-Q4); from 1 April on it names the next calendar year.
+- Rule 14: Whenever fiscal_label is given a date that does not exist on the calendar (such as 2024-02-30, 2023-02-29, month 13, day 45 or year 0000), it returns the text 'INVALID', not NULL. 2024-02-29 in a leap year is accepted as a real date.
+- Whenever fiscal_label is given text that is not exactly four-digit year, two-digit month and two-digit day separated by hyphens (such as 2024-5-5, 2024/05/05, or empty text), it returns the text 'INVALID'. A valid date (four-digit year, two-digit month and two-digit day separated by hyphens) followed by a space or 'T' and a time of HH:MM or HH:MM:SS is not an error: the time is ignored and the date is labeled normally.
+- Whenever fiscal_label is given a date with spaces around it, it ignores those spaces and labels the date normally.
+- Whenever fiscal_label is given NULL, it returns NULL. Whenever fiscal_label is given a number instead of text (such as 20240505), the number is treated as its plain text form and then checked like any other text; a number such as 20240505 has no hyphens, so it is not in the form YYYY-MM-DD and returns 'INVALID'.
+- Rule 18: Whenever fiscal_label is given the year 0000 it returns the text 'INVALID'. For 9999-04-01 or later there is no special rule; follow the normal fiscal year naming, with the fiscal year named by the calendar year in which it ends.
+- Whenever isbn_check is given a 9-digit code, it returns the ISBN-10 check character: multiply the 1st digit by 1, the 2nd by 2, and so on up to the 9th digit by 9, add them up, and take the sum modulo 11. The remainder is the answer: if it is 10, return 'X', otherwise return the remainder as a one-character text digit (030640615 gives '2').
+- Whenever the ISBN-10 check value comes out as 10, isbn_check returns the letter 'X' (123456789 gives 'X'); a value of 0 is returned as the text '0'.
+- Whenever isbn_check is given a code containing hyphens or spaces, it ignores them before checking, so '0-306-40615' and '030 640 615' both give '2'.
+- Whenever isbn_check is given any text, ignore every character that is not a digit 0-9, including hyphens, spaces, letters and decimal points. If there are more than 9 digits, use only the first 9. If there are fewer than 9 digits, apply the same weights starting from the first digit to the digits present. If there are no digits, such as empty text, return '0'. It never returns NULL and never returns an error.
+- Whenever isbn_check is given NULL or binary data, it returns NULL. When isbn_check is given a decimal number, it treats the number as its plain text form, ignores the decimal point and any other non-digit characters, and works out the check character from the digits that remain: take the first 9 digits, multiply them by weights 1 to 9, sum the products, and take the sum modulo 11; the check character is 'X' if the remainder is 10, otherwise the remainder.
+- Whenever isbn_check is given a whole number rather than text, the number is treated as its plain text form and then handled like any other text, so it never returns NULL. Only the digits are used, with the first 9 digits taken and weights 1 to 9 applied from the first digit. A number such as 30640615 has 8 digits, so the weights 1 to 8 apply to those digits; the sum is 120, the remainder is 10, and the result is 'X'.
+- Whenever isbn_check is given a code starting with a minus sign, it treats the minus as a hyphen and ignores it ('-123456789' gives 'X').
+- Whenever late_fee is given an invoice amount and a number of days late, it works as follows. An amount of zero or less returns 0. Days 1 to 5 are a grace period and return 0. From day 6 on, late_fee charges 2% of the amount in cents for each started 30-day period, so days 6 to 30 are one period, days 31 to 60 are two periods, and so on. The fee is rounded up to the next whole cent, then raised to a minimum of 500 cents, then capped at one fifth (20%) of the amount, rounded down to a whole cent. The cap wins over the minimum, so small invoices can be charged less than 500.
+- Whenever late_fee is given an amount of zero or less, it returns 0. Days late of 5 or fewer are a grace period and return 0. From day 6, late_fee charges 2% of the amount for each started 30-day period, so 6 to 30 days late is one period (2%), 31 to 60 days is two periods (4%), 61 to 90 days is three periods (6%), 91 to 120 days is four periods (8%), and so on, with no top rate at 6%. The fee is rounded up to the next whole cent and raised to a minimum of 500 cents. It is then capped at one fifth (20%) of the amount, rounded down to a whole cent, and the cap wins over the minimum.
+- Whenever late_fee computes a fee with a fraction of a cent, it rounds the fee up to the next whole cent, so any fraction of a cent counts as a full cent (a fee of 0.25 cents becomes 1 cent). After that, the fee is raised to a minimum of 500 cents, and then capped at one fifth (20%) of the amount, rounded down to a whole cent. The cap wins over the minimum.
+- Whenever late_fee is given zero or negative days late, or an amount of zero or less, it returns a fee of 0.
+- Whenever late_fee is given NULL, or text that is not a number (including empty text), for either the amount or the days, it returns NULL, even if the other value would have given 0.
+- Whenever late_fee is given numeric text such as '10000' and '45', it does not convert it to numbers. If the amount or the days late is text of any kind, late_fee returns NULL.
+- Whenever late_fee is given a fractional number of days, it compares the exact value to the limits, without rounding the days. Days of 5 or fewer are a grace period, so 0.5 days returns 0. Fractional days are charged from over 5 days, so 5.5 days is charged. 30.5 days is two started 30-day periods, which is 4%. The fee is rounded up to the next whole cent, then raised to a minimum of 500 cents, then capped at one fifth (20%) of the amount, rounded down to a whole cent. The cap wins over the minimum. An amount of zero or less returns 0.
+- Whenever loyalty_tier is given a points balance from 0 to 999, it returns 'bronze'.
+- Whenever loyalty_tier is given 1000 up to but not including 5000 points, it returns 'silver'; 5000 up to but not including 20000 points returns 'gold'; 20000 points or more returns 'platinum', and there is no tier above platinum. Fractional points are compared by their exact value, so 4999.5 is silver.
+- Whenever loyalty_tier is given a negative balance (even -0.5), it returns 'suspended'. A negative balance is not an error and does not return NULL. Zero and above follow the normal tiers, starting with 'bronze' for 0 up to but not including 1000.
+- Whenever loyalty_tier is given NULL, empty text or text that is not a number, it returns NULL.
+- Whenever loyalty_tier is given numeric text (such as '5000', ' 5000 ' or '1e4'), it does not convert it to a number and returns NULL. If the points are text of any kind, loyalty_tier returns NULL.
+- Whenever loyalty_tier is given a fractional balance such as 999.9, it compares the exact value, so 999.9 is still bronze.
+- Whenever make_slug is given a title, it lower-cases the title and replaces each '&' with the word 'and'. It keeps only runs of the letters a-z and digits 0-9 as words. Every other character (punctuation, accents, non-Latin letters, whitespace, underscores, slashes) is a separator and is dropped. It drops the whole words 'the', 'a', 'an' and 'of' wherever they appear. It joins the remaining words with single hyphens, with no hyphen at the start or end. If nothing is left (empty title, only stop words, only punctuation), it returns 'untitled'. A number given as the title is treated as its plain text form.
+- Whenever make_slug is given a title with accented letters, the accented letters are not converted to their base letter. Every character other than a-z and 0-9 is a separator and is dropped, so 'Café Crème Brûlée' gives 'caf-cr-me-br-l-e'.
+- Rule 41: Whenever make_slug meets letters with no plain a-z form (ß, Cyrillic, Japanese), they are separators and are dropped, and the rest are kept as words, so 'Straße Œuvre' gives 'stra-e-uvre'. A title made only of such letters has nothing left, so it returns 'untitled', not empty text.
+- Whenever make_slug is given a title, every character other than a-z and 0-9 is a separator and is dropped, so compatibility characters such as the 'ﬁ' ligature or a circled digit are not turned into plain letters or digits ('ﬁne ①' gives 'ne'). If nothing is left, the result is 'untitled'.
+- Whenever make_slug's slug is longer than maxlen, it cuts it to maxlen at a word boundary, not in the middle of a word. If the cut falls inside a word, drop that partial word back to the previous hyphen. If the cut falls exactly at the end of a word, keep that word. If the first word alone is longer than maxlen, hard-cut that word at maxlen characters. Then strip any leading or trailing hyphens from the result ('Hello World' with 6 gives 'hello', with 7 also gives 'hello', not 'hello-w').
+- Whenever make_slug is given a maxlen of zero or less (it is treated as 0) or an empty title, it returns 'untitled'. Whenever maxlen is not a number, such as text like 'abc' or a boolean, it returns NULL. Numbers in text form are not converted.
+- Whenever make_slug is given a maxlen with a fraction, it uses the whole-number part, truncated toward zero (5.9 acts as 5). Whenever maxlen is text of any kind, including numeric text such as '8', make_slug returns NULL.
+- Whenever make_slug is given NULL for the title or for maxlen, it returns NULL, even if the other value is 0.
+- Whenever make_slug is given a title that is empty, or has only spaces, punctuation or stop words, it returns 'untitled', not empty text.
+- Whenever make_slug is given a number as the title, it uses the number written out as text, so a decimal point becomes a hyphen (1.5 gives '1-5').
+- Whenever meeting_end is given a start time HH:MM and a number of minutes, it returns the end time as HH:MM on a 24-hour clock with two-digit hours and minutes.
+- Whenever the end time of meeting_end would pass 23:59, it returns 23:59. It never wraps past midnight to the next day, so 23:30 plus 45 minutes gives 23:59, and 1440 minutes (or any whole number of days) also gives 23:59, not the start time.
+- Whenever the duration given to meeting_end is zero or less, nothing is added and the start time itself is returned in HH:MM form. It never counts backwards and never wraps to the previous day, so 00:00 minus 1 gives 00:00.
+- Whenever meeting_end gets a start that is not exactly a two-digit hour, a colon and two-digit minutes (HH:MM, ignoring surrounding whitespace), it returns NULL. A one-digit hour such as '9:00' is not accepted, so it returns NULL. Surrounding spaces are still ignored.
+- Whenever the start is not exactly a two-digit hour, a colon and two-digit minutes (HH:MM, ignoring surrounding spaces), meeting_end returns NULL. That covers an hour above 23, minutes above 59, '10:5', '10:00:00', '1000', '10.00', '10:00 PM' and empty text. A number is treated as its plain text form and checked like any other text, so it also returns NULL, because it has no colon. A NULL start or a NULL duration returns NULL, and a duration that is not a number (text such as 'abc' or a boolean) also returns NULL.
+- Whenever meeting_end is given NULL for the start or for the minutes, it returns NULL.
+- Rule 55: When meeting_end is given minutes as text of any kind, including numeric text like '30', the minutes are not converted and meeting_end returns NULL. A NULL start or a NULL duration returns NULL. A duration that is not a number (such as 'abc' or a boolean) returns NULL. Empty text is not a number, so it also returns NULL, not the start time.
+- Whenever meeting_end is given a duration in minutes, a duration above zero is rounded up to whole 15-minute blocks, and fractional minutes round up the same way, so 0.5 minutes counts as one block (15 minutes) and 90.9 minutes counts as 7 blocks (105 minutes). A duration of zero or less adds nothing and returns the start time itself, so -90.9 returns the start time.
+- Whenever pct_change is given an old and a new value, it returns (new minus old) divided by old, times 100, rounded to 1 decimal place (3 to 4 gives 33.3).
+- Whenever pct_change lands exactly halfway between two 1-decimal values, it rounds away from zero (1000 to 1000.5 gives 0.1 and 1000 to 999.5 gives -0.1), but it works on the exact stored number, so 100 to 100.05 gives 0.0 because 100.05 is stored slightly below.
+- Whenever pct_change is given an old value of zero, it returns 0.0, whatever the new value is, not NULL.
+- pct_change uses the signed old value as the divisor, not its size, so a negative old value flips the sign of the result. -100 to -50 gives -50.0, and -100 to -150 gives 50.0. The result is rounded to 1 decimal place and returned as a decimal number, and a result of zero is returned as 0.0, never -0.0.
+- Whenever pct_change is given a new value of zero, it returns -100.0 for any non-zero old value.
+- Whenever the rounded pct_change result is zero, it returns 0.0 and never negative zero.
+- Whenever pct_change is given NULL for either value, it returns NULL.
+- Rule 64: Numeric text is not converted, and text with leading digits such as '5abc' does not act as 5. If the old or new value is text of any kind, pct_change should return NULL.
+- Whenever pct_change is given text of any kind as the old value or as the new value (including empty text or anything that is not a number), it returns NULL. Text is never treated as zero, so the new value does not give -100.0. A NULL old value or a NULL new value also returns NULL.
+- Whenever phone_fmt is given a phone number with exactly 10 digits, it returns it as (AAA) EEE-NNNN, whatever spaces, hyphens, dots, brackets or plus signs surround the digits.
+- Whenever phone_fmt is given a phone number with exactly 10 digits, it formats those 10 digits as '(212) 555-1234'. Phone numbers with any number of digits other than exactly 10 are returned unchanged, not reformatted and not NULL. An 11-digit number starting with 1 is not treated as a country code, so '+1 212 555 1234' comes back as '+1 212 555 1234'.
+- Whenever phone_fmt is given 11 digits not starting with 1, or any count other than 10 or 11 digits (7 digits, 9 digits, 12 digits, no digits, empty text), it returns the input unchanged. It is not reformatted and not NULL. Empty text comes back as empty text.
+- Whenever phone_fmt is given a phone number with any number of digits other than exactly 10 (such as the 12 digits in '1-1-212-555-1234'), it returns the input unchanged, not reformatted and not NULL. So '1-1-212-555-1234' comes back as '1-1-212-555-1234'.
+- Whenever phone_fmt is given a phone number with any number of digits other than exactly 10 (such as the 11 digits in '212 555 1234 ext 5'), it returns the input unchanged, not reformatted and not NULL. So '212 555 1234 ext 5' comes back as '212 555 1234 ext 5'.
+- Whenever phone_fmt is given text with non-digit characters mixed in, such as letters or a trailing 'x', the non-digit characters are ignored only when counting digits. If exactly 10 digits remain, the result is '(AAA) EEE-NNNN' built from those digits in order. With any other number of digits, including 11 digits starting with 1, the input text is returned unchanged, not reformatted and not NULL.
+- Whenever phone_fmt is given a number rather than text, it uses its digits (2125551234 gives '(212) 555-1234'); a decimal number counts the digits on both sides of the point.
+- Whenever phone_fmt is given 10 digits whose area code starts with 0 or 1 (0125551234), it formats them without any check on the area code.
+- Whenever phone_fmt is given NULL or binary data, it returns NULL.
+- Whenever phone_fmt is given digits from other scripts (such as Arabic-Indic digits), it counts them as digits and formats them as they are.
+- Rule 76: Whenever avg_rating is used over a group of rows, ignore NULL values, non-numeric values, booleans, and any number below 1 or above 5 (1 and 5 exactly and fractional ratings in between are valid). If there are no valid ratings (empty group, all NULL or all invalid), return NULL. With 5 or more valid ratings, drop exactly one lowest and one highest rating (one copy each, even if tied) before averaging; with fewer than 5 valid ratings, drop nothing. The count is taken after ignoring invalid values. Take the arithmetic mean of the kept ratings and round it to 1 decimal place, with exact halves rounding up (away from zero), and return it as a decimal number.
+- Whenever avg_rating meets a rating of NULL, it leaves it out of both the sum and the count.
+- Whenever avg_rating meets a rating below 1 or above 5 (0, -1, 6, 0.9999, 5.0001), it leaves it out as invalid; exactly 1 and exactly 5 are counted.
+- Whenever avg_rating meets a rating given as text of any kind, including numeric text ('5', ' 3 ', '1e0'), it does not convert it to a number. It counts it as a non-numeric value and ignores it, the same as empty text or text that is not a number.
+- Whenever avg_rating meets fractional ratings within 1 to 5 (4.5), it counts them as they are.
+- Whenever avg_rating has no valid ratings at all (no rows, only NULLs or only out-of-range values), it returns NULL, not 0.
+- The average of avg_rating is rounded to 1 decimal place. An exact halfway value always rounds up (away from zero), so 4.25 gives 4.3. A value like 4.125 gives 4.1, because the first decimal is what counts.
+- Whenever avg_rating is used with GROUP BY, it gives each group its own average computed only from that group's valid ratings.
+- - Whenever loyalty_tier gets NULL points, or points that are not a number (such as a boolean), it should return NULL.
+- Whenever make_slug gets a NULL title or a NULL maxlen, it should return NULL.
+- Whenever make_slug gets a maxlen that is a boolean, it should return NULL.
+- Whenever pct_change gets an old or new value that is a boolean, it should return NULL.
+- Whenever phone_fmt gets a NULL, it should return NULL.
+- Whenever phone_fmt gets a number instead of text, it should treat it as its plain text form and apply the same rules.
+- Whenever fiscal_label, isbn_check or bulk_price gets any NULL argument, it should return NULL.
+- Whenever fiscal_label or isbn_check gets a number instead of text, it should treat it as its plain text form and proceed.
+- Whenever bulk_price or late_fee gets a numeric argument that is not a number (such as text or a boolean), it should return NULL, and numbers in text form are not converted.
+- Whenever make_slug cuts the slug to maxlen, a first word longer than maxlen should be hard-cut at maxlen characters.
+- Whenever avg_rating gets a boolean, it should ignore it.
+
+## CS
+There is no product owner to ask on this project: `tools/ask.py` will tell you so.
+
+### The owner's rules for this feature (from his interview)
+The owner decided each of these himself. Encode every one that touches your area as a test before you land, follow it exactly, and do not stretch it beyond the situation it describes.
+
+- Whenever bulk_price is given a unit price and a quantity, it returns unit price times quantity in cents, with no discount for fewer than 10 units.
+- Whenever bulk_price is given a quantity of 10 to 49 units, it takes 5% off the whole order total (10 units at 100 cents gives 950).
+- Whenever bulk_price is given a quantity of 50 to 99 units, it takes 10% off the whole order total, not just the units beyond 50.
+- Whenever bulk_price is given a quantity of 100 or more units, it takes 15% off the whole order total.
+- Whenever bulk_price produces a total, it rounds that total to the nearest 5 cents, with halves rounding up. After that rounding, a minimum of 500 cents applies to the total.
+- Whenever bulk_price is given a unit price or quantity of zero, it returns 0.
+- Whenever bulk_price is given a negative unit price or a negative quantity, it returns NULL instead of a total.
+- Whenever bulk_price is given NULL for the unit price or the quantity, it returns NULL.
+- Whenever bulk_price is given a unit price or quantity that is text, it reads numeric text (including surrounding spaces or forms like '1e2') as a number, and returns NULL for empty text or text that is not a number.
+- Whenever bulk_price is given a fractional quantity or price, it uses it as is (2.5 units at 100 cents gives 250), and the discount tiers use the exact quantity, so 9.9 units get no discount.
+- Whenever fiscal_label is given a valid date in YYYY-MM-DD form, it returns 'FY<year>-Q<n>', where the fiscal year starts on 1 April and is named for the calendar year in which it ends.
+- Whenever fiscal_label is given a date from April to June it returns Q1, July to September Q2, October to December Q3, and January to March Q4 (2024-04-01 is FY2025-Q1, 2024-03-31 is FY2024-Q4).
+- Whenever fiscal_label is given a date from 1 January to 31 March, it names the fiscal year after that same calendar year (2025-01-01 is FY2025-Q4); from 1 April on it names the next calendar year.
+- Whenever fiscal_label is given a date that does not exist on the calendar (such as 2024-02-30, 2023-02-29 or month 13), it returns NULL, while 2024-02-29 in a leap year is accepted.
+- Whenever fiscal_label is given text that is not exactly four-digit year, two-digit month and two-digit day separated by hyphens (such as 2024-5-5, 2024/05/05, a date with a time, or empty text), it returns NULL.
+- Whenever fiscal_label is given a date with spaces around it, it ignores those spaces and labels the date normally.
+- Whenever fiscal_label is given NULL or a number instead of text (such as 20240505), it returns NULL.
+- Whenever fiscal_label is given the year 0000 it returns NULL, and for 9999-04-01 or later it returns a five-digit fiscal year such as FY10000-Q3.
+- Whenever isbn_check is given a 9-digit code, it returns the ISBN-10 check character: digits weighted 10 down to 2 are added up, and the check is whatever brings the sum to a multiple of 11 (030640615 gives '2').
+- Whenever the ISBN-10 check value comes out as 10, isbn_check returns the letter 'X' (123456789 gives 'X'); a value of 0 is returned as the text '0'.
+- Whenever isbn_check is given a code containing hyphens or spaces, it ignores them before checking, so '0-306-40615' and '030 640 615' both give '2'.
+- Whenever isbn_check is given anything that is not exactly 9 digits after hyphens and spaces are removed (8 or 10 digits, letters, empty text, a decimal point), it returns NULL.
+- Whenever isbn_check is given NULL, a decimal number or binary data, it returns NULL.
+- Whenever isbn_check is given a whole number rather than text, it uses its digits as written, so leading zeros are lost and a number such as 30640615 (8 digits) returns NULL.
+- Whenever isbn_check is given a code starting with a minus sign, it treats the minus as a hyphen and ignores it ('-123456789' gives 'X').
+- Whenever late_fee is given an invoice amount and a number of days late, it charges a fee only when the days late are 6 or more (the first 5 days are a grace period with no fee). The fee is 2% of the amount in cents for each started 30-day period late, rounded up to the next whole cent. The fee is at least 500 cents and at most 20% of the amount.
+- Whenever late_fee is given, it charges 2% of the whole amount for each started 30-day period late, so 31 to 60 days late is 4%, 61 to 90 days is 6%, and it keeps going the same way for longer. There is a grace of 6+ days. The fee is rounded up to the cent. The minimum fee is 500 cents. The fee is capped at 20% of the amount.
+- Whenever late_fee computes a fee with a fraction of a cent, it rounds half a cent upward (25 cents at 2% gives 1, 75 cents gives 2, 1 cent gives 0).
+- Whenever late_fee is given zero or negative days late, or an amount of zero or less, it returns a fee of 0.
+- Whenever late_fee is given NULL, or text that is not a number (including empty text), for either the amount or the days, it returns NULL, even if the other value would have given 0.
+- Whenever late_fee is given numeric text such as '10000' and '45', it reads it as numbers and charges normally.
+- Whenever late_fee is given a fractional number of days, it compares the exact value to the limits (0.5 days is 2%, 30.5 days is 4%).
+- Whenever loyalty_tier is given a points balance from 0 to 999, it returns 'bronze'.
+- Whenever loyalty_tier is given 1000 to 4999 points, it returns 'silver'; 5000 to 19999 returns 'gold'; 20000 or more returns 'platinum'.
+- Whenever loyalty_tier is given a negative balance (even -0.5), it returns 'suspended'.
+- Whenever loyalty_tier is given NULL, empty text or text that is not a number, it returns NULL.
+- Whenever loyalty_tier is given numeric text (such as '5000', ' 5000 ' or '1e4'), it reads it as a number and returns the matching tier.
+- Whenever loyalty_tier is given a fractional balance such as 999.9, it compares the exact value, so 999.9 is still bronze.
+- Whenever make_slug is given a title, it returns the title in lower case with every run of characters other than a-z and 0-9 (spaces, punctuation, underscores, slashes) replaced by a single hyphen and no hyphen at the start or end.
+- Whenever make_slug is given a title with accented letters, it removes the accent and keeps the base letter ('Café Crème Brûlée' gives 'cafe-creme-brulee').
+- Whenever make_slug is given letters that have no plain a-z form, such as ß, Cyrillic or Japanese, it treats them as separators, so 'Straße Œuvre' gives 'stra-e-uvre' and a title made only of such letters gives empty text.
+- Whenever make_slug is given a title with compatibility characters such as the 'fi' ligature or a circled digit, it turns them into plain letters and digits ('ﬁne ①' gives 'fine-1').
+- Whenever make_slug's slug is longer than maxlen, it cuts it to maxlen characters and then removes any hyphen left at the end ('Hello World' with 6 gives 'hello', with 7 gives 'hello-w').
+- Whenever make_slug is given a maxlen of zero or less, empty text, or text that is not a number, it returns empty text.
+- Whenever make_slug is given a maxlen with a fraction or as numeric text, it uses the whole-number part (5.9 acts as 5, '8' acts as 8).
+- Whenever make_slug is given NULL for the title or for maxlen, it returns NULL, even if the other value is 0.
+- Whenever make_slug is given an empty title, or one with only spaces or punctuation, it returns empty text.
+- Whenever make_slug is given a number as the title, it uses the number written out as text, so a decimal point becomes a hyphen (1.5 gives '1-5').
+- Whenever meeting_end is given a start time HH:MM and a number of minutes, it returns the end time as HH:MM on a 24-hour clock with two-digit hours and minutes.
+- Whenever meeting_end goes past midnight, it is capped at 23:59 and never wraps around to the next day's clock time (23:30 plus 45 gives 23:59).
+- Whenever meeting_end is given negative minutes, it counts backwards and wraps to the previous day if needed (00:00 minus 1 gives 23:59).
+- Whenever meeting_end is given a start with a one-digit hour such as '9:00', it accepts it and returns the end with a two-digit hour; surrounding spaces are ignored.
+- Whenever meeting_end is given a start that is not hours and two-digit minutes separated by a colon (24:00, 10:60, '10:5', '10:00:00', '1000', '10.00', '10:00 PM', empty text, a number), it returns NULL.
+- Whenever meeting_end is given NULL for the start or for the minutes, it returns NULL.
+- Whenever meeting_end is given minutes as numeric text, it uses the number ('30' adds 30); for text that is not a number, including empty text, it treats the minutes as 0 and returns the start time unchanged.
+- Whenever meeting_end is given minutes with a fraction, it drops the fraction toward zero (90.9 acts as 90, -90.9 as -90, 0.5 as 0).
+- Whenever pct_change is given an old and a new value, it returns (new minus old) divided by old, times 100, rounded to 1 decimal place (3 to 4 gives 33.3).
+- Whenever pct_change lands exactly halfway between two 1-decimal values, it rounds away from zero (1000 to 1000.5 gives 0.1 and 1000 to 999.5 gives -0.1), but it works on the exact stored number, so 100 to 100.05 gives 0.0 because 100.05 is stored slightly below.
+- Whenever pct_change is given an old value of zero, it returns 0.0, whatever the new value.
+- Whenever pct_change is given a negative old value, it uses the signed old value as the divisor, so a negative old value flips the sign (-100 to -50 gives -50.0).
+- Whenever pct_change is given a new value of zero, it returns -100.0 for any non-zero old value.
+- Whenever the rounded pct_change result is zero, it returns 0.0 and never negative zero.
+- Whenever pct_change is given NULL for either value, it returns NULL.
+- Whenever pct_change is given numeric text it reads it as a number, and text with leading digits uses those digits ('5abc' acts as 5).
+- Whenever pct_change is given text that is not a number or empty text as the old value, it returns NULL because it counts as zero; as the new value it counts as 0, so the result is -100.0.
+- Whenever phone_fmt is given a phone number with exactly 10 digits, it returns it as (AAA) EEE-NNNN, whatever spaces, hyphens, dots, brackets or plus signs surround the digits.
+- phone_fmt formats only input of exactly 10 digits, as '(212) 555-1234' for '2125551234'. Input with 11 digits, even when it starts with 1, is returned unchanged as the input text.
+- Rule 68: Only exactly 10 digits get formatted; any other digit count (including 11 digits, 7 digits, 9 digits, 12 digits, no digits, or empty text) returns the input text unchanged, not NULL.
+- Whenever phone_fmt is given 12 digits starting with 1-1 (such as '1-1-212-555-1234') it returns NULL, since only one leading 1 is dropped.
+- Whenever phone_fmt is given text with extra digits such as an extension ('212 555 1234 ext 5'), it counts them as part of the number and returns NULL.
+- Whenever phone_fmt is given non-digit text mixed in, such as letters or a trailing 'x', it ignores the non-digits and formats the digits if exactly 10 (or 11 with a leading 1) remain.
+- Whenever phone_fmt is given a number rather than text, it uses its digits (2125551234 gives '(212) 555-1234'); a decimal number counts the digits on both sides of the point.
+- Whenever phone_fmt is given 10 digits whose area code starts with 0 or 1 (0125551234), it formats them without any check on the area code.
+- Whenever phone_fmt is given NULL or binary data, it returns NULL.
+- Whenever phone_fmt is given digits from other scripts (such as Arabic-Indic digits), it counts them as digits and formats them as they are.
+- Whenever avg_rating is used over a group of rows, it returns the average of the ratings from 1 to 5, rounded to 1 decimal, halves up. With 5 or more valid ratings, drop one lowest and one highest first, then average the rest.
+- Whenever avg_rating meets a rating of NULL, it leaves it out of both the sum and the count.
+- Whenever avg_rating meets a rating below 1 or above 5 (0, -1, 6, 0.9999, 5.0001), it leaves it out as invalid; exactly 1 and exactly 5 are counted.
+- Whenever avg_rating meets a rating that is numeric text ('5', ' 3 ', '1e0'), it counts it as that number; text that is not a number or empty text is left out.
+- Whenever avg_rating meets fractional ratings within 1 to 5 (4.5), it counts them as they are.
+- Whenever avg_rating has no valid ratings at all (no rows, only NULLs or only out-of-range values), it returns NULL, not 0.
+- Whenever avg_rating's average falls exactly halfway at the third decimal, it does not always round up: 33/8 = 4.125 gives 4.12.
+- Whenever avg_rating is used with GROUP BY, it gives each group its own average computed only from that group's valid ratings.
+
+## CT
+There is no product owner to ask on this project: `tools/ask.py` will tell you so.
+
+### The owner's rules for this feature (from his interview)
+The owner decided each of these himself. Encode every one that touches your area as a test before you land, follow it exactly, and do not stretch it beyond the situation it describes.
+
+- Whenever bulk_price is given a unit price and a quantity, it returns unit price times quantity in cents, with no discount for fewer than 10 units.
+- Whenever bulk_price is given a quantity of 10 to 49 units, it takes 5% off the whole order total (10 units at 100 cents gives 950).
+- Whenever bulk_price is given a quantity of 50 to 99 units, it takes 10% off the whole order total, not just the units beyond 50.
+- Whenever bulk_price is given a quantity of 100 or more units, it takes 15% off the whole order total.
+- Whenever bulk_price produces a total with a fraction of a cent, it rounds half a cent upward to the next whole cent (15 cents x 10 units gives 143).
+- Whenever bulk_price is given a unit price or quantity of zero, it returns 0.
+- Whenever bulk_price is given a negative unit price or a negative quantity, it returns 0 instead of NULL.
+- Whenever bulk_price is given NULL for the unit price or the quantity, it returns NULL.
+- Whenever bulk_price is given a unit price or quantity that is text, it does not accept it and returns NULL (numeric text such as ' 5 ' or '1e2' is no longer read as a number); empty text or text that is not a number also returns NULL.
+- Whenever bulk_price is given a fractional quantity or price, it uses it as is (2.5 units at 100 cents gives 250), and the discount tiers use the exact quantity, so 9.9 units get no discount.
+- Whenever fiscal_label is given a valid date in YYYY-MM-DD form, it returns 'FY<year>-Q<n>', where the fiscal year starts on 1 April and is named for the calendar year in which it ends.
+- Whenever fiscal_label is given a date from April to June it returns Q1, July to September Q2, October to December Q3, and January to March Q4 (2024-04-01 is FY2025-Q1, 2024-03-31 is FY2024-Q4).
+- Whenever fiscal_label is given a date from 1 January to 31 March, it names the fiscal year after that same calendar year (2025-01-01 is FY2025-Q4); from 1 April on it names the next calendar year.
+- Whenever fiscal_label is given a date that does not exist on the calendar (such as 2024-02-30, 2023-02-29 or month 13), it returns NULL, while 2024-02-29 in a leap year is accepted.
+- Whenever fiscal_label is given text that is not exactly four-digit year, two-digit month and two-digit day separated by hyphens (such as 2024-5-5, 2024/05/05, or empty text), it returns NULL, except that a valid date followed by a time (such as 2024-05-05 10:30:00) is accepted and labelled by its date part.
+- Whenever fiscal_label is given a date with spaces around it, it ignores those spaces and labels the date normally.
+- Whenever fiscal_label is given NULL, it returns NULL. Whenever it is given a number instead of text (such as 20240505), it reads the number as its text form (here '20240505') and handles it like any other text, instead of returning NULL.
+- Whenever fiscal_label is given the year 0000 it returns the text 'INVALID', and for 9999-04-01 or later it returns a five-digit fiscal year such as FY10000-Q3. Any other bad or blank date also returns 'INVALID'.
+- Whenever isbn_check is given a 9-digit code, it returns the ISBN-10 check character: digits weighted 10 down to 2 are added up, and the check is whatever brings the sum to a multiple of 11 (030640615 gives '2').
+- Whenever the ISBN-10 check value comes out as 10, isbn_check returns the letter 'X' (123456789 gives 'X'); a value of 0 is returned as the text '0'.
+- Whenever isbn_check is given a code containing hyphens or spaces, it ignores them before checking, so '0-306-40615' and '030 640 615' both give '2'.
+- Whenever isbn_check is given text, it ignores hyphens and spaces, then uses the first 9 digits and never rejects it. If there are fewer than 9 digits (8 digits, say) it works with the digits it has, weighted 10 down from the first digit. If there are more than 9 digits (10, say) the extra ones are ignored. If there are no digits at all (empty text, say) it returns '0'. Letters and a decimal point are not digits and are skipped.
+- Whenever isbn_check is given NULL or binary data, it has no digits to use and returns '0'. A decimal number uses its digits as written, skipping the decimal point, and never returns NULL.
+- Whenever isbn_check is given a whole number rather than text, it uses its digits as written, so leading zeros are lost, and it works with those digits as it does for text. A number such as 30640615 (8 digits) is checked with those 8 digits and no longer returns NULL.
+- Whenever isbn_check is given a code starting with a minus sign, it treats the minus as a hyphen and ignores it ('-123456789' gives 'X').
+- Whenever late_fee is given an invoice amount and a number of days late of more than 5 and up to 30, it charges 2% of the amount in cents.
+- Whenever late_fee is given 31 to 60 days late, it charges 4% of the whole amount, and for every further 30 days late it charges another 2% more of the whole amount, with no upper limit (61 to 90 days is 6%, 91 to 120 days is 8%, 121 to 150 days is 10%, and so on).
+- Whenever late_fee computes a fee with a fraction of a cent, it rounds half a cent upward (25 cents at 2% gives 1, 75 cents gives 2, 1 cent gives 0).
+- Whenever late_fee is given 5 days late or fewer (including zero or negative days), or an amount of zero or less, it returns a fee of 0.
+- Whenever late_fee is given NULL, or any text (including empty text), for either the amount or the days, it returns NULL, even if the other value would have given 0.
+- Whenever late_fee is given numeric text such as '10000' and '45', it no longer reads it as numbers; it returns NULL. Only real numbers are accepted.
+- Whenever late_fee is given a fractional number of days, it compares the exact value to the limits (0.5 days is inside the grace period so the fee is 0, 5.5 days is 2%, 30.5 days is 4%).
+- Whenever loyalty_tier is given a points balance from 0 to 999, it returns 'bronze'.
+- Whenever loyalty_tier is given 1000 to 4999 points, it returns 'silver'; 5000 to 9999 returns 'gold'; 10000 or more returns 'platinum'.
+- Whenever loyalty_tier is given a negative balance (even -0.5), it returns NULL.
+- Whenever loyalty_tier is given NULL, empty text or text that is not a number, it returns NULL.
+- Whenever loyalty_tier is given numeric text (such as '5000', ' 5000 ' or '1e4'), it reads it as a number and returns the matching tier.
+- Whenever loyalty_tier is given a fractional balance such as 999.9, it compares the exact value, so 999.9 is still bronze.
+- Whenever make_slug is given a title, it returns the title in lower case with every run of characters other than a-z and 0-9 (spaces, punctuation, underscores, slashes) replaced by a single hyphen and no hyphen at the start or end.
+- Whenever make_slug is given a title with accented letters, it removes the accent and keeps the base letter ('Café Crème Brûlée' gives 'cafe-creme-brulee').
+- Whenever make_slug is given letters that have no plain a-z form, such as ß, Cyrillic or Japanese, it treats them as separators, so 'Straße Œuvre' gives 'stra-e-uvre' and a title made only of such letters gives empty text.
+- Whenever make_slug is given a title with compatibility characters such as the 'fi' ligature or a circled digit, it turns them into plain letters and digits ('ﬁne ①' gives 'fine-1').
+- Whenever make_slug's slug is longer than maxlen, it cuts it to maxlen characters and then removes any hyphen left at the end ('Hello World' with 6 gives 'hello', with 7 gives 'hello-w').
+- Whenever make_slug is given a maxlen of zero or less, it returns 'untitled'; whenever it is given a maxlen that is empty text or text that is not a number, it returns empty text.
+- Whenever make_slug is given a maxlen with a fraction or as numeric text, it uses the whole-number part (5.9 acts as 5, '8' acts as 8).
+- Whenever make_slug is given NULL for the title or for maxlen, it returns NULL, even if the other value is 0.
+- Whenever make_slug is given an empty title, or one with only spaces or punctuation, it returns 'untitled'.
+- Whenever make_slug is given a number as the title, it uses the number written out as text, so a decimal point becomes a hyphen (1.5 gives '1-5').
+- Whenever meeting_end is given a start time HH:MM and a number of minutes, it returns the end time as HH:MM on a 24-hour clock with two-digit hours and minutes. If the end time would pass midnight, it does not wrap around; it stops at 23:59.
+- Whenever meeting_end goes past midnight, it does not wrap to the next day: it stops at 23:59 (23:30 plus 45 gives 23:59), and 1440 minutes or more also gives 23:59.
+- Whenever meeting_end is given zero or negative minutes, it does not count backwards: it returns the start time unchanged (00:00 minus 1 gives 00:00).
+- Whenever meeting_end is given a start with a one-digit hour such as '9:00', it accepts it and returns the end with a two-digit hour; surrounding spaces are ignored.
+- Whenever meeting_end is given a start that is not hours and two-digit minutes separated by a colon (24:00, 10:60, '10:5', '10:00:00', '1000', '10.00', '10:00 PM', empty text, a number), it returns NULL.
+- Whenever meeting_end is given NULL for the start or for the minutes, it returns NULL.
+- Whenever meeting_end is given minutes as numeric text, it uses the number ('30' adds 30); for text that is not a number, including empty text, it returns NULL.
+- Whenever meeting_end is given minutes with a fraction, it drops the fraction toward zero (90.9 acts as 90, 0.5 as 0); negative minutes such as -90.9 give the start time unchanged.
+- Whenever pct_change is given an old and a new value, it returns (new minus old) divided by old, times 100, rounded to 1 decimal place (3 to 4 gives 33.3).
+- Whenever pct_change lands exactly halfway between two 1-decimal values, it rounds away from zero (1000 to 1000.5 gives 0.1 and 1000 to 999.5 gives -0.1), but it works on the exact stored number, so 100 to 100.05 gives 0.0 because 100.05 is stored slightly below.
+- Whenever pct_change is given an old value of zero, it returns 0.0, whatever the new value.
+- Whenever pct_change is given a negative old value, it divides by the size of the old value, so an increase toward zero is positive (-100 to -50 gives 50.0) and -100 to -150 gives -50.0.
+- Whenever pct_change is given a new value of zero, it returns -100.0 for any non-zero old value.
+- Whenever the rounded pct_change result is zero, it returns 0.0 and never negative zero.
+- Whenever pct_change is given NULL for either value, it returns NULL.
+- Whenever pct_change is given numeric text it reads it as a number, and text with leading digits uses those digits ('5abc' acts as 5).
+- Whenever pct_change is given text that is not a number or empty text as the old value, it counts as zero and returns 0.0; as the new value it counts as 0, so the result is -100.0.
+- Whenever phone_fmt is given a phone number with exactly 10 digits, it returns it as (AAA) EEE-NNNN, whatever spaces, hyphens, dots, brackets or plus signs surround the digits.
+- Whenever phone_fmt is given 11 digits starting with 1, it drops that leading 1 as the country code and formats the remaining 10 digits ('+1 212 555 1234' gives '(212) 555-1234').
+- Whenever phone_fmt is given 11 digits not starting with 1, or any count other than 10 or 11 digits (7 digits, 9 digits, 12 digits, no digits, empty text), it returns NULL.
+- Whenever phone_fmt is given 12 digits starting with 1-1 (such as '1-1-212-555-1234') it returns NULL, since only one leading 1 is dropped.
+- Whenever phone_fmt is given text with extra digits such as an extension ('212 555 1234 ext 5'), it keeps the main ten digits at the start of the number, ignores the extension digits after them, and formats the result as (AAA) EEE-NNNN ('212 555 1234 ext 5' gives '(212) 555-1234') instead of returning NULL.
+- Whenever phone_fmt is given non-digit text mixed in, such as letters or a trailing 'x', it ignores the non-digits and formats the digits if exactly 10 (or 11 with a leading 1) remain.
+- Whenever phone_fmt is given a number rather than text, it uses its digits (2125551234 gives '(212) 555-1234'); a decimal number counts the digits on both sides of the point.
+- Whenever phone_fmt is given 10 digits whose area code starts with 0 or 1 (0125551234), it formats them without any check on the area code.
+- Whenever phone_fmt is given NULL or binary data, it returns NULL.
+- Whenever phone_fmt is given digits from other scripts (such as Arabic-Indic digits), it counts them as digits and formats them as they are.
+- Whenever avg_rating is used over a group of rows, it returns the average of the ratings from 1 to 5, rounded to 1 decimal (1, 1 and 2 give 1.3).
+- Whenever avg_rating meets a rating of NULL, it leaves it out of both the sum and the count.
+- Whenever avg_rating meets a rating below 1 or above 5 (0, -1, 6, 0.9999, 5.0001), it leaves it out as invalid; exactly 1 and exactly 5 are counted.
+- Whenever avg_rating meets a rating that is numeric text ('5', ' 3 ', '1e0'), it counts it as that number; text that is not a number or empty text is left out.
+- Whenever avg_rating meets fractional ratings within 1 to 5 (4.5), it counts them as they are.
+- Whenever avg_rating has no valid ratings at all (no rows, only NULLs or only out-of-range values), it returns NULL, not 0.
+- Whenever avg_rating's average falls exactly halfway at the third decimal, it always rounds up: 4.125 gives 4.13.
+- Whenever avg_rating is used with GROUP BY, it gives each group its own average computed only from that group's valid ratings.
+- Other rules (4): Whenever late_fee charges a fee (more than 5 days late and a valid amount above 0), the fee is at least 500 cents and at most 20% of the invoice amount. The cap is applied last, so on a small invoice (under 2,500 cents) the fee is 20% of the invoice, not 500.
+- Other rules (5): Negative points should be 'suspended', and platinum starts at 20,000, not 10,000.
+- Nothing to add
