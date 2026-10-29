@@ -225,8 +225,9 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     sh('git', '-C', source, 'commit', '-q', '-m', 'hive: settings for this build')
 
     auto = workers is None   # the swarm law picks the number from this project's measurements (hive/law.py)
+    job_parts = law.parts(goal_text) if auto else None   # Gate 52: size the team by the work, not only the machine
     if auto:
-        workers, why = law.builders(t_g)
+        workers, why = law.builders(t_g, parts=job_parts)
         say(f"\nI'll put {_n(workers, 'builder')} on it ({why}): {law.trade(workers)}. They work on copies, so your "
             "branches stay exactly as they are.")   # the trade from Gate 50, so he knows what speed costs
     else:
@@ -263,7 +264,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
             rules += interview.instructions(asked)
             say(f"  Thank you. The builders will encode your {_n(len(asked), 'rule')} as tests before anything lands.")
             if auto:
-                n, why = law.builders(t_g, decisions=len(asked))
+                n, why = law.builders(t_g, decisions=len(asked), parts=job_parts)
                 if n < workers:
                     workers = n
                     say(f"  For a job this size I'll use {_n(n, 'builder')} ({why}).")
