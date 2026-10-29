@@ -2,9 +2,12 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 29 2026, evening, after Gate 47)
+## Where we left off (Oct 30 2026, after Gate 49 and Gate 45 day 1)
 
 - **Gate 47 done** (asked for by the user): Claude and Codex builders in one swarm coordinate as well as one agent (both mixed teams 1,340/1,340, 100% hidden, 0 breaks; Codex 52% and 73% of landings); a Codex lead works like a Claude lead. Ship fired: `hive start --agent claude,codex`. Cloud power-off from the phone passed live on AWS (after a Windows key fix).
+- **Gate 45, day 1 done (Oct 29, 23:00–00:30):** the founder reviewed the code sheet (46 rules) on his phone and marked none (P2 failed). Two restarts on Hive faults, both disclosed: (1) his question "What does this means" was filed as a correction and the page waited (first attempt stopped at page 5 of 40); (2) restarted on 9 pages; after page 3 he asked for rules clear on first reading, so rules 19-46 were reworded (meaning kept, `/home/node/g45/sheet_D_plain.json`) before he saw them. C = `/home/node/g45/sheet_C.json` (equal to the plain sheet). Last session 273 s. **Next (at least 12 h after, so from Oct 30 ~12:30):** write 12 day-2 situations (one per interface case, the experimenter's framing), get his verdicts on Telegram, cold probe and blind judge; build I from goal + C (4 builders); score N0 vs I; RESULTS with the disclosures.
+- **Gate 49 done:** Laya trained on 444 owner-style messages read 77.5% (hybrid 94.2% vs Claude 92.5%, Laya answering 56% at 0.55 s); ship fired; `hive/fastread.py` (optional). Trained checkpoint: `/g49/ckpt` in container `hive-laya` (not in the repo, about 1 GB). Next card: retrain with the builder commands.
+- **Tool, from the founder's live review:** the sheet review is a conversation (Jarvis says how each part works covering every rule; he answers in his own words; changes said back; detailed rules one tap away); questions answered by reading the built code; every reply form read for what it is; resumes when cut off; sheets written for first reading; build failures told in plain words.
 - **Gate 48 done** (asked for by the user): Laya, the open copy of Jev, read 42.5–45.0% of 120 owner-style messages against Claude's 92.5% (Hindi or mixed 31–41%); fast once set to 2 threads (0.68 s vs 4.2 s); kill fired, Claude stays Jarvis's reader. Next card below: train Laya on the owner's style.
 - **Tool, from the phone (asked for by the user):** Jarvis knows the builders' board while a build runs; "who's doing what", "use 2 Claude and 2 Codex" (the law is put to him first when his size differs), "stop w2" (unwanted work dropped), mid-build instructions to the builder whose work they touch (`OWNER.md`; live check: Codex builders built one), rules mid-build reach all builders; a stop it only inferred is confirmed; skip-tests or push-to-main is never a build. 323 checks; real-model Jarvis bench 25 of 26, then the two it flagged fixed (risky 8/10, redirect 9/10).
 - **Next:** Gate 45 with the founder (his 46-rule phone review); then train Laya on the owner's style (card below); a gate on whether builders act on mid-build instructions reliably at scale.
@@ -39,8 +42,8 @@ Workers run shell commands, so run them in a container. Image: `node:22-bookworm
 
 ## Needs design first (write the config and predictions, push them, then run)
 
-### Train the fast reader (after Gate 48)
-- Laya read 42.5–45.0% of the owner's messages untrained, but answers in 0.7 s. Write 300–500 labelled messages in the owner's style, separately from `gates/gate48/set.jsonl` (which stays the exam), train the multilingual checkpoint with Laya's trainer on 2–4 CPUs, and score it on the 120 with the registered hybrid rule. Ship only if Laya can answer ≥ 50% of messages within 3 points of Claude.
+### Retrain the fast reader with the builder commands (after Gate 49)
+- Gate 49's reader knows Gate 48's 9 meanings only, so Jarvis keeps it off builder commands and, during a build, off everything but greetings and status. Add labelled messages for team, set_team, stop_builder and instruct (written without seeing any exam set), retrain, and test on a new held-out set that includes them. Ship wider use only if the hybrid stays within 3 points of Claude.
 
 ### Team notes on a large, coupled project (when one is available)
 - Hive now switches team notes on at 10+ builders or 0.5 collisions per landing (untested thresholds). Test them where they could matter: 12 builders on a codebase whose areas share machinery, notes on vs off, ABBA (`gates/gate43/referee/run43.py` as a template).

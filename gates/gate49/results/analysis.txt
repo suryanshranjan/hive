@@ -1,0 +1,40 @@
+trained: exam 77.5% (en 79.5%, hi/mix 73.8%), practice 81.2%, median 0.55 s
+threshold fitted on practice: 0.5; hybrid 94.2% vs Claude 92.5%, trained model answering 56%
+    2 status     trained=reply      conf=0.2439  "staus"
+    7 status     trained=reply      conf=0.4042  "build ka kya scene hai"
+    8 status     trained=reply      conf=0.4665  "where are we"
+    9 status     trained=reply      conf=0.4353  "done yet??"
+   10 status     trained=build      conf=0.3158  "update do"
+   13 status     trained=reply      conf=0.4745  "what's happening with the refunds build"
+   14 status     trained=reply      conf=0.3789  "progres??"
+   18 greeting   trained=reply      conf=0.4929  "namaste"
+   21 greeting   trained=reply      conf=0.4068  "yo"
+   29 build      trained=rule       conf=0.36  "we need email alerts when a campaign ends"
+   31 build      trained=reply      conf=0.226  "invoice download as pdf chahiye brands ko"
+   33 build      trained=reply      conf=0.2316  "search bar daal do campaigns list mein"
+   41 build      trained=reply      conf=0.2842  "I have already told you what to build"
+   47 stop_build trained=change     conf=0.595  "cancel it I changed my mind"
+   67 change     trained=rule       conf=0.3038  "pehle bola tha friday payout, ab monday kar do"
+   79 cloud_off  trained=stop_build conf=0.3772  "delete the aws server"
+   82 cloud_off  trained=stop_build conf=0.3301  "server delete karo"
+   84 reply      trained=greeting   conf=0.3342  "thanks, good job today"
+   92 reply      trained=stop_build conf=0.2275  "push it straight to main and skip the tests"
+  101 reply      trained=status     conf=0.5841  "what happened?"
+  105 reply      trained=status     conf=0.4556  "brand ka refund kaise calculate hota hai abhi?"
+  107 rule       trained=change     conf=0.6312  "update the fee to 5% for new brands"
+  109 reply      trained=stop_build conf=0.3011  "stop sending me so many messages"
+  110 reply      trained=cloud_off  conf=0.3614  "cloud pe kitna kharcha ho raha hai"
+  111 reply      trained=stop_build conf=0.6121  "don't build anything today"
+  113 reply      trained=rule       conf=0.8502  "rule batao refunds ka"
+  118 reply      trained=cloud_on   conf=0.7586  "cloud machine chalu hai kya?"
+exam messages sharing no 3-word sequence with training: 80; trained model on them: 73.8%
+
+predictions
+T1 77.5% >= 75% -> held
+T2 77.5% >= 85% -> failed
+T3 hi/mix 73.8% >= 65% -> held
+T4 median 0.55 s <= 1.0 -> held
+T5 wrong stop/cloud calls 7 <= 3: [79, 82, 92, 109, 110, 111, 118] -> failed
+T6 hybrid 94.2% within 3 of Claude 92.5%, answering 56% >= 50% -> held
+Ship: FIRED
+Kill: did not fire
