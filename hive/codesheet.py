@@ -19,12 +19,19 @@ BRIEF = """You are documenting what a piece of software does, so that its busine
 {goal}
 
 Read it and run it, but do not change anything in that folder. Write {out}: a JSON list of strings, one rule per
-string, in plain words the owner can check ("Whenever ..., ..."), each naming the part of the product it is about.
+string, each starting with the part of the product it is about and a colon ("Referral rewards: ...").
 - Cover every business behaviour of this feature: the normal outcome, and what happens with missing, blank or
   unreadable values, wrong formats, letter case, spaces and separators, zero, negative or very large numbers,
   boundaries and rounding. Describe what the code actually does, even where it looks odd.
 - Check each rule by running the code or its tests.
-- One behaviour per rule, one or two sentences each. Business words, no code, no file or function internals.
+- Write so the owner understands each rule on first reading, without having to ask: what happens to a person or to
+  money, in his business words, with one concrete example (a name, an amount, a date): "Referral rewards: when Priya
+  joins through Amit's link, both get 500 rupees of credit after Priya's first deal." Never use the code's own names
+  (field names, labels, statuses, flags, records, "situation name", "payload", "null"); say what they mean for a
+  customer instead. One behaviour per rule, one or two short sentences.
+- Rules about messy or missing details (capitals, spaces, a missing or broken value) go under the part "Messy or
+  missing details", still in plain words with an example ("if someone types the code as ' sunny50 ', it still
+  works"), so he can check them in one look.
 Reply in one line: how many rules you wrote."""
 
 def describe(code_dir, goal, timeout=1800):
