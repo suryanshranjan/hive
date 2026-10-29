@@ -43,6 +43,9 @@ Workers run shell commands, so run them in a container. Image: `node:22-bookworm
 
 ## Needs design first (write the config and predictions, push them, then run)
 
+### Team notes on a large, coupled project (when one is available)
+- Hive now switches team notes on at 10+ builders or 0.5 collisions per landing (untested thresholds). Test them where they could matter: 12 builders on a codebase whose areas share machinery, notes on vs off, ABBA (`gates/gate43/referee/run43.py` as a template).
+
 ### Talking on a coupled project (optional)
 - Gate 43 found no effect of a message board on the scale project (little to coordinate). If revisited: a project where categories share machinery heavily, 12 workers, same ABBA design (`gates/gate43/referee/run43.py`).
 

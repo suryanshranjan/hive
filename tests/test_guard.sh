@@ -42,4 +42,18 @@ check "main's results came from the cache" $((after > before)) 1
 cd $T/a && git pull -q --rebase origin main && echo "API_KEY=abc" > .env && echo "x = 1" > extra.py
 $PY -m hive land leak "with a .env" >/dev/null; check "secret file refused" $? 8
 test -z "$(git log origin/main --name-only --format= | grep -x .env)"; check ".env never reached the shared branch" $? 0
+# 6. team notes (Gates 43-44): a note rides in the landing's commit and others read it
+rm -f .env; git checkout -q -- . 2>/dev/null; git reset -q --hard origin/main
+printf '\ndef neg(a):\n    return -a\n' >> calc.py
+$PY -m hive land neg "add neg" --note "calc.py now has neg(); use it instead of 0 - x" >/dev/null; check "a landing with a team note" $? 0
+cd $T/b && $PY -m hive notes | grep -q "a: calc.py now has neg()"; check "the other builder reads the note" $? 0
+# 7. a collision shows the recent notes, and once this swarm collides often, switches notes on
+export HIVE_RUN=$T/run; mkdir -p $HIVE_RUN; printf '1 LAND\n2 CONFLICT\n3 LAND\n4 CONFLICT\n5 LAND\n6 LAND\n' > $HIVE_RUN/landings.log
+git pull -q --rebase origin main; sed -i 's/return -a/return 0 - a/' calc.py   # b edits neg's line, uncommitted
+cd $T/a && sed -i 's/return -a/return -1 * a/' calc.py && $PY -m hive land neg2 "neg as a product" >/dev/null   # a lands first
+cd $T/b && out=$($PY -m hive land clash "neg as a difference" 2>&1); code=$?
+check "a rebase conflict is reported" $code 5
+echo "$out" | grep -q "Recent team notes"; check "the conflict shows recent team notes" $? 0
+echo "$out" | grep -q "Team notes are now on"; check "frequent collisions switch notes on" $? 0
+git rebase --abort 2>/dev/null; unset HIVE_RUN
 rm -rf $T; exit $fail
