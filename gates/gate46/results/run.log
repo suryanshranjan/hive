@@ -1,0 +1,76 @@
+[14:11:59] predictions registered on origin/main: gates/gate46/prompts/PREDICTIONS.md
+F1: 7 workers, tools/ask.py port None, repo /home/claude/hive/runs/g46/upF1.git
+next: python3 lab/launch.py --run g46
+[14:12:05] launching F1 alone (7 workers)
+launched F1-w1
+launched F1-w2
+launched F1-w3
+launched F1-w4
+launched F1-w5
+launched F1-w6
+launched F1-w7
+F1-w3 finished: exit 0, 4.6 min, tokens 2981196, cost 0.7396736000000002
+F1-w4 finished: exit 0, 4.8 min, tokens 2797207, cost 0.7116748
+F1-w2 finished: exit 0, 5.1 min, tokens 2954575, cost 0.7405434000000002
+F1-w5 finished: exit 0, 6.0 min, tokens 3423204, cost 0.8113859999999999
+F1-w1 finished: exit 0, 6.1 min, tokens 4122367, cost 0.9331136999999997
+F1-w6 finished: exit 0, 6.5 min, tokens 3262817, cost 0.7286888
+F1-w7 finished: exit 0, 6.7 min, tokens 3333687, cost 0.8433993999999998
+wrote /home/claude/hive/runs/g46/agents.csv
+H1: 6 workers, tools/ask.py port None, repo /home/claude/hive/runs/g46/upH1.git
+next: python3 lab/launch.py --run g46
+[14:18:48] H1: lead started; waiting for the plan on main
+[14:19:23] H1: plan on main after 35 s; launching 6 workers
+launched H1-w1
+launched H1-w2
+launched H1-w3
+launched H1-w4
+launched H1-w5
+launched H1-w6
+H1-w4 finished: exit 0, 6.6 min, tokens 4812238, cost 1.1772616999999999
+H1-w2 finished: exit 0, 6.8 min, tokens 3312648, cost 0.8824768999999999
+H1-w1 finished: exit 0, 7.6 min, tokens 4922768, cost 1.1523581
+H1-w6 finished: exit 0, 7.7 min, tokens 2772577, cost 0.7556692
+H1-w3 finished: exit 0, 7.7 min, tokens 3571554, cost 0.8495387000000001
+H1-w5 finished: exit 0, 10.5 min, tokens 2376446, cost 0.7720643999999998
+wrote /home/claude/hive/runs/g46/agents.csv
+H2: 6 workers, tools/ask.py port None, repo /home/claude/hive/runs/g46/upH2.git
+next: python3 lab/launch.py --run g46
+[14:29:54] H2: lead started; waiting for the plan on main
+[14:30:29] H2: plan on main after 35 s; launching 6 workers
+launched H2-w1
+launched H2-w2
+launched H2-w3
+launched H2-w4
+launched H2-w5
+launched H2-w6
+H2-w6 finished: exit 0, 6.6 min, tokens 6215547, cost 1.557604
+H2-w4 finished: exit 0, 6.9 min, tokens 2462304, cost 0.6964853999999999
+H2-w2 finished: exit 0, 7.0 min, tokens 4624998, cost 1.2327436999999999
+H2-w3 finished: exit 0, 8.2 min, tokens 4695929, cost 1.0077342999999996
+H2-w5 finished: exit 0, 8.2 min, tokens 1747138, cost 0.5755817
+H2-w1 finished: exit 0, 8.4 min, tokens 2361306, cost 0.9032456000000001
+wrote /home/claude/hive/runs/g46/agents.csv
+F2: 7 workers, tools/ask.py port None, repo /home/claude/hive/runs/g46/upF2.git
+next: python3 lab/launch.py --run g46
+[14:39:03] launching F2 alone (7 workers)
+launched F2-w1
+launched F2-w2
+launched F2-w3
+launched F2-w4
+launched F2-w5
+launched F2-w6
+launched F2-w7
+F2-w7 finished: exit 0, 6.4 min, tokens 1596146, cost 0.6485251000000001
+F2-w3 finished: exit 0, 6.8 min, tokens 1101990, cost 0.3030543
+F2-w2 finished: exit 0, 7.3 min, tokens 2931953, cost 0.7804261000000001
+F2-w4 finished: exit 0, 7.5 min, tokens 4316553, cost 1.0909313000000003
+F2-w6 finished: exit 0, 7.8 min, tokens 2774930, cost 0.7680450999999998
+F2-w1 finished: exit 0, 7.8 min, tokens 3742957, cost 1.0213179
+F2-w5 finished: exit 0, 7.9 min, tokens 3261056, cost 0.7928981000000002
+wrote /home/claude/hive/runs/g46/agents.csv
+[14:47:03] F1: visible 1340/1340, hidden 2255/2260; replaying
+[14:47:40] H1: visible 1340/1340, hidden 2256/2260; replaying
+[14:48:31] H2: visible 1340/1340, hidden 2256/2260; replaying
+[14:49:09] F2: visible 1340/1340, hidden 2256/2260; replaying
+[14:49:29] done: python3 gates/gate46/referee/analyze.py runs/g46

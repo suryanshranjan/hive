@@ -1,0 +1,42 @@
+# BRAIN.md — minisql team plan (lead-owned; read at every sync, do not edit)
+Goal: all 1340 visible tests, behaving exactly like SQLite. Check what a category needs: `run_tests.py tests/visible --category X --show <id>`.
+Rule: claim by category (tools/claim.py), land small and often (tools/land.py), `git pull --rebase` before each task. Put function/feature notes in `brain/notes/<you>.md` (2-5 lines: what you built, where).
+
+## Hot-file rule (collisions)
+parser.py and engine.py are single files everyone needs. To avoid conflicts:
+- Parser/engine CORE rewrite is owned by L0-parser and L0-select tasks below; until they land, others work ONLY in their own new modules (functions, values, json, dates) and unit-test through `SELECT <expr>` once expressions exist.
+- After core lands: add new syntax as small, localized edits (new method in Parser, new `exec_<type>` in engine); commit+land within minutes; never reformat/reorder existing code.
+- New features go in NEW modules wherever possible: `minisql/funcs_*.py`, `minisql/window.py`, `minisql/jsonfn.py`, `minisql/dates.py`, `minisql/dml.py`, `minisql/ddl.py`.
+
+## Interfaces (build exactly this)
+- **Values**: Python None=NULL, int, float, str, bytes=BLOB, bool never (True/False -> 1/0). `minisql/values.py`: `typeof(v)`, `compare(a,b,collation=None)` (SQLite order NULL<num<text<blob), `sort_key`, `to_numeric(text)`, `cast(v, typename)`, `truthy(v)` (None if NULL), `apply_affinity(v, decl_type)`, `fmt_real`. 64-bit int overflow -> float, int div truncates, x/0 -> NULL.
+- **Expression AST** (tuples, in ast.py docstring; extend there): ('lit',v) ('col',tbl|None,name) ('star',tbl|None) ('un',op,e) ('bin',op,l,r) ('and'/'or',l,r) ('not',e) ('func',name_lower,[args],distinct,filter_expr|None,over|None,order_by|None) ('case',base|None,[(w,t)],else|None) ('cast',e,typename) ('between',e,lo,hi,neg) ('in',e,[exprs]|('select',st),neg) ('like',e,pat,esc|None,neg,kind 'like'|'glob') ('is',e,r,neg) ('isdistinct',l,r,neg) ('isnull',e,neg) ('exists',st,neg) ('subq',st) ('row',[exprs]) ('collate',e,name) ('param',n).
+- **Statements** dict with 'type': select, insert, create, drop, update, delete, alter, create_index, create_view, begin/commit/rollback. SELECT dict: {'type':'select','ctes':[...],'core': ..., 'compound':[(op,core)...], 'order':[(expr,desc,nulls)], 'limit','offset'}; a core: items [(expr,alias)], from (join tree), where, group, having, distinct, windows{name:spec}. Owner of parser decides; the L0 parser worker documents the final shape in ast.py in its FIRST landing.
+- **Expression eval**: `minisql/expr.py`: `evaluate(e, ctx)` where ctx is a row env object (`ctx.lookup(tbl,name)`, `ctx.conn`, agg/window results precomputed and found by node id). Subqueries call `conn.run_select(st, outer_ctx)`.
+- **Scalar functions**: `minisql/funcs.py` defines `SCALAR = {}` and decorator `@scalar('name', min_args, max_args=None)` (name lowercased; fn receives already evaluated args, returns value; NULL-propagation is the function's job). Each family file (`funcs_math.py`, `funcs_str.py`, `funcs_json.py`, `funcs_date.py`) imports the decorator and is imported at the bottom of funcs.py. Never define a name twice (land.py refuses).
+- **Aggregates**: `minisql/aggs.py`: class per aggregate with `step(*args)`/`finalize()`, registered by `@aggregate('name')`; DISTINCT/FILTER/ORDER BY handled by the driver, not the aggregate.
+- **Windows**: `minisql/window.py`: `compute_windows(rows, specs)`; window funcs register with `@window('name')`.
+- **Errors**: raise `minisql.errors.SQLError(msg)`; tests compare error cases — check the test files.
+
+## Levels (every failing category)
+**L0 foundations** (start now): values/types/arith/compare/cast; lexer+expression parser; SELECT core (FROM, WHERE, ORDER/LIMIT, DISTINCT, GROUP BY/aggregates); INSERT/CREATE/DML core.
+  basic arith bitwise real_literal hex_literal blob_literal true_false comments_quoted concat typeof nulls where order_limit limit_expr distinct case case_nested iif_if cast_int_real cast_text_numeric insert_columns default_values integer_primary_key aggregates group_by agg_empty_null group_by_expr_alias strings
+**L1 scalar funcs & simple features** (need only expr eval): abs_sign ceil_floor round_trunc pow_mod sqrt_exp_ln log_funcs trig hyperbolic minmax_scalar instr substr_more replace_more trim_chars length_octet char_unicode hex_unhex quote format printf like_escape glob collate_nocase is_distinct row_values values_clause update_delete update_multi_set delete_all_count insert_or_ignore insert_or_replace check_not_null drop_table alter_table alter_rename_table create_index_noop transactions agg_distinct agg_filter agg_order_by group_concat_sep median percentile
+**L2 relational**: join left_join right_full_join natural_using three_way_join select_star_qualified subquery exists scalar_subquery_order union union_all intersect except compound_order_limit insert_select create_table_as views cte_basic cte_multiple returning upsert update_from
+**L3 heavy**: cte_recursive; window_* (empty_over row_number rank agg frames lag_lead first_last nth_value ntile percent named); json_* (valid extract arrows type array_length build group modify remove patch minify error_position); date/time (date_basic time_basic datetime_basic date_compare date_modifiers date_n_days julianday unixepoch strftime timediff).
+
+## STATUS (update 2) — 1192/1340
+Landed: everything except the categories below. Windows (window.py, hook in select.run_core), CTEs, joins, compounds, json, ddl.py, aggs_extra.py all in.
+Still failing, all LOCKED (do not claim): date/time family (date_basic date_modifiers date_n_days datetime_basic julianday strftime time_basic timediff unixepoch — dates worker), returning update_from update_multi_set upsert (dml2), create_table_as(2/10) views (viewsagg).
+Free workers: if you have no claim, do not start overlapping work; instead run the full suite, and report regressions via notes. dates is the biggest remaining block; if the dates worker splits off strftime/unixepoch/timediff into a claim, take it. Hidden tests likely cover the same categories with other inputs: fuzz your functions against python sqlite3 (`import sqlite3` as oracle) for edge cases.
+
+## Original opening assignments (done/in progress); claim exactly one, in this order)
+1. **values** — values.py + errors.py: types, compare, cast, affinity, arithmetic helpers, fmt of reals. Cats: cast_int_real cast_text_numeric typeof arith. Land FIRST within ~5 min (others import it; stub signatures above if unsure).
+2. **parser** — lexer.py+parser.py+ast.py: full expression grammar (all nodes above, precedence like SQLite), SELECT clauses, INSERT forms, comments, quoting, literals. Cats: comments_quoted real_literal hex_literal blob_literal true_false concat bitwise. Land expression grammar early, document node shapes in ast.py.
+3. **exprs** — expr.py (evaluate: arith, comparison, 3-valued logic, CASE, IN, BETWEEN, LIKE, IS, scalar dispatch via funcs.SCALAR) + funcs.py skeleton with `@scalar`. Cats: case case_nested iif_if nulls is_distinct. Land funcs.py skeleton immediately (first 5 min) so func workers can plug in.
+4. **select** — engine.py SELECT pipeline: WHERE, ORDER/LIMIT/OFFSET, DISTINCT, GROUP BY/HAVING + aggs.py, `*`. Cats: basic where order_limit limit_expr distinct aggregates group_by agg_empty_null group_by_expr_alias.
+5. **dml** — dml.py/ddl.py: CREATE (types, PK, DEFAULT, CHECK, NOT NULL), INSERT variants, UPDATE, DELETE, DROP. Cats: insert_columns default_values integer_primary_key delete_all_count update_delete drop_table check_not_null.
+6. **funcs** — funcs_math.py + funcs_str.py written against the `@scalar` interface (write the decorator in funcs.py yourself only if exprs hasn't landed it; coordinate by pulling often). Cats: abs_sign ceil_floor round_trunc pow_mod sqrt_exp_ln log_funcs trig hyperbolic minmax_scalar strings instr substr_more replace_more trim_chars length_octet char_unicode hex_unhex.
+Next free worker after a landing: take the lowest unclaimed level-1 category, then L2, then L3 (windows/json/dates are independent modules: good parallel targets once SELECT core lands).
+
+## STATUS (update 3) — 1340/1340 visible pass. No locks held. Done; remaining value is hidden-test robustness (fuzz vs python sqlite3).

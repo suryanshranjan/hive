@@ -4,6 +4,8 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 
 ## Where we left off (Oct 29 2026, afternoon, after Gate 38)
 
+- **Gate 46 done** (asked for by the user): a lead with a shared BRAIN.md over 6 builders lost to 7 flat builders on a deep project (95% at 6.4 vs 5.3 min on average, cost 1.09×, same correctness). Hive stays flat. A Codex lead can be rerun with `gates/gate46/` on the user's machine.
+
 - **Gate 38 is done, kill fired** (`gates/gate38/RESULTS.md`). The founder's 13 confirmed rules matched his next-day verdicts on 2 of 11 decisions (raw answers also 2 of 11). Builders followed the rules exactly: surprising 3/6 vs 0/6, ordinary 2/6 vs 5/6, a tie at 5/12. The hand-over (code sheet) is the main intent channel; the interview only seeds it.
 - **Next: Gate 45, with the founder** (registered in `gates/gate45/prompts/PREDICTIONS.md`). Ready in the container:
   - N0 is built (4 builders); the code sheet is written (46 rules, `/home/node/g45/sheet_D.json`);
