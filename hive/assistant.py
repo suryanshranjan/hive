@@ -252,6 +252,24 @@ RISKY = re.compile(r"\b(skip(ping)?|without|no|bina|chhod\w*)\s+(the\s+|any\s+)?
                    r"\b(push|deploy|merge|commit)\w*\s+(it\s+|this\s+|everything\s+)?(straight\s+|directly\s+|right\s+)?"
                    r"(to|into|on|pe|par)\s+(main|master|prod|production|live)\b")
 
+ROUTE = """A team of builders is working on a business owner's product. What each is doing now:
+{board}
+
+Mid-build, the owner asks: "{text}"
+
+Which ONE working builder should take this: the one whose current work it touches (the same page, feature or code);
+if it touches none, the one with least on its plate. Reply with JSON only:
+{{"builder": "w1", "why": "a few plain words on why, e.g. since it is building the earnings page"}}"""
+
+def route(run, text):
+    """(builder, why) for a new task mid-build: the builder whose work it touches, read by the model from the board;
+    the least busy builder if the model cannot say."""
+    working = {r['name'] for r in team.board(run) if r['state'] == 'working'}
+    got = explain.ask_json(ROUTE.format(board=team.board_text(run), text=text)) or {}
+    if got.get('builder') in working:
+        return got['builder'], (got.get('why') or '').strip().rstrip('.')
+    return team.pick(run), ''
+
 def is_risky(text):
     """He asks for what Hive never does: skip the tests, or put work straight onto his own main branch or live. Answered
     in Hive's voice with its limits and the safe way, never started as a build."""
@@ -427,11 +445,13 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         if not live:   # nothing running to redirect: it is a request for a build
             intent, rule = 'build', say_it
         else:
-            me = (team.find(run, got['builder']) if got.get('builder') else None) or team.pick(run)   # one owner
+            me, why = (team.find(run, got['builder']) if got.get('builder') else None), ''
+            if not me:   # one owner, the builder whose work it touches (the bench: by load alone it went to the wrong one)
+                me, why = route(run, say_it)
             if team.instruct(run, say_it, me):
-                ch.send(f"📝 Passed to {me if me else 'the builders'}: {telegram.esc(say_it[:300])}. They pick it up at "
-                        "their next sync, usually within a few minutes; ask \"who's doing what\" to see it taken up.",
-                        html=True)
+                ch.send(f"📝 Passed to {me if me else 'the builders'}" + (f", {telegram.esc(why)}" if why else '') +
+                        f": {telegram.esc(say_it[:300])}. " + ("It picks" if me else "They pick") +
+                        " it up at its next sync, usually within a few minutes.", html=True)
                 return 'instructed'
             ch.send("⚠️ I couldn't reach the builders just now. Say it again in a moment, or \"stop the build\" and "
                     "start it afresh with this."); return 'instruct_failed'
