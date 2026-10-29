@@ -313,14 +313,33 @@ def background_build(repo, goal, ch=None):
         rc = proc.wait()
         if rc != 0 and ch is not None:
             lines = [l.strip() for l in open(log, encoding='utf-8', errors='replace').read().splitlines() if l.strip()]
-            why = lines[-1] if lines else 'no reason was given'
+            why = plain_reason(lines[-1] if lines else '')   # in his words, with the next step; never a raw error
             try:
-                ch.send(f"⚠️ <b>The build stopped before it finished.</b>\n\n{telegram.esc(why)}\n\n<i>Tell me how you'd "
-                        "like to go on, or fix that and say \"build again\".</i>", html=True)
+                ch.send(f"⚠️ <b>The build stopped before it finished.</b>\n\n{telegram.esc(why)}", html=True)
             except Exception:
                 pass
     threading.Thread(target=watch, daemon=True).start()
     return proc
+
+PLAIN_REASONS = [   # why a build stopped, as he should hear it (the owner: "everyone who depends on Hive is Iron Man")
+    (r'unsaved changes', "Your project has edits that aren't saved into it yet, and the builders must start from exactly "
+     "what you have. Save them (in git: commit), or ask your engineer to, then say \"build again\"."),
+    (r'not a git repository', "I'm not pointed at your project's folder. Start me from inside it, then say \"build again\"."),
+    (r'need tests|no results|could not find your tests', "Your project has no tests I can run, and the builders need them "
+     "to know when the work is right. Your engineer can add a few, or tell me which command runs them."),
+    (r'usage limit', "Claude's usage limit was reached. I'll carry on by myself as soon as it resets; nothing is lost."),
+    (r'log ?in|authenticat|login has expired', "Claude's login on this computer has expired. Open Claude once and log in, "
+     "and I'll carry on from where the builders stopped."),
+    (r'no space left|disk', "This computer is out of disk space. Free some up, then say \"build again\"."),
+]
+
+def plain_reason(line):
+    """The reason a build stopped, in his words with the next step, never a raw error line."""
+    for pattern, said in PLAIN_REASONS:
+        if re.search(pattern, line or '', re.I):
+            return said
+    return (f"It hit a technical problem I can't fix from here (for your engineer: {line.strip()[:200]}). Say \"build "
+            "again\" to retry, or send that line to your engineer.") if line else "No reason was recorded. Say \"build again\" to retry."
 
 def _stop(p):
     """End a background build and every builder it started."""
@@ -352,8 +371,8 @@ def _building():
         lines = [l.strip() for l in open(BUILD['log'], encoding='utf-8', errors='replace').read().splitlines() if l.strip()]
     except Exception:
         lines = []
-    return (f"The last build stopped before it finished: {BUILD['goal'][:200]}. The reason it gave: "
-            f"{lines[-1] if lines else 'none recorded'}")
+    return (f"The last build stopped before it finished: {BUILD['goal'][:200]}. Why, in his words: "
+            f"{plain_reason(lines[-1] if lines else '')}")
 
 NO_WORDS = ('no', 'nope', 'nah', 'not now', 'later', 'cancel', 'stop', 'wait', "don't", 'dont', 'never mind', 'leave it')
 
@@ -617,7 +636,7 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         ch.send(f"📌 Noted as a standing rule: {rule}" + (" The builders working now have it too." if sent else ''))
     st = latest_build(repo)
     if st and apply_build:
-        ch.send(f"Shall I update the latest build (branch hive/{st['name']}) to follow it?",
+        ch.send("Shall I update your latest build to follow it?",
                 buttons=[[('Yes, update it', 'upd|yes')], [('Not now', 'upd|no')]])
         upd, other = choose(ch, poll, [('upd|yes', ('update', 'yes')), ('upd|no', NO_WORDS)])
         if other is not None:

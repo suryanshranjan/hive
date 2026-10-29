@@ -79,7 +79,7 @@ assistant.handle(ch(fake), repo, 'status', poll=1)
 running = fake.sent[-1]['text']
 time.sleep(4)
 check('while it builds, status says a build is running; when it stops, he is told why',
-      ('build is running' in running, any('The build stopped' in m['text'] and 'unsaved changes' in m['text'] for m in fake.sent)),
+      ('build is running' in running, any('The build stopped' in m['text'] and "edits that aren't saved" in m['text'] for m in fake.sent)),
       (True, True))
 del os.environ['HIVE_BUILD_CMD']; assistant.BUILD.clear()
 
@@ -117,6 +117,15 @@ r = assistant.handle(ch(fake), repo, 'push it straight to main and skip the test
                      start_build=lambda rp, goal: started.append(goal))
 check('a risky request is answered, not built', (r, started, any('Shall I build' in m['text'] for m in fake.sent)),
       ('chat', [], False))
+
+# 3a6. why a build stopped reaches him in his words with the next step, never as a raw error line ("Iron Man")
+check('every known reason is said plainly, with what to do', [assistant.plain_reason(l)[:30] for l in (
+      'You have unsaved changes. Commit or stash them first.', 'fatal: not a git repository',
+      "usage limit reached|1793300000", 'OSError: [Errno 28] No space left on device')],
+      ['Your project has edits that ar', "I'm not pointed at your projec", "Claude's usage limit was reach", 'This computer is out of disk s'])
+check('an unknown error is kept for his engineer, with what he can do', (
+      'for your engineer: KeyError' in assistant.plain_reason("KeyError: 'x'"), 'build again' in assistant.plain_reason("KeyError: 'x'"),
+      assistant.plain_reason('').startswith('No reason was recorded')), (True, True, True))
 
 # 3b. "build: ..." from the phone starts a build after one confirmation
 started = []
@@ -479,6 +488,47 @@ check('a review cut off midway picks up at the page it stopped on, with what he 
       (any('Picking up where we stopped: section 2 of 2' in m['text'] for m in fake.sent),
        sum(m['text'].startswith('📋') for m in fake.sent), done[2]), (True, 1, 'Rule 3, with the reward doubled for brands.'))
 explain.ask_json = _aj
+
+# 3q4. the sheet as a conversation (the founder: a page of 8 rules was "so cluttered"; "it must be like a conversation"):
+# Jarvis says how a part works, covering every rule; he asks, changes in his own words, and says yes
+talk = ['Verification: rewards wait until the newcomer verifies, for up to 30 days.',
+        'Verification: after 30 days unverified, the referral is cancelled.',
+        'Verification: part-days round down.'] + [f'Invites: rule {k}.' for k in range(4, 12)]
+def talker(prompt):
+    if 'as a short spoken message' in prompt and 'Verification' in prompt:
+        return {'say': 'A newcomer has 30 days to verify; until then both rewards wait.', 'ask': 'Is 30 days right?',
+                'covers': [1, 2]}   # it left out rule 3: that is still said
+    if 'as a short spoken message' in prompt:
+        return {'say': 'Invites work as listed.', 'ask': 'All good?', 'covers': list(range(4, 12))}
+    if 'He replied: "make it 45 days"' in prompt:
+        return {'kind': 'change', 'changes': [{'n': 1, 'rule': 'Verification: rewards wait up to 45 days.'},
+                                               {'n': 2, 'rule': 'Verification: after 45 days unverified, it is cancelled.'}],
+                'new': [], 'said_back': 'Newcomers now get 45 days to verify.'}
+    if 'He replied: "what if they verify on day 40?"' in prompt:
+        return {'kind': 'question'}
+    return _aj(prompt)
+explain.ask_json = talker
+_look, assistant_look = None, assistant.look
+assistant.look = lambda ch, repo, text: 'On day 40 the referral is already cancelled, so nobody is paid.'
+fake = FakeTelegram([say('what if they verify on day 40?'), say('make it 45 days'), say('yes'), tap('cv|ok'), tap('sheet|none')])
+done = interview.confirm_sheet(list(talk), ch(fake), poll=1, missing=True, code=repo)
+assistant.look = assistant_look; explain.ask_json = _aj
+texts = [m['text'] for m in fake.sent]
+check('a part is told as a conversation, with anything the summary left out still said',
+      (texts[1].startswith('🗣'), 'A newcomer has 30 days to verify' in texts[1], 'part-days round down' in texts[1],
+       any(t.startswith('📋') for t in texts)), (True, True, True, False))
+check('his question is answered from the code, his change in his own words is applied and said back, "yes" goes on',
+      (any('On day 40 the referral is already cancelled' in t for t in texts),
+       any('Newcomers now get 45 days to verify.' in t for t in texts),
+       done[:3], done[3:] == talk[3:]),
+      (True, True, ['Verification: rewards wait up to 45 days.', 'Verification: after 45 days unverified, it is cancelled.',
+                    'Verification: part-days round down.'], True))
+fake = FakeTelegram([tap('cv|rules'), tap('pg|ok'), tap('cv|ok'), tap('sheet|none')])
+explain.ask_json = talker
+interview.confirm_sheet(list(talk), ch(fake), poll=1, missing=True)
+explain.ask_json = _aj
+check('"show the detailed rules" opens the page, one tap away',
+      sum(m['text'].startswith('📋') for m in fake.sent), 1)
 
 # 3r. "stop the build" in the middle of a build's questions stops it cleanly; it is not taken as his answer; and an
 # answer that merely contains "stop" is still an answer
