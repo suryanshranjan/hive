@@ -122,11 +122,23 @@ def stop(ask=input, say=print, repo='.', relisten=True):
     if ask(f"Delete the Hive machine {what}? Everything built there comes back to this computer first. [y/N] > "
            ).strip().lower() not in ('y', 'yes'):
         say('Kept.'); return 0
-    if m.get('ip') and os.path.isdir(os.path.join(repo, '.git')):
-        say('  Bringing your results back first...')
-        if cloud.pull(repo, say=say) != 0 and ask("  I couldn't bring the results back, so the machine is kept. Delete it "
-                                                  "anyway, losing what was built there? [y/N] > ").strip().lower() not in ('y', 'yes'):
-            say('Kept. Run `hive cloud pull` to try again, then `hive cloud --stop`.'); return 6
+    if m.get('ip') and os.path.isdir(os.path.join(repo, '.git')):   # nothing built there may be lost (the owner)
+        local = os.environ.get('HIVE_CLOUD_LOCAL')
+        t = cloud.Target(local or f"ubuntu@{m['ip']}", None if local else m.get('key'))
+        if cloud.building(t):   # a build still running there: never delete it mid-way
+            say('A build is still running there. I kept the machine: wait for it to finish (I will tell you), or stop it '
+                'with "stop the build", then run `hive cloud --stop` again.'); return 8
+        say('  Bringing everything back first (every branch, the build records, your rules and our conversation)...')
+        if cloud.pull(repo, say=say, verify=True) != 0:
+            if ask("  Not everything came back, so the machine is kept. To delete it anyway and LOSE that work, type "
+                   "DELETE > ").strip() != 'DELETE':
+                say('Kept. Run `hive cloud pull` to try again, then `hive cloud --stop`.'); return 6
+        if _on_github(repo) and ask("  Also push the result branches (hive/...) to your GitHub, as a second copy? [y/N] > "
+                                   ).strip().lower() in ('y', 'yes'):
+            r = subprocess.run(['git', '-C', repo, 'push', '-q', 'origin', 'refs/heads/hive/*:refs/heads/hive/*'],
+                               capture_output=True, text=True)
+            say('  Pushed the result branches to GitHub.' if r.returncode == 0 else
+                f"  Could not push to GitHub ({r.stderr.strip()[:200]}); your copy here is complete anyway.")
     p, r = m.get('profile'), m.get('region')
     failed = []   # every step is checked: --stop once said "Deleted" while expired credentials had deleted nothing
     if m.get('instance'):
@@ -182,3 +194,8 @@ def _home(repo, say=print):
                                    "is our conversation. Carry on whenever you like.", html=True)
     except Exception:
         pass
+
+def _on_github(repo):
+    """True when the project's origin is on GitHub (then the results can be pushed there as a second copy)."""
+    url = subprocess.run(['git', '-C', repo, 'remote', 'get-url', 'origin'], capture_output=True, text=True).stdout
+    return 'github.com' in url
