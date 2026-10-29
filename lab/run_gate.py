@@ -305,15 +305,33 @@ def run_arms(cfg, name, run, oracle_path, specs, max_parallel):
     try:
         kinds = tour_kinds(cfg); where = {'tour': 'seed_tour', 'contrast': 'seed_tourc', 'handbook': 'seed_hb', 'xtour': 'seed_xtour',
                                           'xtour+handbook': 'seed_xtour_hb', 'tour+handbook': 'seed_tour_hb'}
+        talk = set(cfg.get('talk_arms', []))   # Gate 44: these arms get tools/board.py and cfg['talk_prompt']
         for seed_dir in ('seed', 'seed_tour', 'seed_tourc', 'seed_hb', 'seed_xtour', 'seed_xtour_hb', 'seed_tour_hb'):
-            group = [s for s in specs if where.get(kinds.get(s.split(':')[0]), 'seed') == seed_dir]
+          for talking in (False, True):
+            group = [s for s in specs if where.get(kinds.get(s.split(':')[0]), 'seed') == seed_dir
+                     and (s.split(':')[0] in talk) == talking]
             if not group: continue
-            cmd = [sys.executable, os.path.join(ROOT, 'lab', 'make_swarm.py'), '--run', name, '--seed', os.path.join(run, seed_dir),
-                   '--prompt', os.path.join(ROOT, cfg['prompt']), '--ask-texts', os.path.join(ROOT, cfg['ask_texts']),
+            src = os.path.join(run, seed_dir)
+            if talking:
+                src = os.path.join(run, seed_dir + '_talk')
+                if not os.path.isdir(src):
+                    sh('git', 'clone', '-q', os.path.join(run, seed_dir), src)
+                    shutil.copy(os.path.join(ROOT, cfg['board_tool']), os.path.join(src, 'tools', 'board.py'))
+                    sh('git', 'add', 'tools/board.py', cwd=src)
+                    sh('git', '-c', 'user.name=hive', '-c', 'user.email=hive@local', 'commit', '-q', '-m',
+                       'tools/board.py: the team message board', cwd=src)
+            cmd = [sys.executable, os.path.join(ROOT, 'lab', 'make_swarm.py'), '--run', name, '--seed', src,
+                   '--prompt', os.path.join(ROOT, cfg['talk_prompt'] if talking else cfg['prompt']),
+                   '--ask-texts', os.path.join(ROOT, cfg['ask_texts']),
                    '--example-file', os.path.join(run, 'example.txt')]
             for spec in group:
                 p = spec.split(':'); cmd += ['--arm', spec if not (len(p) > 2 and p[2] == 'quota') else ':'.join(p[:4])]
             print(sh(*cmd), end='')
+            for spec in group if talking else []:
+                arm, n = spec.split(':')[0], int(spec.split(':')[1])
+                board = os.path.join(run, f'board_{arm}.txt'); open(board, 'w').close()
+                for k in range(1, n + 1):
+                    sh('git', 'config', 'hive.board', board, cwd=os.path.join(run, 'work', f'{arm}-w{k}'))
         say('launching workers...')
         launch = [sys.executable, os.path.join(ROOT, 'lab', 'launch.py'), '--run', name]
         for spec in specs: launch += ['--arm', spec.split(':')[0]]
