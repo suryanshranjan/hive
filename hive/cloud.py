@@ -211,7 +211,7 @@ def pull(repo='.', frm=None, say=print, verify=False):
     back = [name for name, src, dst in (
         ('rules', f'{src_hive}/rules/{rules}', os.path.join(memory.DIR, rules)),
         ('conversation', f'{src_hive}/conversation.json', telegram.CONVERSATION)) if t.get(src, dst)]
-    runs_home = os.path.join(os.path.expanduser('~'), '.hive', 'runs-from-cloud', time.strftime('%Y%m%d-%H%M'))
+    runs_home = os.path.join(os.path.expanduser('~'), '.hive', 'runs-from-cloud', _project(repo))   # one copy, refreshed
     if t.local:
         src_runs = os.path.join(t.home(), '.hive', 'runs')
         if os.path.isdir(src_runs):

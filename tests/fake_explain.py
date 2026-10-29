@@ -36,7 +36,9 @@ if 'His newest message:' in prompt and 'What does he mean?' in prompt:   # the l
               else 'greeting' if low in ('hi', 'hello', 'hey hive') else 'reply')
     rule = (said.split(':', 1)[-1].strip() if intent == 'change' else
             (last_build if confirmed else said) if intent == 'build' else '')
-    print(json.dumps({'result': json.dumps({'intent': intent, 'rule': rule, 'confirmed': bool(confirmed and asked)})}))
+    about = low.startswith(('how do', 'how does', 'what happens when'))   # a question about his product
+    print(json.dumps({'result': json.dumps({'intent': 'reply' if about else intent, 'rule': rule,
+                                            'confirmed': bool(confirmed and asked), 'about_product': about})}))
     sys.exit(0)
 if 'Which earlier rulings does this replace' in prompt:
     print(json.dumps({'result': json.dumps({'replaces': [1] if 'late' in prompt.split('He now says:')[1] else []})}))

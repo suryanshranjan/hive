@@ -65,7 +65,7 @@ check('a correction while Hive asks changes what it builds; "yes" then starts it
 
 # 3a2b. "build again" after a failed build is read in context, never as a request to build "again" (the live test)
 started = []
-c = ch(FakeTelegram([]))
+c = ch(FakeTelegram([tap('bld|yes')]))   # it restates the earlier request and asks once
 c.remember('owner', 'build: a page showing creators their earnings'); c.remember('hive', 'The build stopped before it finished.')
 r = assistant.handle(c, repo, 'Build again', poll=1, start_build=lambda rp, goal: started.append(goal))
 check('"build again" builds the earlier request, not "again"', (r, started), ('built', ['a page showing creators their earnings']))
@@ -317,7 +317,7 @@ assistant.listen(repo, poll=1, until=lambda: not fake.script, ch=telegram.Channe
 assistant.handle = _handle
 texts = [m['text'] for m in fake.sent]
 check('an old tap and a failing message do not stop the listener; it says sorry and answers the next',
-      (any('something went wrong' in t for t in texts), any('The latest build' in t for t in texts)), (True, True))
+      (any('went wrong on my side' in t for t in texts), any('The latest build' in t for t in texts)), (True, True))
 
 # 3n. like Jarvis with Tony: messages that came together are read together, repeats are answered once with an apology,
 # and a bare "hi" next to a real request gets no reply of its own; replies are in Hive's own voice, from real facts only
@@ -378,6 +378,29 @@ pages = [m['text'] for m in fake.sent if m['text'].startswith('📋')]
 check('each page of the sheet says why its area matters, and the opening says what the time buys',
       ('Why it matters: Fees decide what you earn on every deal.' in pages[0], 'Payouts decide' in pages[2],
        any('about 3 minutes' in m['text'] and 'costs far more to find' in m['text'] for m in fake.sent)), (True, True, True))
+
+# 3r. "stop the build" in the middle of a build's questions stops it cleanly; it is not taken as his answer; and an
+# answer that merely contains "stop" is still an answer
+fake = FakeTelegram([say('stop the build')])
+try:
+    interview.interview('Fees', ch(fake), situations=[{'id': 'z1', 'situation': 'Case 1.', 'options': ['Yes', 'No']}],
+                        poll=1, sheet=False)
+    stopped = False
+except telegram.Stopped:
+    stopped = True
+check('"stop the build" mid-question stops, and says nothing was built or changed',
+      (stopped, any("I've stopped: nothing was built or changed" in m['text'] for m in fake.sent)), (True, True))
+fake = FakeTelegram([say('stop charging late fees after 7 days'), say('yes')])   # then confirms the reading
+rules = interview.interview('Fees', ch(fake), situations=[{'id': 'z1', 'situation': 'Case 1.', 'options': ['Yes', 'No']}],
+                            poll=1, sheet=False)
+check('an answer that mentions "stop" is still his answer', len(rules), 1)
+
+# 3s. a question about his product is answered by Claude reading the code, read-only, in his project
+assistant.ASK_CMD = '"' + sys.executable.replace(chr(92), '/') + '" "' + os.path.abspath('tests/fake_look.py').replace(chr(92), '/') + '"'
+fake = FakeTelegram([])
+r = assistant.handle(ch(fake), repo, 'How do refunds work in my app?', poll=1)
+check('"how do refunds work?" is answered from the code, not guessed', (r, fake.sent[-1]['text']),
+      ('answered', '🐝 Refunds go back to the brand within 7 days, sir.'))
 
 # 4. the listener steps aside while a build or review is talking to the owner
 json.dump({'pid': os.getppid(), 'at': time.time()}, open(telegram.BUSY, 'w'))

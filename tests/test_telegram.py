@@ -29,7 +29,10 @@ class FakeTelegram:
                 batch = [lambda f, s=s: [s] for s in self.stale][:1] and [self.stale.pop(0)] if self.stale else []
                 return [{'update_id': self._next(), 'message': {'message_id': 1, 'chat': {'id': c}, 'text': t}}
                         for c, t, _, _ in batch]
-            if not self.script:
+            if not self.script:   # the owner has nothing more to say: a test still waiting on him is a bug, not a hang
+                self.idle = getattr(self, 'idle', 0) + 1
+                if self.idle > 200:
+                    raise RuntimeError('the scripted owner ran out of replies while Hive was still waiting')
                 return []
             batch = self.script.pop(0)(self)
             out = []
