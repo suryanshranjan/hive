@@ -1,0 +1,61 @@
+{
+ "name": "g55",
+ "arms": {
+  "N0": {
+   "hidden_pass": 0.36,
+   "ci95_by_function": [
+    0.248,
+    0.484
+   ],
+   "tests": 250
+  },
+  "CC": {
+   "hidden_pass": 1.0,
+   "ci95_by_function": [
+    1.0,
+    1.0
+   ],
+   "tests": 250
+  },
+  "CS": {
+   "hidden_pass": 0.652,
+   "ci95_by_function": [
+    0.428,
+    0.856
+   ],
+   "tests": 250
+  },
+  "CT": {
+   "hidden_pass": 0.664,
+   "ci95_by_function": [
+    0.516,
+    0.804
+   ],
+   "tests": 250
+  }
+ },
+ "diffs": {
+  "CC-N0": {
+   "points": 64.0,
+   "ci95": [
+    52.0,
+    74.8
+   ]
+  },
+  "CS-N0": {
+   "points": 29.2,
+   "ci95": [
+    11.2,
+    47.2
+   ]
+  },
+  "CT-N0": {
+   "points": 30.4,
+   "ci95": [
+    18.4,
+    41.6
+   ]
+  }
+ },
+ "allowance": {}
+}

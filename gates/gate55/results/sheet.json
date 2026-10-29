@@ -1,0 +1,1065 @@
+{
+ "R": [
+  "Across all functions, whenever any argument is NULL, return NULL (for avg_rating, NULL rows are skipped instead; see below).",
+  "Across the numeric-argument functions (bulk_price, late_fee, loyalty_tier, meeting_end, pct_change, make_slug's maxlen), whenever a numeric argument is not a number (for example text such as 'abc' or a boolean), return NULL. Numbers in text form are not converted.",
+  "Across the text-argument functions (fiscal_label, isbn_check, make_slug title, meeting_end start, phone_fmt), whenever the argument is a number rather than text, treat it as its plain text form and proceed.",
+  "Whenever late_fee gets an amount of zero or less, return 0.",
+  "Whenever late_fee gets days_late of 5 or fewer (including zero and negative), return 0; days 6 and over are charged, so the first 5 days are a grace period.",
+  "Whenever late_fee charges, it bills 2% of the amount for each started 30-day period late (1-30 days is one period, 31-60 is two, and so on).",
+  "Whenever late_fee computes a fee, round it up to the next whole cent.",
+  "Whenever the late_fee computed fee is below 500 cents, raise it to a minimum of 500 cents.",
+  "Whenever late_fee has a fee after the minimum, limit it to a cap of one fifth (20%) of the amount, rounded down to a whole cent; the cap wins over the 500-cent minimum, so small invoices can be charged less than 500.",
+  "Whenever late_fee gets fractional days or amounts, apply the same rules exactly (days of 5.5 are charged; 30.5 days is two periods).",
+  "Whenever make_slug builds a slug, lower-case the title, replace each '&' with the word 'and', and keep only runs of the letters a-z and digits 0-9 as words; every other character (punctuation, accents, non-Latin letters, whitespace) is a separator and is dropped.",
+  "Whenever make_slug builds a slug, drop the words 'the', 'a', 'an' and 'of' wherever they appear as whole words, and join the remaining words with single hyphens.",
+  "Whenever the make_slug slug is longer than maxlen, cut it to maxlen characters at a word boundary: if the cut falls inside a word, drop that partial word back to the previous hyphen; if the cut falls exactly at the end of a word, keep that word.",
+  "Whenever the make_slug cut leaves a first word that is itself longer than maxlen (no hyphen inside the cut), hard-cut that word at maxlen characters.",
+  "Whenever make_slug truncates, strip any leading or trailing hyphens from the result.",
+  "Whenever make_slug has a maxlen of zero or negative, treat it as 0, so the result is 'untitled'; a fractional maxlen is truncated toward zero.",
+  "Whenever the make_slug result would be empty (empty title, only stop words, only punctuation or whitespace, or maxlen 0), return the text 'untitled'.",
+  "Whenever loyalty_tier gets negative points, return 'suspended'.",
+  "Whenever loyalty_tier gets points from 0 up to but not including 1000, return 'bronze'.",
+  "Whenever loyalty_tier gets points from 1000 up to but not including 5000, return 'silver'.",
+  "Whenever loyalty_tier gets points from 5000 up to but not including 20000, return 'gold'.",
+  "Whenever loyalty_tier gets 20000 points or more, return 'platinum'; there is no tier above it.",
+  "Whenever loyalty_tier gets fractional points, compare the exact value to the thresholds (4999.5 is silver).",
+  "Whenever fiscal_label runs, the fiscal year starts on April 1 and is named by the calendar year in which it ends (April 2024 through March 2025 is FY2025).",
+  "Whenever fiscal_label labels a date, the quarters are April-June Q1, July-September Q2, October-December Q3 and January-March Q4, written like 'FY2025-Q1'.",
+  "Whenever fiscal_label gets a date from March 27 to March 31, return the year-end close label 'FY<year>-CLOSE' (for example 'FY2025-CLOSE') instead of a Q4 label; March 1-26 is still Q4.",
+  "Whenever fiscal_label gets text that is not in the form YYYY-MM-DD (four, two and two digits with hyphens), or is not a real calendar date (month 13, day 45, February 30, 29 February in a non-leap year, year 0000), return the text 'INVALID'; this includes empty text.",
+  "Whenever fiscal_label gets a valid date followed by a space or 'T' and a time of HH:MM or HH:MM:SS, ignore the time and label by the date; the time digits are not checked.",
+  "Whenever fiscal_label gets text with leading or trailing whitespace, ignore that whitespace.",
+  "Whenever bulk_price gets a unit price of zero or less, or a quantity of zero or less, return 0 (no minimum applies).",
+  "Whenever bulk_price has a quantity of 10 to 49, take 5% off the whole order; 50 to 99 takes 10% off; 100 or more takes 15% off; fewer than 10 gets no discount.",
+  "Whenever bulk_price computes a discounted total, round the total to the nearest 5 cents, with exact halves (2.5 cents) rounding up.",
+  "Whenever the bulk_price rounded total is below 500 cents, charge the minimum order total of 500 cents; this applies to any positive order, and is applied after the rounding.",
+  "Whenever bulk_price gets a fractional quantity or unit price, compute the same way without rounding the inputs.",
+  "Whenever isbn_check runs, ignore every character that is not an ASCII digit 0-9 (hyphens, spaces, letters, signs and dots included).",
+  "Whenever isbn_check has more than 9 digits, use only the first 9 digits and ignore the rest.",
+  "Whenever isbn_check has digits, multiply the 1st digit by 1, the 2nd by 2, and so on up to the 9th digit by 9, add them, and take the sum modulo 11.",
+  "Whenever the isbn_check remainder is 10, return the letter 'X'; otherwise return the remainder as a one-character text digit.",
+  "Whenever isbn_check has fewer than 9 digits, including none (empty text or no digits), do not reject it: apply the same weights starting from the first digit to the digits present (no digits gives '0'). It never returns an error.",
+  "Whenever meeting_end gets a start that is not exactly two-digit hour, a colon and two-digit minutes (HH:MM, ignoring surrounding whitespace), return NULL.",
+  "Whenever meeting_end gets a start with an hour above 23 or minutes above 59, return NULL.",
+  "Whenever meeting_end gets a duration above zero, round the duration up to a whole number of 15-minute blocks and add it to the start (1 to 15 minutes counts as one block, 16 to 30 as two, and so on); fractional minutes are rounded up the same way.",
+  "Whenever meeting_end gets a duration of zero or less, add nothing and return the start time itself, in HH:MM form.",
+  "Whenever the meeting_end end time would pass 23:59, return 23:59; the time never wraps past midnight to the next day.",
+  "Whenever pct_change gets an old value of zero, return 0.0 whatever the new value is.",
+  "Whenever pct_change runs, compute (new - old) / old * 100 using the signed old value as the divisor (not its absolute value), so a negative old value flips the sign of the result.",
+  "Whenever pct_change computes a result, round it to 1 decimal place and return it as a decimal number; a result of zero is returned as 0.0, never -0.0.",
+  "Whenever phone_fmt gets text containing exactly 10 digits, ignoring every non-digit character anywhere in it, return '(AAA) EEE-NNNN' built from those digits in order.",
+  "Whenever phone_fmt gets text with any other number of digits (fewer than 10, more than 10, an 11-digit number starting with 1, a country code, an extension, or no digits), return the input text unchanged, not reformatted and not NULL.",
+  "Whenever phone_fmt gets a number instead of text, treat it as its plain text form and apply the same rules.",
+  "Whenever avg_rating aggregates a group, ignore NULL values, non-numeric values, booleans, and any number below 1 or above 5; ratings of exactly 1 and exactly 5 and fractional ratings in between are valid.",
+  "Whenever avg_rating has no valid ratings in the group (empty group, all NULL or all invalid), return NULL.",
+  "Whenever avg_rating has 5 or more valid ratings, drop exactly one lowest and one highest valid rating (one copy each, even if tied) before averaging; with fewer than 5 valid ratings, drop nothing. The count is taken after ignoring invalid values.",
+  "Whenever avg_rating averages, take the arithmetic mean of the kept ratings and round it to 1 decimal place, with exact halves rounding up (away from zero), returned as a decimal number."
+ ],
+ "D": [
+  "Whenever bulk_price is given a unit price and a quantity, it returns unit price times quantity in cents, with no discount for fewer than 10 units.",
+  "Whenever bulk_price is given a quantity of 10 to 49 units, it takes 5% off the whole order total (10 units at 100 cents gives 950).",
+  "Whenever bulk_price is given a quantity of 50 to 99 units, it takes 10% off the whole order total, not just the units beyond 50.",
+  "Whenever bulk_price is given a quantity of 100 or more units, it takes 15% off the whole order total.",
+  "Whenever bulk_price produces a total with a fraction of a cent, it rounds half a cent upward to the next whole cent (15 cents x 10 units gives 143).",
+  "Whenever bulk_price is given a unit price or quantity of zero, it returns 0.",
+  "Whenever bulk_price is given a negative unit price or a negative quantity, it returns NULL instead of a total.",
+  "Whenever bulk_price is given NULL for the unit price or the quantity, it returns NULL.",
+  "Whenever bulk_price is given a unit price or quantity that is text, it reads numeric text (including surrounding spaces or forms like '1e2') as a number, and returns NULL for empty text or text that is not a number.",
+  "Whenever bulk_price is given a fractional quantity or price, it uses it as is (2.5 units at 100 cents gives 250), and the discount tiers use the exact quantity, so 9.9 units get no discount.",
+  "Whenever fiscal_label is given a valid date in YYYY-MM-DD form, it returns 'FY<year>-Q<n>', where the fiscal year starts on 1 April and is named for the calendar year in which it ends.",
+  "Whenever fiscal_label is given a date from April to June it returns Q1, July to September Q2, October to December Q3, and January to March Q4 (2024-04-01 is FY2025-Q1, 2024-03-31 is FY2024-Q4).",
+  "Whenever fiscal_label is given a date from 1 January to 31 March, it names the fiscal year after that same calendar year (2025-01-01 is FY2025-Q4); from 1 April on it names the next calendar year.",
+  "Whenever fiscal_label is given a date that does not exist on the calendar (such as 2024-02-30, 2023-02-29 or month 13), it returns NULL, while 2024-02-29 in a leap year is accepted.",
+  "Whenever fiscal_label is given text that is not exactly four-digit year, two-digit month and two-digit day separated by hyphens (such as 2024-5-5, 2024/05/05, a date with a time, or empty text), it returns NULL.",
+  "Whenever fiscal_label is given a date with spaces around it, it ignores those spaces and labels the date normally.",
+  "Whenever fiscal_label is given NULL or a number instead of text (such as 20240505), it returns NULL.",
+  "Whenever fiscal_label is given the year 0000 it returns NULL, and for 9999-04-01 or later it returns a five-digit fiscal year such as FY10000-Q3.",
+  "Whenever isbn_check is given a 9-digit code, it returns the ISBN-10 check character: digits weighted 10 down to 2 are added up, and the check is whatever brings the sum to a multiple of 11 (030640615 gives '2').",
+  "Whenever the ISBN-10 check value comes out as 10, isbn_check returns the letter 'X' (123456789 gives 'X'); a value of 0 is returned as the text '0'.",
+  "Whenever isbn_check is given a code containing hyphens or spaces, it ignores them before checking, so '0-306-40615' and '030 640 615' both give '2'.",
+  "Whenever isbn_check is given anything that is not exactly 9 digits after hyphens and spaces are removed (8 or 10 digits, letters, empty text, a decimal point), it returns NULL.",
+  "Whenever isbn_check is given NULL, a decimal number or binary data, it returns NULL.",
+  "Whenever isbn_check is given a whole number rather than text, it uses its digits as written, so leading zeros are lost and a number such as 30640615 (8 digits) returns NULL.",
+  "Whenever isbn_check is given a code starting with a minus sign, it treats the minus as a hyphen and ignores it ('-123456789' gives 'X').",
+  "Whenever late_fee is given an invoice amount and a number of days late from 1 to 30, it charges 2% of the amount in cents.",
+  "Whenever late_fee is given 31 to 60 days late, it charges 4% of the whole amount, and for more than 60 days it charges 6% of the whole amount.",
+  "Whenever late_fee computes a fee with a fraction of a cent, it rounds half a cent upward (25 cents at 2% gives 1, 75 cents gives 2, 1 cent gives 0).",
+  "Whenever late_fee is given zero or negative days late, or an amount of zero or less, it returns a fee of 0.",
+  "Whenever late_fee is given NULL, or text that is not a number (including empty text), for either the amount or the days, it returns NULL, even if the other value would have given 0.",
+  "Whenever late_fee is given numeric text such as '10000' and '45', it reads it as numbers and charges normally.",
+  "Whenever late_fee is given a fractional number of days, it compares the exact value to the limits (0.5 days is 2%, 30.5 days is 4%).",
+  "Whenever loyalty_tier is given a points balance from 0 to 999, it returns 'bronze'.",
+  "Whenever loyalty_tier is given 1000 to 4999 points, it returns 'silver'; 5000 to 9999 returns 'gold'; 10000 or more returns 'platinum'.",
+  "Whenever loyalty_tier is given a negative balance (even -0.5), it returns NULL.",
+  "Whenever loyalty_tier is given NULL, empty text or text that is not a number, it returns NULL.",
+  "Whenever loyalty_tier is given numeric text (such as '5000', ' 5000 ' or '1e4'), it reads it as a number and returns the matching tier.",
+  "Whenever loyalty_tier is given a fractional balance such as 999.9, it compares the exact value, so 999.9 is still bronze.",
+  "Whenever make_slug is given a title, it returns the title in lower case with every run of characters other than a-z and 0-9 (spaces, punctuation, underscores, slashes) replaced by a single hyphen and no hyphen at the start or end.",
+  "Whenever make_slug is given a title with accented letters, it removes the accent and keeps the base letter ('Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' gives 'cafe-creme-brulee').",
+  "Whenever make_slug is given letters that have no plain a-z form, such as \u00df, Cyrillic or Japanese, it treats them as separators, so 'Stra\u00dfe \u0152uvre' gives 'stra-e-uvre' and a title made only of such letters gives empty text.",
+  "Whenever make_slug is given a title with compatibility characters such as the 'fi' ligature or a circled digit, it turns them into plain letters and digits ('\ufb01ne \u2460' gives 'fine-1').",
+  "Whenever make_slug's slug is longer than maxlen, it cuts it to maxlen characters and then removes any hyphen left at the end ('Hello World' with 6 gives 'hello', with 7 gives 'hello-w').",
+  "Whenever make_slug is given a maxlen of zero or less, empty text, or text that is not a number, it returns empty text.",
+  "Whenever make_slug is given a maxlen with a fraction or as numeric text, it uses the whole-number part (5.9 acts as 5, '8' acts as 8).",
+  "Whenever make_slug is given NULL for the title or for maxlen, it returns NULL, even if the other value is 0.",
+  "Whenever make_slug is given an empty title, or one with only spaces or punctuation, it returns empty text.",
+  "Whenever make_slug is given a number as the title, it uses the number written out as text, so a decimal point becomes a hyphen (1.5 gives '1-5').",
+  "Whenever meeting_end is given a start time HH:MM and a number of minutes, it returns the end time as HH:MM on a 24-hour clock with two-digit hours and minutes.",
+  "Whenever meeting_end goes past midnight, it wraps around to the next day's clock time without any day indicator (23:30 plus 45 gives 00:15), and 1440 minutes or any whole number of days returns the same start time.",
+  "Whenever meeting_end is given negative minutes, it counts backwards and wraps to the previous day if needed (00:00 minus 1 gives 23:59).",
+  "Whenever meeting_end is given a start with a one-digit hour such as '9:00', it accepts it and returns the end with a two-digit hour; surrounding spaces are ignored.",
+  "Whenever meeting_end is given a start that is not hours and two-digit minutes separated by a colon (24:00, 10:60, '10:5', '10:00:00', '1000', '10.00', '10:00 PM', empty text, a number), it returns NULL.",
+  "Whenever meeting_end is given NULL for the start or for the minutes, it returns NULL.",
+  "Whenever meeting_end is given minutes as numeric text, it uses the number ('30' adds 30); for text that is not a number, including empty text, it treats the minutes as 0 and returns the start time unchanged.",
+  "Whenever meeting_end is given minutes with a fraction, it drops the fraction toward zero (90.9 acts as 90, -90.9 as -90, 0.5 as 0).",
+  "Whenever pct_change is given an old and a new value, it returns (new minus old) divided by old, times 100, rounded to 1 decimal place (3 to 4 gives 33.3).",
+  "Whenever pct_change lands exactly halfway between two 1-decimal values, it rounds away from zero (1000 to 1000.5 gives 0.1 and 1000 to 999.5 gives -0.1), but it works on the exact stored number, so 100 to 100.05 gives 0.0 because 100.05 is stored slightly below.",
+  "Whenever pct_change is given an old value of zero, it returns NULL, whatever the new value.",
+  "Whenever pct_change is given a negative old value, it divides by the size of the old value, so an increase toward zero is positive (-100 to -50 gives 50.0) and -100 to -150 gives -50.0.",
+  "Whenever pct_change is given a new value of zero, it returns -100.0 for any non-zero old value.",
+  "Whenever the rounded pct_change result is zero, it returns 0.0 and never negative zero.",
+  "Whenever pct_change is given NULL for either value, it returns NULL.",
+  "Whenever pct_change is given numeric text it reads it as a number, and text with leading digits uses those digits ('5abc' acts as 5).",
+  "Whenever pct_change is given text that is not a number or empty text as the old value, it returns NULL because it counts as zero; as the new value it counts as 0, so the result is -100.0.",
+  "Whenever phone_fmt is given a phone number with exactly 10 digits, it returns it as (AAA) EEE-NNNN, whatever spaces, hyphens, dots, brackets or plus signs surround the digits.",
+  "Whenever phone_fmt is given 11 digits starting with 1, it drops that leading 1 as the country code and formats the remaining 10 digits ('+1 212 555 1234' gives '(212) 555-1234').",
+  "Whenever phone_fmt is given 11 digits not starting with 1, or any count other than 10 or 11 digits (7 digits, 9 digits, 12 digits, no digits, empty text), it returns NULL.",
+  "Whenever phone_fmt is given 12 digits starting with 1-1 (such as '1-1-212-555-1234') it returns NULL, since only one leading 1 is dropped.",
+  "Whenever phone_fmt is given text with extra digits such as an extension ('212 555 1234 ext 5'), it counts them as part of the number and returns NULL.",
+  "Whenever phone_fmt is given non-digit text mixed in, such as letters or a trailing 'x', it ignores the non-digits and formats the digits if exactly 10 (or 11 with a leading 1) remain.",
+  "Whenever phone_fmt is given a number rather than text, it uses its digits (2125551234 gives '(212) 555-1234'); a decimal number counts the digits on both sides of the point.",
+  "Whenever phone_fmt is given 10 digits whose area code starts with 0 or 1 (0125551234), it formats them without any check on the area code.",
+  "Whenever phone_fmt is given NULL or binary data, it returns NULL.",
+  "Whenever phone_fmt is given digits from other scripts (such as Arabic-Indic digits), it counts them as digits and formats them as they are.",
+  "Whenever avg_rating is used over a group of rows, it returns the average of the ratings from 1 to 5, rounded to 2 decimals (1, 1 and 2 give 1.33).",
+  "Whenever avg_rating meets a rating of NULL, it leaves it out of both the sum and the count.",
+  "Whenever avg_rating meets a rating below 1 or above 5 (0, -1, 6, 0.9999, 5.0001), it leaves it out as invalid; exactly 1 and exactly 5 are counted.",
+  "Whenever avg_rating meets a rating that is numeric text ('5', ' 3 ', '1e0'), it counts it as that number; text that is not a number or empty text is left out.",
+  "Whenever avg_rating meets fractional ratings within 1 to 5 (4.5), it counts them as they are.",
+  "Whenever avg_rating has no valid ratings at all (no rows, only NULLs or only out-of-range values), it returns NULL, not 0.",
+  "Whenever avg_rating's average falls exactly halfway at the third decimal, it does not always round up: 33/8 = 4.125 gives 4.12.",
+  "Whenever avg_rating is used with GROUP BY, it gives each group its own average computed only from that group's valid ratings."
+ ],
+ "reviews": {
+  "CC": {
+   "replies": 48,
+   "cost": 4.126,
+   "log": [
+    {
+     "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+     "typed": "5, 7, 9, 12, 14, 15, 17, 18, 19, 22, 23, 24, 26, 27, 28, 31, 32, 34, 35, 37, 39, 40, 41, 42, 43, 44, 45, 47, 50, 51, 52, 53, 55, 56, 59, 60, 64, 65, 67, 68, 69, 70, 71, 76, 79, 82"
+    },
+    {
+     "prompt": "  Rule 5: Whenever bulk_price produces a total with a fraction of a cent, it rounds half a cent upward to the next whole cent (15 cents x 10 units gives 143).\n  What should it be? > ",
+     "typed": "Round to the nearest 5 cents, with exact halves (2.5 cents) rounding up. For example, 15 cents x 10 units with 5% off is 142.5 cents, which rounds to 145. After rounding, if the total is below 500 cents, charge the minimum of 500 cents."
+    },
+    {
+     "prompt": "  Rule 7: Whenever bulk_price is given a negative unit price or a negative quantity, it returns NULL instead of a total.\n  What should it be? > ",
+     "typed": "Return 0 when the quantity or unit price is zero or less, with no minimum applying. A negative unit price or a negative quantity is not an error."
+    },
+    {
+     "prompt": "  Rule 9: Whenever bulk_price is given a unit price or quantity that is text, it reads numeric text (including surrounding spaces or forms like '1e2') as a number, and returns NULL for empty text or text that is not a number.\n  What should it be? > ",
+     "typed": "Numeric text such as '10' is not converted: if a unit price or quantity is text of any kind, bulk_price should return NULL."
+    },
+    {
+     "prompt": "  Rule 12: Whenever fiscal_label is given a date from April to June it returns Q1, July to September Q2, October to December Q3, and January to March Q4 (2024-04-01 is FY2025-Q1, 2024-03-31 is FY2024-Q4).\n  What should it be? > ",
+     "typed": "April to June is Q1, July to September is Q2, October to December is Q3, and January to March is Q4, written like 'FY2025-Q1'. The exception is March 27 to March 31, which returns the year-end close label 'FY<year>-CLOSE' instead of Q4, so 2024-03-31 is 'FY2024-CLOSE', not FY2024-Q4; March 1 to 26 is still Q4."
+    },
+    {
+     "prompt": "  Rule 14: Whenever fiscal_label is given a date that does not exist on the calendar (such as 2024-02-30, 2023-02-29 or month 13), it returns NULL, while 2024-02-29 in a leap year is accepted.\n  What should it be? > ",
+     "typed": "Rule 14: It should return the text 'INVALID', not NULL, for a date that does not exist (such as 2024-02-30, 2023-02-29, month 13, day 45 or year 0000). 2024-02-29 in a leap year is accepted as a real date."
+    },
+    {
+     "prompt": "  Rule 15: Whenever fiscal_label is given text that is not exactly four-digit year, two-digit month and two-digit day separated by hyphens (such as 2024-5-5, 2024/05/05, a date with a time, or empty text), it returns NULL.\n  What should it be? > ",
+     "typed": "It should return the text 'INVALID', not NULL, for text that is not four-digit year, two-digit month and two-digit day separated by hyphens (such as 2024-5-5, 2024/05/05 or empty text). A valid date followed by a space or 'T' and a time of HH:MM or HH:MM:SS is not an error: the time is ignored and the date is labeled normally."
+    },
+    {
+     "prompt": "  Rule 17: Whenever fiscal_label is given NULL or a number instead of text (such as 20240505), it returns NULL.\n  What should it be? > ",
+     "typed": "NULL should return NULL, but a number should not. A number is treated as its plain text form and then checked like any other text. A number such as 20240505 has no hyphens, so it is not in the form YYYY-MM-DD and returns 'INVALID'."
+    },
+    {
+     "prompt": "  Rule 18: Whenever fiscal_label is given the year 0000 it returns NULL, and for 9999-04-01 or later it returns a five-digit fiscal year such as FY10000-Q3.\n  What should it be? > ",
+     "typed": "Rule 18: It should return the text 'INVALID' for the year 0000. For 9999-04-01 or later there is no special rule; follow the normal fiscal year naming, with the fiscal year named by the calendar year in which it ends."
+    },
+    {
+     "prompt": "  Rule 19: Whenever isbn_check is given a 9-digit code, it returns the ISBN-10 check character: digits weighted 10 down to 2 are added up, and the check is whatever brings the sum to a multiple of 11 (030640615 gives '2').\n  What should it be? > ",
+     "typed": "It should be the weighted sum with weights 1 to 9, not 10 down to 2. Multiply the 1st digit by 1, the 2nd by 2, and so on up to the 9th digit by 9. Add them up and take the sum modulo 11. The remainder is the answer: if it is 10, return 'X', otherwise return the remainder as a one-character text digit."
+    },
+    {
+     "prompt": "  Rule 22: Whenever isbn_check is given anything that is not exactly 9 digits after hyphens and spaces are removed (8 or 10 digits, letters, empty text, a decimal point), it returns NULL.\n  What should it be? > ",
+     "typed": "It should not return NULL. Ignore every character that is not a digit 0-9, including letters and decimal points. With more than 9 digits, use only the first 9. With fewer than 9 digits, apply the same weights starting from the first digit to the digits present. With no digits, such as empty text, return '0'. It never returns an error."
+    },
+    {
+     "prompt": "  Rule 23: Whenever isbn_check is given NULL, a decimal number or binary data, it returns NULL.\n  What should it be? > ",
+     "typed": "NULL should return NULL, but a decimal number should not. A decimal number is treated as its plain text form, so the decimal point and any other non-digit characters are ignored and the check character is worked out from the digits that remain (first 9 digits, weights 1 to 9, sum modulo 11, 'X' if the remainder is 10)."
+    },
+    {
+     "prompt": "  Rule 24: Whenever isbn_check is given a whole number rather than text, it uses its digits as written, so leading zeros are lost and a number such as 30640615 (8 digits) returns NULL.\n  What should it be? > ",
+     "typed": "A number is treated as its plain text form and then handled like any other text, so it should never return NULL. Only the digits are used, with the first 9 digits taken and weights 1 to 9 applied from the first digit. A number such as 30640615 has 8 digits, so the weights 1 to 8 apply to those digits. The sum is 120, the remainder is 10, and the result is 'X'."
+    },
+    {
+     "prompt": "  Rule 26: Whenever late_fee is given an invoice amount and a number of days late from 1 to 30, it charges 2% of the amount in cents.\n  What should it be? > ",
+     "typed": "Days 1 to 5 are a grace period and return 0. From day 6 on, late_fee charges 2% of the amount for each started 30-day period, so days 6 to 30 are one period. The fee is rounded up to the next whole cent, raised to a minimum of 500 cents, then capped at one fifth (20%) of the amount, rounded down to a whole cent. The cap wins over the minimum, so small invoices can be charged less than 500. An amount of zero or less returns 0."
+    },
+    {
+     "prompt": "  Rule 27: Whenever late_fee is given 31 to 60 days late, it charges 4% of the whole amount, and for more than 60 days it charges 6% of the whole amount.\n  What should it be? > ",
+     "typed": "Rule 27: It is wrong. Days 5 or fewer are a grace period and return 0. From day 6, late_fee charges 2% of the amount for each started 30-day period, so 6 to 30 days is one period (2%), 31 to 60 is two periods (4%), 61 to 90 is three (6%), 91 to 120 is four (8%), and so on, with no top rate at 6%. The fee is rounded up to the next whole cent and raised to a minimum of 500 cents. It is then capped at one fifth (20%) of the amount, rounded down to a whole cent, and the cap wins over the minimum. An amount of zero or less returns 0."
+    },
+    {
+     "prompt": "  Rule 28: Whenever late_fee computes a fee with a fraction of a cent, it rounds half a cent upward (25 cents at 2% gives 1, 75 cents gives 2, 1 cent gives 0).\n  What should it be? > ",
+     "typed": "Always round the fee up to the next whole cent, so any fraction of a cent counts as a full cent (a fee of 0.25 cents becomes 1 cent). After that, raise the fee to a minimum of 500 cents, then cap it at one fifth (20%) of the amount, rounded down to a whole cent. The cap wins over the minimum."
+    },
+    {
+     "prompt": "  Rule 31: Whenever late_fee is given numeric text such as '10000' and '45', it reads it as numbers and charges normally.\n  What should it be? > ",
+     "typed": "Numeric text such as '10000' and '45' is not converted: if the amount or the days late is text of any kind, late_fee should return NULL."
+    },
+    {
+     "prompt": "  Rule 32: Whenever late_fee is given a fractional number of days, it compares the exact value to the limits (0.5 days is 2%, 30.5 days is 4%).\n  What should it be? > ",
+     "typed": "Rule 32 is wrong. Days of 5 or fewer are a grace period, so 0.5 days returns 0, not 2%. Fractional days are charged from over 5 days (5.5 days is charged), and 30.5 days is two started 30-day periods (4%). The fee is then rounded up to the next whole cent, raised to a minimum of 500 cents, and capped at one fifth (20%) of the amount, rounded down to a whole cent. The cap wins over the minimum, and an amount of zero or less returns 0."
+    },
+    {
+     "prompt": "  Rule 34: Whenever loyalty_tier is given 1000 to 4999 points, it returns 'silver'; 5000 to 9999 returns 'gold'; 10000 or more returns 'platinum'.\n  What should it be? > ",
+     "typed": "From 1000 up to but not including 5000 points is 'silver'. From 5000 up to but not including 20000 is 'gold'. 20000 points or more is 'platinum', and there is no tier above it. Fractional points are compared by their exact value, so 4999.5 is silver."
+    },
+    {
+     "prompt": "  Rule 35: Whenever loyalty_tier is given a negative balance (even -0.5), it returns NULL.\n  What should it be? > ",
+     "typed": "Return 'suspended' for any negative points, even -0.5. Zero and above follow the normal tiers, starting with 'bronze' for 0 up to but not including 1000. A negative balance is not an error and does not return NULL."
+    },
+    {
+     "prompt": "  Rule 37: Whenever loyalty_tier is given numeric text (such as '5000', ' 5000 ' or '1e4'), it reads it as a number and returns the matching tier.\n  What should it be? > ",
+     "typed": "Numeric text such as '5000' is not converted: if the points are text of any kind, loyalty_tier should return NULL."
+    },
+    {
+     "prompt": "  Rule 39: Whenever make_slug is given a title, it returns the title in lower case with every run of characters other than a-z and 0-9 (spaces, punctuation, underscores, slashes) replaced by a single hyphen and no hyphen at the start or end.\n  What should it be? > ",
+     "typed": "Lower-case the title and replace each '&' with the word 'and'. Keep only runs of the letters a-z and digits 0-9 as words. Every other character (punctuation, accents, non-Latin letters, whitespace, underscores, slashes) is a separator and is dropped. Drop the whole words 'the', 'a', 'an' and 'of' wherever they appear. Join the remaining words with single hyphens. If nothing is left (empty title, only stop words, only punctuation), return 'untitled'. A number given as the title is treated as its plain text form."
+    },
+    {
+     "prompt": "  Rule 40: Whenever make_slug is given a title with accented letters, it removes the accent and keeps the base letter ('Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' gives 'cafe-creme-brulee').\n  What should it be? > ",
+     "typed": "Rule 40: Accented letters are not converted to their base letter. Every character other than a-z and 0-9 is a separator and is dropped, so 'Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' gives 'caf-cr-me-br-l-e'."
+    },
+    {
+     "prompt": "  Rule 41: Whenever make_slug is given letters that have no plain a-z form, such as \u00df, Cyrillic or Japanese, it treats them as separators, so 'Stra\u00dfe \u0152uvre' gives 'stra-e-uvre' and a title made only of such letters gives empty text.\n  What should it be? > ",
+     "typed": "Rule 41: Whenever make_slug meets letters with no plain a-z form (\u00df, Cyrillic, Japanese), they are separators and are dropped, and the rest are kept as words, so 'Stra\u00dfe \u0152uvre' gives 'stra-e-uvre'. A title made only of such letters has nothing left, so it returns 'untitled', not empty text."
+    },
+    {
+     "prompt": "  Rule 42: Whenever make_slug is given a title with compatibility characters such as the 'fi' ligature or a circled digit, it turns them into plain letters and digits ('\ufb01ne \u2460' gives 'fine-1').\n  What should it be? > ",
+     "typed": "Compatibility characters such as the 'fi' ligature or a circled digit are not turned into plain letters or digits. Every character other than a-z and 0-9 is a separator and is dropped, so '\ufb01ne \u2460' gives 'ne'. If nothing is left, the result is 'untitled'."
+    },
+    {
+     "prompt": "  Rule 43: Whenever make_slug's slug is longer than maxlen, it cuts it to maxlen characters and then removes any hyphen left at the end ('Hello World' with 6 gives 'hello', with 7 gives 'hello-w').\n  What should it be? > ",
+     "typed": "Cut the slug to maxlen at a word boundary, not in the middle of a word. If the cut falls inside a word, drop that partial word back to the previous hyphen. If it falls exactly at the end of a word, keep that word. So 'Hello World' with 6 gives 'hello', and with 7 it also gives 'hello', not 'hello-w'. If the first word alone is longer than maxlen, hard-cut that word at maxlen characters. Then strip any leading or trailing hyphens from the result."
+    },
+    {
+     "prompt": "  Rule 44: Whenever make_slug is given a maxlen of zero or less, empty text, or text that is not a number, it returns empty text.\n  What should it be? > ",
+     "typed": "Return 'untitled', not empty text, when maxlen is zero or negative (it is treated as 0) and when the title is empty. If maxlen is not a number, such as text like 'abc' or a boolean, return NULL. Numbers in text form are not converted."
+    },
+    {
+     "prompt": "  Rule 45: Whenever make_slug is given a maxlen with a fraction or as numeric text, it uses the whole-number part (5.9 acts as 5, '8' acts as 8).\n  What should it be? > ",
+     "typed": "A fractional maxlen is truncated toward zero, so 5.9 acts as 5. Numeric text such as '8' is not converted: if maxlen is text of any kind, make_slug should return NULL."
+    },
+    {
+     "prompt": "  Rule 47: Whenever make_slug is given an empty title, or one with only spaces or punctuation, it returns empty text.\n  What should it be? > ",
+     "typed": "Return 'untitled', not empty text, when the title is empty or has only spaces, punctuation or stop words."
+    },
+    {
+     "prompt": "  Rule 50: Whenever meeting_end goes past midnight, it wraps around to the next day's clock time without any day indicator (23:30 plus 45 gives 00:15), and 1440 minutes or any whole number of days returns the same start time.\n  What should it be? > ",
+     "typed": "Whenever the end time would pass 23:59, it should return 23:59. It never wraps past midnight to the next day, so 23:30 plus 45 gives 23:59, and 1440 minutes (or any whole number of days) also gives 23:59, not the start time."
+    },
+    {
+     "prompt": "  Rule 51: Whenever meeting_end is given negative minutes, it counts backwards and wraps to the previous day if needed (00:00 minus 1 gives 23:59).\n  What should it be? > ",
+     "typed": "Whenever the duration is zero or less, nothing is added and the start time itself is returned in HH:MM form. It never counts backwards and never wraps to the previous day, so 00:00 minus 1 gives 00:00."
+    },
+    {
+     "prompt": "  Rule 52: Whenever meeting_end is given a start with a one-digit hour such as '9:00', it accepts it and returns the end with a two-digit hour; surrounding spaces are ignored.\n  What should it be? > ",
+     "typed": "Whenever meeting_end gets a start that is not exactly a two-digit hour, a colon and two-digit minutes (HH:MM, ignoring surrounding whitespace), it should return NULL. A one-digit hour such as '9:00' is not accepted, so it returns NULL. Surrounding spaces are still ignored."
+    },
+    {
+     "prompt": "  Rule 53: Whenever meeting_end is given a start that is not hours and two-digit minutes separated by a colon (24:00, 10:60, '10:5', '10:00:00', '1000', '10.00', '10:00 PM', empty text, a number), it returns NULL.\n  What should it be? > ",
+     "typed": "Whenever the start is not exactly a two-digit hour, a colon and two-digit minutes (HH:MM, ignoring surrounding spaces), meeting_end should return NULL. That covers an hour above 23, minutes above 59, '10:5', '10:00:00', '1000', '10.00', '10:00 PM' and empty text. A number is treated as its plain text form and checked like any other text, so it also returns NULL, because it has no colon. A NULL start or a NULL duration returns NULL, and a duration that is not a number (text such as 'abc' or a boolean) also returns NULL."
+    },
+    {
+     "prompt": "  Rule 55: Whenever meeting_end is given minutes as numeric text, it uses the number ('30' adds 30); for text that is not a number, including empty text, it treats the minutes as 0 and returns the start time unchanged.\n  What should it be? > ",
+     "typed": "Rule 55: Minutes given as text of any kind, including numeric text like '30', are not converted, so meeting_end should return NULL. A NULL start or NULL duration also returns NULL, and a duration that is not a number (such as 'abc' or a boolean) returns NULL too. Empty text is not a number, so it also returns NULL, not the start time."
+    },
+    {
+     "prompt": "  Rule 56: Whenever meeting_end is given minutes with a fraction, it drops the fraction toward zero (90.9 acts as 90, -90.9 as -90, 0.5 as 0).\n  What should it be? > ",
+     "typed": "It should not drop the fraction. A duration above zero is rounded up to whole 15-minute blocks, and fractional minutes round up the same way, so 0.5 minutes counts as one block (15 minutes) and 90.9 minutes counts as 7 blocks (105 minutes). A duration of zero or less adds nothing and returns the start time itself, so -90.9 returns the start time."
+    },
+    {
+     "prompt": "  Rule 59: Whenever pct_change is given an old value of zero, it returns NULL, whatever the new value.\n  What should it be? > ",
+     "typed": "Rule 59: It should return 0.0 when the old value is zero, whatever the new value is, not NULL."
+    },
+    {
+     "prompt": "  Rule 60: Whenever pct_change is given a negative old value, it divides by the size of the old value, so an increase toward zero is positive (-100 to -50 gives 50.0) and -100 to -150 gives -50.0.\n  What should it be? > ",
+     "typed": "It should use the signed old value as the divisor, not its size, so a negative old value flips the sign of the result. -100 to -50 gives -50.0, and -100 to -150 gives 50.0. The result is rounded to 1 decimal place and returned as a decimal number, and a result of zero is returned as 0.0, never -0.0."
+    },
+    {
+     "prompt": "  Rule 64: Whenever pct_change is given numeric text it reads it as a number, and text with leading digits uses those digits ('5abc' acts as 5).\n  What should it be? > ",
+     "typed": "Rule 64: Numeric text is not converted, and text with leading digits such as '5abc' does not act as 5. If the old or new value is text of any kind, pct_change should return NULL."
+    },
+    {
+     "prompt": "  Rule 65: Whenever pct_change is given text that is not a number or empty text as the old value, it returns NULL because it counts as zero; as the new value it counts as 0, so the result is -100.0.\n  What should it be? > ",
+     "typed": "Rule 65 is wrong. If the old value or the new value is text of any kind (including empty text or anything that is not a number), pct_change should return NULL. Text is never treated as zero, so the new value does not give -100.0. A NULL old or new value also returns NULL."
+    },
+    {
+     "prompt": "  Rule 67: Whenever phone_fmt is given 11 digits starting with 1, it drops that leading 1 as the country code and formats the remaining 10 digits ('+1 212 555 1234' gives '(212) 555-1234').\n  What should it be? > ",
+     "typed": "Rule 67: It is wrong. Phone numbers with any number of digits other than exactly 10 are returned unchanged, not reformatted and not NULL. An 11-digit number starting with 1 is not treated as a country code, so '+1 212 555 1234' comes back as '+1 212 555 1234'."
+    },
+    {
+     "prompt": "  Rule 68: Whenever phone_fmt is given 11 digits not starting with 1, or any count other than 10 or 11 digits (7 digits, 9 digits, 12 digits, no digits, empty text), it returns NULL.\n  What should it be? > ",
+     "typed": "Rule 68: It is wrong. Phone numbers with any number of digits other than exactly 10 (7 digits, 9 digits, 11 digits not starting with 1, 12 digits, no digits, empty text) are returned unchanged, not reformatted and not NULL. Empty text comes back as empty text."
+    },
+    {
+     "prompt": "  Rule 69: Whenever phone_fmt is given 12 digits starting with 1-1 (such as '1-1-212-555-1234') it returns NULL, since only one leading 1 is dropped.\n  What should it be? > ",
+     "typed": "Rule 69: It is wrong. Phone numbers with any number of digits other than exactly 10 (such as the 12 digits in '1-1-212-555-1234') are returned unchanged, not reformatted and not NULL. So '1-1-212-555-1234' comes back as '1-1-212-555-1234'."
+    },
+    {
+     "prompt": "  Rule 70: Whenever phone_fmt is given text with extra digits such as an extension ('212 555 1234 ext 5'), it counts them as part of the number and returns NULL.\n  What should it be? > ",
+     "typed": "Rule 70: It is wrong. Phone numbers with any number of digits other than exactly 10 (such as the 11 digits in '212 555 1234 ext 5') are returned unchanged, not reformatted and not NULL. So '212 555 1234 ext 5' comes back as '212 555 1234 ext 5'."
+    },
+    {
+     "prompt": "  Rule 71: Whenever phone_fmt is given non-digit text mixed in, such as letters or a trailing 'x', it ignores the non-digits and formats the digits if exactly 10 (or 11 with a leading 1) remain.\n  What should it be? > ",
+     "typed": "Rule 71: It is wrong. Non-digit characters such as letters or a trailing 'x' are ignored only when counting digits. If exactly 10 digits remain, the result is '(AAA) EEE-NNNN' built from those digits in order. With any other number of digits, including 11 starting with 1, the input text comes back unchanged, not reformatted and not NULL."
+    },
+    {
+     "prompt": "  Rule 76: Whenever avg_rating is used over a group of rows, it returns the average of the ratings from 1 to 5, rounded to 2 decimals (1, 1 and 2 give 1.33).\n  What should it be? > ",
+     "typed": "Rule 76: Whenever avg_rating is used over a group of rows, it returns the average of the ratings from 1 to 5, rounded to 2 decimals (1, 1 and 2 give 1.33).\n\nWhat should it be? > Rule 76 is wrong in its details. Ignore NULL values, non-numeric values, booleans, and any number below 1 or above 5 (1 and 5 exactly and fractional ratings in between are valid). If there are no valid ratings (empty group, all NULL or all invalid), return NULL. With 5 or more valid ratings, drop exactly one lowest and one highest rating (one copy each, even if tied) before averaging; with fewer than 5 valid ratings, drop nothing. The count is taken after ignoring invalid values. Take the arithmetic mean of the kept ratings and round it to 1 decimal place, with exact halves rounding up (away from zero), and return it as a decimal number."
+    },
+    {
+     "prompt": "  Rule 79: Whenever avg_rating meets a rating that is numeric text ('5', ' 3 ', '1e0'), it counts it as that number; text that is not a number or empty text is left out.\n  What should it be? > ",
+     "typed": "Rule 79 is wrong. A rating given as text of any kind, including numeric text like '5', ' 3 ' or '1e0', is not converted to a number. It counts as a non-numeric value and is ignored, the same as empty text or text that is not a number."
+    },
+    {
+     "prompt": "  Rule 82: Whenever avg_rating's average falls exactly halfway at the third decimal, it does not always round up: 33/8 = 4.125 gives 4.12.\n  What should it be? > ",
+     "typed": "Rule 82 is wrong. The average is rounded to 1 decimal place, and an exact halfway value always rounds up (away from zero), so 4.25 gives 4.3. A value like 4.125 gives 4.1, because the first decimal is what counts."
+    },
+    {
+     "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+     "typed": "- Whenever loyalty_tier gets NULL points, or points that are not a number (such as a boolean), it should return NULL.\n- Whenever make_slug gets a NULL title or a NULL maxlen, it should return NULL.\n- Whenever make_slug gets a maxlen that is a boolean, it should return NULL.\n- Whenever pct_change gets an old or new value that is a boolean, it should return NULL.\n- Whenever phone_fmt gets a NULL, it should return NULL.\n- Whenever phone_fmt gets a number instead of text, it should treat it as its plain text form and apply the same rules.\n- Whenever fiscal_label, isbn_check or bulk_price gets any NULL argument, it should return NULL.\n- Whenever fiscal_label or isbn_check gets a number instead of text, it should treat it as its plain text form and proceed.\n- Whenever bulk_price or late_fee gets a numeric argument that is not a number (such as text or a boolean), it should return NULL, and numbers in text form are not converted.\n- Whenever make_slug cuts the slug to maxlen, a first word longer than maxlen should be hard-cut at maxlen characters.\n- Whenever avg_rating gets a boolean, it should ignore it."
+    }
+   ],
+   "transcript": "\nWhat the built code does now, as rules (each one is what the product will do. Mark any that is not your policy):\n  1. Whenever bulk_price is given a unit price and a quantity, it returns unit price times quantity in cents, with no discount for fewer than 10 units.\n  2. Whenever bulk_price is given a quantity of 10 to 49 units, it takes 5% off the whole order total (10 units at 100 cents gives 950).\n  3. Whenever bulk_price is given a quantity of 50 to 99 units, it takes 10% off the whole order total, not just the units beyond 50.\n  4. Whenever bulk_price is given a quantity of 100 or more units, it takes 15% off the whole order total.\n  5. Whenever bulk_price produces a total with a fraction of a cent, it rounds half a cent upward to the next whole cent (15 cents x 10 units gives 143).\n  6. Whenever bulk_price is given a unit price or quantity of zero, it returns 0.\n  7. Whenever bulk_price is given a negative unit price or a negative quantity, it returns NULL instead of a total.\n  8. Whenever bulk_price is given NULL for the unit price or the quantity, it returns NULL.\n  9. Whenever bulk_price is given a unit price or quantity that is text, it reads numeric text (including surrounding spaces or forms like '1e2') as a number, and returns NULL for empty text or text that is not a number.\n  10. Whenever bulk_price is given a fractional quantity or price, it uses it as is (2.5 units at 100 cents gives 250), and the discount tiers use the exact quantity, so 9.9 units get no discount.\n  11. Whenever fiscal_label is given a valid date in YYYY-MM-DD form, it returns 'FY<year>-Q<n>', where the fiscal year starts on 1 April and is named for the calendar year in which it ends.\n  12. Whenever fiscal_label is given a date from April to June it returns Q1, July to September Q2, October to December Q3, and January to March Q4 (2024-04-01 is FY2025-Q1, 2024-03-31 is FY2024-Q4).\n  13. Whenever fiscal_label is given a date from 1 January to 31 March, it names the fiscal year after that same calendar year (2025-01-01 is FY2025-Q4); from 1 April on it names the next calendar year.\n  14. Whenever fiscal_label is given a date that does not exist on the calendar (such as 2024-02-30, 2023-02-29 or month 13), it returns NULL, while 2024-02-29 in a leap year is accepted.\n  15. Whenever fiscal_label is given text that is not exactly four-digit year, two-digit month and two-digit day separated by hyphens (such as 2024-5-5, 2024/05/05, a date with a time, or empty text), it returns NULL.\n  16. Whenever fiscal_label is given a date with spaces around it, it ignores those spaces and labels the date normally.\n  17. Whenever fiscal_label is given NULL or a number instead of text (such as 20240505), it returns NULL.\n  18. Whenever fiscal_label is given the year 0000 it returns NULL, and for 9999-04-01 or later it returns a five-digit fiscal year such as FY10000-Q3.\n  19. Whenever isbn_check is given a 9-digit code, it returns the ISBN-10 check character: digits weighted 10 down to 2 are added up, and the check is whatever brings the sum to a multiple of 11 (030640615 gives '2').\n  20. Whenever the ISBN-10 check value comes out as 10, isbn_check returns the letter 'X' (123456789 gives 'X'); a value of 0 is returned as the text '0'.\n  21. Whenever isbn_check is given a code containing hyphens or spaces, it ignores them before checking, so '0-306-40615' and '030 640 615' both give '2'.\n  22. Whenever isbn_check is given anything that is not exactly 9 digits after hyphens and spaces are removed (8 or 10 digits, letters, empty text, a decimal point), it returns NULL.\n  23. Whenever isbn_check is given NULL, a decimal number or binary data, it returns NULL.\n  24. Whenever isbn_check is given a whole number rather than text, it uses its digits as written, so leading zeros are lost and a number such as 30640615 (8 digits) returns NULL.\n  25. Whenever isbn_check is given a code starting with a minus sign, it treats the minus as a hyphen and ignores it ('-123456789' gives 'X').\n  26. Whenever late_fee is given an invoice amount and a number of days late from 1 to 30, it charges 2% of the amount in cents.\n  27. Whenever late_fee is given 31 to 60 days late, it charges 4% of the whole amount, and for more than 60 days it charges 6% of the whole amount.\n  28. Whenever late_fee computes a fee with a fraction of a cent, it rounds half a cent upward (25 cents at 2% gives 1, 75 cents gives 2, 1 cent gives 0).\n  29. Whenever late_fee is given zero or negative days late, or an amount of zero or less, it returns a fee of 0.\n  30. Whenever late_fee is given NULL, or text that is not a number (including empty text), for either the amount or the days, it returns NULL, even if the other value would have given 0.\n  31. Whenever late_fee is given numeric text such as '10000' and '45', it reads it as numbers and charges normally.\n  32. Whenever late_fee is given a fractional number of days, it compares the exact value to the limits (0.5 days is 2%, 30.5 days is 4%).\n  33. Whenever loyalty_tier is given a points balance from 0 to 999, it returns 'bronze'.\n  34. Whenever loyalty_tier is given 1000 to 4999 points, it returns 'silver'; 5000 to 9999 returns 'gold'; 10000 or more returns 'platinum'.\n  35. Whenever loyalty_tier is given a negative balance (even -0.5), it returns NULL.\n  36. Whenever loyalty_tier is given NULL, empty text or text that is not a number, it returns NULL.\n  37. Whenever loyalty_tier is given numeric text (such as '5000', ' 5000 ' or '1e4'), it reads it as a number and returns the matching tier.\n  38. Whenever loyalty_tier is given a fractional balance such as 999.9, it compares the exact value, so 999.9 is still bronze.\n  39. Whenever make_slug is given a title, it returns the title in lower case with every run of characters other than a-z and 0-9 (spaces, punctuation, underscores, slashes) replaced by a single hyphen and no hyphen at the start or end.\n  40. Whenever make_slug is given a title with accented letters, it removes the accent and keeps the base letter ('Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' gives 'cafe-creme-brulee').\n  41. Whenever make_slug is given letters that have no plain a-z form, such as \u00df, Cyrillic or Japanese, it treats them as separators, so 'Stra\u00dfe \u0152uvre' gives 'stra-e-uvre' and a title made only of such letters gives empty text.\n  42. Whenever make_slug is given a title with compatibility characters such as the 'fi' ligature or a circled digit, it turns them into plain letters and digits ('\ufb01ne \u2460' gives 'fine-1').\n  43. Whenever make_slug's slug is longer than maxlen, it cuts it to maxlen characters and then removes any hyphen left at the end ('Hello World' with 6 gives 'hello', with 7 gives 'hello-w').\n  44. Whenever make_slug is given a maxlen of zero or less, empty text, or text that is not a number, it returns empty text.\n  45. Whenever make_slug is given a maxlen with a fraction or as numeric text, it uses the whole-number part (5.9 acts as 5, '8' acts as 8).\n  46. Whenever make_slug is given NULL for the title or for maxlen, it returns NULL, even if the other value is 0.\n  47. Whenever make_slug is given an empty title, or one with only spaces or punctuation, it returns empty text.\n  48. Whenever make_slug is given a number as the title, it uses the number written out as text, so a decimal point becomes a hyphen (1.5 gives '1-5').\n  49. Whenever meeting_end is given a start time HH:MM and a number of minutes, it returns the end time as HH:MM on a 24-hour clock with two-digit hours and minutes.\n  50. Whenever meeting_end goes past midnight, it wraps around to the next day's clock time without any day indicator (23:30 plus 45 gives 00:15), and 1440 minutes or any whole number of days returns the same start time.\n  51. Whenever meeting_end is given negative minutes, it counts backwards and wraps to the previous day if needed (00:00 minus 1 gives 23:59).\n  52. Whenever meeting_end is given a start with a one-digit hour such as '9:00', it accepts it and returns the end with a two-digit hour; surrounding spaces are ignored.\n  53. Whenever meeting_end is given a start that is not hours and two-digit minutes separated by a colon (24:00, 10:60, '10:5', '10:00:00', '1000', '10.00', '10:00 PM', empty text, a number), it returns NULL.\n  54. Whenever meeting_end is given NULL for the start or for the minutes, it returns NULL.\n  55. Whenever meeting_end is given minutes as numeric text, it uses the number ('30' adds 30); for text that is not a number, including empty text, it treats the minutes as 0 and returns the start time unchanged.\n  56. Whenever meeting_end is given minutes with a fraction, it drops the fraction toward zero (90.9 acts as 90, -90.9 as -90, 0.5 as 0).\n  57. Whenever pct_change is given an old and a new value, it returns (new minus old) divided by old, times 100, rounded to 1 decimal place (3 to 4 gives 33.3).\n  58. Whenever pct_change lands exactly halfway between two 1-decimal values, it rounds away from zero (1000 to 1000.5 gives 0.1 and 1000 to 999.5 gives -0.1), but it works on the exact stored number, so 100 to 100.05 gives 0.0 because 100.05 is stored slightly below.\n  59. Whenever pct_change is given an old value of zero, it returns NULL, whatever the new value.\n  60. Whenever pct_change is given a negative old value, it divides by the size of the old value, so an increase toward zero is positive (-100 to -50 gives 50.0) and -100 to -150 gives -50.0.\n  61. Whenever pct_change is given a new value of zero, it returns -100.0 for any non-zero old value.\n  62. Whenever the rounded pct_change result is zero, it returns 0.0 and never negative zero.\n  63. Whenever pct_change is given NULL for either value, it returns NULL.\n  64. Whenever pct_change is given numeric text it reads it as a number, and text with leading digits uses those digits ('5abc' acts as 5).\n  65. Whenever pct_change is given text that is not a number or empty text as the old value, it returns NULL because it counts as zero; as the new value it counts as 0, so the result is -100.0.\n  66. Whenever phone_fmt is given a phone number with exactly 10 digits, it returns it as (AAA) EEE-NNNN, whatever spaces, hyphens, dots, brackets or plus signs surround the digits.\n  67. Whenever phone_fmt is given 11 digits starting with 1, it drops that leading 1 as the country code and formats the remaining 10 digits ('+1 212 555 1234' gives '(212) 555-1234').\n  68. Whenever phone_fmt is given 11 digits not starting with 1, or any count other than 10 or 11 digits (7 digits, 9 digits, 12 digits, no digits, empty text), it returns NULL.\n  69. Whenever phone_fmt is given 12 digits starting with 1-1 (such as '1-1-212-555-1234') it returns NULL, since only one leading 1 is dropped.\n  70. Whenever phone_fmt is given text with extra digits such as an extension ('212 555 1234 ext 5'), it counts them as part of the number and returns NULL.\n  71. Whenever phone_fmt is given non-digit text mixed in, such as letters or a trailing 'x', it ignores the non-digits and formats the digits if exactly 10 (or 11 with a leading 1) remain.\n  72. Whenever phone_fmt is given a number rather than text, it uses its digits (2125551234 gives '(212) 555-1234'); a decimal number counts the digits on both sides of the point.\n  73. Whenever phone_fmt is given 10 digits whose area code starts with 0 or 1 (0125551234), it formats them without any check on the area code.\n  74. Whenever phone_fmt is given NULL or binary data, it returns NULL.\n  75. Whenever phone_fmt is given digits from other scripts (such as Arabic-Indic digits), it counts them as digits and formats them as they are.\n  76. Whenever avg_rating is used over a group of rows, it returns the average of the ratings from 1 to 5, rounded to 2 decimals (1, 1 and 2 give 1.33).\n  77. Whenever avg_rating meets a rating of NULL, it leaves it out of both the sum and the count.\n  78. Whenever avg_rating meets a rating below 1 or above 5 (0, -1, 6, 0.9999, 5.0001), it leaves it out as invalid; exactly 1 and exactly 5 are counted.\n  79. Whenever avg_rating meets a rating that is numeric text ('5', ' 3 ', '1e0'), it counts it as that number; text that is not a number or empty text is left out.\n  80. Whenever avg_rating meets fractional ratings within 1 to 5 (4.5), it counts them as they are.\n  81. Whenever avg_rating has no valid ratings at all (no rows, only NULLs or only out-of-range values), it returns NULL, not 0.\n  82. Whenever avg_rating's average falls exactly halfway at the third decimal, it does not always round up: 33/8 = 4.125 gives 4.12.\n  83. Whenever avg_rating is used with GROUP BY, it gives each group its own average computed only from that group's valid ratings.\n  Numbers of any that are wrong (Enter = all correct) > 5, 7, 9, 12, 14, 15, 17, 18, 19, 22, 23, 24, 26, 27, 28, 31, 32, 34, 35, 37, 39, 40, 41, 42, 43, 44, 45, 47, 50, 51, 52, 53, 55, 56, 59, 60, 64, 65, 67, 68, 69, 70, 71, 76, 79, 82\n  Rule 5: Whenever bulk_price produces a total with a fraction of a cent, it rounds half a cent upward to the next whole cent (15 cents x 10 units gives 143).\n  What should it be? > Round to the nearest 5 cents, with exact halves (2.5 cents) rounding up. For example, 15 cents x 10 units with 5% off is 142.5 cents, which rounds to 145. After rounding, if the total is below 500 cents, charge the minimum of 500 cents.\n  Rule 7: Whenever bulk_price is given a negative unit price or a negative quantity, it returns NULL instead of a total.\n  What should it be? > Return 0 when the quantity or unit price is zero or less, with no minimum applying. A negative unit price or a negative quantity is not an error.\n  Rule 9: Whenever bulk_price is given a unit price or quantity that is text, it reads numeric text (including surrounding spaces or forms like '1e2') as a number, and returns NULL for empty text or text that is not a number.\n  What should it be? > Numeric text such as '10' is not converted: if a unit price or quantity is text of any kind, bulk_price should return NULL.\n  Rule 12: Whenever fiscal_label is given a date from April to June it returns Q1, July to September Q2, October to December Q3, and January to March Q4 (2024-04-01 is FY2025-Q1, 2024-03-31 is FY2024-Q4).\n  What should it be? > April to June is Q1, July to September is Q2, October to December is Q3, and January to March is Q4, written like 'FY2025-Q1'. The exception is March 27 to March 31, which returns the year-end close label 'FY<year>-CLOSE' instead of Q4, so 2024-03-31 is 'FY2024-CLOSE', not FY2024-Q4; March 1 to 26 is still Q4.\n  Rule 14: Whenever fiscal_label is given a date that does not exist on the calendar (such as 2024-02-30, 2023-02-29 or month 13), it returns NULL, while 2024-02-29 in a leap year is accepted.\n  What should it be? > Rule 14: It should return the text 'INVALID', not NULL, for a date that does not exist (such as 2024-02-30, 2023-02-29, month 13, day 45 or year 0000). 2024-02-29 in a leap year is accepted as a real date.\n  Rule 15: Whenever fiscal_label is given text that is not exactly four-digit year, two-digit month and two-digit day separated by hyphens (such as 2024-5-5, 2024/05/05, a date with a time, or empty text), it returns NULL.\n  What should it be? > It should return the text 'INVALID', not NULL, for text that is not four-digit year, two-digit month and two-digit day separated by hyphens (such as 2024-5-5, 2024/05/05 or empty text). A valid date followed by a space or 'T' and a time of HH:MM or HH:MM:SS is not an error: the time is ignored and the date is labeled normally.\n  Rule 17: Whenever fiscal_label is given NULL or a number instead of text (such as 20240505), it returns NULL.\n  What should it be? > NULL should return NULL, but a number should not. A number is treated as its plain text form and then checked like any other text. A number such as 20240505 has no hyphens, so it is not in the form YYYY-MM-DD and returns 'INVALID'.\n  Rule 18: Whenever fiscal_label is given the year 0000 it returns NULL, and for 9999-04-01 or later it returns a five-digit fiscal year such as FY10000-Q3.\n  What should it be? > Rule 18: It should return the text 'INVALID' for the year 0000. For 9999-04-01 or later there is no special rule; follow the normal fiscal year naming, with the fiscal year named by the calendar year in which it ends.\n  Rule 19: Whenever isbn_check is given a 9-digit code, it returns the ISBN-10 check character: digits weighted 10 down to 2 are added up, and the check is whatever brings the sum to a multiple of 11 (030640615 gives '2').\n  What should it be? > It should be the weighted sum with weights 1 to 9, not 10 down to 2. Multiply the 1st digit by 1, the 2nd by 2, and so on up to the 9th digit by 9. Add them up and take the sum modulo 11. The remainder is the answer: if it is 10, return 'X', otherwise return the remainder as a one-character text digit.\n  Rule 22: Whenever isbn_check is given anything that is not exactly 9 digits after hyphens and spaces are removed (8 or 10 digits, letters, empty text, a decimal point), it returns NULL.\n  What should it be? > It should not return NULL. Ignore every character that is not a digit 0-9, including letters and decimal points. With more than 9 digits, use only the first 9. With fewer than 9 digits, apply the same weights starting from the first digit to the digits present. With no digits, such as empty text, return '0'. It never returns an error.\n  Rule 23: Whenever isbn_check is given NULL, a decimal number or binary data, it returns NULL.\n  What should it be? > NULL should return NULL, but a decimal number should not. A decimal number is treated as its plain text form, so the decimal point and any other non-digit characters are ignored and the check character is worked out from the digits that remain (first 9 digits, weights 1 to 9, sum modulo 11, 'X' if the remainder is 10).\n  Rule 24: Whenever isbn_check is given a whole number rather than text, it uses its digits as written, so leading zeros are lost and a number such as 30640615 (8 digits) returns NULL.\n  What should it be? > A number is treated as its plain text form and then handled like any other text, so it should never return NULL. Only the digits are used, with the first 9 digits taken and weights 1 to 9 applied from the first digit. A number such as 30640615 has 8 digits, so the weights 1 to 8 apply to those digits. The sum is 120, the remainder is 10, and the result is 'X'.\n  Rule 26: Whenever late_fee is given an invoice amount and a number of days late from 1 to 30, it charges 2% of the amount in cents.\n  What should it be? > Days 1 to 5 are a grace period and return 0. From day 6 on, late_fee charges 2% of the amount for each started 30-day period, so days 6 to 30 are one period. The fee is rounded up to the next whole cent, raised to a minimum of 500 cents, then capped at one fifth (20%) of the amount, rounded down to a whole cent. The cap wins over the minimum, so small invoices can be charged less than 500. An amount of zero or less returns 0.\n  Rule 27: Whenever late_fee is given 31 to 60 days late, it charges 4% of the whole amount, and for more than 60 days it charges 6% of the whole amount.\n  What should it be? > Rule 27: It is wrong. Days 5 or fewer are a grace period and return 0. From day 6, late_fee charges 2% of the amount for each started 30-day period, so 6 to 30 days is one period (2%), 31 to 60 is two periods (4%), 61 to 90 is three (6%), 91 to 120 is four (8%), and so on, with no top rate at 6%. The fee is rounded up to the next whole cent and raised to a minimum of 500 cents. It is then capped at one fifth (20%) of the amount, rounded down to a whole cent, and the cap wins over the minimum. An amount of zero or less returns 0.\n  Rule 28: Whenever late_fee computes a fee with a fraction of a cent, it rounds half a cent upward (25 cents at 2% gives 1, 75 cents gives 2, 1 cent gives 0).\n  What should it be? > Always round the fee up to the next whole cent, so any fraction of a cent counts as a full cent (a fee of 0.25 cents becomes 1 cent). After that, raise the fee to a minimum of 500 cents, then cap it at one fifth (20%) of the amount, rounded down to a whole cent. The cap wins over the minimum.\n  Rule 31: Whenever late_fee is given numeric text such as '10000' and '45', it reads it as numbers and charges normally.\n  What should it be? > Numeric text such as '10000' and '45' is not converted: if the amount or the days late is text of any kind, late_fee should return NULL.\n  Rule 32: Whenever late_fee is given a fractional number of days, it compares the exact value to the limits (0.5 days is 2%, 30.5 days is 4%).\n  What should it be? > Rule 32 is wrong. Days of 5 or fewer are a grace period, so 0.5 days returns 0, not 2%. Fractional days are charged from over 5 days (5.5 days is charged), and 30.5 days is two started 30-day periods (4%). The fee is then rounded up to the next whole cent, raised to a minimum of 500 cents, and capped at one fifth (20%) of the amount, rounded down to a whole cent. The cap wins over the minimum, and an amount of zero or less returns 0.\n  Rule 34: Whenever loyalty_tier is given 1000 to 4999 points, it returns 'silver'; 5000 to 9999 returns 'gold'; 10000 or more returns 'platinum'.\n  What should it be? > From 1000 up to but not including 5000 points is 'silver'. From 5000 up to but not including 20000 is 'gold'. 20000 points or more is 'platinum', and there is no tier above it. Fractional points are compared by their exact value, so 4999.5 is silver.\n  Rule 35: Whenever loyalty_tier is given a negative balance (even -0.5), it returns NULL.\n  What should it be? > Return 'suspended' for any negative points, even -0.5. Zero and above follow the normal tiers, starting with 'bronze' for 0 up to but not including 1000. A negative balance is not an error and does not return NULL.\n  Rule 37: Whenever loyalty_tier is given numeric text (such as '5000', ' 5000 ' or '1e4'), it reads it as a number and returns the matching tier.\n  What should it be? > Numeric text such as '5000' is not converted: if the points are text of any kind, loyalty_tier should return NULL.\n  Rule 39: Whenever make_slug is given a title, it returns the title in lower case with every run of characters other than a-z and 0-9 (spaces, punctuation, underscores, slashes) replaced by a single hyphen and no hyphen at the start or end.\n  What should it be? > Lower-case the title and replace each '&' with the word 'and'. Keep only runs of the letters a-z and digits 0-9 as words. Every other character (punctuation, accents, non-Latin letters, whitespace, underscores, slashes) is a separator and is dropped. Drop the whole words 'the', 'a', 'an' and 'of' wherever they appear. Join the remaining words with single hyphens. If nothing is left (empty title, only stop words, only punctuation), return 'untitled'. A number given as the title is treated as its plain text form.\n  Rule 40: Whenever make_slug is given a title with accented letters, it removes the accent and keeps the base letter ('Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' gives 'cafe-creme-brulee').\n  What should it be? > Rule 40: Accented letters are not converted to their base letter. Every character other than a-z and 0-9 is a separator and is dropped, so 'Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' gives 'caf-cr-me-br-l-e'.\n  Rule 41: Whenever make_slug is given letters that have no plain a-z form, such as \u00df, Cyrillic or Japanese, it treats them as separators, so 'Stra\u00dfe \u0152uvre' gives 'stra-e-uvre' and a title made only of such letters gives empty text.\n  What should it be? > Rule 41: Whenever make_slug meets letters with no plain a-z form (\u00df, Cyrillic, Japanese), they are separators and are dropped, and the rest are kept as words, so 'Stra\u00dfe \u0152uvre' gives 'stra-e-uvre'. A title made only of such letters has nothing left, so it returns 'untitled', not empty text.\n  Rule 42: Whenever make_slug is given a title with compatibility characters such as the 'fi' ligature or a circled digit, it turns them into plain letters and digits ('\ufb01ne \u2460' gives 'fine-1').\n  What should it be? > Compatibility characters such as the 'fi' ligature or a circled digit are not turned into plain letters or digits. Every character other than a-z and 0-9 is a separator and is dropped, so '\ufb01ne \u2460' gives 'ne'. If nothing is left, the result is 'untitled'.\n  Rule 43: Whenever make_slug's slug is longer than maxlen, it cuts it to maxlen characters and then removes any hyphen left at the end ('Hello World' with 6 gives 'hello', with 7 gives 'hello-w').\n  What should it be? > Cut the slug to maxlen at a word boundary, not in the middle of a word. If the cut falls inside a word, drop that partial word back to the previous hyphen. If it falls exactly at the end of a word, keep that word. So 'Hello World' with 6 gives 'hello', and with 7 it also gives 'hello', not 'hello-w'. If the first word alone is longer than maxlen, hard-cut that word at maxlen characters. Then strip any leading or trailing hyphens from the result.\n  Rule 44: Whenever make_slug is given a maxlen of zero or less, empty text, or text that is not a number, it returns empty text.\n  What should it be? > Return 'untitled', not empty text, when maxlen is zero or negative (it is treated as 0) and when the title is empty. If maxlen is not a number, such as text like 'abc' or a boolean, return NULL. Numbers in text form are not converted.\n  Rule 45: Whenever make_slug is given a maxlen with a fraction or as numeric text, it uses the whole-number part (5.9 acts as 5, '8' acts as 8).\n  What should it be? > A fractional maxlen is truncated toward zero, so 5.9 acts as 5. Numeric text such as '8' is not converted: if maxlen is text of any kind, make_slug should return NULL.\n  Rule 47: Whenever make_slug is given an empty title, or one with only spaces or punctuation, it returns empty text.\n  What should it be? > Return 'untitled', not empty text, when the title is empty or has only spaces, punctuation or stop words.\n  Rule 50: Whenever meeting_end goes past midnight, it wraps around to the next day's clock time without any day indicator (23:30 plus 45 gives 00:15), and 1440 minutes or any whole number of days returns the same start time.\n  What should it be? > Whenever the end time would pass 23:59, it should return 23:59. It never wraps past midnight to the next day, so 23:30 plus 45 gives 23:59, and 1440 minutes (or any whole number of days) also gives 23:59, not the start time.\n  Rule 51: Whenever meeting_end is given negative minutes, it counts backwards and wraps to the previous day if needed (00:00 minus 1 gives 23:59).\n  What should it be? > Whenever the duration is zero or less, nothing is added and the start time itself is returned in HH:MM form. It never counts backwards and never wraps to the previous day, so 00:00 minus 1 gives 00:00.\n  Rule 52: Whenever meeting_end is given a start with a one-digit hour such as '9:00', it accepts it and returns the end with a two-digit hour; surrounding spaces are ignored.\n  What should it be? > Whenever meeting_end gets a start that is not exactly a two-digit hour, a colon and two-digit minutes (HH:MM, ignoring surrounding whitespace), it should return NULL. A one-digit hour such as '9:00' is not accepted, so it returns NULL. Surrounding spaces are still ignored.\n  Rule 53: Whenever meeting_end is given a start that is not hours and two-digit minutes separated by a colon (24:00, 10:60, '10:5', '10:00:00', '1000', '10.00', '10:00 PM', empty text, a number), it returns NULL.\n  What should it be? > Whenever the start is not exactly a two-digit hour, a colon and two-digit minutes (HH:MM, ignoring surrounding spaces), meeting_end should return NULL. That covers an hour above 23, minutes above 59, '10:5', '10:00:00', '1000', '10.00', '10:00 PM' and empty text. A number is treated as its plain text form and checked like any other text, so it also returns NULL, because it has no colon. A NULL start or a NULL duration returns NULL, and a duration that is not a number (text such as 'abc' or a boolean) also returns NULL.\n  Rule 55: Whenever meeting_end is given minutes as numeric text, it uses the number ('30' adds 30); for text that is not a number, including empty text, it treats the minutes as 0 and returns the start time unchanged.\n  What should it be? > Rule 55: Minutes given as text of any kind, including numeric text like '30', are not converted, so meeting_end should return NULL. A NULL start or NULL duration also returns NULL, and a duration that is not a number (such as 'abc' or a boolean) returns NULL too. Empty text is not a number, so it also returns NULL, not the start time.\n  Rule 56: Whenever meeting_end is given minutes with a fraction, it drops the fraction toward zero (90.9 acts as 90, -90.9 as -90, 0.5 as 0).\n  What should it be? > It should not drop the fraction. A duration above zero is rounded up to whole 15-minute blocks, and fractional minutes round up the same way, so 0.5 minutes counts as one block (15 minutes) and 90.9 minutes counts as 7 blocks (105 minutes). A duration of zero or less adds nothing and returns the start time itself, so -90.9 returns the start time.\n  Rule 59: Whenever pct_change is given an old value of zero, it returns NULL, whatever the new value.\n  What should it be? > Rule 59: It should return 0.0 when the old value is zero, whatever the new value is, not NULL.\n  Rule 60: Whenever pct_change is given a negative old value, it divides by the size of the old value, so an increase toward zero is positive (-100 to -50 gives 50.0) and -100 to -150 gives -50.0.\n  What should it be? > It should use the signed old value as the divisor, not its size, so a negative old value flips the sign of the result. -100 to -50 gives -50.0, and -100 to -150 gives 50.0. The result is rounded to 1 decimal place and returned as a decimal number, and a result of zero is returned as 0.0, never -0.0.\n  Rule 64: Whenever pct_change is given numeric text it reads it as a number, and text with leading digits uses those digits ('5abc' acts as 5).\n  What should it be? > Rule 64: Numeric text is not converted, and text with leading digits such as '5abc' does not act as 5. If the old or new value is text of any kind, pct_change should return NULL.\n  Rule 65: Whenever pct_change is given text that is not a number or empty text as the old value, it returns NULL because it counts as zero; as the new value it counts as 0, so the result is -100.0.\n  What should it be? > Rule 65 is wrong. If the old value or the new value is text of any kind (including empty text or anything that is not a number), pct_change should return NULL. Text is never treated as zero, so the new value does not give -100.0. A NULL old or new value also returns NULL.\n  Rule 67: Whenever phone_fmt is given 11 digits starting with 1, it drops that leading 1 as the country code and formats the remaining 10 digits ('+1 212 555 1234' gives '(212) 555-1234').\n  What should it be? > Rule 67: It is wrong. Phone numbers with any number of digits other than exactly 10 are returned unchanged, not reformatted and not NULL. An 11-digit number starting with 1 is not treated as a country code, so '+1 212 555 1234' comes back as '+1 212 555 1234'.\n  Rule 68: Whenever phone_fmt is given 11 digits not starting with 1, or any count other than 10 or 11 digits (7 digits, 9 digits, 12 digits, no digits, empty text), it returns NULL.\n  What should it be? > Rule 68: It is wrong. Phone numbers with any number of digits other than exactly 10 (7 digits, 9 digits, 11 digits not starting with 1, 12 digits, no digits, empty text) are returned unchanged, not reformatted and not NULL. Empty text comes back as empty text.\n  Rule 69: Whenever phone_fmt is given 12 digits starting with 1-1 (such as '1-1-212-555-1234') it returns NULL, since only one leading 1 is dropped.\n  What should it be? > Rule 69: It is wrong. Phone numbers with any number of digits other than exactly 10 (such as the 12 digits in '1-1-212-555-1234') are returned unchanged, not reformatted and not NULL. So '1-1-212-555-1234' comes back as '1-1-212-555-1234'.\n  Rule 70: Whenever phone_fmt is given text with extra digits such as an extension ('212 555 1234 ext 5'), it counts them as part of the number and returns NULL.\n  What should it be? > Rule 70: It is wrong. Phone numbers with any number of digits other than exactly 10 (such as the 11 digits in '212 555 1234 ext 5') are returned unchanged, not reformatted and not NULL. So '212 555 1234 ext 5' comes back as '212 555 1234 ext 5'.\n  Rule 71: Whenever phone_fmt is given non-digit text mixed in, such as letters or a trailing 'x', it ignores the non-digits and formats the digits if exactly 10 (or 11 with a leading 1) remain.\n  What should it be? > Rule 71: It is wrong. Non-digit characters such as letters or a trailing 'x' are ignored only when counting digits. If exactly 10 digits remain, the result is '(AAA) EEE-NNNN' built from those digits in order. With any other number of digits, including 11 starting with 1, the input text comes back unchanged, not reformatted and not NULL.\n  Rule 76: Whenever avg_rating is used over a group of rows, it returns the average of the ratings from 1 to 5, rounded to 2 decimals (1, 1 and 2 give 1.33).\n  What should it be? > Rule 76: Whenever avg_rating is used over a group of rows, it returns the average of the ratings from 1 to 5, rounded to 2 decimals (1, 1 and 2 give 1.33).\n\nWhat should it be? > Rule 76 is wrong in its details. Ignore NULL values, non-numeric values, booleans, and any number below 1 or above 5 (1 and 5 exactly and fractional ratings in between are valid). If there are no valid ratings (empty group, all NULL or all invalid), return NULL. With 5 or more valid ratings, drop exactly one lowest and one highest rating (one copy each, even if tied) before averaging; with fewer than 5 valid ratings, drop nothing. The count is taken after ignoring invalid values. Take the arithmetic mean of the kept ratings and round it to 1 decimal place, with exact halves rounding up (away from zero), and return it as a decimal number.\n  Rule 79: Whenever avg_rating meets a rating that is numeric text ('5', ' 3 ', '1e0'), it counts it as that number; text that is not a number or empty text is left out.\n  What should it be? > Rule 79 is wrong. A rating given as text of any kind, including numeric text like '5', ' 3 ' or '1e0', is not converted to a number. It counts as a non-numeric value and is ignored, the same as empty text or text that is not a number.\n  Rule 82: Whenever avg_rating's average falls exactly halfway at the third decimal, it does not always round up: 33/8 = 4.125 gives 4.12.\n  What should it be? > Rule 82 is wrong. The average is rounded to 1 decimal place, and an exact halfway value always rounds up (away from zero), so 4.25 gives 4.3. A value like 4.125 gives 4.1, because the first decimal is what counts.\n  Anything the builders should know that is not on this list? (Enter = nothing) > - Whenever loyalty_tier gets NULL points, or points that are not a number (such as a boolean), it should return NULL.\n- Whenever make_slug gets a NULL title or a NULL maxlen, it should return NULL.\n- Whenever make_slug gets a maxlen that is a boolean, it should return NULL.\n- Whenever pct_change gets an old or new value that is a boolean, it should return NULL.\n- Whenever phone_fmt gets a NULL, it should return NULL.\n- Whenever phone_fmt gets a number instead of text, it should treat it as its plain text form and apply the same rules.\n- Whenever fiscal_label, isbn_check or bulk_price gets any NULL argument, it should return NULL.\n- Whenever fiscal_label or isbn_check gets a number instead of text, it should treat it as its plain text form and proceed.\n- Whenever bulk_price or late_fee gets a numeric argument that is not a number (such as text or a boolean), it should return NULL, and numbers in text form are not converted.\n- Whenever make_slug cuts the slug to maxlen, a first word longer than maxlen should be hard-cut at maxlen characters.\n- Whenever avg_rating gets a boolean, it should ignore it.\n",
+   "minutes": 5.0,
+   "rules": [
+    "Whenever bulk_price is given a unit price and a quantity, it returns unit price times quantity in cents, with no discount for fewer than 10 units.",
+    "Whenever bulk_price is given a quantity of 10 to 49 units, it takes 5% off the whole order total (10 units at 100 cents gives 950).",
+    "Whenever bulk_price is given a quantity of 50 to 99 units, it takes 10% off the whole order total, not just the units beyond 50.",
+    "Whenever bulk_price is given a quantity of 100 or more units, it takes 15% off the whole order total.",
+    "Whenever bulk_price produces a total with a fraction of a cent, it rounds the total to the nearest 5 cents, with exact halves (2.5 cents) rounding up (15 cents x 10 units with 5% off is 142.5 cents, which rounds to 145). After rounding, if the total is below 500 cents, charge the minimum of 500 cents.",
+    "Whenever bulk_price is given a unit price or quantity of zero, it returns 0.",
+    "Whenever bulk_price is given a unit price or a quantity that is zero or less, it returns 0 instead of a total, with no minimum applying. A negative unit price or a negative quantity is not an error.",
+    "Whenever bulk_price is given NULL for the unit price or the quantity, it returns NULL.",
+    "Whenever bulk_price is given a unit price or quantity that is text of any kind (including numeric text such as '10'), it does not convert it and returns NULL.",
+    "Whenever bulk_price is given a fractional quantity or price, it uses it as is (2.5 units at 100 cents gives 250), and the discount tiers use the exact quantity, so 9.9 units get no discount.",
+    "Whenever fiscal_label is given a valid date in YYYY-MM-DD form, it returns 'FY<year>-Q<n>', where the fiscal year starts on 1 April and is named for the calendar year in which it ends.",
+    "Whenever fiscal_label is given a date from April to June it returns Q1, July to September Q2, October to December Q3, and January to March Q4, written like 'FY2025-Q1' (2024-04-01 is FY2025-Q1). The exception is March 27 to March 31, which returns the year-end close label 'FY<year>-CLOSE' instead of Q4, so 2024-03-31 is 'FY2024-CLOSE', not FY2024-Q4; March 1 to 26 is still Q4.",
+    "Whenever fiscal_label is given a date from 1 January to 31 March, it names the fiscal year after that same calendar year (2025-01-01 is FY2025-Q4); from 1 April on it names the next calendar year.",
+    "Rule 14: Whenever fiscal_label is given a date that does not exist on the calendar (such as 2024-02-30, 2023-02-29, month 13, day 45 or year 0000), it returns the text 'INVALID', not NULL. 2024-02-29 in a leap year is accepted as a real date.",
+    "Whenever fiscal_label is given text that is not exactly four-digit year, two-digit month and two-digit day separated by hyphens (such as 2024-5-5, 2024/05/05, or empty text), it returns the text 'INVALID'. A valid date (four-digit year, two-digit month and two-digit day separated by hyphens) followed by a space or 'T' and a time of HH:MM or HH:MM:SS is not an error: the time is ignored and the date is labeled normally.",
+    "Whenever fiscal_label is given a date with spaces around it, it ignores those spaces and labels the date normally.",
+    "Whenever fiscal_label is given NULL, it returns NULL. Whenever fiscal_label is given a number instead of text (such as 20240505), the number is treated as its plain text form and then checked like any other text; a number such as 20240505 has no hyphens, so it is not in the form YYYY-MM-DD and returns 'INVALID'.",
+    "Rule 18: Whenever fiscal_label is given the year 0000 it returns the text 'INVALID'. For 9999-04-01 or later there is no special rule; follow the normal fiscal year naming, with the fiscal year named by the calendar year in which it ends.",
+    "Whenever isbn_check is given a 9-digit code, it returns the ISBN-10 check character: multiply the 1st digit by 1, the 2nd by 2, and so on up to the 9th digit by 9, add them up, and take the sum modulo 11. The remainder is the answer: if it is 10, return 'X', otherwise return the remainder as a one-character text digit (030640615 gives '2').",
+    "Whenever the ISBN-10 check value comes out as 10, isbn_check returns the letter 'X' (123456789 gives 'X'); a value of 0 is returned as the text '0'.",
+    "Whenever isbn_check is given a code containing hyphens or spaces, it ignores them before checking, so '0-306-40615' and '030 640 615' both give '2'.",
+    "Whenever isbn_check is given any text, ignore every character that is not a digit 0-9, including hyphens, spaces, letters and decimal points. If there are more than 9 digits, use only the first 9. If there are fewer than 9 digits, apply the same weights starting from the first digit to the digits present. If there are no digits, such as empty text, return '0'. It never returns NULL and never returns an error.",
+    "Whenever isbn_check is given NULL or binary data, it returns NULL. When isbn_check is given a decimal number, it treats the number as its plain text form, ignores the decimal point and any other non-digit characters, and works out the check character from the digits that remain: take the first 9 digits, multiply them by weights 1 to 9, sum the products, and take the sum modulo 11; the check character is 'X' if the remainder is 10, otherwise the remainder.",
+    "Whenever isbn_check is given a whole number rather than text, the number is treated as its plain text form and then handled like any other text, so it never returns NULL. Only the digits are used, with the first 9 digits taken and weights 1 to 9 applied from the first digit. A number such as 30640615 has 8 digits, so the weights 1 to 8 apply to those digits; the sum is 120, the remainder is 10, and the result is 'X'.",
+    "Whenever isbn_check is given a code starting with a minus sign, it treats the minus as a hyphen and ignores it ('-123456789' gives 'X').",
+    "Whenever late_fee is given an invoice amount and a number of days late, it works as follows. An amount of zero or less returns 0. Days 1 to 5 are a grace period and return 0. From day 6 on, late_fee charges 2% of the amount in cents for each started 30-day period, so days 6 to 30 are one period, days 31 to 60 are two periods, and so on. The fee is rounded up to the next whole cent, then raised to a minimum of 500 cents, then capped at one fifth (20%) of the amount, rounded down to a whole cent. The cap wins over the minimum, so small invoices can be charged less than 500.",
+    "Whenever late_fee is given an amount of zero or less, it returns 0. Days late of 5 or fewer are a grace period and return 0. From day 6, late_fee charges 2% of the amount for each started 30-day period, so 6 to 30 days late is one period (2%), 31 to 60 days is two periods (4%), 61 to 90 days is three periods (6%), 91 to 120 days is four periods (8%), and so on, with no top rate at 6%. The fee is rounded up to the next whole cent and raised to a minimum of 500 cents. It is then capped at one fifth (20%) of the amount, rounded down to a whole cent, and the cap wins over the minimum.",
+    "Whenever late_fee computes a fee with a fraction of a cent, it rounds the fee up to the next whole cent, so any fraction of a cent counts as a full cent (a fee of 0.25 cents becomes 1 cent). After that, the fee is raised to a minimum of 500 cents, and then capped at one fifth (20%) of the amount, rounded down to a whole cent. The cap wins over the minimum.",
+    "Whenever late_fee is given zero or negative days late, or an amount of zero or less, it returns a fee of 0.",
+    "Whenever late_fee is given NULL, or text that is not a number (including empty text), for either the amount or the days, it returns NULL, even if the other value would have given 0.",
+    "Whenever late_fee is given numeric text such as '10000' and '45', it does not convert it to numbers. If the amount or the days late is text of any kind, late_fee returns NULL.",
+    "Whenever late_fee is given a fractional number of days, it compares the exact value to the limits, without rounding the days. Days of 5 or fewer are a grace period, so 0.5 days returns 0. Fractional days are charged from over 5 days, so 5.5 days is charged. 30.5 days is two started 30-day periods, which is 4%. The fee is rounded up to the next whole cent, then raised to a minimum of 500 cents, then capped at one fifth (20%) of the amount, rounded down to a whole cent. The cap wins over the minimum. An amount of zero or less returns 0.",
+    "Whenever loyalty_tier is given a points balance from 0 to 999, it returns 'bronze'.",
+    "Whenever loyalty_tier is given 1000 up to but not including 5000 points, it returns 'silver'; 5000 up to but not including 20000 points returns 'gold'; 20000 points or more returns 'platinum', and there is no tier above platinum. Fractional points are compared by their exact value, so 4999.5 is silver.",
+    "Whenever loyalty_tier is given a negative balance (even -0.5), it returns 'suspended'. A negative balance is not an error and does not return NULL. Zero and above follow the normal tiers, starting with 'bronze' for 0 up to but not including 1000.",
+    "Whenever loyalty_tier is given NULL, empty text or text that is not a number, it returns NULL.",
+    "Whenever loyalty_tier is given numeric text (such as '5000', ' 5000 ' or '1e4'), it does not convert it to a number and returns NULL. If the points are text of any kind, loyalty_tier returns NULL.",
+    "Whenever loyalty_tier is given a fractional balance such as 999.9, it compares the exact value, so 999.9 is still bronze.",
+    "Whenever make_slug is given a title, it lower-cases the title and replaces each '&' with the word 'and'. It keeps only runs of the letters a-z and digits 0-9 as words. Every other character (punctuation, accents, non-Latin letters, whitespace, underscores, slashes) is a separator and is dropped. It drops the whole words 'the', 'a', 'an' and 'of' wherever they appear. It joins the remaining words with single hyphens, with no hyphen at the start or end. If nothing is left (empty title, only stop words, only punctuation), it returns 'untitled'. A number given as the title is treated as its plain text form.",
+    "Whenever make_slug is given a title with accented letters, the accented letters are not converted to their base letter. Every character other than a-z and 0-9 is a separator and is dropped, so 'Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' gives 'caf-cr-me-br-l-e'.",
+    "Rule 41: Whenever make_slug meets letters with no plain a-z form (\u00df, Cyrillic, Japanese), they are separators and are dropped, and the rest are kept as words, so 'Stra\u00dfe \u0152uvre' gives 'stra-e-uvre'. A title made only of such letters has nothing left, so it returns 'untitled', not empty text.",
+    "Whenever make_slug is given a title, every character other than a-z and 0-9 is a separator and is dropped, so compatibility characters such as the '\ufb01' ligature or a circled digit are not turned into plain letters or digits ('\ufb01ne \u2460' gives 'ne'). If nothing is left, the result is 'untitled'.",
+    "Whenever make_slug's slug is longer than maxlen, it cuts it to maxlen at a word boundary, not in the middle of a word. If the cut falls inside a word, drop that partial word back to the previous hyphen. If the cut falls exactly at the end of a word, keep that word. If the first word alone is longer than maxlen, hard-cut that word at maxlen characters. Then strip any leading or trailing hyphens from the result ('Hello World' with 6 gives 'hello', with 7 also gives 'hello', not 'hello-w').",
+    "Whenever make_slug is given a maxlen of zero or less (it is treated as 0) or an empty title, it returns 'untitled'. Whenever maxlen is not a number, such as text like 'abc' or a boolean, it returns NULL. Numbers in text form are not converted.",
+    "Whenever make_slug is given a maxlen with a fraction, it uses the whole-number part, truncated toward zero (5.9 acts as 5). Whenever maxlen is text of any kind, including numeric text such as '8', make_slug returns NULL.",
+    "Whenever make_slug is given NULL for the title or for maxlen, it returns NULL, even if the other value is 0.",
+    "Whenever make_slug is given a title that is empty, or has only spaces, punctuation or stop words, it returns 'untitled', not empty text.",
+    "Whenever make_slug is given a number as the title, it uses the number written out as text, so a decimal point becomes a hyphen (1.5 gives '1-5').",
+    "Whenever meeting_end is given a start time HH:MM and a number of minutes, it returns the end time as HH:MM on a 24-hour clock with two-digit hours and minutes.",
+    "Whenever the end time of meeting_end would pass 23:59, it returns 23:59. It never wraps past midnight to the next day, so 23:30 plus 45 minutes gives 23:59, and 1440 minutes (or any whole number of days) also gives 23:59, not the start time.",
+    "Whenever the duration given to meeting_end is zero or less, nothing is added and the start time itself is returned in HH:MM form. It never counts backwards and never wraps to the previous day, so 00:00 minus 1 gives 00:00.",
+    "Whenever meeting_end gets a start that is not exactly a two-digit hour, a colon and two-digit minutes (HH:MM, ignoring surrounding whitespace), it returns NULL. A one-digit hour such as '9:00' is not accepted, so it returns NULL. Surrounding spaces are still ignored.",
+    "Whenever the start is not exactly a two-digit hour, a colon and two-digit minutes (HH:MM, ignoring surrounding spaces), meeting_end returns NULL. That covers an hour above 23, minutes above 59, '10:5', '10:00:00', '1000', '10.00', '10:00 PM' and empty text. A number is treated as its plain text form and checked like any other text, so it also returns NULL, because it has no colon. A NULL start or a NULL duration returns NULL, and a duration that is not a number (text such as 'abc' or a boolean) also returns NULL.",
+    "Whenever meeting_end is given NULL for the start or for the minutes, it returns NULL.",
+    "Rule 55: When meeting_end is given minutes as text of any kind, including numeric text like '30', the minutes are not converted and meeting_end returns NULL. A NULL start or a NULL duration returns NULL. A duration that is not a number (such as 'abc' or a boolean) returns NULL. Empty text is not a number, so it also returns NULL, not the start time.",
+    "Whenever meeting_end is given a duration in minutes, a duration above zero is rounded up to whole 15-minute blocks, and fractional minutes round up the same way, so 0.5 minutes counts as one block (15 minutes) and 90.9 minutes counts as 7 blocks (105 minutes). A duration of zero or less adds nothing and returns the start time itself, so -90.9 returns the start time.",
+    "Whenever pct_change is given an old and a new value, it returns (new minus old) divided by old, times 100, rounded to 1 decimal place (3 to 4 gives 33.3).",
+    "Whenever pct_change lands exactly halfway between two 1-decimal values, it rounds away from zero (1000 to 1000.5 gives 0.1 and 1000 to 999.5 gives -0.1), but it works on the exact stored number, so 100 to 100.05 gives 0.0 because 100.05 is stored slightly below.",
+    "Whenever pct_change is given an old value of zero, it returns 0.0, whatever the new value is, not NULL.",
+    "pct_change uses the signed old value as the divisor, not its size, so a negative old value flips the sign of the result. -100 to -50 gives -50.0, and -100 to -150 gives 50.0. The result is rounded to 1 decimal place and returned as a decimal number, and a result of zero is returned as 0.0, never -0.0.",
+    "Whenever pct_change is given a new value of zero, it returns -100.0 for any non-zero old value.",
+    "Whenever the rounded pct_change result is zero, it returns 0.0 and never negative zero.",
+    "Whenever pct_change is given NULL for either value, it returns NULL.",
+    "Rule 64: Numeric text is not converted, and text with leading digits such as '5abc' does not act as 5. If the old or new value is text of any kind, pct_change should return NULL.",
+    "Whenever pct_change is given text of any kind as the old value or as the new value (including empty text or anything that is not a number), it returns NULL. Text is never treated as zero, so the new value does not give -100.0. A NULL old value or a NULL new value also returns NULL.",
+    "Whenever phone_fmt is given a phone number with exactly 10 digits, it returns it as (AAA) EEE-NNNN, whatever spaces, hyphens, dots, brackets or plus signs surround the digits.",
+    "Whenever phone_fmt is given a phone number with exactly 10 digits, it formats those 10 digits as '(212) 555-1234'. Phone numbers with any number of digits other than exactly 10 are returned unchanged, not reformatted and not NULL. An 11-digit number starting with 1 is not treated as a country code, so '+1 212 555 1234' comes back as '+1 212 555 1234'.",
+    "Whenever phone_fmt is given 11 digits not starting with 1, or any count other than 10 or 11 digits (7 digits, 9 digits, 12 digits, no digits, empty text), it returns the input unchanged. It is not reformatted and not NULL. Empty text comes back as empty text.",
+    "Whenever phone_fmt is given a phone number with any number of digits other than exactly 10 (such as the 12 digits in '1-1-212-555-1234'), it returns the input unchanged, not reformatted and not NULL. So '1-1-212-555-1234' comes back as '1-1-212-555-1234'.",
+    "Whenever phone_fmt is given a phone number with any number of digits other than exactly 10 (such as the 11 digits in '212 555 1234 ext 5'), it returns the input unchanged, not reformatted and not NULL. So '212 555 1234 ext 5' comes back as '212 555 1234 ext 5'.",
+    "Whenever phone_fmt is given text with non-digit characters mixed in, such as letters or a trailing 'x', the non-digit characters are ignored only when counting digits. If exactly 10 digits remain, the result is '(AAA) EEE-NNNN' built from those digits in order. With any other number of digits, including 11 digits starting with 1, the input text is returned unchanged, not reformatted and not NULL.",
+    "Whenever phone_fmt is given a number rather than text, it uses its digits (2125551234 gives '(212) 555-1234'); a decimal number counts the digits on both sides of the point.",
+    "Whenever phone_fmt is given 10 digits whose area code starts with 0 or 1 (0125551234), it formats them without any check on the area code.",
+    "Whenever phone_fmt is given NULL or binary data, it returns NULL.",
+    "Whenever phone_fmt is given digits from other scripts (such as Arabic-Indic digits), it counts them as digits and formats them as they are.",
+    "Rule 76: Whenever avg_rating is used over a group of rows, ignore NULL values, non-numeric values, booleans, and any number below 1 or above 5 (1 and 5 exactly and fractional ratings in between are valid). If there are no valid ratings (empty group, all NULL or all invalid), return NULL. With 5 or more valid ratings, drop exactly one lowest and one highest rating (one copy each, even if tied) before averaging; with fewer than 5 valid ratings, drop nothing. The count is taken after ignoring invalid values. Take the arithmetic mean of the kept ratings and round it to 1 decimal place, with exact halves rounding up (away from zero), and return it as a decimal number.",
+    "Whenever avg_rating meets a rating of NULL, it leaves it out of both the sum and the count.",
+    "Whenever avg_rating meets a rating below 1 or above 5 (0, -1, 6, 0.9999, 5.0001), it leaves it out as invalid; exactly 1 and exactly 5 are counted.",
+    "Whenever avg_rating meets a rating given as text of any kind, including numeric text ('5', ' 3 ', '1e0'), it does not convert it to a number. It counts it as a non-numeric value and ignores it, the same as empty text or text that is not a number.",
+    "Whenever avg_rating meets fractional ratings within 1 to 5 (4.5), it counts them as they are.",
+    "Whenever avg_rating has no valid ratings at all (no rows, only NULLs or only out-of-range values), it returns NULL, not 0.",
+    "The average of avg_rating is rounded to 1 decimal place. An exact halfway value always rounds up (away from zero), so 4.25 gives 4.3. A value like 4.125 gives 4.1, because the first decimal is what counts.",
+    "Whenever avg_rating is used with GROUP BY, it gives each group its own average computed only from that group's valid ratings.",
+    "- Whenever loyalty_tier gets NULL points, or points that are not a number (such as a boolean), it should return NULL.\n- Whenever make_slug gets a NULL title or a NULL maxlen, it should return NULL.\n- Whenever make_slug gets a maxlen that is a boolean, it should return NULL.\n- Whenever pct_change gets an old or new value that is a boolean, it should return NULL.\n- Whenever phone_fmt gets a NULL, it should return NULL.\n- Whenever phone_fmt gets a number instead of text, it should treat it as its plain text form and apply the same rules.\n- Whenever fiscal_label, isbn_check or bulk_price gets any NULL argument, it should return NULL.\n- Whenever fiscal_label or isbn_check gets a number instead of text, it should treat it as its plain text form and proceed.\n- Whenever bulk_price or late_fee gets a numeric argument that is not a number (such as text or a boolean), it should return NULL, and numbers in text form are not converted.\n- Whenever make_slug cuts the slug to maxlen, a first word longer than maxlen should be hard-cut at maxlen characters.\n- Whenever avg_rating gets a boolean, it should ignore it."
+   ]
+  },
+  "CS": {
+   "replies": 13,
+   "cost": 1.1,
+   "log": [
+    {
+     "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+     "typed": "5, 26, 27, 34, 35, 50, 59, 60, 67, 68, 76"
+    },
+    {
+     "prompt": "  Rule 5: Whenever bulk_price produces a total with a fraction of a cent, it rounds half a cent upward to the next whole cent (15 cents x 10 units gives 143).\n  What should it be? > ",
+     "typed": "Round to the nearest 5 cents, halves up, and a 500-cent minimum after that."
+    },
+    {
+     "prompt": "  Rule 26: Whenever late_fee is given an invoice amount and a number of days late from 1 to 30, it charges 2% of the amount in cents.\n  What should it be? > ",
+     "typed": "Fee starts after 5 days grace (6+ days), 2% per started 30-day period, rounded up to the cent, minimum 500 cents, capped at 20% of the amount."
+    },
+    {
+     "prompt": "  Rule 27: Whenever late_fee is given 31 to 60 days late, it charges 4% of the whole amount, and for more than 60 days it charges 6% of the whole amount.\n  What should it be? > ",
+     "typed": "Already covered in the rule 26 answer: 2% per started 30-day period, so 31-60 days is 4%, 61-90 is 6%, and it keeps going. Also 6+ days grace, round up to the cent, 500-cent minimum, capped at 20% of the amount."
+    },
+    {
+     "prompt": "  Rule 34: Whenever loyalty_tier is given 1000 to 4999 points, it returns 'silver'; 5000 to 9999 returns 'gold'; 10000 or more returns 'platinum'.\n  What should it be? > ",
+     "typed": "Silver 1000 to 4999, gold 5000 to 19999, platinum 20000 or more."
+    },
+    {
+     "prompt": "  Rule 35: Whenever loyalty_tier is given a negative balance (even -0.5), it returns NULL.\n  What should it be? > ",
+     "typed": "Negative points should be 'suspended'."
+    },
+    {
+     "prompt": "  Rule 50: Whenever meeting_end goes past midnight, it wraps around to the next day's clock time without any day indicator (23:30 plus 45 gives 00:15), and 1440 minutes or any whole number of days returns the same start time.\n  What should it be? > ",
+     "typed": "Cap it at 23:59. It never wraps past midnight."
+    },
+    {
+     "prompt": "  Rule 59: Whenever pct_change is given an old value of zero, it returns NULL, whatever the new value.\n  What should it be? > ",
+     "typed": "Return 0.0 when the old value is zero, whatever the new value is."
+    },
+    {
+     "prompt": "  Rule 60: Whenever pct_change is given a negative old value, it divides by the size of the old value, so an increase toward zero is positive (-100 to -50 gives 50.0) and -100 to -150 gives -50.0.\n  What should it be? > ",
+     "typed": "Use the signed old value as the divisor, so a negative old value flips the sign (-100 to -50 gives -50.0)."
+    },
+    {
+     "prompt": "  Rule 67: Whenever phone_fmt is given 11 digits starting with 1, it drops that leading 1 as the country code and formats the remaining 10 digits ('+1 212 555 1234' gives '(212) 555-1234').\n  What should it be? > ",
+     "typed": "Only exactly 10 digits get formatted. 11 digits, even starting with 1, return the input text unchanged."
+    },
+    {
+     "prompt": "  Rule 68: Whenever phone_fmt is given 11 digits not starting with 1, or any count other than 10 or 11 digits (7 digits, 9 digits, 12 digits, no digits, empty text), it returns NULL.\n  What should it be? > ",
+     "typed": "Rule 68: Only exactly 10 digits get formatted; any other digit count returns the input text unchanged, not NULL."
+    },
+    {
+     "prompt": "  Rule 76: Whenever avg_rating is used over a group of rows, it returns the average of the ratings from 1 to 5, rounded to 2 decimals (1, 1 and 2 give 1.33).\n  What should it be? > ",
+     "typed": "Round the average to 1 decimal, halves up. With 5 or more valid ratings, drop one lowest and one highest first."
+    },
+    {
+     "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+     "typed": ""
+    }
+   ],
+   "transcript": "\nWhat the built code does now, as rules (each one is what the product will do. Mark any that is not your policy):\n  1. Whenever bulk_price is given a unit price and a quantity, it returns unit price times quantity in cents, with no discount for fewer than 10 units.\n  2. Whenever bulk_price is given a quantity of 10 to 49 units, it takes 5% off the whole order total (10 units at 100 cents gives 950).\n  3. Whenever bulk_price is given a quantity of 50 to 99 units, it takes 10% off the whole order total, not just the units beyond 50.\n  4. Whenever bulk_price is given a quantity of 100 or more units, it takes 15% off the whole order total.\n  5. Whenever bulk_price produces a total with a fraction of a cent, it rounds half a cent upward to the next whole cent (15 cents x 10 units gives 143).\n  6. Whenever bulk_price is given a unit price or quantity of zero, it returns 0.\n  7. Whenever bulk_price is given a negative unit price or a negative quantity, it returns NULL instead of a total.\n  8. Whenever bulk_price is given NULL for the unit price or the quantity, it returns NULL.\n  9. Whenever bulk_price is given a unit price or quantity that is text, it reads numeric text (including surrounding spaces or forms like '1e2') as a number, and returns NULL for empty text or text that is not a number.\n  10. Whenever bulk_price is given a fractional quantity or price, it uses it as is (2.5 units at 100 cents gives 250), and the discount tiers use the exact quantity, so 9.9 units get no discount.\n  11. Whenever fiscal_label is given a valid date in YYYY-MM-DD form, it returns 'FY<year>-Q<n>', where the fiscal year starts on 1 April and is named for the calendar year in which it ends.\n  12. Whenever fiscal_label is given a date from April to June it returns Q1, July to September Q2, October to December Q3, and January to March Q4 (2024-04-01 is FY2025-Q1, 2024-03-31 is FY2024-Q4).\n  13. Whenever fiscal_label is given a date from 1 January to 31 March, it names the fiscal year after that same calendar year (2025-01-01 is FY2025-Q4); from 1 April on it names the next calendar year.\n  14. Whenever fiscal_label is given a date that does not exist on the calendar (such as 2024-02-30, 2023-02-29 or month 13), it returns NULL, while 2024-02-29 in a leap year is accepted.\n  15. Whenever fiscal_label is given text that is not exactly four-digit year, two-digit month and two-digit day separated by hyphens (such as 2024-5-5, 2024/05/05, a date with a time, or empty text), it returns NULL.\n  16. Whenever fiscal_label is given a date with spaces around it, it ignores those spaces and labels the date normally.\n  17. Whenever fiscal_label is given NULL or a number instead of text (such as 20240505), it returns NULL.\n  18. Whenever fiscal_label is given the year 0000 it returns NULL, and for 9999-04-01 or later it returns a five-digit fiscal year such as FY10000-Q3.\n  19. Whenever isbn_check is given a 9-digit code, it returns the ISBN-10 check character: digits weighted 10 down to 2 are added up, and the check is whatever brings the sum to a multiple of 11 (030640615 gives '2').\n  20. Whenever the ISBN-10 check value comes out as 10, isbn_check returns the letter 'X' (123456789 gives 'X'); a value of 0 is returned as the text '0'.\n  21. Whenever isbn_check is given a code containing hyphens or spaces, it ignores them before checking, so '0-306-40615' and '030 640 615' both give '2'.\n  22. Whenever isbn_check is given anything that is not exactly 9 digits after hyphens and spaces are removed (8 or 10 digits, letters, empty text, a decimal point), it returns NULL.\n  23. Whenever isbn_check is given NULL, a decimal number or binary data, it returns NULL.\n  24. Whenever isbn_check is given a whole number rather than text, it uses its digits as written, so leading zeros are lost and a number such as 30640615 (8 digits) returns NULL.\n  25. Whenever isbn_check is given a code starting with a minus sign, it treats the minus as a hyphen and ignores it ('-123456789' gives 'X').\n  26. Whenever late_fee is given an invoice amount and a number of days late from 1 to 30, it charges 2% of the amount in cents.\n  27. Whenever late_fee is given 31 to 60 days late, it charges 4% of the whole amount, and for more than 60 days it charges 6% of the whole amount.\n  28. Whenever late_fee computes a fee with a fraction of a cent, it rounds half a cent upward (25 cents at 2% gives 1, 75 cents gives 2, 1 cent gives 0).\n  29. Whenever late_fee is given zero or negative days late, or an amount of zero or less, it returns a fee of 0.\n  30. Whenever late_fee is given NULL, or text that is not a number (including empty text), for either the amount or the days, it returns NULL, even if the other value would have given 0.\n  31. Whenever late_fee is given numeric text such as '10000' and '45', it reads it as numbers and charges normally.\n  32. Whenever late_fee is given a fractional number of days, it compares the exact value to the limits (0.5 days is 2%, 30.5 days is 4%).\n  33. Whenever loyalty_tier is given a points balance from 0 to 999, it returns 'bronze'.\n  34. Whenever loyalty_tier is given 1000 to 4999 points, it returns 'silver'; 5000 to 9999 returns 'gold'; 10000 or more returns 'platinum'.\n  35. Whenever loyalty_tier is given a negative balance (even -0.5), it returns NULL.\n  36. Whenever loyalty_tier is given NULL, empty text or text that is not a number, it returns NULL.\n  37. Whenever loyalty_tier is given numeric text (such as '5000', ' 5000 ' or '1e4'), it reads it as a number and returns the matching tier.\n  38. Whenever loyalty_tier is given a fractional balance such as 999.9, it compares the exact value, so 999.9 is still bronze.\n  39. Whenever make_slug is given a title, it returns the title in lower case with every run of characters other than a-z and 0-9 (spaces, punctuation, underscores, slashes) replaced by a single hyphen and no hyphen at the start or end.\n  40. Whenever make_slug is given a title with accented letters, it removes the accent and keeps the base letter ('Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' gives 'cafe-creme-brulee').\n  41. Whenever make_slug is given letters that have no plain a-z form, such as \u00df, Cyrillic or Japanese, it treats them as separators, so 'Stra\u00dfe \u0152uvre' gives 'stra-e-uvre' and a title made only of such letters gives empty text.\n  42. Whenever make_slug is given a title with compatibility characters such as the 'fi' ligature or a circled digit, it turns them into plain letters and digits ('\ufb01ne \u2460' gives 'fine-1').\n  43. Whenever make_slug's slug is longer than maxlen, it cuts it to maxlen characters and then removes any hyphen left at the end ('Hello World' with 6 gives 'hello', with 7 gives 'hello-w').\n  44. Whenever make_slug is given a maxlen of zero or less, empty text, or text that is not a number, it returns empty text.\n  45. Whenever make_slug is given a maxlen with a fraction or as numeric text, it uses the whole-number part (5.9 acts as 5, '8' acts as 8).\n  46. Whenever make_slug is given NULL for the title or for maxlen, it returns NULL, even if the other value is 0.\n  47. Whenever make_slug is given an empty title, or one with only spaces or punctuation, it returns empty text.\n  48. Whenever make_slug is given a number as the title, it uses the number written out as text, so a decimal point becomes a hyphen (1.5 gives '1-5').\n  49. Whenever meeting_end is given a start time HH:MM and a number of minutes, it returns the end time as HH:MM on a 24-hour clock with two-digit hours and minutes.\n  50. Whenever meeting_end goes past midnight, it wraps around to the next day's clock time without any day indicator (23:30 plus 45 gives 00:15), and 1440 minutes or any whole number of days returns the same start time.\n  51. Whenever meeting_end is given negative minutes, it counts backwards and wraps to the previous day if needed (00:00 minus 1 gives 23:59).\n  52. Whenever meeting_end is given a start with a one-digit hour such as '9:00', it accepts it and returns the end with a two-digit hour; surrounding spaces are ignored.\n  53. Whenever meeting_end is given a start that is not hours and two-digit minutes separated by a colon (24:00, 10:60, '10:5', '10:00:00', '1000', '10.00', '10:00 PM', empty text, a number), it returns NULL.\n  54. Whenever meeting_end is given NULL for the start or for the minutes, it returns NULL.\n  55. Whenever meeting_end is given minutes as numeric text, it uses the number ('30' adds 30); for text that is not a number, including empty text, it treats the minutes as 0 and returns the start time unchanged.\n  56. Whenever meeting_end is given minutes with a fraction, it drops the fraction toward zero (90.9 acts as 90, -90.9 as -90, 0.5 as 0).\n  57. Whenever pct_change is given an old and a new value, it returns (new minus old) divided by old, times 100, rounded to 1 decimal place (3 to 4 gives 33.3).\n  58. Whenever pct_change lands exactly halfway between two 1-decimal values, it rounds away from zero (1000 to 1000.5 gives 0.1 and 1000 to 999.5 gives -0.1), but it works on the exact stored number, so 100 to 100.05 gives 0.0 because 100.05 is stored slightly below.\n  59. Whenever pct_change is given an old value of zero, it returns NULL, whatever the new value.\n  60. Whenever pct_change is given a negative old value, it divides by the size of the old value, so an increase toward zero is positive (-100 to -50 gives 50.0) and -100 to -150 gives -50.0.\n  61. Whenever pct_change is given a new value of zero, it returns -100.0 for any non-zero old value.\n  62. Whenever the rounded pct_change result is zero, it returns 0.0 and never negative zero.\n  63. Whenever pct_change is given NULL for either value, it returns NULL.\n  64. Whenever pct_change is given numeric text it reads it as a number, and text with leading digits uses those digits ('5abc' acts as 5).\n  65. Whenever pct_change is given text that is not a number or empty text as the old value, it returns NULL because it counts as zero; as the new value it counts as 0, so the result is -100.0.\n  66. Whenever phone_fmt is given a phone number with exactly 10 digits, it returns it as (AAA) EEE-NNNN, whatever spaces, hyphens, dots, brackets or plus signs surround the digits.\n  67. Whenever phone_fmt is given 11 digits starting with 1, it drops that leading 1 as the country code and formats the remaining 10 digits ('+1 212 555 1234' gives '(212) 555-1234').\n  68. Whenever phone_fmt is given 11 digits not starting with 1, or any count other than 10 or 11 digits (7 digits, 9 digits, 12 digits, no digits, empty text), it returns NULL.\n  69. Whenever phone_fmt is given 12 digits starting with 1-1 (such as '1-1-212-555-1234') it returns NULL, since only one leading 1 is dropped.\n  70. Whenever phone_fmt is given text with extra digits such as an extension ('212 555 1234 ext 5'), it counts them as part of the number and returns NULL.\n  71. Whenever phone_fmt is given non-digit text mixed in, such as letters or a trailing 'x', it ignores the non-digits and formats the digits if exactly 10 (or 11 with a leading 1) remain.\n  72. Whenever phone_fmt is given a number rather than text, it uses its digits (2125551234 gives '(212) 555-1234'); a decimal number counts the digits on both sides of the point.\n  73. Whenever phone_fmt is given 10 digits whose area code starts with 0 or 1 (0125551234), it formats them without any check on the area code.\n  74. Whenever phone_fmt is given NULL or binary data, it returns NULL.\n  75. Whenever phone_fmt is given digits from other scripts (such as Arabic-Indic digits), it counts them as digits and formats them as they are.\n  76. Whenever avg_rating is used over a group of rows, it returns the average of the ratings from 1 to 5, rounded to 2 decimals (1, 1 and 2 give 1.33).\n  77. Whenever avg_rating meets a rating of NULL, it leaves it out of both the sum and the count.\n  78. Whenever avg_rating meets a rating below 1 or above 5 (0, -1, 6, 0.9999, 5.0001), it leaves it out as invalid; exactly 1 and exactly 5 are counted.\n  79. Whenever avg_rating meets a rating that is numeric text ('5', ' 3 ', '1e0'), it counts it as that number; text that is not a number or empty text is left out.\n  80. Whenever avg_rating meets fractional ratings within 1 to 5 (4.5), it counts them as they are.\n  81. Whenever avg_rating has no valid ratings at all (no rows, only NULLs or only out-of-range values), it returns NULL, not 0.\n  82. Whenever avg_rating's average falls exactly halfway at the third decimal, it does not always round up: 33/8 = 4.125 gives 4.12.\n  83. Whenever avg_rating is used with GROUP BY, it gives each group its own average computed only from that group's valid ratings.\n  Numbers of any that are wrong (Enter = all correct) > 5, 26, 27, 34, 35, 50, 59, 60, 67, 68, 76\n  Rule 5: Whenever bulk_price produces a total with a fraction of a cent, it rounds half a cent upward to the next whole cent (15 cents x 10 units gives 143).\n  What should it be? > Round to the nearest 5 cents, halves up, and a 500-cent minimum after that.\n  Rule 26: Whenever late_fee is given an invoice amount and a number of days late from 1 to 30, it charges 2% of the amount in cents.\n  What should it be? > Fee starts after 5 days grace (6+ days), 2% per started 30-day period, rounded up to the cent, minimum 500 cents, capped at 20% of the amount.\n  Rule 27: Whenever late_fee is given 31 to 60 days late, it charges 4% of the whole amount, and for more than 60 days it charges 6% of the whole amount.\n  What should it be? > Already covered in the rule 26 answer: 2% per started 30-day period, so 31-60 days is 4%, 61-90 is 6%, and it keeps going. Also 6+ days grace, round up to the cent, 500-cent minimum, capped at 20% of the amount.\n  Rule 34: Whenever loyalty_tier is given 1000 to 4999 points, it returns 'silver'; 5000 to 9999 returns 'gold'; 10000 or more returns 'platinum'.\n  What should it be? > Silver 1000 to 4999, gold 5000 to 19999, platinum 20000 or more.\n  Rule 35: Whenever loyalty_tier is given a negative balance (even -0.5), it returns NULL.\n  What should it be? > Negative points should be 'suspended'.\n  Rule 50: Whenever meeting_end goes past midnight, it wraps around to the next day's clock time without any day indicator (23:30 plus 45 gives 00:15), and 1440 minutes or any whole number of days returns the same start time.\n  What should it be? > Cap it at 23:59. It never wraps past midnight.\n  Rule 59: Whenever pct_change is given an old value of zero, it returns NULL, whatever the new value.\n  What should it be? > Return 0.0 when the old value is zero, whatever the new value is.\n  Rule 60: Whenever pct_change is given a negative old value, it divides by the size of the old value, so an increase toward zero is positive (-100 to -50 gives 50.0) and -100 to -150 gives -50.0.\n  What should it be? > Use the signed old value as the divisor, so a negative old value flips the sign (-100 to -50 gives -50.0).\n  Rule 67: Whenever phone_fmt is given 11 digits starting with 1, it drops that leading 1 as the country code and formats the remaining 10 digits ('+1 212 555 1234' gives '(212) 555-1234').\n  What should it be? > Only exactly 10 digits get formatted. 11 digits, even starting with 1, return the input text unchanged.\n  Rule 68: Whenever phone_fmt is given 11 digits not starting with 1, or any count other than 10 or 11 digits (7 digits, 9 digits, 12 digits, no digits, empty text), it returns NULL.\n  What should it be? > Rule 68: Only exactly 10 digits get formatted; any other digit count returns the input text unchanged, not NULL.\n  Rule 76: Whenever avg_rating is used over a group of rows, it returns the average of the ratings from 1 to 5, rounded to 2 decimals (1, 1 and 2 give 1.33).\n  What should it be? > Round the average to 1 decimal, halves up. With 5 or more valid ratings, drop one lowest and one highest first.\n  Anything the builders should know that is not on this list? (Enter = nothing) > \n",
+   "minutes": 1.1,
+   "rules": [
+    "Whenever bulk_price is given a unit price and a quantity, it returns unit price times quantity in cents, with no discount for fewer than 10 units.",
+    "Whenever bulk_price is given a quantity of 10 to 49 units, it takes 5% off the whole order total (10 units at 100 cents gives 950).",
+    "Whenever bulk_price is given a quantity of 50 to 99 units, it takes 10% off the whole order total, not just the units beyond 50.",
+    "Whenever bulk_price is given a quantity of 100 or more units, it takes 15% off the whole order total.",
+    "Whenever bulk_price produces a total, it rounds that total to the nearest 5 cents, with halves rounding up. After that rounding, a minimum of 500 cents applies to the total.",
+    "Whenever bulk_price is given a unit price or quantity of zero, it returns 0.",
+    "Whenever bulk_price is given a negative unit price or a negative quantity, it returns NULL instead of a total.",
+    "Whenever bulk_price is given NULL for the unit price or the quantity, it returns NULL.",
+    "Whenever bulk_price is given a unit price or quantity that is text, it reads numeric text (including surrounding spaces or forms like '1e2') as a number, and returns NULL for empty text or text that is not a number.",
+    "Whenever bulk_price is given a fractional quantity or price, it uses it as is (2.5 units at 100 cents gives 250), and the discount tiers use the exact quantity, so 9.9 units get no discount.",
+    "Whenever fiscal_label is given a valid date in YYYY-MM-DD form, it returns 'FY<year>-Q<n>', where the fiscal year starts on 1 April and is named for the calendar year in which it ends.",
+    "Whenever fiscal_label is given a date from April to June it returns Q1, July to September Q2, October to December Q3, and January to March Q4 (2024-04-01 is FY2025-Q1, 2024-03-31 is FY2024-Q4).",
+    "Whenever fiscal_label is given a date from 1 January to 31 March, it names the fiscal year after that same calendar year (2025-01-01 is FY2025-Q4); from 1 April on it names the next calendar year.",
+    "Whenever fiscal_label is given a date that does not exist on the calendar (such as 2024-02-30, 2023-02-29 or month 13), it returns NULL, while 2024-02-29 in a leap year is accepted.",
+    "Whenever fiscal_label is given text that is not exactly four-digit year, two-digit month and two-digit day separated by hyphens (such as 2024-5-5, 2024/05/05, a date with a time, or empty text), it returns NULL.",
+    "Whenever fiscal_label is given a date with spaces around it, it ignores those spaces and labels the date normally.",
+    "Whenever fiscal_label is given NULL or a number instead of text (such as 20240505), it returns NULL.",
+    "Whenever fiscal_label is given the year 0000 it returns NULL, and for 9999-04-01 or later it returns a five-digit fiscal year such as FY10000-Q3.",
+    "Whenever isbn_check is given a 9-digit code, it returns the ISBN-10 check character: digits weighted 10 down to 2 are added up, and the check is whatever brings the sum to a multiple of 11 (030640615 gives '2').",
+    "Whenever the ISBN-10 check value comes out as 10, isbn_check returns the letter 'X' (123456789 gives 'X'); a value of 0 is returned as the text '0'.",
+    "Whenever isbn_check is given a code containing hyphens or spaces, it ignores them before checking, so '0-306-40615' and '030 640 615' both give '2'.",
+    "Whenever isbn_check is given anything that is not exactly 9 digits after hyphens and spaces are removed (8 or 10 digits, letters, empty text, a decimal point), it returns NULL.",
+    "Whenever isbn_check is given NULL, a decimal number or binary data, it returns NULL.",
+    "Whenever isbn_check is given a whole number rather than text, it uses its digits as written, so leading zeros are lost and a number such as 30640615 (8 digits) returns NULL.",
+    "Whenever isbn_check is given a code starting with a minus sign, it treats the minus as a hyphen and ignores it ('-123456789' gives 'X').",
+    "Whenever late_fee is given an invoice amount and a number of days late, it charges a fee only when the days late are 6 or more (the first 5 days are a grace period with no fee). The fee is 2% of the amount in cents for each started 30-day period late, rounded up to the next whole cent. The fee is at least 500 cents and at most 20% of the amount.",
+    "Whenever late_fee is given, it charges 2% of the whole amount for each started 30-day period late, so 31 to 60 days late is 4%, 61 to 90 days is 6%, and it keeps going the same way for longer. There is a grace of 6+ days. The fee is rounded up to the cent. The minimum fee is 500 cents. The fee is capped at 20% of the amount.",
+    "Whenever late_fee computes a fee with a fraction of a cent, it rounds half a cent upward (25 cents at 2% gives 1, 75 cents gives 2, 1 cent gives 0).",
+    "Whenever late_fee is given zero or negative days late, or an amount of zero or less, it returns a fee of 0.",
+    "Whenever late_fee is given NULL, or text that is not a number (including empty text), for either the amount or the days, it returns NULL, even if the other value would have given 0.",
+    "Whenever late_fee is given numeric text such as '10000' and '45', it reads it as numbers and charges normally.",
+    "Whenever late_fee is given a fractional number of days, it compares the exact value to the limits (0.5 days is 2%, 30.5 days is 4%).",
+    "Whenever loyalty_tier is given a points balance from 0 to 999, it returns 'bronze'.",
+    "Whenever loyalty_tier is given 1000 to 4999 points, it returns 'silver'; 5000 to 19999 returns 'gold'; 20000 or more returns 'platinum'.",
+    "Whenever loyalty_tier is given a negative balance (even -0.5), it returns 'suspended'.",
+    "Whenever loyalty_tier is given NULL, empty text or text that is not a number, it returns NULL.",
+    "Whenever loyalty_tier is given numeric text (such as '5000', ' 5000 ' or '1e4'), it reads it as a number and returns the matching tier.",
+    "Whenever loyalty_tier is given a fractional balance such as 999.9, it compares the exact value, so 999.9 is still bronze.",
+    "Whenever make_slug is given a title, it returns the title in lower case with every run of characters other than a-z and 0-9 (spaces, punctuation, underscores, slashes) replaced by a single hyphen and no hyphen at the start or end.",
+    "Whenever make_slug is given a title with accented letters, it removes the accent and keeps the base letter ('Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' gives 'cafe-creme-brulee').",
+    "Whenever make_slug is given letters that have no plain a-z form, such as \u00df, Cyrillic or Japanese, it treats them as separators, so 'Stra\u00dfe \u0152uvre' gives 'stra-e-uvre' and a title made only of such letters gives empty text.",
+    "Whenever make_slug is given a title with compatibility characters such as the 'fi' ligature or a circled digit, it turns them into plain letters and digits ('\ufb01ne \u2460' gives 'fine-1').",
+    "Whenever make_slug's slug is longer than maxlen, it cuts it to maxlen characters and then removes any hyphen left at the end ('Hello World' with 6 gives 'hello', with 7 gives 'hello-w').",
+    "Whenever make_slug is given a maxlen of zero or less, empty text, or text that is not a number, it returns empty text.",
+    "Whenever make_slug is given a maxlen with a fraction or as numeric text, it uses the whole-number part (5.9 acts as 5, '8' acts as 8).",
+    "Whenever make_slug is given NULL for the title or for maxlen, it returns NULL, even if the other value is 0.",
+    "Whenever make_slug is given an empty title, or one with only spaces or punctuation, it returns empty text.",
+    "Whenever make_slug is given a number as the title, it uses the number written out as text, so a decimal point becomes a hyphen (1.5 gives '1-5').",
+    "Whenever meeting_end is given a start time HH:MM and a number of minutes, it returns the end time as HH:MM on a 24-hour clock with two-digit hours and minutes.",
+    "Whenever meeting_end goes past midnight, it is capped at 23:59 and never wraps around to the next day's clock time (23:30 plus 45 gives 23:59).",
+    "Whenever meeting_end is given negative minutes, it counts backwards and wraps to the previous day if needed (00:00 minus 1 gives 23:59).",
+    "Whenever meeting_end is given a start with a one-digit hour such as '9:00', it accepts it and returns the end with a two-digit hour; surrounding spaces are ignored.",
+    "Whenever meeting_end is given a start that is not hours and two-digit minutes separated by a colon (24:00, 10:60, '10:5', '10:00:00', '1000', '10.00', '10:00 PM', empty text, a number), it returns NULL.",
+    "Whenever meeting_end is given NULL for the start or for the minutes, it returns NULL.",
+    "Whenever meeting_end is given minutes as numeric text, it uses the number ('30' adds 30); for text that is not a number, including empty text, it treats the minutes as 0 and returns the start time unchanged.",
+    "Whenever meeting_end is given minutes with a fraction, it drops the fraction toward zero (90.9 acts as 90, -90.9 as -90, 0.5 as 0).",
+    "Whenever pct_change is given an old and a new value, it returns (new minus old) divided by old, times 100, rounded to 1 decimal place (3 to 4 gives 33.3).",
+    "Whenever pct_change lands exactly halfway between two 1-decimal values, it rounds away from zero (1000 to 1000.5 gives 0.1 and 1000 to 999.5 gives -0.1), but it works on the exact stored number, so 100 to 100.05 gives 0.0 because 100.05 is stored slightly below.",
+    "Whenever pct_change is given an old value of zero, it returns 0.0, whatever the new value.",
+    "Whenever pct_change is given a negative old value, it uses the signed old value as the divisor, so a negative old value flips the sign (-100 to -50 gives -50.0).",
+    "Whenever pct_change is given a new value of zero, it returns -100.0 for any non-zero old value.",
+    "Whenever the rounded pct_change result is zero, it returns 0.0 and never negative zero.",
+    "Whenever pct_change is given NULL for either value, it returns NULL.",
+    "Whenever pct_change is given numeric text it reads it as a number, and text with leading digits uses those digits ('5abc' acts as 5).",
+    "Whenever pct_change is given text that is not a number or empty text as the old value, it returns NULL because it counts as zero; as the new value it counts as 0, so the result is -100.0.",
+    "Whenever phone_fmt is given a phone number with exactly 10 digits, it returns it as (AAA) EEE-NNNN, whatever spaces, hyphens, dots, brackets or plus signs surround the digits.",
+    "phone_fmt formats only input of exactly 10 digits, as '(212) 555-1234' for '2125551234'. Input with 11 digits, even when it starts with 1, is returned unchanged as the input text.",
+    "Rule 68: Only exactly 10 digits get formatted; any other digit count (including 11 digits, 7 digits, 9 digits, 12 digits, no digits, or empty text) returns the input text unchanged, not NULL.",
+    "Whenever phone_fmt is given 12 digits starting with 1-1 (such as '1-1-212-555-1234') it returns NULL, since only one leading 1 is dropped.",
+    "Whenever phone_fmt is given text with extra digits such as an extension ('212 555 1234 ext 5'), it counts them as part of the number and returns NULL.",
+    "Whenever phone_fmt is given non-digit text mixed in, such as letters or a trailing 'x', it ignores the non-digits and formats the digits if exactly 10 (or 11 with a leading 1) remain.",
+    "Whenever phone_fmt is given a number rather than text, it uses its digits (2125551234 gives '(212) 555-1234'); a decimal number counts the digits on both sides of the point.",
+    "Whenever phone_fmt is given 10 digits whose area code starts with 0 or 1 (0125551234), it formats them without any check on the area code.",
+    "Whenever phone_fmt is given NULL or binary data, it returns NULL.",
+    "Whenever phone_fmt is given digits from other scripts (such as Arabic-Indic digits), it counts them as digits and formats them as they are.",
+    "Whenever avg_rating is used over a group of rows, it returns the average of the ratings from 1 to 5, rounded to 1 decimal, halves up. With 5 or more valid ratings, drop one lowest and one highest first, then average the rest.",
+    "Whenever avg_rating meets a rating of NULL, it leaves it out of both the sum and the count.",
+    "Whenever avg_rating meets a rating below 1 or above 5 (0, -1, 6, 0.9999, 5.0001), it leaves it out as invalid; exactly 1 and exactly 5 are counted.",
+    "Whenever avg_rating meets a rating that is numeric text ('5', ' 3 ', '1e0'), it counts it as that number; text that is not a number or empty text is left out.",
+    "Whenever avg_rating meets fractional ratings within 1 to 5 (4.5), it counts them as they are.",
+    "Whenever avg_rating has no valid ratings at all (no rows, only NULLs or only out-of-range values), it returns NULL, not 0.",
+    "Whenever avg_rating's average falls exactly halfway at the third decimal, it does not always round up: 33/8 = 4.125 gives 4.12.",
+    "Whenever avg_rating is used with GROUP BY, it gives each group its own average computed only from that group's valid ratings."
+   ]
+  },
+  "CT": {
+   "replies": 27,
+   "cost": 2.105,
+   "log": [
+    {
+     "seen": "Hive: \ud83d\udde3 Other rules (1)   1 of 12   \u25b0\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nPrice is unit price times quantity, with 5% off the whole order from 10 items, 10% off from 50, and 15% off from 100 or more. So 10 items at \u20b9100 each comes to \u20b9950. Half a paisa rounds up, and a zero price or quantity gives zero. A negative or missing price or quantity gives no total at all.\n\nIs it right that each discount covers the whole order, so 50 items cost less than 49?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "A negative price or quantity should give 0, not no total."
+    },
+    {
+     "seen": "Hive: \u270d\ufe0f A negative unit price or negative quantity will now give 0 instead of NULL; NULL inputs still give NULL. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Yes, that's right"
+    },
+    {
+     "seen": "Hive: \ud83d\udde3 Other rules (2)   2 of 12   \u25b0\u25b0\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nBulk pricing now accepts quantities and prices typed as text, even with stray spaces or forms like 1e2, and gives no answer if the text is empty or not a number. Fractions work as they are: 2.5 units at 100 cents is 250, and 9.9 units get no discount because tiers use the exact quantity. Fiscal labels run from 1 April, so 2024-04-01 is FY2025-Q1 and 2024-03-31 is FY2024-Q4; April\u2013June is Q1, July\u2013September Q2, October\u2013December Q3, January\u2013March Q4. Dates that don't exist (2023-02-29, month 13) or aren't written exactly YYYY-MM-DD (2024-5-5, with a time, empty) give no answer, though 2024-02-29 is fine and surrounding spaces are ignored.\n\nIs it right that badly formatted dates like 2024-5-5 are refused outright instead of being tolerated?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Dates with a time on the end should still work, and prices or quantities typed as text shouldn't be accepted."
+    },
+    {
+     "seen": "Hive: \u270d\ufe0f bulk_price will return NULL for any price or quantity given as text, even numeric text like '1e2', and fiscal_label will accept a valid date with a time on the end and label it by the date. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Yes, that's right"
+    },
+    {
+     "seen": "Hive: \ud83d\udde3 Other rules (3)   3 of 12   \u25b0\u25b0\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nSir, the fiscal label now gives back nothing for blank entries or plain numbers like 20240505, and for year 0000. Dates from 9999-04-01 onward get a five-digit year, such as FY10000-Q3. The book check works on nine-digit codes, ignoring hyphens and spaces, so '0-306-40615' gives 2, and a result of ten shows as X. Anything that isn't exactly nine digits, or is blank, decimal or binary, gives nothing; a plain number loses its leading zeros, so 30640615 gives nothing.\n\nWhen a book code arrives as a plain number, its leading zeros are lost and it is rejected, so should we instead restore the zeros and accept it?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Book check should never reject: use the first 9 digits, work with fewer, and give '0' for none. Bad or blank dates should return the text 'INVALID', not nothing."
+    },
+    {
+     "seen": "Hive: \u270d\ufe0f isbn_check will never return NULL: it uses the first 9 digits it finds, works with fewer if there are fewer, and returns '0' if there are none, while fiscal_label returns the text 'INVALID' instead of NULL for bad or blank dates (NULL, numbers, year 0000). Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "NULL should still give NULL, and a number should be read as its text form."
+    },
+    {
+     "seen": "Hive: \u270d\ufe0f fiscal_label will still return NULL for NULL, but a number such as 20240505 will now be read as its text '20240505' and handled like any other text, instead of automatically giving NULL. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Yes, that's right"
+    },
+    {
+     "seen": "Hive: \ud83d\udde3 Other rules (4)   4 of 12   \u25b0\u25b0\u25b0\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nA book code starting with a minus sign has the minus ignored. Late fees are 2% of the invoice for 1\u201330 days late, 4% for 31\u201360, and 6% beyond that, so \u20b910,000 at 45 days costs \u20b9400, and half a paisa rounds up. Zero or negative days or amount means no fee, while blank or non-number input gives no answer. Numbers typed as text still work, and part-days count exactly (30.5 days is 4%).\n\nIs it right that blank or unreadable input gives no answer, rather than a zero fee?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Late fees need a 5-day grace period (up to 5 days late is 0), a 500-cent minimum, and a cap of 20% of the invoice. Also, text numbers shouldn't work."
+    },
+    {
+     "seen": "Hive: \u270d\ufe0f Up to 5 days late now costs nothing; from day 6 on, the fee is the normal 2%/4%/6% but never less than 500 cents and never more than 20% of the invoice (the cap wins on small invoices), and any text, even '10000' or '45', now gives NULL instead of being read as a number. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Fees should keep growing 2% for every 30 days late, not stop at 6%."
+    },
+    {
+     "seen": "Hive: \u270d\ufe0f The fee will keep growing by 2% of the amount for every 30 days late (2% for 1-30 days, 4% for 31-60, 6% for 61-90, 8% for 91-120, and so on) instead of stopping at 6% after 60 days. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Yes, that's right"
+    },
+    {
+     "seen": "Hive: \ud83d\udde3 Other rules (5)   5 of 12   \u25b0\u25b0\u25b0\u25b0\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nLoyalty tiers go by points: 0 to 999 is bronze, 1,000 to 4,999 silver, 5,000 to 9,999 gold, and 10,000 or more platinum. Exact values count, so 999.9 points is still bronze, and numbers typed as text, like ' 5000 ' or '1e4', are read as numbers. A negative balance, a blank, or text that isn't a number gets no tier. Page web addresses are made from titles in lower case, with any run of spaces or symbols becoming one hyphen, none at the ends, and accents dropped: 'Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' becomes 'cafe-creme-brulee'.\n\nIs it right that someone with -50 points, or a blank balance, gets no tier at all rather than bronze?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Negative points should be 'suspended', and platinum starts at 20,000, not 10,000."
+    },
+    {
+     "seen": "Hive: \ud83d\udcdd Noted, in your words, for the builders. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Yes, that's right"
+    },
+    {
+     "seen": "Hive: \ud83d\udde3 Other rules (6)   6 of 12   \u25b0\u25b0\u25b0\u25b0\u25b0\u25b1\u25b1\u25b1\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nTitles are turned into web-address text by simplifying fancy characters: a ligature or circled number becomes plain letters, so '\ufb01ne \u2460' becomes 'fine-1'. Letters with no plain English form, like \u00df, Russian or Japanese, are treated as breaks, so 'Stra\u00dfe \u0152uvre' becomes 'stra-e-uvre', and a title of only those gives nothing. A length limit cuts the text and drops a dangling dash, and fractions or numbers typed as text use the whole part. Blank titles, a zero or invalid limit give nothing, missing values give 'missing', and a number title like 1.5 becomes '1-5'.\n\nIs it acceptable that Japanese, Russian and German \u00df titles lose those letters or come out empty, rather than being spelled out in English letters?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Missing should give NULL, not 'missing', and blank titles or a zero limit should give 'untitled', not nothing."
+    },
+    {
+     "seen": "Hive: \u270d\ufe0f A blank title (empty, or only spaces or punctuation) or a maxlen of zero or less will now give 'untitled' instead of empty text, and a missing (NULL) title or maxlen still gives NULL, even when the other value is blank or 0. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Yes, that's right"
+    },
+    {
+     "seen": "Hive: \ud83d\udde3 Other rules (7)   7 of 12   \u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b1\u25b1\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nMeeting end time works from a start like 9:00 plus minutes. Past midnight it wraps to the next day with no day marker, so 23:30 plus 45 gives 00:15, and a full day adds nothing. Negative minutes wrap backward, so 00:00 minus 1 gives 23:59. Fractions are cut toward zero, text minutes count as a number if possible and otherwise as zero, and a badly formatted or missing start or minutes gives blank. Percent change is new minus old over old, to one decimal: 3 to 4 is 33.3.\n\nWhen the minutes are junk text, we quietly keep the start time rather than flag it as blank; is that right?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "No wrapping past midnight: cap at 23:59. Zero or negative minutes should just give the start time, and junk text minutes should give NULL."
+    },
+    {
+     "seen": "Hive: \u270d\ufe0f Meeting ends that would pass midnight will now stop at 23:59, zero or negative minutes will return the start time unchanged, and minutes given as non-numeric text (including empty text) will return NULL. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Yes, that's right"
+    },
+    {
+     "seen": "Hive: \ud83d\udde3 Other rules (8)   8 of 12   \u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b1\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nWhen you compare an old number to a new one, Hive gives the percent change to one decimal, rounding exact halves away from zero, so 1000 to 1000.5 shows 0.1. It judges the number as stored, so 100 to 100.05 shows 0.0, and a zero result never shows as negative zero. With a negative old value it divides by its size, so -100 to -50 is +50.0. A new value of zero gives -100.0; a missing value gives blank. Text is read as a number, '5abc' counts as 5, and unreadable or empty text counts as zero, so as the old value it gives blank and as the new value -100.0. An old value of zero always gives blank.\n\nWhen the old value is zero, or unreadable text that counts as zero, do you want a blank result, as now, instead of a made-up percentage?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "An old value of zero should give 0.0, not blank."
+    },
+    {
+     "seen": "Hive: \u270d\ufe0f An old value of zero (including non-numeric or empty text as the old value, which counts as zero) will now give 0.0 instead of NULL, whatever the new value. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Yes, that's right"
+    },
+    {
+     "seen": "Hive: \ud83d\udde3 Other rules (9)   9 of 12   \u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nPhone numbers now come out as (212) 555-1234, whatever spaces, dots, brackets, plus signs or stray letters surround the digits. Ten digits work, and so do eleven starting with 1, where that 1 is dropped; a number typed as a plain number works too. Anything else gives blank: 7, 9 or 12 digits, eleven not starting with 1, no digits, or an extension like '212 555 1234 ext 5', since its extra digits are counted. Area codes starting with 0 or 1 are formatted without any check.\n\nShould an extension like 'ext 5' blank the whole number, as it does now, or should we keep the main ten digits?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Keep the main ten digits; an extension shouldn't blank the number."
+    },
+    {
+     "seen": "Hive: \u270d\ufe0f A number with an extension, like '212 555 1234 ext 5', will now come back as '(212) 555-1234' with the extension dropped, instead of NULL. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Yes, that's right"
+    },
+    {
+     "seen": "Hive: \ud83d\udde3 Other rules (10)   10 of 12   \u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nPhone formatting returns blank for blank or binary input, and treats Arabic-Indic digits as ordinary digits, formatting them as given. The average rating counts only valid ratings from 1 to 5 inclusive, including decimals like 4.5 and numeric text like ' 3 '. It skips blanks, anything outside 1 to 5, and non-numeric text, so ratings of 1, 1 and 2 give 1.33, rounded to two decimals. If no valid rating remains, it returns blank, not 0.\n\nWhen a product has only invalid ratings, is a blank result right, or would you rather show 0?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Round the average to 1 decimal, not 2, so 1, 1 and 2 gives 1.3."
+    },
+    {
+     "seen": "Hive: \u270d\ufe0f avg_rating will now round its average to 1 decimal place instead of 2, so ratings of 1, 1 and 2 give 1.3. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Yes, that's right"
+    },
+    {
+     "seen": "Hive: \ud83d\udde3 Other rules (11)   11 of 12   \u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nWhen we average customer ratings, a result that lands exactly halfway at the third decimal doesn't always round up. For example, ratings totalling 33 over 8 reviews give 4.125, and it shows as 4.12. When ratings are grouped, say by branch or product, each group gets its own average from only that group's valid ratings.\n\nIs it fine that exact halfway averages like 4.125 can round down to 4.12, or should they always round up to 4.13?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Always round up on exact halves: 4.125 should show 4.13."
+    },
+    {
+     "seen": "Hive: \u270d\ufe0f From now on, when an average lands exactly halfway at the third decimal, it will always round up, so 33/8 = 4.125 will show as 4.13. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Yes, that's right"
+    },
+    {
+     "seen": "Hive: \ud83d\udde3 Whenever meeting_end is given a start time HH   12 of 12   \u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\n\nGive it a meeting start time and a length in minutes, and it tells you when the meeting ends. For example, a 09:30 meeting running 90 minutes ends at 11:00, and a 23:30 start with 45 minutes comes back as 00:15. The answer is always on a 24-hour clock, like 14:05, with two digits for the hour and the minutes.\n\nWhen a meeting runs past midnight, is it fine that it just shows 00:15 with no mention of the next day?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "No wrapping past midnight: it should stop at 23:59."
+    },
+    {
+     "seen": "Hive: \u270d\ufe0f If a meeting would end after midnight, meeting_end will now return 23:59 instead of wrapping around to the next day. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]",
+     "typed": "Yes, that's right"
+    },
+    {
+     "seen": "Hive: \u2795 Anything the builders should know that is not on these pages? Say it in your own words, or tap Nothing to add.\n   [buttons: \u2705 Nothing to add]",
+     "typed": "Nothing to add"
+    }
+   ],
+   "transcript": "Hive: \ud83d\udcdc What the build does now, as rules\n\n83 rules in 12 short sections, about 11 minutes. Every rule here is something the builders decided on their own; a wrong one costs far more to find once customers hit it. Each one is what the product will do. Mark any that is not your policy. Most will be right: I'll tell you how each part works; say yes to move on, or tell me what to change. If anything is unclear, just ask.\n\nHive: \ud83d\udde3 Other rules (1)   1 of 12   \u25b0\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nPrice is unit price times quantity, with 5% off the whole order from 10 items, 10% off from 50, and 15% off from 100 or more. So 10 items at \u20b9100 each comes to \u20b9950. Half a paisa rounds up, and a zero price or quantity gives zero. A negative or missing price or quantity gives no total at all.\n\nIs it right that each discount covers the whole order, so 50 items cost less than 49?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: A negative price or quantity should give 0, not no total.\n\nHive: \u270d\ufe0f A negative unit price or negative quantity will now give 0 instead of NULL; NULL inputs still give NULL. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Yes, that's right\n\nHive: \ud83d\udde3 Other rules (2)   2 of 12   \u25b0\u25b0\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nBulk pricing now accepts quantities and prices typed as text, even with stray spaces or forms like 1e2, and gives no answer if the text is empty or not a number. Fractions work as they are: 2.5 units at 100 cents is 250, and 9.9 units get no discount because tiers use the exact quantity. Fiscal labels run from 1 April, so 2024-04-01 is FY2025-Q1 and 2024-03-31 is FY2024-Q4; April\u2013June is Q1, July\u2013September Q2, October\u2013December Q3, January\u2013March Q4. Dates that don't exist (2023-02-29, month 13) or aren't written exactly YYYY-MM-DD (2024-5-5, with a time, empty) give no answer, though 2024-02-29 is fine and surrounding spaces are ignored.\n\nIs it right that badly formatted dates like 2024-5-5 are refused outright instead of being tolerated?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Dates with a time on the end should still work, and prices or quantities typed as text shouldn't be accepted.\n\nHive: \u270d\ufe0f bulk_price will return NULL for any price or quantity given as text, even numeric text like '1e2', and fiscal_label will accept a valid date with a time on the end and label it by the date. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Yes, that's right\n\nHive: \ud83d\udde3 Other rules (3)   3 of 12   \u25b0\u25b0\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nSir, the fiscal label now gives back nothing for blank entries or plain numbers like 20240505, and for year 0000. Dates from 9999-04-01 onward get a five-digit year, such as FY10000-Q3. The book check works on nine-digit codes, ignoring hyphens and spaces, so '0-306-40615' gives 2, and a result of ten shows as X. Anything that isn't exactly nine digits, or is blank, decimal or binary, gives nothing; a plain number loses its leading zeros, so 30640615 gives nothing.\n\nWhen a book code arrives as a plain number, its leading zeros are lost and it is rejected, so should we instead restore the zeros and accept it?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Book check should never reject: use the first 9 digits, work with fewer, and give '0' for none. Bad or blank dates should return the text 'INVALID', not nothing.\n\nHive: \u270d\ufe0f isbn_check will never return NULL: it uses the first 9 digits it finds, works with fewer if there are fewer, and returns '0' if there are none, while fiscal_label returns the text 'INVALID' instead of NULL for bad or blank dates (NULL, numbers, year 0000). Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: NULL should still give NULL, and a number should be read as its text form.\n\nHive: \u270d\ufe0f fiscal_label will still return NULL for NULL, but a number such as 20240505 will now be read as its text '20240505' and handled like any other text, instead of automatically giving NULL. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Yes, that's right\n\nHive: \ud83d\udde3 Other rules (4)   4 of 12   \u25b0\u25b0\u25b0\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nA book code starting with a minus sign has the minus ignored. Late fees are 2% of the invoice for 1\u201330 days late, 4% for 31\u201360, and 6% beyond that, so \u20b910,000 at 45 days costs \u20b9400, and half a paisa rounds up. Zero or negative days or amount means no fee, while blank or non-number input gives no answer. Numbers typed as text still work, and part-days count exactly (30.5 days is 4%).\n\nIs it right that blank or unreadable input gives no answer, rather than a zero fee?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Late fees need a 5-day grace period (up to 5 days late is 0), a 500-cent minimum, and a cap of 20% of the invoice. Also, text numbers shouldn't work.\n\nHive: \u270d\ufe0f Up to 5 days late now costs nothing; from day 6 on, the fee is the normal 2%/4%/6% but never less than 500 cents and never more than 20% of the invoice (the cap wins on small invoices), and any text, even '10000' or '45', now gives NULL instead of being read as a number. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Fees should keep growing 2% for every 30 days late, not stop at 6%.\n\nHive: \u270d\ufe0f The fee will keep growing by 2% of the amount for every 30 days late (2% for 1-30 days, 4% for 31-60, 6% for 61-90, 8% for 91-120, and so on) instead of stopping at 6% after 60 days. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Yes, that's right\n\nHive: \ud83d\udde3 Other rules (5)   5 of 12   \u25b0\u25b0\u25b0\u25b0\u25b1\u25b1\u25b1\u25b1\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nLoyalty tiers go by points: 0 to 999 is bronze, 1,000 to 4,999 silver, 5,000 to 9,999 gold, and 10,000 or more platinum. Exact values count, so 999.9 points is still bronze, and numbers typed as text, like ' 5000 ' or '1e4', are read as numbers. A negative balance, a blank, or text that isn't a number gets no tier. Page web addresses are made from titles in lower case, with any run of spaces or symbols becoming one hyphen, none at the ends, and accents dropped: 'Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' becomes 'cafe-creme-brulee'.\n\nIs it right that someone with -50 points, or a blank balance, gets no tier at all rather than bronze?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Negative points should be 'suspended', and platinum starts at 20,000, not 10,000.\n\nHive: \ud83d\udcdd Noted, in your words, for the builders. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Yes, that's right\n\nHive: \ud83d\udde3 Other rules (6)   6 of 12   \u25b0\u25b0\u25b0\u25b0\u25b0\u25b1\u25b1\u25b1\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nTitles are turned into web-address text by simplifying fancy characters: a ligature or circled number becomes plain letters, so '\ufb01ne \u2460' becomes 'fine-1'. Letters with no plain English form, like \u00df, Russian or Japanese, are treated as breaks, so 'Stra\u00dfe \u0152uvre' becomes 'stra-e-uvre', and a title of only those gives nothing. A length limit cuts the text and drops a dangling dash, and fractions or numbers typed as text use the whole part. Blank titles, a zero or invalid limit give nothing, missing values give 'missing', and a number title like 1.5 becomes '1-5'.\n\nIs it acceptable that Japanese, Russian and German \u00df titles lose those letters or come out empty, rather than being spelled out in English letters?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Missing should give NULL, not 'missing', and blank titles or a zero limit should give 'untitled', not nothing.\n\nHive: \u270d\ufe0f A blank title (empty, or only spaces or punctuation) or a maxlen of zero or less will now give 'untitled' instead of empty text, and a missing (NULL) title or maxlen still gives NULL, even when the other value is blank or 0. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Yes, that's right\n\nHive: \ud83d\udde3 Other rules (7)   7 of 12   \u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b1\u25b1\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nMeeting end time works from a start like 9:00 plus minutes. Past midnight it wraps to the next day with no day marker, so 23:30 plus 45 gives 00:15, and a full day adds nothing. Negative minutes wrap backward, so 00:00 minus 1 gives 23:59. Fractions are cut toward zero, text minutes count as a number if possible and otherwise as zero, and a badly formatted or missing start or minutes gives blank. Percent change is new minus old over old, to one decimal: 3 to 4 is 33.3.\n\nWhen the minutes are junk text, we quietly keep the start time rather than flag it as blank; is that right?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: No wrapping past midnight: cap at 23:59. Zero or negative minutes should just give the start time, and junk text minutes should give NULL.\n\nHive: \u270d\ufe0f Meeting ends that would pass midnight will now stop at 23:59, zero or negative minutes will return the start time unchanged, and minutes given as non-numeric text (including empty text) will return NULL. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Yes, that's right\n\nHive: \ud83d\udde3 Other rules (8)   8 of 12   \u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b1\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nWhen you compare an old number to a new one, Hive gives the percent change to one decimal, rounding exact halves away from zero, so 1000 to 1000.5 shows 0.1. It judges the number as stored, so 100 to 100.05 shows 0.0, and a zero result never shows as negative zero. With a negative old value it divides by its size, so -100 to -50 is +50.0. A new value of zero gives -100.0; a missing value gives blank. Text is read as a number, '5abc' counts as 5, and unreadable or empty text counts as zero, so as the old value it gives blank and as the new value -100.0. An old value of zero always gives blank.\n\nWhen the old value is zero, or unreadable text that counts as zero, do you want a blank result, as now, instead of a made-up percentage?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: An old value of zero should give 0.0, not blank.\n\nHive: \u270d\ufe0f An old value of zero (including non-numeric or empty text as the old value, which counts as zero) will now give 0.0 instead of NULL, whatever the new value. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Yes, that's right\n\nHive: \ud83d\udde3 Other rules (9)   9 of 12   \u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nPhone numbers now come out as (212) 555-1234, whatever spaces, dots, brackets, plus signs or stray letters surround the digits. Ten digits work, and so do eleven starting with 1, where that 1 is dropped; a number typed as a plain number works too. Anything else gives blank: 7, 9 or 12 digits, eleven not starting with 1, no digits, or an extension like '212 555 1234 ext 5', since its extra digits are counted. Area codes starting with 0 or 1 are formatted without any check.\n\nShould an extension like 'ext 5' blank the whole number, as it does now, or should we keep the main ten digits?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Keep the main ten digits; an extension shouldn't blank the number.\n\nHive: \u270d\ufe0f A number with an extension, like '212 555 1234 ext 5', will now come back as '(212) 555-1234' with the extension dropped, instead of NULL. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Yes, that's right\n\nHive: \ud83d\udde3 Other rules (10)   10 of 12   \u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b1\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nPhone formatting returns blank for blank or binary input, and treats Arabic-Indic digits as ordinary digits, formatting them as given. The average rating counts only valid ratings from 1 to 5 inclusive, including decimals like 4.5 and numeric text like ' 3 '. It skips blanks, anything outside 1 to 5, and non-numeric text, so ratings of 1, 1 and 2 give 1.33, rounded to two decimals. If no valid rating remains, it returns blank, not 0.\n\nWhen a product has only invalid ratings, is a blank result right, or would you rather show 0?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Round the average to 1 decimal, not 2, so 1, 1 and 2 gives 1.3.\n\nHive: \u270d\ufe0f avg_rating will now round its average to 1 decimal place instead of 2, so ratings of 1, 1 and 2 give 1.3. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Yes, that's right\n\nHive: \ud83d\udde3 Other rules (11)   11 of 12   \u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b1\n\n\ud83d\udca1 Why it matters: Wrong discounts mean undercharging and losing revenue on big orders, or overcharging customers who then complain, demand refunds or leave.\n\nWhen we average customer ratings, a result that lands exactly halfway at the third decimal doesn't always round up. For example, ratings totalling 33 over 8 reviews give 4.125, and it shows as 4.12. When ratings are grouped, say by branch or product, each group gets its own average from only that group's valid ratings.\n\nIs it fine that exact halfway averages like 4.125 can round down to 4.12, or should they always round up to 4.13?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Always round up on exact halves: 4.125 should show 4.13.\n\nHive: \u270d\ufe0f From now on, when an average lands exactly halfway at the third decimal, it will always round up, so 33/8 = 4.125 will show as 4.13. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Yes, that's right\n\nHive: \ud83d\udde3 Whenever meeting_end is given a start time HH   12 of 12   \u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\n\nGive it a meeting start time and a length in minutes, and it tells you when the meeting ends. For example, a 09:30 meeting running 90 minutes ends at 11:00, and a 23:30 start with 45 minutes comes back as 00:15. The answer is always on a 24-hour clock, like 14:05, with two digits for the hour and the minutes.\n\nWhen a meeting runs past midnight, is it fine that it just shows 00:15 with no mention of the next day?\nSay yes, tell me what to change in your own words, or ask me anything.\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: No wrapping past midnight: it should stop at 23:59.\n\nHive: \u270d\ufe0f If a meeting would end after midnight, meeting_end will now return 23:59 instead of wrapping around to the next day. Anything else here, or shall we go on?\n   [buttons: \u2705 Yes, that's right | \ud83d\udccb Show the detailed rules]\n\nYou: Yes, that's right\n\nHive: \u2795 Anything the builders should know that is not on these pages? Say it in your own words, or tap Nothing to add.\n   [buttons: \u2705 Nothing to add]\n\nYou: Nothing to add\n\nHive: \u2705 Thank you. These are your rules now; the builders will encode every one as a test.",
+   "minutes": 3.9,
+   "rules": [
+    "Whenever bulk_price is given a unit price and a quantity, it returns unit price times quantity in cents, with no discount for fewer than 10 units.",
+    "Whenever bulk_price is given a quantity of 10 to 49 units, it takes 5% off the whole order total (10 units at 100 cents gives 950).",
+    "Whenever bulk_price is given a quantity of 50 to 99 units, it takes 10% off the whole order total, not just the units beyond 50.",
+    "Whenever bulk_price is given a quantity of 100 or more units, it takes 15% off the whole order total.",
+    "Whenever bulk_price produces a total with a fraction of a cent, it rounds half a cent upward to the next whole cent (15 cents x 10 units gives 143).",
+    "Whenever bulk_price is given a unit price or quantity of zero, it returns 0.",
+    "Whenever bulk_price is given a negative unit price or a negative quantity, it returns 0 instead of NULL.",
+    "Whenever bulk_price is given NULL for the unit price or the quantity, it returns NULL.",
+    "Whenever bulk_price is given a unit price or quantity that is text, it does not accept it and returns NULL (numeric text such as ' 5 ' or '1e2' is no longer read as a number); empty text or text that is not a number also returns NULL.",
+    "Whenever bulk_price is given a fractional quantity or price, it uses it as is (2.5 units at 100 cents gives 250), and the discount tiers use the exact quantity, so 9.9 units get no discount.",
+    "Whenever fiscal_label is given a valid date in YYYY-MM-DD form, it returns 'FY<year>-Q<n>', where the fiscal year starts on 1 April and is named for the calendar year in which it ends.",
+    "Whenever fiscal_label is given a date from April to June it returns Q1, July to September Q2, October to December Q3, and January to March Q4 (2024-04-01 is FY2025-Q1, 2024-03-31 is FY2024-Q4).",
+    "Whenever fiscal_label is given a date from 1 January to 31 March, it names the fiscal year after that same calendar year (2025-01-01 is FY2025-Q4); from 1 April on it names the next calendar year.",
+    "Whenever fiscal_label is given a date that does not exist on the calendar (such as 2024-02-30, 2023-02-29 or month 13), it returns NULL, while 2024-02-29 in a leap year is accepted.",
+    "Whenever fiscal_label is given text that is not exactly four-digit year, two-digit month and two-digit day separated by hyphens (such as 2024-5-5, 2024/05/05, or empty text), it returns NULL, except that a valid date followed by a time (such as 2024-05-05 10:30:00) is accepted and labelled by its date part.",
+    "Whenever fiscal_label is given a date with spaces around it, it ignores those spaces and labels the date normally.",
+    "Whenever fiscal_label is given NULL, it returns NULL. Whenever it is given a number instead of text (such as 20240505), it reads the number as its text form (here '20240505') and handles it like any other text, instead of returning NULL.",
+    "Whenever fiscal_label is given the year 0000 it returns the text 'INVALID', and for 9999-04-01 or later it returns a five-digit fiscal year such as FY10000-Q3. Any other bad or blank date also returns 'INVALID'.",
+    "Whenever isbn_check is given a 9-digit code, it returns the ISBN-10 check character: digits weighted 10 down to 2 are added up, and the check is whatever brings the sum to a multiple of 11 (030640615 gives '2').",
+    "Whenever the ISBN-10 check value comes out as 10, isbn_check returns the letter 'X' (123456789 gives 'X'); a value of 0 is returned as the text '0'.",
+    "Whenever isbn_check is given a code containing hyphens or spaces, it ignores them before checking, so '0-306-40615' and '030 640 615' both give '2'.",
+    "Whenever isbn_check is given text, it ignores hyphens and spaces, then uses the first 9 digits and never rejects it. If there are fewer than 9 digits (8 digits, say) it works with the digits it has, weighted 10 down from the first digit. If there are more than 9 digits (10, say) the extra ones are ignored. If there are no digits at all (empty text, say) it returns '0'. Letters and a decimal point are not digits and are skipped.",
+    "Whenever isbn_check is given NULL or binary data, it has no digits to use and returns '0'. A decimal number uses its digits as written, skipping the decimal point, and never returns NULL.",
+    "Whenever isbn_check is given a whole number rather than text, it uses its digits as written, so leading zeros are lost, and it works with those digits as it does for text. A number such as 30640615 (8 digits) is checked with those 8 digits and no longer returns NULL.",
+    "Whenever isbn_check is given a code starting with a minus sign, it treats the minus as a hyphen and ignores it ('-123456789' gives 'X').",
+    "Whenever late_fee is given an invoice amount and a number of days late of more than 5 and up to 30, it charges 2% of the amount in cents.",
+    "Whenever late_fee is given 31 to 60 days late, it charges 4% of the whole amount, and for every further 30 days late it charges another 2% more of the whole amount, with no upper limit (61 to 90 days is 6%, 91 to 120 days is 8%, 121 to 150 days is 10%, and so on).",
+    "Whenever late_fee computes a fee with a fraction of a cent, it rounds half a cent upward (25 cents at 2% gives 1, 75 cents gives 2, 1 cent gives 0).",
+    "Whenever late_fee is given 5 days late or fewer (including zero or negative days), or an amount of zero or less, it returns a fee of 0.",
+    "Whenever late_fee is given NULL, or any text (including empty text), for either the amount or the days, it returns NULL, even if the other value would have given 0.",
+    "Whenever late_fee is given numeric text such as '10000' and '45', it no longer reads it as numbers; it returns NULL. Only real numbers are accepted.",
+    "Whenever late_fee is given a fractional number of days, it compares the exact value to the limits (0.5 days is inside the grace period so the fee is 0, 5.5 days is 2%, 30.5 days is 4%).",
+    "Whenever loyalty_tier is given a points balance from 0 to 999, it returns 'bronze'.",
+    "Whenever loyalty_tier is given 1000 to 4999 points, it returns 'silver'; 5000 to 9999 returns 'gold'; 10000 or more returns 'platinum'.",
+    "Whenever loyalty_tier is given a negative balance (even -0.5), it returns NULL.",
+    "Whenever loyalty_tier is given NULL, empty text or text that is not a number, it returns NULL.",
+    "Whenever loyalty_tier is given numeric text (such as '5000', ' 5000 ' or '1e4'), it reads it as a number and returns the matching tier.",
+    "Whenever loyalty_tier is given a fractional balance such as 999.9, it compares the exact value, so 999.9 is still bronze.",
+    "Whenever make_slug is given a title, it returns the title in lower case with every run of characters other than a-z and 0-9 (spaces, punctuation, underscores, slashes) replaced by a single hyphen and no hyphen at the start or end.",
+    "Whenever make_slug is given a title with accented letters, it removes the accent and keeps the base letter ('Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' gives 'cafe-creme-brulee').",
+    "Whenever make_slug is given letters that have no plain a-z form, such as \u00df, Cyrillic or Japanese, it treats them as separators, so 'Stra\u00dfe \u0152uvre' gives 'stra-e-uvre' and a title made only of such letters gives empty text.",
+    "Whenever make_slug is given a title with compatibility characters such as the 'fi' ligature or a circled digit, it turns them into plain letters and digits ('\ufb01ne \u2460' gives 'fine-1').",
+    "Whenever make_slug's slug is longer than maxlen, it cuts it to maxlen characters and then removes any hyphen left at the end ('Hello World' with 6 gives 'hello', with 7 gives 'hello-w').",
+    "Whenever make_slug is given a maxlen of zero or less, it returns 'untitled'; whenever it is given a maxlen that is empty text or text that is not a number, it returns empty text.",
+    "Whenever make_slug is given a maxlen with a fraction or as numeric text, it uses the whole-number part (5.9 acts as 5, '8' acts as 8).",
+    "Whenever make_slug is given NULL for the title or for maxlen, it returns NULL, even if the other value is 0.",
+    "Whenever make_slug is given an empty title, or one with only spaces or punctuation, it returns 'untitled'.",
+    "Whenever make_slug is given a number as the title, it uses the number written out as text, so a decimal point becomes a hyphen (1.5 gives '1-5').",
+    "Whenever meeting_end is given a start time HH:MM and a number of minutes, it returns the end time as HH:MM on a 24-hour clock with two-digit hours and minutes. If the end time would pass midnight, it does not wrap around; it stops at 23:59.",
+    "Whenever meeting_end goes past midnight, it does not wrap to the next day: it stops at 23:59 (23:30 plus 45 gives 23:59), and 1440 minutes or more also gives 23:59.",
+    "Whenever meeting_end is given zero or negative minutes, it does not count backwards: it returns the start time unchanged (00:00 minus 1 gives 00:00).",
+    "Whenever meeting_end is given a start with a one-digit hour such as '9:00', it accepts it and returns the end with a two-digit hour; surrounding spaces are ignored.",
+    "Whenever meeting_end is given a start that is not hours and two-digit minutes separated by a colon (24:00, 10:60, '10:5', '10:00:00', '1000', '10.00', '10:00 PM', empty text, a number), it returns NULL.",
+    "Whenever meeting_end is given NULL for the start or for the minutes, it returns NULL.",
+    "Whenever meeting_end is given minutes as numeric text, it uses the number ('30' adds 30); for text that is not a number, including empty text, it returns NULL.",
+    "Whenever meeting_end is given minutes with a fraction, it drops the fraction toward zero (90.9 acts as 90, 0.5 as 0); negative minutes such as -90.9 give the start time unchanged.",
+    "Whenever pct_change is given an old and a new value, it returns (new minus old) divided by old, times 100, rounded to 1 decimal place (3 to 4 gives 33.3).",
+    "Whenever pct_change lands exactly halfway between two 1-decimal values, it rounds away from zero (1000 to 1000.5 gives 0.1 and 1000 to 999.5 gives -0.1), but it works on the exact stored number, so 100 to 100.05 gives 0.0 because 100.05 is stored slightly below.",
+    "Whenever pct_change is given an old value of zero, it returns 0.0, whatever the new value.",
+    "Whenever pct_change is given a negative old value, it divides by the size of the old value, so an increase toward zero is positive (-100 to -50 gives 50.0) and -100 to -150 gives -50.0.",
+    "Whenever pct_change is given a new value of zero, it returns -100.0 for any non-zero old value.",
+    "Whenever the rounded pct_change result is zero, it returns 0.0 and never negative zero.",
+    "Whenever pct_change is given NULL for either value, it returns NULL.",
+    "Whenever pct_change is given numeric text it reads it as a number, and text with leading digits uses those digits ('5abc' acts as 5).",
+    "Whenever pct_change is given text that is not a number or empty text as the old value, it counts as zero and returns 0.0; as the new value it counts as 0, so the result is -100.0.",
+    "Whenever phone_fmt is given a phone number with exactly 10 digits, it returns it as (AAA) EEE-NNNN, whatever spaces, hyphens, dots, brackets or plus signs surround the digits.",
+    "Whenever phone_fmt is given 11 digits starting with 1, it drops that leading 1 as the country code and formats the remaining 10 digits ('+1 212 555 1234' gives '(212) 555-1234').",
+    "Whenever phone_fmt is given 11 digits not starting with 1, or any count other than 10 or 11 digits (7 digits, 9 digits, 12 digits, no digits, empty text), it returns NULL.",
+    "Whenever phone_fmt is given 12 digits starting with 1-1 (such as '1-1-212-555-1234') it returns NULL, since only one leading 1 is dropped.",
+    "Whenever phone_fmt is given text with extra digits such as an extension ('212 555 1234 ext 5'), it keeps the main ten digits at the start of the number, ignores the extension digits after them, and formats the result as (AAA) EEE-NNNN ('212 555 1234 ext 5' gives '(212) 555-1234') instead of returning NULL.",
+    "Whenever phone_fmt is given non-digit text mixed in, such as letters or a trailing 'x', it ignores the non-digits and formats the digits if exactly 10 (or 11 with a leading 1) remain.",
+    "Whenever phone_fmt is given a number rather than text, it uses its digits (2125551234 gives '(212) 555-1234'); a decimal number counts the digits on both sides of the point.",
+    "Whenever phone_fmt is given 10 digits whose area code starts with 0 or 1 (0125551234), it formats them without any check on the area code.",
+    "Whenever phone_fmt is given NULL or binary data, it returns NULL.",
+    "Whenever phone_fmt is given digits from other scripts (such as Arabic-Indic digits), it counts them as digits and formats them as they are.",
+    "Whenever avg_rating is used over a group of rows, it returns the average of the ratings from 1 to 5, rounded to 1 decimal (1, 1 and 2 give 1.3).",
+    "Whenever avg_rating meets a rating of NULL, it leaves it out of both the sum and the count.",
+    "Whenever avg_rating meets a rating below 1 or above 5 (0, -1, 6, 0.9999, 5.0001), it leaves it out as invalid; exactly 1 and exactly 5 are counted.",
+    "Whenever avg_rating meets a rating that is numeric text ('5', ' 3 ', '1e0'), it counts it as that number; text that is not a number or empty text is left out.",
+    "Whenever avg_rating meets fractional ratings within 1 to 5 (4.5), it counts them as they are.",
+    "Whenever avg_rating has no valid ratings at all (no rows, only NULLs or only out-of-range values), it returns NULL, not 0.",
+    "Whenever avg_rating's average falls exactly halfway at the third decimal, it always rounds up: 4.125 gives 4.13.",
+    "Whenever avg_rating is used with GROUP BY, it gives each group its own average computed only from that group's valid ratings.",
+    "Other rules (4): Whenever late_fee charges a fee (more than 5 days late and a valid amount above 0), the fee is at least 500 cents and at most 20% of the invoice amount. The cap is applied last, so on a small invoice (under 2,500 cents) the fee is 20% of the invoice, not 500.",
+    "Other rules (5): Negative points should be 'suspended', and platinum starts at 20,000, not 10,000.",
+    "Nothing to add"
+   ]
+  }
+ },
+ "cost_usd": {
+  "documenter": 0.1589975,
+  "describer": 0.40111990000000003,
+  "owner_CC": 4.126,
+  "owner_CS": 1.1,
+  "owner_CT": 2.105,
+  "judge": 0.4169719999999999
+ },
+ "labels": [
+  {
+   "function": "late_fee",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "CC": "right",
+   "CS": "wrong",
+   "CT": "right",
+   "R": "right",
+   "note": "grace: D/CS say 0.5 days is charged"
+  },
+  {
+   "function": "late_fee",
+   "decision": 1,
+   "label": "right",
+   "D": "absent",
+   "CC": "right",
+   "CS": "right",
+   "CT": "right",
+   "R": "right",
+   "note": "min 500"
+  },
+  {
+   "function": "late_fee",
+   "decision": 2,
+   "label": "right",
+   "D": "absent",
+   "CC": "right",
+   "CS": "right",
+   "CT": "right",
+   "R": "right",
+   "note": "cap 20%"
+  },
+  {
+   "function": "late_fee",
+   "decision": 3,
+   "label": "right",
+   "D": "wrong",
+   "CC": "right",
+   "CS": "wrong",
+   "CT": "wrong",
+   "R": "right",
+   "note": "ceil; D/CS/CT say half-up (CS also says ceil)"
+  },
+  {
+   "function": "make_slug",
+   "decision": 0,
+   "label": "right",
+   "D": "absent",
+   "CC": "right",
+   "CS": "absent",
+   "CT": "absent",
+   "R": "right",
+   "note": "stopwords"
+  },
+  {
+   "function": "make_slug",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "CC": "right",
+   "CS": "wrong",
+   "CT": "wrong",
+   "R": "right",
+   "note": "& treated as separator"
+  },
+  {
+   "function": "make_slug",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "CC": "right",
+   "CS": "wrong",
+   "CT": "wrong",
+   "R": "right",
+   "note": "cut then strip hyphen, hello-w"
+  },
+  {
+   "function": "make_slug",
+   "decision": 3,
+   "label": "right",
+   "D": "wrong",
+   "CC": "right",
+   "CS": "wrong",
+   "CT": "wrong",
+   "R": "right",
+   "note": "D/CS empty text; CT says untitled and empty text"
+  },
+  {
+   "function": "loyalty_tier",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "CC": "right",
+   "CS": "right",
+   "CT": "wrong",
+   "R": "right",
+   "note": "CT states NULL and suspended"
+  },
+  {
+   "function": "loyalty_tier",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "CC": "right",
+   "CS": "right",
+   "CT": "wrong",
+   "R": "right",
+   "note": "CT states 10000 and 20000"
+  },
+  {
+   "function": "fiscal_label",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "CC": "right",
+   "CS": "wrong",
+   "CT": "wrong",
+   "R": "right",
+   "note": "D/CS/CT say 03-31 is Q4"
+  },
+  {
+   "function": "fiscal_label",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "CC": "right",
+   "CS": "wrong",
+   "CT": "right",
+   "R": "right",
+   "note": "time suffix"
+  },
+  {
+   "function": "fiscal_label",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "CC": "right",
+   "CS": "wrong",
+   "CT": "wrong",
+   "R": "right",
+   "note": "NULL vs INVALID; CT mixed"
+  },
+  {
+   "function": "bulk_price",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "CC": "right",
+   "CS": "right",
+   "CT": "wrong",
+   "R": "right",
+   "note": "round to 5; D/CT whole cent"
+  },
+  {
+   "function": "bulk_price",
+   "decision": 1,
+   "label": "right",
+   "D": "absent",
+   "CC": "right",
+   "CS": "right",
+   "CT": "absent",
+   "R": "right",
+   "note": "min 500"
+  },
+  {
+   "function": "isbn_check",
+   "decision": 0,
+   "label": "right",
+   "D": "right",
+   "CC": "right",
+   "CS": "right",
+   "CT": "right",
+   "R": "right",
+   "note": "X; weights equivalent"
+  },
+  {
+   "function": "isbn_check",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "CC": "right",
+   "CS": "wrong",
+   "CT": "right",
+   "R": "right",
+   "note": "letters give NULL in D/CS"
+  },
+  {
+   "function": "isbn_check",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "CC": "right",
+   "CS": "wrong",
+   "CT": "right",
+   "R": "right",
+   "note": "exactly 9 else NULL in D/CS"
+  },
+  {
+   "function": "meeting_end",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "CC": "right",
+   "CS": "wrong",
+   "CT": "wrong",
+   "R": "right",
+   "note": "0.5 acts as 0, drops fraction"
+  },
+  {
+   "function": "meeting_end",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "CC": "right",
+   "CS": "right",
+   "CT": "right",
+   "R": "right",
+   "note": "D wraps"
+  },
+  {
+   "function": "pct_change",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "CC": "right",
+   "CS": "right",
+   "CT": "right",
+   "R": "right",
+   "note": "D NULL"
+  },
+  {
+   "function": "phone_fmt",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "CC": "right",
+   "CS": "wrong",
+   "CT": "wrong",
+   "R": "right",
+   "note": "NULL/country code in D; CS keeps 12-digit/ext NULL; CT unchanged ext/NULL"
+  },
+  {
+   "function": "avg_rating",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "CC": "right",
+   "CS": "wrong",
+   "CT": "wrong",
+   "R": "right",
+   "note": "numeric text counted in D/CS/CT"
+  },
+  {
+   "function": "avg_rating",
+   "decision": 1,
+   "label": "right",
+   "D": "absent",
+   "CC": "right",
+   "CS": "right",
+   "CT": "absent",
+   "R": "right",
+   "note": "trim"
+  },
+  {
+   "function": "avg_rating",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "CC": "right",
+   "CS": "wrong",
+   "CT": "wrong",
+   "R": "right",
+   "note": "2 decimals / 4.125 conflicts"
+  }
+ ]
+}

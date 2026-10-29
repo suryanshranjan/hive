@@ -1,0 +1,156 @@
+[04:33:36] predictions registered on origin/main: gates/gate55/prompts/PREDICTIONS.md
+[04:33:36] rule-giver writing private rules (headless Claude Code)...
+[04:36:23] rules checked: 10 functions, 138 calls, deterministic
+[04:36:23] declared decisions per function: 1:2, 2:3, 3:3, 4:2
+[04:36:24] starting repo and hidden suite built
+[04:36:24] pre-launch: python3 gates/gate55/referee/review55.py pre {run} {oracle}
+[04:36:24] wind tunnel: documenter writing the owner's policy in prose...
+[04:37:03] wind tunnel: R: 54 rules; ask text for N0 written
+[04:37:03] stage 1: N0 alone
+N0: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g55/upN0.git
+next: python3 lab/launch.py --run g55
+[04:37:04] launching workers...
+launched N0-w1 
+launched N0-w2 
+launched N0-w3 
+N0-w2 finished: exit 0, 0.6 min, tokens 494347, cost 0.16647450000000003
+N0-w3 finished: exit 0, 1.0 min, tokens 545052, cost 0.23919720000000003
+N0-w1 finished: exit 0, 2.7 min, tokens 532746, cost 0.19264740000000002
+wrote /home/claude/hive/runs/g55/agents.csv
+[04:39:46] after N0: python3 gates/gate55/referee/review55.py after {run} {oracle} {base}
+[04:39:46] wind tunnel: describer writing what N0's code does, as rules...
+[04:41:31] wind tunnel: D: 83 rules from the code
+[04:41:49] wind tunnel: CC owner #1: '5, 7, 9, 12, 14, 15, 17, 18, 19, 22, 23, 24, 26, 27, 28, 31, 32, 34, 35, 37, 39,'
+[04:41:51] wind tunnel: CC owner #2: 'Round to the nearest 5 cents, with exact halves (2.5 cents) rounding up. For exa'
+[04:42:01] wind tunnel: CC owner #3: 'Return 0 when the quantity or unit price is zero or less, with no minimum applyi'
+[04:42:05] wind tunnel: CC owner #4: "Numeric text such as '10' is not converted: if a unit price or quantity is text "
+[04:42:11] wind tunnel: CC owner #5: 'April to June is Q1, July to September is Q2, October to December is Q3, and Jan'
+[04:42:17] wind tunnel: CC owner #6: "Rule 14: It should return the text 'INVALID', not NULL, for a date that does not"
+[04:42:22] wind tunnel: CC owner #7: "It should return the text 'INVALID', not NULL, for text that is not four-digit y"
+[04:42:28] wind tunnel: CC owner #8: 'NULL should return NULL, but a number should not. A number is treated as its pla'
+[04:42:34] wind tunnel: CC owner #9: "Rule 18: It should return the text 'INVALID' for the year 0000. For 9999-04-01 o"
+[04:42:39] wind tunnel: CC owner #10: 'It should be the weighted sum with weights 1 to 9, not 10 down to 2. Multiply th'
+[04:42:44] wind tunnel: CC owner #11: 'It should not return NULL. Ignore every character that is not a digit 0-9, inclu'
+[04:42:51] wind tunnel: CC owner #12: 'NULL should return NULL, but a decimal number should not. A decimal number is tr'
+[04:42:58] wind tunnel: CC owner #13: 'A number is treated as its plain text form and then handled like any other text,'
+[04:43:04] wind tunnel: CC owner #14: 'Days 1 to 5 are a grace period and return 0. From day 6 on, late_fee charges 2% '
+[04:43:11] wind tunnel: CC owner #15: 'Rule 27: It is wrong. Days 5 or fewer are a grace period and return 0. From day '
+[04:43:18] wind tunnel: CC owner #16: 'Always round the fee up to the next whole cent, so any fraction of a cent counts'
+[04:43:23] wind tunnel: CC owner #17: "Numeric text such as '10000' and '45' is not converted: if the amount or the day"
+[04:43:30] wind tunnel: CC owner #18: 'Rule 32 is wrong. Days of 5 or fewer are a grace period, so 0.5 days returns 0, '
+[04:43:38] wind tunnel: CC owner #19: "From 1000 up to but not including 5000 points is 'silver'. From 5000 up to but n"
+[04:43:43] wind tunnel: CC owner #20: "Return 'suspended' for any negative points, even -0.5. Zero and above follow the"
+[04:43:48] wind tunnel: CC owner #21: "Numeric text such as '5000' is not converted: if the points are text of any kind"
+[04:43:55] wind tunnel: CC owner #22: "Lower-case the title and replace each '&' with the word 'and'. Keep only runs of"
+[04:44:00] wind tunnel: CC owner #23: 'Rule 40: Accented letters are not converted to their base letter. Every characte'
+[04:44:05] wind tunnel: CC owner #24: 'Rule 41: Whenever make_slug meets letters with no plain a-z form (ß, Cyrillic, J'
+[04:44:11] wind tunnel: CC owner #25: "Compatibility characters such as the 'fi' ligature or a circled digit are not tu"
+[04:44:17] wind tunnel: CC owner #26: 'Cut the slug to maxlen at a word boundary, not in the middle of a word. If the c'
+[04:44:23] wind tunnel: CC owner #27: "Return 'untitled', not empty text, when maxlen is zero or negative (it is treate"
+[04:44:28] wind tunnel: CC owner #28: 'A fractional maxlen is truncated toward zero, so 5.9 acts as 5. Numeric text suc'
+[04:44:33] wind tunnel: CC owner #29: "Return 'untitled', not empty text, when the title is empty or has only spaces, p"
+[04:44:38] wind tunnel: CC owner #30: 'Whenever the end time would pass 23:59, it should return 23:59. It never wraps p'
+[04:44:43] wind tunnel: CC owner #31: 'Whenever the duration is zero or less, nothing is added and the start time itsel'
+[04:44:48] wind tunnel: CC owner #32: 'Whenever meeting_end gets a start that is not exactly a two-digit hour, a colon '
+[04:44:57] wind tunnel: CC owner #33: 'Whenever the start is not exactly a two-digit hour, a colon and two-digit minute'
+[04:45:03] wind tunnel: CC owner #34: "Rule 55: Minutes given as text of any kind, including numeric text like '30', ar"
+[04:45:09] wind tunnel: CC owner #35: 'It should not drop the fraction. A duration above zero is rounded up to whole 15'
+[04:45:14] wind tunnel: CC owner #36: 'Rule 59: It should return 0.0 when the old value is zero, whatever the new value'
+[04:45:20] wind tunnel: CC owner #37: 'It should use the signed old value as the divisor, not its size, so a negative o'
+[04:45:25] wind tunnel: CC owner #38: "Rule 64: Numeric text is not converted, and text with leading digits such as '5a"
+[04:45:31] wind tunnel: CC owner #39: 'Rule 65 is wrong. If the old value or the new value is text of any kind (includi'
+[04:45:35] wind tunnel: CC owner #40: 'Rule 67: It is wrong. Phone numbers with any number of digits other than exactly'
+[04:45:40] wind tunnel: CC owner #41: 'Rule 68: It is wrong. Phone numbers with any number of digits other than exactly'
+[04:45:49] wind tunnel: CC owner #42: 'Rule 69: It is wrong. Phone numbers with any number of digits other than exactly'
+[04:45:54] wind tunnel: CC owner #43: 'Rule 70: It is wrong. Phone numbers with any number of digits other than exactly'
+[04:46:00] wind tunnel: CC owner #44: "Rule 71: It is wrong. Non-digit characters such as letters or a trailing 'x' are"
+[04:46:06] wind tunnel: CC owner #45: 'Rule 76: Whenever avg_rating is used over a group of rows, it returns the averag'
+[04:46:13] wind tunnel: CC owner #46: 'Rule 79 is wrong. A rating given as text of any kind, including numeric text lik'
+[04:46:19] wind tunnel: CC owner #47: 'Rule 82 is wrong. The average is rounded to 1 decimal place, and an exact halfwa'
+[04:46:34] wind tunnel: CC owner #48: '- Whenever loyalty_tier gets NULL points, or points that are not a number (such '
+[04:46:34] wind tunnel: CC: 84 rules after review, 48 replies, 5.0 min
+[04:46:42] wind tunnel: CS owner #1: '5, 26, 27, 34, 35, 50, 59, 60, 67, 68, 76'
+[04:46:44] wind tunnel: CS owner #2: 'Round to the nearest 5 cents, halves up, and a 500-cent minimum after that.'
+[04:46:48] wind tunnel: CS owner #3: 'Fee starts after 5 days grace (6+ days), 2% per started 30-day period, rounded u'
+[04:46:53] wind tunnel: CS owner #4: 'Already covered in the rule 26 answer: 2% per started 30-day period, so 31-60 da'
+[04:47:01] wind tunnel: CS owner #5: 'Silver 1000 to 4999, gold 5000 to 19999, platinum 20000 or more.'
+[04:47:05] wind tunnel: CS owner #6: "Negative points should be 'suspended'."
+[04:47:10] wind tunnel: CS owner #7: 'Cap it at 23:59. It never wraps past midnight.'
+[04:47:14] wind tunnel: CS owner #8: 'Return 0.0 when the old value is zero, whatever the new value is.'
+[04:47:19] wind tunnel: CS owner #9: 'Use the signed old value as the divisor, so a negative old value flips the sign '
+[04:47:25] wind tunnel: CS owner #10: 'Only exactly 10 digits get formatted. 11 digits, even starting with 1, return th'
+[04:47:29] wind tunnel: CS owner #11: 'Rule 68: Only exactly 10 digits get formatted; any other digit count returns the'
+[04:47:35] wind tunnel: CS owner #12: 'Round the average to 1 decimal, halves up. With 5 or more valid ratings, drop on'
+[04:47:39] wind tunnel: CS owner #13: ''
+[04:47:39] wind tunnel: CS: 83 rules after review, 13 replies, 1.1 min
+[04:47:55] wind tunnel: CT owner #1: 'A negative price or quantity should give 0, not no total.'
+[04:48:00] wind tunnel: CT owner #2: "Yes, that's right"
+[04:48:09] wind tunnel: CT owner #3: 'Dates with a time on the end should still work, and prices or quantities typed a'
+[04:48:14] wind tunnel: CT owner #4: "Yes, that's right"
+[04:48:25] wind tunnel: CT owner #5: 'Book check should never reject: use the first 9 digits, work with fewer, and giv'
+[04:48:42] wind tunnel: CT owner #6: 'NULL should still give NULL, and a number should be read as its text form.'
+[04:48:52] wind tunnel: CT owner #7: "Yes, that's right"
+[04:49:05] wind tunnel: CT owner #8: 'Late fees need a 5-day grace period (up to 5 days late is 0), a 500-cent minimum'
+[04:49:26] wind tunnel: CT owner #9: 'Fees should keep growing 2% for every 30 days late, not stop at 6%.'
+[04:49:34] wind tunnel: CT owner #10: "Yes, that's right"
+[04:49:42] wind tunnel: CT owner #11: "Negative points should be 'suspended', and platinum starts at 20,000, not 10,000"
+[04:49:50] wind tunnel: CT owner #12: "Yes, that's right"
+[04:50:00] wind tunnel: CT owner #13: "Missing should give NULL, not 'missing', and blank titles or a zero limit should"
+[04:50:12] wind tunnel: CT owner #14: "Yes, that's right"
+[04:50:19] wind tunnel: CT owner #15: 'No wrapping past midnight: cap at 23:59. Zero or negative minutes should just gi'
+[04:50:30] wind tunnel: CT owner #16: "Yes, that's right"
+[04:50:37] wind tunnel: CT owner #17: 'An old value of zero should give 0.0, not blank.'
+[04:50:43] wind tunnel: CT owner #18: "Yes, that's right"
+[04:50:49] wind tunnel: CT owner #19: "Keep the main ten digits; an extension shouldn't blank the number."
+[04:50:57] wind tunnel: CT owner #20: "Yes, that's right"
+[04:51:05] wind tunnel: CT owner #21: 'Round the average to 1 decimal, not 2, so 1, 1 and 2 gives 1.3.'
+[04:51:12] wind tunnel: CT owner #22: "Yes, that's right"
+[04:51:18] wind tunnel: CT owner #23: 'Always round up on exact halves: 4.125 should show 4.13.'
+[04:51:23] wind tunnel: CT owner #24: "Yes, that's right"
+[04:51:29] wind tunnel: CT owner #25: 'No wrapping past midnight: it should stop at 23:59.'
+[04:51:33] wind tunnel: CT owner #26: "Yes, that's right"
+[04:51:36] wind tunnel: CT owner #27: 'Nothing to add'
+[04:51:36] wind tunnel: CT: 86 rules after review, 27 replies, 3.9 min
+[04:51:36] wind tunnel: judge labelling every declared decision...
+[04:53:05] wind tunnel: ask texts for CC, CS and CT written
+[04:53:05] stage 2: CC, CS, CT
+CC: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g55/upCC.git
+CS: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g55/upCS.git
+CT: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g55/upCT.git
+next: python3 lab/launch.py --run g55
+[04:53:07] launching workers...
+launched CC-w1 
+launched CC-w2 
+launched CC-w3 
+launched CS-w1 
+launched CS-w2 
+launched CS-w3 
+launched CT-w1 
+CC-w3 finished: exit 0, 0.7 min, tokens 463172, cost 0.20257770000000003
+launched CT-w2 
+CC-w1 finished: exit 0, 0.7 min, tokens 545053, cost 0.2216334
+launched CT-w3 
+CS-w1 finished: exit 0, 0.8 min, tokens 569764, cost 0.21671489999999996
+CC-w2 finished: exit 0, 0.9 min, tokens 545506, cost 0.25180290000000005
+CS-w3 finished: exit 0, 0.9 min, tokens 515839, cost 0.2298944
+CS-w2 finished: exit 0, 1.0 min, tokens 715624, cost 0.26900079999999993
+CT-w1 finished: exit 0, 1.1 min, tokens 763254, cost 0.27242069999999996
+CT-w3 finished: exit 0, 1.1 min, tokens 666310, cost 0.274014
+CT-w2 finished: exit 0, 2.9 min, tokens 643901, cost 0.2482593
+wrote /home/claude/hive/runs/g55/agents.csv
+[04:56:47] scoring every arm call by call...
+# g55: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 36.0% | 24.8%–48.4% |
+| CC | 100.0% | 100.0%–100.0% |
+| CS | 65.2% | 42.8%–85.6% |
+| CT | 66.4% | 51.6%–80.4% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| CC-N0 | +64.0 | +52.0 to +74.8 |
+| CS-N0 | +29.2 | +11.2 to +47.2 |
+| CT-N0 | +30.4 | +18.4 to +41.6 |
+[04:56:48] done. Next: write the gate RESULTS.md from runs/g55/summary.md, update BRAIN.md and lab/QUEUE.md, push.
