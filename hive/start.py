@@ -288,9 +288,9 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
         say(f'\n[{_now()}] Sent {_n(len(found), "assumption")} to your phone; waiting for your replies.')
         if _review_and_fix(state, phone):
             rc = _deliver(state)
-            phone.send(f"🎉 Done{', ' + phone.name() if phone.name() else ''}. Your changes are in. {state['check']} It's ready on branch hive/{name} whenever you are.")
+            phone.send(f"🎉 Done{', ' + phone.name() if phone.name() else ''}. Your changes are in. {state['check']} It's ready for you to look over, as a separate copy: nothing of yours was touched. (For your engineer: branch hive/{name}.)")
         else:
-            phone.send(f"✅ All set. It's ready on branch hive/{name} whenever you are.")
+            phone.send(f"✅ All set. It's ready for you to look over, as a separate copy: nothing of yours was touched. (For your engineer: branch hive/{name}.)")
         handover(state, phone)
         return rc
     if overnight:
@@ -534,5 +534,5 @@ def apply_ruling(state, rule, ch=None):
     state.update(final=run, cost=state.get('cost', 0) + _cost(run), started=time.time())
     rc = _deliver(state)
     if ch:
-        ch.send(f"🎉 Done. The build now follows your new ruling. {state['check']} It's on branch hive/{state['name']}.")
+        ch.send(f"🎉 Done. The build now follows your new ruling. {state['check']} Same separate copy as before. (For your engineer: branch hive/{state['name']}.)")
     return rc

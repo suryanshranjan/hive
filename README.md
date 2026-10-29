@@ -157,7 +157,7 @@ Every experiment (a *gate*) pushes its predictions and kill conditions to GitHub
 | --- | --- |
 | [`BRAIN.md`](BRAIN.md) | Shared memory: findings and how sure we are, measured constants, evidence log, prediction scorecard, open questions |
 | [`hive/`](hive/) | The tool |
-| [`tests/`](tests/) | Tests for the tool: 333 checks, using stand-in builders, a fake Telegram and a stand-in model, with no network; [`lab/jarvis_bench.py`](lab/jarvis_bench.py) tests Jarvis with the real model and a blind judge |
+| [`tests/`](tests/) | Tests for the tool: 341 checks, using stand-in builders, a fake Telegram and a stand-in model, with no network; [`lab/jarvis_bench.py`](lab/jarvis_bench.py) tests Jarvis with the real model and a blind judge |
 | [`gates/`](gates/) | Every experiment (Gates 0–48 and trials): predictions, results, referee code, swarm histories, logs |
 | [`lab/`](lab/) | Run any gate in one command; [`lab/QUEUE.md`](lab/QUEUE.md) is the queue and session handoff |
 | [`docs/`](docs/) | Design write-ups, the v1 plan, related work |

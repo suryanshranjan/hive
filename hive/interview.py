@@ -339,7 +339,84 @@ def _ask_fix(ch, poll, k, rule, goal, code=None):
         return _amend(rule, a)
     return rule
 
-def _confirm_pages(general, ch, poll, title, note, missing, goal='', save=None, code=None):
+TALK = """You are Hive, a founder's assistant, in the manner of J.A.R.V.I.S. with Tony Stark. His builders have just built
+part of his product. Tell him, as a short spoken message, how this part now works, so he can say whether it is what he
+wants. The part: {area}. What it does, rule by rule:
+{rules}
+
+Write 2 to 5 short sentences in plain business words, with a concrete example (names, rupees, days) where it helps.
+Cover every rule above: merge similar ones, leave none out, add nothing. No code words, no rule numbers. Then one short
+question asking whether that is how he wants it, pointing at the decision most worth his attention.
+Reply with JSON only: {{"say": "...", "ask": "...", "covers": [the rule numbers your message covers]}}"""
+
+HEAR = """Hive told a business owner how part of his product works. The rules behind it, numbered:
+{rules}
+
+He replied: "{reply}"
+
+What does he mean? Reply with JSON only:
+{{"kind": "fine" (he agrees, or wants to move on) | "question" (he asks what something means or what happens in a case)
+         | "change" (he wants something to work differently),
+ "changes": for a change, [{{"n": rule number, "rule": "that whole rule as he now wants it, keeping every part he did
+            not object to"}}],
+ "new": for a change that no rule covers, ["the new rule, in plain words"], else [],
+ "said_back": for a change, one short sentence saying back exactly what will now happen}}"""
+
+def _converse(ch, poll, area, items, general, goal, code, where, stake):
+    """One part of the sheet as a conversation (the founder: "it must be like a conversation"; a page of 8 rules was
+    "so cluttered"): Jarvis says how it works in a few sentences covering every rule, he answers in his own words, and
+    each change is said back. Returns 'done', or 'pages' for the detailed rules (his choice, or no model to talk)."""
+    nums = [n for n, _ in items]
+    listing = '\n'.join(f'{n}. {general[n - 1]}' for n in nums)
+    got = explain.ask_json(TALK.format(area=area, rules=listing))
+    got = got if isinstance(got, dict) else {}
+    say, ask = got.get('say'), got.get('ask')
+    if not isinstance(say, str) or not say.strip():
+        return 'pages'
+    covered = {n for n in got.get('covers') or [] if isinstance(n, int)}
+    left = [n for n in nums if n not in covered]   # anything the summary left out is said too: nothing hidden
+    extra = ''.join(f"\n• {general[n - 1].split(':', 1)[-1].strip()}" for n in left)
+    buttons = [[("✅ Yes, that's right", 'cv|ok')], [('📋 Show the detailed rules', 'cv|rules')]]
+    more = "<i>Say yes, tell me what to change in your own words, or ask me anything.</i>"
+    ch.send(f"🗣 <b>{telegram.esc(area)}</b>   {where}\n\n{stake}{telegram.esc(say.strip())}{telegram.esc(extra)}\n\n"
+            f"<b>{telegram.esc((ask or 'Is that how you want it?').strip())}</b>\n{more}", html=True, buttons=buttons)
+    for _ in range(15):
+        kind, a = telegram._wait(ch, poll, {'cv|ok', 'cv|rules'})
+        if a == 'cv|ok':
+            return 'done'
+        if a == 'cv|rules':
+            return 'pages'
+        if kind != 'text' or not (a or '').strip():
+            continue
+        if page_reply('text', a, nums)[0] == 'fine':
+            return 'done'
+        heard = explain.ask_json(HEAR.format(rules=listing, reply=a))
+        heard = heard if isinstance(heard, dict) else {}
+        if heard.get('kind') == 'fine':
+            return 'done'
+        if heard.get('kind') == 'question' or (heard.get('kind') != 'change' and ASKING.search(' '.join(a.lower().split()))):
+            meaning = _explain(ch, a, listing, goal, code) or 'I could not work that out from what was built, sir.'
+            ch.send(f"💬 {telegram.esc(meaning)}\n\n<i>Anything to change here, or shall we go on?</i>", html=True,
+                    buttons=buttons)
+            continue
+        changed = []
+        for c in heard.get('changes') or []:
+            if isinstance(c, dict) and c.get('n') in nums and isinstance(c.get('rule'), str) and c['rule'].strip():
+                general[c['n'] - 1] = c['rule'].strip(); changed.append(c['n'])
+        for r in heard.get('new') or []:
+            if isinstance(r, str) and r.strip():
+                general.append(f'{area}: {r.strip()}'); changed.append(len(general))
+        if changed:
+            back = heard.get('said_back') if isinstance(heard.get('said_back'), str) else ''
+            ch.send(f"✍️ {telegram.esc(back.strip() or 'Done: changed as you said.')} <i>Anything else here, or shall we "
+                    "go on?</i>", html=True, buttons=buttons)
+            continue
+        general.append(f'{area}: {a.strip()}')   # nothing could be read from it: his words go to the builders as said
+        ch.send("📝 Noted, in your words, for the builders. <i>Anything else here, or shall we go on?</i>", html=True,
+                buttons=buttons)
+    return 'done'
+
+def _confirm_pages(general, ch, poll, title, note, missing, goal='', save=None, code=None, talk=True):
     """The sheet one area at a time, at most 8 rules a page: he taps a wrong rule's number, or "this section is fine";
     each wrong rule is put right on its own page, while the context is fresh. With `save`, progress is kept after every
     page, so a review cut off midway picks up at the page it stopped on."""
@@ -369,6 +446,10 @@ def _confirm_pages(general, ch, poll, title, note, missing, goal='', save=None, 
         rows = [nums[i:i + 4] for i in range(0, len(nums), 4)] + [[('✅ This section is fine', 'pg|ok')]]
         stake = why.get(area.split(' · ')[0].split(' (')[0])   # a shared page shows its first area's stake
         stake = f"💡 <i>Why it matters: {telegram.esc(stake)}</i>\n\n" if stake else ''
+        if talk and _converse(ch, poll, area, items, general, goal, code, f'{p} of {len(pages)}   '
+                              f'{telegram.bar(p, len(pages))}', stake) == 'done':
+            keep(p); continue
+        listing = '\n'.join(f'<b>{n}.</b> {telegram.esc(general[n - 1])}' for n, _ in items)   # as he may have changed them
         ch.send(f"📋 <b>{telegram.esc(area)}</b>   {p} of {len(pages)}   {telegram.bar(p, len(pages))}\n\n{stake}{listing}\n\n"
                 "<i>Tap the number of any rule that is wrong, or tell me. Ask if anything is unclear.</i>", html=True,
                 buttons=rows)
