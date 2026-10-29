@@ -1,0 +1,17 @@
+{
+ "name": "g44",
+ "predictions": "gates/gate44/prompts/PREDICTIONS.md",
+ "rulegiver_brief": "gates/gate44/prompts/rulegiver_brief.md",
+ "require_decisions": true,
+ "prompt": "gates/gate44/prompts/prompt_builder.md",
+ "talk_prompt": "gates/gate44/prompts/prompt_builder_talk.md",
+ "board_tool": "gates/gate44/board.py",
+ "talk_arms": ["NT", "CT"],
+ "ask_texts": "runs/g44/ask_texts.md",
+ "visible_seed": 44100,
+ "hidden_seed": 44200000,
+ "baseline": "N0",
+ "pre_launch": ["python3 gates/gate44/referee/sheet44.py pre {run} {oracle}"],
+ "after_baseline": ["python3 gates/gate44/referee/sheet44.py after {run} {oracle} {base}"],
+ "arms": ["N0:3:none", "NT:3:none", "C:3:none", "CT:3:none"]
+}
