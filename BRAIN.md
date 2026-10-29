@@ -224,6 +224,7 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
   - **A correction amends the rule; it never replaces it** (Gate 39: "mostly right, but you left out a minimum" erased the rate and cap he had just confirmed). An answer in his own words counts as a choice only if it adds nothing the choice lacks. The terminal restates a rule before asking for its correction.
   - **Unusual input is a business decision** (Gate 39): all 8 decisions the interview never asked were what the product shows for an unreadable date, a lowercase code, separators or leftover fractions. But telling the planner so did not raise coverage (Gate 40), so `inputs=True` stays off.
   - **Hand over general rules, not case rulings** (Gate 41): adding his answers word for word beside the sheet cost 6.8 points and broke more (16 vs 6). The sheet's merge lost nothing measurable; the loss is that a question about a case returns a rule about that case.
+  - **Builders stay silent; team notes switch on only when they collide** (Gates 43–44: a message board added nothing at 3–6 builders). A note is one line in a landing's commit, carried by git, not a chat. It turns on for 10+ builders or at 0.5 collisions per landing (conjecture, the measured 12-worker rate was 0.48); every rebase conflict shows the recent notes. Untested where it could matter: a large, tightly coupled codebase.
   - **Hand over a sheet written from the built code** (Gate 42, synthetic owner: 99.6% vs 68.4% from the interview): every behaviour as a whole rule; the owner marks what is wrong, says it right, adds what is missing; the changes go to a fix round. In the tool (`hive/codesheet.py`, `start.handover`). Keep the interview before the build for the decisions that change what gets built.
 
 ## 8. Open questions, most important first
@@ -296,6 +297,7 @@ Rules of the lab:
 
 ## 12. Changelog
 
+- **Oct 29 2026, tool:** team notes, gated by the law (asked for by the user): `hive land --note`, `hive notes`; off below 10 builders unless the swarm's collisions reach 0.5 per landing; a conflict always shows recent notes. 216 checks pass.
 - **Oct 29 2026, Gate 44 (asked for by the user):** Hive's code sheet and a talking swarm together: the sheet added +54.8 points (100% silent and talking); talking added 0.0 with it and +4.0 without. Hive stays silent.
 - **Oct 29 2026, Gate 43 (asked for by the user):** a talking swarm (shared message board) against a silent one on the scale project: no difference in finish (3.6 vs 3.5 min), cost (1.01×) or correctness. Hive stays silent.
 - **Oct 29 2026, Gate 42:** a rule sheet written from the first build's code, corrected by the synthetic owner, took fresh builders to 99.6% (interview 68.4%, complete sheet 100%); ship rule fired. Tool: `hive/codesheet.py`; the hand-over now starts with the code sheet (mark, amend, add missing, one fix round). Next: the same with the real founder.

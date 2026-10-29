@@ -20,7 +20,7 @@ Work is claimed by area, so two workers never build the same thing:
 3. **Work** until your areas do what the goal intends in every case you can think of, not merely until a test passes.
 4. **Land.** `python3 -m hive land <short_name> "<what you did and the choices you made>"`. Exit 5: resolve the conflict, `git add`, `git rebase --continue`, then `python3 -m hive land <short_name> --continue`. Exit 6, 7 or 8: fix what it shows, commit, then `--continue`. Never bypass `hive land` with a direct push.
 5. Back to step 1.
-
+{NOTES}
 ## Stop when
 - {MINUTES} minutes have passed since your start time, or
 - every area has landed and there is nothing left you would change.

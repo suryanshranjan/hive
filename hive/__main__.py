@@ -25,7 +25,8 @@ Step by step (scripts and experiments):
 
 For the builders, inside a run:
   hive claim <name> <area>[,<area>...] "<what you will build>"     hive areas
-  hive land <name> "<commit message>"    (or: hive land <name> --continue)
+  hive land <name> "<commit message>" [--note "<one line for the team>"]   (or: hive land <name> --continue)
+  hive notes                             the latest team notes on the shared branch
   hive ask "<question>"                  hive answers
   hive assume [--technical] "<default>"  hive assumptions
 """
@@ -68,6 +69,8 @@ def main(argv=None):
     c = sub.add_parser('claim'); c.add_argument('name'); c.add_argument('areas'); c.add_argument('desc')
     l = sub.add_parser('land'); l.add_argument('name'); l.add_argument('message', nargs='?')
     l.add_argument('--continue', dest='cont', action='store_true')   # after fixing a conflict or a blocked landing
+    l.add_argument('--note', help='one line the other builders should know (a shared helper, a changed interface)')
+    nt = sub.add_parser('notes'); nt.add_argument('-n', type=int, default=8)
     sub.add_parser('areas')
     r = sub.add_parser('run'); r.add_argument('--repo', default='.'); r.add_argument('--run', required=True)
     r.add_argument('--workers', type=int, required=True); r.add_argument('--goal', required=True)
@@ -125,7 +128,9 @@ def main(argv=None):
     if a.cmd == 'land':
         if not a.cont and not a.message:
             ap.error('land needs a commit message, or --continue')
-        return guard.land(a.name, '--continue' if a.cont else a.message)
+        return guard.land(a.name, '--continue' if a.cont else a.message, a.note)
+    if a.cmd == 'notes':
+        return guard.show_notes(a.n)
     if a.cmd == 'areas':
         return claims.status()
     if a.cmd == 'run':

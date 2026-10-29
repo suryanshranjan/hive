@@ -8,7 +8,7 @@ Workers run $HIVE_WORKER_CMD (default: headless Claude Code) inside their clone 
 shell commands, so run swarms in a container or a throwaway VM."""
 import csv, json, os, shlex, shutil, subprocess, sys, time
 
-from . import PY, config, owner
+from . import PY, config, law, owner
 from .guard import sh
 
 DEFAULT_CMD = 'claude -p --output-format json --permission-mode acceptEdits --allowedTools Bash Read Edit Write Glob Grep'
@@ -75,6 +75,11 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
     sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--bare', '--branch', b, repo, up)
     sh('git', '-C', up, 'symbolic-ref', 'HEAD', f'refs/heads/{b}')
     template = open(os.path.join(HIVE_ROOT, 'hive', 'templates', 'worker.md'), encoding='utf-8').read()
+    notes_on, _ = law.notes(workers)   # Gates 43-44: silence is enough below about 10 builders
+    notes_text = ("\n## Team notes\nThis swarm is large enough that builders may change the same code. At each sync, "
+                  "`python3 -m hive notes` shows what the others said. When you land something others must know about (a "
+                  "shared helper, a changed interface, a file many will touch), add `--note \"<one line>\"` to `hive land`. "
+                  "One line, only when it matters.\n") if notes_on else ""
     goal_text = open(goal, encoding='utf-8').read().strip() if os.path.exists(goal) else goal
     for k in range(1, workers + 1):
         me = f'w{k}'; work = os.path.join(run, 'work', me)
@@ -87,7 +92,7 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
         text = (template.replace('{ME}', me).replace('{N}', str(workers)).replace('{WORK}', work).replace('{BRANCH}', b)
                 .replace('{LOG}', os.path.join(run, 'logs', f'{me}.log')).replace('{GOAL}', goal_text)
                 .replace('{TEST_CMD}', cfg['test_cmd']).replace('{AREAS}', _areas_text(cfg)).replace('{OWNER}', owner_text)
-                .replace('{MINUTES}', str(minutes)))
+                .replace('{MINUTES}', str(minutes)).replace('{NOTES}', notes_text))
         open(os.path.join(run, 'prompts', f'{me}.md'), 'w', encoding='utf-8').write(text.replace('python3 -m hive', f'{PY} -m hive'))
     json.dump(dict(repo=repo, branch=b, workers=workers, started=None), open(os.path.join(run, 'run.json'), 'w'), indent=1)
     return run

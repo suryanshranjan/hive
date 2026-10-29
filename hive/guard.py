@@ -13,7 +13,7 @@ add patterns with "never_commit") and leaves build artifacts and dependency fold
 Exit codes: 0 landed; 2 push kept failing; 5 rebase conflict; 6 duplicate definitions; 7 regressions; 8 forbidden files."""
 import ast, fnmatch, hashlib, io, json, os, subprocess, sys, tarfile, tempfile, time
 
-from . import config, junit
+from . import config, junit, law
 
 LOCK_DIR = 'current_tasks'
 NEVER_COMMIT = ['.env', '.env.*', '*.pem', '*.key', '*.p12', '*.pfx', 'id_rsa*', 'id_ed25519*', '*credentials*.json',
@@ -47,6 +47,17 @@ def log(event):
     p = os.environ.get('HIVE_LOG')
     if p:
         open(p, 'a').write(f'{int(time.time())} {event}\n')
+    run = os.environ.get('HIVE_RUN')   # the whole swarm's landings and collisions, for the notes switch
+    if run and event.split()[0] in ('LAND', 'CONFLICT') and os.path.isdir(run):
+        open(os.path.join(run, 'landings.log'), 'a').write(f'{int(time.time())} {event.split()[0]}\n')
+
+def swarm_collisions():
+    """(collisions, landings) so far in this swarm (0, 0 outside a Hive run)."""
+    run = os.environ.get('HIVE_RUN'); path = run and os.path.join(run, 'landings.log')
+    if not path or not os.path.exists(path):
+        return 0, 0
+    kinds = [l.split()[1] for l in open(path) if len(l.split()) > 1]
+    return kinds.count('CONFLICT'), kinds.count('LAND')
 
 # ---------------------------------------------------------------- duplicate definitions (Python files)
 
@@ -131,9 +142,36 @@ def main_results(cfg):
 
 # ---------------------------------------------------------------- landing
 
-def land(name, message):
-    """message is a commit message, or '--continue' after resolving a rebase conflict."""
+NOTE = 'Team-note:'
+
+def team_notes(b=None, n=8):
+    """The latest one-line team notes on the shared branch, newest first: (who, note)."""
+    b = b or branch(config.load())
+    sh('git', 'fetch', '-q', 'origin', b)
+    out = sh('git', 'log', f'origin/{b}', '-n', '200', '--format=%an%x00%B%x01').stdout
+    got = []
+    for entry in out.split('\x01'):
+        if '\x00' not in entry:
+            continue
+        who, body = entry.split('\x00', 1)
+        got += [(who.strip(), l.split(NOTE, 1)[1].strip()) for l in body.splitlines() if l.strip().startswith(NOTE)]
+    return got[:n]
+
+def show_notes(n=8):
+    got = team_notes(n=n)
+    print('\n'.join(f'{who}: {note}' for who, note in got) if got else '(no team notes yet)')
+    return 0
+
+def land(name, message, note=None):
+    """message is a commit message, or '--continue' after resolving a rebase conflict. A note (one line others should
+    know: a shared helper, a changed interface, a file many touch) rides in the commit as a Team-note trailer."""
     cfg = config.load(); b = branch(cfg)
+    note = ' '.join((note or '').split())[:300]
+    if note and message != '--continue':
+        message = f'{message}\n\n{NOTE} {note}'
+    elif note:   # after a conflict: the note goes on the commit being landed
+        body = sh('git', 'log', '-1', '--format=%B').stdout.rstrip()
+        sh('git', 'commit', '-q', '--amend', '-m', f'{body}\n\n{NOTE} {note}')
     lock = os.path.join(LOCK_DIR, f'{name}.txt')
     if message != '--continue':
         if os.path.exists(lock):
@@ -149,7 +187,8 @@ def land(name, message):
             log(f'BLOCKED_FORBIDDEN {name} {len(bad)}')
             print('Refused: these files must never be committed (secrets or dependencies): ' + ', '.join(bad[:10]))
             print('Delete them or add them to .gitignore, then run hive land again.'); return 8
-        r = sh('git', 'commit', '-q', '-m', f'{message} (lock {name} released)')
+        head, _, rest = message.partition('\n')
+        r = sh('git', 'commit', '-q', '-m', f'{head} (lock {name} released)' + ('\n' + rest if rest else ''))
         if r.returncode and 'nothing to commit' not in r.stdout + r.stderr:
             print(r.stdout, r.stderr); return 2
     for _ in range(8):
@@ -157,6 +196,15 @@ def land(name, message):
             files = sh('git', 'diff', '--name-only', '--diff-filter=U').stdout.split()
             log(f'CONFLICT {name} {" ".join(files)}')
             print('Rebase conflict in: ' + ', '.join(files) + f'\nResolve, git add, git rebase --continue, then: hive land {name} --continue')
+            got = team_notes(b, 5)   # a collision is when notes matter (Gates 43-44: rarely otherwise)
+            if got:
+                print('Recent team notes (others may be changing the same code):\n' + '\n'.join(f'  {w}: {t}' for w, t in got))
+            print('If what you resolved affects others, add --note "<one line>" to the --continue.')
+            c, l = swarm_collisions()
+            on, why = law.notes(0, c, l)
+            if on:   # switched on only when this swarm's builders keep colliding
+                print(f'Team notes are now on for this swarm ({why}): run `hive notes` at each sync, and add '
+                      '--note "<one line>" when you land something others must know about.')
             return 5
         new_dups = dup_defs(python_sources('HEAD')) - dup_defs(python_sources(f'origin/{b}'))
         if new_dups:
