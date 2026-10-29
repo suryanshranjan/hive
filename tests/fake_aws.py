@@ -12,6 +12,12 @@ replies = {
     'ec2 run-instances': {'Instances': [{'InstanceId': 'i-0hive'}]},
     'ec2 describe-instances': {'Reservations': [{'Instances': [{'PublicIpAddress': '203.0.113.9'}]}]},
 }
+if os.environ.get('FAKE_AWS_EXPIRED') and cmd != 'configure get':   # expired credentials: every call fails
+    sys.stderr.write('An error occurred (ExpiredToken): The security token included in the request is expired\n')
+    sys.exit(255)
+if cmd == 'ec2 describe-instances' and 'terminate' in open(os.environ['FAKE_AWS_LOG']).read():
+    print(json.dumps({'Reservations': [{'Instances': [{'PublicIpAddress': '203.0.113.9', 'State': {'Name': 'terminated'}}]}]}))
+    sys.exit(0)
 if cmd == 'configure get':
     print('ap-south-1')
 elif cmd in replies:

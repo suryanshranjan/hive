@@ -128,14 +128,32 @@ def stop(ask=input, say=print, repo='.', relisten=True):
                                                   "anyway, losing what was built there? [y/N] > ").strip().lower() not in ('y', 'yes'):
             say('Kept. Run `hive cloud pull` to try again, then `hive cloud --stop`.'); return 6
     p, r = m.get('profile'), m.get('region')
+    failed = []   # every step is checked: --stop once said "Deleted" while expired credentials had deleted nothing
     if m.get('instance'):
-        _aws(['ec2', 'terminate-instances', '--instance-ids', m['instance']], p, r, check=False)
         say(f"  Deleting {m['instance']}...")
-        _aws(['ec2', 'wait', 'instance-terminated', '--instance-ids', m['instance']], p, r, check=False)
-    if m.get('group'):
-        _aws(['ec2', 'delete-security-group', '--group-id', m['group']], p, r, check=False)
-    if m.get('key_name'):
-        _aws(['ec2', 'delete-key-pair', '--key-name', m['key_name']], p, r, check=False)
+        try:
+            _aws(['ec2', 'terminate-instances', '--instance-ids', m['instance']], p, r)
+            _aws(['ec2', 'wait', 'instance-terminated', '--instance-ids', m['instance']], p, r)
+            state = _aws(['ec2', 'describe-instances', '--instance-ids', m['instance']], p, r)
+            gone = state.get('Reservations', [{}])[0].get('Instances', [{}])[0].get('State', {}).get('Name') == 'terminated'
+            if not gone and state:
+                failed.append(f"the machine {m['instance']} is not terminated yet")
+        except Exception as e:
+            failed.append(f"the machine {m['instance']}: {e}")
+    if m.get('group') and not failed:   # the firewall rule can only go once the machine is gone
+        try:
+            _aws(['ec2', 'delete-security-group', '--group-id', m['group']], p, r)
+        except Exception as e:
+            failed.append(f"the firewall rule {m['group']}: {e}")
+    if m.get('key_name') and not failed:
+        try:
+            _aws(['ec2', 'delete-key-pair', '--key-name', m['key_name']], p, r)
+        except Exception as e:
+            failed.append(f"the key {m['key_name']}: {e}")
+    if failed:   # keep the record, so --stop can be run again; never claim what did not happen
+        say("I could NOT delete everything, so it may still be running and billing:\n  - " + '\n  - '.join(failed) +
+            "\nCheck your AWS login (aws login), then run `hive cloud --stop` again.")
+        return 7
     for f in (m.get('key'), os.path.join(HOME(), m['name'] + '.boot.sh'), STATE()):
         if f and os.path.exists(f):
             os.remove(f)
