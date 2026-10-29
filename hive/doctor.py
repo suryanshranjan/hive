@@ -19,8 +19,14 @@ def checks(repo='.', claude_probe=True):
     git = shutil.which('git')
     out.append((bool(git), True, 'git is installed', 'Install git from git-scm.com.'))
     claude = shutil.which('claude')
-    out.append((bool(claude), True, 'Claude Code is installed (the builders run on it)',
+    out.append((bool(claude), True, 'Claude Code is installed (Hive thinks with it; builders run on it by default)',
                 'Install it: npm install -g @anthropic-ai/claude-code, then run claude once to log in.'))
+    from . import swarm
+    agent = (os.environ.get('HIVE_AGENT') or swarm.config_agent() or 'claude').lower()
+    if agent != 'claude' and agent in swarm.AGENTS:   # builders on another agent: it must be there too
+        exe = swarm.AGENTS[agent][1]
+        out.append((bool(shutil.which(exe)), True, f'{agent} is installed (your builders run on it)',
+                    f'Install {agent} and log in once in a terminal ({exe}), or build with --agent claude.'))
     if claude and claude_probe:
         p = _run(['claude', '-p', 'Reply with the single word OK'], timeout=90)
         ok = bool(p and p.returncode == 0 and 'OK' in p.stdout.upper())

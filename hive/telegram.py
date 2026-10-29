@@ -330,6 +330,17 @@ def is_clarify(text):
     t = (text or '').strip()
     return bool(t) and len(t) < 160 and bool(CLARIFY.search(t) or re.fullmatch(r"(what|huh|hmm+|sorry)\W*\??", t, re.I))
 
+class Stopped(Exception):
+    """He asked to stop the build while Hive was waiting for an answer: it ends cleanly, nothing built or changed."""
+
+STOP = re.compile(r"^\s*(please\s+)?(stop|cancel|abort|halt|kill)(\s+(it|this|that|the build|building|everything|all|now|"
+                  r"the whole thing))*\s*(please|now)?[\s.!]*$|\b(stop|cancel|abort)\s+(the\s+)?(build|building)\b|"
+                  r"\b(band karo|ruk jao|rok do)\b", re.I)
+
+def is_stop(text):
+    """He wants the build stopped ("stop", "cancel the build", "band karo"), not answering the question."""
+    return bool(text and STOP.search(text.strip()))
+
 def understand(text, about):
     """Reason about the owner's reply the way an assistant would (Gate 38: "What does it mean" and "What is review, I
     don't understand" were taken as his rules): did he answer, or ask what the question means? Returns
@@ -364,6 +375,10 @@ def _wait(ch, poll, want, current=None, about=None):
                 continue
             if text and answer_status(ch, text):
                 continue
+            if text and not ch.listener and is_stop(text):   # "stop the build" mid-question is not his answer
+                ch.send("🛑 Understood. I've stopped: nothing was built or changed. Say the word when you want to start "
+                        "again.")
+                raise Stopped(text)
             if text and about:
                 kind, explanation = understand(text, about)
                 if kind == 'question':

@@ -65,7 +65,7 @@ check "with expired AWS credentials, --stop says it could NOT delete, and keeps 
 printf 'y\n' | $PY -m hive cloud --stop > $T/stop.txt 2>&1
 check "--stop brings the cloud's work back to this computer before deleting" "$(git branch --list 'hive/ratings' | tr -d ' *')" "hive/ratings"
 check "every other branch comes home too, kept apart from his own, and the build records" \
-  "$(git rev-parse -q --verify refs/remotes/hive-cloud/experiment >/dev/null && echo yes) $(ls $T/.hive/runs-from-cloud/*/runs/ratings-1/state.json 2>/dev/null | wc -l | tr -d ' ') $(grep -c 'Checked: all' $T/stop.txt)" "yes 1 1"
+  "$(git rev-parse -q --verify refs/remotes/hive-cloud/experiment >/dev/null && echo yes) $(ls $T/.hive/runs-from-cloud/project/runs/ratings-1/state.json 2>/dev/null | wc -l | tr -d ' ') $(grep -c 'Checked: all' $T/stop.txt)" "yes 1 1"
 check "and the rules and conversation from the cloud come home too"   "$($PY -m hive rules | grep -c 'Ratings show after both sides review') $(grep -c 'said in the cloud' $T/.hive/conversation.json)" "1 1"
 check "--stop deletes the machine (2 tries: the expired one, then this), its firewall rule and its key; nothing is left" \
   "$(grep -c 'terminate-instances --instance-ids i-0hive' $T/aws.log) $(grep -c 'delete-security-group --group-id sg-0hive' $T/aws.log) $(grep -c 'delete-key-pair' $T/aws.log) $(ls $T/.hive/cloud | wc -l | tr -d ' ')" "2 1 1 0"

@@ -12,6 +12,35 @@ from . import PY, config, law, owner
 from .guard import sh
 
 DEFAULT_CMD = 'claude -p --output-format json --permission-mode acceptEdits --allowedTools Bash Read Edit Write Glob Grep'
+
+# Any coding agent can be a builder (the owner: "Hive can work with any"). Each runs unattended in its own clone and
+# reads its instructions on stdin; agents that take the task as an argument get it from stdin through `sh -c`.
+# Builders push to the shared upstream outside their folder, so sandboxed agents need write access beyond it: run
+# Hive in a container. Codex was run for real (0.160.1, reads stdin); Gemini's and Antigravity's flags are as
+# documented in Oct 2026, and Antigravity's approval flag is unverified (sources disagree).
+AGENTS = {
+    'claude': (DEFAULT_CMD, 'claude'),
+    'codex': ('codex exec --json --skip-git-repo-check --sandbox danger-full-access -', 'codex'),   # verified, 0.160.1
+    'gemini': ("""sh -c 'gemini --yolo --output-format json -p "$(cat)"'""", 'gemini'),
+    'antigravity': ("""sh -c 'agy --output-format json --approve all -p "$(cat)"'""", 'agy'),
+}
+
+def builder_cmd(agent=None):
+    """The command that runs one builder: HIVE_WORKER_CMD if set, else the chosen agent's preset (default Claude Code)."""
+    if os.environ.get('HIVE_WORKER_CMD'):
+        return os.environ['HIVE_WORKER_CMD']
+    agent = (agent or os.environ.get('HIVE_AGENT') or config_agent() or 'claude').lower()
+    if agent not in AGENTS:
+        raise SystemExit(f"Hive doesn't know the agent '{agent}'. Choose one of: {', '.join(AGENTS)}, or set "
+                         "HIVE_WORKER_CMD to any command that reads its task on stdin.")
+    return AGENTS[agent][0]
+
+def config_agent():
+    """The builder agent saved in ~/.hive/agent (set with `hive start --agent ... --save-agent`)."""
+    try:
+        return open(os.path.join(os.path.expanduser('~'), '.hive', 'agent')).read().strip()
+    except OSError:
+        return None
 HIVE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def _usage(path):
@@ -100,7 +129,7 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
 def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
     """Run every worker (at most max_parallel at once), wait for all, and write <run>/agents.csv."""
     run = os.path.abspath(run)
-    cmd = shlex.split(os.environ.get('HIVE_WORKER_CMD', DEFAULT_CMD))
+    cmd = shlex.split(builder_cmd())
     env = dict(os.environ, PYTHONPATH=HIVE_ROOT + os.pathsep + os.environ.get('PYTHONPATH', ''),
                HIVE_GUARD_CACHE=os.path.join(run, 'guard_cache'), HIVE_RUN=run)
     queue = sorted(f[:-3] for f in os.listdir(os.path.join(run, 'prompts')) if f.endswith('.md'))
