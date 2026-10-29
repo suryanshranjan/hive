@@ -17,7 +17,7 @@ check('a small computer limits them when the tests are slow (each builder keeps 
 n, why = law.builders(1.4, cpus=2)
 check('with a fast suite, 2 cores do not limit them to 2 (Gate 50: 7 builders 3.0x faster than one)', n >= 7, True)
 check('the scalability fit peaks near Gate 50\'s best team size', max(range(1, 65), key=law.speedup) in (7, 8), True)
-check('the trade is said in plain words', ('speed of one builder' in law.trade(7), law.trade(1).startswith('one builder')), (True, True))
+check('the trade is said in plain words', ('speed of one builder' in law.trade(7), law.trade(1) == 'the cheapest way'), (True, True))
 n, why = law.builders(5, cpus=16, decisions=4)
 check('a small job gets few builders (about 3 decisions each)', (n, '4 decisions' in why), (2, True))
 n, why = law.builders(1.4, cpus=8, parts=1)

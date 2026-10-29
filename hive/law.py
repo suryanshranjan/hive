@@ -55,7 +55,7 @@ def cost_vs_one(n):
 def trade(n):
     """The owner's trade in plain words: speed and cost against one builder (Gate 50)."""
     if n <= 1:
-        return 'one builder: the cheapest, and the slowest'
+        return 'the cheapest way'
     return f'about {speedup(n):.1f}× the speed of one builder, for about {cost_vs_one(n):.1f}× the cost'
 
 PARTS = """Software builders are about to work on this goal, in parallel, each in its own copy of the code:
