@@ -265,12 +265,53 @@ def rule_sheet(rules, ch=None, ask=None, poll=20, save=None):
 SHEET_TITLE = 'Your rules for this feature, as the builders will follow them'
 SHEET_NOTE = 'Each one applies to every case like it, not just the example.'
 
+PAGED_FROM = 10   # longer sheets go page by page
+
+def _confirm_pages(general, ch, poll, title, note, missing):
+    """The sheet one area at a time, at most 8 rules a page: he taps a wrong rule's number, or "this section is fine";
+    each wrong rule is put right on its own page, while the context is fresh."""
+    from .codesheet import areas
+    pages = areas(general)
+    ch.send(f"📜 <b>{telegram.esc(title)}</b>\n\n{len(general)} rules in {len(pages)} short sections. <i>{telegram.esc(note)} "
+            "Most will be right: tap \"this section is fine\" to move on.</i>", html=True)
+    for p, (area, items) in enumerate(pages, 1):
+        listing = '\n'.join(f'<b>{n}.</b> {telegram.esc(r)}' for n, r in items)
+        nums = [(str(n), f'pg|{n}') for n, _ in items]
+        rows = [nums[i:i + 4] for i in range(0, len(nums), 4)] + [[('✅ This section is fine', 'pg|ok')]]
+        ch.send(f"📋 <b>{telegram.esc(area)}</b>   {p} of {len(pages)}   {telegram.bar(p, len(pages))}\n\n{listing}\n\n"
+                "<i>Tap the number of any rule that is wrong, or tell me.</i>", html=True, buttons=rows)
+        wrong, valid = [], {n for n, _ in items}
+        while True:
+            kind, a = telegram._wait(ch, poll, {d for row in rows for _, d in row})
+            if a == 'pg|ok' or (kind == 'text' and (is_yes(a) or no_rule(a))):
+                break
+            picks = [int(a.split('|')[1])] if kind == 'tap' else [int(x) for x in re.findall(r'\d+', a)]
+            if kind == 'text' and not picks:   # his words without a number: a correction to this section as a whole
+                general.append(f'{area}: {a.strip()}'); ch.send('📝 Noted for this section.'); continue
+            for k in picks:
+                if k in valid and k not in wrong:
+                    wrong.append(k); ch.send(f'🔖 {k} marked. Tap more, or "this section is fine" when done.')
+        for k in wrong:
+            ch.send(f"✍️ <b>Rule {k}:</b> {telegram.esc(general[k - 1])}\n\n<b>What should it be?</b> <i>Your own words, "
+                    "or 🎙 a voice note.</i>", html=True)
+            general[k - 1] = _amend(general[k - 1], telegram._wait(ch, poll, set())[1])
+    if missing:
+        ch.send("➕ <b>Anything the builders should know that is not on these pages?</b> <i>Say it in your own words, "
+                "or tap Nothing to add.</i>", html=True, buttons=[[('✅ Nothing to add', 'sheet|none')]])
+        kind, a = telegram._wait(ch, poll, {'sheet|none'})
+        if kind == 'text' and a.strip() and not no_rule(a) and not is_yes(a):
+            general.append(a.strip())
+    ch.send('✅ Thank you. These are your rules now; the builders will encode every one as a test.')
+    return general
+
 def confirm_sheet(general, ch=None, ask=None, poll=20, title=SHEET_TITLE, note=SHEET_NOTE, missing=False):
     """Show the whole sheet; he marks the numbers of any wrong rules and says each one right; each is amended, not
     replaced (Gate 39). With `missing`, he is then asked what the builders should know that is not on it (Gate 42: a
     sheet written from the built code). Returns the confirmed rules."""
     general = list(general)
     listing = '\n'.join(f'<b>{n}.</b> {telegram.esc(r)}' for n, r in enumerate(general, 1))
+    if ch and len(general) > PAGED_FROM:   # a long sheet in pages by area (the owner: "60-80 rules is too much")
+        return _confirm_pages(general, ch, poll, title, note, missing)
     if ch:
         nums = [(str(n), f'sheet|{n}') for n in range(1, len(general) + 1)]
         rows = [nums[i:i + 5] for i in range(0, len(nums), 5)] + [[('✅ All correct', 'sheet|done')]]

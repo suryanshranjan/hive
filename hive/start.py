@@ -447,9 +447,15 @@ def handover(state, ch=None, poll=20, rounds=3):
     a settled rule, so he sees the whole result as rules and confirms it)."""
     sheet = _code_sheet(state)
     if sheet:   # Gate 42: the sheet from the built code is complete by construction; he marks only what is wrong
+        known = (state.get('asked') or []) + [r['text'] for r in memory.load(state['repo'])]
+        show, his = codesheet.split_known(sheet, known)   # what only repeats his own rules is not read again
         if not ch:
-            say('\nHere is everything the build does now, written from its code.')
-        done = interview.confirm_sheet(sheet, ch, None if ch else (lambda p: _ask(p, '')), poll,
+            say('\nHere is everything the build does now, written from its code' +
+                (f" ({len(his)} more only repeat your own rules, so I left them out)." if his else '.'))
+        elif his:
+            ch.send(f"🐝 The build follows your {len(his)} rule{'s' if len(his) != 1 else ''} as you gave them, so I've "
+                    "left those out. Here is the rest of what it does.")
+        done = interview.confirm_sheet(show, ch, None if ch else (lambda p: _ask(p, '')), poll,
                                        title='What the build does now, as rules',
                                        note='Each one is what the product will do. Mark any that is not your policy.',
                                        missing=True)
