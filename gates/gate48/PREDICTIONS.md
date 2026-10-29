@@ -47,3 +47,19 @@ Jev is a "decision model": it picks among options in a fraction of a second. Its
 ## Cost
 
 About 120 Claude calls (around $1) and a few minutes of CPU. Laya and its models are free.
+
+## Amendment (Oct 29 2026, after the registered arms ran, before v3 runs on this set)
+
+The registered arms are scored (kill fired: Laya-ml 42.5%, Claude 92.5%). Two causes were then found on the separate practice set `dev.jsonl` (48 new messages, never in this set):
+- **Speed:** PyTorch used all 24 host threads inside a 2-CPU container. With `OMP_NUM_THREADS=2` the median fell from 5.0 to 0.55–0.72 s.
+- **Accuracy:** the catch-all "anything else" was almost never chosen. Splitting it into concrete meanings and tightening "stop" (v3) raised practice accuracy from 18/48 to 30/48, and wrong stops from 7 to 1. Yes/no questions per meaning (v4: 16/48) and the English checkpoint with v3 (29/48) did worse. Claude read 46/48 of the practice set.
+- On the practice set no variant reaches 95% at any confidence threshold (v3 at ≥ 0.9: 9 of 11), so the registered hybrid rule would never let Laya answer.
+
+**Run once on this set:** laya-ml with v3, 2 threads (`run48.py laya-ml <out> --variant v3`).
+
+| # | Prediction | Odds |
+| --- | --- | --- |
+| A1 | v3 reads 55% to 72% of the 120 right | 60% |
+| A2 | Median time ≤ 1.0 s (L3 under the fixed setting) | 85% |
+| A3 | v3 makes at most 3 wrong stop calls (v1: 13) | 55% |
+| A4 | The hybrid rule (threshold fitted on the practice set) still lets Laya answer nothing, so Claude stays the only reader | 85% |
