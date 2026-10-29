@@ -300,7 +300,11 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
                 f"`hive morning` to check {'it' if len(found) == 1 else 'them'}; I'll fix anything you correct and update "
                 f"the branch.")
         return rc
-    if found:
+    sheet = _code_sheet(state) if found else None   # Gate 52: one review, not two (20 assumptions, then the sheet)
+    if found and sheet:
+        say(f"They made {_n(len(found), 'assumption')} your description didn't cover. Rather than going through them one "
+            "by one, I'll show you everything the build does, as rules: that covers them all.")
+    elif found:
         n = len(found)
         say(f"Before I hand it over: they made {_n(n, 'assumption')} your description didn't cover. Let's check "
             f"{'it' if n == 1 else 'them'} together: press Enter if one is right, or say what should happen instead.")
@@ -310,7 +314,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
             say(str(e) + " The build is handed over as is; run `hive morning` later to check its decisions.")
             state["overnight"] = True
     rc = _deliver(state)
-    handover(state, phone)
+    handover(state, phone, sheet=sheet)
     return rc
 
 def _review_and_fix(state, phone=None):
@@ -451,11 +455,11 @@ def morning(name=None, phone=False):
     handover(state, ch)
     return rc
 
-def handover(state, ch=None, poll=20, rounds=3):
+def handover(state, ch=None, poll=20, rounds=3, sheet=None):
     """The last step: show the owner what the product now does by his rules, and get a yes. Anything he says is
     different goes straight to a fix round on the same branch (Gate 37: his answer to one framing of a decision is not
     a settled rule, so he sees the whole result as rules and confirms it)."""
-    sheet = _code_sheet(state)
+    sheet = sheet if sheet is not None else _code_sheet(state)
     if not sheet and state.get('sheet_source'):
         shutil.rmtree(state.pop('sheet_source'), ignore_errors=True)
     if sheet:   # Gate 42: the sheet from the built code is complete by construction; he marks only what is wrong

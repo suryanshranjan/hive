@@ -78,4 +78,11 @@ printf 'Implement creator fees and payouts.\n' | HIVE_RESUME_MIN=1 HIVE_WORKER_C
   $PY -m hive start --workers 2 --overnight > $T/limit.txt 2>&1
 check "a usage limit is told to the owner, and the build still finishes" \
   "$? $(grep -c "usage limit was reached. I'll pick up again at" $T/limit.txt)" "0 1"
+# Gate 52: when the code sheet can be written, it replaces the one-by-one assumption review (one review, not two)
+git checkout -q main
+printf 'Implement creator fees and payouts.\nA\nOnly charge a late fee after a week.\n' | \
+  HIVE_DESCRIBE_CMD="$PY $HIVE/tests/fake_describe_sheet.py" $PY -m hive start --workers 2 > $T/sheet.txt 2>&1
+check "with a code sheet, it exits cleanly" $? 0
+check "the assumptions are covered by the code sheet, not reviewed one by one" \
+  "$(grep -c "Rather than going through them one by one" $T/sheet.txt) $(grep -c "Assumption 1 of" $T/sheet.txt) $(grep -c "What the build does now, as rules" $T/sheet.txt)" "1 0 1"
 rm -rf $T; exit $fail

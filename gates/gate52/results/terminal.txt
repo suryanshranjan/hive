@@ -1,0 +1,346 @@
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: pytest. 2 tests, all passing.
+
+I'll put 8 builders on it (that is the most builders tested end to end so far): about 2.3× the speed of one builder, for about 2.2× the cost. They work on copies, so your branches stay exactly as they are.
+If they need a decision only you can make, the question will appear right here.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+
+First, a few quick situations where your own rules matter:
+
+1 of 11. Meera bought a 4,000 rupee kurta set and it was delivered 31 days ago. She asks for her money back. What happens?
+  A) Refused. Refunds stop after 30 days, so she gets nothing  B) Refunds are accepted up to 15 days after delivery, and nothing after that  C) Refunds are accepted up to 30 days after delivery, and she gets store credit only from day 31 to day 45
+  Your answer (a letter, or your own words) > 
+  > Refused, she gets nothing. Day 31 is past 30 days, so no refund at all, unless the goods arrived damaged.
+
+2 of 11. Arjun paid 2,000 rupees for shoes plus 150 rupees for delivery. Five days later he says he simply changed his mind and sends the shoes back unused. What does he get back?
+  A) 2,000 rupees. The delivery charge is not returned and nothing is deducted  B) 2,000 rupees minus a 10% handling fee, so 1,800 rupees, and no delivery charge  C) 2,150 rupees, the full amount including delivery
+  Your answer (a letter, or your own words) > 
+  > A) 2,000 rupees. The delivery charge is never refunded, and nothing is deducted.
+  (Your answer also settles 1 of the coming question; I'll skip it.)
+
+4 of 11. A customer asks for a refund and gives one of these reasons: 'wrong item sent', 'delivered 10 days late', 'other', or she leaves the reason blank. How should these be treated?
+  A) Like a changed mind: item price only, no delivery charge  B) 'Wrong item sent' is treated like damaged, with the delivery charge refunded too. 'Late delivery', 'other' and blank are treated like a changed mind  C) Everything that is your fault (wrong item, late delivery) is treated like damaged. 'Other' and blank are treated like a changed mind
+  Your answer (a letter, or your own words) > 
+  > B) Only "wrong item sent" is treated like damaged: full refund up to 90 days, delivery charge refunded too. Late delivery, other and blank are treated like a changed mind.
+
+Wait, my policy only names the reason "damaged" for special treatment. So really: only "damaged" gets the special treatment. Wrong item, late delivery, other and blank are all treated like a changed mind.
+
+5 of 11. Rohit paid for a 3,000 rupee order by card, and his refund is approved. Where does the money go? Also, Priya paid with a gift card. Where does hers go?
+  A) Rohit's money goes back to his card. Priya's goes back as store credit  B) Everyone gets store credit, whatever they paid with  C) Changed-mind refunds are store credit only. Damaged-item refunds go back to the card
+  Your answer (a letter, or your own words) > 
+  > Card orders go back to the card, and orders paid with store credit go back as store credit. Priya paid with a gift card, which my policy doesn't mention, so I'm not sure how that one is handled.
+
+6 of 11. Vikram had a 5,000 rupee jacket on sale. He used a coupon and paid only 3,500 rupees. He returns it. What does he get back?
+  A) 3,500 rupees, which is what he actually paid  B) 5,000 rupees, the full list price  C) 3,500 rupees as cash. If the coupon was a free gift or a loyalty reward, he gets store credit worth the discounted price
+  Your answer (a letter, or your own words) > 
+  > A) 3,500 rupees. Refunds are worked out on what he actually paid, which is the item price minus the discount code.
+
+7 of 11. Anita's order was 2,000 rupees of goods, 360 rupees of tax, 100 rupees for delivery and a 50 rupee gift-wrap fee. She returns it. What does she get back?
+  A) Goods and tax (2,360 rupees). Delivery is refunded only if the item was damaged. The gift-wrap fee is never refunded  B) Everything she paid, 2,510 rupees, in every case  C) Goods only (2,000 rupees). No tax, delivery or fees are refunded, even for damaged items
+  Your answer (a letter, or your own words) > 
+  > A) is close but wrong on one thing: my policy doesn't refund tax or gift-wrap separately. The refund is worked out on item prices times quantities minus the discount code, so Anita gets the goods only, 2,000 rupees, with the time rules applied. Delivery is refunded only if damaged. I don't have a rule for tax or gift-wrap, so I'd say neither is refunded.
+  (Your answer also settles 1 of the coming question; I'll skip it.)
+
+9 of 11. Neha wants to return a gift card, a custom-embroidered cushion cover and a pack of fresh sweets, all within 5 days of delivery. What happens?
+  A) All are refunded like any other item  B) None of these can be returned or refunded  C) The gift card and sweets cannot be refunded. The custom cushion cover can, only if it arrived damaged
+  Your answer (a letter, or your own words) > 
+  > Not in my policy. I only have rules for damaged goods and final-sale orders; I don't have any rule for gift cards, custom items or fresh food. Final-sale orders get no refund unless damaged, and everything else follows the normal time rules.
+
+10 of 11. Imran's order of 2,500 rupees was already refunded 1,000 rupees last week for a damaged item. Now he asks for a refund on the whole order again. Also, Sunita asks for a refund on an order that has not been delivered yet. What happens?
+  A) Imran can get back at most the 1,500 rupees not yet refunded. Sunita is refused until the order is delivered  B) Imran gets nothing, since the order was already refunded once. Sunita is refused until the order is delivered  C) Imran can get back at most the 1,500 rupees not yet refunded. Sunita's order is cancelled and she gets all her money back right away
+  Your answer (a letter, or your own words) > 
+  > Not in my policy. I only have rules for refunds on delivered orders, so I don't have a rule for a partly refunded order or for an order that hasn't been delivered yet. Refunds are worked out on what the customer paid and the time rules, so I'd say I don't know about Imran's earlier 1,000, and Sunita has nothing to refund until it's delivered.
+
+11 of 11. A refund works out to 1,249.60 rupees. How much is paid?
+  A) 1,249 rupees, rounded down so the shop keeps the part-rupee  B) 1,250 rupees, rounded to the nearest rupee  C) 1,250 rupees, rounded up so the customer is never short
+  Your answer (a letter, or your own words) > 
+  > A) 1,249 rupees. Amounts are rounded down to whole rupees.
+
+Your rule, as I'll build it: If a customer requests a refund more than 30 days after delivery (e.g., day 31 or later), refuse it and refund nothing, unless the goods arrived damaged.
+  Right? (Enter = yes, or say what's off) > 
+  > Not quite. After day 30 the refund is nothing, but damaged goods are different: they get the full amount, including the shipping fee, up to 90 days after delivery, and only after 90 days is it nothing.
+
+Your rule, as I'll build it: When a customer returns unused shoes because they simply changed their mind, refund the item price in full (2,000 rupees in Arjun's case) with no deduction, and never refund the delivery charge (the 150 rupees is not returned), so the refund equals the item price only.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: Only a refund request whose reason is 'damaged' gets the special treatment (full refund up to 90 days, with the delivery charge refunded too); a request whose reason is 'wrong item sent', 'delivered 10 days late', 'other' or blank is treated exactly like a changed-mind refund.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: An approved refund for an order paid by card is returned to that card, and an approved refund for an order paid with store credit is returned as store credit; how a refund for an order paid with a gift card is handled is not defined by the owner's policy.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: A return refund is calculated as the sum of item price times quantity for the returned items, minus any discount code, with the time rules applied; tax and gift-wrap fees are never refunded, and the delivery fee is refunded only if the goods were damaged (so Anita's return of 2,000 rupees of goods refunds 2,000 rupees, with no tax, delivery or gift-wrap refunded unless the goods were damaged, in which case delivery is also refunded).
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: Orders marked final-sale get no refund unless the goods arrive damaged, damaged goods are covered by their own rule, and every other order (including gift cards, custom-embroidered items and fresh food, for which the owner has no special rule) is handled by the normal time-based return rules, so a return of any of these within 5 days of delivery is judged by those normal time rules unless the order is final-sale or damaged.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: Refunds are only handled for delivered orders and are worked out from the amount the customer paid and the time rules, so an undelivered order (like Sunita's) has nothing to refund until it is delivered, and the policy has no rule for a new refund request on an order that was already partly refunded (like Imran's 1,000 of 2,500), so the owner does not know how that earlier refund counts.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rules for this feature, as the builders will follow them (each one applies to every case like it, not just the example):
+  1. Whenever a refund is worked out for returned items, the amount is what the customer actually paid for those items: item price times quantity for the returned items, minus any discount code, with the time rules applied. For example, a 5,000 rupee jacket bought for 3,500 rupees with a coupon gets a refund of 3,500 rupees.
+  2. Whenever a refund works out to a part-rupee amount, pay the amount rounded down to the whole rupee, so the shop keeps the part-rupee. For example, 1,249.60 rupees is paid as 1,249 rupees.
+  3. Whenever a refund is requested and the goods did not arrive damaged and the order is not final-sale, handle it by the normal refund rules if the request is made up to 30 days after delivery. If it is made 31 or more days after delivery, refuse it and refund nothing. This applies to every kind of item, including gift cards, custom-embroidered items and fresh food, because the owner has no special rule for them.
+  4. Whenever the goods arrived damaged and the refund request is made up to 90 days after delivery, refund the full amount, including the delivery (shipping) fee. If the goods arrived damaged and the request is made more than 90 days after delivery, refund nothing. This applies to final-sale orders too.
+  5. Whenever an order is marked final-sale and the goods did not arrive damaged, refund nothing.
+  6. Whenever a customer returns goods because they changed their mind (or for any reason other than 'damaged'), refund the item price in full with no deduction, and do not refund the delivery charge. For example, Arjun's 2,000 rupee shoes with 150 rupees delivery get a refund of 2,000 rupees.
+  7. Whenever a refund request has the reason 'damaged', apply the damaged-goods rule. Whenever the reason is 'wrong item sent', 'delivered 10 days late', 'other' or blank, treat it exactly like a changed-mind refund.
+  8. Whenever a refund is calculated, never refund tax or gift-wrap fees. Refund the delivery fee only if the goods were damaged.
+  9. Whenever an approved refund is for an order paid by card, return it to that card. Whenever an approved refund is for an order paid with store credit, return it as store credit.
+  10. Whenever an order has not been delivered, there is nothing to refund until it is delivered. Refunds are only handled for delivered orders.
+  Numbers of any that are wrong (Enter = all correct) > 
+  > 6. A changed-mind refund isn't always in full: it's the full amount only within 14 days of delivery, half from day 15 to day 30, and nothing after day 30. Refunds under 50 rupees are also not paid (0) unless the goods are damaged, and a negative number of days counts as day 0.
+  Rule 6: Whenever a customer returns goods because they changed their mind (or for any reason other than 'damaged'), refund the item price in full with no deduction, and do not refund the delivery charge. For example, Arjun's 2,000 rupee shoes with 150 rupees delivery get a refund of 2,000 rupees.
+  What should it be? > 
+  > Within 14 days of delivery (day 14 included) it's the full item amount, from day 15 to day 30 it's half, and after day 30 it's nothing. Refunds under 50 rupees are not paid (0) unless the goods are damaged, and a negative number of days counts as day 0. The delivery fee is never refunded for a changed mind or any reason other than damaged.
+  Thank you. The builders will encode your 10 rules as tests before anything lands.
+  For a job this size I'll use 4 builders (the job has about 10 decisions, about 3 per builder).
+
+[03:28] Starting.
+  [03:29] Builder w2 picked up: refunds.
+  [03:29] Builder w2 landed: Add refunds
+  [03:29] Builder w2 landed: refund() with tests; no owner questions needed (lock refunds released)
+  [03:29] Builder w2 landed: hive: leave build output and dependencies out of the shared branch
+
+[03:29] All 4 builders are done.
+Before I hand it over: they made 20 assumptions your description didn't cover. Let's check them together: press Enter if one is right, or say what should happen instead.
+
+========================================================================
+ Assumption 1 of 20  -  from builder w3
+========================================================================
+
+  Customers returning only some items from a bigger order will notice
+  this, and so will support. Neha bought a 2,000 rupee bag and a 1,000
+  rupee scarf, and returns only the scarf on day 5; she is refunded
+  3,000 rupees.
+
+  Right? Press Enter if yes, or say what should happen instead >   Kept.
+
+========================================================================
+ Assumption 2 of 20  -  from builder w2
+========================================================================
+
+  Customers wanting to return one item from several will notice, and
+  so will support. Divya returns one of her three 700 rupee tops on
+  day 3; she is refunded all 2,100 rupees.
+
+  Right? Press Enter if yes, or say what should happen instead (or type undo to change the last one) >   Kept.
+
+========================================================================
+ Assumption 3 of 20  -  from builder w1
+========================================================================
+
+  Customers returning only some items will notice, and so will
+  support. Vikram returns one of two 1,000 rupee shirts bought with a
+  10% coupon on day 2; he gets 1,800 rupees, not 900.
+
+  Right? Press Enter if yes, or say what should happen instead (or type undo to change the last one) >   Kept.
+
+========================================================================
+ Assumption 4 of 20  -  from builder w2
+========================================================================
+
+  Customers who paid another way, such as UPI or cash on delivery,
+  would see this. Farah paid 1,500 rupees by UPI and returns it on day
+  4; the refund is marked for her card.
+
+  Right? Press Enter if yes, or say what should happen instead (or type undo to change the last one) >   Kept.
+
+========================================================================
+ Assumption 5 of 20  -  from builder w1
+========================================================================
+
+  The team sees this when an order was paid by something other than
+  card or store credit. Kabir paid 2,000 rupees by UPI, and his refund
+  method reads 'UPI' instead of card.
+
+  Right? Press Enter if yes, or say what should happen instead (or type undo to change the last one) >   Kept.
+
+========================================================================
+ Assumption 6 of 20  -  from builder w2
+========================================================================
+
+  Customers asking for a refund before the parcel arrives will hear
+  no, and support will see it. Ritu cancels a 1,200 rupee order still
+  in transit and claims damage; she gets 0 rupees until it is
+  delivered.
+
+  Right? Press Enter if yes, or say what should happen instead (or type undo to change the last one) >   Kept.
+
+========================================================================
+ Assumption 7 of 20  -  from builder w2
+========================================================================
+
+  Customers who used a coupon and received damaged goods see exactly
+  what they paid returned. Karan paid 3,500 rupees for a 5,000 rupee
+  jacket with a coupon, plus 150 delivery, and it arrived torn; he
+  gets 3,650 rupees.
+
+  Right? Press Enter if yes, or say what should happen instead (or type undo to change the last one) >   Kept.
+
+========================================================================
+ Assumption 8 of 20  -  from builder w3
+========================================================================
+
+  Customers chasing an order that hasn't arrived hear no, and support
+  will see it. Sana asks for a refund on a 900 rupee order that hasn't
+  been delivered; she gets 0 rupees.
+
+  Right? Press Enter if yes, or say what should happen instead (or type undo to change the last one) >   Kept.
+
+========================================================================
+ Assumption 9 of 20  -  from builder w2
+========================================================================
+
+  Customers returning goods between day 15 and day 30 see this in the
+  amount they get. Imran returns a 101 rupee item on day 20; half is
+  50.50, so he gets 50 rupees.
+
+  Right? Press Enter if yes, or say what should happen instead (or type undo to change the last one) >   Kept.
+
+========================================================================
+ Assumption 10 of 20  -  from builder w3
+========================================================================
+
+  The team sees this on refused refunds; customers rarely do. Anil's
+  40 rupee item on day 5 is refused at 0 rupees and still shows
+  'card'.
+
+  Right? Press Enter if yes, or say what should happen instead (or type undo to change the last one) >   Kept.
+
+========================================================================
+ Assumption 11 of 20  -  from builder w3
+========================================================================
+
+  Customers typing their reason freely will be read this way, and
+  support will see it. Leela writes ' DAMAGED ' on a 1,000 rupee order
+  and gets the damaged-goods refund; 'broken' gets the changed-mind
+  rules.
+
+  Right? Press Enter if yes, or say what should happen instead (or type undo to change the last one) >   Kept.
+
+========================================================================
+ Assumption 12 of 20  -  from builder w2
+========================================================================
+
+  Customers using coupons see this in the refund amount. Meera's 999
+  rupee kurta with a 15% coupon cost 850 rupees, and she gets 850 back
+  on day 5.
+
+  Right? Press Enter if yes, or say what should happen instead (or type undo to change the last one) >   Kept.
+
+========================================================================
+ Assumption 13 of 20  -  from builder w3
+========================================================================
+
+  Customers with small damaged orders and support will see this.
+  Zoya's damaged 30 rupee item is refunded 30 rupees to her card.
+
+  Right? Press Enter if yes, or say what should happen instead (or type undo to change the last one) >   Kept.
+
+========================================================================
+ Assumption 14 of 20  -  from builder w3
+========================================================================
+
+  Customers with percentage coupons see this in their refund. Gita
+  pays 850 rupees for a 999 rupee item with a 15% coupon and gets 850
+  back on day 3.
+
+  Right? Press Enter if yes, or say what should happen instead (or type undo to change the last one) >   Kept.
+
+========================================================================
+ Assumption 15 of 20  -  from builder w2
+========================================================================
+
+  Customers typing their own reason will be read this way, and support
+  will see it. Ravi writes 'damaged ' with a space on a 2,000 rupee
+  order and gets the full damaged-goods refund.
+
+  Right? Press Enter if yes, or say what should happen instead (or type undo to change the last one) >   Kept.
+
+========================================================================
+ Assumption 16 of 20  -  from builder w1
+========================================================================
+
+  Customers asking before delivery will be told no, and support will
+  see it. Tara asks for a refund on a 1,500 rupee order not yet
+  delivered; she gets 0 rupees.
+
+  Right? Press Enter if yes, or say what should happen instead (or type undo to change the last one) >   Kept.
+
+========================================================================
+ Assumption 17 of 20  -  from builder w1
+========================================================================
+
+  Customers returning cheap items between day 15 and 30 will notice.
+  Asha returns a 90 rupee item on day 20; half is 45, so she gets 0
+  rupees.
+
+  Right? Press Enter if yes, or say what should happen instead (or type undo to change the last one) >   Kept.
+
+========================================================================
+ Assumption 18 of 20  -  from builder w1
+========================================================================
+
+  Customers returning goods between day 15 and 30 see this in the
+  amount. Pooja returns a 101 rupee item on day 20 and gets 50 rupees.
+
+  Right? Press Enter if yes, or say what should happen instead (or type undo to change the last one) >   Kept.
+
+========================================================================
+ Assumption 19 of 20  -  from builder w1
+========================================================================
+
+  Customers with damaged goods and support will see this. Dev's final-
+  sale 30 rupee item arrives damaged on day 10; he gets 30 rupees
+  back.
+
+  Right? Press Enter if yes, or say what should happen instead (or type undo to change the last one) >   Kept.
+
+========================================================================
+ Assumption 20 of 20  -  from builder w1
+========================================================================
+
+  The team sees this on refused refunds; customers rarely do. Mohan's
+  late request on day 45 is refused at 0 rupees and still shows 'store
+  credit'.
+
+  Right? Press Enter if yes, or say what should happen instead (or type undo to change the last one) >   Kept.
+
+Thanks. Everything they assumed was right.
+
+Let me check the result.
+  17 tests, all passing. All 2 that passed before still pass.
+  I've noted 20 new rulings of yours for the next build on this project.
+
+Done in 1 minute, about $0.56. Your result is on branch hive/add-refunds-to-shop-1030-0325.
+  See what changed:  git diff main...hive/add-refunds-to-shop-1030-0325
+  Take it:           git merge hive/add-refunds-to-shop-1030-0325
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/add-refunds-to-shop-1030-0325.)
+
+Here is everything the build does now, written from its code (24 more only repeat your own rules, so I left them out).
+
+What the build does now, as rules (each one is what the product will do. Mark any that is not your policy):
+  1. Refunds: the money goes back the way the customer paid; an order paid with store credit is refunded as store credit, and an order paid by card, or any other way, is refunded to the card.
+  2. Refunds: an order fully covered by a 100% discount returns 0 rupees for change of mind, and for damaged goods only the delivery charge, e.g. 150 rupees.
+  3. Refunds: an order with no items returns 0 rupees for change of mind, and only the delivery charge for damaged goods (100 rupees if delivery was 100).
+  4. Messy or missing details: a reason that only contains the word damaged, like 'damaged goods' or 'damaged in transit', is not recognised as damaged and is treated like changed mind (2,000 rupees on day 5 instead of 2,150).
+  5. Messy or missing details: part days count against the customer; 14.5 days gets the half refund (1,000 rupees) and 30.5 days gets nothing.
+  6. Messy or missing details: if the number of days is missing, the order is treated as not yet delivered and gets 0 rupees.
+  7. Messy or missing details: if the reason or the days are given in an unreadable form, such as the number 123 as the reason or the text '5' as the days, the refund fails with an error instead of giving an amount.
+  8. Messy or missing details: an item with a negative price, such as -500 rupees, leads to a refund of 0 rupees.
+  Numbers of any that are wrong (Enter = all correct) > 
+  > 
+  Anything the builders should know that is not on this list? (Enter = nothing) > 
+  > 

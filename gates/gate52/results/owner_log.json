@@ -1,0 +1,82 @@
+[
+ {
+  "prompt": "\n1 of 11. Meera bought a 4,000 rupee kurta set and it was delivered 31 days ago. She asks for her money back. What happens?\n  A) Refused. Refunds stop after 30 days, so she gets nothing  B) Refunds are accepted up to 15 days after delivery, and nothing after that  C) Refunds are accepted up to 30 days after delivery, and she gets store credit only from day 31 to day 45\n  Your answer (a letter, or your own words) > ",
+  "typed": "Refused, she gets nothing. Day 31 is past 30 days, so no refund at all, unless the goods arrived damaged."
+ },
+ {
+  "prompt": "\n2 of 11. Arjun paid 2,000 rupees for shoes plus 150 rupees for delivery. Five days later he says he simply changed his mind and sends the shoes back unused. What does he get back?\n  A) 2,000 rupees. The delivery charge is not returned and nothing is deducted  B) 2,000 rupees minus a 10% handling fee, so 1,800 rupees, and no delivery charge  C) 2,150 rupees, the full amount including delivery\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) 2,000 rupees. The delivery charge is never refunded, and nothing is deducted."
+ },
+ {
+  "prompt": "\n4 of 11. A customer asks for a refund and gives one of these reasons: 'wrong item sent', 'delivered 10 days late', 'other', or she leaves the reason blank. How should these be treated?\n  A) Like a changed mind: item price only, no delivery charge  B) 'Wrong item sent' is treated like damaged, with the delivery charge refunded too. 'Late delivery', 'other' and blank are treated like a changed mind  C) Everything that is your fault (wrong item, late delivery) is treated like damaged. 'Other' and blank are treated like a changed mind\n  Your answer (a letter, or your own words) > ",
+  "typed": "B) Only \"wrong item sent\" is treated like damaged: full refund up to 90 days, delivery charge refunded too. Late delivery, other and blank are treated like a changed mind.\n\nWait, my policy only names the reason \"damaged\" for special treatment. So really: only \"damaged\" gets the special treatment. Wrong item, late delivery, other and blank are all treated like a changed mind."
+ },
+ {
+  "prompt": "\n5 of 11. Rohit paid for a 3,000 rupee order by card, and his refund is approved. Where does the money go? Also, Priya paid with a gift card. Where does hers go?\n  A) Rohit's money goes back to his card. Priya's goes back as store credit  B) Everyone gets store credit, whatever they paid with  C) Changed-mind refunds are store credit only. Damaged-item refunds go back to the card\n  Your answer (a letter, or your own words) > ",
+  "typed": "Card orders go back to the card, and orders paid with store credit go back as store credit. Priya paid with a gift card, which my policy doesn't mention, so I'm not sure how that one is handled."
+ },
+ {
+  "prompt": "\n6 of 11. Vikram had a 5,000 rupee jacket on sale. He used a coupon and paid only 3,500 rupees. He returns it. What does he get back?\n  A) 3,500 rupees, which is what he actually paid  B) 5,000 rupees, the full list price  C) 3,500 rupees as cash. If the coupon was a free gift or a loyalty reward, he gets store credit worth the discounted price\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) 3,500 rupees. Refunds are worked out on what he actually paid, which is the item price minus the discount code."
+ },
+ {
+  "prompt": "\n7 of 11. Anita's order was 2,000 rupees of goods, 360 rupees of tax, 100 rupees for delivery and a 50 rupee gift-wrap fee. She returns it. What does she get back?\n  A) Goods and tax (2,360 rupees). Delivery is refunded only if the item was damaged. The gift-wrap fee is never refunded  B) Everything she paid, 2,510 rupees, in every case  C) Goods only (2,000 rupees). No tax, delivery or fees are refunded, even for damaged items\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) is close but wrong on one thing: my policy doesn't refund tax or gift-wrap separately. The refund is worked out on item prices times quantities minus the discount code, so Anita gets the goods only, 2,000 rupees, with the time rules applied. Delivery is refunded only if damaged. I don't have a rule for tax or gift-wrap, so I'd say neither is refunded."
+ },
+ {
+  "prompt": "\n9 of 11. Neha wants to return a gift card, a custom-embroidered cushion cover and a pack of fresh sweets, all within 5 days of delivery. What happens?\n  A) All are refunded like any other item  B) None of these can be returned or refunded  C) The gift card and sweets cannot be refunded. The custom cushion cover can, only if it arrived damaged\n  Your answer (a letter, or your own words) > ",
+  "typed": "Not in my policy. I only have rules for damaged goods and final-sale orders; I don't have any rule for gift cards, custom items or fresh food. Final-sale orders get no refund unless damaged, and everything else follows the normal time rules."
+ },
+ {
+  "prompt": "\n10 of 11. Imran's order of 2,500 rupees was already refunded 1,000 rupees last week for a damaged item. Now he asks for a refund on the whole order again. Also, Sunita asks for a refund on an order that has not been delivered yet. What happens?\n  A) Imran can get back at most the 1,500 rupees not yet refunded. Sunita is refused until the order is delivered  B) Imran gets nothing, since the order was already refunded once. Sunita is refused until the order is delivered  C) Imran can get back at most the 1,500 rupees not yet refunded. Sunita's order is cancelled and she gets all her money back right away\n  Your answer (a letter, or your own words) > ",
+  "typed": "Not in my policy. I only have rules for refunds on delivered orders, so I don't have a rule for a partly refunded order or for an order that hasn't been delivered yet. Refunds are worked out on what the customer paid and the time rules, so I'd say I don't know about Imran's earlier 1,000, and Sunita has nothing to refund until it's delivered."
+ },
+ {
+  "prompt": "\n11 of 11. A refund works out to 1,249.60 rupees. How much is paid?\n  A) 1,249 rupees, rounded down so the shop keeps the part-rupee  B) 1,250 rupees, rounded to the nearest rupee  C) 1,250 rupees, rounded up so the customer is never short\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) 1,249 rupees. Amounts are rounded down to whole rupees."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: If a customer requests a refund more than 30 days after delivery (e.g., day 31 or later), refuse it and refund nothing, unless the goods arrived damaged.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. After day 30 the refund is nothing, but damaged goods are different: they get the full amount, including the shipping fee, up to 90 days after delivery, and only after 90 days is it nothing."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When a customer returns unused shoes because they simply changed their mind, refund the item price in full (2,000 rupees in Arjun's case) with no deduction, and never refund the delivery charge (the 150 rupees is not returned), so the refund equals the item price only.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: Only a refund request whose reason is 'damaged' gets the special treatment (full refund up to 90 days, with the delivery charge refunded too); a request whose reason is 'wrong item sent', 'delivered 10 days late', 'other' or blank is treated exactly like a changed-mind refund.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: An approved refund for an order paid by card is returned to that card, and an approved refund for an order paid with store credit is returned as store credit; how a refund for an order paid with a gift card is handled is not defined by the owner's policy.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A return refund is calculated as the sum of item price times quantity for the returned items, minus any discount code, with the time rules applied; tax and gift-wrap fees are never refunded, and the delivery fee is refunded only if the goods were damaged (so Anita's return of 2,000 rupees of goods refunds 2,000 rupees, with no tax, delivery or gift-wrap refunded unless the goods were damaged, in which case delivery is also refunded).\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: Orders marked final-sale get no refund unless the goods arrive damaged, damaged goods are covered by their own rule, and every other order (including gift cards, custom-embroidered items and fresh food, for which the owner has no special rule) is handled by the normal time-based return rules, so a return of any of these within 5 days of delivery is judged by those normal time rules unless the order is final-sale or damaged.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: Refunds are only handled for delivered orders and are worked out from the amount the customer paid and the time rules, so an undelivered order (like Sunita's) has nothing to refund until it is delivered, and the policy has no rule for a new refund request on an order that was already partly refunded (like Imran's 1,000 of 2,500), so the owner does not know how that earlier refund counts.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": "6. A changed-mind refund isn't always in full: it's the full amount only within 14 days of delivery, half from day 15 to day 30, and nothing after day 30. Refunds under 50 rupees are also not paid (0) unless the goods are damaged, and a negative number of days counts as day 0."
+ },
+ {
+  "prompt": "  Rule 6: Whenever a customer returns goods because they changed their mind (or for any reason other than 'damaged'), refund the item price in full with no deduction, and do not refund the delivery charge. For example, Arjun's 2,000 rupee shoes with 150 rupees delivery get a refund of 2,000 rupees.\n  What should it be? > ",
+  "typed": "Within 14 days of delivery (day 14 included) it's the full item amount, from day 15 to day 30 it's half, and after day 30 it's nothing. Refunds under 50 rupees are not paid (0) unless the goods are damaged, and a negative number of days counts as day 0. The delivery fee is never refunded for a changed mind or any reason other than damaged."
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": ""
+ }
+]
