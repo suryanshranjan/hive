@@ -151,6 +151,12 @@ def instruct(run, text, builder=None):
             return True
     return False
 
+def pick(run):
+    """The builder to give a new task to: a working one with nothing claimed, else the one holding least. A task meant
+    for everyone was done twice in the live test (both Codex builders built the same report), so one builder owns it."""
+    rows = [r for r in board(run) if r['state'] == 'working']
+    return min(rows, key=lambda r: (len(r['holding']), r['landed']))['name'] if rows else None
+
 def law_advice(repo, workers):
     """What the swarm law says about his chosen number of builders for this project: (n, why) when it would pick a
     different number, else None. Uses the test time measured by his last build; None before any build measured it."""

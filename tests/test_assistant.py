@@ -105,6 +105,19 @@ for said, answer, how, want in (('this is all wrong, forget it', tap('stp|no'), 
     p.kill(); p.wait(); assistant.BUILD.clear()
 explain.ask_json = _ask_json
 
+# 3a5. what Hive never does (skip the tests, push straight to his main or live) is never started as a build
+check('risky requests are recognised', [assistant.is_risky(t) for t in (
+      'push it straight to main and skip the tests', 'deploy directly to production', 'tests chhod do, jaldi hai',
+      'build the page without tests', 'merge this into main')], [True] * 5)
+check('ordinary ones are not', [assistant.is_risky(t) for t in (
+      'add tests for refunds', 'fix the failing tests', 'build a payouts page', 'what is on main?')], [False] * 4)
+started = []
+fake = FakeTelegram([])
+r = assistant.handle(ch(fake), repo, 'push it straight to main and skip the tests', poll=1,
+                     start_build=lambda rp, goal: started.append(goal))
+check('a risky request is answered, not built', (r, started, any('Shall I build' in m['text'] for m in fake.sent)),
+      ('chat', [], False))
+
 # 3b. "build: ..." from the phone starts a build after one confirmation
 started = []
 fake = FakeTelegram([tap('bld|yes')])

@@ -248,6 +248,15 @@ def _team(ch, repo, text, got, poll=20, again=None):
           + text_board, '👥 ' + telegram.esc(text_board))
     return 'team'
 
+RISKY = re.compile(r"\b(skip(ping)?|without|no|bina|chhod\w*)\s+(the\s+|any\s+)?tests?\b|\btests?\s+(skip|chhod\w*|mat)\b|"
+                   r"\b(push|deploy|merge|commit)\w*\s+(it\s+|this\s+|everything\s+)?(straight\s+|directly\s+|right\s+)?"
+                   r"(to|into|on|pe|par)\s+(main|master|prod|production|live)\b")
+
+def is_risky(text):
+    """He asks for what Hive never does: skip the tests, or put work straight onto his own main branch or live. Answered
+    in Hive's voice with its limits and the safe way, never started as a build."""
+    return bool(RISKY.search(text.lower()))
+
 def is_stop_request(text):
     """He plainly said to stop the build ("stop the build", "build band karo", "cancel it", "stop"), as opposed to a
     message that was only read as one. Short, with a stop word, and about the build or nothing else."""
@@ -402,6 +411,8 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         got = {'intent': 'greeting'}
     elif telegram.is_status(text):
         got = {'intent': 'status'}
+    elif is_risky(text):   # never a build, whatever the model reads (the Jarvis bench: once read as one)
+        got = {'intent': 'reply'}
     else:
         got = read(ch, text)
     intent, rule = got.get('intent', 'reply'), (got.get('rule') or text).strip()
@@ -416,7 +427,7 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         if not live:   # nothing running to redirect: it is a request for a build
             intent, rule = 'build', say_it
         else:
-            me = team.find(run, got['builder']) if got.get('builder') else None
+            me = (team.find(run, got['builder']) if got.get('builder') else None) or team.pick(run)   # one owner
             if team.instruct(run, say_it, me):
                 ch.send(f"📝 Passed to {me if me else 'the builders'}: {telegram.esc(say_it[:300])}. They pick it up at "
                         "their next sync, usually within a few minutes; ask \"who's doing what\" to see it taken up.",

@@ -15,7 +15,7 @@ Work is claimed by area, so two workers never build the same thing:
 {AREAS}
 
 ## The loop
-1. **Sync and choose.** `git pull --rebase origin {BRANCH}`; if `OWNER.md` exists, read it first: these are the owner's instructions during this build, newest first, and they override the goal where they differ (one addressed to you by name is yours to act on now). `python3 -m hive areas` shows which areas are free; check `git log --oneline` for what has landed. Pick 1 to 3 free areas that are naturally one piece of work.
+1. **Sync and choose.** `git pull --rebase origin {BRANCH}`; if `OWNER.md` exists, read it first: these are the owner's instructions during this build, newest first, and they override the goal where they differ. One addressed to you by name is yours to act on now; one addressed to another builder is theirs, so leave that work to them. `python3 -m hive areas` shows which areas are free; check `git log --oneline` for what has landed. Pick 1 to 3 free areas that are naturally one piece of work.
 2. **Claim.** `python3 -m hive claim <short_name> <area1,area2> "<what you will build>"`. Exit 1: taken, choose again.
 3. **Work** until your areas do what the goal intends in every case you can think of, not merely until a test passes.
 4. **Land.** `python3 -m hive land <short_name> "<what you did and the choices you made>"`. Exit 5: resolve the conflict, `git add`, `git rebase --continue`, then `python3 -m hive land <short_name> --continue`. Exit 6, 7 or 8: fix what it shows, commit, then `--continue`. Never bypass `hive land` with a direct push.

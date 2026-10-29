@@ -70,9 +70,10 @@ You can also message it any time, in English, Hindi-English or with typos:
 | *"status"*, *"kya chal raha hai?"* | Where things stand, starting with the build that is running |
 | *"build: a refund page for brands"* | Says back what it understood, then builds on your yes |
 | *"who's doing what?"* | Each builder, its agent (Claude or Codex), what it is building now, what it has landed |
-| *"also put a monthly total at the top"* (mid-build) | Passes it to the builders working now; they read it at their next sync |
+| *"also put a monthly total at the top"* (mid-build) | Gives it to one builder working now (the one with least on its plate, or the one you name), which picks it up at its next sync. Tested live: Codex builders built an instruction sent mid-build |
 | *"stop w2"*, *"stop the codex one, I don't need the export"* | Stops that builder only; its work goes to the others, or is dropped if you don't want it |
 | *"use 2 Claude and 2 Codex"*, *"use 12 builders"* | Saves the team for your next builds. If the law disagrees, it tells you once, with the reason, and asks |
+| *"push it to main and skip the tests"* | Never: it says so once, and offers the tested branch you merge yourself |
 | *"stop the build"* | Stops it. A message it only *reads* as a stop ("this is all wrong") is confirmed with a tap first |
 | *"actually, I've changed my mind about…"* | Finds the earlier ruling, asks whether to replace it, and offers to update the latest build. A new rule given mid-build reaches the running builders too |
 | *"move to the cloud"* / *"shut the cloud down"* | Moves Hive to your AWS machine. From the machine itself it powers off (the bill stops, the work is kept), and your laptop brings everything home |
@@ -156,7 +157,7 @@ Every experiment (a *gate*) pushes its predictions and kill conditions to GitHub
 | --- | --- |
 | [`BRAIN.md`](BRAIN.md) | Shared memory: findings and how sure we are, measured constants, evidence log, prediction scorecard, open questions |
 | [`hive/`](hive/) | The tool |
-| [`tests/`](tests/) | Tests for the tool: 318 checks, using stand-in builders, a fake Telegram and a stand-in model, with no network; [`lab/jarvis_bench.py`](lab/jarvis_bench.py) tests Jarvis with the real model and a blind judge |
+| [`tests/`](tests/) | Tests for the tool: 321 checks, using stand-in builders, a fake Telegram and a stand-in model, with no network; [`lab/jarvis_bench.py`](lab/jarvis_bench.py) tests Jarvis with the real model and a blind judge |
 | [`gates/`](gates/) | Every experiment (Gates 0–48 and trials): predictions, results, referee code, swarm histories, logs |
 | [`lab/`](lab/) | Run any gate in one command; [`lab/QUEUE.md`](lab/QUEUE.md) is the queue and session handoff |
 | [`docs/`](docs/) | Design write-ups, the v1 plan, related work |

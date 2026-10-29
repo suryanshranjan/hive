@@ -136,13 +136,16 @@ check('"let the law decide" hands the number back to the law', 'workers' in team
 # a new direction mid-build reaches the running builders through the shared branch; so does a new standing rule
 p2 = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)'])
 assistant.BUILD.update(proc=p2, goal='a refund page for brands', started=time.time() - 300)
+b = json.load(open(os.path.join(run, 'builders.json')))   # w3 joins, working with nothing claimed yet
+b['w3'] = {'agent': 'claude', 'state': 'working', 'pid': p2.pid, 'started': int(time.time()) - 120}
+json.dump(b, open(os.path.join(run, 'builders.json'), 'w'))
 reads(intent='instruct', rule='also show refunds per month on the page', builder='')
 fake = FakeTelegram([])
 r = assistant.handle(ch(fake), seed, 'also show refunds per month on the page', poll=1)
 owner_md = lambda: subprocess.run(['git', '--git-dir', os.path.join(run, 'up.git'), 'show', 'main:OWNER.md'],
                                   capture_output=True, text=True).stdout
-check('a mid-build instruction goes to the builders (OWNER.md on the shared branch)',
-      (r, 'also show refunds per month on the page' in owner_md(), any('Passed to the builders' in m['text'] for m in fake.sent)),
+check('a mid-build instruction goes to one builder, the one with least on its plate (OWNER.md on the shared branch)',
+      (r, 'to w3: also show refunds per month on the page' in owner_md(), any('Passed to w3' in m['text'] for m in fake.sent)),
       ('instructed', True, True))
 reads(intent='instruct', rule='do the CSV export instead', builder='w1')
 r = assistant.handle(ch(FakeTelegram([])), seed, 'w1, do the CSV export instead', poll=1)
