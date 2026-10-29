@@ -367,7 +367,7 @@ def _confirm_pages(general, ch, poll, title, note, missing, goal='', save=None, 
         listing = '\n'.join(f'<b>{n}.</b> {telegram.esc(r)}' for n, r in items)
         nums = [(str(n), f'pg|{n}') for n, _ in items]
         rows = [nums[i:i + 4] for i in range(0, len(nums), 4)] + [[('✅ This section is fine', 'pg|ok')]]
-        stake = why.get(area.split(' (')[0])
+        stake = why.get(area.split(' · ')[0].split(' (')[0])   # a shared page shows its first area's stake
         stake = f"💡 <i>Why it matters: {telegram.esc(stake)}</i>\n\n" if stake else ''
         ch.send(f"📋 <b>{telegram.esc(area)}</b>   {p} of {len(pages)}   {telegram.bar(p, len(pages))}\n\n{stake}{listing}\n\n"
                 "<i>Tap the number of any rule that is wrong, or tell me. Ask if anything is unclear.</i>", html=True,
