@@ -56,4 +56,11 @@ check("the owner's earlier rulings reach the model, to judge where he is likely 
       ("earlier rulings" in seen['prompt'], 'A late post is never paid less.' in seen['prompt'], '"differs"' in seen['prompt']),
       (True, True, True))
 srv.shutdown()
+# Gates 52-54: Hive's own model calls are counted, so the cost it reports includes them
+explain._CLAUDE_DOWN[0] = 0.0
+fake = os.path.join(tempfile.mkdtemp(), 'paid.py')
+open(fake, 'w').write('import json, sys; sys.stdin.read(); print(json.dumps({"result": json.dumps({"ok": 1}), "total_cost_usd": 0.05}))')
+explain.CMD = f'"{sys.executable}" "{fake}"'
+before = explain.SPENT[0]; explain.ask_json('anything')
+check("a model call's cost is counted in Hive's own spending", round(explain.SPENT[0] - before, 2), 0.05)
 sys.exit(fail)

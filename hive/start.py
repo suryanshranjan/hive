@@ -5,7 +5,7 @@ and their assumptions to the owner in plain words, sends back what the owner cor
 over a branch. The owner's own branches are never changed: the result arrives as a new branch, hive/<name>."""
 import csv, glob, json, os, re, shlex, shutil, subprocess, sys, threading, time
 
-from . import PY, codesheet, docs as docs_mod, interview, junit, law, memory, owner, swarm, telegram
+from . import PY, codesheet, docs as docs_mod, explain, interview, junit, law, memory, owner, swarm, telegram
 from .guard import sh
 
 RUNS = os.path.join(os.path.expanduser('~'), '.hive', 'runs')
@@ -155,6 +155,7 @@ def _phase(source, run, workers, goal, minutes, questions, assumptions, narrate_
 
 def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interview_first=True, docs=None):
     repo = os.path.abspath(repo)
+    spent0 = explain.SPENT[0]   # what Hive's own model calls cost from here on is reported with the builders'
     say("\nHive here. What are we building today?")
     goal = goal or _ask("(Describe it in a sentence or two, or give the path of a file that describes it.)")
     if not goal:
@@ -276,7 +277,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     say(f'\n[{_now()}] Starting.')
     state = dict(repo=repo, branch=branch, name=name, home=home, test_cmd=test_cmd, links=links, goal=goal_text, t_g=t_g,
                  rules=rules, workers=workers, minutes=minutes, before=before, started=time.time(), overnight=overnight,
-                 asked=asked)
+                 asked=asked, spent0=spent0)
     run1 = os.path.join(home, 'build')
     b, code = _phase(source, run1, workers, goal_text + rules, minutes, 0 if overnight else 4 * workers, True,
                      not overnight, phone)
@@ -414,8 +415,11 @@ def _deliver(state):
     sh('git', '-C', state['repo'], 'fetch', '-q', '-f', os.path.join(state['final'], 'up.git'), f"+{state['b']}:{out}")
     mins = round((time.time() - state['started']) / 60)
     took = 'under a minute' if mins < 1 else _n(mins, 'minute')
-    say(f'\nDone in {took}' + (f", about ${state['cost']:.2f}" if state['cost'] >= 0.01 else '') +
-        f'. Your result is on branch {out}.')
+    own = max(0.0, explain.SPENT[0] - state.get('spent0', 0.0))   # Hive's own questions and checks, counted too
+    total = state['cost'] + own
+    cost_text = ((f", about ${total:.2f} in all (builders ${state['cost']:.2f}, Hive's own questions and checks ${own:.2f})"
+                  if own >= 0.01 else f", about ${state['cost']:.2f}") if total >= 0.01 else '')
+    say(f'\nDone in {took}' + cost_text + f'. Your result is on branch {out}.')
     say(f"  See what changed:  git diff {state['branch']}...{out}")
     say(f'  Take it:           git merge {out}')
     say(f"(Everything from this build, including the questions and answers, is in {state['home']}.)")
