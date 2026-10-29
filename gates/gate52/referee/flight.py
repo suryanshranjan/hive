@@ -12,12 +12,14 @@ GOAL = ("Add refunds to the shop: a function `refund(order, days_since_delivery,
         "out what the customer gets back. It returns `{'amount': <whole rupees>, 'method': 'card' or 'store_credit'}`. "
         "`reason` is the customer's reason, for example 'changed mind' or 'damaged'.")
 OWNER = ['claude', '-p', '--output-format', 'json']
+BRIEF = os.path.join(ROOT, 'gates', 'gate52', 'prompts', 'owner_brief.md')   # Gate 54 points this elsewhere
+HIDDEN = 'test_refunds_hidden.py'
 
 def sh(*a, cwd=None):
     return subprocess.run(list(a), cwd=cwd, capture_output=True, text=True)
 
 def hidden_score(code_dir):
-    r = subprocess.run([sys.executable, '-m', 'pytest', '-q', '-p', 'no:cacheprovider', os.path.join(PRIV, 'test_refunds_hidden.py')],
+    r = subprocess.run([sys.executable, '-m', 'pytest', '-q', '-p', 'no:cacheprovider', os.path.join(PRIV, HIDDEN)],
                        cwd=code_dir, capture_output=True, text=True, env=dict(os.environ, PYTHONPATH=code_dir))
     last = (r.stdout.strip().splitlines() or [''])[-1]
     import re
@@ -40,7 +42,7 @@ def main():
     sys.path.insert(0, ROOT)
     from hive import start, codesheet
     policy = open(os.path.join(PRIV, 'policy.md')).read()
-    brief = open(os.path.join(ROOT, 'gates', 'gate52', 'prompts', 'owner_brief.md')).read().replace('{POLICY}', policy)
+    brief = open(BRIEF).read().replace('{POLICY}', policy)
     term, log, cost = io.StringIO(), [], [0.0]
     real_stdout = sys.stdout
     class Tee(io.TextIOBase):
