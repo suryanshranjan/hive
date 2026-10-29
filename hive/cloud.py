@@ -8,7 +8,7 @@ itself (pip install from GitHub), the owner's rulings for this project, the Tele
 The Claude login goes only with --with-login: otherwise run `claude` once on the machine to log in there.
 Never sent: .env files, keys, node_modules (dependencies are installed fresh there), anything not committed.
 For tests and mounted disks, --to may also be a local folder."""
-import json, os, shlex, shutil, subprocess, tempfile
+import json, os, shlex, shutil, subprocess, tempfile, time
 
 from . import memory, telegram
 
@@ -162,8 +162,26 @@ def _stop_local_listener(say=print):
     except OSError:
         pass
 
-def pull(repo='.', frm=None, say=print):
-    """Fetch the hive/... result branches built in the cloud into this repository (your branches are not touched)."""
+def _remote_heads(repo, url, env):
+    """{branch: commit} of every branch on the cloud copy."""
+    p = subprocess.run(['git', '-C', repo, 'ls-remote', '--heads', url], capture_output=True, text=True, env=env)
+    out = {}
+    for line in p.stdout.splitlines():
+        sha, _, ref = line.partition('\t')
+        if ref.startswith('refs/heads/'):
+            out[ref[len('refs/heads/'):]] = sha
+    return out if p.returncode == 0 else None
+
+def building(t):
+    """True while a build is running on the cloud copy (deleting it then would lose the work in progress)."""
+    if t.local:
+        return False
+    return bool(t.run("pgrep -f 'hive start' >/dev/null && echo yes || true", check=False).stdout.strip())
+
+def pull(repo='.', frm=None, say=print, verify=False):
+    """Bring everything done in the cloud to this computer: every branch (hive/... as your result branches, any other
+    under hive-cloud/...), the build records, the rules and the conversation. With `verify`, check every branch arrived
+    whole before anything may be deleted (the owner: no development may ever be lost). Returns 0 only when complete."""
     repo = os.path.abspath(repo)
     key = None
     cfg = os.path.join(os.path.expanduser('~'), '.hive', 'cloud.json')
@@ -176,18 +194,46 @@ def pull(repo='.', frm=None, say=print):
     t = Target(frm, key); proj = f'{t.home()}/{_project(repo)}'
     url = proj if t.local else f'{t.to}:{proj}'
     env = dict(os.environ, GIT_SSH_COMMAND='ssh ' + ' '.join(shlex.quote(o) for o in Target(frm, key).opts)) if key else None
-    p = subprocess.run(['git', '-C', repo, 'fetch', url, '+refs/heads/hive/*:refs/heads/hive/*'], capture_output=True,
-                       text=True, env=env)
+    heads = _remote_heads(repo, url, env)
+    if heads is None:
+        say('Could not reach the cloud copy to bring the work back.'); return 1
+    # results as his hive/... branches; every other branch kept apart, never over his own
+    p = subprocess.run(['git', '-C', repo, 'fetch', url, '+refs/heads/hive/*:refs/heads/hive/*',
+                        '+refs/heads/*:refs/remotes/hive-cloud/*'], capture_output=True, text=True, env=env)
     if p.returncode != 0:
         say(f'Could not fetch: {p.stderr.strip()[:300]}'); return 1
-    got = subprocess.run(['git', '-C', repo, 'branch', '--list', 'hive/*'], capture_output=True, text=True).stdout.split()
-    say(f"Brought back {len([g for g in got if g != '*'])} result branch(es): " + ', '.join(g for g in got if g != '*'))
-    # and what he said there: rules given while Hive was in the cloud, and the conversation, so nothing is lost coming home
+    results = sorted(b for b in heads if b.startswith('hive/'))
+    say(f"Brought back {len(results)} result branch(es)" + (': ' + ', '.join(results) if results else '') +
+        (f"; {len(heads) - len(results)} other branch(es) under hive-cloud/..." if len(heads) > len(results) else '') + '.')
+    # what he said there, and the records of every build made there
     src_hive = f'{t.home()}/.hive' if t.local else '.hive'
     rules = memory.project_key(repo) + '.json'
     back = [name for name, src, dst in (
         ('rules', f'{src_hive}/rules/{rules}', os.path.join(memory.DIR, rules)),
         ('conversation', f'{src_hive}/conversation.json', telegram.CONVERSATION)) if t.get(src, dst)]
+    runs_home = os.path.join(os.path.expanduser('~'), '.hive', 'runs-from-cloud', time.strftime('%Y%m%d-%H%M'))
+    if t.local:
+        src_runs = os.path.join(t.home(), '.hive', 'runs')
+        if os.path.isdir(src_runs):
+            shutil.copytree(src_runs, os.path.join(runs_home, 'runs'), dirs_exist_ok=True); back.append('build records')
+    else:
+        os.makedirs(runs_home, exist_ok=True)
+        tar = subprocess.run(['ssh'] + t.opts + [t.to, 'test -d .hive/runs && tar czf - -C .hive runs || true'],
+                             capture_output=True)
+        if tar.returncode == 0 and tar.stdout:
+            subprocess.run(['tar', 'xzf', '-', '-C', runs_home], input=tar.stdout, capture_output=True)
+            back.append('build records')
     if back:
-        say('  Also brought back: your ' + ' and '.join(back) + ' from there.')
+        say('  Also brought back: your ' + ', '.join(back) + '.')
+    if not verify:
+        return 0
+    missing = []   # every branch there must now be here, at the same commit
+    for b, sha in heads.items():
+        local = f'refs/heads/{b}' if b.startswith('hive/') else f'refs/remotes/hive-cloud/{b}'
+        got = subprocess.run(['git', '-C', repo, 'rev-parse', '--verify', '-q', local], capture_output=True, text=True).stdout.strip()
+        if got != sha:
+            missing.append(b)
+    if missing:
+        say("  These did NOT arrive whole: " + ', '.join(missing) + '. Nothing will be deleted.'); return 1
+    say(f"  Checked: all {len(heads)} branch(es) are here, commit for commit.")
     return 0
