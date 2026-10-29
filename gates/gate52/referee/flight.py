@@ -61,6 +61,22 @@ def main():
         json.dump(log, open(os.path.join(RUN, 'owner_log.json'), 'w'), indent=1)
         return typed or default
     start._ask = ask
+    class OwnerKeyboard:   # Gate 54: builders' live questions and any other prompt that reads the keyboard directly
+        def readline(self):
+            p = subprocess.run(OWNER, input=brief.replace('{SCREEN}', term.getvalue()[-12000:]), capture_output=True,
+                               text=True, timeout=600)
+            try:
+                d = json.loads(p.stdout); reply = (d.get('result') or '').strip(); cost[0] += float(d.get('total_cost_usd') or 0)
+            except Exception:
+                reply = ''
+            typed = '' if reply.strip('`').upper() in ('ENTER', '(ENTER)', '') else ' '.join(reply.split())
+            print(f'  > {typed}')
+            log.append(dict(prompt=term.getvalue()[-1500:], typed=typed, keyboard=True))
+            json.dump(log, open(os.path.join(RUN, 'owner_log.json'), 'w'), indent=1)
+            return typed + '\n'
+        def isatty(self):
+            return False
+    sys.stdin = OwnerKeyboard()
     before = {}
     real_describe = codesheet.describe
     def describe(code_dir, goal, timeout=1800):   # the build as delivered, scored before the hand-over changes it

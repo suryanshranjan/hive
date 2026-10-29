@@ -225,6 +225,9 @@ def format_question(q, number, budget=None, width=72):
     lines += ['', '  Your answer (a letter, or say it in your own words) > ']
     return '\n'.join(lines)
 
+NO_OWNER = ("The owner is not at the keyboard to answer. Decide as the goal most likely intends, and record your choice "
+            "with `hive assume` so he can check it afterwards.")
+
 def serve(run, poll=2, until=None, tick=None, greet=True):
     """The owner's terminal: show each unanswered question, read the answer, write it. Ctrl+C to stop.
     Inside `hive start`: tick() narrates progress between questions, and the loop ends once until() is true and no
@@ -233,7 +236,7 @@ def serve(run, poll=2, until=None, tick=None, greet=True):
         print('Waiting for the builders to start...', flush=True)
         while not os.path.exists(os.path.join(run, 'run.json')):   # never create the run folder: hive run owns it
             time.sleep(poll)
-    d = _dir(run); seen = set(); answered = 0; idle_note = False
+    d = _dir(run); seen = set(); answered = 0; idle_note = False; closed = False
     if greet:
         print('\nHi! The builders are at work. When they hit a decision only you can make, the question appears here.\n'
               'Each one is a real situation: pick a letter, or answer in your own words, and press Enter.\n'
@@ -251,8 +254,18 @@ def serve(run, poll=2, until=None, tick=None, greet=True):
                 if q['id'] in seen or os.path.exists(os.path.join(d, 'answers', q['id'] + '.json')):
                     continue
                 seen.add(q['id'])
+                if closed:   # no one can answer here: the builder decides rather than waiting half an hour
+                    json.dump({'id': q['id'], 'answer': NO_OWNER, 'answered': int(time.time()), 'seconds': 0, 'no_owner': True},
+                              open(os.path.join(d, 'answers', q['id'] + '.json'), 'w'))
+                    continue
                 print(format_question(q, i, budget), end='', flush=True)
-                ans = sys.stdin.readline().strip()
+                line = sys.stdin.readline()
+                if line == '':   # end of input (Gate 54: a closed input re-showed one question 173 times)
+                    closed = True; seen.discard(q['id'])
+                    print("\n  No one can answer here (the input is closed), so the builders will decide for themselves "
+                          "and write down what they assumed; you can check those afterwards.", flush=True)
+                    continue
+                ans = line.strip()
                 if not ans:
                     seen.discard(q['id']); print('  OK, I will show it again shortly.', flush=True); continue
                 json.dump({'id': q['id'], 'answer': ans, 'answered': int(time.time()), 'seconds': int(time.time()) - q['asked']},
