@@ -36,6 +36,20 @@ def team_run(goal):
                for k, (a, p) in enumerate(zip(('claude', 'codex'), procs), 1)}, open(os.path.join(run, 'builders.json'), 'w'))
     return run, procs
 
+PRODUCT = """\"\"\"Sunny Shop: what a brand gets back when it asks for a refund on a campaign.\"\"\"
+
+PLATFORM_FEE = 0.05   # kept by Sunny Shop on every refund
+
+
+def refund(paid, days_since_delivery, creator_posted=False):
+    \"\"\"Rupees returned to the brand.\"\"\"
+    if creator_posted:
+        return 0                      # once the creator has posted, no refund
+    if days_since_delivery > 7:
+        return 0                      # refunds only within 7 days of delivery
+    return round(paid * (1 - PLATFORM_FEE))
+"""
+
 SCENARIOS = [
     ('greeting', ['Hi'], 'A short, warm greeting that says where things stand (nothing built yet) and offers to start.'),
     ('build with typos', ['So build a page which show creafors there earnings use our design language', 'yes'],
@@ -88,6 +102,14 @@ SCENARIOS = [
      'take a minute) and why, then lets him choose; no lecture, and his choice is respected.'),
     ('redirect mid-build', ['build: a page with creator earnings', 'TAP:bld|yes', 'also put a monthly total at the top'],
      'Passes the addition to the builders working now (not a new separate build, not a standing rule), and says so briefly.'),
+    ('product question', ['how do refunds work?'],
+     'Answers from the code: a refund only within 7 days of delivery and only if the creator has not posted; the brand '
+     'gets back what it paid minus a 5% fee (95%); nothing otherwise. Plain words, no invented details.'),
+    ('edge case question', ['what happens if a brand asks for a refund on day 8?'],
+     'Says plainly the brand gets nothing back (refunds only within 7 days of delivery); no invented details.'),
+    ('hinglish product question', ['refund ka kya rule hai abhi? 10000 diya tha'],
+     'Understands the Hindi-English; answers from the code: within 7 days of delivery and before the creator posts, the '
+     'brand gets 9,500 back of 10,000 (5% kept); after that, nothing.'),
     ('vague request', ['make it better'], 'Asks one short clarifying question about what to improve; does not start a build '
      'on "make it better" alone.'),
 ]
@@ -110,9 +132,11 @@ def run(name, msgs):
     elif os.path.exists(measured):
         os.remove(measured)
     repo = os.path.join(home, 'shop')
-    if not os.path.isdir(repo):
+    if not os.path.isdir(repo):   # a small real product, so questions about it have true answers the judge knows
         subprocess.run(['git', 'init', '-q', '-b', 'main', repo])
-        subprocess.run(['git', '-C', repo, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '--allow-empty', '-m', 'i'])
+        open(os.path.join(repo, 'refunds.py'), 'w').write(PRODUCT)
+        subprocess.run(['git', '-C', repo, 'add', '.'])
+        subprocess.run(['git', '-C', repo, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '-m', 'i'])
     assistant.BUILD.clear()
 
     def start_build(rp, goal):   # a stub build: it "runs" until told to fail or is stopped

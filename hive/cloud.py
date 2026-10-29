@@ -91,7 +91,8 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
     for src, dst in ((rules, f'{dst_hive}/rules/{os.path.basename(rules)}'), (telegram.PATH, f'{dst_hive}/telegram.json'),
                      (os.path.join(hive_dir, 'llm.json'), f'{dst_hive}/llm.json'),
                      (telegram.CONVERSATION, f'{dst_hive}/conversation.json'),
-                     (memory._names(), f'{dst_hive}/names.json')):   # the thread goes too: "yes" stays in context
+                     (memory._names(), f'{dst_hive}/names.json'),   # the thread goes too: "yes" stays in context
+                     (memory._notes_path(repo), f'{dst_hive}/rules/{os.path.basename(memory._notes_path(repo))}')):   # his business
         if os.path.exists(src):
             t.put(src, dst); sent.append(os.path.basename(src))
     if with_login:
@@ -211,7 +212,9 @@ def pull(repo='.', frm=None, say=print, verify=False):
     rules = memory.project_key(repo) + '.json'
     back = [name for name, src, dst in (
         ('rules', f'{src_hive}/rules/{rules}', os.path.join(memory.DIR, rules)),
-        ('conversation', f'{src_hive}/conversation.json', telegram.CONVERSATION)) if t.get(src, dst)]
+        ('conversation', f'{src_hive}/conversation.json', telegram.CONVERSATION),
+        ('what he told me about his business', f'{src_hive}/rules/{memory.project_key(repo)}.notes.json',
+         memory._notes_path(repo))) if t.get(src, dst)]
     runs_home = os.path.join(os.path.expanduser('~'), '.hive', 'runs-from-cloud', _project(repo))   # one copy, refreshed
     if t.local:
         src_runs = os.path.join(t.home(), '.hive', 'runs')

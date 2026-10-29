@@ -128,6 +128,9 @@ def facts(repo, ch=None):
         lines.append('The builders right now:\n' + team.board_text(run))
     if team.chosen():
         lines.append(f'The team he chose for builds: {team.describe(team.chosen())}.')
+    known = memory.notes(repo)[-15:]
+    if known:   # what he has told you about his business, so answers fit his world
+        lines.append('What he has told you about his business:\n' + '\n'.join(f'- {n}' for n in known))
     note = ch.note() if ch is not None and callable(getattr(ch, 'note', None)) else None
     if note:
         lines.append(f'Happening now: {note}')
@@ -314,6 +317,33 @@ def fast_read(ch, text):
         return None   # a question may be about his product, which Claude answers by reading the code
     return got
 
+REMEMBER = """A business owner is chatting with his software assistant. His newest message:
+"{text}"
+
+The conversation before it:
+{history}
+
+Does this message tell the assistant something lasting about his business that is worth remembering for future
+conversations: his customers, market, team, plans, priorities, deadlines, or how he likes to work? Not a rule for how the
+product should behave (those are kept elsewhere), not a question, not small talk, not about one build. Reply with JSON
+only: {{"note": "the fact, in one short plain sentence, or empty if there is nothing lasting"}}"""
+
+def remember(ch, repo, text):
+    """Keep any lasting fact about his business from his message, in the background so his reply is not slowed (the
+    owner: no gaps; Jarvis knows Tony's world, not just this conversation)."""
+    import threading
+    history = ch.recent() if hasattr(ch, 'recent') else ''
+    def run():
+        try:
+            got = explain.ask_json(REMEMBER.format(text=text, history=history))
+            note = got.get('note') if isinstance(got, dict) else None
+            if isinstance(note, str) and note.strip():
+                memory.add_note(repo, note.strip())
+        except Exception:
+            pass
+    t = threading.Thread(target=run, daemon=True); t.start()
+    return t
+
 def read(ch, text):
     """What the owner means by his newest message, read in the context of the conversation (Gate 38 live test: "Yes",
     "I already told you" and a corrected request were each read alone, and went wrong)."""
@@ -349,6 +379,23 @@ def background_build(repo, goal, ch=None):
             except Exception:
                 pass
     threading.Thread(target=watch, daemon=True).start()
+
+    def keep_an_eye():   # speak up unprompted (the owner: no gaps): a builder making no progress is worth his attention
+        seen = {}
+        while proc.poll() is None:
+            time.sleep(float(os.environ.get('HIVE_WATCH_SECONDS', 60)))
+            run = team.current_run()
+            if not run or ch is None:
+                continue
+            for r in team.stuck(run, seen):
+                doing = '; '.join(r['holding'])[:160] or 'its piece of the work'
+                try:
+                    ch.send(f"⏳ <b>{r['name']} ({r['agent']}) may be stuck, sir.</b> It has been on {telegram.esc(doing)} "
+                            f"for {r['minutes']} minutes without finishing anything. Say \"stop {r['name']}\" and its work "
+                            "goes back to the others, or leave it be; it may simply be a hard piece.", html=True)
+                except Exception:
+                    pass
+    threading.Thread(target=keep_an_eye, daemon=True).start()
     return proc
 
 PLAIN_REASONS = [   # why a build stopped, as he should hear it (the owner: "everyone who depends on Hive is Iron Man")
@@ -424,11 +471,14 @@ def choose(ch, poll, options):
         return options[-1][0], None
     return None, got
 
-LOOK = """You are Hive, the business owner's assistant, answering him about his own product. You are in his project's
-folder: read the code to find the answer (read only: change nothing, run nothing that writes). Answer what the product
-actually does today, in plain business words he can act on, in at most 4 short sentences, in the manner of J.A.R.V.I.S.:
-calm, precise, a light dry touch at most. No code, file names or technical terms unless he asks. If the code does not
-settle it, say so plainly and say what would. Address him as "{who}".
+LOOK = """You are Hive, the business owner's assistant, answering him about his own product. You are in a scratch copy
+of his project: read the code to find the answer. When the answer depends on a case the code does not make obvious
+(a date, an amount, an edge), check it: run the tests or a small script here. This folder is a throwaway copy, so
+nothing you do reaches his product; never use the network and never install anything. Answer what the product actually
+does today, in plain business words he can act on, in at most 4 short sentences, in the manner of J.A.R.V.I.S.: calm,
+precise, a light dry touch at most. If you checked by running it, say so in a few words ("I tried it: ..."). No code,
+file names or technical terms unless he asks. If the code does not settle it, say so plainly and say what would.
+Address him as "{who}".
 
 The conversation so far:
 {history}
@@ -437,28 +487,49 @@ His question: "{text}"
 
 Reply with the answer only."""
 
-ASK_CMD = os.environ.get('HIVE_LOOK_CMD', 'claude -p --output-format json --allowedTools Read Grep Glob')
+ASK_CMD = os.environ.get('HIVE_LOOK_CMD', 'claude -p --output-format json --allowedTools Read Grep Glob Bash')
+
+def _scratch(repo):
+    """A throwaway copy of his project to read and run (the owner: no gaps; an answer can be checked by running it).
+    His own folder is never written to. Dependency folders are linked in, not copied."""
+    import shutil, tempfile
+    from .start import detect_links, _link
+    work = tempfile.mkdtemp(prefix='hive_look_')
+    copy = os.path.join(work, 'project')
+    links = detect_links(repo)
+    shutil.copytree(repo, copy, symlinks=True, ignore=shutil.ignore_patterns('.git', *[os.path.basename(l) for l in links]))
+    try:
+        _link(repo, copy, links)
+    except OSError:   # Windows without symlink rights: the code can still be read, and run where it needs no packages
+        pass
+    return work, copy
 
 def look(ch, repo, text):
-    """Answer a question about his product by having Claude read the code (read-only): "how do refunds work?" gets what
-    the code does, not a guess from a few facts. Shows "typing..." while it reads. None if Claude cannot answer."""
-    import threading
+    """Answer a question about his product by having Claude read his code, and run it where a case needs checking, in a
+    throwaway copy: "how do refunds work?" gets what the code does, not a guess. Shows "typing..." while it works.
+    None if Claude cannot answer."""
+    import shutil, threading
     box, done = {}, threading.Event()
 
     def run():
+        work = None
         try:
-            p = subprocess.run(argv(ASK_CMD), cwd=repo, input=LOOK.format(
+            work, copy = _scratch(repo)
+            p = subprocess.run(argv(ASK_CMD), cwd=copy, input=LOOK.format(
                 who=_who(ch) or 'sir', history=ch.recent() if hasattr(ch, 'recent') else '', text=text),
-                capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=240)
+                capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=300)
             reply = json.loads(p.stdout)
             if not reply.get('is_error'):
                 box['answer'] = (reply.get('result') or '').strip()
         except Exception:
             pass
+        finally:
+            if work:
+                shutil.rmtree(work, ignore_errors=True)
         done.set()
     threading.Thread(target=run, daemon=True).start()
     typing = getattr(ch, 'typing', None)
-    while not done.wait(4):   # keep "typing..." up while Claude reads (Telegram shows it for about 5 seconds)
+    while not done.wait(4):   # keep "typing..." up while Claude works (Telegram shows it for about 5 seconds)
         if callable(typing):
             typing()
     return box.get('answer') or None
@@ -632,6 +703,7 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
             ch.send('🐝 ' + telegram.esc(answer), html=True)
             return 'answered'
     if intent not in ('change', 'rule'):   # a question, a complaint, small talk: answered, in context, never kept as a rule
+        remember(ch, repo, text)   # a lasting fact about his business is kept for later (in the background)
         speak(ch, repo, 'The conversation so far:\n' + (ch.recent() if hasattr(ch, 'recent') else '') +
               f'\n\nHis newest message: "{text}". Reply as his assistant would: answer what he asked; if he is '
               'frustrated, own the mistake plainly and say what you are doing about it; if he refers back to something, '
