@@ -1,0 +1,26 @@
+# BRAIN (lead-maintained; read at every sync). Goal: all 127 categories pass, exact SQLite behaviour.
+Status: 9/1340 at start (only `basic` partly). Engine is a 221-line skeleton: tuples for exprs, dict statements.
+
+## Rules to avoid collisions
+- One owner per file at a time (the lock's description must name the files). Put NEW code in NEW modules; touch shared files (parser.py, engine.py) with small, surgical edits and land often (small commits, rebase before landing).
+- Functions: NEVER edit a shared function table. Each family file `minisql/fn_<family>.py` registers via decorator (see Interfaces); `functions.py` auto-imports all `fn_*.py`.
+- Errors: SQLite errors -> raise `minisql.errors.SQLError(msg)` (tests may expect error rows; check `--show`).
+
+## Interfaces (the contract; build exactly this)
+- `minisql/values.py` (W1): SQL values are Python None/int/float/str/bytes (bool never). `typeof(v)`, `compare(a,b,collation='BINARY')` (SQLite ordering NULL<num<text<blob; returns -1/0/1), `sort_key(v,collation)`, `to_bool(v)->None/True/False`, `apply_affinity(v,aff)`, `cast(v,typename)`, `text_to_number(s)` (prefix parse), `fmt_real(f)` (SQLite float->text, e.g. 1.0, 1e+20), `like(pat,s,esc)`, `glob(pat,s)`, collations dict `COLLATIONS` (BINARY,NOCASE,RTRIM).
+- `minisql/errors.py` (W1, first commit within 3 min): `class SQLError(Exception)`.
+- `minisql/functions.py` (W2): `SCALAR = {}` name(lower)->callable(*args)->value; `AGG = {}` name->class with `step(*args)`, `final()`; `WINDOW`; decorator `@scalar('name', nargs=None)` and `@aggregate('name')`; `register_all()` imports `fn_*.py`. Functions receive already-evaluated Python values; NULL handling inside the function. Special-form funcs needing lazy args (coalesce/iif/ifnull/nullif) are handled in evaluator as ('func',...) w/ `lazy=True` flag in the decorator.
+- Expression AST (tuples, extend not rewrite): ('lit',v) ('col',tbl,name) ('star',tbl|None) ('unary',op,e) ('bin',op,l,r) [op: + - * / % || & | << >> = == != <> < <= > >= AND OR IS 'IS NOT' LIKE GLOB] ('like',e,pat,esc,neg,kind) ('between',e,lo,hi,neg) ('in',e,list_or_subq,neg) ('isnull',e,neg) ('case',base,whens,else) ('cast',e,type) ('func',name,args,distinct,filter,over,orderby) ('subq',select) ('exists',select,neg) ('collate',e,name) ('param',n) ('row',[exprs]).
+- Statement dicts keep `'type'`: select (with `ctes`, `distinct`, `items`, `from` (list of source nodes with join info), `where`, `group`, `having`, `order`, `limit`, `offset`, `compound` chain), insert, update, delete, create (table/index/view), drop, alter, begin/commit/rollback.
+- `minisql/evaluator.py` (W1): `evaluate(e, ctx)` where ctx.row is a dict-like `Row` with `.get(tbl,name)`; evaluator moves out of engine.py. Aggregates/window results are pre-computed and looked up by node identity in `ctx.aggs`.
+- `minisql/exec_select.py` (W3): FROM/JOIN/WHERE/GROUP/HAVING/ORDER/LIMIT/DISTINCT/compound; `minisql/exec_dml.py` (W4): INSERT/UPDATE/DELETE/upsert/returning/DDL/constraints/transactions(snapshot copy of tables). `engine.py` only dispatches `exec_<type>` to these.
+- Dates: `minisql/fn_date.py` single owner (W5). JSON: `minisql/fn_json.py` single owner (W6).
+
+## Levels (all categories failing at start)
+- L0 foundations: basic, arith, real_literal, hex_literal, blob_literal, comments_quoted, concat, true_false, nulls, where, case, case_nested, typeof, cast_int_real, cast_text_numeric, bitwise, limit_expr, order_limit, strings, distinct, insert_columns, default_values, update_delete, delete_all_count, update_multi_set.
+- L1 (need L0 evaluator/select): aggregates, agg_distinct, agg_empty_null, agg_filter, agg_order_by, group_by, group_by_expr_alias, group_concat_sep, minmax_scalar, order_nulls, collate_nocase, like_escape, glob, is_distinct, row_values, values_clause, iif_if, instr, replace_more, substr_more, trim_chars, length_octet, char_unicode, hex_unhex, quote, format, printf, abs_sign, round_trunc, ceil_floor, pow_mod, sqrt_exp_ln, log_funcs, trig, hyperbolic, check_not_null, integer_primary_key, create_table_as, create_index_noop, drop_table, alter_table, alter_rename_table, transactions, insert_or_ignore, insert_or_replace.
+- L2 (joins/subqueries/compound): join, left_join, right_full_join, three_way_join, natural_using, select_star_qualified, subquery, exists, scalar_subquery_order, union, union_all, intersect, except, compound_order_limit, insert_select, views, cte_basic, cte_multiple, cte_recursive, update_from, upsert, returning.
+- L3 (needs aggregates machinery): window_* (row_number, rank, agg, frames, lag_lead, first_last, nth_value, ntile, percent, named, empty_over), median, percentile.
+- Independent leaf families (need only L0 evaluator + function registry): date_basic, date_compare, date_modifiers, date_n_days, datetime_basic, time_basic, julianday, unixepoch, strftime, timediff; json_* (array_length, arrows, build, error_position, extract, group, minify, modify, patch, remove, type, valid).
+
+## STATUS (update 3): 1340/1340, all 127 categories pass, no locks held. Done. Optional: hardening vs hidden variants (claim a lock named after the family first).

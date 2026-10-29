@@ -1,0 +1,17 @@
+hidden categories left out: ['median', 'percentile', 'transactions']
+team  t95(min)  v10   v20   finish  visible  hidden  cost(lead)      plan(s)  landings  brain  conflicts blocks logged
+F1       4.4  1340  1340     4.5   1340    99.8%  $ 5.51 (–)    None      42     0      0      0      0
+H1       6.2  1340  1340     7.9   1340    99.8%  $ 5.76 ($0.17)      35      45     4      0      0      2
+H2       6.7  1340  1340     7.0   1340    99.8%  $ 6.17 ($0.20)      35      44     4      1      0      9
+F2       6.3  1340  1340     6.3   1340    99.8%  $ 5.41 (–)    None      37     0      0      0      0
+
+means: t95 F 5.3 vs H 6.4 min (ratio 1.20); cost F $5.46 vs H $5.97 (ratio 1.09); v10 F 1340 vs H 1340; hidden F 99.8 vs H 99.8
+
+predictions
+D1 plans within 6 min: 35 s, 35 s -> held
+D2 H not ≥ 20% sooner to 95%: ratio 1.20 -> held
+D3 H costs ≥ 1.10× F: 1.09 -> failed
+D4 at 10 min H < F: 1340 vs 1340 -> failed
+D5 hidden within 3 points: +0.0 -> held
+Ship (lead + brain ≥ 20% sooner in both pairings, cost ≤ 1.15×): did not fire
+Kill (not sooner and costlier): FIRED
