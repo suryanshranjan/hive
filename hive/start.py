@@ -227,8 +227,8 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     auto = workers is None   # the swarm law picks the number from this project's measurements (hive/law.py)
     if auto:
         workers, why = law.builders(t_g)
-        say(f"\nI'll put {_n(workers, 'builder')} on it ({why}). They work on copies, so your branches stay exactly "
-            "as they are.")
+        say(f"\nI'll put {_n(workers, 'builder')} on it ({why}): {law.trade(workers)}. They work on copies, so your "
+            "branches stay exactly as they are.")   # the trade from Gate 50, so he knows what speed costs
     else:
         say(f"\nI'll put {workers} builders on it, as you chose. They work on copies, so your branches stay exactly as "
             "they are.")
@@ -236,7 +236,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
         if n < workers:
             say(f"  (The law would use {_n(n, 'builder')}: {why}. More won't finish sooner, and cost more.)")
         elif n > workers:
-            say(f"  (The law would use {_n(n, 'builder')}: {why}. Fewer will take longer.)")
+            say(f"  (The law would use {_n(n, 'builder')}: {why}; {law.trade(n)}. Fewer will take longer, and cost less.)")
     cfg_phone = telegram.load()
     phone = telegram.Channel(cfg_phone) if cfg_phone else None
     if overnight:
