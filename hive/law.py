@@ -87,13 +87,14 @@ def builders(t_g_seconds, cpus=None, decisions=None, cap=CAP):
 # nothing at 3-6 builders (finish 1.03x, cost 1.01x; +0 on top of the owner's rules), because builders rarely collided.
 # Collisions grow with swarm size (conflicts per landing 0.14 / 0.33 / 0.48 at 2 / 6 / 12, Gates 2-3), so notes are
 # switched on only where collisions are likely to matter. Both thresholds are conjectures, not yet tested.
-NOTES_FROM_BUILDERS = 10        # above the largest swarms where silence was measured to be enough
+NOTES_FROM_BUILDERS = None      # Gate 51: at 12 builders, notes were not faster (95% at 8.0 vs 5.2 min, cost 1.04x), so
+                                # size alone no longer turns them on; only a swarm that keeps colliding does
 NOTES_FROM_CONFLICT_RATE = 0.5  # this run's rebase conflicts per landing (Gate 3's 12-worker rate was 0.48)
 
 def notes(n, conflicts=0, landings=0):
     """(on, why): whether builders should post and read team notes."""
-    if n >= NOTES_FROM_BUILDERS:
+    if NOTES_FROM_BUILDERS and n >= NOTES_FROM_BUILDERS:
         return True, f"{n} builders: at this size they start getting in each other's way"
     if landings >= 4 and conflicts / landings >= NOTES_FROM_CONFLICT_RATE:
         return True, f'{conflicts} collisions in {landings} landings: builders keep editing the same code'
-    return False, f'{n} builders rarely collide; silence is enough (Gates 43-44)'
+    return False, f'{n} builders rarely collide; silence is enough (Gates 43-44, 51)'
