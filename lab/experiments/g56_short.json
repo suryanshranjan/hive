@@ -1,0 +1,14 @@
+{
+ "name": "g56",
+ "predictions": "gates/gate56/prompts/PREDICTIONS.md",
+ "rulegiver_brief": "gates/gate56/prompts/rulegiver_brief.md",
+ "require_decisions": true,
+ "prompt": "gates/gate56/prompts/prompt_builder.md",
+ "ask_texts": "runs/g56/ask_texts.md",
+ "visible_seed": 56100,
+ "hidden_seed": 56200000,
+ "baseline": "N0",
+ "pre_launch": ["python3 gates/gate56/referee/review56.py pre {run} {oracle}"],
+ "after_baseline": ["python3 gates/gate56/referee/review56.py after {run} {oracle} {base}"],
+ "arms": ["N0:3:none", "SF:3:none", "SS:3:none"]
+}
