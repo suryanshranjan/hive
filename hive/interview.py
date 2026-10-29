@@ -25,9 +25,11 @@ work. The feature to build:
 List the {n} situations where his own business rules are most likely to matter and differ from what builders would
 assume: money, timing, limits, exceptions, missing information, conflicts between people. Skip anything the feature
 description already settles. Each situation is one concrete case in plain words (names, rupees, days), with 2 or 3
-realistic outcomes a business might choose, clearly different from each other. No technical words.
+realistic outcomes a business might choose, clearly different from each other. No technical words. For each, add
+"why": one short line on what it costs his business if the builders simply guess (money paid out wrongly, an angry
+customer, a legal risk, abuse), so he sees the question is worth his time.
 
-Reply with JSON only: {{"situations": [{{"situation": "...", "options": ["...", "...", "..."]}}]}}"""
+Reply with JSON only: {{"situations": [{{"situation": "...", "options": ["...", "...", "..."], "why": "..."}}]}}"""
 
 FROM_DECISIONS = """
 These are the decisions the builders' code must take, each with the outcome they would pick if nobody told them:
@@ -117,7 +119,8 @@ def write_situations(goal, rulings=None, n=12, inputs=False):
     for k, s in enumerate(got.get('situations', [])[:n], 1):
         opts = [o for o in s.get('options', []) if isinstance(o, str) and o.strip()][:3]
         if s.get('situation') and len(opts) >= 2:
-            out.append({'id': f'q{k:02d}', 'situation': s['situation'].strip(), 'options': opts})
+            out.append({'id': f'q{k:02d}', 'situation': s['situation'].strip(), 'options': opts}
+                       | ({'why': s['why'].strip()} if isinstance(s.get('why'), str) and s['why'].strip() else {}))
     return _dedupe(out)
 
 def _rule(situation, answer):
@@ -267,18 +270,24 @@ SHEET_NOTE = 'Each one applies to every case like it, not just the example.'
 
 PAGED_FROM = 10   # longer sheets go page by page
 
-def _confirm_pages(general, ch, poll, title, note, missing):
+def _confirm_pages(general, ch, poll, title, note, missing, goal=''):
     """The sheet one area at a time, at most 8 rules a page: he taps a wrong rule's number, or "this section is fine";
     each wrong rule is put right on its own page, while the context is fresh."""
-    from .codesheet import areas
+    from .codesheet import areas, stakes
     pages = areas(general)
-    ch.send(f"📜 <b>{telegram.esc(title)}</b>\n\n{len(general)} rules in {len(pages)} short sections. <i>{telegram.esc(note)} "
-            "Most will be right: tap \"this section is fine\" to move on.</i>", html=True)
+    why = stakes(pages, goal)
+    mins = max(3, round(len(general) * 8 / 60))   # about 8 seconds a rule, most of them a glance
+    ch.send(f"📜 <b>{telegram.esc(title)}</b>\n\n{len(general)} rules in {len(pages)} short sections, about {mins} minutes. "
+            "Every rule here is something the builders decided on their own; a wrong one costs far more to find once "
+            f"customers hit it. <i>{telegram.esc(note)} Most will be right: tap \"this section is fine\" to move on.</i>",
+            html=True)
     for p, (area, items) in enumerate(pages, 1):
         listing = '\n'.join(f'<b>{n}.</b> {telegram.esc(r)}' for n, r in items)
         nums = [(str(n), f'pg|{n}') for n, _ in items]
         rows = [nums[i:i + 4] for i in range(0, len(nums), 4)] + [[('✅ This section is fine', 'pg|ok')]]
-        ch.send(f"📋 <b>{telegram.esc(area)}</b>   {p} of {len(pages)}   {telegram.bar(p, len(pages))}\n\n{listing}\n\n"
+        stake = why.get(area.split(' (')[0])
+        stake = f"💡 <i>Why it matters: {telegram.esc(stake)}</i>\n\n" if stake else ''
+        ch.send(f"📋 <b>{telegram.esc(area)}</b>   {p} of {len(pages)}   {telegram.bar(p, len(pages))}\n\n{stake}{listing}\n\n"
                 "<i>Tap the number of any rule that is wrong, or tell me.</i>", html=True, buttons=rows)
         wrong, valid = [], {n for n, _ in items}
         while True:
@@ -304,14 +313,14 @@ def _confirm_pages(general, ch, poll, title, note, missing):
     ch.send('✅ Thank you. These are your rules now; the builders will encode every one as a test.')
     return general
 
-def confirm_sheet(general, ch=None, ask=None, poll=20, title=SHEET_TITLE, note=SHEET_NOTE, missing=False):
+def confirm_sheet(general, ch=None, ask=None, poll=20, title=SHEET_TITLE, note=SHEET_NOTE, missing=False, goal=''):
     """Show the whole sheet; he marks the numbers of any wrong rules and says each one right; each is amended, not
     replaced (Gate 39). With `missing`, he is then asked what the builders should know that is not on it (Gate 42: a
     sheet written from the built code). Returns the confirmed rules."""
     general = list(general)
     listing = '\n'.join(f'<b>{n}.</b> {telegram.esc(r)}' for n, r in enumerate(general, 1))
     if ch and len(general) > PAGED_FROM:   # a long sheet in pages by area (the owner: "60-80 rules is too much")
-        return _confirm_pages(general, ch, poll, title, note, missing)
+        return _confirm_pages(general, ch, poll, title, note, missing, goal)
     if ch:
         nums = [(str(n), f'sheet|{n}') for n in range(1, len(general) + 1)]
         rows = [nums[i:i + 5] for i in range(0, len(nums), 5)] + [[('✅ All correct', 'sheet|done')]]

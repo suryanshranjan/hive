@@ -458,7 +458,7 @@ def handover(state, ch=None, poll=20, rounds=3):
         done = interview.confirm_sheet(show, ch, None if ch else (lambda p: _ask(p, '')), poll,
                                        title='What the build does now, as rules',
                                        note='Each one is what the product will do. Mark any that is not your policy.',
-                                       missing=True)
+                                       missing=True, goal=state.get('goal', ''))
         changed = [r for r in done if r not in sheet]
         if not changed:
             if ch:

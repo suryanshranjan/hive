@@ -335,6 +335,25 @@ explain.ask_json = _ask_json
 check('a rule that only repeats his own is not shown again', (show, his),
       (['fees: late fees start after 7 days.'], ['fees: a tip carries no fee.']))
 
+# 3q. every question and every page says why it matters, so the owner sees it is worth his time (the founder: "the
+# questions must feel important, not random")
+fake = FakeTelegram([tap('w1|0')])
+interview.interview('Fees', ch(fake), situations=[{'id': 'w1', 'situation': 'Case 1.', 'options': ['Yes', 'No'],
+                                                    'why': 'A wrong answer here pays referrers twice.'}], poll=1, sheet=False)
+check('a question shows why it matters', any('Why it matters: A wrong answer here pays referrers twice.' in m['text']
+                                             for m in fake.sent), True)
+_ask_json = explain.ask_json
+explain.ask_json = lambda prompt: ({'why': {'fees': 'Fees decide what you earn on every deal.',
+                                            'payouts': 'Payouts decide what creators receive.'}}
+                                   if 'why it is worth his attention' in prompt else _ask_json(prompt))
+fake = FakeTelegram([tap('pg|ok')] * 4 + [tap('sheet|none')])
+interview.confirm_sheet(list(sheet20), ch(fake), poll=1, missing=True, goal='Fees and payouts')
+explain.ask_json = _ask_json
+pages = [m['text'] for m in fake.sent if m['text'].startswith('📋')]
+check('each page of the sheet says why its area matters, and the opening says what the time buys',
+      ('Why it matters: Fees decide what you earn on every deal.' in pages[0], 'Payouts decide' in pages[2],
+       any('about 3 minutes' in m['text'] and 'costs far more to find' in m['text'] for m in fake.sent)), (True, True, True))
+
 # 4. the listener steps aside while a build or review is talking to the owner
 json.dump({'pid': os.getppid(), 'at': time.time()}, open(telegram.BUSY, 'w'))
 check('another live process talking: the listener steps aside', telegram.busy_elsewhere(), True)
