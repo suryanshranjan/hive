@@ -33,7 +33,7 @@ def checks(repo='.', claude_probe=True):
         out.append((bool(shutil.which(exe)), True, f'{agent} is installed (your builders run on it)',
                     f'Install {agent} and log in once in a terminal ({exe}), or build with --agent claude.'))
     if claude and claude_probe:
-        p = _run(['claude', '-p', 'Reply with the single word OK'], timeout=90)
+        p = _run([claude, '-p', 'Reply with the single word OK'], timeout=90)   # the full path: on Windows it is a .cmd
         ok = bool(p and p.returncode == 0 and 'OK' in p.stdout.upper())
         out.append((ok, True, 'Claude Code is logged in and answering',
                     'Run claude in a terminal and log in (or /login), then try again.'))

@@ -308,6 +308,25 @@ def page_reply(kind, a, valid):
         return 'out', [int(m.group(1))]
     return 'note', t
 
+STOP = {'the', 'a', 'an', 'is', 'are', 'what', 'if', 'they', 'it', 'to', 'of', 'on', 'in', 'and', 'or', 'for', 'happens',
+        'does', 'do', 'mean', 'means', 'this', 'that', 'make', 'be', 'should', 'how', 'when', 'kya', 'hai', 'ka', 'ki', 'ko'}
+
+def _words(t):
+    return {w.rstrip('s') for w in re.findall(r'[a-z0-9]+', t.lower()) if w not in STOP and len(w) > 1}
+
+def related(items, text, top=2):
+    """The rules on a page his words are about, by shared words: what Hive can still show him with no model to ask
+    (a dry run with no model answered "what happens if they verify on day 31?" with "which rule is unclear?")."""
+    ask = _words(text)
+    scored = sorted(((len(ask & _words(r)), n, r) for n, r in items), key=lambda x: (-x[0], x[1]))
+    return [(n, r) for s, n, r in scored[:top] if s]
+
+def _area_of(items, text, page_area):
+    """The area his words belong to: the closest rule's own area, not a shared page's joined title."""
+    near = related(items, text, 1)
+    head = near[0][1].partition(':')[0] if near and ':' in near[0][1] else ''
+    return head.split(' (')[0].strip() or page_area.split(' · ')[0]
+
 def _explain(ch, a, rules_text, goal, code=None):
     """His question about rules on the sheet, answered in context. With `code` (the build's own folder), Claude reads
     the code and answers what it does, with an example (the owner: "agentic level contextual answers"); otherwise, or
@@ -344,7 +363,8 @@ part of his product. Tell him, as a short spoken message, how this part now work
 wants. The part: {area}. What it does, rule by rule:
 {rules}
 
-Write 2 to 5 short sentences in plain business words, with a concrete example (names, rupees, days) where it helps.
+Write 2 to 4 short sentences, under 80 words, in plain business words, with a concrete example (names, rupees, days)
+where it helps.
 Cover every rule above: merge similar ones, leave none out, add nothing. No code words, no rule numbers. Then one short
 question asking whether that is how he wants it, pointing at the decision most worth his attention.
 Reply with JSON only: {{"say": "...", "ask": "...", "covers": [the rule numbers your message covers]}}"""
@@ -395,7 +415,11 @@ def _converse(ch, poll, area, items, general, goal, code, where, stake):
         if heard.get('kind') == 'fine':
             return 'done'
         if heard.get('kind') == 'question' or (heard.get('kind') != 'change' and ASKING.search(' '.join(a.lower().split()))):
-            meaning = _explain(ch, a, listing, goal, code) or 'I could not work that out from what was built, sir.'
+            meaning = _explain(ch, a, listing, goal, code)
+            if not meaning:   # no model: the rules that speak to it
+                near = related(items, a)
+                meaning = ('Here is what the rules say about that:\n' + '\n'.join(f'{n}. {general[n - 1]}' for n, _ in near)
+                           if near else 'I could not work that out from what was built, sir.')
             ch.send(f"💬 {telegram.esc(meaning)}\n\n<i>Anything to change here, or shall we go on?</i>", html=True,
                     buttons=buttons)
             continue
@@ -411,7 +435,7 @@ def _converse(ch, poll, area, items, general, goal, code, where, stake):
             ch.send(f"✍️ {telegram.esc(back.strip() or 'Done: changed as you said.')} <i>Anything else here, or shall we "
                     "go on?</i>", html=True, buttons=buttons)
             continue
-        general.append(f'{area}: {a.strip()}')   # nothing could be read from it: his words go to the builders as said
+        general.append(f'{_area_of(items, a, area)}: {a.strip()}')   # nothing read from it: his words go to the builders
         ch.send("📝 Noted, in your words, for the builders. <i>Anything else here, or shall we go on?</i>", html=True,
                 buttons=buttons)
     return 'done'
@@ -434,8 +458,9 @@ def _confirm_pages(general, ch, poll, title, note, missing, goal='', save=None, 
     mins = max(3, round(len(general) * 8 / 60))   # about 8 seconds a rule, most of them a glance
     ch.send((f"📜 <b>{telegram.esc(title)}</b>\n\n{len(general)} rules in {len(pages)} short sections, about {mins} minutes. "
              "Every rule here is something the builders decided on their own; a wrong one costs far more to find once "
-             f"customers hit it. <i>{telegram.esc(note)} Most will be right: tap \"this section is fine\" to move on. If a "
-             "rule is unclear, just ask.</i>") if not done else
+             f"customers hit it. <i>{telegram.esc(note)} Most will be right: " +
+             ("I'll tell you how each part works; say yes to move on, or tell me what to change. " if talk else
+              "tap \"this section is fine\" to move on. ") + "If anything is unclear, just ask.</i>") if not done else
             f"📜 <b>Picking up where we stopped:</b> section {done + 1} of {len(pages)}.", html=True)
     for p, (area, items) in enumerate(pages, 1):
         if p <= done:
@@ -462,8 +487,11 @@ def _confirm_pages(general, ch, poll, title, note, missing, goal='', save=None, 
                 break
             if what == 'question':   # Gate 45: answered, never filed as a correction
                 meaning = _explain(ch, a, '\n'.join(f'{n}. {r}' for n, r in items), goal, code)
-                ch.send(f"💬 {telegram.esc(meaning or 'Which rule here is unclear? Tell me its number and I will explain it in plain words.')}"
-                        f"\n\n{again}", html=True, buttons=rows)
+                if not meaning:   # no model answered: show him the rules that speak to it, rather than ask him back
+                    near = related(items, a)
+                    meaning = ("Here is what the rules say about that:\n" + '\n'.join(f'{n}. {r}' for n, r in near)
+                               if near else 'Which rule here is unclear? Tell me its number and I will explain it in plain words.')
+                ch.send(f"💬 {telegram.esc(meaning)}\n\n{again}", html=True, buttons=rows)
                 continue
             if what == 'out':
                 ch.send(f"Rule {', '.join(map(str, x))} isn't on this page; here it's {valid[0]} to {valid[-1]}. {again}",
@@ -475,8 +503,8 @@ def _confirm_pages(general, ch, poll, title, note, missing, goal='', save=None, 
                 ch.send(f"✍️ Rule {k} is now: {telegram.esc(general[k - 1])}\n\n<i>Anything else here? Tap a number, "
                         "or ✅ This section is fine.</i>", html=True, buttons=rows)
                 continue
-            if what == 'note':   # his words without a rule number: a correction to this section as a whole
-                general.append(f'{area}: {x}')
+            if what == 'note':   # his words without a rule number: a correction, filed under the area it is about
+                general.append(f'{_area_of(items, x, area)}: {x}')
                 ch.send(f"📝 Noted for this section. Anything else here? {again}", html=True, buttons=rows)
                 continue
             for k in x:
