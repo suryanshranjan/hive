@@ -24,6 +24,7 @@ check "both workers landed" "$(git log --format=%s | grep -c '^implement ')" 2
 check "no lock left behind" "$(ls current_tasks/*.txt 2>/dev/null | wc -l)" 0
 check "the source repository was never touched" "$(git -C $T/project rev-parse HEAD)" "$before"
 check "cost logged for every worker" "$(tail -n +2 $T/run/agents.csv | wc -l)" 2
+check "the phone's board of builders: each one's agent, finished, with its process recorded"   "$($PY -c "import json; b = json.load(open('$TW/run/builders.json')); print(sorted((k, v['agent'], v['state'], v['pid'] > 0) for k, v in b.items()))")"   "[('w1', 'custom', 'finished', True), ('w2', 'custom', 'finished', True)]"
 
 # a usage limit mid-build: the worker waits for the reset, then picks up again in its own clone and finishes
 HIVE_RESUME_MIN=1 HIVE_WORKER_CMD="sh $HIVE/tests/fake_limited_worker.sh" $PY -m hive run --repo $T/project \

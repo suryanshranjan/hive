@@ -159,6 +159,17 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
     meta = json.load(open(os.path.join(run, 'run.json'))); meta['started'] = int(time.time())
     json.dump(meta, open(os.path.join(run, 'run.json'), 'w'), indent=1)
 
+    board = {}   # <run>/builders.json: who runs on which agent, working or done, for the owner's phone (hive/team.py)
+
+    def mark(me, **kw):
+        board.setdefault(me, {'agent': builder_agent(k=kth(me))}).update(kw)
+        try:
+            json.dump(board, open(os.path.join(run, 'builders.json.tmp'), 'w'), indent=1)
+            os.replace(os.path.join(run, 'builders.json.tmp'), os.path.join(run, 'builders.json'))
+        except OSError:
+            pass
+    for me in queue:
+        mark(me, state='queued')
     tries = int(os.environ.get('HIVE_RESUME_TRIES', 8))   # about 6 hours of waiting at most
     attempts, spent, first = {}, {}, {}   # per worker: limit stops so far, tokens and cost of earlier attempts, start
 
@@ -174,6 +185,7 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
             pass
         say(f'{"picked up" if attempts.get(me) else "launched"} {me}' + (f' ({builder_agent(k=kth(me))})' if len(agents()) > 1 else ''))
         first.setdefault(me, time.time())
+        mark(me, state='working', pid=p.pid, started=int(first[me]))
         return [me, time.time(), p, out]
 
     cap = max_parallel or len(queue); live = []; rows = []; waiting = []   # waiting: [(when, worker)]
@@ -196,6 +208,7 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
                 t, c = spent.get(me, (0, 0.0)); spent[me] = (t + int(tok or 0), c + float(cost or 0))
                 shutil.copy(path, os.path.join(run, 'out', f'{me}.limit{n}.json'))
                 when = _resume_at(reset, n - 1); waiting.append((when, me))
+                mark(me, state='waiting', until=int(when))
                 say((f"{me} stopped: Claude's login has expired. Run claude and log in again (/login); I'll try again "
                      f"at {time.strftime('%H:%M', time.localtime(when))} and keep trying.") if reset == -1 else
                     f"{me} stopped: Claude's usage limit was reached. I'll pick up again at "
@@ -208,6 +221,8 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
             rows.append(dict(worker=me, agent=builder_agent(k=kth(me)), start=int(first[me]), end=int(time.time()),
                              minutes=round((time.time() - first[me]) / 60, 1), exit=p.returncode, tokens=tok,
                              cost_usd=cost, api_error=err, limit_stops=attempts.get(me, 0)))
+            mark(me, state='stopped' if os.path.exists(os.path.join(run, 'stopped', me)) else 'finished',
+                 ended=int(time.time()), exit=p.returncode)
             say(f'{me} finished: exit {p.returncode}, {rows[-1]["minutes"]} min, cost {cost}' + (f', API ERROR {err}' if err else ''))
         time.sleep(2)
     with open(os.path.join(run, 'agents.csv'), 'w', newline='') as f:
