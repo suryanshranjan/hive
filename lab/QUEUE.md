@@ -2,7 +2,14 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 31 2026, after Gate 58; Gate 45 day 2 next, with the founder)
+## Where we left off (Oct 30 2026 IST, after Gate 60; Gate 61 running; Gate 45 day 2 still next with the founder)
+
+- **Gate 60 done** (the user, travelling: "Run the tests as required"): two wings. The cases where two independent builds disagree did not find the owner's decisions: pooled over two rule sets, 20 of 50 decisions right vs 26 for Gate 58's spot checks, from 10 cases vs 29. Two Claude builds disagree on only 19% of the first build's errors. Kill fired; the spotter stays. Gate 58 replicated. Found: on the fresh rule set the skimmer touched every function in the list review, so the skip rule showed him no spot checks (BRAIN §8, 000c).
+- **Fast or cheap (product, no gate):** `hive pace fast|cheap`, asked once at the first `hive start` that would use more than one builder; cheap means one builder.
+- **Gate 61 (the flight log), registered and running:** confirmed outcomes kept as tests; six 2-builder teams clean up the code (N without the log, T with it).
+- **Gate 62 (next, mechanical, no owner):** does a second build from a different model (Opus, Haiku) disagree more where the first is wrong?
+
+## Earlier (Oct 31 2026, after Gate 58)
 
 - **Gate 58 done** (asked for by the user): the combined review (list, then spot checks on every function the list left, each correction applied alone and re-shown) beat the list alone for the skimming owner: 9 vs 4 of 25 decisions, hidden 58.8 vs 43.2%; 9 of 10 corrections confirmed on re-show. Shipped as the hand-over's last step (`hive/spotcheck.py`). For Gate 45 day 2: the founder's real review should use this flow. Re-shows are now one short sentence (12 and 19 words in a real-model check).
 - **Fresh install checked (Oct 31):** `pip install git+https://github.com/suryanshranjan/hive` into a clean venv and a new home folder in the lab container; `hive` with no input exits politely, `hive doctor` reports all set. (Windows fresh install not separately checked; `hive doctor` on Windows was fixed Oct 30.)

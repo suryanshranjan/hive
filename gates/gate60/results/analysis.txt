@@ -1,0 +1,43 @@
+== runs/g60a
+hidden pass: N0 41.6%, B 35.6%, SL 47.2%, CB 59.6%, DG 47.2%
+D: right 2, partial 1, wrong 20, absent 2
+SL: right 6, partial 1, wrong 17, absent 1
+CB: right 12, partial 3, wrong 9, absent 1
+DG: right 6, partial 2, wrong 16, absent 1
+R: right 25, partial 0, wrong 0, absent 0
+CB: 29 cases shown, 15 corrected, 15 confirmed on re-show, 4.3 min, owner model cost $3.2
+DG: 10 cases shown, 2 corrected, 2 confirmed on re-show, 0.9 min, owner model cost $0.819
+wings: 300 calls; N0 differs from the policy on 108; the builds disagree on 46; both: 17 (recall 0.16); of disagreements, N0 wrong on 0.37
+disagreements per function: bulk_price 6/30, fiscal_label 2/30, isbn_check 1/30, late_fee 16/30, loyalty_tier 4/30, make_slug 2/30, meeting_end 1/30, pct_change 4/30, phone_fmt 10/30, avg_rating 0/30
+== runs/g60b
+hidden pass: N0 34.8%, B 32.4%, SL 69.2%, CB 66.4%, DG 66.8%
+D: right 2, partial 0, wrong 20, absent 3
+SL: right 14, partial 0, wrong 9, absent 2
+CB: right 14, partial 0, wrong 9, absent 2
+DG: right 14, partial 0, wrong 9, absent 2
+R: right 25, partial 0, wrong 0, absent 0
+CB: 0 cases shown, 0 corrected, 0 confirmed on re-show, 0.0 min, owner model cost $0.0
+DG: 0 cases shown, 0 corrected, 0 confirmed on re-show, 0.0 min, owner model cost $0.0
+wings: 300 calls; N0 differs from the policy on 135; the builds disagree on 31; both: 30 (recall 0.22); of disagreements, N0 wrong on 0.97
+disagreements per function: biz_days_between 4/30, fmt_phone 13/30, grade_letter 4/30, late_fee 2/30, mask_card 4/30, shipping_cost 0/30, slugify 0/30, tiered_price 1/30, weighted_rating 2/30, gross_receipts 1/30
+
+== pooled
+D: right 4 of 50, partial 1
+SL: right 20 of 50, partial 1
+CB: right 26 of 50, partial 3
+DG: right 20 of 50, partial 2
+R: right 50 of 50, partial 0
+hidden pass (mean over runs): N0 38.2%, B 34.0%, SL 58.2%, CB 63.0%, DG 57.0%
+DG − CB = -6.0 points per function (95% CI -12.4 to +0.0, bootstrap over functions)
+CB: 29 cases shown, 15 corrected, 15 confirmed, 0 decisions SL had right spoiled
+DG: 10 cases shown, 2 corrected, 2 confirmed, 0 decisions SL had right spoiled
+
+predictions
+W1 disagreement recall of N0 errors ≥ 0.50: 0.19 (47 of 243) -> failed
+W2 DG right ≥ CB right: 20 vs 26 -> failed
+W3 DG cases ≤ 70% of CB cases: 0.34 -> held
+W4 hidden DG ≥ CB − 3: -6.0 -> failed
+W5 DG right ≥ SL right + 2: 20 vs 20 -> failed
+Ship (cases from disagreements): did not fire
+Replace outright: did not fire
+Kill: FIRED
