@@ -1,0 +1,22 @@
+{
+ "name": "g58",
+ "predictions": "gates/gate58/prompts/PREDICTIONS.md",
+ "rulegiver_brief": "gates/gate58/prompts/rulegiver_brief.md",
+ "require_decisions": true,
+ "prompt": "gates/gate58/prompts/prompt_builder.md",
+ "ask_texts": "runs/g58/ask_texts.md",
+ "visible_seed": 58100,
+ "hidden_seed": 58200000,
+ "baseline": "N0",
+ "pre_launch": [
+  "python3 gates/gate58/referee/review58.py pre {run} {oracle}"
+ ],
+ "after_baseline": [
+  "python3 gates/gate58/referee/review58.py after {run} {oracle} {base}"
+ ],
+ "arms": [
+  "N0:3:none",
+  "SL:3:none",
+  "CB:3:none"
+ ]
+}
