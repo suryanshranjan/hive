@@ -300,6 +300,16 @@ INTENTS_V1 = {   # the 9 meanings the fast reader was trained on (Gate 48's v1, 
     'cloud_off': 'shut the cloud machine down',
     'reply': 'anything else: a question, a complaint, thanks, frustration, small talk, or declining what Hive proposed',
 }
+INTENTS_V2 = dict(INTENTS_V1, **{   # Gate 59: the reader retrained with the builder commands
+    'build': 'he wants something new built, added, fixed or made in the product, including agreeing to or correcting a '
+             'build Hive just proposed (a separate new build, not an instruction to builders already working)',
+    'stop_build': 'he wants the whole build that is running stopped or cancelled',
+    'team': 'he asks about the builders themselves: who is doing what, which agents they run on, what one of them did',
+    'set_team': 'he chooses the builders for his builds: which agents (Claude, Codex) or how many',
+    'stop_builder': 'he wants one particular builder stopped, not the whole build',
+    'instruct': 'while a build is running, he tells the builders to do something different or extra in this build; not a '
+                'separate new build and not a standing rule',
+})
 TEAM_WORDS = re.compile(r"\bw\d+\b|\bbuilders?\b|\bcodex\b|\bclaude\b|\bgemini\b|\bteam\b|\binstead\b|\balso\b|\bjust\b")
 
 def fast_read(ch, text):
