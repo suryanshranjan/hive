@@ -398,11 +398,16 @@ def main():
     elif cfg.get('after_baseline'):
         # stage 1: the base arm alone; then gate-specific steps that read its code (Gate 42: a rule sheet written from
         # the built code, corrected by the owner); then every other arm
-        base_specs = [s for s in cfg['arms'] if s.split(':')[0] == cfg['baseline']]
-        say(f'stage 1: {cfg["baseline"]} alone')
+        # (Gate 60: cfg['stage1'] names other arms built in stage 1 too, e.g. a second independent build; each is
+        # cloned to runs/<name>/final_<arm> for the after-baseline steps)
+        first = [cfg['baseline']] + list(cfg.get('stage1', []))
+        base_specs = [s for s in cfg['arms'] if s.split(':')[0] in first]
+        say(f'stage 1: {", ".join(first)}' + ('' if len(first) > 1 else ' alone'))
         run_arms(cfg, name, run, oracle_path, base_specs, a.max_parallel)
-        final = os.path.join(run, f'final_{cfg["baseline"]}'); shutil.rmtree(final, ignore_errors=True)
-        sh('git', 'clone', '-q', os.path.join(run, f'up{cfg["baseline"]}.git'), final)
+        for arm in first:
+            fa = os.path.join(run, f'final_{arm}'); shutil.rmtree(fa, ignore_errors=True)
+            sh('git', 'clone', '-q', os.path.join(run, f'up{arm}.git'), fa)
+        final = os.path.join(run, f'final_{cfg["baseline"]}')
         for cmd in cfg['after_baseline']:
             say(f'after {cfg["baseline"]}: {cmd}')
             r = subprocess.run(cmd.format(root=ROOT, run=run, name=name, oracle=oracle_path, base=final), shell=True, cwd=ROOT)
