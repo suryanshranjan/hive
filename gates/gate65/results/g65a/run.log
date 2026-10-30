@@ -1,0 +1,118 @@
+[19:18:33] predictions registered on origin/main: gates/gate65/prompts/PREDICTIONS.md
+[19:19:55] wind tunnel: g65a: Sonnet spotter 49 cases (Gate 60), Opus spotter 46 cases ($0.48)
+[19:19:57] wind tunnel: CS case #1: ''
+[19:20:00] wind tunnel: CS case #2: 'No, 27 to 31 March is the year-end close, so 31 March 2026 should be FY2026-CLOS'
+[19:20:26] wind tunnel: CS case #3: ''
+[19:20:29] wind tunnel: CS case #4: "No, it should return the text 'INVALID' for a date that doesn't exist."
+[19:20:41] wind tunnel: CS case #5: 'No, a time is ignored, so 1 April 2026 at 10:00 should still get the label FY202'
+[19:20:55] wind tunnel: CS case #6: ''
+[19:20:58] wind tunnel: CS case #7: 'No, hyphens are ignored, so 0-306-40615 should also get 2.'
+[19:21:12] wind tunnel: CS case #8: 'No, it should still get a check digit, using just the 8 digits it has.'
+[19:21:35] wind tunnel: CS case #9: ''
+[19:21:37] wind tunnel: CS case #10: "No, an empty code should still get a check digit, which is '0'."
+[19:21:51] wind tunnel: CS case #11: "No, it should back up to the last hyphen and give 'hello'."
+[19:22:05] wind tunnel: CS case #12: "No, accented letters are separators and get dropped, so it should give 'caf-cr-m"
+[19:22:16] wind tunnel: CS case #13: ''
+[19:22:18] wind tunnel: CS case #14: "No, it should give 'untitled', not an empty address, for a limit of 0 or less."
+[19:22:30] wind tunnel: CS case #15: "No, a missing length limit should give NULL, not 'hello-world'."
+[19:22:43] wind tunnel: CS case #16: 'No, an old value of zero should give 0.0, not nothing.'
+[19:22:55] wind tunnel: CS case #17: 'No, dividing by the signed old value makes it -150.0, not up 150%.'
+[19:23:10] wind tunnel: CS case #18: ''
+[19:23:12] wind tunnel: CS case #19: "No, 'abc' isn't a number, so it should give NULL, not down 100%."
+[19:23:25] wind tunnel: CS case #20: "No, 'abc' as the new figure should also give NULL, not be treated as zero."
+[19:23:43] wind tunnel: CS case #21: 'No, with 11 digits it should come back unchanged as 1-415-555-1234.'
+[19:23:56] wind tunnel: CS case #22: ''
+[19:23:59] wind tunnel: CS case #23: ''
+[19:24:01] wind tunnel: CS case #24: ''
+[19:24:04] wind tunnel: CS case #25: ''
+[19:24:07] wind tunnel: CS case #26: 'No, it should be rounded to 1 decimal, so 4.2, not 4.17.'
+[19:24:18] wind tunnel: CS case #27: ''
+[19:24:21] wind tunnel: CS case #28: ''
+[19:24:23] wind tunnel: CS case #29: 'No, it should be rounded to one decimal, so 4.3.'
+[19:24:36] wind tunnel: CS case #30: ''
+[19:24:40] wind tunnel: CS case #31: "No, 10 units cost 95 dollars, which is more than 90, so it isn't cheaper."
+[19:25:09] wind tunnel: CS case #32: ''
+[19:25:11] wind tunnel: CS case #33: ''
+[19:25:13] wind tunnel: CS case #34: ''
+[19:25:16] wind tunnel: CS case #35: 'No, the grace period is only 5 days, so 30 days late is charged: the fee is 500 '
+[19:25:33] wind tunnel: CS case #36: "No, the minimum fee is 500 cents, so it's a 5-dollar fee, not 4."
+[19:25:56] wind tunnel: CS case #37: 'No, day 60 is also 5 dollars because of the 500-cent minimum, not 4. Day 61 is 6'
+[19:26:14] wind tunnel: CS case #38: 'No, the 20% cap wins over the minimum: a 12-cent invoice is charged 2 cents and '
+[19:26:39] wind tunnel: CS case #39: ''
+[19:26:41] wind tunnel: CS case #40: ''
+[19:26:43] wind tunnel: CS case #41: ''
+[19:26:46] wind tunnel: CS case #42: "No, negative points should be 'suspended', not bronze."
+[19:26:57] wind tunnel: CS case #43: ''
+[19:27:00] wind tunnel: CS case #44: ''
+[19:27:02] wind tunnel: CS case #45: 'No, it should stop at 23:59; bookings never run past midnight.'
+[19:27:15] wind tunnel: CS case #46: 'No, it should stop at 23:59, since bookings never run past midnight.'
+[19:27:32] wind tunnel: CS case #47: 'No, a duration of zero or less adds nothing, so it should end at 09:00, not 08:3'
+[19:27:46] wind tunnel: CS case #48: "No, 'abc' isn't a number, so it should give NULL, not 09:00."
+[19:27:59] wind tunnel: CS case #49: 'No, durations round up to 15-minute blocks, so 45.9 minutes is 4 blocks and it e'
+[19:28:17] wind tunnel: g65a CS: 49 cases, 28 corrected, 27 confirmed
+[19:28:20] wind tunnel: CO case #1: ''
+[19:28:23] wind tunnel: CO case #2: 'No, 31 March is in the year-end close period, so it should be FY2026-CLOSE, not '
+[19:28:37] wind tunnel: CO case #3: 'Case 3 is wrong: 31 December is in the October-to-December quarter, which is Q3 '
+[19:28:50] wind tunnel: CO case #4: 'No, a date with a time should still be labelled: it should be FY2027-Q1.'
+[19:29:04] wind tunnel: CO case #5: 'No, an impossible date should give the label INVALID, not blank.'
+[19:29:17] wind tunnel: CO case #6: ''
+[19:29:21] wind tunnel: CO case #7: 'No, a short code should still get a check digit. Here that would be 6, not blank'
+[19:29:47] wind tunnel: CO case #8: 'No, dashes should just be ignored, so it should give a check digit: 2.'
+[19:30:05] wind tunnel: CO case #9: ''
+[19:30:08] wind tunnel: CO case #10: ''
+[19:30:11] wind tunnel: CO case #11: 'No, the cut is in the middle of a word, so it should back up to the last hyphen:'
+[19:30:27] wind tunnel: CO case #12: 'No, it should come out as "untitled", not empty.'
+[19:30:42] wind tunnel: CO case #13: 'No, if no length limit is given it should return nothing (NULL), not summer-sale'
+[19:30:54] wind tunnel: CO case #14: 'No, the ampersand should become "and": tom-s-50-off-and-more.'
+[19:31:12] wind tunnel: CO case #15: 'No, when the old value is zero it should return 0.0, not blank.'
+[19:31:23] wind tunnel: CO case #16: 'No, it should be -150.0, because the change is divided by the signed old value, '
+[19:31:39] wind tunnel: CO case #17: 'No, it should be -50.0, because the change is divided by the signed old value, s'
+[19:31:57] wind tunnel: CO case #18: ''
+[19:32:00] wind tunnel: CO case #19: ''
+[19:32:02] wind tunnel: CO case #20: ''
+[19:32:05] wind tunnel: CO case #21: 'No, with the +1 it has 11 digits, so it should come back exactly as typed, not r'
+[19:32:20] wind tunnel: CO case #22: ''
+[19:32:22] wind tunnel: CO case #23: ''
+[19:32:24] wind tunnel: CO case #24: ''
+[19:32:26] wind tunnel: CO case #25: ''
+[19:32:30] wind tunnel: CO case #26: 'No, it should be rounded to 1 decimal: 3.8.'
+[19:32:42] wind tunnel: CO case #27: ''
+[19:32:44] wind tunnel: CO case #28: ''
+[19:32:46] wind tunnel: CO case #29: ''
+[19:32:49] wind tunnel: CO case #30: 'No, 100 or more mugs gets 15% off, so it should be 4,250 dollars.'
+[19:33:04] wind tunnel: CO case #31: 'No, the minimum order total is 5.00 dollars, so it should be 5.00, not 1.43.'
+[19:33:28] wind tunnel: CO case #32: ''
+[19:33:31] wind tunnel: CO case #33: 'No, grace is only 5 days, so 30 days late is chargeable: the fee should be 5.00 '
+[19:33:49] wind tunnel: CO case #34: 'No, the minimum fee is 5.00 dollars, so it should be 5.00, not 4.'
+[19:34:09] wind tunnel: CO case #35: 'No, the cap is 20% of the invoice, so it should be 2,000 dollars, not 600.'
+[19:34:27] wind tunnel: CO case #36: 'No, the minimum fee is 5.00 dollars, so it should be 5.00, not 6.'
+[19:35:10] wind tunnel: CO case #37: "No, it's chargeable at 45 days late. The fee is capped at 20% of 12 cents, so it"
+[19:35:35] wind tunnel: CO case #38: ''
+[19:35:38] wind tunnel: CO case #39: ''
+[19:35:40] wind tunnel: CO case #40: 'No, negative points should be suspended, not Bronze.'
+[19:35:53] wind tunnel: CO case #41: ''
+[19:35:56] wind tunnel: CO case #42: 'No, bookings never go past midnight, so it should end at 23:59.'
+[19:36:10] wind tunnel: CO case #43: 'No, it passes 23:59, so it should end at 23:59.'
+[19:36:26] wind tunnel: CO case #44: 'No, with minus minutes nothing is added, so it should end at 09:00, the start ti'
+[19:36:40] wind tunnel: CO case #45: 'No, a part minute counts as a started block, so it should end at 10:00.'
+[19:37:05] wind tunnel: CO case #46: ''
+[19:37:05] wind tunnel: g65a CO: 46 cases, 27 corrected, 26 confirmed
+CS: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g65a/upCS.git
+CO: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g65a/upCO.git
+next: python3 lab/launch.py --run g65a
+launched CO-w1 
+launched CO-w2 
+launched CO-w3 
+launched CS-w1 
+launched CS-w2 
+launched CS-w3 
+CS-w1 finished: exit 0, 0.9 min, tokens 524968, cost 0.2318648
+CO-w2 finished: exit 0, 1.0 min, tokens 611281, cost 0.2637073999999999
+CS-w2 finished: exit 0, 1.3 min, tokens 613232, cost 0.28360510000000005
+CS-w3 finished: exit 0, 1.3 min, tokens 422327, cost 0.2539785
+CO-w3 finished: exit 0, 1.3 min, tokens 744611, cost 0.29531490000000005
+CO-w1 finished: exit 0, 2.8 min, tokens 530203, cost 0.22494300000000003
+wrote /home/claude/hive/runs/g65a/agents.csv
+700 calls, 586 correct; hidden tests 171/250; edge calls 388/498
+700 calls, 590 correct; hidden tests 171/250; edge calls 388/498
+[19:41:51] wind tunnel: g65a done

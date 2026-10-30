@@ -1,0 +1,2055 @@
+{
+ "src": "g60a",
+ "arms": {
+  "CS": {
+   "shown": [
+    {
+     "function": "fiscal_label",
+     "call": "SELECT fiscal_label('2026-04-01')",
+     "got": "FY2027-Q1",
+     "say": "An invoice dated 1 April 2026 falls in the first quarter of the fiscal year named 2027, because the year starts in April and is named for the year it ends in."
+    },
+    {
+     "function": "fiscal_label",
+     "call": "SELECT fiscal_label('2026-03-31')",
+     "got": "FY2026-Q4",
+     "say": "An invoice dated 31 March 2026 still belongs to the fourth quarter of fiscal 2026, one day before the new year begins."
+    },
+    {
+     "function": "fiscal_label",
+     "call": "SELECT fiscal_label('2026-01-15')",
+     "got": "FY2026-Q4",
+     "say": "A January 2026 sale counts in the fourth quarter of fiscal 2026, while a December 2026 sale counts in fiscal 2027."
+    },
+    {
+     "function": "fiscal_label",
+     "call": "SELECT fiscal_label('2026-02-30')",
+     "got": null,
+     "say": "A sale dated 30 February 2026, which does not exist, gets no label at all rather than an error."
+    },
+    {
+     "function": "fiscal_label",
+     "call": "SELECT fiscal_label('2026-04-01 10:00')",
+     "got": null,
+     "say": "A sale stamped 1 April 2026 at 10:00 with the time of day attached gets no label, so timestamps must be trimmed to a plain date first."
+    },
+    {
+     "function": "isbn_check",
+     "call": "SELECT isbn_check('123456789')",
+     "got": "X",
+     "say": "For catalogue code 123456789 the check character is the letter X, not a digit."
+    },
+    {
+     "function": "isbn_check",
+     "call": "SELECT isbn_check('0-306-40615')",
+     "got": null,
+     "say": "Catalogue code 0-306-40615 typed with hyphens gets no check digit, even though it holds the same nine digits as 030640615, which gets 2."
+    },
+    {
+     "function": "isbn_check",
+     "call": "SELECT isbn_check('12345678')",
+     "got": null,
+     "say": "A catalogue code with only 8 digits gets no check digit instead of an error."
+    },
+    {
+     "function": "isbn_check",
+     "call": "SELECT isbn_check(' 030640615 ')",
+     "got": "2",
+     "say": "Spaces around catalogue code 030640615 are ignored, so it still gets the check digit 2."
+    },
+    {
+     "function": "isbn_check",
+     "call": "SELECT isbn_check('')",
+     "got": null,
+     "say": "An empty catalogue code gets no check digit."
+    },
+    {
+     "function": "make_slug",
+     "call": "SELECT make_slug('Hello World Today', 8)",
+     "got": "hello-wo",
+     "say": "The page 'Hello World Today' with an 8-character limit is cut in the middle of a word and becomes 'hello-wo'."
+    },
+    {
+     "function": "make_slug",
+     "call": "SELECT make_slug('Caf\u00e9 Cr\u00e8me', 20)",
+     "got": "caf-cr-me",
+     "say": "The product 'Caf\u00e9 Cr\u00e8me' loses its accented letters and becomes 'caf-cr-me', with the accents turned into dashes."
+    },
+    {
+     "function": "make_slug",
+     "call": "SELECT make_slug('\u65e5\u672c\u8a9e shoes', 50)",
+     "got": "shoes",
+     "say": "A product titled '\u65e5\u672c\u8a9e shoes' is reduced to just 'shoes', because non-English letters are dropped entirely."
+    },
+    {
+     "function": "make_slug",
+     "call": "SELECT make_slug('Hello World', 0)",
+     "got": "",
+     "say": "The page 'Hello World' with a length limit of 0 gets an empty address, and a negative limit does the same."
+    },
+    {
+     "function": "make_slug",
+     "call": "SELECT make_slug('Hello World', NULL)",
+     "got": "hello-world",
+     "say": "The page 'Hello World' with no length limit given is not shortened and becomes 'hello-world'."
+    },
+    {
+     "function": "pct_change",
+     "call": "SELECT pct_change(0, 50)",
+     "got": null,
+     "say": "Sales that grew from 0 to 50 units show no percentage change at all, because there is nothing to compare against."
+    },
+    {
+     "function": "pct_change",
+     "call": "SELECT pct_change(-100, 50)",
+     "got": 150.0,
+     "say": "A balance that moves from minus 100 to plus 50 is reported as up 150%."
+    },
+    {
+     "function": "pct_change",
+     "call": "SELECT pct_change(3, 4)",
+     "got": 33.3,
+     "say": "Monthly orders rising from 3 to 4 are reported as up 33.3%, rounded to one decimal."
+    },
+    {
+     "function": "pct_change",
+     "call": "SELECT pct_change(100, 'abc')",
+     "got": -100.0,
+     "say": "Revenue of 100 followed by a new figure typed as 'abc' is reported as down 100%, as if the new figure were zero."
+    },
+    {
+     "function": "pct_change",
+     "call": "SELECT pct_change('abc', 5)",
+     "got": null,
+     "say": "A previous figure typed as 'abc' gives no percentage change, whereas the same text as the new figure is treated as zero."
+    },
+    {
+     "function": "phone_fmt",
+     "call": "SELECT phone_fmt('1-415-555-1234')",
+     "got": "(415) 555-1234",
+     "say": "Dana's phone number written 1-415-555-1234 is shown as (415) 555-1234, with the leading country 1 removed."
+    },
+    {
+     "function": "phone_fmt",
+     "call": "SELECT phone_fmt('555-1234')",
+     "got": "555-1234",
+     "say": "A customer's 7-digit number 555-1234 with no area code is returned unchanged, with no sign that it was left unformatted."
+    },
+    {
+     "function": "phone_fmt",
+     "call": "SELECT phone_fmt('0155551234')",
+     "got": "(015) 555-1234",
+     "say": "A number starting with 0, which no real North American area code does, is still formatted as (015) 555-1234."
+    },
+    {
+     "function": "phone_fmt",
+     "call": "SELECT phone_fmt('415-555-1234 ext 22')",
+     "got": "415-555-1234 ext 22",
+     "say": "A number with an extension, 415-555-1234 ext 22, is left exactly as typed, because the extra digits make it too long."
+    },
+    {
+     "function": "phone_fmt",
+     "call": "SELECT phone_fmt('+44 20 7946 0958')",
+     "got": "+44 20 7946 0958",
+     "say": "A London number, +44 20 7946 0958, is passed through unchanged rather than rejected."
+    },
+    {
+     "function": "avg_rating",
+     "call": "SELECT avg_rating(v) FROM r WHERE g='a'",
+     "got": 4.166666666666667,
+     "say": "A shop's ratings of 5, 4, 0, 7, 3.5, a blank and the word 'x' average 4.17, because only the 5, 4 and 3.5 count."
+    },
+    {
+     "function": "avg_rating",
+     "call": "SELECT avg_rating(v) FROM r WHERE g='b'",
+     "got": null,
+     "say": "A shop whose only ratings are a blank and a 9, which is off the 1-to-5 scale, shows no average at all."
+    },
+    {
+     "function": "avg_rating",
+     "call": "SELECT avg_rating(v) FROM r WHERE g='d'",
+     "got": null,
+     "say": "A shop whose ratings of 5 and 3 were stored as text shows no average at all, instead of 4."
+    },
+    {
+     "function": "avg_rating",
+     "call": "SELECT avg_rating(v) FROM r WHERE g='e'",
+     "got": 4.333333333333333,
+     "say": "A shop rated 5, 4 and 4 shows an average of 4.333333333333333, with no rounding to one decimal."
+    },
+    {
+     "function": "bulk_price",
+     "call": "SELECT bulk_price(1000, 10)",
+     "got": 9500,
+     "say": "Meera orders 10 units at 10 dollars each and the whole order gets 5% off, so she pays 95 dollars instead of 100."
+    },
+    {
+     "function": "bulk_price",
+     "call": "SELECT bulk_price(1000, 9)",
+     "got": 9000,
+     "say": "Meera orders 9 units at 10 dollars each and gets no discount, so she pays 90 dollars; one unit more would make the order cheaper than this one."
+    },
+    {
+     "function": "bulk_price",
+     "call": "SELECT bulk_price(1000, 50)",
+     "got": 45000,
+     "say": "Omar orders 50 units at 10 dollars each and the 10% discount applies to the whole order, so he pays 450 dollars, while 49 units would cost 465.50."
+    },
+    {
+     "function": "bulk_price",
+     "call": "SELECT bulk_price(1000, -3)",
+     "got": 0,
+     "say": "A negative order of minus 3 units at 10 dollars each is not flagged as an error and simply totals 0 dollars."
+    },
+    {
+     "function": "bulk_price",
+     "call": "SELECT bulk_price('1000', 10)",
+     "got": null,
+     "say": "If a unit price of 10 dollars arrives as text instead of a number, the 10-unit order gets no total at all."
+    },
+    {
+     "function": "late_fee",
+     "call": "SELECT late_fee(10000, 30)",
+     "got": 0,
+     "say": "Ravi's 100-dollar invoice paid exactly 30 days late carries no late fee, because the grace period runs through day 30."
+    },
+    {
+     "function": "late_fee",
+     "call": "SELECT late_fee(10000, 31)",
+     "got": 400,
+     "say": "Ravi's 100-dollar invoice paid 31 days late is charged a 4-dollar fee, which is 4% of the invoice."
+    },
+    {
+     "function": "late_fee",
+     "call": "SELECT late_fee(10000, 61)",
+     "got": 600,
+     "say": "Ravi's 100-dollar invoice paid 61 days late is charged 6 dollars, while on day 60 it is still 4 dollars."
+    },
+    {
+     "function": "late_fee",
+     "call": "SELECT late_fee(12, 31)",
+     "got": 0,
+     "say": "A 12-cent invoice paid 31 days late is charged no fee, because 4% of it rounds down to nothing, while a 13-cent invoice is charged 1 cent."
+    },
+    {
+     "function": "late_fee",
+     "call": "SELECT late_fee(-5000, 40)",
+     "got": 0,
+     "say": "A 50-dollar credit note (a negative amount) that is 40 days overdue is charged no fee, with no warning."
+    },
+    {
+     "function": "loyalty_tier",
+     "call": "SELECT loyalty_tier(1000)",
+     "got": "silver",
+     "say": "A customer with exactly 1000 points is already silver, and one with 999 is still bronze."
+    },
+    {
+     "function": "loyalty_tier",
+     "call": "SELECT loyalty_tier(5000)",
+     "got": "gold",
+     "say": "A customer with exactly 5000 points becomes gold, and one with 4999 is still silver."
+    },
+    {
+     "function": "loyalty_tier",
+     "call": "SELECT loyalty_tier(-100)",
+     "got": "bronze",
+     "say": "A customer with a negative balance of minus 100 points is simply listed as bronze, not flagged as a data error."
+    },
+    {
+     "function": "loyalty_tier",
+     "call": "SELECT loyalty_tier(NULL)",
+     "got": null,
+     "say": "A customer with no points balance recorded gets no tier at all, not even bronze."
+    },
+    {
+     "function": "loyalty_tier",
+     "call": "SELECT loyalty_tier('5000')",
+     "got": null,
+     "say": "A customer whose 5000-point balance is stored as text gets no tier at all instead of gold."
+    },
+    {
+     "function": "meeting_end",
+     "call": "SELECT meeting_end('23:30', 60)",
+     "got": "00:30",
+     "say": "Priya's room booking from 23:30 for an hour ends at 00:30, and the result does not say it falls on the next day."
+    },
+    {
+     "function": "meeting_end",
+     "call": "SELECT meeting_end('23:30', 1500)",
+     "got": "00:30",
+     "say": "A booking from 23:30 lasting 25 hours is shown as ending at 00:30, the same as a booking lasting one hour."
+    },
+    {
+     "function": "meeting_end",
+     "call": "SELECT meeting_end('09:00', -30)",
+     "got": "08:30",
+     "say": "A booking from 09:00 with a duration of minus 30 minutes is not rejected and is shown as ending at 08:30, before it starts."
+    },
+    {
+     "function": "meeting_end",
+     "call": "SELECT meeting_end('09:00', 'abc')",
+     "got": "09:00",
+     "say": "A booking from 09:00 whose duration was typed as 'abc' is shown as ending at 09:00, as if it lasted no time."
+    },
+    {
+     "function": "meeting_end",
+     "call": "SELECT meeting_end('09:00', 45.9)",
+     "got": "09:45",
+     "say": "A booking from 09:00 lasting 45.9 minutes ends at 09:45, because the part-minute is dropped, not rounded up."
+    }
+   ],
+   "fixes": [
+    {
+     "shown": "An invoice dated 31 March 2026 still belongs to the fourth quarter of fiscal 2026, one day before the new year begins.",
+     "said": "No, 27 to 31 March is the year-end close, so 31 March 2026 should be FY2026-CLOSE, not Q4.",
+     "function": "fiscal_label",
+     "rounds": 1,
+     "now": "The invoice dated 31 March 2026 is not in the fourth quarter of fiscal 2026: because 27 to 31 March is the year-end close, the software labels it 'FY2026-CLOSE', one day before the new fiscal year begins on 1 April.",
+     "confirmed": true
+    },
+    {
+     "shown": "A sale dated 30 February 2026, which does not exist, gets no label at all rather than an error.",
+     "said": "No, it should return the text 'INVALID' for a date that doesn't exist.",
+     "function": "fiscal_label",
+     "rounds": 1,
+     "now": "The sale dated 30 February 2026, a date that doesn't exist, is not given a fiscal quarter label: the system returns the text 'INVALID' (not NULL and not an error), so the sale ends up with the label 'INVALID'.",
+     "confirmed": true
+    },
+    {
+     "shown": "A sale stamped 1 April 2026 at 10:00 with the time of day attached gets no label, so timestamps must be trimmed to a plain date first.",
+     "said": "No, a time is ignored, so 1 April 2026 at 10:00 should still get the label FY2027-Q1.",
+     "function": "fiscal_label",
+     "rounds": 1,
+     "now": "A sale stamped 1 April 2026 at 10:00 does get a label, contrary to the case's claim: the time of day is ignored and the date alone counts, so the sale is labelled 'FY2027-Q1' (first quarter of fiscal year 2027), with no need to trim the timestamp first.",
+     "confirmed": true
+    },
+    {
+     "shown": "Catalogue code 0-306-40615 typed with hyphens gets no check digit, even though it holds the same nine digits as 030640615, which gets 2.",
+     "said": "No, hyphens are ignored, so 0-306-40615 should also get 2.",
+     "function": "isbn_check",
+     "rounds": 1,
+     "now": "Catalogue code 0-306-40615, typed with hyphens, is treated as the nine digits 030640615 because the software ignores hyphens, so it does get a check digit: the check digit comes to 2, the same as for 030640615, which means the case's claim that it gets none doesn't match the rules.",
+     "confirmed": true
+    },
+    {
+     "shown": "A catalogue code with only 8 digits gets no check digit instead of an error.",
+     "said": "No, it should still get a check digit, using just the 8 digits it has.",
+     "function": "isbn_check",
+     "rounds": 1,
+     "now": "A catalogue code of only 8 digits is still a valid input and gets a check digit rather than an error: the last digit is weighted 2, the digits are weighted 9 down to 2, and the code gets the digit that brings the total to a multiple of 11, or 'X' if that digit would be 10. For example, '12345678' gets '0', and '00000000' gets '0'. The code is not left without a check digit, which would happen only for input that is not exactly 8 or 9 digits, such as 7 digits, 10 digits, letters, or a number with fewer than 8 digits; those return NULL.",
+     "confirmed": true
+    },
+    {
+     "shown": "An empty catalogue code gets no check digit.",
+     "said": "No, an empty code should still get a check digit, which is '0'.",
+     "function": "isbn_check",
+     "rounds": 1,
+     "now": "An empty catalogue code does get a check digit: the software returns '0' (as text) for it, not NULL, because empty text counts as having nothing left after outer spaces and hyphens are ignored.",
+     "confirmed": true
+    },
+    {
+     "shown": "The page 'Hello World Today' with an 8-character limit is cut in the middle of a word and becomes 'hello-wo'.",
+     "said": "No, it should back up to the last hyphen and give 'hello'.",
+     "function": "make_slug",
+     "rounds": 1,
+     "now": "The page 'Hello World Today' with an 8-character limit is cut in the middle of a word (the 8-character cut 'hello-wo' falls inside 'world'), so it backs up to the last hyphen and drops everything after it, and the slug becomes 'hello', not 'hello-wo'.",
+     "confirmed": true
+    },
+    {
+     "shown": "The product 'Caf\u00e9 Cr\u00e8me' loses its accented letters and becomes 'caf-cr-me', with the accents turned into dashes.",
+     "said": "No, accented letters are separators and get dropped, so it should give 'caf-cr-me' with dashes, not... actually that's right.\n\nENTER",
+     "function": "make_slug",
+     "rounds": 1,
+     "now": "The product 'Caf\u00e9 Cr\u00e8me' has no maxlen limit, so its title is turned into a slug by lowercasing it and treating the accented letters \u00e9 and \u00e8 as separators rather than transliterating them: the slug comes out as 'caf-cr-me'.",
+     "confirmed": true
+    },
+    {
+     "shown": "The page 'Hello World' with a length limit of 0 gets an empty address, and a negative limit does the same.",
+     "said": "No, it should give 'untitled', not an empty address, for a limit of 0 or less.",
+     "function": "make_slug",
+     "rounds": 1,
+     "now": "The page 'Hello World' with a length limit of 0 does not get an empty address: it gets the address 'untitled', and a negative limit gets 'untitled' too, since a limit of zero or less always gives 'untitled'.",
+     "confirmed": true
+    },
+    {
+     "shown": "The page 'Hello World' with no length limit given is not shortened and becomes 'hello-world'.",
+     "said": "No, a missing length limit should give NULL, not 'hello-world'.",
+     "function": "make_slug",
+     "rounds": 1,
+     "now": "The page 'Hello World' is given no length limit, so no slug is made and nothing is shortened: the result is NULL, not 'hello-world'.",
+     "confirmed": true
+    },
+    {
+     "shown": "Sales that grew from 0 to 50 units show no percentage change at all, because there is nothing to compare against.",
+     "said": "No, an old value of zero should give 0.0, not nothing.",
+     "function": "pct_change",
+     "rounds": 1,
+     "now": "Sales grew from 0 to 50 units, but because the starting figure was 0 the software reports a percentage change of 0.0 (not blank, and not NULL): the growth shows as 0.0%.",
+     "confirmed": true
+    },
+    {
+     "shown": "A balance that moves from minus 100 to plus 50 is reported as up 150%.",
+     "said": "No, dividing by the signed old value makes it -150.0, not up 150%.",
+     "function": "pct_change",
+     "rounds": 1,
+     "now": "A balance that moves from minus 100 to plus 50 is not reported as up 150%: because the old value's negative sign is kept in the division, the change comes out as -150.0, so a rise of 150 reads as a 150% fall.",
+     "confirmed": true
+    },
+    {
+     "shown": "Revenue of 100 followed by a new figure typed as 'abc' is reported as down 100%, as if the new figure were zero.",
+     "said": "No, 'abc' isn't a number, so it should give NULL, not down 100%.",
+     "function": "pct_change",
+     "rounds": 1,
+     "now": "Revenue of 100 followed by a new figure typed as 'abc' is not reported as down 100%, because 'abc' does not start with a number and so is not a number: the percent change comes back as NULL (no figure at all), not as -100.0, which is what a new figure of zero would give.",
+     "confirmed": true
+    },
+    {
+     "shown": "A previous figure typed as 'abc' gives no percentage change, whereas the same text as the new figure is treated as zero.",
+     "said": "No, 'abc' as the new figure should also give NULL, not be treated as zero.",
+     "function": "pct_change",
+     "rounds": 2,
+     "now": "A previous figure typed as 'abc' and a new figure typed as 'abc' both give no percentage change (NULL), because text that does not start with a number is never treated as zero, so the claim that the new figure is treated as zero is wrong.",
+     "confirmed": false,
+     "said_again": "No, 'abc' as the new figure should also give NULL, not be treated as zero."
+    },
+    {
+     "shown": "Dana's phone number written 1-415-555-1234 is shown as (415) 555-1234, with the leading country 1 removed.",
+     "said": "No, with 11 digits it should come back unchanged as 1-415-555-1234.",
+     "function": "phone_fmt",
+     "rounds": 1,
+     "now": "Dana's phone number written 1-415-555-1234 has 11 digits, so it is not formatted and no country code is removed: it comes back exactly as entered, 1-415-555-1234, not as (415) 555-1234.",
+     "confirmed": true
+    },
+    {
+     "shown": "A shop's ratings of 5, 4, 0, 7, 3.5, a blank and the word 'x' average 4.17, because only the 5, 4 and 3.5 count.",
+     "said": "No, it should be rounded to 1 decimal, so 4.2, not 4.17.",
+     "function": "avg_rating",
+     "rounds": 1,
+     "now": "A shop's ratings of 5, 4, 0, 7, 3.5, a blank and the word 'x' are averaged: only the 5, 4 and 3.5 count, because the 0 and 7 fall outside 1 to 5 and the blank and 'x' are text, so the average is 4.2 (rounded to 1 decimal place, not 4.17).",
+     "confirmed": true
+    },
+    {
+     "shown": "A shop rated 5, 4 and 4 shows an average of 4.333333333333333, with no rounding to one decimal.",
+     "said": "No, it should be rounded to one decimal, so 4.3.",
+     "function": "avg_rating",
+     "rounds": 1,
+     "now": "A shop rated 5, 4 and 4 shows an average rating of 4.3, because all three ratings count and the average is always rounded to one decimal place, so it never shows 4.333333333333333.",
+     "confirmed": true
+    },
+    {
+     "shown": "Meera orders 9 units at 10 dollars each and gets no discount, so she pays 90 dollars; one unit more would make the order cheaper than this one.",
+     "said": "No, 10 units cost 95 dollars, which is more than 90, so it isn't cheaper.",
+     "function": "bulk_price",
+     "rounds": 1,
+     "now": "Meera orders 9 units at 10 dollars each and gets no discount, so she pays 90 dollars; one unit more would not make the order cheaper, because 10 units get 5% off 100 dollars, which is 95 dollars, and that is more than 90 dollars, so the order would cost 95 dollars.",
+     "confirmed": true
+    },
+    {
+     "shown": "Ravi's 100-dollar invoice paid exactly 30 days late carries no late fee, because the grace period runs through day 30.",
+     "said": "No, the grace period is only 5 days, so 30 days late is charged: the fee is 500 cents (5 dollars).",
+     "function": "late_fee",
+     "rounds": 1,
+     "now": "Ravi's 100-dollar invoice paid exactly 30 days late is not free of fees, because the grace period is only 5 days, not 30: day 30 falls in the first started 30-day period, so 2% of 100 dollars would be 2 dollars, but the 500-cent minimum applies (the 20% cap of 20 dollars is not reached), and the late fee comes to 500 cents, which is 5 dollars.",
+     "confirmed": true
+    },
+    {
+     "shown": "Ravi's 100-dollar invoice paid 31 days late is charged a 4-dollar fee, which is 4% of the invoice.",
+     "said": "No, the minimum fee is 500 cents, so it's a 5-dollar fee, not 4.",
+     "function": "late_fee",
+     "rounds": 1,
+     "now": "Ravi's 100-dollar invoice paid 31 days late is past the 5-day grace and falls in two started 30-day periods, so 4% would be 4 dollars (400 cents), but the 500-cent minimum raises that, and the 20% cap of 20 dollars does not bite, so the late fee comes to 5 dollars rather than 4.",
+     "confirmed": true
+    },
+    {
+     "shown": "Ravi's 100-dollar invoice paid 61 days late is charged 6 dollars, while on day 60 it is still 4 dollars.",
+     "said": "No, day 60 is also 5 dollars because of the 500-cent minimum, not 4. Day 61 is 6 dollars.",
+     "function": "late_fee",
+     "rounds": 1,
+     "now": "Ravi's 100-dollar invoice paid 61 days late is three started 30-day periods, so 6% comes to 600 cents, which is above the 500-cent minimum and under the 2,000-cent cap, and he is charged 6 dollars; but on day 60 it is not 4 dollars, because two periods give 4%, or 400 cents, which the 500-cent minimum raises, so the late fee on day 60 is 5 dollars.",
+     "confirmed": true
+    },
+    {
+     "shown": "A 12-cent invoice paid 31 days late is charged no fee, because 4% of it rounds down to nothing, while a 13-cent invoice is charged 1 cent.",
+     "said": "No, the 20% cap wins over the minimum: a 12-cent invoice is charged 2 cents and a 13-cent invoice is also charged 2 cents.",
+     "function": "late_fee",
+     "rounds": 1,
+     "now": "A 12-cent invoice paid 31 days late is charged 2 cents, not nothing, and a 13-cent invoice paid 31 days late is also charged 2 cents, not 1: the 4% two-period fee rounds to 0 and 1 cent, but the 500-cent minimum raises each to 500 cents, and the cap of 20% of the invoice (2.4 and 2.6 cents, rounded down to 2) always wins over the minimum.",
+     "confirmed": true
+    },
+    {
+     "shown": "A customer with a negative balance of minus 100 points is simply listed as bronze, not flagged as a data error.",
+     "said": "No, negative points should be 'suspended', not bronze.",
+     "function": "loyalty_tier",
+     "rounds": 1,
+     "now": "A customer with a negative balance of minus 100 points is not listed as bronze: the loyalty tier comes back as 'suspended', because any balance below 0 is suspended and bronze starts at 0.",
+     "confirmed": true
+    },
+    {
+     "shown": "Priya's room booking from 23:30 for an hour ends at 00:30, and the result does not say it falls on the next day.",
+     "said": "No, it should stop at 23:59; bookings never run past midnight.",
+     "function": "meeting_end",
+     "rounds": 1,
+     "now": "Priya's room booking from 23:30 for an hour does not end at 00:30: because it runs past midnight, the software never wraps to the next day's clock time and instead gives an end time of 23:59.",
+     "confirmed": true
+    },
+    {
+     "shown": "A booking from 23:30 lasting 25 hours is shown as ending at 00:30, the same as a booking lasting one hour.",
+     "said": "No, it should stop at 23:59, since bookings never run past midnight.",
+     "function": "meeting_end",
+     "rounds": 1,
+     "now": "A booking from 23:30 lasting 25 hours (1500 minutes) runs past midnight, so the end time is not wrapped round to the next day's clock time: it is capped and shown as ending at 23:59, not 00:30, and that is the same as a one-hour booking from 23:30, which also shows 23:59.",
+     "confirmed": true
+    },
+    {
+     "shown": "A booking from 09:00 with a duration of minus 30 minutes is not rejected and is shown as ending at 08:30, before it starts.",
+     "said": "No, a duration of zero or less adds nothing, so it should end at 09:00, not 08:30.",
+     "function": "meeting_end",
+     "rounds": 1,
+     "now": "A booking from 09:00 with a duration of minus 30 minutes is not rejected and does not count backwards: a duration of zero or less adds nothing, so the booking is shown as ending at 09:00, the same time it starts.",
+     "confirmed": true
+    },
+    {
+     "shown": "A booking from 09:00 whose duration was typed as 'abc' is shown as ending at 09:00, as if it lasted no time.",
+     "said": "No, 'abc' isn't a number, so it should give NULL, not 09:00.",
+     "function": "meeting_end",
+     "rounds": 1,
+     "now": "A booking from 09:00 whose duration was typed as 'abc' is not a valid duration, so the software gives no end time at all (blank/NULL) instead of showing it ending at 09:00 as if it lasted no time.",
+     "confirmed": true
+    },
+    {
+     "shown": "A booking from 09:00 lasting 45.9 minutes ends at 09:45, because the part-minute is dropped, not rounded up.",
+     "said": "No, durations round up to 15-minute blocks, so 45.9 minutes is 4 blocks and it ends at 10:00, not 09:45.",
+     "function": "meeting_end",
+     "rounds": 1,
+     "now": "A booking that starts at 09:00 and lasts 45.9 minutes has its duration rounded up to the next whole 15-minute block, 4 blocks or 60 minutes, so it ends at 10:00, not 09:45.",
+     "confirmed": true
+    }
+   ],
+   "review": {
+    "replies": 77,
+    "cost": 6.042,
+    "log": [
+     {
+      "prompt": "\nCase 1 of 49. An invoice dated 1 April 2026 falls in the first quarter of the fiscal year named 2027, because the year starts in April and is named for the year it ends in.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 2 of 49. An invoice dated 31 March 2026 still belongs to the fourth quarter of fiscal 2026, one day before the new year begins.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, 27 to 31 March is the year-end close, so 31 March 2026 should be FY2026-CLOSE, not Q4."
+     },
+     {
+      "prompt": "\n  With your correction: The invoice dated 31 March 2026 is not in the fourth quarter of fiscal 2026: because 27 to 31 March is the year-end close, the software labels it 'FY2026-CLOSE', one day before the new fiscal year begins on 1 April.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 3 of 49. A January 2026 sale counts in the fourth quarter of fiscal 2026, while a December 2026 sale counts in fiscal 2027.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 4 of 49. A sale dated 30 February 2026, which does not exist, gets no label at all rather than an error.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, it should return the text 'INVALID' for a date that doesn't exist."
+     },
+     {
+      "prompt": "\n  With your correction: The sale dated 30 February 2026, a date that doesn't exist, is not given a fiscal quarter label: the system returns the text 'INVALID' (not NULL and not an error), so the sale ends up with the label 'INVALID'.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 5 of 49. A sale stamped 1 April 2026 at 10:00 with the time of day attached gets no label, so timestamps must be trimmed to a plain date first.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, a time is ignored, so 1 April 2026 at 10:00 should still get the label FY2027-Q1."
+     },
+     {
+      "prompt": "\n  With your correction: A sale stamped 1 April 2026 at 10:00 does get a label, contrary to the case's claim: the time of day is ignored and the date alone counts, so the sale is labelled 'FY2027-Q1' (first quarter of fiscal year 2027), with no need to trim the timestamp first.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 6 of 49. For catalogue code 123456789 the check character is the letter X, not a digit.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 7 of 49. Catalogue code 0-306-40615 typed with hyphens gets no check digit, even though it holds the same nine digits as 030640615, which gets 2.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, hyphens are ignored, so 0-306-40615 should also get 2."
+     },
+     {
+      "prompt": "\n  With your correction: Catalogue code 0-306-40615, typed with hyphens, is treated as the nine digits 030640615 because the software ignores hyphens, so it does get a check digit: the check digit comes to 2, the same as for 030640615, which means the case's claim that it gets none doesn't match the rules.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 8 of 49. A catalogue code with only 8 digits gets no check digit instead of an error.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, it should still get a check digit, using just the 8 digits it has."
+     },
+     {
+      "prompt": "n: A catalogue code of only 8 digits is still a valid input and gets a check digit rather than an error: the last digit is weighted 2, the digits are weighted 9 down to 2, and the code gets the digit that brings the total to a multiple of 11, or 'X' if that digit would be 10. For example, '12345678' gets '0', and '00000000' gets '0'. The code is not left without a check digit, which would happen only for input that is not exactly 8 or 9 digits, such as 7 digits, 10 digits, letters, or a number with fewer than 8 digits; those return NULL.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 9 of 49. Spaces around catalogue code 030640615 are ignored, so it still gets the check digit 2.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 10 of 49. An empty catalogue code gets no check digit.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, an empty code should still get a check digit, which is '0'."
+     },
+     {
+      "prompt": "\n  With your correction: An empty catalogue code does get a check digit: the software returns '0' (as text) for it, not NULL, because empty text counts as having nothing left after outer spaces and hyphens are ignored.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 11 of 49. The page 'Hello World Today' with an 8-character limit is cut in the middle of a word and becomes 'hello-wo'.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, it should back up to the last hyphen and give 'hello'."
+     },
+     {
+      "prompt": "\n  With your correction: The page 'Hello World Today' with an 8-character limit is cut in the middle of a word (the 8-character cut 'hello-wo' falls inside 'world'), so it backs up to the last hyphen and drops everything after it, and the slug becomes 'hello', not 'hello-wo'.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 12 of 49. The product 'Caf\u00e9 Cr\u00e8me' loses its accented letters and becomes 'caf-cr-me', with the accents turned into dashes.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, accented letters are separators and get dropped, so it should give 'caf-cr-me' with dashes, not... actually that's right.\n\nENTER"
+     },
+     {
+      "prompt": "\n  With your correction: The product 'Caf\u00e9 Cr\u00e8me' has no maxlen limit, so its title is turned into a slug by lowercasing it and treating the accented letters \u00e9 and \u00e8 as separators rather than transliterating them: the slug comes out as 'caf-cr-me'.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 13 of 49. A product titled '\u65e5\u672c\u8a9e shoes' is reduced to just 'shoes', because non-English letters are dropped entirely.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 14 of 49. The page 'Hello World' with a length limit of 0 gets an empty address, and a negative limit does the same.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, it should give 'untitled', not an empty address, for a limit of 0 or less."
+     },
+     {
+      "prompt": "\n  With your correction: The page 'Hello World' with a length limit of 0 does not get an empty address: it gets the address 'untitled', and a negative limit gets 'untitled' too, since a limit of zero or less always gives 'untitled'.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 15 of 49. The page 'Hello World' with no length limit given is not shortened and becomes 'hello-world'.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, a missing length limit should give NULL, not 'hello-world'."
+     },
+     {
+      "prompt": "\n  With your correction: The page 'Hello World' is given no length limit, so no slug is made and nothing is shortened: the result is NULL, not 'hello-world'.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 16 of 49. Sales that grew from 0 to 50 units show no percentage change at all, because there is nothing to compare against.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, an old value of zero should give 0.0, not nothing."
+     },
+     {
+      "prompt": "\n  With your correction: Sales grew from 0 to 50 units, but because the starting figure was 0 the software reports a percentage change of 0.0 (not blank, and not NULL): the growth shows as 0.0%.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 17 of 49. A balance that moves from minus 100 to plus 50 is reported as up 150%.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, dividing by the signed old value makes it -150.0, not up 150%."
+     },
+     {
+      "prompt": "\n  With your correction: A balance that moves from minus 100 to plus 50 is not reported as up 150%: because the old value's negative sign is kept in the division, the change comes out as -150.0, so a rise of 150 reads as a 150% fall.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 18 of 49. Monthly orders rising from 3 to 4 are reported as up 33.3%, rounded to one decimal.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 19 of 49. Revenue of 100 followed by a new figure typed as 'abc' is reported as down 100%, as if the new figure were zero.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, 'abc' isn't a number, so it should give NULL, not down 100%."
+     },
+     {
+      "prompt": "\n  With your correction: Revenue of 100 followed by a new figure typed as 'abc' is not reported as down 100%, because 'abc' does not start with a number and so is not a number: the percent change comes back as NULL (no figure at all), not as -100.0, which is what a new figure of zero would give.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 20 of 49. A previous figure typed as 'abc' gives no percentage change, whereas the same text as the new figure is treated as zero.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, 'abc' as the new figure should also give NULL, not be treated as zero."
+     },
+     {
+      "prompt": "\n  With your correction: A previous figure typed as 'abc' and a new figure typed as 'abc' both give no percentage change (NULL), because text that does not start with a number is never treated as zero, so the claim that the new figure is treated as zero is wrong.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": "No, 'abc' as the new figure should also give NULL, not be treated as zero."
+     },
+     {
+      "prompt": "\nCase 21 of 49. Dana's phone number written 1-415-555-1234 is shown as (415) 555-1234, with the leading country 1 removed.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, with 11 digits it should come back unchanged as 1-415-555-1234."
+     },
+     {
+      "prompt": "\n  With your correction: Dana's phone number written 1-415-555-1234 has 11 digits, so it is not formatted and no country code is removed: it comes back exactly as entered, 1-415-555-1234, not as (415) 555-1234.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 22 of 49. A customer's 7-digit number 555-1234 with no area code is returned unchanged, with no sign that it was left unformatted.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 23 of 49. A number starting with 0, which no real North American area code does, is still formatted as (015) 555-1234.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 24 of 49. A number with an extension, 415-555-1234 ext 22, is left exactly as typed, because the extra digits make it too long.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 25 of 49. A London number, +44 20 7946 0958, is passed through unchanged rather than rejected.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 26 of 49. A shop's ratings of 5, 4, 0, 7, 3.5, a blank and the word 'x' average 4.17, because only the 5, 4 and 3.5 count.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, it should be rounded to 1 decimal, so 4.2, not 4.17."
+     },
+     {
+      "prompt": "\n  With your correction: A shop's ratings of 5, 4, 0, 7, 3.5, a blank and the word 'x' are averaged: only the 5, 4 and 3.5 count, because the 0 and 7 fall outside 1 to 5 and the blank and 'x' are text, so the average is 4.2 (rounded to 1 decimal place, not 4.17).\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 27 of 49. A shop whose only ratings are a blank and a 9, which is off the 1-to-5 scale, shows no average at all.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 28 of 49. A shop whose ratings of 5 and 3 were stored as text shows no average at all, instead of 4.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 29 of 49. A shop rated 5, 4 and 4 shows an average of 4.333333333333333, with no rounding to one decimal.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, it should be rounded to one decimal, so 4.3."
+     },
+     {
+      "prompt": "\n  With your correction: A shop rated 5, 4 and 4 shows an average rating of 4.3, because all three ratings count and the average is always rounded to one decimal place, so it never shows 4.333333333333333.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 30 of 49. Meera orders 10 units at 10 dollars each and the whole order gets 5% off, so she pays 95 dollars instead of 100.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 31 of 49. Meera orders 9 units at 10 dollars each and gets no discount, so she pays 90 dollars; one unit more would make the order cheaper than this one.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, 10 units cost 95 dollars, which is more than 90, so it isn't cheaper."
+     },
+     {
+      "prompt": "\n  With your correction: Meera orders 9 units at 10 dollars each and gets no discount, so she pays 90 dollars; one unit more would not make the order cheaper, because 10 units get 5% off 100 dollars, which is 95 dollars, and that is more than 90 dollars, so the order would cost 95 dollars.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 32 of 49. Omar orders 50 units at 10 dollars each and the 10% discount applies to the whole order, so he pays 450 dollars, while 49 units would cost 465.50.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 33 of 49. A negative order of minus 3 units at 10 dollars each is not flagged as an error and simply totals 0 dollars.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 34 of 49. If a unit price of 10 dollars arrives as text instead of a number, the 10-unit order gets no total at all.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 35 of 49. Ravi's 100-dollar invoice paid exactly 30 days late carries no late fee, because the grace period runs through day 30.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, the grace period is only 5 days, so 30 days late is charged: the fee is 500 cents (5 dollars)."
+     },
+     {
+      "prompt": "\n  With your correction: Ravi's 100-dollar invoice paid exactly 30 days late is not free of fees, because the grace period is only 5 days, not 30: day 30 falls in the first started 30-day period, so 2% of 100 dollars would be 2 dollars, but the 500-cent minimum applies (the 20% cap of 20 dollars is not reached), and the late fee comes to 500 cents, which is 5 dollars.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 36 of 49. Ravi's 100-dollar invoice paid 31 days late is charged a 4-dollar fee, which is 4% of the invoice.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, the minimum fee is 500 cents, so it's a 5-dollar fee, not 4."
+     },
+     {
+      "prompt": "\n  With your correction: Ravi's 100-dollar invoice paid 31 days late is past the 5-day grace and falls in two started 30-day periods, so 4% would be 4 dollars (400 cents), but the 500-cent minimum raises that, and the 20% cap of 20 dollars does not bite, so the late fee comes to 5 dollars rather than 4.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 37 of 49. Ravi's 100-dollar invoice paid 61 days late is charged 6 dollars, while on day 60 it is still 4 dollars.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, day 60 is also 5 dollars because of the 500-cent minimum, not 4. Day 61 is 6 dollars."
+     },
+     {
+      "prompt": "\n  With your correction: Ravi's 100-dollar invoice paid 61 days late is three started 30-day periods, so 6% comes to 600 cents, which is above the 500-cent minimum and under the 2,000-cent cap, and he is charged 6 dollars; but on day 60 it is not 4 dollars, because two periods give 4%, or 400 cents, which the 500-cent minimum raises, so the late fee on day 60 is 5 dollars.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 38 of 49. A 12-cent invoice paid 31 days late is charged no fee, because 4% of it rounds down to nothing, while a 13-cent invoice is charged 1 cent.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, the 20% cap wins over the minimum: a 12-cent invoice is charged 2 cents and a 13-cent invoice is also charged 2 cents."
+     },
+     {
+      "prompt": "\n  With your correction: A 12-cent invoice paid 31 days late is charged 2 cents, not nothing, and a 13-cent invoice paid 31 days late is also charged 2 cents, not 1: the 4% two-period fee rounds to 0 and 1 cent, but the 500-cent minimum raises each to 500 cents, and the cap of 20% of the invoice (2.4 and 2.6 cents, rounded down to 2) always wins over the minimum.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 39 of 49. A 50-dollar credit note (a negative amount) that is 40 days overdue is charged no fee, with no warning.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 40 of 49. A customer with exactly 1000 points is already silver, and one with 999 is still bronze.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 41 of 49. A customer with exactly 5000 points becomes gold, and one with 4999 is still silver.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 42 of 49. A customer with a negative balance of minus 100 points is simply listed as bronze, not flagged as a data error.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, negative points should be 'suspended', not bronze."
+     },
+     {
+      "prompt": "\n  With your correction: A customer with a negative balance of minus 100 points is not listed as bronze: the loyalty tier comes back as 'suspended', because any balance below 0 is suspended and bronze starts at 0.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 43 of 49. A customer with no points balance recorded gets no tier at all, not even bronze.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 44 of 49. A customer whose 5000-point balance is stored as text gets no tier at all instead of gold.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 45 of 49. Priya's room booking from 23:30 for an hour ends at 00:30, and the result does not say it falls on the next day.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, it should stop at 23:59; bookings never run past midnight."
+     },
+     {
+      "prompt": "\n  With your correction: Priya's room booking from 23:30 for an hour does not end at 00:30: because it runs past midnight, the software never wraps to the next day's clock time and instead gives an end time of 23:59.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 46 of 49. A booking from 23:30 lasting 25 hours is shown as ending at 00:30, the same as a booking lasting one hour.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, it should stop at 23:59, since bookings never run past midnight."
+     },
+     {
+      "prompt": "\n  With your correction: A booking from 23:30 lasting 25 hours (1500 minutes) runs past midnight, so the end time is not wrapped round to the next day's clock time: it is capped and shown as ending at 23:59, not 00:30, and that is the same as a one-hour booking from 23:30, which also shows 23:59.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 47 of 49. A booking from 09:00 with a duration of minus 30 minutes is not rejected and is shown as ending at 08:30, before it starts.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, a duration of zero or less adds nothing, so it should end at 09:00, not 08:30."
+     },
+     {
+      "prompt": "\n  With your correction: A booking from 09:00 with a duration of minus 30 minutes is not rejected and does not count backwards: a duration of zero or less adds nothing, so the booking is shown as ending at 09:00, the same time it starts.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 48 of 49. A booking from 09:00 whose duration was typed as 'abc' is shown as ending at 09:00, as if it lasted no time.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, 'abc' isn't a number, so it should give NULL, not 09:00."
+     },
+     {
+      "prompt": "\n  With your correction: A booking from 09:00 whose duration was typed as 'abc' is not a valid duration, so the software gives no end time at all (blank/NULL) instead of showing it ending at 09:00 as if it lasted no time.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 49 of 49. A booking from 09:00 lasting 45.9 minutes ends at 09:45, because the part-minute is dropped, not rounded up.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, durations round up to 15-minute blocks, so 45.9 minutes is 4 blocks and it ends at 10:00, not 09:45."
+     },
+     {
+      "prompt": "\n  With your correction: A booking that starts at 09:00 and lasts 45.9 minutes has its duration rounded up to the next whole 15-minute block, 4 blocks or 60 minutes, so it ends at 10:00, not 09:45.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     }
+    ],
+    "transcript": "Hive: Now 49 quick checks on what the build does in real cases. Press Enter if a result is right, or say what should happen instead.\n\nCase 1 of 49. An invoice dated 1 April 2026 falls in the first quarter of the fiscal year named 2027, because the year starts in April and is named for the year it ends in.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 2 of 49. An invoice dated 31 March 2026 still belongs to the fourth quarter of fiscal 2026, one day before the new year begins.\n  Right? (Enter = yes, or say what should happen) > No, 27 to 31 March is the year-end close, so 31 March 2026 should be FY2026-CLOSE, not Q4.\n\n  With your correction: The invoice dated 31 March 2026 is not in the fourth quarter of fiscal 2026: because 27 to 31 March is the year-end close, the software labels it 'FY2026-CLOSE', one day before the new fiscal year begins on 1 April.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 3 of 49. A January 2026 sale counts in the fourth quarter of fiscal 2026, while a December 2026 sale counts in fiscal 2027.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 4 of 49. A sale dated 30 February 2026, which does not exist, gets no label at all rather than an error.\n  Right? (Enter = yes, or say what should happen) > No, it should return the text 'INVALID' for a date that doesn't exist.\n\n  With your correction: The sale dated 30 February 2026, a date that doesn't exist, is not given a fiscal quarter label: the system returns the text 'INVALID' (not NULL and not an error), so the sale ends up with the label 'INVALID'.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 5 of 49. A sale stamped 1 April 2026 at 10:00 with the time of day attached gets no label, so timestamps must be trimmed to a plain date first.\n  Right? (Enter = yes, or say what should happen) > No, a time is ignored, so 1 April 2026 at 10:00 should still get the label FY2027-Q1.\n\n  With your correction: A sale stamped 1 April 2026 at 10:00 does get a label, contrary to the case's claim: the time of day is ignored and the date alone counts, so the sale is labelled 'FY2027-Q1' (first quarter of fiscal year 2027), with no need to trim the timestamp first.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 6 of 49. For catalogue code 123456789 the check character is the letter X, not a digit.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 7 of 49. Catalogue code 0-306-40615 typed with hyphens gets no check digit, even though it holds the same nine digits as 030640615, which gets 2.\n  Right? (Enter = yes, or say what should happen) > No, hyphens are ignored, so 0-306-40615 should also get 2.\n\n  With your correction: Catalogue code 0-306-40615, typed with hyphens, is treated as the nine digits 030640615 because the software ignores hyphens, so it does get a check digit: the check digit comes to 2, the same as for 030640615, which means the case's claim that it gets none doesn't match the rules.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 8 of 49. A catalogue code with only 8 digits gets no check digit instead of an error.\n  Right? (Enter = yes, or say what should happen) > No, it should still get a check digit, using just the 8 digits it has.\n\n  With your correction: A catalogue code of only 8 digits is still a valid input and gets a check digit rather than an error: the last digit is weighted 2, the digits are weighted 9 down to 2, and the code gets the digit that brings the total to a multiple of 11, or 'X' if that digit would be 10. For example, '12345678' gets '0', and '00000000' gets '0'. The code is not left without a check digit, which would happen only for input that is not exactly 8 or 9 digits, such as 7 digits, 10 digits, letters, or a number with fewer than 8 digits; those return NULL.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 9 of 49. Spaces around catalogue code 030640615 are ignored, so it still gets the check digit 2.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 10 of 49. An empty catalogue code gets no check digit.\n  Right? (Enter = yes, or say what should happen) > No, an empty code should still get a check digit, which is '0'.\n\n  With your correction: An empty catalogue code does get a check digit: the software returns '0' (as text) for it, not NULL, because empty text counts as having nothing left after outer spaces and hyphens are ignored.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 11 of 49. The page 'Hello World Today' with an 8-character limit is cut in the middle of a word and becomes 'hello-wo'.\n  Right? (Enter = yes, or say what should happen) > No, it should back up to the last hyphen and give 'hello'.\n\n  With your correction: The page 'Hello World Today' with an 8-character limit is cut in the middle of a word (the 8-character cut 'hello-wo' falls inside 'world'), so it backs up to the last hyphen and drops everything after it, and the slug becomes 'hello', not 'hello-wo'.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 12 of 49. The product 'Caf\u00e9 Cr\u00e8me' loses its accented letters and becomes 'caf-cr-me', with the accents turned into dashes.\n  Right? (Enter = yes, or say what should happen) > No, accented letters are separators and get dropped, so it should give 'caf-cr-me' with dashes, not... actually that's right.\n\nENTER\n\n  With your correction: The product 'Caf\u00e9 Cr\u00e8me' has no maxlen limit, so its title is turned into a slug by lowercasing it and treating the accented letters \u00e9 and \u00e8 as separators rather than transliterating them: the slug comes out as 'caf-cr-me'.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 13 of 49. A product titled '\u65e5\u672c\u8a9e shoes' is reduced to just 'shoes', because non-English letters are dropped entirely.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 14 of 49. The page 'Hello World' with a length limit of 0 gets an empty address, and a negative limit does the same.\n  Right? (Enter = yes, or say what should happen) > No, it should give 'untitled', not an empty address, for a limit of 0 or less.\n\n  With your correction: The page 'Hello World' with a length limit of 0 does not get an empty address: it gets the address 'untitled', and a negative limit gets 'untitled' too, since a limit of zero or less always gives 'untitled'.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 15 of 49. The page 'Hello World' with no length limit given is not shortened and becomes 'hello-world'.\n  Right? (Enter = yes, or say what should happen) > No, a missing length limit should give NULL, not 'hello-world'.\n\n  With your correction: The page 'Hello World' is given no length limit, so no slug is made and nothing is shortened: the result is NULL, not 'hello-world'.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 16 of 49. Sales that grew from 0 to 50 units show no percentage change at all, because there is nothing to compare against.\n  Right? (Enter = yes, or say what should happen) > No, an old value of zero should give 0.0, not nothing.\n\n  With your correction: Sales grew from 0 to 50 units, but because the starting figure was 0 the software reports a percentage change of 0.0 (not blank, and not NULL): the growth shows as 0.0%.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 17 of 49. A balance that moves from minus 100 to plus 50 is reported as up 150%.\n  Right? (Enter = yes, or say what should happen) > No, dividing by the signed old value makes it -150.0, not up 150%.\n\n  With your correction: A balance that moves from minus 100 to plus 50 is not reported as up 150%: because the old value's negative sign is kept in the division, the change comes out as -150.0, so a rise of 150 reads as a 150% fall.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 18 of 49. Monthly orders rising from 3 to 4 are reported as up 33.3%, rounded to one decimal.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 19 of 49. Revenue of 100 followed by a new figure typed as 'abc' is reported as down 100%, as if the new figure were zero.\n  Right? (Enter = yes, or say what should happen) > No, 'abc' isn't a number, so it should give NULL, not down 100%.\n\n  With your correction: Revenue of 100 followed by a new figure typed as 'abc' is not reported as down 100%, because 'abc' does not start with a number and so is not a number: the percent change comes back as NULL (no figure at all), not as -100.0, which is what a new figure of zero would give.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 20 of 49. A previous figure typed as 'abc' gives no percentage change, whereas the same text as the new figure is treated as zero.\n  Right? (Enter = yes, or say what should happen) > No, 'abc' as the new figure should also give NULL, not be treated as zero.\n\n  With your correction: A previous figure typed as 'abc' and a new figure typed as 'abc' both give no percentage change (NULL), because text that does not start with a number is never treated as zero, so the claim that the new figure is treated as zero is wrong.\n  Right now? (Enter = yes, or say what should happen) > No, 'abc' as the new figure should also give NULL, not be treated as zero.\n\nCase 21 of 49. Dana's phone number written 1-415-555-1234 is shown as (415) 555-1234, with the leading country 1 removed.\n  Right? (Enter = yes, or say what should happen) > No, with 11 digits it should come back unchanged as 1-415-555-1234.\n\n  With your correction: Dana's phone number written 1-415-555-1234 has 11 digits, so it is not formatted and no country code is removed: it comes back exactly as entered, 1-415-555-1234, not as (415) 555-1234.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 22 of 49. A customer's 7-digit number 555-1234 with no area code is returned unchanged, with no sign that it was left unformatted.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 23 of 49. A number starting with 0, which no real North American area code does, is still formatted as (015) 555-1234.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 24 of 49. A number with an extension, 415-555-1234 ext 22, is left exactly as typed, because the extra digits make it too long.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 25 of 49. A London number, +44 20 7946 0958, is passed through unchanged rather than rejected.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 26 of 49. A shop's ratings of 5, 4, 0, 7, 3.5, a blank and the word 'x' average 4.17, because only the 5, 4 and 3.5 count.\n  Right? (Enter = yes, or say what should happen) > No, it should be rounded to 1 decimal, so 4.2, not 4.17.\n\n  With your correction: A shop's ratings of 5, 4, 0, 7, 3.5, a blank and the word 'x' are averaged: only the 5, 4 and 3.5 count, because the 0 and 7 fall outside 1 to 5 and the blank and 'x' are text, so the average is 4.2 (rounded to 1 decimal place, not 4.17).\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 27 of 49. A shop whose only ratings are a blank and a 9, which is off the 1-to-5 scale, shows no average at all.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 28 of 49. A shop whose ratings of 5 and 3 were stored as text shows no average at all, instead of 4.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 29 of 49. A shop rated 5, 4 and 4 shows an average of 4.333333333333333, with no rounding to one decimal.\n  Right? (Enter = yes, or say what should happen) > No, it should be rounded to one decimal, so 4.3.\n\n  With your correction: A shop rated 5, 4 and 4 shows an average rating of 4.3, because all three ratings count and the average is always rounded to one decimal place, so it never shows 4.333333333333333.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 30 of 49. Meera orders 10 units at 10 dollars each and the whole order gets 5% off, so she pays 95 dollars instead of 100.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 31 of 49. Meera orders 9 units at 10 dollars each and gets no discount, so she pays 90 dollars; one unit more would make the order cheaper than this one.\n  Right? (Enter = yes, or say what should happen) > No, 10 units cost 95 dollars, which is more than 90, so it isn't cheaper.\n\n  With your correction: Meera orders 9 units at 10 dollars each and gets no discount, so she pays 90 dollars; one unit more would not make the order cheaper, because 10 units get 5% off 100 dollars, which is 95 dollars, and that is more than 90 dollars, so the order would cost 95 dollars.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 32 of 49. Omar orders 50 units at 10 dollars each and the 10% discount applies to the whole order, so he pays 450 dollars, while 49 units would cost 465.50.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 33 of 49. A negative order of minus 3 units at 10 dollars each is not flagged as an error and simply totals 0 dollars.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 34 of 49. If a unit price of 10 dollars arrives as text instead of a number, the 10-unit order gets no total at all.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 35 of 49. Ravi's 100-dollar invoice paid exactly 30 days late carries no late fee, because the grace period runs through day 30.\n  Right? (Enter = yes, or say what should happen) > No, the grace period is only 5 days, so 30 days late is charged: the fee is 500 cents (5 dollars).\n\n  With your correction: Ravi's 100-dollar invoice paid exactly 30 days late is not free of fees, because the grace period is only 5 days, not 30: day 30 falls in the first started 30-day period, so 2% of 100 dollars would be 2 dollars, but the 500-cent minimum applies (the 20% cap of 20 dollars is not reached), and the late fee comes to 500 cents, which is 5 dollars.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 36 of 49. Ravi's 100-dollar invoice paid 31 days late is charged a 4-dollar fee, which is 4% of the invoice.\n  Right? (Enter = yes, or say what should happen) > No, the minimum fee is 500 cents, so it's a 5-dollar fee, not 4.\n\n  With your correction: Ravi's 100-dollar invoice paid 31 days late is past the 5-day grace and falls in two started 30-day periods, so 4% would be 4 dollars (400 cents), but the 500-cent minimum raises that, and the 20% cap of 20 dollars does not bite, so the late fee comes to 5 dollars rather than 4.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 37 of 49. Ravi's 100-dollar invoice paid 61 days late is charged 6 dollars, while on day 60 it is still 4 dollars.\n  Right? (Enter = yes, or say what should happen) > No, day 60 is also 5 dollars because of the 500-cent minimum, not 4. Day 61 is 6 dollars.\n\n  With your correction: Ravi's 100-dollar invoice paid 61 days late is three started 30-day periods, so 6% comes to 600 cents, which is above the 500-cent minimum and under the 2,000-cent cap, and he is charged 6 dollars; but on day 60 it is not 4 dollars, because two periods give 4%, or 400 cents, which the 500-cent minimum raises, so the late fee on day 60 is 5 dollars.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 38 of 49. A 12-cent invoice paid 31 days late is charged no fee, because 4% of it rounds down to nothing, while a 13-cent invoice is charged 1 cent.\n  Right? (Enter = yes, or say what should happen) > No, the 20% cap wins over the minimum: a 12-cent invoice is charged 2 cents and a 13-cent invoice is also charged 2 cents.\n\n  With your correction: A 12-cent invoice paid 31 days late is charged 2 cents, not nothing, and a 13-cent invoice paid 31 days late is also charged 2 cents, not 1: the 4% two-period fee rounds to 0 and 1 cent, but the 500-cent minimum raises each to 500 cents, and the cap of 20% of the invoice (2.4 and 2.6 cents, rounded down to 2) always wins over the minimum.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 39 of 49. A 50-dollar credit note (a negative amount) that is 40 days overdue is charged no fee, with no warning.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 40 of 49. A customer with exactly 1000 points is already silver, and one with 999 is still bronze.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 41 of 49. A customer with exactly 5000 points becomes gold, and one with 4999 is still silver.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 42 of 49. A customer with a negative balance of minus 100 points is simply listed as bronze, not flagged as a data error.\n  Right? (Enter = yes, or say what should happen) > No, negative points should be 'suspended', not bronze.\n\n  With your correction: A customer with a negative balance of minus 100 points is not listed as bronze: the loyalty tier comes back as 'suspended', because any balance below 0 is suspended and bronze starts at 0.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 43 of 49. A customer with no points balance recorded gets no tier at all, not even bronze.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 44 of 49. A customer whose 5000-point balance is stored as text gets no tier at all instead of gold.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 45 of 49. Priya's room booking from 23:30 for an hour ends at 00:30, and the result does not say it falls on the next day.\n  Right? (Enter = yes, or say what should happen) > No, it should stop at 23:59; bookings never run past midnight.\n\n  With your correction: Priya's room booking from 23:30 for an hour does not end at 00:30: because it runs past midnight, the software never wraps to the next day's clock time and instead gives an end time of 23:59.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 46 of 49. A booking from 23:30 lasting 25 hours is shown as ending at 00:30, the same as a booking lasting one hour.\n  Right? (Enter = yes, or say what should happen) > No, it should stop at 23:59, since bookings never run past midnight.\n\n  With your correction: A booking from 23:30 lasting 25 hours (1500 minutes) runs past midnight, so the end time is not wrapped round to the next day's clock time: it is capped and shown as ending at 23:59, not 00:30, and that is the same as a one-hour booking from 23:30, which also shows 23:59.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 47 of 49. A booking from 09:00 with a duration of minus 30 minutes is not rejected and is shown as ending at 08:30, before it starts.\n  Right? (Enter = yes, or say what should happen) > No, a duration of zero or less adds nothing, so it should end at 09:00, not 08:30.\n\n  With your correction: A booking from 09:00 with a duration of minus 30 minutes is not rejected and does not count backwards: a duration of zero or less adds nothing, so the booking is shown as ending at 09:00, the same time it starts.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 48 of 49. A booking from 09:00 whose duration was typed as 'abc' is shown as ending at 09:00, as if it lasted no time.\n  Right? (Enter = yes, or say what should happen) > No, 'abc' isn't a number, so it should give NULL, not 09:00.\n\n  With your correction: A booking from 09:00 whose duration was typed as 'abc' is not a valid duration, so the software gives no end time at all (blank/NULL) instead of showing it ending at 09:00 as if it lasted no time.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 49 of 49. A booking from 09:00 lasting 45.9 minutes ends at 09:45, because the part-minute is dropped, not rounded up.\n  Right? (Enter = yes, or say what should happen) > No, durations round up to 15-minute blocks, so 45.9 minutes is 4 blocks and it ends at 10:00, not 09:45.\n\n  With your correction: A booking that starts at 09:00 and lasts 45.9 minutes has its duration rounded up to the next whole 15-minute block, 4 blocks or 60 minutes, so it ends at 10:00, not 09:45.\n  Right now? (Enter = yes, or say what should happen) > \n"
+   },
+   "rules": [
+    "Whenever bulk_price is given a unit price and a quantity of fewer than 10, it returns unit price times quantity with no discount.",
+    "Whenever bulk_price is given a quantity of 10 to 49, it takes 5% off the whole order (not just the units above 10), so 10 units at 100 cents cost 950. A larger quantity at the same unit price never costs less than a smaller one. If the discounted total would come out below what any smaller quantity costs, such as 9.99 units at 100 cents costing 999 (no discount) against 950 for 10 units, bulk_price returns that higher total instead (999 for 10 units here).",
+    "Whenever bulk_price is given a quantity of 100 or more, it takes 15% off the whole order. When it is given a quantity of 50 to 99, it takes 10% off the whole order. A larger quantity at the same unit price never costs less than a smaller one. If the discounted total would come out below what any smaller quantity costs, bulk_price returns the highest total of any smaller quantity instead. So 49 units at 100 cents cost 4655, and 50 units at 100 cents also cost 4655, not 4500 (the 10% off only gives a lower price once it beats that); 99 units at 100 cents cost 8910, and 100 units cost 8910, not 8500.",
+    "Whenever a bulk_price discount leaves a fraction of a cent, bulk_price rounds half a cent up to the next whole cent (15 cents x 10 units gives 143, 3 x 10 gives 29).",
+    "Whenever bulk_price is given a quantity of zero or less, or a negative unit price, it returns 0 rather than a negative or error value.",
+    "Whenever either input to bulk_price is NULL, empty text, or any text (even '100' or '5'), bulk_price returns NULL; only real numbers are accepted, and this check comes before the zero/negative rule.",
+    "Whenever bulk_price is given a fractional quantity or price and no discount applies, it drops the fraction of the total (10.5 cents x 3 gives 31, 100 x 9.99 gives 999, while 100 x 2.5 gives 250).",
+    "Whenever bulk_price is given a fractional quantity of 10 or more or a fractional unit price with a discount, the discount tier is judged on the exact quantity (10.5 counts as 10 or more) and the discounted total is rounded half up, though it may come back in decimal form such as 998.0.",
+    "Whenever late_fee is given an invoice that is 5 days late or fewer (including zero or negative days), the fee is 0, because the grace period is only 5 days. From more than 5 days late, the fee is charged under the period rules: 6 to 30 days late is one started 30-day period, so the fee is 2% of the invoice amount, with the minimum of 500 cents and the cap of 20% of the invoice amount. The cap always wins over the minimum: if 500 cents is more than the cap, the fee is the cap, in whole cents rounded down. A 100-dollar invoice that is exactly 30 days late therefore owes 500 cents.",
+    "Rule 10: Whenever late_fee is given an invoice, the fee is 2% of the invoice amount per started 30-day period, after a 5-day grace. An invoice that is 31 to 60 days late is two periods, so the percentage is 4% of the invoice amount, but the minimum then applies to that figure. The fee has a minimum of 500 cents and is capped at 20% of the invoice amount; the cap always wins over the minimum, so if 500 cents is more than the cap, the fee is the cap, in whole cents rounded down. A 100-dollar invoice that is exactly 60 days late therefore owes 500 cents, not 400, because 4% is 400 cents and the 500-cent minimum raises it (the cap of 2000 cents is not reached). In the same way, a 100-dollar invoice 61 days late owes 600 cents, because 6% is already above the minimum.",
+    "Whenever late_fee is given an invoice that is 61 or more days late, the fee is 2% of the whole invoice amount for each started 30-day period, so 61 to 90 days late is 6%, 91 to 120 days late is 8%, and so on, not in addition to the 4%. The fee has a minimum of 500 cents and a cap of 20% of the invoice amount; the cap always wins over the minimum, so if 500 cents is more than the cap, the fee is the cap, in whole cents rounded down.",
+    "Whenever a late_fee percentage leaves a fraction of a cent, late_fee rounds half a cent up before the minimum and the cap are applied, so 4% of 12 cents rounds to 0 and 4% of 13 cents rounds to 1. The minimum fee of 500 cents and the cap of 20% of the invoice amount then apply to the rounded figure: a rounded fee below 500 cents is raised to the 500-cent minimum, but the cap always wins over the minimum, so the fee never goes above 20% of the invoice amount, taken in whole cents rounded down. A small invoice that is more than 5 days late therefore does not owe no fee; it owes the cap. For example, a 12-cent invoice 31 days late owes 2 cents and a 13-cent invoice 31 days late also owes 2 cents. (An invoice amount of zero or less still owes 0, as in rule 13.)",
+    "Whenever late_fee is given an invoice amount of zero or less, the fee is 0, whatever the days late.",
+    "Whenever late_fee is given a fractional days_late, it applies the same limits to the exact value (30.5 days is already in the 4% band, 60.5 days in the 6% band), and a fractional amount gives a whole-cent fee: the percentage is rounded half a cent up to a whole cent (100.5 cents at 4% rounds to 4), and the minimum of 500 cents and the cap of 20% of the invoice amount are then applied to that rounded figure, exactly as for any other invoice, with the cap always winning over the minimum and the cap taken in whole cents rounded down.",
+    "Whenever either input to late_fee is NULL, empty text or text of any kind (even '1000' or '40'), late_fee returns NULL, even when the amount is zero or the days are negative.",
+    "Whenever loyalty_tier is given fewer than 0 points (a negative balance), it returns 'suspended'. Whenever loyalty_tier is given 0 up to 999.9 points, it returns 'bronze'; this includes 0 and 999.9.",
+    "Whenever loyalty_tier is given 1000 to 4999 points (4999.5 included), it returns 'silver'; exactly 1000 is silver.",
+    "Whenever loyalty_tier is given 20000 points or more, it returns 'platinum'. Whenever loyalty_tier is given 5000 points or more but fewer than 20000 points, it returns 'gold'; exactly 5000 is gold and exactly 20000 is platinum.",
+    "Whenever loyalty_tier is given NULL, empty text or any text (even '5000'), it returns NULL.",
+    "Whenever make_slug is given a title, it lowercases it and turns every run of characters that are not English letters a-z or digits 0-9 (spaces, punctuation, underscores, slashes, hyphens) into a single hyphen, and removes hyphens from the start and end ('  Hello,   World!! ' becomes 'hello-world').",
+    "Whenever a title contains accented or non-English letters, make_slug does not transliterate them but treats them as separators ('Caf\u00e9 Cr\u00e8me' becomes 'caf-cr-me'), and a title with no a-z or digits at all, or an empty title, gives empty text.",
+    "Whenever make_slug is given a maxlen, it cuts the slug to at most that many characters, but it never leaves a word cut in half. If the cut falls in the middle of a word (the character just after the cut is not a hyphen), it backs up to the last hyphen before the cut and drops everything from that hyphen on. If there is no hyphen to back up to (the slug is a single word), it keeps the plain cut. It then removes any hyphen left at the end ('Hello World' with maxlen 6 gives 'hello', 'Hello World Today' with maxlen 8 gives 'hello', and 'Hello World' with maxlen 1 gives 'h' because there is no hyphen to back up to).",
+    "Whenever make_slug is given a maxlen of zero or less, it returns 'untitled'; whenever it is given a maxlen that is empty text or text that is not a number, it returns empty text; a numeric text such as '5' works as 5 and a fractional maxlen such as 5.9 is cut down to 5.",
+    "Whenever make_slug is given a NULL maxlen, or no length limit at all, it returns NULL whatever the title, and it applies no slug-making or length limit; a NULL title also returns NULL whatever the maxlen.",
+    "Whenever make_slug is given a number as the title, it uses the number's text (12345 becomes '12345', 1.5 becomes '1-5').",
+    "Whenever isbn_check is given exactly 9 digits, it multiplies the digits by 10, 9, 8 ... 2 from left to right, adds them, and returns the digit that brings the total to a multiple of 11; if that digit would be 10 it returns 'X'; the result is text ('030640615' gives '2', '123456789' gives 'X', '000000000' gives '0'). Whenever it is given exactly 8 digits, it uses just those 8 digits in the same way, but the weights run 9, 8, 7 ... 2 from left to right (so the last digit is always multiplied by 2), then adds them and returns the digit that brings the total to a multiple of 11, or 'X' if that digit would be 10; the result is text ('00000000' gives '0', '12345678' gives '0').",
+    "Whenever isbn_check is given a code with leading or trailing spaces around 8 or 9 digits, it ignores those outer spaces. It also ignores hyphens anywhere in the code, so '0-306-40615' is treated as '030640615' and gets '2'. Spaces inside the code still make it invalid.",
+    "Whenever isbn_check is given anything other than exactly 8 or exactly 9 ASCII digits (once outer spaces and hyphens are ignored), it returns NULL, with one exception: empty text, or text with only hyphens or spaces (nothing left once outer spaces and hyphens are ignored), gets the check digit '0' (as text). Everything else still returns NULL, such as 7 or 10 digits, letters including an X, spaces inside the code, non-Western digits, or NULL (a NULL input still returns NULL).",
+    "Whenever isbn_check is given a whole number of 8 or 9 digits (123456789, 30640615), it treats it as text of those digits and works as for text of that length, with no leading zero added; a number with fewer than 8 digits (3064061) or a decimal such as 30640615.0 returns NULL, with no leading zero added.",
+    "Whenever fiscal_label is given a valid YYYY-MM-DD date, the fiscal year starts on 1 April and is named for the calendar year it ends in, so 2024-04-01 is 'FY2025-Q1' and 2025-03-26 is 'FY2025-Q4'. The last five days of the fiscal year, 27 to 31 March, are the year-end close and are labelled 'FY' plus the fiscal year, then '-CLOSE', so 2025-03-31 is 'FY2025-CLOSE'.",
+    "Whenever fiscal_label is given a date, quarters run Q1 April-June, Q2 July-September, Q3 October-December and Q4 1 January to 26 March, so 2024-06-30 is Q1, 2024-07-01 is Q2, 2024-10-01 is Q3, 2025-01-01 is Q4 and 2025-03-26 is Q4; the label looks like 'FY2025-Q1'. In every year, 27 to 31 March is the year-end close and is not part of Q4: those dates get the label 'FY2025-CLOSE' (the fiscal year number followed by '-CLOSE'), so 2025-03-27 and 2026-03-31 are 'FY2025-CLOSE' and 'FY2026-CLOSE'. 26 March is still Q4 and 1 April starts Q1 of the next fiscal year.",
+    "Whenever fiscal_label is given a date that does not exist (2024-02-30, 2023-02-29, 2026-02-30, month 13, month 00), it returns the text 'INVALID' instead of NULL or an error, while a real leap day such as 2024-02-29 is accepted and labelled 'FY2024-Q4'.",
+    "Whenever fiscal_label is given text that is not in the exact form of four-digit year, two-digit month and two-digit day separated by hyphens (2024-1-5, 2024/04/01, 20240401, empty text, a number, or NULL), it returns NULL; spaces around a valid date are ignored. The exception is a date with a time of day after it (for example '2026-04-01 10:00' or '2026-04-01T10:00:00'): the time is ignored and the label comes from the date part alone, so '2026-04-01 10:00' is 'FY2027-Q1'. The date part must still be in the exact four-digit year, two-digit month, two-digit day form, and a date part that does not exist still returns 'INVALID' whatever time follows it.",
+    "Whenever fiscal_label is given an extreme year, it still applies the same rule without a range check: year 0001 gives 'FY2-Q1' with no zero padding, and 9999-12-31 gives 'FY10000-Q3'.",
+    "Whenever meeting_end is given a start time and a number of minutes, it rounds the duration up to a whole number of 15-minute blocks (see rule 40) and returns the start plus those rounded minutes as HH:MM on the 24-hour clock with zero padding ('09:00' plus 60 gives '10:00', '9:05' plus 30 gives '09:35', '09:00' plus 45.9 gives '10:00').",
+    "Whenever a booking runs past midnight, meeting_end must never wrap around to the next day's clock time, however long the booking is, including a booking of more than 24 hours that would otherwise wrap past midnight a second time. The end is the start plus the minutes, counted straight on without wrapping. Any meeting_end past 23:59, or exactly 24:00, gives '23:59'. For example, '23:30' plus 60 gives '23:59', 1440 minutes gives '23:59', 1500 minutes gives '23:59', and '23:30' plus 25 hours (1500 minutes) gives '23:59', not '00:30'.",
+    "Whenever meeting_end is given zero or negative minutes (a duration of zero or less), the duration adds nothing: it never counts backwards from the start and never wraps to the previous evening. The result is the start itself as HH:MM on the 24-hour clock with zero padding ('09:00' minus 30 gives '09:00', '10:00' minus 30 gives '10:00', '00:10' minus 30 gives '00:10', '9:05' minus 10 gives '09:05', '09:00' plus 0 gives '09:00').",
+    "Whenever meeting_end is given a start that is not H:MM or HH:MM with two-digit minutes (24:00, 12:60, '9am', '09:00:00', '9:5', empty text, a number, or NULL), it returns NULL; one or two digit hours and spaces around the start are accepted.",
+    "Whenever meeting_end is given NULL minutes, it returns NULL.",
+    "Whenever meeting_end is given minutes with a fraction or any amount that is not a whole number of 15-minute blocks, it rounds the duration up to the next whole 15-minute block; it never drops the part-minute or the part-block (45 gives 3 blocks, which is 45 minutes; 45.9 gives 4 blocks, which is 60 minutes; 46 gives 60 minutes; 0.5 gives 1 block, which is 15 minutes; an exact multiple of 15 such as 30 or 60 stays as it is). Zero minutes stays zero, and zero or negative durations are still handled by rule 37, so they add nothing. Numeric text such as '30' or '1e2' is read as a number and then rounded up the same way, and text that begins with a number ('30 min') uses that number. Text that is not a number and does not begin with a number ('abc', empty text) is not a duration at all, so meeting_end returns NULL instead of treating it as 0 minutes.",
+    "Whenever pct_change is given an old and a new value, it returns (new minus old) divided by the old value itself (with its sign), times 100, rounded to 1 decimal, as a decimal number: 100 to 150 is 50.0 and 150 to 100 is -33.3.",
+    "Whenever pct_change is given a negative old value, it divides by the old value with its sign kept, so a rise from a negative old value reads as negative and a fall reads as positive (-100 to -50 is -50.0, -100 to 50 is -150.0).",
+    "Whenever pct_change is given an old value of 0, it returns 0.0, whatever the new value is (0 to 50 is 0.0, and 0 to 0 is 0.0); with any other old value, a new value of 0 gives -100.0, and no change gives 0.0.",
+    "Whenever pct_change is given a NULL for either value, it returns NULL.",
+    "Whenever pct_change is given numeric text such as '100' or ' 100 ', it uses the number; text starting with a number ('150abc') uses the leading number; text that does not start with a number (such as 'abc') or is empty is not a number, so it returns NULL, whether that text is the old value, the new value, or both (so an old value of 100 with a new value of 'abc' gives NULL, an old value of 'abc' with a new value of 100 gives NULL, and 'abc' for both gives NULL). Such text is never treated as zero, on either side, so a new value of 'abc' never gives -100.0.",
+    "Whenever pct_change is given a binary (blob) value for either side, it returns NULL.",
+    "Whenever the pct_change result falls exactly halfway at the second decimal, it rounds away from zero (2000 to 2001 gives 0.1, 2000 to 1999 gives -0.1), but values that are only a hair below the halfway point because of decimal inexactness round down (100 to 100.05 gives 0.0).",
+    "Whenever phone_fmt is given a phone number with 10 digits, it ignores every non-digit character (brackets, hyphens, dots, spaces, plus sign, even letters or surrounding words) and returns it as (AAA) EEE-NNNN ('212.555.1234' and 'call 212-555-1234 now' both give '(212) 555-1234').",
+    "Whenever phone_fmt finds 11 digits, whatever the first digit is (including a leading 1), it does not format it and returns the input exactly as it was given ('1-415-555-1234' comes back as '1-415-555-1234', and '+1 212 555 1234' comes back as '+1 212 555 1234'). There is no dropping of a country code.",
+    "Whenever phone_fmt is given anything with some other count of digits (7, 9, 12 digits, no digits, empty text, an international number like '+44 20 7946 0958', or non-Western digits), it returns the input exactly as it was given.",
+    "Whenever phone_fmt is given NULL, it returns NULL.",
+    "Whenever phone_fmt is given a whole number of 10 digits (2125551234), it formats it as text, but a number with a decimal point (2125551234.0), one with too few digits, or one with 11 digits (including one starting with 1) is returned unchanged as a number.",
+    "Whenever phone_fmt is given 10 digits, it does not check that the area code or exchange is valid, so '0125551234' gives '(012) 555-1234' and '0000000000' gives '(000) 000-0000'.",
+    "Whenever avg_rating is applied to a group of rows, it returns the average of the ratings between 1 and 5 inclusive, always rounded to 1 decimal place, including when the average is a long or repeating decimal (ratings 4 and 5 give 4.5, 5, 4 and 3.5 give 4.2, 5, 3, 1 and 2.5 give 2.9, and 5, 4 and 4 give 4.3, not 4.333333333333333).",
+    "Whenever a row's rating is NULL, below 1, above 5, or text (even '4'), avg_rating leaves it out of the average completely, counting neither its value nor the row.",
+    "Whenever a group has no ratings that count (no rows, all NULL, empty text, or all outside 1 to 5), avg_rating returns NULL.",
+    "Whenever avg_rating is used with GROUP BY, it gives one average per group, and without GROUP BY it averages across all selected rows; it is not available on a single value outside a group of rows (avg_rating(5) gives NULL).",
+    "Bulk prices round to the nearest 5 cents, with a 500-cent minimum order.",
+    "The product 'Caf\u00e9 Cr\u00e8me' loses its accented letters and becomes 'caf-cr-me', with the accents turned into dashes. The owner says: No, accented letters are separators and get dropped, so it should give 'caf-cr-me' with dashes, not... actually that's right.\n\nENTER",
+    "A customer with a negative balance of minus 100 points is simply listed as bronze, not flagged as a data error. The owner says: No, negative points should be 'suspended', not bronze.",
+    "Priya's room booking from 23:30 for an hour ends at 00:30, and the result does not say it falls on the next day. The owner says: No, it should stop at 23:59; bookings never run past midnight."
+   ]
+  },
+  "CO": {
+   "shown": [
+    {
+     "function": "fiscal_label",
+     "call": "SELECT fiscal_label('2026-04-01')",
+     "got": "FY2027-Q1",
+     "say": "A sale on 1 April 2026 opens a new fiscal year, which is named after the year it ends in: it is labelled fiscal 2027, quarter 1."
+    },
+    {
+     "function": "fiscal_label",
+     "call": "SELECT fiscal_label('2026-03-31')",
+     "got": "FY2026-Q4",
+     "say": "A sale on 31 March 2026, the last day before the April year start, is labelled fiscal 2026, quarter 4."
+    },
+    {
+     "function": "fiscal_label",
+     "call": "SELECT fiscal_label('2026-12-31')",
+     "got": "FY2027-Q3",
+     "say": "A Christmas-season sale on 31 December 2026 falls in October-to-December: it is labelled fiscal 2027, quarter 3."
+    },
+    {
+     "function": "fiscal_label",
+     "call": "SELECT fiscal_label('2026-04-01 09:30:00')",
+     "got": null,
+     "say": "A sale recorded with a time of day, 1 April 2026 at 9:30, is not recognised as a date at all: it gets no fiscal label."
+    },
+    {
+     "function": "fiscal_label",
+     "call": "SELECT fiscal_label('2026-02-30')",
+     "got": null,
+     "say": "A sale typed in with the impossible date 30 February 2026 is not flagged with a label: it gets no fiscal label (left blank)."
+    },
+    {
+     "function": "isbn_check",
+     "call": "SELECT isbn_check('080442957')",
+     "got": "X",
+     "say": "For catalogue code 080442957 the check works out to ten, which is written as a letter rather than a digit: the check digit is X."
+    },
+    {
+     "function": "isbn_check",
+     "call": "SELECT isbn_check(12345678)",
+     "got": null,
+     "say": "Catalogue code 012345678 stored as a number loses its leading zero and is only 8 digits long: no check digit is given (left blank)."
+    },
+    {
+     "function": "isbn_check",
+     "call": "SELECT isbn_check('0-306-40615')",
+     "got": null,
+     "say": "Catalogue code 0-306-40615 typed with dashes, as it is often printed, is rejected rather than cleaned up: no check digit is given (left blank)."
+    },
+    {
+     "function": "isbn_check",
+     "call": "SELECT isbn_check('030640615')",
+     "got": "2",
+     "say": "For the plain 9-digit catalogue code 030640615 the check digit is 2."
+    },
+    {
+     "function": "make_slug",
+     "call": "SELECT make_slug('Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e', 50)",
+     "got": "caf-cr-me-br-l-e",
+     "say": "The product page 'Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' has its accented letters turned into breaks instead of plain letters: the web address becomes caf-cr-me-br-l-e."
+    },
+    {
+     "function": "make_slug",
+     "call": "SELECT make_slug('Summer Sale', 9)",
+     "got": "summer-sa",
+     "say": "The page 'Summer Sale' with a 9-character limit is cut in the middle of a word: the web address becomes summer-sa."
+    },
+    {
+     "function": "make_slug",
+     "call": "SELECT make_slug('!!!', 10)",
+     "got": "",
+     "say": "A page titled only '!!!' has nothing usable in its title: the web address comes out empty."
+    },
+    {
+     "function": "make_slug",
+     "call": "SELECT make_slug('Summer Sale', NULL)",
+     "got": "summer-sale",
+     "say": "The page 'Summer Sale' with no length limit given is not cut at all: the web address becomes summer-sale."
+    },
+    {
+     "function": "make_slug",
+     "call": "SELECT make_slug('Tom''s 50% Off & More', 40)",
+     "got": "tom-s-50-off-more",
+     "say": "The page 'Tom's 50% Off & More' loses its apostrophe as a break, and the percent and ampersand disappear: the web address becomes tom-s-50-off-more."
+    },
+    {
+     "function": "pct_change",
+     "call": "SELECT pct_change(0, 50)",
+     "got": null,
+     "say": "A new product goes from 0 to 50 dollars in sales: no percentage change is given (left blank)."
+    },
+    {
+     "function": "pct_change",
+     "call": "SELECT pct_change(-100, 50)",
+     "got": 150.0,
+     "say": "A shop goes from a 100-dollar loss to a 50-dollar profit, and the change is measured against the size of the loss: it shows a 150% increase."
+    },
+    {
+     "function": "pct_change",
+     "call": "SELECT pct_change(-100, -50)",
+     "got": 50.0,
+     "say": "A shop's loss shrinks from 100 dollars to 50 dollars: it shows as a 50% increase, not a decrease."
+    },
+    {
+     "function": "pct_change",
+     "call": "SELECT pct_change(8, 8.1)",
+     "got": 1.2,
+     "say": "A price rises from 8.00 to 8.10 dollars, exactly 1.25%, but a tiny arithmetic error makes it round down instead of up: the change shows as 1.2%."
+    },
+    {
+     "function": "pct_change",
+     "call": "SELECT pct_change(100, 0)",
+     "got": -100.0,
+     "say": "Sales drop from 100 dollars to nothing: the change is minus 100%."
+    },
+    {
+     "function": "phone_fmt",
+     "call": "SELECT phone_fmt('123-4567')",
+     "got": "123-4567",
+     "say": "Ana's phone number is entered without an area code, and it is passed through as typed with no warning: it stays 123-4567."
+    },
+    {
+     "function": "phone_fmt",
+     "call": "SELECT phone_fmt('+1 (555) 123-4567')",
+     "got": "(555) 123-4567",
+     "say": "Ana's number typed with the +1 country code has the code dropped: it becomes (555) 123-4567."
+    },
+    {
+     "function": "phone_fmt",
+     "call": "SELECT phone_fmt('555-123-4567 ext 89')",
+     "got": "555-123-4567 ext 89",
+     "say": "Ana's office number with extension 89 is not formatted at all: it stays 555-123-4567 ext 89."
+    },
+    {
+     "function": "phone_fmt",
+     "call": "SELECT phone_fmt('055-123-4567')",
+     "got": "(055) 123-4567",
+     "say": "A number with area code 055, which no real North American area code starts with, is accepted anyway: it becomes (055) 123-4567."
+    },
+    {
+     "function": "phone_fmt",
+     "call": "SELECT phone_fmt('+44 20 7946 0958')",
+     "got": "+44 20 7946 0958",
+     "say": "A London customer's number is passed through untouched with no warning: it stays +44 20 7946 0958."
+    },
+    {
+     "function": "avg_rating",
+     "call": "SELECT avg_rating(rating) FROM r  -- ratings 5, 4, 0, 6 and one blank",
+     "got": 4.5,
+     "say": "A product with reviews of 5, 4, 0, 6 and one blank quietly ignores the 0, the 6 and the blank instead of flagging them: the average rating is 4.5 stars."
+    },
+    {
+     "function": "avg_rating",
+     "call": "SELECT avg_rating(rating) FROM h  -- ratings 4.5, 3 and the text '5'",
+     "got": 3.75,
+     "say": "A product with reviews of 4.5 and 3 stars plus a 5-star review stored as text leaves the 5-star review out, and the result is not rounded: the average rating is 3.75 stars."
+    },
+    {
+     "function": "avg_rating",
+     "call": "SELECT avg_rating(rating) FROM e  -- no reviews",
+     "got": null,
+     "say": "A new product with no reviews yet gets no average at all rather than zero stars: the average rating is left blank."
+    },
+    {
+     "function": "bulk_price",
+     "call": "SELECT bulk_price(1000, 49)",
+     "got": 46550,
+     "say": "Maria buys 49 mugs at 10 dollars each and only gets the 5% discount, because the 10% discount starts at 50 mugs: she pays 465.50 dollars, more than the 450 dollars she would pay for 50 mugs."
+    },
+    {
+     "function": "bulk_price",
+     "call": "SELECT bulk_price(1000, 10)",
+     "got": 9500,
+     "say": "Maria buys exactly 10 mugs at 10 dollars each, which is where the first discount starts, and it applies to the whole order: she pays 95 dollars."
+    },
+    {
+     "function": "bulk_price",
+     "call": "SELECT bulk_price(1000, 500)",
+     "got": 450000,
+     "say": "A wholesaler orders 500 mugs at 10 dollars each and the discount stops growing at 10%: the order comes to 4,500 dollars."
+    },
+    {
+     "function": "bulk_price",
+     "call": "SELECT bulk_price(15, 10)",
+     "got": 143,
+     "say": "Ten stickers at 15 cents each come to 142.5 cents after the 5% discount, and the half cent is rounded up in the shop's favour: the total is 1.43 dollars."
+    },
+    {
+     "function": "bulk_price",
+     "call": "SELECT bulk_price(1000, -3)",
+     "got": 0,
+     "say": "An order is entered with a quantity of minus 3 mugs at 10 dollars each, and instead of being flagged as an error it is priced at nothing: the total is 0 dollars."
+    },
+    {
+     "function": "late_fee",
+     "call": "SELECT late_fee(10000, 30)",
+     "got": 0,
+     "say": "Ravi's 100-dollar invoice is paid 30 days late, the last day of the grace period: the late fee is 0 dollars."
+    },
+    {
+     "function": "late_fee",
+     "call": "SELECT late_fee(10000, 31)",
+     "got": 400,
+     "say": "Ravi's 100-dollar invoice is paid 31 days late, and the fee jumps straight to a flat 4% of the invoice: the late fee is 4 dollars."
+    },
+    {
+     "function": "late_fee",
+     "call": "SELECT late_fee(1000000, 400)",
+     "got": 60000,
+     "say": "A 10,000-dollar invoice is paid more than a year late, but the fee never goes above 6% and has no cap or minimum in dollars: the late fee is 600 dollars."
+    },
+    {
+     "function": "late_fee",
+     "call": "SELECT late_fee(10000, 61)",
+     "got": 600,
+     "say": "Ravi's 100-dollar invoice is paid 61 days late, one day into the top band: the late fee is 6 dollars."
+    },
+    {
+     "function": "late_fee",
+     "call": "SELECT late_fee(12, 45)",
+     "got": 0,
+     "say": "A 12-cent balance is paid 45 days late, and 4% of it rounds down to nothing: the late fee is 0 dollars."
+    },
+    {
+     "function": "loyalty_tier",
+     "call": "SELECT loyalty_tier(4999.99)",
+     "got": "silver",
+     "say": "Priya has 4,999.99 points, just short of the 5,000 needed: she stays Silver."
+    },
+    {
+     "function": "loyalty_tier",
+     "call": "SELECT loyalty_tier(1000)",
+     "got": "silver",
+     "say": "Priya reaches exactly 1,000 points: she becomes Silver."
+    },
+    {
+     "function": "loyalty_tier",
+     "call": "SELECT loyalty_tier(-200)",
+     "got": "bronze",
+     "say": "Priya's balance is minus 200 points after a refund, and instead of being flagged it is treated like a normal low balance: she is Bronze."
+    },
+    {
+     "function": "loyalty_tier",
+     "call": "SELECT loyalty_tier('5000')",
+     "got": null,
+     "say": "Priya's 5,000 points are stored as text rather than as a number: she gets no tier at all (left blank) instead of Gold."
+    },
+    {
+     "function": "meeting_end",
+     "call": "SELECT meeting_end('23:30', 60)",
+     "got": "00:30",
+     "say": "A one-hour booking starting at 11:30 pm runs past midnight, with no sign that it ends the next day: it ends at 00:30."
+    },
+    {
+     "function": "meeting_end",
+     "call": "SELECT meeting_end('09:00', 1500)",
+     "got": "10:00",
+     "say": "A 25-hour booking starting at 9:00 is not refused, and the extra day silently disappears: it ends at 10:00."
+    },
+    {
+     "function": "meeting_end",
+     "call": "SELECT meeting_end('09:00', -30)",
+     "got": "08:30",
+     "say": "A booking at 9:00 entered with minus 30 minutes is not refused: it ends at 8:30, before it starts."
+    },
+    {
+     "function": "meeting_end",
+     "call": "SELECT meeting_end('09:00', 45.9)",
+     "got": "09:45",
+     "say": "A booking at 9:00 lasting 45.9 minutes has the part minute dropped rather than rounded: it ends at 9:45."
+    },
+    {
+     "function": "meeting_end",
+     "call": "SELECT meeting_end('9am', 30)",
+     "got": null,
+     "say": "A 30-minute booking whose start is typed as '9am' is not understood: no end time is given (left blank)."
+    }
+   ],
+   "fixes": [
+    {
+     "shown": "A sale on 31 March 2026, the last day before the April year start, is labelled fiscal 2026, quarter 4.",
+     "said": "No, 31 March is in the year-end close period, so it should be FY2026-CLOSE, not Q4.",
+     "function": "fiscal_label",
+     "rounds": 1,
+     "now": "A sale on 31 March 2026, the last day before the April year start, is labelled 'FY2026-CLOSE' and not fiscal 2026 quarter 4: 31 March is in the year-end close period, so it gets CLOSE in place of a quarter.",
+     "confirmed": true
+    },
+    {
+     "shown": "A Christmas-season sale on 31 December 2026 falls in October-to-December: it is labelled fiscal 2027, quarter 3.",
+     "said": "Case 3 is wrong: 31 December is in the October-to-December quarter, which is Q3 of FY2027, so the label is right. Nothing jumps out.\n\nYes, that's right",
+     "function": "fiscal_label",
+     "rounds": 1,
+     "now": "The Christmas-season sale on 31 December 2026 falls in the fiscal year that began on 1 April 2026 and ends in 2027, in the October-to-December quarter, and it is not 31 March, so there is no year-end close: it is labelled 'FY2027-Q3', meaning fiscal 2027, quarter 3.",
+     "confirmed": true
+    },
+    {
+     "shown": "A sale recorded with a time of day, 1 April 2026 at 9:30, is not recognised as a date at all: it gets no fiscal label.",
+     "said": "No, a date with a time should still be labelled: it should be FY2027-Q1.",
+     "function": "fiscal_label",
+     "rounds": 1,
+     "now": "A sale recorded with a time of day, 1 April 2026 at 9:30, is still recognised as a date, because the time is ignored and only the date part is used: it gets the fiscal label FY2027-Q1, not an empty label.",
+     "confirmed": true
+    },
+    {
+     "shown": "A sale typed in with the impossible date 30 February 2026 is not flagged with a label: it gets no fiscal label (left blank).",
+     "said": "No, an impossible date should give the label INVALID, not blank.",
+     "function": "fiscal_label",
+     "rounds": 1,
+     "now": "A sale typed in with the impossible date 30 February 2026 does get a fiscal label: 30 February doesn't exist, so the label comes back as 'INVALID', not blank or NULL, and the sale is flagged as having a bad date.",
+     "confirmed": true
+    },
+    {
+     "shown": "Catalogue code 012345678 stored as a number loses its leading zero and is only 8 digits long: no check digit is given (left blank).",
+     "said": "No, a short code should still get a check digit. Here that would be 6, not blank.",
+     "function": "isbn_check",
+     "rounds": 1,
+     "now": "Catalogue code 012345678, stored as a number, loses its leading zero and is only 8 digits long (12345678), but it still gets a check digit: no zero is added back, and the digits are weighted 10 down to 3 to give a total of 192, so the check digit '6' is returned as text and is not left blank.",
+     "confirmed": true
+    },
+    {
+     "shown": "Catalogue code 0-306-40615 typed with dashes, as it is often printed, is rejected rather than cleaned up: no check digit is given (left blank).",
+     "said": "No, dashes should just be ignored, so it should give a check digit: 2.",
+     "function": "isbn_check",
+     "rounds": 1,
+     "now": "Catalogue code 0-306-40615 typed with dashes is not rejected, because the dashes are ignored and it is read as 030640615, so the check digit comes out as 2 (the digits weighted 10 down to 2 add up to 130, and 2 brings that to 132, a multiple of 11).",
+     "confirmed": true
+    },
+    {
+     "shown": "The page 'Summer Sale' with a 9-character limit is cut in the middle of a word: the web address becomes summer-sa.",
+     "said": "No, the cut is in the middle of a word, so it should back up to the last hyphen: \"summer\".",
+     "function": "make_slug",
+     "rounds": 1,
+     "now": "The page 'Summer Sale' with a 9-character limit becomes the slug summer-sale, and the cut at 9 characters falls in the middle of 'sale', so the software backs up to the hyphen and drops the partial word and the trailing hyphen: the web address comes to 'summer', not 'summer-sa'.",
+     "confirmed": true
+    },
+    {
+     "shown": "A page titled only '!!!' has nothing usable in its title: the web address comes out empty.",
+     "said": "No, it should come out as \"untitled\", not empty.",
+     "function": "make_slug",
+     "rounds": 1,
+     "now": "A page titled only '!!!' has no letters or digits in its title, so the software does not leave the web address empty: it gives the placeholder address 'untitled'.",
+     "confirmed": true
+    },
+    {
+     "shown": "The page 'Summer Sale' with no length limit given is not cut at all: the web address becomes summer-sale.",
+     "said": "No, if no length limit is given it should return nothing (NULL), not summer-sale.",
+     "function": "make_slug",
+     "rounds": 1,
+     "now": "The page 'Summer Sale' is given no length limit, so the web address is not produced at all: the slug comes out as NULL (nothing), not 'summer-sale'.",
+     "confirmed": true
+    },
+    {
+     "shown": "The page 'Tom's 50% Off & More' loses its apostrophe as a break, and the percent and ampersand disappear: the web address becomes tom-s-50-off-more.",
+     "said": "No, the ampersand should become \"and\": tom-s-50-off-and-more.",
+     "function": "make_slug",
+     "rounds": 1,
+     "now": "The page title 'Tom's 50% Off & More' becomes the web address tom-s-50-off-and-more, not tom-s-50-off-more: the apostrophe and the percent sign each become a hyphen, and the ampersand is not dropped but turned into the word 'and', as long as a length limit is given (with no limit given, the result is NULL, not a web address).",
+     "confirmed": true
+    },
+    {
+     "shown": "A new product goes from 0 to 50 dollars in sales: no percentage change is given (left blank).",
+     "said": "No, when the old value is zero it should return 0.0, not blank.",
+     "function": "pct_change",
+     "rounds": 1,
+     "now": "A new product's sales go from 0 to 50 dollars: because the old value is 0, the percentage change comes out as 0.0, not blank, so the product is shown with a 0.0% change rather than an infinite or missing growth figure.",
+     "confirmed": true
+    },
+    {
+     "shown": "A shop goes from a 100-dollar loss to a 50-dollar profit, and the change is measured against the size of the loss: it shows a 150% increase.",
+     "said": "No, it should be -150.0, because the change is divided by the signed old value, so the sign flips.",
+     "function": "pct_change",
+     "rounds": 1,
+     "now": "A shop goes from a 100-dollar loss (-100) to a 50-dollar profit, and the change is measured against the loss with its minus sign kept: the software reports -150.0 percent, which reads as a 150% decrease even though the shop improved, not a 150% increase.",
+     "confirmed": true
+    },
+    {
+     "shown": "A shop's loss shrinks from 100 dollars to 50 dollars: it shows as a 50% increase, not a decrease.",
+     "said": "No, it should be -50.0, because the change is divided by the signed old value, so it shows as a decrease, not an increase.",
+     "function": "pct_change",
+     "rounds": 1,
+     "now": "The shop's loss shrinks from 100 dollars to 50 dollars, which is a change from -100 to -50 if the loss is entered as a negative number: the software divides by the old value with its sign kept, so the result is -50.0, a 50% decrease and not the 50% increase claimed (a loss entered as plain 100 to 50 also gives -50.0).",
+     "confirmed": true
+    },
+    {
+     "shown": "Ana's number typed with the +1 country code has the code dropped: it becomes (555) 123-4567.",
+     "said": "No, with the +1 it has 11 digits, so it should come back exactly as typed, not reformatted.",
+     "function": "phone_fmt",
+     "rounds": 1,
+     "now": "Ana's phone number typed with the +1 country code has 11 digits, so it is not reformatted and the 1 is not dropped: the software returns it exactly as she typed it, and it does not become (555) 123-4567.",
+     "confirmed": true
+    },
+    {
+     "shown": "A product with reviews of 4.5 and 3 stars plus a 5-star review stored as text leaves the 5-star review out, and the result is not rounded: the average rating is 3.75 stars.",
+     "said": "No, it should be rounded to 1 decimal: 3.8.",
+     "function": "avg_rating",
+     "rounds": 1,
+     "now": "A product with reviews of 4.5 and 3 stars plus a 5-star review stored as text has the text review left out completely, so only 4.5 and 3 count, their average of 3.75 is rounded to 1 decimal place with the half rounded up, and the average rating comes to 3.8 stars (not 3.75).",
+     "confirmed": true
+    },
+    {
+     "shown": "A wholesaler orders 500 mugs at 10 dollars each and the discount stops growing at 10%: the order comes to 4,500 dollars.",
+     "said": "No, 100 or more mugs gets 15% off, so it should be 4,250 dollars.",
+     "function": "bulk_price",
+     "rounds": 1,
+     "now": "A wholesaler's order of 500 mugs at 10 dollars each gets the 15% discount on the whole order, because 100 or more units earns 15% and the discount does not stop at 10%: the 5,000-dollar total comes to 4,250 dollars, not 4,500.",
+     "confirmed": true
+    },
+    {
+     "shown": "Ten stickers at 15 cents each come to 142.5 cents after the 5% discount, and the half cent is rounded up in the shop's favour: the total is 1.43 dollars.",
+     "said": "No, the minimum order total is 5.00 dollars, so it should be 5.00, not 1.43.",
+     "function": "bulk_price",
+     "rounds": 1,
+     "now": "Ten stickers at 15 cents each come to 150 cents, the 5% bulk discount makes that 142.5, and the half cent rounds up to 143 cents, but 143 is below the 500-cent minimum order total, so the order is raised to 500 cents: the customer is charged 5.00 dollars, not 1.43.",
+     "confirmed": true
+    },
+    {
+     "shown": "Ravi's 100-dollar invoice is paid 30 days late, the last day of the grace period: the late fee is 0 dollars.",
+     "said": "No, grace is only 5 days, so 30 days late is chargeable: the fee should be 5.00 dollars (the minimum).",
+     "function": "late_fee",
+     "rounds": 1,
+     "now": "Ravi's 100-dollar invoice is paid 30 days late, which is past the 5-day grace period and counts as one 30-day period, so the 2% fee of 2 dollars is raised to the 5-dollar minimum (below the 20-dollar cap): the late fee comes to 5 dollars, not 0.",
+     "confirmed": true
+    },
+    {
+     "shown": "Ravi's 100-dollar invoice is paid 31 days late, and the fee jumps straight to a flat 4% of the invoice: the late fee is 4 dollars.",
+     "said": "No, the minimum fee is 5.00 dollars, so it should be 5.00, not 4.",
+     "function": "late_fee",
+     "rounds": 1,
+     "now": "Ravi's 100-dollar invoice is paid 31 days late, which is two started 30-day periods after the 5-day grace, so the percentage is 4% (4 dollars), but that is below the 5-dollar minimum fee and well under the 20-dollar cap, so the late fee comes to 5 dollars, not 4.",
+     "confirmed": true
+    },
+    {
+     "shown": "A 10,000-dollar invoice is paid more than a year late, but the fee never goes above 6% and has no cap or minimum in dollars: the late fee is 600 dollars.",
+     "said": "No, the cap is 20% of the invoice, so it should be 2,000 dollars, not 600.",
+     "function": "late_fee",
+     "rounds": 1,
+     "now": "A 10,000-dollar invoice is paid more than a year late: the fee keeps rising by 2% for every started 30-day period until it reaches the 20% cap (after 270 days), so the late fee is 2,000 dollars, not 600.",
+     "confirmed": true
+    },
+    {
+     "shown": "Ravi's 100-dollar invoice is paid 61 days late, one day into the top band: the late fee is 6 dollars.",
+     "said": "No, the minimum fee is 5.00 dollars, so it should be 5.00, not 6.",
+     "function": "late_fee",
+     "rounds": 2,
+     "now": "Ravi's 100-dollar invoice is paid 61 days late, one day into the 6% band, which would work out to 6 dollars, but every chargeable invoice owes exactly 500 cents: the late fee comes to 5 dollars, not 6.",
+     "confirmed": false,
+     "said_again": "No, 6 dollars was right. The 5.00 is only a minimum, and 6% of 100 is already above it, so the fee is 6.00."
+    },
+    {
+     "shown": "A 12-cent balance is paid 45 days late, and 4% of it rounds down to nothing: the late fee is 0 dollars.",
+     "said": "No, it's chargeable at 45 days late. The fee is capped at 20% of 12 cents, so it should be 2 cents, not 0.",
+     "function": "late_fee",
+     "rounds": 1,
+     "now": "The 12-cent balance is paid 45 days late: 4% of it rounds to 0 cents, but that is raised to the 500-cent (5.00-dollar) minimum and then cut down to the 20% cap (2.4 cents, rounded to 2), so the late fee comes to 2 cents (0.02 dollars), not 0.",
+     "confirmed": true
+    },
+    {
+     "shown": "Priya's balance is minus 200 points after a refund, and instead of being flagged it is treated like a normal low balance: she is Bronze.",
+     "said": "No, negative points should be suspended, not Bronze.",
+     "function": "loyalty_tier",
+     "rounds": 1,
+     "now": "Priya's balance drops to minus 200 points after a refund: because the balance is below 0, her loyalty tier comes out as 'suspended', not Bronze.",
+     "confirmed": true
+    },
+    {
+     "shown": "A one-hour booking starting at 11:30 pm runs past midnight, with no sign that it ends the next day: it ends at 00:30.",
+     "said": "No, bookings never go past midnight, so it should end at 23:59.",
+     "function": "meeting_end",
+     "rounds": 1,
+     "now": "The one-hour booking starting at 11:30 pm runs past midnight, so the meeting end does not wrap round to 00:30 the next day: it is capped at the last minute of the day, 23:59.",
+     "confirmed": true
+    },
+    {
+     "shown": "A 25-hour booking starting at 9:00 is not refused, and the extra day silently disappears: it ends at 10:00.",
+     "said": "No, it passes 23:59, so it should end at 23:59.",
+     "function": "meeting_end",
+     "rounds": 1,
+     "now": "A 25-hour booking starting at 9:00 (1500 minutes) is not refused, but its end time is never wrapped to the next day, so it does not end at 10:00: the meeting end comes to 23:59.",
+     "confirmed": true
+    },
+    {
+     "shown": "A booking at 9:00 entered with minus 30 minutes is not refused: it ends at 8:30, before it starts.",
+     "said": "No, with minus minutes nothing is added, so it should end at 09:00, the start time.",
+     "function": "meeting_end",
+     "rounds": 1,
+     "now": "A booking that starts at 9:00 and is entered with minus 30 minutes is not refused or counted backwards: the meeting ends at its start time, 09:00, because negative minutes add nothing.",
+     "confirmed": true
+    },
+    {
+     "shown": "A booking at 9:00 lasting 45.9 minutes has the part minute dropped rather than rounded: it ends at 9:45.",
+     "said": "No, a part minute counts as a started block, so it should end at 10:00.",
+     "function": "meeting_end",
+     "rounds": 1,
+     "now": "A booking at 9:00 lasting 45.9 minutes is not cut to 45 minutes: the part minute counts as a started block, so the duration rounds up to a full 60 minutes and the meeting ends at 10:00, not 9:45.",
+     "confirmed": true
+    }
+   ],
+   "review": {
+    "replies": 73,
+    "cost": 5.734,
+    "log": [
+     {
+      "prompt": "\nCase 1 of 46. A sale on 1 April 2026 opens a new fiscal year, which is named after the year it ends in: it is labelled fiscal 2027, quarter 1.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 2 of 46. A sale on 31 March 2026, the last day before the April year start, is labelled fiscal 2026, quarter 4.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, 31 March is in the year-end close period, so it should be FY2026-CLOSE, not Q4."
+     },
+     {
+      "prompt": "\n  With your correction: A sale on 31 March 2026, the last day before the April year start, is labelled 'FY2026-CLOSE' and not fiscal 2026 quarter 4: 31 March is in the year-end close period, so it gets CLOSE in place of a quarter.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 3 of 46. A Christmas-season sale on 31 December 2026 falls in October-to-December: it is labelled fiscal 2027, quarter 3.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "Case 3 is wrong: 31 December is in the October-to-December quarter, which is Q3 of FY2027, so the label is right. Nothing jumps out.\n\nYes, that's right"
+     },
+     {
+      "prompt": "\n  With your correction: The Christmas-season sale on 31 December 2026 falls in the fiscal year that began on 1 April 2026 and ends in 2027, in the October-to-December quarter, and it is not 31 March, so there is no year-end close: it is labelled 'FY2027-Q3', meaning fiscal 2027, quarter 3.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 4 of 46. A sale recorded with a time of day, 1 April 2026 at 9:30, is not recognised as a date at all: it gets no fiscal label.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, a date with a time should still be labelled: it should be FY2027-Q1."
+     },
+     {
+      "prompt": "\n  With your correction: A sale recorded with a time of day, 1 April 2026 at 9:30, is still recognised as a date, because the time is ignored and only the date part is used: it gets the fiscal label FY2027-Q1, not an empty label.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 5 of 46. A sale typed in with the impossible date 30 February 2026 is not flagged with a label: it gets no fiscal label (left blank).\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, an impossible date should give the label INVALID, not blank."
+     },
+     {
+      "prompt": "\n  With your correction: A sale typed in with the impossible date 30 February 2026 does get a fiscal label: 30 February doesn't exist, so the label comes back as 'INVALID', not blank or NULL, and the sale is flagged as having a bad date.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 6 of 46. For catalogue code 080442957 the check works out to ten, which is written as a letter rather than a digit: the check digit is X.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 7 of 46. Catalogue code 012345678 stored as a number loses its leading zero and is only 8 digits long: no check digit is given (left blank).\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, a short code should still get a check digit. Here that would be 6, not blank."
+     },
+     {
+      "prompt": "\n  With your correction: Catalogue code 012345678, stored as a number, loses its leading zero and is only 8 digits long (12345678), but it still gets a check digit: no zero is added back, and the digits are weighted 10 down to 3 to give a total of 192, so the check digit '6' is returned as text and is not left blank.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 8 of 46. Catalogue code 0-306-40615 typed with dashes, as it is often printed, is rejected rather than cleaned up: no check digit is given (left blank).\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, dashes should just be ignored, so it should give a check digit: 2."
+     },
+     {
+      "prompt": "\n  With your correction: Catalogue code 0-306-40615 typed with dashes is not rejected, because the dashes are ignored and it is read as 030640615, so the check digit comes out as 2 (the digits weighted 10 down to 2 add up to 130, and 2 brings that to 132, a multiple of 11).\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 9 of 46. For the plain 9-digit catalogue code 030640615 the check digit is 2.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 10 of 46. The product page 'Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' has its accented letters turned into breaks instead of plain letters: the web address becomes caf-cr-me-br-l-e.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 11 of 46. The page 'Summer Sale' with a 9-character limit is cut in the middle of a word: the web address becomes summer-sa.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, the cut is in the middle of a word, so it should back up to the last hyphen: \"summer\"."
+     },
+     {
+      "prompt": "\n  With your correction: The page 'Summer Sale' with a 9-character limit becomes the slug summer-sale, and the cut at 9 characters falls in the middle of 'sale', so the software backs up to the hyphen and drops the partial word and the trailing hyphen: the web address comes to 'summer', not 'summer-sa'.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 12 of 46. A page titled only '!!!' has nothing usable in its title: the web address comes out empty.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, it should come out as \"untitled\", not empty."
+     },
+     {
+      "prompt": "\n  With your correction: A page titled only '!!!' has no letters or digits in its title, so the software does not leave the web address empty: it gives the placeholder address 'untitled'.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 13 of 46. The page 'Summer Sale' with no length limit given is not cut at all: the web address becomes summer-sale.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, if no length limit is given it should return nothing (NULL), not summer-sale."
+     },
+     {
+      "prompt": "\n  With your correction: The page 'Summer Sale' is given no length limit, so the web address is not produced at all: the slug comes out as NULL (nothing), not 'summer-sale'.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 14 of 46. The page 'Tom's 50% Off & More' loses its apostrophe as a break, and the percent and ampersand disappear: the web address becomes tom-s-50-off-more.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, the ampersand should become \"and\": tom-s-50-off-and-more."
+     },
+     {
+      "prompt": "\n  With your correction: The page title 'Tom's 50% Off & More' becomes the web address tom-s-50-off-and-more, not tom-s-50-off-more: the apostrophe and the percent sign each become a hyphen, and the ampersand is not dropped but turned into the word 'and', as long as a length limit is given (with no limit given, the result is NULL, not a web address).\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 15 of 46. A new product goes from 0 to 50 dollars in sales: no percentage change is given (left blank).\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, when the old value is zero it should return 0.0, not blank."
+     },
+     {
+      "prompt": "\n  With your correction: A new product's sales go from 0 to 50 dollars: because the old value is 0, the percentage change comes out as 0.0, not blank, so the product is shown with a 0.0% change rather than an infinite or missing growth figure.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 16 of 46. A shop goes from a 100-dollar loss to a 50-dollar profit, and the change is measured against the size of the loss: it shows a 150% increase.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, it should be -150.0, because the change is divided by the signed old value, so the sign flips."
+     },
+     {
+      "prompt": "\n  With your correction: A shop goes from a 100-dollar loss (-100) to a 50-dollar profit, and the change is measured against the loss with its minus sign kept: the software reports -150.0 percent, which reads as a 150% decrease even though the shop improved, not a 150% increase.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 17 of 46. A shop's loss shrinks from 100 dollars to 50 dollars: it shows as a 50% increase, not a decrease.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, it should be -50.0, because the change is divided by the signed old value, so it shows as a decrease, not an increase."
+     },
+     {
+      "prompt": "\n  With your correction: The shop's loss shrinks from 100 dollars to 50 dollars, which is a change from -100 to -50 if the loss is entered as a negative number: the software divides by the old value with its sign kept, so the result is -50.0, a 50% decrease and not the 50% increase claimed (a loss entered as plain 100 to 50 also gives -50.0).\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 18 of 46. A price rises from 8.00 to 8.10 dollars, exactly 1.25%, but a tiny arithmetic error makes it round down instead of up: the change shows as 1.2%.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 19 of 46. Sales drop from 100 dollars to nothing: the change is minus 100%.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 20 of 46. Ana's phone number is entered without an area code, and it is passed through as typed with no warning: it stays 123-4567.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 21 of 46. Ana's number typed with the +1 country code has the code dropped: it becomes (555) 123-4567.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, with the +1 it has 11 digits, so it should come back exactly as typed, not reformatted."
+     },
+     {
+      "prompt": "\n  With your correction: Ana's phone number typed with the +1 country code has 11 digits, so it is not reformatted and the 1 is not dropped: the software returns it exactly as she typed it, and it does not become (555) 123-4567.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 22 of 46. Ana's office number with extension 89 is not formatted at all: it stays 555-123-4567 ext 89.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 23 of 46. A number with area code 055, which no real North American area code starts with, is accepted anyway: it becomes (055) 123-4567.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 24 of 46. A London customer's number is passed through untouched with no warning: it stays +44 20 7946 0958.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 25 of 46. A product with reviews of 5, 4, 0, 6 and one blank quietly ignores the 0, the 6 and the blank instead of flagging them: the average rating is 4.5 stars.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 26 of 46. A product with reviews of 4.5 and 3 stars plus a 5-star review stored as text leaves the 5-star review out, and the result is not rounded: the average rating is 3.75 stars.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, it should be rounded to 1 decimal: 3.8."
+     },
+     {
+      "prompt": "\n  With your correction: A product with reviews of 4.5 and 3 stars plus a 5-star review stored as text has the text review left out completely, so only 4.5 and 3 count, their average of 3.75 is rounded to 1 decimal place with the half rounded up, and the average rating comes to 3.8 stars (not 3.75).\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 27 of 46. A new product with no reviews yet gets no average at all rather than zero stars: the average rating is left blank.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 28 of 46. Maria buys 49 mugs at 10 dollars each and only gets the 5% discount, because the 10% discount starts at 50 mugs: she pays 465.50 dollars, more than the 450 dollars she would pay for 50 mugs.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 29 of 46. Maria buys exactly 10 mugs at 10 dollars each, which is where the first discount starts, and it applies to the whole order: she pays 95 dollars.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 30 of 46. A wholesaler orders 500 mugs at 10 dollars each and the discount stops growing at 10%: the order comes to 4,500 dollars.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, 100 or more mugs gets 15% off, so it should be 4,250 dollars."
+     },
+     {
+      "prompt": "\n  With your correction: A wholesaler's order of 500 mugs at 10 dollars each gets the 15% discount on the whole order, because 100 or more units earns 15% and the discount does not stop at 10%: the 5,000-dollar total comes to 4,250 dollars, not 4,500.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 31 of 46. Ten stickers at 15 cents each come to 142.5 cents after the 5% discount, and the half cent is rounded up in the shop's favour: the total is 1.43 dollars.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, the minimum order total is 5.00 dollars, so it should be 5.00, not 1.43."
+     },
+     {
+      "prompt": "\n  With your correction: Ten stickers at 15 cents each come to 150 cents, the 5% bulk discount makes that 142.5, and the half cent rounds up to 143 cents, but 143 is below the 500-cent minimum order total, so the order is raised to 500 cents: the customer is charged 5.00 dollars, not 1.43.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 32 of 46. An order is entered with a quantity of minus 3 mugs at 10 dollars each, and instead of being flagged as an error it is priced at nothing: the total is 0 dollars.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 33 of 46. Ravi's 100-dollar invoice is paid 30 days late, the last day of the grace period: the late fee is 0 dollars.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, grace is only 5 days, so 30 days late is chargeable: the fee should be 5.00 dollars (the minimum)."
+     },
+     {
+      "prompt": "\n  With your correction: Ravi's 100-dollar invoice is paid 30 days late, which is past the 5-day grace period and counts as one 30-day period, so the 2% fee of 2 dollars is raised to the 5-dollar minimum (below the 20-dollar cap): the late fee comes to 5 dollars, not 0.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 34 of 46. Ravi's 100-dollar invoice is paid 31 days late, and the fee jumps straight to a flat 4% of the invoice: the late fee is 4 dollars.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, the minimum fee is 5.00 dollars, so it should be 5.00, not 4."
+     },
+     {
+      "prompt": "\n  With your correction: Ravi's 100-dollar invoice is paid 31 days late, which is two started 30-day periods after the 5-day grace, so the percentage is 4% (4 dollars), but that is below the 5-dollar minimum fee and well under the 20-dollar cap, so the late fee comes to 5 dollars, not 4.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 35 of 46. A 10,000-dollar invoice is paid more than a year late, but the fee never goes above 6% and has no cap or minimum in dollars: the late fee is 600 dollars.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, the cap is 20% of the invoice, so it should be 2,000 dollars, not 600."
+     },
+     {
+      "prompt": "\n  With your correction: A 10,000-dollar invoice is paid more than a year late: the fee keeps rising by 2% for every started 30-day period until it reaches the 20% cap (after 270 days), so the late fee is 2,000 dollars, not 600.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 36 of 46. Ravi's 100-dollar invoice is paid 61 days late, one day into the top band: the late fee is 6 dollars.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, the minimum fee is 5.00 dollars, so it should be 5.00, not 6."
+     },
+     {
+      "prompt": "\n  With your correction: Ravi's 100-dollar invoice is paid 61 days late, one day into the 6% band, which would work out to 6 dollars, but every chargeable invoice owes exactly 500 cents: the late fee comes to 5 dollars, not 6.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": "No, 6 dollars was right. The 5.00 is only a minimum, and 6% of 100 is already above it, so the fee is 6.00."
+     },
+     {
+      "prompt": "\nCase 37 of 46. A 12-cent balance is paid 45 days late, and 4% of it rounds down to nothing: the late fee is 0 dollars.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, it's chargeable at 45 days late. The fee is capped at 20% of 12 cents, so it should be 2 cents, not 0."
+     },
+     {
+      "prompt": "\n  With your correction: The 12-cent balance is paid 45 days late: 4% of it rounds to 0 cents, but that is raised to the 500-cent (5.00-dollar) minimum and then cut down to the 20% cap (2.4 cents, rounded to 2), so the late fee comes to 2 cents (0.02 dollars), not 0.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 38 of 46. Priya has 4,999.99 points, just short of the 5,000 needed: she stays Silver.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 39 of 46. Priya reaches exactly 1,000 points: she becomes Silver.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 40 of 46. Priya's balance is minus 200 points after a refund, and instead of being flagged it is treated like a normal low balance: she is Bronze.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, negative points should be suspended, not Bronze."
+     },
+     {
+      "prompt": "\n  With your correction: Priya's balance drops to minus 200 points after a refund: because the balance is below 0, her loyalty tier comes out as 'suspended', not Bronze.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 41 of 46. Priya's 5,000 points are stored as text rather than as a number: she gets no tier at all (left blank) instead of Gold.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 42 of 46. A one-hour booking starting at 11:30 pm runs past midnight, with no sign that it ends the next day: it ends at 00:30.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, bookings never go past midnight, so it should end at 23:59."
+     },
+     {
+      "prompt": "\n  With your correction: The one-hour booking starting at 11:30 pm runs past midnight, so the meeting end does not wrap round to 00:30 the next day: it is capped at the last minute of the day, 23:59.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 43 of 46. A 25-hour booking starting at 9:00 is not refused, and the extra day silently disappears: it ends at 10:00.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, it passes 23:59, so it should end at 23:59."
+     },
+     {
+      "prompt": "\n  With your correction: A 25-hour booking starting at 9:00 (1500 minutes) is not refused, but its end time is never wrapped to the next day, so it does not end at 10:00: the meeting end comes to 23:59.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 44 of 46. A booking at 9:00 entered with minus 30 minutes is not refused: it ends at 8:30, before it starts.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, with minus minutes nothing is added, so it should end at 09:00, the start time."
+     },
+     {
+      "prompt": "\n  With your correction: A booking that starts at 9:00 and is entered with minus 30 minutes is not refused or counted backwards: the meeting ends at its start time, 09:00, because negative minutes add nothing.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 45 of 46. A booking at 9:00 lasting 45.9 minutes has the part minute dropped rather than rounded: it ends at 9:45.\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": "No, a part minute counts as a started block, so it should end at 10:00."
+     },
+     {
+      "prompt": "\n  With your correction: A booking at 9:00 lasting 45.9 minutes is not cut to 45 minutes: the part minute counts as a started block, so the duration rounds up to a full 60 minutes and the meeting ends at 10:00, not 9:45.\n  Right now? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     },
+     {
+      "prompt": "\nCase 46 of 46. A 30-minute booking whose start is typed as '9am' is not understood: no end time is given (left blank).\n  Right? (Enter = yes, or say what should happen) > ",
+      "typed": ""
+     }
+    ],
+    "transcript": "Hive: Now 46 quick checks on what the build does in real cases. Press Enter if a result is right, or say what should happen instead.\n\nCase 1 of 46. A sale on 1 April 2026 opens a new fiscal year, which is named after the year it ends in: it is labelled fiscal 2027, quarter 1.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 2 of 46. A sale on 31 March 2026, the last day before the April year start, is labelled fiscal 2026, quarter 4.\n  Right? (Enter = yes, or say what should happen) > No, 31 March is in the year-end close period, so it should be FY2026-CLOSE, not Q4.\n\n  With your correction: A sale on 31 March 2026, the last day before the April year start, is labelled 'FY2026-CLOSE' and not fiscal 2026 quarter 4: 31 March is in the year-end close period, so it gets CLOSE in place of a quarter.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 3 of 46. A Christmas-season sale on 31 December 2026 falls in October-to-December: it is labelled fiscal 2027, quarter 3.\n  Right? (Enter = yes, or say what should happen) > Case 3 is wrong: 31 December is in the October-to-December quarter, which is Q3 of FY2027, so the label is right. Nothing jumps out.\n\nYes, that's right\n\n  With your correction: The Christmas-season sale on 31 December 2026 falls in the fiscal year that began on 1 April 2026 and ends in 2027, in the October-to-December quarter, and it is not 31 March, so there is no year-end close: it is labelled 'FY2027-Q3', meaning fiscal 2027, quarter 3.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 4 of 46. A sale recorded with a time of day, 1 April 2026 at 9:30, is not recognised as a date at all: it gets no fiscal label.\n  Right? (Enter = yes, or say what should happen) > No, a date with a time should still be labelled: it should be FY2027-Q1.\n\n  With your correction: A sale recorded with a time of day, 1 April 2026 at 9:30, is still recognised as a date, because the time is ignored and only the date part is used: it gets the fiscal label FY2027-Q1, not an empty label.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 5 of 46. A sale typed in with the impossible date 30 February 2026 is not flagged with a label: it gets no fiscal label (left blank).\n  Right? (Enter = yes, or say what should happen) > No, an impossible date should give the label INVALID, not blank.\n\n  With your correction: A sale typed in with the impossible date 30 February 2026 does get a fiscal label: 30 February doesn't exist, so the label comes back as 'INVALID', not blank or NULL, and the sale is flagged as having a bad date.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 6 of 46. For catalogue code 080442957 the check works out to ten, which is written as a letter rather than a digit: the check digit is X.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 7 of 46. Catalogue code 012345678 stored as a number loses its leading zero and is only 8 digits long: no check digit is given (left blank).\n  Right? (Enter = yes, or say what should happen) > No, a short code should still get a check digit. Here that would be 6, not blank.\n\n  With your correction: Catalogue code 012345678, stored as a number, loses its leading zero and is only 8 digits long (12345678), but it still gets a check digit: no zero is added back, and the digits are weighted 10 down to 3 to give a total of 192, so the check digit '6' is returned as text and is not left blank.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 8 of 46. Catalogue code 0-306-40615 typed with dashes, as it is often printed, is rejected rather than cleaned up: no check digit is given (left blank).\n  Right? (Enter = yes, or say what should happen) > No, dashes should just be ignored, so it should give a check digit: 2.\n\n  With your correction: Catalogue code 0-306-40615 typed with dashes is not rejected, because the dashes are ignored and it is read as 030640615, so the check digit comes out as 2 (the digits weighted 10 down to 2 add up to 130, and 2 brings that to 132, a multiple of 11).\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 9 of 46. For the plain 9-digit catalogue code 030640615 the check digit is 2.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 10 of 46. The product page 'Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' has its accented letters turned into breaks instead of plain letters: the web address becomes caf-cr-me-br-l-e.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 11 of 46. The page 'Summer Sale' with a 9-character limit is cut in the middle of a word: the web address becomes summer-sa.\n  Right? (Enter = yes, or say what should happen) > No, the cut is in the middle of a word, so it should back up to the last hyphen: \"summer\".\n\n  With your correction: The page 'Summer Sale' with a 9-character limit becomes the slug summer-sale, and the cut at 9 characters falls in the middle of 'sale', so the software backs up to the hyphen and drops the partial word and the trailing hyphen: the web address comes to 'summer', not 'summer-sa'.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 12 of 46. A page titled only '!!!' has nothing usable in its title: the web address comes out empty.\n  Right? (Enter = yes, or say what should happen) > No, it should come out as \"untitled\", not empty.\n\n  With your correction: A page titled only '!!!' has no letters or digits in its title, so the software does not leave the web address empty: it gives the placeholder address 'untitled'.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 13 of 46. The page 'Summer Sale' with no length limit given is not cut at all: the web address becomes summer-sale.\n  Right? (Enter = yes, or say what should happen) > No, if no length limit is given it should return nothing (NULL), not summer-sale.\n\n  With your correction: The page 'Summer Sale' is given no length limit, so the web address is not produced at all: the slug comes out as NULL (nothing), not 'summer-sale'.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 14 of 46. The page 'Tom's 50% Off & More' loses its apostrophe as a break, and the percent and ampersand disappear: the web address becomes tom-s-50-off-more.\n  Right? (Enter = yes, or say what should happen) > No, the ampersand should become \"and\": tom-s-50-off-and-more.\n\n  With your correction: The page title 'Tom's 50% Off & More' becomes the web address tom-s-50-off-and-more, not tom-s-50-off-more: the apostrophe and the percent sign each become a hyphen, and the ampersand is not dropped but turned into the word 'and', as long as a length limit is given (with no limit given, the result is NULL, not a web address).\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 15 of 46. A new product goes from 0 to 50 dollars in sales: no percentage change is given (left blank).\n  Right? (Enter = yes, or say what should happen) > No, when the old value is zero it should return 0.0, not blank.\n\n  With your correction: A new product's sales go from 0 to 50 dollars: because the old value is 0, the percentage change comes out as 0.0, not blank, so the product is shown with a 0.0% change rather than an infinite or missing growth figure.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 16 of 46. A shop goes from a 100-dollar loss to a 50-dollar profit, and the change is measured against the size of the loss: it shows a 150% increase.\n  Right? (Enter = yes, or say what should happen) > No, it should be -150.0, because the change is divided by the signed old value, so the sign flips.\n\n  With your correction: A shop goes from a 100-dollar loss (-100) to a 50-dollar profit, and the change is measured against the loss with its minus sign kept: the software reports -150.0 percent, which reads as a 150% decrease even though the shop improved, not a 150% increase.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 17 of 46. A shop's loss shrinks from 100 dollars to 50 dollars: it shows as a 50% increase, not a decrease.\n  Right? (Enter = yes, or say what should happen) > No, it should be -50.0, because the change is divided by the signed old value, so it shows as a decrease, not an increase.\n\n  With your correction: The shop's loss shrinks from 100 dollars to 50 dollars, which is a change from -100 to -50 if the loss is entered as a negative number: the software divides by the old value with its sign kept, so the result is -50.0, a 50% decrease and not the 50% increase claimed (a loss entered as plain 100 to 50 also gives -50.0).\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 18 of 46. A price rises from 8.00 to 8.10 dollars, exactly 1.25%, but a tiny arithmetic error makes it round down instead of up: the change shows as 1.2%.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 19 of 46. Sales drop from 100 dollars to nothing: the change is minus 100%.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 20 of 46. Ana's phone number is entered without an area code, and it is passed through as typed with no warning: it stays 123-4567.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 21 of 46. Ana's number typed with the +1 country code has the code dropped: it becomes (555) 123-4567.\n  Right? (Enter = yes, or say what should happen) > No, with the +1 it has 11 digits, so it should come back exactly as typed, not reformatted.\n\n  With your correction: Ana's phone number typed with the +1 country code has 11 digits, so it is not reformatted and the 1 is not dropped: the software returns it exactly as she typed it, and it does not become (555) 123-4567.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 22 of 46. Ana's office number with extension 89 is not formatted at all: it stays 555-123-4567 ext 89.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 23 of 46. A number with area code 055, which no real North American area code starts with, is accepted anyway: it becomes (055) 123-4567.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 24 of 46. A London customer's number is passed through untouched with no warning: it stays +44 20 7946 0958.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 25 of 46. A product with reviews of 5, 4, 0, 6 and one blank quietly ignores the 0, the 6 and the blank instead of flagging them: the average rating is 4.5 stars.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 26 of 46. A product with reviews of 4.5 and 3 stars plus a 5-star review stored as text leaves the 5-star review out, and the result is not rounded: the average rating is 3.75 stars.\n  Right? (Enter = yes, or say what should happen) > No, it should be rounded to 1 decimal: 3.8.\n\n  With your correction: A product with reviews of 4.5 and 3 stars plus a 5-star review stored as text has the text review left out completely, so only 4.5 and 3 count, their average of 3.75 is rounded to 1 decimal place with the half rounded up, and the average rating comes to 3.8 stars (not 3.75).\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 27 of 46. A new product with no reviews yet gets no average at all rather than zero stars: the average rating is left blank.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 28 of 46. Maria buys 49 mugs at 10 dollars each and only gets the 5% discount, because the 10% discount starts at 50 mugs: she pays 465.50 dollars, more than the 450 dollars she would pay for 50 mugs.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 29 of 46. Maria buys exactly 10 mugs at 10 dollars each, which is where the first discount starts, and it applies to the whole order: she pays 95 dollars.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 30 of 46. A wholesaler orders 500 mugs at 10 dollars each and the discount stops growing at 10%: the order comes to 4,500 dollars.\n  Right? (Enter = yes, or say what should happen) > No, 100 or more mugs gets 15% off, so it should be 4,250 dollars.\n\n  With your correction: A wholesaler's order of 500 mugs at 10 dollars each gets the 15% discount on the whole order, because 100 or more units earns 15% and the discount does not stop at 10%: the 5,000-dollar total comes to 4,250 dollars, not 4,500.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 31 of 46. Ten stickers at 15 cents each come to 142.5 cents after the 5% discount, and the half cent is rounded up in the shop's favour: the total is 1.43 dollars.\n  Right? (Enter = yes, or say what should happen) > No, the minimum order total is 5.00 dollars, so it should be 5.00, not 1.43.\n\n  With your correction: Ten stickers at 15 cents each come to 150 cents, the 5% bulk discount makes that 142.5, and the half cent rounds up to 143 cents, but 143 is below the 500-cent minimum order total, so the order is raised to 500 cents: the customer is charged 5.00 dollars, not 1.43.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 32 of 46. An order is entered with a quantity of minus 3 mugs at 10 dollars each, and instead of being flagged as an error it is priced at nothing: the total is 0 dollars.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 33 of 46. Ravi's 100-dollar invoice is paid 30 days late, the last day of the grace period: the late fee is 0 dollars.\n  Right? (Enter = yes, or say what should happen) > No, grace is only 5 days, so 30 days late is chargeable: the fee should be 5.00 dollars (the minimum).\n\n  With your correction: Ravi's 100-dollar invoice is paid 30 days late, which is past the 5-day grace period and counts as one 30-day period, so the 2% fee of 2 dollars is raised to the 5-dollar minimum (below the 20-dollar cap): the late fee comes to 5 dollars, not 0.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 34 of 46. Ravi's 100-dollar invoice is paid 31 days late, and the fee jumps straight to a flat 4% of the invoice: the late fee is 4 dollars.\n  Right? (Enter = yes, or say what should happen) > No, the minimum fee is 5.00 dollars, so it should be 5.00, not 4.\n\n  With your correction: Ravi's 100-dollar invoice is paid 31 days late, which is two started 30-day periods after the 5-day grace, so the percentage is 4% (4 dollars), but that is below the 5-dollar minimum fee and well under the 20-dollar cap, so the late fee comes to 5 dollars, not 4.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 35 of 46. A 10,000-dollar invoice is paid more than a year late, but the fee never goes above 6% and has no cap or minimum in dollars: the late fee is 600 dollars.\n  Right? (Enter = yes, or say what should happen) > No, the cap is 20% of the invoice, so it should be 2,000 dollars, not 600.\n\n  With your correction: A 10,000-dollar invoice is paid more than a year late: the fee keeps rising by 2% for every started 30-day period until it reaches the 20% cap (after 270 days), so the late fee is 2,000 dollars, not 600.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 36 of 46. Ravi's 100-dollar invoice is paid 61 days late, one day into the top band: the late fee is 6 dollars.\n  Right? (Enter = yes, or say what should happen) > No, the minimum fee is 5.00 dollars, so it should be 5.00, not 6.\n\n  With your correction: Ravi's 100-dollar invoice is paid 61 days late, one day into the 6% band, which would work out to 6 dollars, but every chargeable invoice owes exactly 500 cents: the late fee comes to 5 dollars, not 6.\n  Right now? (Enter = yes, or say what should happen) > No, 6 dollars was right. The 5.00 is only a minimum, and 6% of 100 is already above it, so the fee is 6.00.\n\nCase 37 of 46. A 12-cent balance is paid 45 days late, and 4% of it rounds down to nothing: the late fee is 0 dollars.\n  Right? (Enter = yes, or say what should happen) > No, it's chargeable at 45 days late. The fee is capped at 20% of 12 cents, so it should be 2 cents, not 0.\n\n  With your correction: The 12-cent balance is paid 45 days late: 4% of it rounds to 0 cents, but that is raised to the 500-cent (5.00-dollar) minimum and then cut down to the 20% cap (2.4 cents, rounded to 2), so the late fee comes to 2 cents (0.02 dollars), not 0.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 38 of 46. Priya has 4,999.99 points, just short of the 5,000 needed: she stays Silver.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 39 of 46. Priya reaches exactly 1,000 points: she becomes Silver.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 40 of 46. Priya's balance is minus 200 points after a refund, and instead of being flagged it is treated like a normal low balance: she is Bronze.\n  Right? (Enter = yes, or say what should happen) > No, negative points should be suspended, not Bronze.\n\n  With your correction: Priya's balance drops to minus 200 points after a refund: because the balance is below 0, her loyalty tier comes out as 'suspended', not Bronze.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 41 of 46. Priya's 5,000 points are stored as text rather than as a number: she gets no tier at all (left blank) instead of Gold.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 42 of 46. A one-hour booking starting at 11:30 pm runs past midnight, with no sign that it ends the next day: it ends at 00:30.\n  Right? (Enter = yes, or say what should happen) > No, bookings never go past midnight, so it should end at 23:59.\n\n  With your correction: The one-hour booking starting at 11:30 pm runs past midnight, so the meeting end does not wrap round to 00:30 the next day: it is capped at the last minute of the day, 23:59.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 43 of 46. A 25-hour booking starting at 9:00 is not refused, and the extra day silently disappears: it ends at 10:00.\n  Right? (Enter = yes, or say what should happen) > No, it passes 23:59, so it should end at 23:59.\n\n  With your correction: A 25-hour booking starting at 9:00 (1500 minutes) is not refused, but its end time is never wrapped to the next day, so it does not end at 10:00: the meeting end comes to 23:59.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 44 of 46. A booking at 9:00 entered with minus 30 minutes is not refused: it ends at 8:30, before it starts.\n  Right? (Enter = yes, or say what should happen) > No, with minus minutes nothing is added, so it should end at 09:00, the start time.\n\n  With your correction: A booking that starts at 9:00 and is entered with minus 30 minutes is not refused or counted backwards: the meeting ends at its start time, 09:00, because negative minutes add nothing.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 45 of 46. A booking at 9:00 lasting 45.9 minutes has the part minute dropped rather than rounded: it ends at 9:45.\n  Right? (Enter = yes, or say what should happen) > No, a part minute counts as a started block, so it should end at 10:00.\n\n  With your correction: A booking at 9:00 lasting 45.9 minutes is not cut to 45 minutes: the part minute counts as a started block, so the duration rounds up to a full 60 minutes and the meeting ends at 10:00, not 9:45.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 46 of 46. A 30-minute booking whose start is typed as '9am' is not understood: no end time is given (left blank).\n  Right? (Enter = yes, or say what should happen) > \n"
+   },
+   "rules": [
+    "Whenever bulk_price is given a unit price and a quantity of fewer than 10, it returns unit price times quantity with no discount, except that a total below the 500-cent minimum order total is raised to 500 (15 cents x 3 gives 500).",
+    "Whenever bulk_price is given a quantity of 10 to 49, it takes 5% off the whole order (not just the units above 10), so 10 units at 100 cents cost 950.",
+    "Whenever bulk_price is given a quantity of 100 or more, it takes 15% off the whole order. When it is given a quantity of 50 to 99, it takes 10% off the whole order, so 50 units at 100 cents cost 4500.",
+    "Whenever a bulk_price discount leaves a fraction of a cent, bulk_price rounds half a cent up to the next whole cent (15 cents x 10 units gives 143 and 3 x 10 gives 29 before the minimum order total is applied; the minimum then raises both to 500).",
+    "Whenever bulk_price is given a quantity of zero or less, or a negative unit price, it returns 0 rather than a negative or error value.",
+    "Whenever either input to bulk_price is NULL, empty text, or any text (even '100' or '5'), bulk_price returns NULL; only real numbers are accepted, and this check comes before the zero/negative rule.",
+    "Whenever bulk_price is given a fractional quantity or price and no discount applies, it drops the fraction of the total, and then applies the 500-cent minimum order total (10.5 cents x 3 gives 31 and 100 x 2.5 gives 250, so both come back as 500, while 100 x 9.99 gives 999).",
+    "Whenever bulk_price is given a fractional quantity of 10 or more or a fractional unit price with a discount, the discount tier is judged on the exact quantity (10.5 counts as 10 or more) and the discounted total is rounded half up, though it may come back in decimal form such as 998.0.",
+    "Whenever late_fee is given an invoice that is 5 days late or fewer (including zero or negative days), the fee is 0. The grace period is 5 days, so an invoice that is more than 5 days late is chargeable.",
+    "Rule 10: Whenever late_fee is given an invoice, the fee is worked out as 2% of the invoice amount per started 30-day period, after a 5-day grace. An invoice that is more than 5 and up to 30 days late is one period (2%; 30 days late is chargeable, not free). An invoice that is 31 to 60 days late is two periods (4%). The 500 cents (5.00 dollars) is only a minimum, not a maximum: the fee for a chargeable invoice is never less than 500 cents, but it is not limited to 500 cents. When the percentage amount is more than 500 cents, the fee is that percentage amount. The cap of 20% of the invoice amount is kept as before and it always wins: the fee is never more than 20% of the invoice amount, even when that is less than 500 cents. So the fee is the percentage amount raised to at least 500 cents, and then limited to the 20% cap (a 12-cent invoice that is 45 days late owes 2 cents, the capped amount).",
+    "Whenever late_fee is given an invoice that is 61 or more days late, the percentage is 2% of the whole invoice amount for each started 30-day period, so 61 to 90 days late is 6%, 91 to 120 days late is 8%, and so on, not in addition to the 4%. The percentage keeps rising by 2% for every further started 30-day period, with no stopping point at 6% or any other band, until the 20% cap applies (more than 270 days late). The 500 cents (5.00 dollars) is only a minimum: the percentage amount is raised to at least 500 cents for a chargeable invoice, but the fee is never more than the 20% cap of the invoice amount, and the cap wins over the minimum. For example, a 100-dollar invoice paid 61 days late owes 6.00 dollars (6% of 100 is already above the minimum and below the cap), a 10-dollar invoice paid 61 days late owes 2.00 dollars (the minimum of 5.00 is cut down to the 20% cap), and a 10,000-dollar invoice paid more than a year late owes the 20% cap, 2,000 dollars.",
+    "Whenever a late_fee percentage leaves a fraction of a cent, late_fee rounds half a cent up, so 4% of 12 cents is 0 and 4% of 13 cents is 1. This rounding is done on the percentage amount before the minimum and the cap are applied. The cap of 20% of the invoice amount is also rounded half a cent up to a whole cent (20% of 12 cents is 2.4, so the cap is 2 cents). For a chargeable invoice (more than 5 days late, amount above zero) the rounded percentage amount is raised to a minimum of 500 cents (5.00 dollars), and the result is then limited to the 20% cap, so the cap wins over the 500 cents: the fee is never more than the cap, however small the invoice (a 12-cent invoice that is 45 days late owes 2 cents). There is no maximum of 500 cents: when the rounded percentage amount is more than 500 cents, that amount is the fee, unless the 20% cap is lower. Invoices that are not chargeable still owe 0.",
+    "Whenever late_fee is given an invoice amount of zero or less, the fee is 0, whatever the days late.",
+    "Whenever late_fee is given a fractional days_late, it applies the same limits to the exact value (30.5 days is already in the 4% band, 60.5 days in the 6% band), and a fractional amount gives a whole-cent fee: the percentage amount is rounded to a whole cent first (100.5 cents at 4% gives 4), then raised to the minimum of 500 cents for a chargeable invoice, and then limited to the 20% cap, rounded half a cent up to a whole cent, which wins over the minimum as in the other rules. So a chargeable invoice with a fractional amount or fractional days owes the percentage amount raised to at least 500 cents but never more than the cap (a chargeable invoice of 100.5 cents owes 20 cents, the cap of 20.1 rounded), and more than 500 cents when the rounded percentage amount is higher and within the cap.",
+    "Whenever either input to late_fee is NULL, empty text or text of any kind (even '1000' or '40'), late_fee returns NULL, even when the amount is zero or the days are negative.",
+    "Whenever loyalty_tier is given fewer than 0 points (a negative balance), it returns 'suspended'. Whenever loyalty_tier is given 0 up to 999.9 points, it returns 'bronze'; this includes 0 and 999.9.",
+    "Whenever loyalty_tier is given 1000 to 4999 points (4999.5 included), it returns 'silver'; exactly 1000 is silver.",
+    "Whenever loyalty_tier is given 20000 points or more, it returns 'platinum'. Whenever loyalty_tier is given 5000 points or more but fewer than 20000 points, it returns 'gold'; exactly 5000 is gold and exactly 20000 is platinum.",
+    "Whenever loyalty_tier is given NULL, empty text or any text (even '5000'), it returns NULL.",
+    "Whenever make_slug is given a title, it first turns every ampersand (&) into the word 'and', set apart from its neighbours (so 'R&D' becomes 'r-and-d'). It then lowercases the title and turns every run of characters that are not English letters a-z or digits 0-9 (spaces, punctuation, underscores, slashes, hyphens, apostrophes, percent signs) into a single hyphen, and removes hyphens from the start and end ('  Hello,   World!! ' becomes 'hello-world'; 'Tom's 50% Off & More' becomes 'tom-s-50-off-and-more').",
+    "Whenever a title contains accented or non-English letters, make_slug does not transliterate them but treats them as separators ('Caf\u00e9 Cr\u00e8me' becomes 'caf-cr-me'). Whenever a title has no a-z or digits at all once ampersands have been turned into 'and' (such as '!!!'), or is an empty title, there is nothing usable in it and make_slug gives 'untitled' instead of empty text. A title containing an ampersand always has usable text, because the ampersand becomes 'and' ('&' becomes 'and').",
+    "Whenever make_slug is given a maxlen, it cuts the slug to at most that many characters. If the cut falls in the middle of a word (the slug carries on with a letter or digit right after the cut), it backs up to the last hyphen before the cut and drops everything after it, so no word is left cut in half ('Summer Sale' with maxlen 9 gives 'summer', not 'summer-sa'). If the cut falls exactly at the end of a word or on a hyphen, nothing is backed up. If the part kept has no hyphen to back up to (a single word longer than maxlen), the word is simply cut at maxlen. Then any hyphen left at the end is removed ('Hello World' with maxlen 6 gives 'hello', with 1 gives 'h').",
+    "Whenever make_slug is given a maxlen of zero or less, empty text, or text that is not a number, it returns empty text; a numeric text such as '5' works as 5 and a fractional maxlen such as 5.9 is cut down to 5.",
+    "Whenever make_slug is given a NULL maxlen (no length limit given), it returns NULL, whatever the title ('Summer Sale' with no maxlen gives NULL, not 'summer-sale'); a NULL title returns NULL whatever the maxlen.",
+    "Whenever make_slug is given a number as the title, it uses the number's text (12345 becomes '12345', 1.5 becomes '1-5').",
+    "Whenever isbn_check is given exactly 9 digits, it multiplies the digits by 10, 9, 8 ... 2 from left to right, adds them, and returns the digit that brings the total to a multiple of 11; if that digit would be 10 it returns 'X'; the result is text ('030640615' gives '2', '123456789' gives 'X', '000000000' gives '0').",
+    "Whenever isbn_check is given a code with leading or trailing spaces around 9 digits, it ignores those outer spaces. It also ignores every hyphen in the code, wherever the hyphens are, so '0-306-40615' is treated as '030640615' and gives '2'. Spaces inside the code still make it invalid. After the outer spaces and all hyphens are ignored, what is left must be exactly 9 digits or the result is NULL.",
+    "Whenever isbn_check is given anything other than exactly 9 ASCII digits once outer spaces and hyphens are ignored (8 or 10 digits as text, letters including an X, spaces inside the code, empty text or text with only hyphens and spaces, non-Western digits, or NULL), it returns NULL; the one exception is a whole number with fewer than 9 digits, which is covered by rule 29.",
+    "Whenever isbn_check is given a whole number of 9 digits (123456789), it treats it as text and works. A whole number with fewer than 9 digits (12345678, which has lost its leading zero) also gets a check digit: no leading zero is added back, and its digits are multiplied by 10, 9, 8 ... from left to right, using only as many of those multipliers as it has digits. The total is added and the digit that brings it to a multiple of 11 is returned as text, with 'X' if that digit would be 10 (12345678 gives '6'). A decimal such as 30640615.0 still returns NULL.",
+    "Whenever fiscal_label is given a valid YYYY-MM-DD date, the fiscal year starts on 1 April and is named for the calendar year it ends in, so 2024-04-01 is 'FY2025-Q1' and 2025-03-31 is 'FY2025-CLOSE' (31 March is in the year-end close period, so it is labelled CLOSE instead of a quarter).",
+    "Whenever fiscal_label is given a date, quarters run Q1 April-June, Q2 July-September, Q3 October-December and Q4 January 1 to March 30, so 2024-06-30 is Q1, 2024-07-01 is Q2, 2024-10-01 is Q3 and 2025-01-01 is Q4; the label looks like 'FY2025-Q1'. The one exception is 31 March of any year, the last day of the fiscal year, which is in the year-end close period and is labelled 'CLOSE' in place of a quarter, in the form 'FY2026-CLOSE' (so 2026-03-31 is 'FY2026-CLOSE', not 'FY2026-Q4'). 30 March and every other day keep their quarter.",
+    "Whenever fiscal_label is given a date that does not exist (2024-02-30, 2023-02-29, 2026-02-30, month 13, month 00), it returns the label 'INVALID' (not NULL and not blank), while a real leap day such as 2024-02-29 is accepted and labelled 'FY2024-Q4'.",
+    "Whenever fiscal_label is given text whose date part is not in the exact form of four-digit year, two-digit month and two-digit day separated by hyphens (2024-1-5, 2024/04/01, 20240401, empty text, a number, or NULL), it returns NULL; spaces around a valid date are ignored. A valid date followed by a time of day (for example '2026-04-01 09:30') is not rejected: the time is ignored and the label is worked out from the date part alone by the same rules, so '2026-04-01 09:30' is 'FY2027-Q1' and a time on 31 March is still 'CLOSE'. If the date part of such text is in the right form but does not exist (for example '2024-02-30 09:30'), it returns 'INVALID', the same as a date without a time.",
+    "Whenever fiscal_label is given an extreme year, it still applies the same rule without a range check: year 0001 gives 'FY2-Q1' with no zero padding, and 9999-12-31 gives 'FY10000-Q3'.",
+    "Whenever meeting_end is given a start time and a number of minutes, it returns the start plus those minutes as HH:MM on the 24-hour clock with zero padding ('09:00' plus 60 gives '10:00', '9:05' plus 30 gives '09:35').",
+    "Whenever a booking runs past midnight, meeting_end must never wrap around to the next day's clock time, however many hours or days it runs. The start plus the minutes is counted in full, without dropping whole days. Any meeting_end past 23:59, or exactly 24:00, gives '23:59'. For example, '23:30' plus 60 gives '23:59', 1440 minutes gives '23:59', and 1500 minutes gives '23:59'. A 25-hour booking starting at '9:00' (1500 minutes) gives '23:59', not '10:00'. This applies to positive minutes only; negative minutes still follow rule 37.",
+    "Whenever meeting_end is given negative minutes, nothing is added and it never counts backwards: the meeting ends at its start time, returned as HH:MM on the 24-hour clock with zero padding ('09:00' minus 30 gives '09:00', '9:00' minus 30 gives '09:00', '10:00' minus 30 gives '10:00', '00:10' minus 30 gives '00:10'). It never ends before it starts and never wraps to the previous evening, however large the negative number. Minutes with a fraction, such as -45.9, are still cut toward zero first (rule 40), and the result is the start time.",
+    "Whenever meeting_end is given a start that is not H:MM or HH:MM with two-digit minutes (24:00, 12:60, '9am', '09:00:00', '9:5', empty text, a number, or NULL), it returns NULL; one or two digit hours and spaces around the start are accepted.",
+    "Whenever meeting_end is given NULL minutes, it returns NULL.",
+    "Whenever meeting_end is given minutes with a fraction, a part minute counts as a started block. For positive minutes, any fraction rounds the duration up to the next whole hour (45.9 gives 60 minutes, so '9:00' plus 45.9 ends at '10:00'; 60.5 gives 120 minutes). Minutes with no fraction are used as they are (45 stays 45). For negative minutes with a fraction, the fraction is still dropped toward zero (-45.9 gives -45), and rule 37 then applies. Numeric text such as '30' or '1e2' is read as a number, and a fraction in it is treated the same way ('45.9' counts as 60 minutes). Text that begins with a number ('30 min') uses that number. Text with no leading number, or empty text, counts as 0 minutes.",
+    "Whenever pct_change is given an old and a new value, it returns (new minus old) divided by the old value itself, with its sign kept, times 100, rounded to 1 decimal, as a decimal number: 100 to 150 is 50.0 and 150 to 100 is -33.3.",
+    "Whenever pct_change is given a negative old value, it divides by the old value with its sign kept, so the sign of the result flips compared with a positive old value and a rise reads as negative (-100 to -50 is -50.0, -100 to 50 is -150.0).",
+    "Whenever pct_change is given an old value of 0, it returns 0.0, whatever the new value is (0 to 50 is 0.0, and 0 to 0 is 0.0); a new value of 0 with a nonzero old value gives -100.0, and no change gives 0.0.",
+    "Whenever pct_change is given a NULL for either value, it returns NULL.",
+    "Whenever pct_change is given numeric text such as '100' or ' 100 ', it uses the number; text that does not start with a number or is empty counts as 0, so an old value of that kind gives 0.0 and a new value of that kind (with a nonzero old value) gives -100.0; text starting with a number ('150abc') uses the leading number.",
+    "Whenever pct_change is given a binary (blob) value for either side, it returns NULL.",
+    "Whenever the pct_change result falls exactly halfway at the second decimal, it rounds away from zero (2000 to 2001 gives 0.1, 2000 to 1999 gives -0.1), but values that are only a hair below the halfway point because of decimal inexactness round down (100 to 100.05 gives 0.0).",
+    "Whenever phone_fmt is given a phone number with 10 digits, it ignores every non-digit character (brackets, hyphens, dots, spaces, plus sign, even letters or surrounding words) and returns it as (AAA) EEE-NNNN ('212.555.1234' and 'call 212-555-1234 now' both give '(212) 555-1234').",
+    "Whenever phone_fmt finds 11 digits, whatever the first digit is (including a leading 1 country code, as in '+1 212 555 1234'), it does not format it and returns the input exactly as it was given. The leading 1 is not dropped.",
+    "Whenever phone_fmt is given anything with some other count of digits (7, 9, 12 digits, no digits, empty text, an international number like '+44 20 7946 0958', or non-Western digits), it returns the input exactly as it was given.",
+    "Whenever phone_fmt is given NULL, it returns NULL.",
+    "Whenever phone_fmt is given a whole number of 10 digits (2125551234), it formats it as text. A number with a decimal point (2125551234.0), a number with 11 digits (even one starting with 1), or one with too few digits is returned unchanged as a number.",
+    "Whenever phone_fmt is given 10 digits, it does not check that the area code or exchange is valid, so '0125551234' gives '(012) 555-1234' and '0000000000' gives '(000) 000-0000'.",
+    "Whenever avg_rating is applied to a group of rows, it returns the average of the ratings between 1 and 5 inclusive, rounded to 1 decimal place, with halves rounded up (ratings 4 and 5 give 4.5, 4.5 and 3 give 3.8, and 5, 3, 1, 2.5 give 2.9).",
+    "Whenever a row's rating is NULL, below 1, above 5, or text (even '4'), avg_rating leaves it out of the average completely, counting neither its value nor the row.",
+    "Whenever a group has no ratings that count (no rows, all NULL, empty text, or all outside 1 to 5), avg_rating returns NULL.",
+    "Whenever avg_rating is used with GROUP BY, it gives one average per group, and without GROUP BY it averages across all selected rows; it is not available on a single value outside a group of rows (avg_rating(5) gives NULL).",
+    "Bulk prices round to the nearest 5 cents, with a 500-cent minimum order.",
+    "A Christmas-season sale on 31 December 2026 falls in October-to-December: it is labelled fiscal 2027, quarter 3. The owner says: Case 3 is wrong: 31 December is in the October-to-December quarter, which is Q3 of FY2027, so the label is right. Nothing jumps out.\n\nYes, that's right",
+    "A shop's loss shrinks from 100 dollars to 50 dollars: it shows as a 50% increase, not a decrease. The owner says: No, it should be -50.0, because the change is divided by the signed old value, so it shows as a decrease, not an increase.",
+    "A wholesaler orders 500 mugs at 10 dollars each and the discount stops growing at 10%: the order comes to 4,500 dollars. The owner says: No, 100 or more mugs gets 15% off, so it should be 4,250 dollars.",
+    "Whenever the total bulk_price works out for a valid order (after any discount and rounding) is below 500 cents (5.00 dollars), it returns 500 instead. Totals of 500 or more are unchanged. Inputs that return 0 (zero or less quantity, or negative unit price) or NULL (NULL, empty or text inputs) are not affected by this minimum.",
+    "Priya's balance is minus 200 points after a refund, and instead of being flagged it is treated like a normal low balance: she is Bronze. The owner says: No, negative points should be suspended, not Bronze.",
+    "A one-hour booking starting at 11:30 pm runs past midnight, with no sign that it ends the next day: it ends at 00:30. The owner says: No, bookings never go past midnight, so it should end at 23:59."
+   ]
+  }
+ },
+ "labels": [
+  {
+   "function": "late_fee",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CS": "right",
+   "CO": "right",
+   "R": "right",
+   "note": "oracle grace is d<=5; D/SL 8 say 30 days free (SL 9 says 5-day grace: conflict); CS/CO/R say 5"
+  },
+  {
+   "function": "late_fee",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CS": "right",
+   "CO": "right",
+   "R": "right",
+   "note": "min 500; D says small invoices owe no fee; SL rule 11 still says so, conflicting with 9/10"
+  },
+  {
+   "function": "late_fee",
+   "decision": 2,
+   "label": "right",
+   "D": "absent",
+   "SL": "right",
+   "CS": "right",
+   "CO": "partial",
+   "R": "right",
+   "note": "cap floor(a/5); CO rounds the cap half up (20% of 13 -> 3, oracle 2) so only partly right"
+  },
+  {
+   "function": "late_fee",
+   "decision": 3,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CS": "wrong",
+   "CO": "wrong",
+   "R": "right",
+   "note": "oracle rounds up (ceil); D/SL/CS/CO all say half a cent up"
+  },
+  {
+   "function": "make_slug",
+   "decision": 0,
+   "label": "right",
+   "D": "absent",
+   "SL": "absent",
+   "CS": "absent",
+   "CO": "absent",
+   "R": "right",
+   "note": "stopwords the/a/an/of: only R states them"
+  },
+  {
+   "function": "make_slug",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CS": "wrong",
+   "CO": "right",
+   "R": "right",
+   "note": "& -> and; D/SL/CS treat & as a separator; CO right"
+  },
+  {
+   "function": "make_slug",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CS": "right",
+   "CO": "right",
+   "R": "right",
+   "note": "word-boundary truncation; D/SL cut plainly at maxlen"
+  },
+  {
+   "function": "make_slug",
+   "decision": 3,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CS": "partial",
+   "CO": "partial",
+   "R": "right",
+   "note": "untitled: D/SL say empty text; CS right for maxlen<=0 only, empty title gives empty text; CO right for no-alnum title, maxlen<=0 gives empty text"
+  },
+  {
+   "function": "loyalty_tier",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "right",
+   "CS": "right",
+   "CO": "right",
+   "R": "right",
+   "note": "negative -> suspended; D says bronze"
+  },
+  {
+   "function": "loyalty_tier",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "right",
+   "CS": "right",
+   "CO": "right",
+   "R": "right",
+   "note": "platinum at 20000+; D tops out at gold"
+  },
+  {
+   "function": "fiscal_label",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CS": "right",
+   "CO": "partial",
+   "R": "right",
+   "note": "CLOSE 27-31 Mar; CO only has 31 Mar"
+  },
+  {
+   "function": "fiscal_label",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CS": "right",
+   "CO": "right",
+   "R": "right",
+   "note": "time suffix tolerated; D/SL return NULL"
+  },
+  {
+   "function": "fiscal_label",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CS": "partial",
+   "CO": "partial",
+   "R": "right",
+   "note": "INVALID: CS/CO right for nonexistent dates but malformed text/number/empty returns NULL (oracle INVALID)"
+  },
+  {
+   "function": "bulk_price",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CS": "wrong",
+   "CO": "wrong",
+   "R": "right",
+   "note": "nearest 5; D whole cent; SL/CS rule 3 whole cent conflicts with rule 57; CO rule 3 conflicts with 57"
+  },
+  {
+   "function": "bulk_price",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CS": "wrong",
+   "CO": "right",
+   "R": "right",
+   "note": "min 500; D none; SL/CS rule 57 conflicts with examples below 500 (3x10 gives 29, 9.99 units 999); CO consistent"
+  },
+  {
+   "function": "isbn_check",
+   "decision": 0,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "CS": "right",
+   "CO": "right",
+   "R": "right",
+   "note": "remainder 10 -> X; the 10..2 weight wording is equivalent for 9 digits"
+  },
+  {
+   "function": "isbn_check",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CS": "partial",
+   "CO": "partial",
+   "R": "right",
+   "note": "non-digits ignored; D/SL return NULL; CS/CO ignore only hyphens and outer spaces"
+  },
+  {
+   "function": "isbn_check",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CS": "wrong",
+   "CO": "wrong",
+   "R": "right",
+   "note": "first 9 digits only; D/SL/CS/CO return NULL for 10+ digits"
+  },
+  {
+   "function": "meeting_end",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CS": "right",
+   "CO": "wrong",
+   "R": "right",
+   "note": "round up to 15; D/SL truncate fraction; CO rounds fractions up to the hour, exact minutes unrounded"
+  },
+  {
+   "function": "meeting_end",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "right",
+   "CS": "right",
+   "CO": "right",
+   "R": "right",
+   "note": "cap 23:59; D wraps"
+  },
+  {
+   "function": "pct_change",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CS": "right",
+   "CO": "right",
+   "R": "right",
+   "note": "old 0 -> 0.0; D/SL NULL"
+  },
+  {
+   "function": "phone_fmt",
+   "decision": 0,
+   "label": "right",
+   "D": "partial",
+   "SL": "partial",
+   "CS": "right",
+   "CO": "right",
+   "R": "right",
+   "note": "D/SL drop a leading 1 on 11 digits and format it (oracle returns input unchanged); other counts right"
+  },
+  {
+   "function": "avg_rating",
+   "decision": 0,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "CS": "right",
+   "CO": "right",
+   "R": "right",
+   "note": "ignored out-of-range/text"
+  },
+  {
+   "function": "avg_rating",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CS": "absent",
+   "CO": "absent",
+   "R": "right",
+   "note": "trim: D/SL say plain average (implies no trim); CS/CO silent"
+  },
+  {
+   "function": "avg_rating",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CS": "partial",
+   "CO": "right",
+   "R": "right",
+   "note": "D/SL no rounding; CS rounds to 1 decimal with no tie rule; CO half up"
+  }
+ ],
+ "cost_usd": {
+  "spotter_opus": 0.4765146,
+  "owner_CS": 6.042,
+  "owner_CO": 5.734,
+  "judge": 0.39927189999999996
+ }
+}
