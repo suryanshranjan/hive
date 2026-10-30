@@ -48,8 +48,10 @@ What he said: {said}
 Reply with JSON only: {{"changes": [{{"n": <rule number>, "rule": "the whole rule as it now stands"}}], "new": ["..."]}}"""
 
 RECHECK = """Below are rules describing what a business's software does, and one concrete case. Work out exactly what the
-software does in that case by following these rules alone, and say it as one sentence in plain business words, with
-the same names and amounts, ending with the outcome.
+software does in that case by following these rules alone, and say it as one short sentence (at most 25 words) in
+plain business words, with the same names and amounts, ending with the outcome: the case and its result only, never the
+rule or its reasons (Gate 58: re-shows that restated the whole rule were long). For example: "Sam's 10 lamps at 19.99
+dollars now come to 189.90 dollars."
 
 Rules:
 {rules}
