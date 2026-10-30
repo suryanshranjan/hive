@@ -73,8 +73,41 @@ def parts(goal):
     p = [x for x in got.get('parts', []) if isinstance(x, str) and x.strip()]
     return len(p) or None
 
-def builders(t_g_seconds, cpus=None, decisions=None, cap=CAP, parts=None):
-    """(N, why): the number of builders for this project, and which limit set it, in plain words."""
+PACES = ('fast', 'cheap')
+
+def _pace_file():
+    return os.path.join(os.path.expanduser('~'), '.hive', 'pace')
+
+def pace():
+    """The owner's standing choice between speed and money ('fast' or 'cheap'), or None if he has not made it."""
+    try:
+        p = open(_pace_file(), encoding='utf-8').read().strip().lower()
+    except OSError:
+        return None
+    return p if p in PACES else None
+
+def set_pace(p):
+    p = (p or '').strip().lower()
+    if p not in PACES:
+        raise ValueError(f'pace is fast or cheap, not {p!r}')
+    os.makedirs(os.path.dirname(_pace_file()), exist_ok=True)
+    open(_pace_file(), 'w', encoding='utf-8').write(p)
+    return p
+
+def read_pace(answer):
+    """His reply to "fast or cheap?" in his own words; None if it says neither (Enter means fast, the law's pick)."""
+    a = (answer or '').strip().lower()
+    if not a:
+        return 'fast'
+    cheap = any(w in a for w in ('cheap', 'money', 'cost', 'save', 'budget', 'slow', 'one builder', 'sasta', 'kam'))
+    fast = any(w in a for w in ('fast', 'quick', 'speed', 'soon', 'jaldi', 'asap'))
+    return 'cheap' if cheap and not fast else 'fast' if fast and not cheap else None
+
+def builders(t_g_seconds, cpus=None, decisions=None, cap=CAP, parts=None, pace=None):
+    """(N, why): the number of builders for this project, and which limit set it, in plain words. pace='cheap' (the
+    owner's choice, Gate 50: one builder is the cheapest way) means one builder whatever the other limits allow."""
+    if pace == 'cheap':
+        return 1, 'you asked for the cheapest builds'
     cpus = cpus or os.cpu_count() or 2
     t_g = max(t_g_seconds, 1) / 60
     limits = {

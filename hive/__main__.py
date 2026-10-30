@@ -10,6 +10,7 @@ For the owner:
   hive listen                            stay on Telegram: change your mind, "build: ...", "status"
   hive rules [forget <n>]                your standing rulings for this project
   hive name ["Sunny Shop"]               what Hive calls this project (your startup's name)
+  hive pace [fast|cheap]                 build fast (more builders, more cost) or cheap (one builder)
   hive setup                             first run: checks, then your phone, voice and a backup model
   hive doctor                            check this machine and project are ready
   hive telegram setup | test | call <name>   connect your phone; how Hive addresses you
@@ -35,7 +36,7 @@ For the builders, inside a run:
 """
 import argparse, json, os, sys
 
-from . import claims, guard, owner, start, swarm, telegram
+from . import claims, guard, law, owner, start, swarm, telegram
 
 class Parser(argparse.ArgumentParser):
     """argparse, with plain answers to mistakes: the closest real option ("did you mean --goal?") and this command's
@@ -150,6 +151,7 @@ def build_parser():
     tg.add_argument('address', nargs='?'); tg.add_argument('--out'); tg.add_argument('--intro')
     lm = sub.add_parser('llm'); lm.add_argument('action', choices=['setup'])
     sub.add_parser('name').add_argument('name', nargs='*')
+    sub.add_parser('pace').add_argument('choice', nargs='?', choices=['fast', 'cheap'])
     ru = sub.add_parser('rules'); ru.add_argument('action', nargs='?', choices=['forget']); ru.add_argument('n', nargs='?', type=int)
     i = sub.add_parser('init'); i.add_argument('--test-cmd', required=True); i.add_argument('--junit', default='.hive/junit.xml')
     c = sub.add_parser('claim'); c.add_argument('name'); c.add_argument('areas'); c.add_argument('desc')
@@ -205,6 +207,14 @@ def main(argv=None):
             memory.set_name('.', ' '.join(a.name)); print(f"Got it: I'll call this project {' '.join(a.name)}."); return 0
         n = memory.project_name('.')
         print(f'This project is {n}.' if n else "No name yet. Tell me your startup's name: hive name \"Sunny Shop\""); return 0
+    if a.cmd == 'pace':   # the owner's standing speed-or-money choice (Gate 50); `hive start` asks it once
+        if a.choice:
+            law.set_pace(a.choice)
+        p = law.pace()
+        print({'fast': 'Fast: I use as many builders as help (more speed, more cost).',
+               'cheap': 'Cheap: I use one builder (the lowest cost, slower).'}.get(p, 'Not chosen yet: I use as many '
+              'builders as help, and ask you once at the next build.') + ' Change it with `hive pace fast` or `hive pace cheap`.')
+        return 0
     if a.cmd == 'rules':
         from . import memory
         return memory.forget('.', a.n or 0) if a.action == 'forget' else memory.show('.')

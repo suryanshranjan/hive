@@ -90,6 +90,7 @@ You can also message it any time, in English, Hindi-English or with typos:
 | `hive listen` | Stay on Telegram as your Jarvis: start, steer and stop builds and builders, rules, status, cloud |
 | `hive rules` | Your standing rulings for this project (`hive rules forget 3` drops one) |
 | `hive name "Sunny Shop"` | What Hive calls this project: your startup's name (guessed from package.json or the README until you set it) |
+| `hive pace fast` or `hive pace cheap` | Build fast (as many builders as help, about 2–3× sooner for about 2× the cost, Gate 50) or cheap (one builder). Asked once at the first `hive start` that would use more than one builder |
 | `hive cloud --new` / `--stop` | Make a machine on your AWS account and move Hive there; delete it when done |
 | `hive cloud --to user@host` / `hive cloud pull` | Move Hive to a server you already have; bring results back |
 | `hive setup` | First run: checks, then your phone, voice notes and a backup model |

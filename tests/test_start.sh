@@ -72,6 +72,15 @@ printf 'Implement creator fees and payouts.\n' | $PY -m hive start --overnight -
 check "documents are read, and the builders get them with the rule that silence is unknown" \
   "$(grep -c 'read your documents' $T/docs.txt) $(grep -c -e 'A tip carries no fee' -e 'treat it as unknown' $(ls -td $T/.hive/runs/*/ | head -1)build/prompts/w1.md)" "1 2"
 check "with no --workers, the law picks the number of builders and says why" "$(grep -c "on it (" $T/docs.txt)" 1
+# fast or cheap: asked once when the law would use more than one builder (Gate 50's trade), and kept
+if grep -q "put 2 builders on it" $T/docs.txt; then
+  git checkout -q main
+  printf 'Implement creator fees and payouts.\ncheap please\n' | $PY -m hive start --no-interview > $T/pace.txt 2>&1
+  check "the owner is asked once whether to build fast or cheap, and cheap means one builder" \
+    "$(grep -c 'asked only once' $T/pace.txt) $(grep -c 'you asked for the cheapest builds' $T/pace.txt)" "1 1"
+  check "the choice is kept" "$($PY -m hive pace | grep -c '^Cheap')" 1
+  $PY -m hive pace fast > /dev/null
+fi
 # a usage limit overnight: the owner is told when it picks up again, and the build still finishes
 git checkout -q main
 printf 'Implement creator fees and payouts.\n' | HIVE_RESUME_MIN=1 HIVE_WORKER_CMD="sh $HIVE/tests/fake_limited_worker.sh" \
