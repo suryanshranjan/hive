@@ -1,0 +1,17 @@
+hidden categories left out: ['median', 'percentile', 'transactions']
+team  t95(min)  tdone(min)  visible  hidden   cost   (first wave / sonnet / opus / lead)  escalation waves  breaks
+H         9.4      10.8     1340   99.4%  $ 4.89  (4.89 / 0.00 / 0.00 / 0.00)   0   0
+OHE      11.2      13.7     1340   99.7%  $ 5.56  (4.25 / 0.00 / 0.00 / 1.30)   0   0
+S         5.3       5.3     1340   99.8%  $ 5.01  (5.01 / 0.00 / 0.00 / 0.00)   0   0
+HE       11.2      11.5     1340   99.9%  $ 5.13  (5.13 / 0.00 / 0.00 / 0.00)   0   0
+OH       11.6      12.4     1340   99.8%  $ 5.20  (4.24 / 0.00 / 0.00 / 0.97)   0   0
+
+predictions
+D1 H reaches 1,340 visible: 1340 -> held
+D2 OH t95 ≤ 0.8 × H's: 11.6 vs 9.4 -> failed
+D3 HE finishes, hidden within 1 of S, cost ≤ 0.6 × S: tdone 11.5, hidden 99.9 vs 99.8, cost 1.02× S -> failed
+D4 OHE the same: tdone 13.7, hidden 99.7, cost 1.11× S -> failed
+D5 OHE costs ≥ HE: $5.56 vs $5.13 -> held
+Cheap pace = Haiku + escalation: did not fire
+The Opus planner too: did not fire
+Kill (Sonnet builders stay): FIRED

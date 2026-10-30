@@ -1,0 +1,71 @@
+[17:58:36] predictions registered on origin/main: gates/gate64/prompts/PREDICTIONS.md
+H: 4 workers, tools/ask.py port None, repo /home/claude/hive/runs/g64/upH.git
+next: python3 lab/launch.py --run g64
+[17:58:37] launching H alone (4 Haiku builders)
+launched H-w1 
+launched H-w2 
+launched H-w3 
+launched H-w4 
+H-w2 finished: exit 0, 11.3 min, tokens 18706214, cost 1.1392180499999998
+H-w1 finished: exit 0, 11.8 min, tokens 18101223, cost 1.14497566
+H-w3 finished: exit 0, 12.7 min, tokens 20678313, cost 1.2836096200000002
+H-w4 finished: exit 0, 13.4 min, tokens 21100513, cost 1.3225252400000003
+wrote /home/claude/hive/runs/g64/agents.csv
+OHE: 4 workers, tools/ask.py port None, repo /home/claude/hive/runs/g64/upOHE.git
+next: python3 lab/launch.py --run g64
+[18:12:01] OHE: Opus lead started; waiting for the plan on main
+[18:13:16] OHE: plan on main after 75 s; launching 4 Haiku builders
+launched OHE-w1 
+launched OHE-w2 
+launched OHE-w3 
+launched OHE-w4 
+OHE-w3 finished: exit 0, 11.7 min, tokens 20127561, cost 1.2993020100000006
+OHE-w2 finished: exit 0, 14.0 min, tokens 13686065, cost 0.7960826900000002
+OHE-w1 finished: exit 0, 15.3 min, tokens 17202679, cost 1.0842883700000008
+OHE-w4 finished: exit 0, 15.7 min, tokens 15319090, cost 1.07492617
+wrote /home/claude/hive/runs/g64/agents.csv
+[18:29:02] OHE: 1340/1340 visible pass
+S: 4 workers, tools/ask.py port None, repo /home/claude/hive/runs/g64/upS.git
+next: python3 lab/launch.py --run g64
+[18:29:03] launching S alone (4 Sonnet builders)
+launched S-w1 
+launched S-w2 
+launched S-w3 
+launched S-w4 
+S-w4 finished: exit 0, 6.7 min, tokens 4873075, cost 1.1888843000000002
+S-w3 finished: exit 0, 7.2 min, tokens 3979403, cost 1.133152
+S-w1 finished: exit 0, 8.1 min, tokens 3540387, cost 1.1884005
+S-w2 finished: exit 0, 8.6 min, tokens 5132565, cost 1.5000585000000002
+wrote /home/claude/hive/runs/g64/agents.csv
+HE: 4 workers, tools/ask.py port None, repo /home/claude/hive/runs/g64/upHE.git
+next: python3 lab/launch.py --run g64
+[18:37:42] launching HE alone (4 Haiku builders)
+launched HE-w1 
+launched HE-w2 
+launched HE-w3 
+launched HE-w4 
+HE-w4 finished: exit 0, 11.7 min, tokens 20593403, cost 1.30692635
+HE-w1 finished: exit 0, 12.3 min, tokens 16560984, cost 1.0616318099999997
+HE-w2 finished: exit 0, 14.5 min, tokens 21369786, cost 1.28983481
+HE-w3 finished: exit 0, 15.0 min, tokens 23011950, cost 1.4743683300000006
+wrote /home/claude/hive/runs/g64/agents.csv
+[18:52:47] HE: 1340/1340 visible pass
+OH: 4 workers, tools/ask.py port None, repo /home/claude/hive/runs/g64/upOH.git
+next: python3 lab/launch.py --run g64
+[18:52:48] OH: Opus lead started; waiting for the plan on main
+[18:54:08] OH: plan on main after 80 s; launching 4 Haiku builders
+launched OH-w1 
+launched OH-w2 
+launched OH-w3 
+launched OH-w4 
+OH-w1 finished: exit 0, 11.2 min, tokens 15030742, cost 0.9149416999999997
+OH-w3 finished: exit 0, 11.7 min, tokens 14858767, cost 1.0207826000000004
+OH-w2 finished: exit 0, 12.0 min, tokens 14966808, cost 0.9916683900000004
+OH-w4 finished: exit 0, 13.3 min, tokens 20647439, cost 1.3117501
+wrote /home/claude/hive/runs/g64/agents.csv
+[19:07:33] H: visible 1340/1340, hidden 2247/2260; replaying
+[19:08:35] OHE: visible 1340/1340, hidden 2254/2260; replaying
+[19:09:49] S: visible 1340/1340, hidden 2255/2260; replaying
+[19:10:06] HE: visible 1340/1340, hidden 2257/2260; replaying
+[19:10:59] OH: visible 1340/1340, hidden 2255/2260; replaying
+[19:12:02] done: python3 gates/gate64/referee/analyze.py runs/g64
