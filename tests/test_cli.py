@@ -84,7 +84,7 @@ os.environ.pop('HIVE_WORKER_CMD'); os.environ.pop('HIVE_AGENT')
 # has no command-line mode, so the antigravity preset cannot run here)
 import shutil as _sh
 _which = _sh.which
-_sh.which = lambda exe: None if exe in ('agy', 'gemini') else _which(exe)
+_sh.which = lambda exe: None if exe in ('agy', 'gemini') else '/usr/bin/' + exe   # this machine has Claude and Codex only
 check('agents missing here are found before a build', swarm.missing_agents('claude,antigravity,gemini'), ['antigravity', 'gemini'])
 check('and Antigravity says why, pointing to Gemini', 'use --agent gemini' in swarm.AGENT_HELP['antigravity'], True)
 _sh.which = _which
