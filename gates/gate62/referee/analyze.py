@@ -7,14 +7,15 @@ G3  the Sonnet replicate's recall is within 0.10 of Gate 60's B (a check that sa
 G4  every wing with recall >= 0.35 has precision >= 0.50
 Go (a new owner test with that wing as the second build): some other-model wing reaches recall >= 0.50 with precision >= 0.50.
 Stop (two wings is not worth an owner test): no wing reaches recall 0.35."""
-import collections, json, os, sys
+import collections, gzip, json, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(os.path.dirname(HERE), '..', 'gate60', 'referee'))
 import wings
 tot = collections.defaultdict(collections.Counter)
 for d in sys.argv[1:]:
     r = json.load(open(os.path.join(d, 'results.json')))
-    out = {w: json.load(open(os.path.join(d, f'out_{w}.json'))) for w in ('N0', 'B', 'So', 'Op', 'Ha', 'policy')}
+    out = {w: json.load(gzip.open(p + '.gz')) if os.path.exists(p + '.gz') else json.load(open(p))
+           for w, p in ((w, os.path.join(d, f'out_{w}.json')) for w in ('N0', 'B', 'So', 'Op', 'Ha', 'policy'))}
     A, O = out['N0'], out['policy']
     wrong = {i for i, (a, o) in enumerate(zip(A, O)) if a and o and not wings.same(a, o)}
     print(f"== {d} ({r['src']}): N0 wrong on {len(wrong)} of {len(A)} calls; hidden calls right: "

@@ -1,0 +1,25 @@
+== runs/g62a (g60a): N0 wrong on 108 of 300 calls; hidden calls right: So 473/700, Op 473/700, Ha 467/700, N0 484/700, B 467/700
+  B: disagrees on 46; recall 0.16; precision 0.37
+  So: disagrees on 43; recall 0.16; precision 0.40
+  Op: disagrees on 58; recall 0.27; precision 0.50
+  Ha: disagrees on 51; recall 0.20; precision 0.43
+== runs/g62b (g60b): N0 wrong on 135 of 300 calls; hidden calls right: So 436/700, Op 426/700, Ha 429/700, N0 443/700, B 426/700
+  B: disagrees on 31; recall 0.22; precision 0.97
+  So: disagrees on 12; recall 0.08; precision 0.92
+  Op: disagrees on 33; recall 0.23; precision 0.94
+  Ha: disagrees on 34; recall 0.20; precision 0.79
+
+== pooled
+B: recall 0.19 (47 of 243), precision 0.61, disagreements 77
+So: recall 0.12 (28 of 243), precision 0.51, disagreements 55
+Op: recall 0.25 (60 of 243), precision 0.66, disagreements 91
+Ha: recall 0.20 (49 of 243), precision 0.58, disagreements 85
+union: recall 0.29 (70 of 243), precision 0.63, disagreements 111
+
+predictions
+G1 Haiku recall ≥ 0.35: 0.20 -> failed
+G2 Opus recall ≥ Sonnet replicate + 0.10: 0.25 vs 0.12 -> held
+G3 Sonnet replicate within 0.10 of B: 0.12 vs 0.19 -> held
+G4 wings with recall ≥ 0.35 have precision ≥ 0.50:  -> held
+Go: did not fire
+Stop: FIRED

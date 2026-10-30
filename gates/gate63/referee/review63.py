@@ -55,4 +55,4 @@ def main(src, oracle):
     say(f'{name} done')
 
 if __name__ == '__main__':
-    main(sys.argv[1], sys.argv[2])
+    main(sys.argv[1], os.path.abspath(sys.argv[2]))   # the probes run from '/'
