@@ -1,0 +1,14 @@
+{
+ "name": "g57",
+ "predictions": "gates/gate57/prompts/PREDICTIONS.md",
+ "rulegiver_brief": "gates/gate57/prompts/rulegiver_brief.md",
+ "require_decisions": true,
+ "prompt": "gates/gate57/prompts/prompt_builder.md",
+ "ask_texts": "runs/g57/ask_texts.md",
+ "visible_seed": 57100,
+ "hidden_seed": 57200000,
+ "baseline": "N0",
+ "pre_launch": ["python3 gates/gate57/referee/review57.py pre {run} {oracle}"],
+ "after_baseline": ["python3 gates/gate57/referee/review57.py after {run} {oracle} {base}"],
+ "arms": ["N0:3:none", "SL:3:none", "SP:3:none"]
+}
