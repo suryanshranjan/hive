@@ -2,12 +2,13 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 30 2026 IST, after Gate 61; Gate 62 running; Gate 45 day 2 still next with the founder)
+## Where we left off (Oct 30 2026 IST, after Gate 62; Gate 63 running; Gate 45 day 2 still next with the founder)
 
 - **Gate 60 done** (the user, travelling: "Run the tests as required"): two wings. The cases where two independent builds disagree did not find the owner's decisions: pooled over two rule sets, 20 of 50 decisions right vs 26 for Gate 58's spot checks, from 10 cases vs 29. Two Claude builds disagree on only 19% of the first build's errors. Kill fired; the spotter stays. Gate 58 replicated. Found: on the fresh rule set the skimmer touched every function in the list review, so the skip rule showed him no spot checks (BRAIN §8, 000c).
 - **Fast or cheap (product, no gate):** `hive pace fast|cheap`, asked once at the first `hive start` that would use more than one builder; cheap means one builder.
 - **Gate 61 done:** the flight log. Six 2-builder teams cleaned up a careful owner's code; none broke any of 700 hidden calls, with or without the owner's confirmed outcomes as tests. Kill fired; no product change.
-- **Gate 62 (registered, running; mechanical, no owner):** does a second build from a different model (Opus, Haiku) disagree more where the first is wrong?
+- **Gate 62 done:** a second build from Opus or Haiku disagrees with the first on at most 25% of its errors (all three extra models 29%); stop fired; two wings is closed for Claude models.
+- **Gate 63 (registered, running):** spot checks on the parts the list review touched, too (Gate 60's skip-rule finding). Its first g60a attempt stopped at the probe on the same relative-path fault; rerun from scratch.
 
 ## Earlier (Oct 31 2026, after Gate 58)
 

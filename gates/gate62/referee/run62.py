@@ -21,21 +21,26 @@ WINGS = {'So': 'sonnet', 'Op': 'opus', 'Ha': 'haiku'}
 
 def main(src, oracle):
     run_gate.prereg_check('gates/gate62/prompts/PREDICTIONS.md')
-    name = 'g62' + src[-1]; run = os.path.join(ROOT, 'runs', name); shutil.rmtree(run, ignore_errors=True); os.makedirs(run)
+    score_only = os.environ.get('G62_SCORE_ONLY') == '1'   # rescoring finished builds after a referee fault (disclosed)
+    name = 'g62' + src[-1]; run = os.path.join(ROOT, 'runs', name)
+    if not score_only:
+        shutil.rmtree(run, ignore_errors=True); os.makedirs(run)
     o = intent.load_oracle(oracle); agg = intent.Gen(o).AGG or ''
     asks = os.path.join(run, 'ask_texts.md')
-    open(asks, 'w').write(''.join(f'## {w}\n{wt.NO_OWNER} Work from the spec and the examples.\n\n' for w in WINGS))
+    os.path.exists(asks) and score_only or open(asks, 'w').write(''.join(f'## {w}\n{wt.NO_OWNER} Work from the spec and the examples.\n\n' for w in WINGS))
     cmd = [sys.executable, os.path.join(ROOT, 'lab', 'make_swarm.py'), '--run', name, '--seed', os.path.join(ROOT, 'runs', src, 'seed'),
            '--prompt', os.path.join(ROOT, 'gates', 'gate60', 'prompts', 'prompt_builder.md'), '--ask-texts', asks,
            '--example-file', os.path.join(ROOT, 'runs', src, 'example.txt')]
     for w in WINGS: cmd += ['--arm', f'{w}:3:none']
-    subprocess.run(cmd, check=True, cwd=ROOT)
+    if not score_only:
+        subprocess.run(cmd, check=True, cwd=ROOT)
     def go(w):
         env = dict(os.environ, HIVE_WORKER_CMD=f'{BASE} --model {WINGS[w]}')
         subprocess.run([sys.executable, os.path.join(ROOT, 'lab', 'launch.py'), '--run', name, '--arm', w], env=env, cwd=ROOT)
     say(f'{name}: building So, Op, Ha (3 builders each) from runs/{src}/seed...')
     ts = [threading.Thread(target=go, args=(w,)) for w in WINGS]
-    [t.start() for t in ts]; [t.join() for t in ts]
+    if not score_only:
+        [t.start() for t in ts]; [t.join() for t in ts]
     calls = os.path.join(ROOT, 'private', src, 'wings', 'calls.json')
     res = {}
     for w in list(WINGS) + ['N0', 'B']:
@@ -59,4 +64,4 @@ def main(src, oracle):
     say(f'{name} done: ' + ', '.join(f"{w} {v['hidden_calls_right']}/{v['hidden_calls']}" for w, v in res.items()))
 
 if __name__ == '__main__':
-    main(sys.argv[1], sys.argv[2])
+    main(sys.argv[1], os.path.abspath(sys.argv[2]))   # the probes run from '/'
