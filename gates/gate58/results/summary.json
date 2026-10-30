@@ -1,0 +1,46 @@
+{
+ "name": "g58",
+ "arms": {
+  "N0": {
+   "hidden_pass": 0.368,
+   "ci95_by_function": [
+    0.216,
+    0.544
+   ],
+   "tests": 250
+  },
+  "SL": {
+   "hidden_pass": 0.432,
+   "ci95_by_function": [
+    0.288,
+    0.596
+   ],
+   "tests": 250
+  },
+  "CB": {
+   "hidden_pass": 0.588,
+   "ci95_by_function": [
+    0.444,
+    0.728
+   ],
+   "tests": 250
+  }
+ },
+ "diffs": {
+  "SL-N0": {
+   "points": 6.4,
+   "ci95": [
+    1.6,
+    12.8
+   ]
+  },
+  "CB-N0": {
+   "points": 22.0,
+   "ci95": [
+    13.6,
+    31.2
+   ]
+  }
+ },
+ "allowance": {}
+}
