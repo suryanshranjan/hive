@@ -4,7 +4,7 @@
 set -u
 python3 -c '' 2>/dev/null && PY=python3 || PY=python; export PY   # Windows has python, not python3
 [ "$PY" = python ] && export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false   # Windows: test repos keep LF
-HIVE=$(pwd -W 2>/dev/null || pwd); T=$(mktemp -d); TW=$(cd "$T" && (pwd -W 2>/dev/null || pwd)); export PYTHONPATH=$HIVE HOME=$T USERPROFILE="$TW" HIVE_WORKER_CMD="sh $HIVE/tests/fake_assuming_worker.sh" HIVE_EXPLAIN_CMD="$PY $HIVE/tests/fake_explain.py" HIVE_DESCRIBE_CMD="$PY $HIVE/tests/fake_describe.py"
+HIVE=$(pwd -W 2>/dev/null || pwd); T=$(mktemp -d); TW=$(cd "$T" && (pwd -W 2>/dev/null || pwd)); export PYTHONPATH=$HIVE HOME=$T USERPROFILE="$TW" HIVE_WORKER_CMD="sh $HIVE/tests/fake_assuming_worker.sh" HIVE_EXPLAIN_CMD="$PY $HIVE/tests/fake_explain.py" HIVE_DESCRIBE_CMD="$PY $HIVE/tests/fake_describe.py" HIVE_SPOT_CMD="$PY $HIVE/tests/fake_spot.py"
 fail=0; check() { if [ "$2" = "$3" ]; then echo "ok   $1"; else echo "FAIL $1 (got $2, expected $3)"; fail=1; fi; }
 cd "$T" || exit 1
 git init -q -b main project && cd project && git config user.email t@t && git config user.name t
@@ -85,4 +85,5 @@ printf 'Implement creator fees and payouts.\nA\nOnly charge a late fee after a w
 check "with a code sheet, it exits cleanly" $? 0
 check "the assumptions are covered by the code sheet, not reviewed one by one" \
   "$(grep -c "Rather than going through them one by one" $T/sheet.txt) $(grep -c "Assumption 1 of" $T/sheet.txt) $(grep -c "What the build does now, as rules" $T/sheet.txt)" "1 0 1"
+check "after the rules, spot checks on concrete cases of the parts his review left alone (Gate 58)"   "$(grep -c "quick check.* on what the build does in real cases" $T/sheet.txt) $(grep -q "2 of 2." $T/sheet.txt && echo shown)" "1 shown"
 rm -rf $T; exit $fail

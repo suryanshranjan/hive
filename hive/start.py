@@ -5,7 +5,7 @@ and their assumptions to the owner in plain words, sends back what the owner cor
 over a branch. The owner's own branches are never changed: the result arrives as a new branch, hive/<name>."""
 import csv, glob, json, os, re, shlex, shutil, subprocess, sys, threading, time
 
-from . import PY, codesheet, docs as docs_mod, explain, interview, junit, law, memory, owner, swarm, telegram
+from . import PY, codesheet, docs as docs_mod, explain, interview, junit, law, memory, owner, spotcheck, swarm, telegram
 from .guard import sh
 
 RUNS = os.path.join(os.path.expanduser('~'), '.hive', 'runs')
@@ -486,7 +486,12 @@ def handover(state, ch=None, poll=20, rounds=3, sheet=None):
                                        note='Each one is what the product will do. Mark any that is not your policy.',
                                        missing=True, goal=state.get('goal', ''), code=state.get('sheet_source'),
                                        save=state.get('home') and os.path.join(state['home'], 'sheet_review.json'))   # resumes
-        if state.get('sheet_source'):
+        if state.get('sheet_source'):   # Gate 58: spot checks on every part his review left as it was
+            mine = lambda rules, p: [r for r in rules if r.startswith(p)]
+            untouched = [p for p in spotcheck.parts_of(done) if mine(show, p) == mine(done, p)]
+            spots = spotcheck.find(state['sheet_source'], state.get('goal', ''), untouched)
+            done, state['spot_checks'] = spotcheck.review(done, spots, ch, None if ch else (lambda p: _ask(p, '')), poll,
+                                                          code=state['sheet_source'], goal=state.get('goal', ''))
             shutil.rmtree(state.pop('sheet_source'), ignore_errors=True)
         changed = [r for r in done if r not in sheet]
         if not changed:

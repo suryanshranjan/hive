@@ -1,0 +1,92 @@
+[06:47:56] predictions registered on origin/main: gates/gate58/prompts/PREDICTIONS.md
+[06:47:56] reusing oracle gates/gate55/referee/oracle.py (test mode)
+[06:47:56] rules checked: 10 functions, 138 calls, deterministic
+[06:47:56] declared decisions per function: 1:2, 2:3, 3:3, 4:2
+[06:47:57] starting repo and hidden suite built
+[06:47:57] pre-launch: python3 gates/gate58/referee/review58.py pre {run} {oracle}
+[06:47:57] wind tunnel: documenter writing the owner's policy in prose...
+[06:48:58] wind tunnel: R: 52 rules; ask text for N0 written
+[06:48:58] stage 1: N0 alone
+N0: 3 workers, tools/ask.py port None, repo /home/node/hive/runs/g58/upN0.git
+next: python3 lab/launch.py --run g58
+[06:48:58] launching workers...
+launched N0-w1 
+launched N0-w2 
+launched N0-w3 
+N0-w1 finished: exit 0, 1.5 min, tokens 608330, cost 0.5362214000000001
+N0-w2 finished: exit 0, 1.6 min, tokens 828566, cost 0.5999422000000001
+N0-w3 finished: exit 0, 1.8 min, tokens 746085, cost 0.581389
+wrote /home/node/hive/runs/g58/agents.csv
+[06:50:47] after N0: python3 gates/gate58/referee/review58.py after {run} {oracle} {base}
+[06:54:35] wind tunnel: D: 107 rules; 48 spot checks over 10 functions
+[06:54:41] wind tunnel: SL owner #1: '36, 47, 65, 88'
+[06:54:45] wind tunnel: SL owner #2: '2% for every started 30 days, no stopping at 6%, capped at 20%.'
+[06:54:58] wind tunnel: SL owner #3: 'Gold up to 20000, platinum from 20000 up.'
+[06:55:08] wind tunnel: SL owner #4: 'Never past midnight, cap it at 23:59.'
+[06:55:17] wind tunnel: SL owner #5: "Don't strip the 1; only exactly 10 digits get formatted, otherwise give back wha"
+[06:55:29] wind tunnel: SL owner #6: ''
+[06:55:29] wind tunnel: SL: 107 rules after review, 6 replies, 0.9 min
+[06:55:34] wind tunnel: CB spot #1: ''
+[06:55:38] wind tunnel: CB spot #2: ''
+[06:55:44] wind tunnel: CB spot #3: ''
+[06:55:50] wind tunnel: CB spot #4: 'No, we round totals to the nearest 5 cents, so 189.90.'
+[06:56:14] wind tunnel: CB spot #5: 'No, it should still give a total: 25 dollars.'
+[06:56:35] wind tunnel: CB spot #6: ''
+[06:56:39] wind tunnel: CB spot #7: 'No, March 27 to 31 is year-end close: FY2026-CLOSE, not Q4.'
+[06:56:59] wind tunnel: CB spot #8: ''
+[06:57:04] wind tunnel: CB spot #9: ''
+[06:57:08] wind tunnel: CB spot #10: ''
+[06:57:13] wind tunnel: CB spot #11: ''
+[06:57:19] wind tunnel: CB spot #12: ''
+[06:57:27] wind tunnel: CB spot #13: "No, don't pad short codes; use just the digits given."
+[06:57:59] wind tunnel: CB spot #14: 'No, compute from the 8 digits it has: check digit 1.'
+[06:58:25] wind tunnel: CB spot #15: 'No, drop the cut word: just "summer".'
+[06:58:46] wind tunnel: CB spot #16: 'No, an empty address is no good: make it "untitled".'
+[06:59:11] wind tunnel: CB spot #17: 'No, the & should become "and": tom-and-jerry-s-toys.'
+[06:59:33] wind tunnel: CB spot #18: ''
+[06:59:37] wind tunnel: CB spot #19: 'No, never leave it empty: make it "untitled".'
+[06:59:58] wind tunnel: CB spot #20: 'Should show 0% when last month was zero.'
+[07:00:18] wind tunnel: CB spot #21: ''
+[07:00:24] wind tunnel: CB spot #22: ''
+[07:00:30] wind tunnel: CB spot #23: ''
+[07:00:36] wind tunnel: CB spot #24: ''
+[07:00:40] wind tunnel: CB spot #25: ''
+[07:00:45] wind tunnel: CB spot #26: ''
+[07:00:52] wind tunnel: CB spot #27: ''
+[07:00:55] wind tunnel: CB spot #28: ''
+[07:01:01] wind tunnel: CB spot #29: ''
+[07:01:01] wind tunnel: CB: list 6 replies; 29 spot checks (4 functions changed by the list skipped), 10 corrected, 9 confirmed on re-show
+[07:01:01] wind tunnel: judge labelling every declared decision...
+[07:02:40] wind tunnel: ask texts for SL and CB written
+[07:02:40] stage 2: SL, CB
+SL: 3 workers, tools/ask.py port None, repo /home/node/hive/runs/g58/upSL.git
+CB: 3 workers, tools/ask.py port None, repo /home/node/hive/runs/g58/upCB.git
+next: python3 lab/launch.py --run g58
+[07:02:41] launching workers...
+launched CB-w1 
+launched CB-w2 
+launched CB-w3 
+launched SL-w1 
+launched SL-w2 
+launched SL-w3 
+SL-w1 finished: exit 0, 1.7 min, tokens 754558, cost 0.6423772000000001
+CB-w3 finished: exit 0, 1.9 min, tokens 867178, cost 0.6960066000000001
+SL-w2 finished: exit 0, 1.9 min, tokens 788750, cost 0.6874548
+SL-w3 finished: exit 0, 2.1 min, tokens 930512, cost 0.7672643999999998
+CB-w1 finished: exit 0, 2.2 min, tokens 978193, cost 0.8010442
+CB-w2 finished: exit 0, 2.8 min, tokens 1177332, cost 0.9560636
+wrote /home/node/hive/runs/g58/agents.csv
+[07:05:34] scoring every arm call by call...
+# g58: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 36.8% | 21.6%–54.4% |
+| SL | 43.2% | 28.8%–59.6% |
+| CB | 58.8% | 44.4%–72.8% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| SL-N0 | +6.4 | +1.6 to +12.8 |
+| CB-N0 | +22.0 | +13.6 to +31.2 |
+[07:05:35] done. Next: write the gate RESULTS.md from runs/g58/summary.md, update BRAIN.md and lab/QUEUE.md, push.

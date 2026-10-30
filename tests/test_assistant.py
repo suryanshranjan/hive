@@ -572,6 +572,50 @@ check('a note from a shared page is filed under the area it is about',
       interview._area_of(vr, 'make the verification window 45 days', 'Referral rewards · Referral limit · Verification'),
       'Verification')
 
+# 3q6. spot checks after the rules (Gate 58): each correction applied to its own part only, the case shown again,
+# a question answered first, a second correction when he still disagrees; on the phone and in the terminal
+from hive import spotcheck
+rules = ['Late fees: the fee is 2% of the amount for every 30 days late.', 'Late fees: the fee is rounded down to the rupee.',
+         'Bulk price: 10 units or more get 5% off.']
+check('the parts are read from the rules', spotcheck.parts_of(rules), ['Late fees', 'Bulk price'])
+def spotter(prompt):
+    if 'He said: "No, the first 7 days are free"' in prompt or 'What he said: No, the first 7 days are free' in prompt:
+        return {'changes': [{'n': 1, 'rule': 'Late fees: the first 7 days are free; after that 2% for every 30 days late.'}], 'new': []}
+    if 'What he said: and 0 on day 7 too' in prompt:
+        return {'changes': [{'n': 1, 'rule': 'Late fees: up to and including day 7 is free; after that 2% for every 30 days late.'}]}
+    if 'Bulk price' in prompt and 'What he said' in prompt:
+        return {'changes': [{'n': 3, 'rule': 'WRONG PART TOUCHED'}]}
+    if 'by following these rules alone' in prompt and 'first 7 days are free' in prompt:
+        return {'say': "Ravi's 100-rupee invoice, 5 days late: the fee comes to 0."}
+    if 'by following these rules alone' in prompt:
+        return {'say': "Ravi's 100-rupee invoice, 7 days late: the fee comes to 0."}
+    return _aj(prompt)
+explain.ask_json = spotter
+spots = [{'part': 'Late fees', 'say': "Ravi's 100-rupee invoice, 5 days late: the fee comes to 2 rupees."},
+         {'part': 'Bulk price', 'say': 'Asha orders 10 units at 100 rupees: she pays 950.'}]
+_ex = interview._explain
+interview._explain = lambda ch, a, rules_text, goal, code=None: 'It means the fee starts on day one.'
+fake = FakeTelegram([say('what does that mean?'), say('No, the first 7 days are free'), tap('sc|ok'), tap('sc|ok')])
+out, rec = spotcheck.review(list(rules), spots, ch(fake), poll=1)
+texts = [m['text'] for m in fake.sent]
+check('phone: a question is answered first, the correction applied to its own part, the case shown again and confirmed',
+      (any('It means the fee starts on day one.' in t for t in texts),
+       any("With your correction: Ravi's 100-rupee invoice, 5 days late: the fee comes to 0." in t for t in texts),
+       out[0], out[2], rec[0]['confirmed'], len(rec)),
+      (True, True, 'Late fees: the first 7 days are free; after that 2% for every 30 days late.', rules[2], True, 1))
+said = iter(['No, the first 7 days are free', 'and 0 on day 7 too', ''])
+out, rec = spotcheck.review(list(rules), spots[:1], ask=lambda p: next(said))
+check('terminal: still wrong on re-show, his second correction is applied too',
+      (out[0], rec[0]['confirmed'], rec[0]['said_again']),
+      ('Late fees: up to and including day 7 is free; after that 2% for every 30 days late.', False, 'and 0 on day 7 too'))
+interview._explain = _ex; explain.ask_json = _aj
+os.environ['HIVE_SPOT_CMD'] = '"' + sys.executable.replace(chr(92), '/') + '" "' + os.path.abspath('tests/fake_spot.py').replace(chr(92), '/') + '"'
+got = spotcheck.find(repo, 'Late fees', ['Late fees', 'Bulk price'])
+os.environ.pop('HIVE_SPOT_CMD')
+check('spot checks come from running a copy of the built code, one part at a time', [g['part'] for g in got], ['Late fees', 'Bulk price'])
+check('HIVE_SPOTS=0 turns them off', (os.environ.__setitem__('HIVE_SPOTS', '0'), spotcheck.find(repo, 'x', ['Late fees']),
+                                       os.environ.pop('HIVE_SPOTS'))[1], [])
+
 # 3r. "stop the build" in the middle of a build's questions stops it cleanly; it is not taken as his answer; and an
 # answer that merely contains "stop" is still an answer
 fake = FakeTelegram([say('stop the build')])
