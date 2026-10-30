@@ -1,0 +1,1163 @@
+{
+ "src": "g60b",
+ "touched": [
+  "biz_days_between",
+  "fmt_phone",
+  "grade_letter",
+  "gross_receipts",
+  "late_fee",
+  "mask_card",
+  "shipping_cost",
+  "slugify",
+  "tiered_price",
+  "weighted_rating"
+ ],
+ "shown": [
+  {
+   "function": "biz_days_between",
+   "call": "SELECT biz_days_between('2026-11-02', '2026-11-06')",
+   "got": 4,
+   "say": "Nia's order is placed on Monday 2 November and promised for Friday 6 November: the engine counts 4 working days, because the end date itself is not counted."
+  },
+  {
+   "function": "biz_days_between",
+   "call": "SELECT biz_days_between('2026-12-24', '2026-12-28')",
+   "got": 2,
+   "say": "A job starting Thursday 24 December and ending Monday 28 December, with Christmas Day in between, counts 2 working days, because public holidays are treated as ordinary working days."
+  },
+  {
+   "function": "biz_days_between",
+   "call": "SELECT biz_days_between('2026-11-06', '2026-11-02')",
+   "got": -4,
+   "say": "A job that ends on Monday 2 November but started on Friday 6 November, entered the wrong way round, shows minus 4 working days instead of an error."
+  },
+  {
+   "function": "biz_days_between",
+   "call": "SELECT biz_days_between('2026-11-02', '11/06/2026')",
+   "got": null,
+   "say": "Nia's delivery date typed as 11/06/2026 instead of year-month-day gives no answer at all, so the working-day count is left blank."
+  },
+  {
+   "function": "fmt_phone",
+   "call": "SELECT fmt_phone('1-415-555-0132')",
+   "got": "(415) 555-0132",
+   "say": "Customer Dana's number typed as 1-415-555-0132 is shown as (415) 555-0132, with the leading 1 dropped."
+  },
+  {
+   "function": "fmt_phone",
+   "call": "SELECT fmt_phone('555-0132')",
+   "got": "555-0132",
+   "say": "Dana's seven-digit number with no area code, 555-0132, is passed through exactly as typed, so it is not flagged as incomplete."
+  },
+  {
+   "function": "fmt_phone",
+   "call": "SELECT fmt_phone('415 555 0132 ext 12')",
+   "got": "415 555 0132 ext 12",
+   "say": "Dana's office number written with an extension, 415 555 0132 ext 12, is left untidied exactly as typed, because the extra digits push it past ten."
+  },
+  {
+   "function": "fmt_phone",
+   "call": "SELECT fmt_phone('(015) 555-0132')",
+   "got": "(015) 555-0132",
+   "say": "A number with an impossible area code starting in 0, (015) 555-0132, is accepted and shown unchanged as a valid-looking number."
+  },
+  {
+   "function": "fmt_phone",
+   "call": "SELECT fmt_phone('+44 20 7946 0958')",
+   "got": "+44 20 7946 0958",
+   "say": "A London customer's number, +44 20 7946 0958, is returned exactly as typed and not rejected, so non-North-American numbers pass through silently."
+  },
+  {
+   "function": "grade_letter",
+   "call": "SELECT grade_letter(90)",
+   "got": "A",
+   "say": "Priya's course score of exactly 90 earns an A, so 90 is the lowest score that gets an A."
+  },
+  {
+   "function": "grade_letter",
+   "call": "SELECT grade_letter(89.99)",
+   "got": "B",
+   "say": "Tom's score of 89.99 earns a B, not an A, so there is no rounding up to the next grade."
+  },
+  {
+   "function": "grade_letter",
+   "call": "SELECT grade_letter(105)",
+   "got": "A",
+   "say": "Priya's score of 105 with extra credit still earns an A, so scores above 100 are accepted."
+  },
+  {
+   "function": "grade_letter",
+   "call": "SELECT grade_letter('')",
+   "got": "F",
+   "say": "A student whose score was left as blank text gets an F rather than an empty grade."
+  },
+  {
+   "function": "grade_letter",
+   "call": "SELECT grade_letter(-5)",
+   "got": "F",
+   "say": "A mistyped score of minus 5 gets an F instead of being flagged as invalid."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 31)",
+   "got": 1550,
+   "say": "Ravi's 100-rupee invoice (10,000 cents) is paid 31 days late: the late fee comes to 1,550 cents, which is 15.50 rupees, charged at half a percent per day."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 400)",
+   "got": 20000,
+   "say": "Ravi's 100-rupee invoice left unpaid for 400 days is charged a late fee of 20,000 cents, twice the invoice itself, because there is no cap."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(100, 1)",
+   "got": 1,
+   "say": "A 1-rupee invoice (100 cents) paid one day late is charged 1 cent, because half a cent is rounded up and there is no minimum fee."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, -3)",
+   "got": 0,
+   "say": "Ravi's invoice paid 3 days early is charged a late fee of 0, and early payment earns no credit."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 2.5)",
+   "got": 125,
+   "say": "Ravi's invoice paid two and a half days late is charged 125 cents, because part-days are charged pro rata rather than rounded to whole days."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('4111 1111 1111 1111')",
+   "got": "************1111",
+   "say": "Ana's card 4111 1111 1111 1111 prints on the receipt as 12 stars followed by 1111, with the spaces removed."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('411')",
+   "got": "***",
+   "say": "A card number mistyped as just 411 is shown as 3 stars, so it is hidden completely and nothing flags it as too short."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('4111-1111-1111-1111-123')",
+   "got": "***************1123",
+   "say": "A card number with too many digits, 4111-1111-1111-1111-123, is accepted and shown with 15 stars then 1123, and it is not rejected."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('abcd')",
+   "got": "",
+   "say": "If a cashier types letters instead of a card number, the receipt shows an empty string, and no mask appears."
+  },
+  {
+   "function": "shipping_cost",
+   "call": "SELECT shipping_cost(1000, 2)",
+   "got": 800,
+   "say": "A parcel weighing exactly 1 kilogram to zone 2 costs 800 cents, which is 8.00."
+  },
+  {
+   "function": "shipping_cost",
+   "call": "SELECT shipping_cost(1001, 2)",
+   "got": 1000,
+   "say": "The same parcel at 1 gram over a kilogram to zone 2 costs 1,000 cents, 2.00 more, because every started kilogram is billed in full."
+  },
+  {
+   "function": "shipping_cost",
+   "call": "SELECT shipping_cost(0, 1)",
+   "got": 300,
+   "say": "A parcel weighing nothing to zone 1 still costs 300 cents, which is 3.00, because there is a base charge."
+  },
+  {
+   "function": "shipping_cost",
+   "call": "SELECT shipping_cost(500, 0)",
+   "got": null,
+   "say": "A parcel sent to zone 0 gets no price at all, which leaves the shipping charge blank."
+  },
+  {
+   "function": "shipping_cost",
+   "call": "SELECT shipping_cost(100000, 3)",
+   "got": 30900,
+   "say": "A 100-kilogram pallet to zone 3 costs 30,900 cents, which is 309.00, because there is no weight limit or cap."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('Caf\u00e9 M\u00fcnster \u2013 50% Off')",
+   "got": "cafe-munster-50-off",
+   "say": "The title 'Caf\u00e9 M\u00fcnster \u2013 50% Off' becomes the web address cafe-munster-50-off, with accents stripped and the percent sign dropped."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('\u6771\u4eac Tower')",
+   "got": "tower",
+   "say": "A product called '\u6771\u4eac Tower' becomes just tower in its web address, because the Japanese characters are silently thrown away."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('!!!')",
+   "got": "",
+   "say": "A title made only of punctuation, '!!!', produces an empty web address, which would collide with other such titles."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('  Spring   Sale  ')",
+   "got": "spring-sale",
+   "say": "The title '  Spring   Sale  ' with extra spaces becomes spring-sale, so spaces are tidied into single dashes."
+  },
+  {
+   "function": "tiered_price",
+   "call": "SELECT tiered_price(1000, 9)",
+   "got": 9000,
+   "say": "Mei orders 9 items at 10.00 each and pays 9,000 cents, which is 90.00 with no discount."
+  },
+  {
+   "function": "tiered_price",
+   "call": "SELECT tiered_price(1000, 10)",
+   "got": 9000,
+   "say": "Mei orders 10 items at 10.00 each and pays 9,000 cents, which is 90.00, so the 10% discount starts at exactly 10 items and she pays the same as for 9."
+  },
+  {
+   "function": "tiered_price",
+   "call": "SELECT tiered_price(1000, 100)",
+   "got": 90000,
+   "say": "Mei orders 100 items at 10.00 each and pays 90,000 cents, which is 900.00, so ordering ten times as many items earns no bigger discount than 10%."
+  },
+  {
+   "function": "tiered_price",
+   "call": "SELECT tiered_price(995, 10)",
+   "got": 8955,
+   "say": "Mei orders 10 items at 9.95 each and pays 8,955 cents, which is 89.55 after the 10% discount applies to the whole order."
+  },
+  {
+   "function": "tiered_price",
+   "call": "SELECT tiered_price(1000, -2)",
+   "got": null,
+   "say": "An order for minus 2 items at 10.00 gets no price, which leaves the total blank rather than a refund."
+  },
+  {
+   "function": "weighted_rating",
+   "call": "SELECT weighted_rating(5.0, 1)",
+   "got": 3.18,
+   "say": "A cafe with a single 5-star vote gets an adjusted rating of 3.18, because the score is pulled strongly toward 3."
+  },
+  {
+   "function": "weighted_rating",
+   "call": "SELECT weighted_rating(5.0, 0)",
+   "got": 3.0,
+   "say": "A new cafe with no votes shows an adjusted rating of 3.0, the default middle score."
+  },
+  {
+   "function": "weighted_rating",
+   "call": "SELECT weighted_rating(4.5, 1000)",
+   "got": 4.49,
+   "say": "A cafe averaging 4.5 stars from 1,000 votes shows 4.49, so a large number of votes barely moves the score."
+  },
+  {
+   "function": "weighted_rating",
+   "call": "SELECT weighted_rating(9, 10)",
+   "got": 6.0,
+   "say": "A mistyped average of 9 stars from 10 votes gives an adjusted rating of 6.0, which is above the 5-star maximum, because ratings are not capped."
+  },
+  {
+   "function": "weighted_rating",
+   "call": "SELECT weighted_rating(4.8, -1)",
+   "got": null,
+   "say": "A cafe with minus 1 votes gets no rating, so the score is left blank."
+  },
+  {
+   "function": "gross_receipts",
+   "call": "SELECT gross_receipts(amount) FROM p",
+   "got": 350,
+   "say": "Four payment rows of 100, 250, a refund of minus 50 and one blank add up to gross receipts of 350, because the refund is ignored instead of being subtracted."
+  },
+  {
+   "function": "gross_receipts",
+   "call": "SELECT gross_receipts(amount) FROM p WHERE amount < 0",
+   "got": 0,
+   "say": "A day with only one refund of 50 and no other payments shows gross receipts of 0, not minus 50 and not blank."
+  },
+  {
+   "function": "gross_receipts",
+   "call": "SELECT gross_receipts(amount) FROM p WHERE amount > 1000",
+   "got": 0,
+   "say": "A day with no payments at all shows gross receipts of 0 rather than a blank."
+  }
+ ],
+ "fixes": [
+  {
+   "shown": "A job starting Thursday 24 December and ending Monday 28 December, with Christmas Day in between, counts 2 working days, because public holidays are treated as ordinary working days.",
+   "said": "No. Christmas Day is never a working day, so it should be 1.",
+   "function": "biz_days_between",
+   "rounds": 1,
+   "now": "A job starting Thursday 24 December and ending Monday 28 December counts only 1 working day, not 2: Thursday the 24th counts, Christmas Day on the Friday is never a working day, the weekend is skipped and the end day is excluded, so the claim that public holidays are ordinary working days is wrong for Christmas Day.",
+   "confirmed": true
+  },
+  {
+   "shown": "A job that ends on Monday 2 November but started on Friday 6 November, entered the wrong way round, shows minus 4 working days instead of an error.",
+   "said": "No. It should be 0, never a negative count.",
+   "function": "biz_days_between",
+   "rounds": 1,
+   "now": "A job that ends on Monday 2 November but started on Friday 6 November was entered with its dates the wrong way round, so the system shows 0 working days, not minus 4 and not an error.",
+   "confirmed": true
+  },
+  {
+   "shown": "Nia's delivery date typed as 11/06/2026 instead of year-month-day gives no answer at all, so the working-day count is left blank.",
+   "said": "No. A date in the wrong format should give -1, not blank.",
+   "function": "biz_days_between",
+   "rounds": 1,
+   "now": "Nia's delivery date typed as 11/06/2026 uses slashes instead of year-month-day, so it counts as an unreadable date and the working-day count comes back as -1, not blank.",
+   "confirmed": true
+  },
+  {
+   "shown": "Dana's seven-digit number with no area code, 555-0132, is passed through exactly as typed, so it is not flagged as incomplete.",
+   "said": "No. A number without an area code should come back as an empty string, not as typed.",
+   "function": "fmt_phone",
+   "rounds": 1,
+   "now": "Dana's seven-digit number with no area code, 555-0132, is not passed through as typed: it has only 7 digits, so the phone formatter returns an empty string, which flags the number as incomplete.",
+   "confirmed": true
+  },
+  {
+   "shown": "Dana's office number written with an extension, 415 555 0132 ext 12, is left untidied exactly as typed, because the extra digits push it past ten.",
+   "said": "No. An extension should be split off and shown as (415) 555-0132 x12.",
+   "function": "fmt_phone",
+   "rounds": 1,
+   "now": "Dana's office number typed as 415 555 0132 ext 12 is tidied, not left as typed: the extension is set aside before the digits are counted, the remaining ten digits make a valid number, and the result is (415) 555-0132 x12.",
+   "confirmed": true
+  },
+  {
+   "shown": "A number with an impossible area code starting in 0, (015) 555-0132, is accepted and shown unchanged as a valid-looking number.",
+   "said": "No. An area code starting in 0 is still accepted and formatted, so it should come back as (015) 555-0132, not unchanged.",
+   "function": "fmt_phone",
+   "rounds": 1,
+   "now": "A customer's phone number written as (015) 555-0132, with an area code starting in 0, is accepted and reformatted as a normal 10-digit number, so it comes back as (015) 555-0132: it looks unchanged because it was formatted, not passed through, and no check rejects the 0 in the area code.",
+   "confirmed": true
+  },
+  {
+   "shown": "A London customer's number, +44 20 7946 0958, is returned exactly as typed and not rejected, so non-North-American numbers pass through silently.",
+   "said": "No. Non-North-American numbers should come back as an empty string, not as typed.",
+   "function": "fmt_phone",
+   "rounds": 1,
+   "now": "A London customer's number, +44 20 7946 0958, has 12 digits, so it is not a valid 10-digit number or an 11-digit number starting with 1, and it is not returned as typed or passed through: the formatter rejects it and returns an empty string.",
+   "confirmed": true
+  },
+  {
+   "shown": "Priya's course score of exactly 90 earns an A, so 90 is the lowest score that gets an A.",
+   "said": "No. 90 is a B. An A starts at 92.",
+   "function": "grade_letter",
+   "rounds": 1,
+   "now": "Priya's course score of exactly 90 is not an A, because an A needs 92 or more, so 90 falls in the 83-to-under-92 band: the software gives her a B, and the lowest score that earns an A is 92.",
+   "confirmed": true
+  },
+  {
+   "shown": "Priya's score of 105 with extra credit still earns an A, so scores above 100 are accepted.",
+   "said": "No. A score above 100 is invalid and should come back as X, not an A.",
+   "function": "grade_letter",
+   "rounds": 1,
+   "now": "Priya's score of 105 with extra credit is above 100, so it is invalid and is not accepted: the software returns 'X', not an 'A'.",
+   "confirmed": true
+  },
+  {
+   "shown": "A student whose score was left as blank text gets an F rather than an empty grade.",
+   "said": "No. Blank text isn't a number, so it should come back empty, not an F.",
+   "function": "grade_letter",
+   "rounds": 2,
+   "now": "A student whose score was left as blank text does not get an F: the score is not a number, so the grade comes back empty (NULL), and only text with no leading number, like 'abc', is treated as 0 and gets an F.",
+   "confirmed": false,
+   "said_again": "No. Text like 'abc' isn't a number either, so it should also come back empty, not an F."
+  },
+  {
+   "shown": "A mistyped score of minus 5 gets an F instead of being flagged as invalid.",
+   "said": "No. A score below 0 is invalid and should come back as X, not an F.",
+   "function": "grade_letter",
+   "rounds": 1,
+   "now": "A mistyped score of minus 5 is below 0, so it is not graded as an F: it is flagged as invalid and the grade comes back as 'X'.",
+   "confirmed": true
+  },
+  {
+   "shown": "Ravi's 100-rupee invoice left unpaid for 400 days is charged a late fee of 20,000 cents, twice the invoice itself, because there is no cap.",
+   "said": "No. There's a cap: the fee can't exceed 20% of the invoice, so it should be 2,000 cents.",
+   "function": "late_fee",
+   "rounds": 1,
+   "now": "Ravi's 100-rupee invoice (10,000 cents) left unpaid for 400 days has 395 charged days after the 5 free ones, which would come to 19,750 cents (197.50 rupees), but the fee is capped at 20% of the invoice, so the late fee comes to 2,000 cents (20 rupees), not 20,000 cents, because the cap does apply.",
+   "confirmed": true
+  },
+  {
+   "shown": "A 1-rupee invoice (100 cents) paid one day late is charged 1 cent, because half a cent is rounded up and there is no minimum fee.",
+   "said": "No. 1 day late is within the 5 free days, so the fee should be 0.",
+   "function": "late_fee",
+   "rounds": 1,
+   "now": "A 1-rupee invoice (100 cents) paid one day late falls within the first 5 free days, so nothing is charged and the minimum fee does not apply: the late fee comes to 0 cents.",
+   "confirmed": true
+  },
+  {
+   "shown": "Ravi's invoice paid two and a half days late is charged 125 cents, because part-days are charged pro rata rather than rounded to whole days.",
+   "said": "No. 2.5 days rounds down to 2, which is within the 5 free days, so the fee should be 0.",
+   "function": "late_fee",
+   "rounds": 1,
+   "now": "Ravi's invoice paid two and a half days late is not charged 125 cents: the first 5 days late are always free, and nothing in the rules charges part-days pro rata, so an invoice late by 5 days or fewer has no fee whatever its amount, and the late fee comes to 0.",
+   "confirmed": true
+  },
+  {
+   "shown": "Ana's card 4111 1111 1111 1111 prints on the receipt as 12 stars followed by 1111, with the spaces removed.",
+   "said": "No. Spaces stay in place, so it should print as **** **** **** 1111.",
+   "function": "mask_card",
+   "rounds": 1,
+   "now": "Ana's card 4111 1111 1111 1111 has 16 digits, more than 4, so the first 12 digits are masked and the last 4 are shown, and the spaces stay where they are: the receipt prints '**** **** **** 1111', with the spaces kept rather than removed.",
+   "confirmed": true
+  },
+  {
+   "shown": "A card number mistyped as just 411 is shown as 3 stars, so it is hidden completely and nothing flags it as too short.",
+   "said": "No. A card with fewer than 13 digits should come back as INVALID, not stars.",
+   "function": "mask_card",
+   "rounds": 1,
+   "now": "A card number mistyped as just 411 has only 3 digits, fewer than the 13 needed, so it is not masked to 3 stars: the software returns 'INVALID', shows no digits and no stars, and so does flag it as too short.",
+   "confirmed": true
+  },
+  {
+   "shown": "A card number with too many digits, 4111-1111-1111-1111-123, is accepted and shown with 15 stars then 1123, and it is not rejected.",
+   "said": "No. Too many digits should come back as INVALID, not stars.",
+   "function": "mask_card",
+   "rounds": 1,
+   "now": "A card number with too many digits, 4111-1111-1111-1111-123 (19 digits, more than the 16 allowed), is not accepted or masked: it is rejected as too long to be a card number, and the result is 'INVALID' with no stars and no digits shown.",
+   "confirmed": true
+  },
+  {
+   "shown": "If a cashier types letters instead of a card number, the receipt shows an empty string, and no mask appears.",
+   "said": "No. Letters aren't a card number, so it should come back as INVALID, not an empty string.",
+   "function": "mask_card",
+   "rounds": 1,
+   "now": "If a cashier types letters such as 'abcd' instead of a card number, the receipt does not show an empty string: the text has no digits but is not empty, so the card number is rejected as 'INVALID' and no mask appears.",
+   "confirmed": true
+  },
+  {
+   "shown": "A parcel sent to zone 0 gets no price at all, which leaves the shipping charge blank.",
+   "said": "No. A zone 0 should be billed as zone 3, not left blank.",
+   "function": "shipping_cost",
+   "rounds": 1,
+   "now": "A parcel sent to zone 0 still gets a price, because zone 0 is outside zones 1 to 3 and is billed as zone 3 instead of being left blank: the shipping charge is 3 x (300 + 100 x the started kilograms) cents, for example 1,200 cents for a parcel of up to 1 kg.",
+   "confirmed": true
+  },
+  {
+   "shown": "A 100-kilogram pallet to zone 3 costs 30,900 cents, which is 309.00, because there is no weight limit or cap.",
+   "said": "No. Over 30 kg is a flat 9999 whatever the zone, so it should be 9,999 cents.",
+   "function": "shipping_cost",
+   "rounds": 1,
+   "now": "A 100-kilogram pallet (100,000 g) to zone 3 is over the 30,000 g limit, so it is not priced by weight and zone but billed the flat 9999 cents, which is 99.99, not 30,900 cents (309.00), because there is a weight limit.",
+   "confirmed": true
+  },
+  {
+   "shown": "A title made only of punctuation, '!!!', produces an empty web address, which would collide with other such titles.",
+   "said": "No. It should come back as 'untitled', not an empty address.",
+   "function": "slugify",
+   "rounds": 1,
+   "now": "A page titled '!!!' has nothing left once the punctuation is turned into dashes and those dashes are trimmed away, so instead of an empty web address, the slug comes out as 'untitled'.",
+   "confirmed": true
+  },
+  {
+   "shown": "Mei orders 100 items at 10.00 each and pays 90,000 cents, which is 900.00, so ordering ten times as many items earns no bigger discount than 10%.",
+   "said": "No. 50 or more items gets 20% off, so it should be 80,000 cents (800.00).",
+   "function": "tiered_price",
+   "rounds": 1,
+   "now": "Mei's order of 100 items at 10.00 each (1,000 cents) is not billed 90,000 cents (900.00) with a 10% discount, because 100 items is 50 or more, so the whole order gets 20% off: the total comes to 80,000 cents, which is 800.00.",
+   "confirmed": true
+  },
+  {
+   "shown": "An order for minus 2 items at 10.00 gets no price, which leaves the total blank rather than a refund.",
+   "said": "No. A quantity of zero or less should give a total of 0, not blank.",
+   "function": "tiered_price",
+   "rounds": 1,
+   "now": "An order for minus 2 items at 10.00 each is not left blank and not refunded: because the quantity is zero or less, the total comes to 0.",
+   "confirmed": true
+  },
+  {
+   "shown": "A cafe with a single 5-star vote gets an adjusted rating of 3.18, because the score is pulled strongly toward 3.",
+   "said": "No. With fewer than 5 votes there's no rating, so it should come back empty, not 3.18.",
+   "function": "weighted_rating",
+   "rounds": 1,
+   "now": "A cafe with a single 5-star vote gets no adjusted rating: with only 1 vote, which is fewer than the 5 votes required, the weighted rating is not calculated and comes back NULL, not 3.18.",
+   "confirmed": true
+  },
+  {
+   "shown": "A new cafe with no votes shows an adjusted rating of 3.0, the default middle score.",
+   "said": "No. With fewer than 5 votes there's no rating, so it should come back empty, not 3.0.",
+   "function": "weighted_rating",
+   "rounds": 1,
+   "now": "A new cafe with no votes gets no adjusted rating, not a default 3.0: with fewer than 5 votes (0 included) the rating is left empty (NULL).",
+   "confirmed": true
+  },
+  {
+   "shown": "A day with only one refund of 50 and no other payments shows gross receipts of 0, not minus 50 and not blank.",
+   "said": "No. With no valid payments it should come back blank (NULL), not 0.",
+   "function": "gross_receipts",
+   "rounds": 1,
+   "now": "On a day with only one refund of 50 and no other payments, the refund is left out because gross receipts count only amounts above zero, so no valid payments remain and gross receipts show blank (not 0, and not minus 50).",
+   "confirmed": true
+  },
+  {
+   "shown": "A day with no payments at all shows gross receipts of 0 rather than a blank.",
+   "said": "No. With no payments it should come back blank (NULL), not 0.",
+   "function": "gross_receipts",
+   "rounds": 1,
+   "now": "A day with no payments at all shows gross receipts of blank (NULL), not 0: with no rows to total there are no valid amounts, so the software leaves the total blank rather than showing 0.",
+   "confirmed": true
+  }
+ ],
+ "review": {
+  "replies": 72,
+  "cost": 5.432,
+  "log": [
+   {
+    "prompt": "\nCase 1 of 45. Nia's order is placed on Monday 2 November and promised for Friday 6 November: the engine counts 4 working days, because the end date itself is not counted.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 2 of 45. A job starting Thursday 24 December and ending Monday 28 December, with Christmas Day in between, counts 2 working days, because public holidays are treated as ordinary working days.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. Christmas Day is never a working day, so it should be 1."
+   },
+   {
+    "prompt": "\n  With your correction: A job starting Thursday 24 December and ending Monday 28 December counts only 1 working day, not 2: Thursday the 24th counts, Christmas Day on the Friday is never a working day, the weekend is skipped and the end day is excluded, so the claim that public holidays are ordinary working days is wrong for Christmas Day.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 3 of 45. A job that ends on Monday 2 November but started on Friday 6 November, entered the wrong way round, shows minus 4 working days instead of an error.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. It should be 0, never a negative count."
+   },
+   {
+    "prompt": "\n  With your correction: A job that ends on Monday 2 November but started on Friday 6 November was entered with its dates the wrong way round, so the system shows 0 working days, not minus 4 and not an error.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 4 of 45. Nia's delivery date typed as 11/06/2026 instead of year-month-day gives no answer at all, so the working-day count is left blank.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. A date in the wrong format should give -1, not blank."
+   },
+   {
+    "prompt": "\n  With your correction: Nia's delivery date typed as 11/06/2026 uses slashes instead of year-month-day, so it counts as an unreadable date and the working-day count comes back as -1, not blank.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 5 of 45. Customer Dana's number typed as 1-415-555-0132 is shown as (415) 555-0132, with the leading 1 dropped.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 6 of 45. Dana's seven-digit number with no area code, 555-0132, is passed through exactly as typed, so it is not flagged as incomplete.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. A number without an area code should come back as an empty string, not as typed."
+   },
+   {
+    "prompt": "\n  With your correction: Dana's seven-digit number with no area code, 555-0132, is not passed through as typed: it has only 7 digits, so the phone formatter returns an empty string, which flags the number as incomplete.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 7 of 45. Dana's office number written with an extension, 415 555 0132 ext 12, is left untidied exactly as typed, because the extra digits push it past ten.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. An extension should be split off and shown as (415) 555-0132 x12."
+   },
+   {
+    "prompt": "\n  With your correction: Dana's office number typed as 415 555 0132 ext 12 is tidied, not left as typed: the extension is set aside before the digits are counted, the remaining ten digits make a valid number, and the result is (415) 555-0132 x12.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 8 of 45. A number with an impossible area code starting in 0, (015) 555-0132, is accepted and shown unchanged as a valid-looking number.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. An area code starting in 0 is still accepted and formatted, so it should come back as (015) 555-0132, not unchanged."
+   },
+   {
+    "prompt": "\n  With your correction: A customer's phone number written as (015) 555-0132, with an area code starting in 0, is accepted and reformatted as a normal 10-digit number, so it comes back as (015) 555-0132: it looks unchanged because it was formatted, not passed through, and no check rejects the 0 in the area code.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 9 of 45. A London customer's number, +44 20 7946 0958, is returned exactly as typed and not rejected, so non-North-American numbers pass through silently.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. Non-North-American numbers should come back as an empty string, not as typed."
+   },
+   {
+    "prompt": "\n  With your correction: A London customer's number, +44 20 7946 0958, has 12 digits, so it is not a valid 10-digit number or an 11-digit number starting with 1, and it is not returned as typed or passed through: the formatter rejects it and returns an empty string.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 10 of 45. Priya's course score of exactly 90 earns an A, so 90 is the lowest score that gets an A.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. 90 is a B. An A starts at 92."
+   },
+   {
+    "prompt": "\n  With your correction: Priya's course score of exactly 90 is not an A, because an A needs 92 or more, so 90 falls in the 83-to-under-92 band: the software gives her a B, and the lowest score that earns an A is 92.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 11 of 45. Tom's score of 89.99 earns a B, not an A, so there is no rounding up to the next grade.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 12 of 45. Priya's score of 105 with extra credit still earns an A, so scores above 100 are accepted.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. A score above 100 is invalid and should come back as X, not an A."
+   },
+   {
+    "prompt": "\n  With your correction: Priya's score of 105 with extra credit is above 100, so it is invalid and is not accepted: the software returns 'X', not an 'A'.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 13 of 45. A student whose score was left as blank text gets an F rather than an empty grade.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. Blank text isn't a number, so it should come back empty, not an F."
+   },
+   {
+    "prompt": "\n  With your correction: A student whose score was left as blank text does not get an F: the score is not a number, so the grade comes back empty (NULL), and only text with no leading number, like 'abc', is treated as 0 and gets an F.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": "No. Text like 'abc' isn't a number either, so it should also come back empty, not an F."
+   },
+   {
+    "prompt": "\nCase 14 of 45. A mistyped score of minus 5 gets an F instead of being flagged as invalid.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. A score below 0 is invalid and should come back as X, not an F."
+   },
+   {
+    "prompt": "\n  With your correction: A mistyped score of minus 5 is below 0, so it is not graded as an F: it is flagged as invalid and the grade comes back as 'X'.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 15 of 45. Ravi's 100-rupee invoice (10,000 cents) is paid 31 days late: the late fee comes to 1,550 cents, which is 15.50 rupees, charged at half a percent per day.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 16 of 45. Ravi's 100-rupee invoice left unpaid for 400 days is charged a late fee of 20,000 cents, twice the invoice itself, because there is no cap.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. There's a cap: the fee can't exceed 20% of the invoice, so it should be 2,000 cents."
+   },
+   {
+    "prompt": "\n  With your correction: Ravi's 100-rupee invoice (10,000 cents) left unpaid for 400 days has 395 charged days after the 5 free ones, which would come to 19,750 cents (197.50 rupees), but the fee is capped at 20% of the invoice, so the late fee comes to 2,000 cents (20 rupees), not 20,000 cents, because the cap does apply.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 17 of 45. A 1-rupee invoice (100 cents) paid one day late is charged 1 cent, because half a cent is rounded up and there is no minimum fee.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. 1 day late is within the 5 free days, so the fee should be 0."
+   },
+   {
+    "prompt": "\n  With your correction: A 1-rupee invoice (100 cents) paid one day late falls within the first 5 free days, so nothing is charged and the minimum fee does not apply: the late fee comes to 0 cents.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 18 of 45. Ravi's invoice paid 3 days early is charged a late fee of 0, and early payment earns no credit.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 19 of 45. Ravi's invoice paid two and a half days late is charged 125 cents, because part-days are charged pro rata rather than rounded to whole days.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. 2.5 days rounds down to 2, which is within the 5 free days, so the fee should be 0."
+   },
+   {
+    "prompt": "\n  With your correction: Ravi's invoice paid two and a half days late is not charged 125 cents: the first 5 days late are always free, and nothing in the rules charges part-days pro rata, so an invoice late by 5 days or fewer has no fee whatever its amount, and the late fee comes to 0.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 20 of 45. Ana's card 4111 1111 1111 1111 prints on the receipt as 12 stars followed by 1111, with the spaces removed.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. Spaces stay in place, so it should print as **** **** **** 1111."
+   },
+   {
+    "prompt": "\n  With your correction: Ana's card 4111 1111 1111 1111 has 16 digits, more than 4, so the first 12 digits are masked and the last 4 are shown, and the spaces stay where they are: the receipt prints '**** **** **** 1111', with the spaces kept rather than removed.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 21 of 45. A card number mistyped as just 411 is shown as 3 stars, so it is hidden completely and nothing flags it as too short.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. A card with fewer than 13 digits should come back as INVALID, not stars."
+   },
+   {
+    "prompt": "\n  With your correction: A card number mistyped as just 411 has only 3 digits, fewer than the 13 needed, so it is not masked to 3 stars: the software returns 'INVALID', shows no digits and no stars, and so does flag it as too short.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 22 of 45. A card number with too many digits, 4111-1111-1111-1111-123, is accepted and shown with 15 stars then 1123, and it is not rejected.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. Too many digits should come back as INVALID, not stars."
+   },
+   {
+    "prompt": "\n  With your correction: A card number with too many digits, 4111-1111-1111-1111-123 (19 digits, more than the 16 allowed), is not accepted or masked: it is rejected as too long to be a card number, and the result is 'INVALID' with no stars and no digits shown.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 23 of 45. If a cashier types letters instead of a card number, the receipt shows an empty string, and no mask appears.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. Letters aren't a card number, so it should come back as INVALID, not an empty string."
+   },
+   {
+    "prompt": "\n  With your correction: If a cashier types letters such as 'abcd' instead of a card number, the receipt does not show an empty string: the text has no digits but is not empty, so the card number is rejected as 'INVALID' and no mask appears.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 24 of 45. A parcel weighing exactly 1 kilogram to zone 2 costs 800 cents, which is 8.00.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 25 of 45. The same parcel at 1 gram over a kilogram to zone 2 costs 1,000 cents, 2.00 more, because every started kilogram is billed in full.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 26 of 45. A parcel weighing nothing to zone 1 still costs 300 cents, which is 3.00, because there is a base charge.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 27 of 45. A parcel sent to zone 0 gets no price at all, which leaves the shipping charge blank.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. A zone 0 should be billed as zone 3, not left blank."
+   },
+   {
+    "prompt": "\n  With your correction: A parcel sent to zone 0 still gets a price, because zone 0 is outside zones 1 to 3 and is billed as zone 3 instead of being left blank: the shipping charge is 3 x (300 + 100 x the started kilograms) cents, for example 1,200 cents for a parcel of up to 1 kg.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 28 of 45. A 100-kilogram pallet to zone 3 costs 30,900 cents, which is 309.00, because there is no weight limit or cap.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. Over 30 kg is a flat 9999 whatever the zone, so it should be 9,999 cents."
+   },
+   {
+    "prompt": "\n  With your correction: A 100-kilogram pallet (100,000 g) to zone 3 is over the 30,000 g limit, so it is not priced by weight and zone but billed the flat 9999 cents, which is 99.99, not 30,900 cents (309.00), because there is a weight limit.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 29 of 45. The title 'Caf\u00e9 M\u00fcnster \u2013 50% Off' becomes the web address cafe-munster-50-off, with accents stripped and the percent sign dropped.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 30 of 45. A product called '\u6771\u4eac Tower' becomes just tower in its web address, because the Japanese characters are silently thrown away.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 31 of 45. A title made only of punctuation, '!!!', produces an empty web address, which would collide with other such titles.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. It should come back as 'untitled', not an empty address."
+   },
+   {
+    "prompt": "\n  With your correction: A page titled '!!!' has nothing left once the punctuation is turned into dashes and those dashes are trimmed away, so instead of an empty web address, the slug comes out as 'untitled'.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 32 of 45. The title '  Spring   Sale  ' with extra spaces becomes spring-sale, so spaces are tidied into single dashes.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 33 of 45. Mei orders 9 items at 10.00 each and pays 9,000 cents, which is 90.00 with no discount.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 34 of 45. Mei orders 10 items at 10.00 each and pays 9,000 cents, which is 90.00, so the 10% discount starts at exactly 10 items and she pays the same as for 9.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 35 of 45. Mei orders 100 items at 10.00 each and pays 90,000 cents, which is 900.00, so ordering ten times as many items earns no bigger discount than 10%.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. 50 or more items gets 20% off, so it should be 80,000 cents (800.00)."
+   },
+   {
+    "prompt": "\n  With your correction: Mei's order of 100 items at 10.00 each (1,000 cents) is not billed 90,000 cents (900.00) with a 10% discount, because 100 items is 50 or more, so the whole order gets 20% off: the total comes to 80,000 cents, which is 800.00.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 36 of 45. Mei orders 10 items at 9.95 each and pays 8,955 cents, which is 89.55 after the 10% discount applies to the whole order.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 37 of 45. An order for minus 2 items at 10.00 gets no price, which leaves the total blank rather than a refund.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. A quantity of zero or less should give a total of 0, not blank."
+   },
+   {
+    "prompt": "\n  With your correction: An order for minus 2 items at 10.00 each is not left blank and not refunded: because the quantity is zero or less, the total comes to 0.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 38 of 45. A cafe with a single 5-star vote gets an adjusted rating of 3.18, because the score is pulled strongly toward 3.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. With fewer than 5 votes there's no rating, so it should come back empty, not 3.18."
+   },
+   {
+    "prompt": "\n  With your correction: A cafe with a single 5-star vote gets no adjusted rating: with only 1 vote, which is fewer than the 5 votes required, the weighted rating is not calculated and comes back NULL, not 3.18.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 39 of 45. A new cafe with no votes shows an adjusted rating of 3.0, the default middle score.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. With fewer than 5 votes there's no rating, so it should come back empty, not 3.0."
+   },
+   {
+    "prompt": "\n  With your correction: A new cafe with no votes gets no adjusted rating, not a default 3.0: with fewer than 5 votes (0 included) the rating is left empty (NULL).\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 40 of 45. A cafe averaging 4.5 stars from 1,000 votes shows 4.49, so a large number of votes barely moves the score.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 41 of 45. A mistyped average of 9 stars from 10 votes gives an adjusted rating of 6.0, which is above the 5-star maximum, because ratings are not capped.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 42 of 45. A cafe with minus 1 votes gets no rating, so the score is left blank.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 43 of 45. Four payment rows of 100, 250, a refund of minus 50 and one blank add up to gross receipts of 350, because the refund is ignored instead of being subtracted.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 44 of 45. A day with only one refund of 50 and no other payments shows gross receipts of 0, not minus 50 and not blank.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. With no valid payments it should come back blank (NULL), not 0."
+   },
+   {
+    "prompt": "\n  With your correction: On a day with only one refund of 50 and no other payments, the refund is left out because gross receipts count only amounts above zero, so no valid payments remain and gross receipts show blank (not 0, and not minus 50).\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 45 of 45. A day with no payments at all shows gross receipts of 0 rather than a blank.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No. With no payments it should come back blank (NULL), not 0."
+   },
+   {
+    "prompt": "\n  With your correction: A day with no payments at all shows gross receipts of blank (NULL), not 0: with no rows to total there are no valid amounts, so the software leaves the total blank rather than showing 0.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   }
+  ],
+  "transcript": "Hive: Now 45 quick checks on what the build does in real cases. Press Enter if a result is right, or say what should happen instead.\n\nCase 1 of 45. Nia's order is placed on Monday 2 November and promised for Friday 6 November: the engine counts 4 working days, because the end date itself is not counted.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 2 of 45. A job starting Thursday 24 December and ending Monday 28 December, with Christmas Day in between, counts 2 working days, because public holidays are treated as ordinary working days.\n  Right? (Enter = yes, or say what should happen) > No. Christmas Day is never a working day, so it should be 1.\n\n  With your correction: A job starting Thursday 24 December and ending Monday 28 December counts only 1 working day, not 2: Thursday the 24th counts, Christmas Day on the Friday is never a working day, the weekend is skipped and the end day is excluded, so the claim that public holidays are ordinary working days is wrong for Christmas Day.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 3 of 45. A job that ends on Monday 2 November but started on Friday 6 November, entered the wrong way round, shows minus 4 working days instead of an error.\n  Right? (Enter = yes, or say what should happen) > No. It should be 0, never a negative count.\n\n  With your correction: A job that ends on Monday 2 November but started on Friday 6 November was entered with its dates the wrong way round, so the system shows 0 working days, not minus 4 and not an error.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 4 of 45. Nia's delivery date typed as 11/06/2026 instead of year-month-day gives no answer at all, so the working-day count is left blank.\n  Right? (Enter = yes, or say what should happen) > No. A date in the wrong format should give -1, not blank.\n\n  With your correction: Nia's delivery date typed as 11/06/2026 uses slashes instead of year-month-day, so it counts as an unreadable date and the working-day count comes back as -1, not blank.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 5 of 45. Customer Dana's number typed as 1-415-555-0132 is shown as (415) 555-0132, with the leading 1 dropped.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 6 of 45. Dana's seven-digit number with no area code, 555-0132, is passed through exactly as typed, so it is not flagged as incomplete.\n  Right? (Enter = yes, or say what should happen) > No. A number without an area code should come back as an empty string, not as typed.\n\n  With your correction: Dana's seven-digit number with no area code, 555-0132, is not passed through as typed: it has only 7 digits, so the phone formatter returns an empty string, which flags the number as incomplete.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 7 of 45. Dana's office number written with an extension, 415 555 0132 ext 12, is left untidied exactly as typed, because the extra digits push it past ten.\n  Right? (Enter = yes, or say what should happen) > No. An extension should be split off and shown as (415) 555-0132 x12.\n\n  With your correction: Dana's office number typed as 415 555 0132 ext 12 is tidied, not left as typed: the extension is set aside before the digits are counted, the remaining ten digits make a valid number, and the result is (415) 555-0132 x12.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 8 of 45. A number with an impossible area code starting in 0, (015) 555-0132, is accepted and shown unchanged as a valid-looking number.\n  Right? (Enter = yes, or say what should happen) > No. An area code starting in 0 is still accepted and formatted, so it should come back as (015) 555-0132, not unchanged.\n\n  With your correction: A customer's phone number written as (015) 555-0132, with an area code starting in 0, is accepted and reformatted as a normal 10-digit number, so it comes back as (015) 555-0132: it looks unchanged because it was formatted, not passed through, and no check rejects the 0 in the area code.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 9 of 45. A London customer's number, +44 20 7946 0958, is returned exactly as typed and not rejected, so non-North-American numbers pass through silently.\n  Right? (Enter = yes, or say what should happen) > No. Non-North-American numbers should come back as an empty string, not as typed.\n\n  With your correction: A London customer's number, +44 20 7946 0958, has 12 digits, so it is not a valid 10-digit number or an 11-digit number starting with 1, and it is not returned as typed or passed through: the formatter rejects it and returns an empty string.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 10 of 45. Priya's course score of exactly 90 earns an A, so 90 is the lowest score that gets an A.\n  Right? (Enter = yes, or say what should happen) > No. 90 is a B. An A starts at 92.\n\n  With your correction: Priya's course score of exactly 90 is not an A, because an A needs 92 or more, so 90 falls in the 83-to-under-92 band: the software gives her a B, and the lowest score that earns an A is 92.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 11 of 45. Tom's score of 89.99 earns a B, not an A, so there is no rounding up to the next grade.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 12 of 45. Priya's score of 105 with extra credit still earns an A, so scores above 100 are accepted.\n  Right? (Enter = yes, or say what should happen) > No. A score above 100 is invalid and should come back as X, not an A.\n\n  With your correction: Priya's score of 105 with extra credit is above 100, so it is invalid and is not accepted: the software returns 'X', not an 'A'.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 13 of 45. A student whose score was left as blank text gets an F rather than an empty grade.\n  Right? (Enter = yes, or say what should happen) > No. Blank text isn't a number, so it should come back empty, not an F.\n\n  With your correction: A student whose score was left as blank text does not get an F: the score is not a number, so the grade comes back empty (NULL), and only text with no leading number, like 'abc', is treated as 0 and gets an F.\n  Right now? (Enter = yes, or say what should happen) > No. Text like 'abc' isn't a number either, so it should also come back empty, not an F.\n\nCase 14 of 45. A mistyped score of minus 5 gets an F instead of being flagged as invalid.\n  Right? (Enter = yes, or say what should happen) > No. A score below 0 is invalid and should come back as X, not an F.\n\n  With your correction: A mistyped score of minus 5 is below 0, so it is not graded as an F: it is flagged as invalid and the grade comes back as 'X'.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 15 of 45. Ravi's 100-rupee invoice (10,000 cents) is paid 31 days late: the late fee comes to 1,550 cents, which is 15.50 rupees, charged at half a percent per day.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 16 of 45. Ravi's 100-rupee invoice left unpaid for 400 days is charged a late fee of 20,000 cents, twice the invoice itself, because there is no cap.\n  Right? (Enter = yes, or say what should happen) > No. There's a cap: the fee can't exceed 20% of the invoice, so it should be 2,000 cents.\n\n  With your correction: Ravi's 100-rupee invoice (10,000 cents) left unpaid for 400 days has 395 charged days after the 5 free ones, which would come to 19,750 cents (197.50 rupees), but the fee is capped at 20% of the invoice, so the late fee comes to 2,000 cents (20 rupees), not 20,000 cents, because the cap does apply.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 17 of 45. A 1-rupee invoice (100 cents) paid one day late is charged 1 cent, because half a cent is rounded up and there is no minimum fee.\n  Right? (Enter = yes, or say what should happen) > No. 1 day late is within the 5 free days, so the fee should be 0.\n\n  With your correction: A 1-rupee invoice (100 cents) paid one day late falls within the first 5 free days, so nothing is charged and the minimum fee does not apply: the late fee comes to 0 cents.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 18 of 45. Ravi's invoice paid 3 days early is charged a late fee of 0, and early payment earns no credit.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 19 of 45. Ravi's invoice paid two and a half days late is charged 125 cents, because part-days are charged pro rata rather than rounded to whole days.\n  Right? (Enter = yes, or say what should happen) > No. 2.5 days rounds down to 2, which is within the 5 free days, so the fee should be 0.\n\n  With your correction: Ravi's invoice paid two and a half days late is not charged 125 cents: the first 5 days late are always free, and nothing in the rules charges part-days pro rata, so an invoice late by 5 days or fewer has no fee whatever its amount, and the late fee comes to 0.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 20 of 45. Ana's card 4111 1111 1111 1111 prints on the receipt as 12 stars followed by 1111, with the spaces removed.\n  Right? (Enter = yes, or say what should happen) > No. Spaces stay in place, so it should print as **** **** **** 1111.\n\n  With your correction: Ana's card 4111 1111 1111 1111 has 16 digits, more than 4, so the first 12 digits are masked and the last 4 are shown, and the spaces stay where they are: the receipt prints '**** **** **** 1111', with the spaces kept rather than removed.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 21 of 45. A card number mistyped as just 411 is shown as 3 stars, so it is hidden completely and nothing flags it as too short.\n  Right? (Enter = yes, or say what should happen) > No. A card with fewer than 13 digits should come back as INVALID, not stars.\n\n  With your correction: A card number mistyped as just 411 has only 3 digits, fewer than the 13 needed, so it is not masked to 3 stars: the software returns 'INVALID', shows no digits and no stars, and so does flag it as too short.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 22 of 45. A card number with too many digits, 4111-1111-1111-1111-123, is accepted and shown with 15 stars then 1123, and it is not rejected.\n  Right? (Enter = yes, or say what should happen) > No. Too many digits should come back as INVALID, not stars.\n\n  With your correction: A card number with too many digits, 4111-1111-1111-1111-123 (19 digits, more than the 16 allowed), is not accepted or masked: it is rejected as too long to be a card number, and the result is 'INVALID' with no stars and no digits shown.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 23 of 45. If a cashier types letters instead of a card number, the receipt shows an empty string, and no mask appears.\n  Right? (Enter = yes, or say what should happen) > No. Letters aren't a card number, so it should come back as INVALID, not an empty string.\n\n  With your correction: If a cashier types letters such as 'abcd' instead of a card number, the receipt does not show an empty string: the text has no digits but is not empty, so the card number is rejected as 'INVALID' and no mask appears.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 24 of 45. A parcel weighing exactly 1 kilogram to zone 2 costs 800 cents, which is 8.00.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 25 of 45. The same parcel at 1 gram over a kilogram to zone 2 costs 1,000 cents, 2.00 more, because every started kilogram is billed in full.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 26 of 45. A parcel weighing nothing to zone 1 still costs 300 cents, which is 3.00, because there is a base charge.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 27 of 45. A parcel sent to zone 0 gets no price at all, which leaves the shipping charge blank.\n  Right? (Enter = yes, or say what should happen) > No. A zone 0 should be billed as zone 3, not left blank.\n\n  With your correction: A parcel sent to zone 0 still gets a price, because zone 0 is outside zones 1 to 3 and is billed as zone 3 instead of being left blank: the shipping charge is 3 x (300 + 100 x the started kilograms) cents, for example 1,200 cents for a parcel of up to 1 kg.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 28 of 45. A 100-kilogram pallet to zone 3 costs 30,900 cents, which is 309.00, because there is no weight limit or cap.\n  Right? (Enter = yes, or say what should happen) > No. Over 30 kg is a flat 9999 whatever the zone, so it should be 9,999 cents.\n\n  With your correction: A 100-kilogram pallet (100,000 g) to zone 3 is over the 30,000 g limit, so it is not priced by weight and zone but billed the flat 9999 cents, which is 99.99, not 30,900 cents (309.00), because there is a weight limit.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 29 of 45. The title 'Caf\u00e9 M\u00fcnster \u2013 50% Off' becomes the web address cafe-munster-50-off, with accents stripped and the percent sign dropped.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 30 of 45. A product called '\u6771\u4eac Tower' becomes just tower in its web address, because the Japanese characters are silently thrown away.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 31 of 45. A title made only of punctuation, '!!!', produces an empty web address, which would collide with other such titles.\n  Right? (Enter = yes, or say what should happen) > No. It should come back as 'untitled', not an empty address.\n\n  With your correction: A page titled '!!!' has nothing left once the punctuation is turned into dashes and those dashes are trimmed away, so instead of an empty web address, the slug comes out as 'untitled'.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 32 of 45. The title '  Spring   Sale  ' with extra spaces becomes spring-sale, so spaces are tidied into single dashes.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 33 of 45. Mei orders 9 items at 10.00 each and pays 9,000 cents, which is 90.00 with no discount.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 34 of 45. Mei orders 10 items at 10.00 each and pays 9,000 cents, which is 90.00, so the 10% discount starts at exactly 10 items and she pays the same as for 9.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 35 of 45. Mei orders 100 items at 10.00 each and pays 90,000 cents, which is 900.00, so ordering ten times as many items earns no bigger discount than 10%.\n  Right? (Enter = yes, or say what should happen) > No. 50 or more items gets 20% off, so it should be 80,000 cents (800.00).\n\n  With your correction: Mei's order of 100 items at 10.00 each (1,000 cents) is not billed 90,000 cents (900.00) with a 10% discount, because 100 items is 50 or more, so the whole order gets 20% off: the total comes to 80,000 cents, which is 800.00.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 36 of 45. Mei orders 10 items at 9.95 each and pays 8,955 cents, which is 89.55 after the 10% discount applies to the whole order.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 37 of 45. An order for minus 2 items at 10.00 gets no price, which leaves the total blank rather than a refund.\n  Right? (Enter = yes, or say what should happen) > No. A quantity of zero or less should give a total of 0, not blank.\n\n  With your correction: An order for minus 2 items at 10.00 each is not left blank and not refunded: because the quantity is zero or less, the total comes to 0.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 38 of 45. A cafe with a single 5-star vote gets an adjusted rating of 3.18, because the score is pulled strongly toward 3.\n  Right? (Enter = yes, or say what should happen) > No. With fewer than 5 votes there's no rating, so it should come back empty, not 3.18.\n\n  With your correction: A cafe with a single 5-star vote gets no adjusted rating: with only 1 vote, which is fewer than the 5 votes required, the weighted rating is not calculated and comes back NULL, not 3.18.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 39 of 45. A new cafe with no votes shows an adjusted rating of 3.0, the default middle score.\n  Right? (Enter = yes, or say what should happen) > No. With fewer than 5 votes there's no rating, so it should come back empty, not 3.0.\n\n  With your correction: A new cafe with no votes gets no adjusted rating, not a default 3.0: with fewer than 5 votes (0 included) the rating is left empty (NULL).\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 40 of 45. A cafe averaging 4.5 stars from 1,000 votes shows 4.49, so a large number of votes barely moves the score.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 41 of 45. A mistyped average of 9 stars from 10 votes gives an adjusted rating of 6.0, which is above the 5-star maximum, because ratings are not capped.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 42 of 45. A cafe with minus 1 votes gets no rating, so the score is left blank.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 43 of 45. Four payment rows of 100, 250, a refund of minus 50 and one blank add up to gross receipts of 350, because the refund is ignored instead of being subtracted.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 44 of 45. A day with only one refund of 50 and no other payments shows gross receipts of 0, not minus 50 and not blank.\n  Right? (Enter = yes, or say what should happen) > No. With no valid payments it should come back blank (NULL), not 0.\n\n  With your correction: On a day with only one refund of 50 and no other payments, the refund is left out because gross receipts count only amounts above zero, so no valid payments remain and gross receipts show blank (not 0, and not minus 50).\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 45 of 45. A day with no payments at all shows gross receipts of 0 rather than a blank.\n  Right? (Enter = yes, or say what should happen) > No. With no payments it should come back blank (NULL), not 0.\n\n  With your correction: A day with no payments at all shows gross receipts of blank (NULL), not 0: with no rows to total there are no valid amounts, so the software leaves the total blank rather than showing 0.\n  Right now? (Enter = yes, or say what should happen) > \n"
+ },
+ "CA": [
+  "biz_days_between: Whenever two valid dates are given, it counts the Monday-to-Friday days from the start date up to but not including the end date, so the start day counts if it is a weekday and the end day never counts, except that days that are non-working days under rule 5 (Dec 25 in particular) are never counted even when they fall on a weekday (Monday 2024-01-01 to Monday 2024-01-08 gives 5; Friday to the next Monday gives 1; Thursday 24 December to Monday 28 December with Christmas Day on the Friday gives 1).",
+  "biz_days_between: Whenever the start and end dates are the same day, it returns 0.",
+  "biz_days_between: Whenever the end date is earlier than the start date (the dates were entered the wrong way round), it returns 0, never a negative number and never an error, whatever the days between them are (2024-01-08 back to 2024-01-01 gives 0; Friday 6 November back to Monday 2 November gives 0).",
+  "biz_days_between: Whenever the period contains only Saturdays and Sundays, it returns 0; a weekend start day is not counted but a weekend end day is simply excluded like any end day.",
+  "biz_days_between: Saturdays and Sundays are skipped, and Jan 1 and Dec 25 are non-working days. Christmas Day (Dec 25) is never a working day: it is never counted in any period, in any year, whichever day of the week it falls on. No other holidays count; all other public holidays are counted as ordinary working days.",
+  "biz_days_between: Whenever either date is NULL, it returns NULL.",
+  "biz_days_between: Whenever either date is empty text, unreadable text (such as 'abc') or a number that is not an accepted date (such as 2024), meaning it is not written in any accepted date format, it returns -1 rather than NULL, an error or 0. Whenever either date is written in an accepted format but is a non-existent calendar date (such as 2024-02-30 or month 13), it still returns NULL rather than an error or 0. If either date is NULL, rule 6 applies and the result is NULL.",
+  "biz_days_between: Whenever a date is written with a time after it (such as '2024-01-01 10:00:00' or '2024-01-01T09:00'), the time is ignored and only the first 10 characters are used as the date.",
+  "biz_days_between: Whenever a date has extra text after its first 10 characters (such as '2024-01-10abc'), the extra text is ignored and the date is accepted; spaces around the date are also ignored.",
+  "biz_days_between: Whenever a date is written in a wrong format, such as with slashes ('2024/01/10' or '11/06/2026'), without zero padding ('2024-1-10') or with a one-digit day ('2024-01-1'), it returns -1 rather than NULL, an error or 0; compact digits ('20240110') and ISO week dates ('2024-W01-1') are however accepted as valid dates, as is the number 20240110. If either date is NULL, rule 6 applies and the result is NULL.",
+  "fmt_phone: Whenever the text contains exactly 10 digits after setting aside any extension and ignoring everything that is not a digit, it returns the number as (AAA) BBB-CCCC, whatever the separators were (dashes, dots, spaces, brackets, plus sign). If an extension was set aside, it is appended as ' x' followed by the extension digits (so '415 555 0132 ext 12' gives '(415) 555-0132 x12').",
+  "fmt_phone: Whenever the text contains exactly 11 digits after setting aside any extension, and the first digit is 1, it drops that leading 1 and formats the remaining 10 digits as (AAA) BBB-CCCC (so '+1 555 123 4567' and '15551234567' both give '(555) 123-4567'). If an extension was set aside, it is appended as ' x' followed by the extension digits (so '1 555 123 4567 ext 89' gives '(555) 123-4567 x89').",
+  "fmt_phone: An extension is split off from the phone number before the digits are counted. An extension is a marker word or sign such as 'ext', 'ext.', 'extension', 'x' or '#', followed by its digits (for example 'ext 12', 'x12', '#12'), and it is not counted as part of the number's digits. Whenever the number itself, without the extension, is valid (exactly 10 digits, or 11 digits starting with 1), the result is the formatted number with the extension appended as ' x' followed by the extension digits, for example '(415) 555-0132 x12'. Whenever the number itself does not end up with exactly 10 digits, it returns an empty string instead of the original text, and a trailing extension does not rescue it. This covers 11 digits that do not start with 1 (such as '2 555 123 4567'), fewer than 10 digits, 12 or more digits, and an international number like '+44 20 7946 0958'.",
+  "fmt_phone: Whenever letters or other words are mixed in with exactly 10 digits (such as 'CALL-555-123-4567'), the non-digit characters are thrown away and the number is formatted; but a vanity number with letters instead of digits ('1-800-FLOWERS') has too few digits and returns an empty string, not the original text. The same holds for any text that has at least one digit but fewer than 10, such as a seven-digit number with no area code ('555-0132'): it returns an empty string, not the text as typed.",
+  "fmt_phone: Whenever the area code or exchange begins with 0 or 1 (such as '0551234567' or '0155550132'), the number is still accepted and formatted in the usual way, exactly like any other 10-digit number: '0551234567' gives '(055) 123-4567' and '0155550132' gives '(015) 555-0132'. This also holds when the text is already written as (AAA) BBB-CCCC, such as '(015) 555-0132', which comes back as '(015) 555-0132' because it is formatted, not because it was passed through untouched. No check is made that the number is a valid North American number, and no such number is rejected or returned unformatted for having a 0 or 1 in those places. Only a single leading 1 on an 11-digit number is removed.",
+  "fmt_phone: Whenever the input is NULL, it returns NULL; whenever it is empty text, it returns empty text; whenever it has no digits ('abc'), it returns the text unchanged.",
+  "fmt_phone: Whenever the input is a plain number rather than text (such as 5551234567 or 15551234567), it is treated as its digits and formatted; a decimal number such as 5551234567.0 is not a valid North American number, because the extra digit makes 11 digits not starting with 1. It returns an empty string, not the text as typed.",
+  "fmt_phone: Whenever the digits are written in non-Western numerals (such as Arabic-Indic digits), they are not recognised as digits and the text is returned unchanged.",
+  "grade_letter: Whenever the score is 92 or more and no more than 100 it returns 'A'; 83 or more but under 92 returns 'B'; 71 or more but under 83 returns 'C'; 60 or more but under 71 returns 'D'; anything lower but not below 0 (0 or more but under 60) returns 'F'. A score above 100, extra credit included, is never an 'A' because it is invalid and returns 'X' (see rule 21). A score below 0 (such as -5 or -0.01) is never an 'F' because it is invalid and also returns 'X' (see rule 21).",
+  "grade_letter: Whenever the score is exactly on a boundary (92, 83, 71, 60) it gets the higher grade, so exactly 92 is an 'A' and 90 is a 'B'; scores are never rounded, so 91.99 or 91.9999999 is a 'B' and 59.99 is an 'F'.",
+  "grade_letter: Whenever the score is above 100 or below 0 it returns 'X'. Exactly 0 is valid and returns 'F'. Exactly 100 is valid and returns 'A'.",
+  "grade_letter: Whenever the score is NULL, it returns NULL.",
+  "grade_letter: Whenever the score is text holding a number ('95', ' 85 ', '89.5', '1e2'), it is read as that number; text that starts with a number ('85%', '90abc') uses the leading number.",
+  "grade_letter: Whenever the score is empty or blank text (nothing in it, or only spaces or other whitespace), it is not a number and returns NULL, not 'F'. Whenever the score is text with no leading number ('abc', 'A', '-', '0x5A'), it is also not a number and returns NULL, not 'F'. Whenever the score is the boolean true, it is still treated as 0 and returns 'F' rather than NULL.",
+  "late_fee: Whenever an invoice is late by a positive number of days, the first 5 days late are free, so only the days beyond the 5th are charged. An invoice late by 5 days or fewer has no fee. For each charged day the fee is 0.5% of the invoice amount in cents, and the total is rounded down to a whole number of cents. The fee has a minimum of 500 cents, and it is capped at 20% of the invoice amount in cents, rounded down. The cap wins over the minimum, so on a small invoice where 20% of the invoice is less than 500 cents, the fee is that 20% amount. Example: 10000 cents, 10 days late: 5 charged days give 250, raised to the 500 minimum, so the fee is 500. The cap here is 2000.",
+  "late_fee: Whenever the fee is not a whole number of cents, it is rounded to the nearest cent with exact halves rounded up. The first 5 days late are always free and are taken off before the fee is worked out, so an invoice late by 5 days or fewer has a fee of 0, whatever its amount (100 cents for 1 day late gives 0; 100 cents for 3 days late gives 0). Examples of the rounding, counting only the days beyond the 5th: 1 cent for 100 days gives 0 (95 charged days give 0.475 cents); 1 cent for 99 days gives 0; 99 cents for 10 days gives 2 (5 charged days give 2.475 cents).",
+  "late_fee: Whenever days late is zero or negative (not late), or the invoice amount is zero or negative, the fee is 0.",
+  "late_fee: Whenever either the amount or the days late is NULL, it returns NULL.",
+  "Whenever days late is a fraction (such as 2.5), it is first rounded down to a whole number of days (2.5 counts as 2, 7.9 counts as 7, 0.9 counts as 0), and only then are the 5 free days taken off and the fee worked out. So 10000 cents for 2.5 days gives 0, because 2 days is within the 5 free days; 10000 cents for 7.5 days counts as 7 days, so 2 charged days give 100, raised to the 500 minimum, so the fee is 500. This applies the same way to a fractional number given as text (for example '2.5' counts as 2 days). A fractional amount (1000.5) is still used as is before the final rounding to a whole cent.",
+  "late_fee: Whenever the amount or days late is text, a number in the text is used ('10000' and '10' give 500; '3 days' counts as 3); empty text or text with no leading number counts as 0, so the fee is 0 and not NULL.",
+  "Whenever the weight is valid, not over 30000 g, and the zone is valid, the charge is zone x (300 + 100 x the number of started kilograms) cents, where any part of a kilogram counts as a whole one (500 g in zone 1 gives 400; exactly 1000 g gives 400; 1001 g gives 500; 2500 g in zone 2 gives 1200). A weight over 30000 g (30 kg) is not priced this way: it is a flat 9999 whatever the zone, as in rule 37, so a 100 kg pallet to zone 3 costs 9999, not 30900.",
+  "shipping_cost: Whenever the weight is exactly 0, the charge is the base amount only: zone x 300 cents (zone 3 gives 900), and the fractional weight 0.5 g counts as one started kilogram.",
+  "shipping_cost: Whenever the weight is negative, it returns NULL.",
+  "shipping_cost: A zone that is not a number at all (empty text, 'abc', 'A'), is not a whole number (1.5), or is outside 1 to 3 (below 1, meaning zero or negative, or above 3) is billed as zone 3, and it does not return NULL. A whole-valued zone like 2.0 or '1.0' is accepted as that zone number. There is no zone above 3, so zone 100 is billed as zone 3.",
+  "shipping_cost: Whenever the weight or zone is NULL, it returns NULL.",
+  "shipping_cost: Whenever the weight is text, a number in the text is used ('500', '2kg' counts as 2 g); empty text or text with no leading number counts as a weight of 0 (charged only the base amount), while text with a leading number in the zone ('2z' is zone 2) is accepted.",
+  "shipping_cost: Whenever the weight is over 30000 g, the charge is a flat 9999, whatever the zone (for example, 1,000,000,000 g in zone 1 gives 9999). A weight of exactly 30000 g is priced normally.",
+  "tiered_price: Whenever the quantity is under 10, the total is the unit price times the quantity with no discount (250 cents x 5 gives 1250).",
+  "tiered_price: Whenever the quantity is 10 to 49 units, the whole order, not just the units above 10, gets 10% off (250 x 10 gives 2250; 250 x 11 gives 2475), so 10 units can cost the same as 9 units (2250 each). Whenever the quantity is 50 or more, with no upper limit, the whole order, not just the units above 50, gets 20% off, so 50 or more units always earns a bigger discount than 10 to 49 units (1000 cents x 100 gives 80000, not 90000).",
+  "tiered_price: The total is rounded to the nearest 5 cents, with exact halves rounded up, so the total is always a multiple of 5 cents (1 cent x 10 gives 10; 1 cent x 15 gives 15; 1 cent x 25 gives 25; 99.5 cents x 3 gives 300).",
+  "tiered_price: Whenever the quantity is 0 or less (zero or any negative quantity), or the unit price is 0, the total is 0, never NULL and never a refund (minus 2 items at 1000 cents gives 0).",
+  "tiered_price: Whenever the unit price is negative, it returns NULL, unless the quantity is 0 or less, in which case the total is 0. A negative quantity no longer returns NULL: it gives 0.",
+  "tiered_price: Whenever either the unit price or quantity is NULL, it returns NULL.",
+  "tiered_price: Whenever the quantity is a fraction, it is used as is and the discount applies only when it is 10 or more (9.99 gives no discount, 250 x 9.99 gives 2498; 10.0 gets the discount).",
+  "tiered_price: Whenever the price or quantity is text, a number in the text is used ('250' and '10' give 2250; '12x' counts as 12); empty text or text with no leading number counts as 0, so the total is 0 and not NULL.",
+  "weighted_rating: Whenever the rating and the number of votes are valid and there are at least 5 votes, the result is (votes x average rating + 30) / (votes + 10), that is the average pulled toward a neutral prior of 3.0 that is worth 10 votes (5.0 with 10 votes gives 4.0; 4.5 with 100 votes gives 4.36). With fewer than 5 votes this calculation is not used and the result is NULL (see rule 48).",
+  "weighted_rating: Whenever the result is calculated, it is rounded to 2 decimal places with exact halves rounded up, and is returned as a decimal number (4.0, not 4).",
+  "weighted_rating: Whenever there are fewer than 5 votes, including 0 votes, the result is NULL. Exactly 5 votes is accepted.",
+  "weighted_rating: Whenever the votes are negative, it returns NULL; whenever either the rating or the votes are NULL, it returns NULL.",
+  "weighted_rating: Whenever the average rating lies outside any normal scale (0, negative or above 5, such as -2 or 7), it is not rejected or limited and is used as given (rating 0 with 10 votes gives 1.5; rating 7 with 10 votes gives 5.0).",
+  "weighted_rating: Whenever the votes are a fraction (2.5), they are used as is in the calculation.",
+  "weighted_rating: Whenever the rating or votes are text, a number in the text is used ('5' and '10' give 4.0); empty text or text with no leading number counts as 0, so a rating of 'abc' counts as rating 0 (giving 1.5 with 10 votes) and votes of 'abc' counts as 0 votes (giving NULL, because fewer than 5 votes always gives NULL).",
+  "gross_receipts: Whenever a group of rows is totalled, it adds up only the amounts that are greater than zero; negative amounts (refunds) are left out and not subtracted (100, -50, 300 gives 400).",
+  "gross_receipts: Whenever an amount is NULL or exactly 0, it adds nothing to the total.",
+  "gross_receipts: Whenever there are no rows, only NULL amounts, or only zero or negative amounts (including text that counts as 0), there are no valid rows and the total is NULL (blank), not 0. This holds everywhere the total is shown or used, including a single day, period or group with no payments at all, which comes back blank (NULL) and never 0.",
+  "gross_receipts: Whenever every counted amount is a whole number, the total is a whole number; whenever any counted amount has decimals the total is a decimal number (100.5 and 200 give 300.5), using ordinary floating point addition (0.1 and 0.2 give 0.30000000000000004).",
+  "gross_receipts: Whenever amounts are text, a number in the text is used ('100' and '250.5' give 350.5; '12x' counts as 12; '1e2' counts as 100.0); text with no leading number counts as 0 and adds nothing.",
+  "gross_receipts: Whenever it is used with GROUP BY, each group is totalled separately by the same rules (a group with only refunds, or with no valid rows, gives NULL), and rows removed by WHERE are not counted.",
+  "gross_receipts: Whenever DISTINCT is written inside it, it is ignored and every row is still added (amounts 5, 5, 3 give 13, not 8).",
+  "slugify: Whenever a title is given, it returns the text in lower case with every run of characters that are not letters a-z or digits 0-9 (spaces, punctuation, tabs, line breaks, underscores, symbols) replaced by one single dash ('Hello, World!' gives 'hello-world'; 'snake_case' gives 'snake-case').",
+  "slugify: Whenever the result would begin or end with a dash (leading or trailing spaces or punctuation, such as '  Hello   World  ' or '--Hello--'), those dashes are removed.",
+  "slugify: Whenever the title has accented letters, they are reduced to the plain letter ('Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' gives 'cafe-creme-brulee'; '\u00c7a va' gives 'ca-va'), and full-width letters and digits, ligatures and superscripts are also converted to plain ones ('\ufb01ne' gives 'fine', 'x\u00b2' gives 'x2').",
+  "slugify: Whenever a letter has no plain-letter form (\u00df, \u00c6, \u00d8, and all non-Latin scripts such as Japanese, and emoji), it is silently deleted rather than turned into a dash or transliterated ('Stra\u00dfe' gives 'strae'; '\u00c6r\u00f8 \u00d8l \u00df' gives 'r-l'; '\u65e5\u672c\u8a9e Tokyo' gives 'tokyo').",
+  "slugify: Whenever the title has typographic dashes or quotes (en dash, em dash, curly quotes), they are deleted and not turned into a dash, so the words either side are joined ('a\u2013b\u2014c' gives 'abc'). A plain apostrophe is also deleted, not turned into a dash ('dog's' gives 'dogs').",
+  "slugify: Whenever the finished result would be empty, it returns 'untitled' instead, never NULL and never empty text. This covers a title that is empty, spaces only, punctuation only such as '!!!', only non-Latin characters or emoji, only letters that get deleted (such as '\u00df'), or any mix of these, because after all the other steps (lower-casing, dash replacement, accent reduction, deleting letters with no plain form, deleting typographic dashes and quotes and plain apostrophes, and trimming leading and trailing dashes) nothing is left. A NULL title still returns NULL.",
+  "slugify: Whenever the title is NULL, it returns NULL.",
+  "slugify: Whenever the input is a number (12345 or 12.5), it is treated as its text and a decimal point becomes a dash ('12-5').",
+  "mask_card: Whenever a card number has 13 to 16 digits (counting digits only, without spaces), it replaces every digit except the last 4 with '*' and shows those last 4 digits, so there is one '*' for every masked digit. Spaces stay exactly where they are ('4111 1111 1111 1111' gives '**** **** **** 1111'; '4111111111111111' gives '************1111'). The number of '*' plus the shown digits equals the number of digits. Whenever the number has more than 16 digits (counting digits only, without spaces or hyphens), it returns 'INVALID' because the number is too long to be a card number, and no digits are shown and no '*' are returned ('4111-1111-1111-1111-123' has 19 digits and gives 'INVALID').",
+  "mask_card: Spaces and hyphens in the number stay exactly where they are, and the digits are masked as before, so that only the last four digits are shown and every other digit is replaced with '*' ('4111-1111-1111-1111' gives '****-****-****-1111'). Any other non-digit character, such as dots, slashes, underscores or brackets, makes it return 'INVALID'.",
+  "mask_card: Whenever the number has at least 1 digit but fewer than 13 digits (counting digits only, without spaces or hyphens), it returns 'INVALID' because the number is too short to be a card number, and no digits are shown and no '*' are returned ('411' gives 'INVALID'; '1234' gives 'INVALID'; '0000' gives 'INVALID'; '4111 1111 111' gives 'INVALID').",
+  "mask_card: Whenever the input has no digits at all and is empty text, it returns empty text. Whenever the input has no digits at all but contains letters or other text (such as 'abcd'), it returns 'INVALID' because letters are not a card number, and no digits are shown and no '*' are returned.",
+  "mask_card: Whenever the input is NULL, it returns NULL.",
+  "mask_card: Whenever the input has letters or other text mixed with digits, only the digits count, and the last 4 digits found are shown even if they come from other text, provided there are 13 to 16 digits in total (with fewer than 13 digits or more than 16 digits it returns 'INVALID'). Spaces stay where they are, and the letters, any existing '*', and other dropped text are removed ('4111 1111 1111 1111 exp 12/26' has 20 digits in total, so it gives 'INVALID'; 'XXXX-XXXX-XXXX-1111' gives 'INVALID', because the X's and any existing '*' are dropped and only 4 digits remain, which is fewer than 13).",
+  "mask_card: Whenever the input is a plain number rather than text (4111111111111111), it is treated as its digits and masked in the same way, including the rule that fewer than 13 digits gives 'INVALID'; a number with a decimal point such as 41.5 counts its digits and not the point (3 digits, so it gives 'INVALID').",
+  "mask_card: Whenever digits are written in non-Western numerals (such as Arabic-Indic digits), they are counted as digits and the last four are shown as written.",
+  "Nothing else. Enter",
+  "Ravi's 100-rupee invoice left unpaid for 400 days is charged a late fee of 20,000 cents, twice the invoice itself, because there is no cap. The owner says: No. There's a cap: the fee can't exceed 20% of the invoice, so it should be 2,000 cents.",
+  "A parcel sent to zone 0 gets no price at all, which leaves the shipping charge blank. The owner says: No. A zone 0 should be billed as zone 3, not left blank.",
+  "A new cafe with no votes shows an adjusted rating of 3.0, the default middle score. The owner says: No. With fewer than 5 votes there's no rating, so it should come back empty, not 3.0."
+ ],
+ "labels": [
+  {
+   "function": "late_fee",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "wrong",
+   "CA": "right",
+   "R": "right",
+   "note": "D has no grace; SL/CB state the 5-day grace but rules 25/28 still charge 3 days and 1.5 days; CA fixes those"
+  },
+  {
+   "function": "late_fee",
+   "decision": 1,
+   "label": "right",
+   "D": "absent",
+   "SL": "wrong",
+   "CB": "wrong",
+   "CA": "wrong",
+   "R": "right",
+   "note": "D silent; SL/CB/CA state min 500 but their example (99 cents, 10 days gives 5 / 2) breaks min-then-cap (should be 19)"
+  },
+  {
+   "function": "late_fee",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "SL": "right",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D says no cap"
+  },
+  {
+   "function": "late_fee",
+   "decision": 3,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "wrong",
+   "CA": "wrong",
+   "R": "right",
+   "note": "D/SL/CB/CA rule 25 says nearest cent half up, which conflicts with SL rule 24 round-down; R says floor"
+  },
+  {
+   "function": "fmt_phone",
+   "decision": 0,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "leading 1 on 11 digits stated in all"
+  },
+  {
+   "function": "fmt_phone",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "right",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D returns text unchanged for ext; SL says only for \"ext 89\", CA lists the markers"
+  },
+  {
+   "function": "fmt_phone",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "wrong",
+   "CA": "wrong",
+   "R": "right",
+   "note": "D returns original text; SL/CB say empty but rules 13/15 still say unchanged; CA fixes rule 13 but rule 15 (\"abc\" unchanged) and 17 remain"
+  },
+  {
+   "function": "grade_letter",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "wrong",
+   "CA": "right",
+   "R": "right",
+   "note": "D 90/80/70; SL/CB state 92/83/71 but rule 19 still says boundaries 90/80/70; CA fixes"
+  },
+  {
+   "function": "grade_letter",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "right",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D gives A above 100 and F below 0"
+  },
+  {
+   "function": "biz_days_between",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "right",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D counts holidays as working days"
+  },
+  {
+   "function": "biz_days_between",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "wrong",
+   "CA": "right",
+   "R": "right",
+   "note": "D/SL/CB give negative count; CA returns 0"
+  },
+  {
+   "function": "biz_days_between",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "wrong",
+   "CA": "wrong",
+   "R": "right",
+   "note": "D/SL/CB return NULL; CA says -1 for unreadable text but NULL for nonexistent dates and accepts times, extra text, compact/week dates, which the policy returns -1 for"
+  },
+  {
+   "function": "shipping_cost",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "right",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D has no weight cap"
+  },
+  {
+   "function": "shipping_cost",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "right",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D returns NULL for bad zones; SL says \"2z\" is zone 2 (policy: zone 3), minor"
+  },
+  {
+   "function": "mask_card",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "right",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D removes separators; SL rule 72 example drops hyphens in letter case but rule 68 is explicit"
+  },
+  {
+   "function": "mask_card",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "wrong",
+   "CA": "wrong",
+   "R": "right",
+   "note": "D/SL/CB mask any length; CA gives INVALID under 13 but over 16 (policy 19), and masks letters-with-digits"
+  },
+  {
+   "function": "mask_card",
+   "decision": 2,
+   "label": "right",
+   "D": "absent",
+   "SL": "absent",
+   "CB": "absent",
+   "CA": "absent",
+   "R": "right",
+   "note": "Amex rule only in R"
+  },
+  {
+   "function": "slugify",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "wrong",
+   "CA": "wrong",
+   "R": "right",
+   "note": "non-alnum run becomes dash, so & is a dash, never \"and\""
+  },
+  {
+   "function": "slugify",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "right",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D turns apostrophe into dash"
+  },
+  {
+   "function": "slugify",
+   "decision": 2,
+   "label": "right",
+   "D": "absent",
+   "SL": "absent",
+   "CB": "absent",
+   "CA": "absent",
+   "R": "right",
+   "note": "30-char limit only in R"
+  },
+  {
+   "function": "slugify",
+   "decision": 3,
+   "label": "right",
+   "D": "wrong",
+   "SL": "right",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D returns empty text"
+  },
+  {
+   "function": "tiered_price",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "right",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D rounds to nearest cent"
+  },
+  {
+   "function": "tiered_price",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "wrong",
+   "CA": "right",
+   "R": "right",
+   "note": "D/SL/CB give NULL for negative qty; CA gives 0"
+  },
+  {
+   "function": "weighted_rating",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "wrong",
+   "CA": "right",
+   "R": "right",
+   "note": "D gives 3.0 at 0 votes; SL/CB rule 47 right but rule 51 still gives 3.0 for 0 votes; CA fixes"
+  },
+  {
+   "function": "gross_receipts",
+   "decision": 0,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "negatives skipped in all"
+  }
+ ],
+ "cost_usd": {
+  "owner": 5.432,
+  "judge": 0.4337056
+ }
+}

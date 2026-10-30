@@ -1,5 +1,6 @@
 """Spot checks after the rule review (Gate 58): concrete outcomes of the built code, one at a time, for every part of
-the product the owner's review left as it was; each correction is applied on its own and the case is shown to him again.
+the product (Gate 63: the parts his review changed too, after the ones it left as they were); each correction is applied
+on its own and the case is shown to him again.
 
 Gate 55: an owner who skims a rule list corrects what he remembers and lets details pass. Gate 57: concrete outcomes
 ("Ravi's 100-rupee invoice, 31 days late: the fee comes to 2 rupees. Right?") draw his corrections, but one rewrite of
@@ -68,6 +69,14 @@ def parts_of(rules):
         if head and len(head) <= 60 and '.' not in head and head not in out:
             out.append(head)
     return out
+
+def order(before, after):
+    """Every part of the sheet, to spot-check: the ones his review left as they were first (Gate 58), then the ones it
+    changed (Gate 63: a part corrected for its headline rule still has the details he skimmed)."""
+    mine = lambda rules, p: [r for r in rules if r.startswith(p)]
+    parts = parts_of(after)
+    same = [p for p in parts if mine(before, p) == mine(after, p)]
+    return same + [p for p in parts if p not in same]
 
 def find(code_dir, goal, parts, timeout=1500):
     """Spot checks for these parts, from running the built code in a throwaway copy ([] if none could be made)."""

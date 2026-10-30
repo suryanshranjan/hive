@@ -578,6 +578,8 @@ from hive import spotcheck
 rules = ['Late fees: the fee is 2% of the amount for every 30 days late.', 'Late fees: the fee is rounded down to the rupee.',
          'Bulk price: 10 units or more get 5% off.']
 check('the parts are read from the rules', spotcheck.parts_of(rules), ['Late fees', 'Bulk price'])
+check('every part is spot-checked, the ones his review left alone first, then the ones it changed (Gate 63)',
+      spotcheck.order(rules, [rules[0].replace('2', '3')] + rules[1:]), ['Bulk price', 'Late fees'])
 def spotter(prompt):
     if 'He said: "No, the first 7 days are free"' in prompt or 'What he said: No, the first 7 days are free' in prompt:
         return {'changes': [{'n': 1, 'rule': 'Late fees: the first 7 days are free; after that 2% for every 30 days late.'}], 'new': []}
