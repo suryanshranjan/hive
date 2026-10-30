@@ -84,7 +84,7 @@ You can also message it any time, in English, Hindi-English or with typos:
 | --- | --- |
 | `hive` | One conversation from an idea to a tested branch |
 | `hive start --overnight` | Builds without asking anything; you review the next morning |
-| `hive start --agent codex` | Builders run on another coding agent (`claude`, `codex`, `gemini`, `antigravity`); `--agent claude,codex` mixes them, each builder taking the next agent in turn (Gate 47: mixed swarms matched single-agent ones, with no breaks of main, at about half the Claude bill) |
+| `hive start --agent codex` | Builders run on another coding agent (`claude`, `codex`, `gemini`; `antigravity` needs a headless command the Antigravity IDE does not have, so use `gemini` for Google's models); `--agent claude,codex` mixes them, each builder taking the next agent in turn (Gate 47: mixed swarms matched single-agent ones, with no breaks of main, at about half the Claude bill) |
 | `hive start --workers N` | Your choice of team size; Hive says what the law would pick if it differs |
 | `hive morning [--phone]` | Check an overnight build's decisions; Hive fixes what you correct |
 | `hive listen` | Stay on Telegram as your Jarvis: start, steer and stop builds and builders, rules, status, cloud |

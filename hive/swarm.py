@@ -16,8 +16,18 @@ DEFAULT_CMD = 'claude -p --output-format json --permission-mode acceptEdits --al
 # Any coding agent can be a builder (the owner: "Hive can work with any"). Each runs unattended in its own clone and
 # reads its instructions on stdin; agents that take the task as an argument get it from stdin through `sh -c`.
 # Builders push to the shared upstream outside their folder, so sandboxed agents need write access beyond it: run
-# Hive in a container. Codex was run for real (0.160.1, reads stdin); Gemini's and Antigravity's flags are as
-# documented in Oct 2026, and Antigravity's approval flag is unverified (sources disagree).
+# Hive in a container. Codex was run for real (0.160.1, reads stdin); Gemini's flags are as documented in Oct 2026.
+# Antigravity: the owner's machine has the Antigravity IDE (1.107.0), an editor whose agent runs inside its window; its
+# command line (antigravity-ide) only opens files and manages extensions, so it cannot be run as a headless builder
+# (checked Oct 31 2026). The preset expects a headless `agy`; without one, Hive says so and suggests Gemini, which runs
+# the same Google models from the command line.
+AGENT_HELP = {
+    'antigravity': "The Antigravity IDE has no command-line mode Hive can run as a builder (its agent works inside the "
+                   "editor window). For Google's models, use --agent gemini: npm install -g @google/gemini-cli, then run "
+                   "gemini once to log in.",
+    'gemini': 'Install it: npm install -g @google/gemini-cli, then run gemini once in a terminal to log in.',
+    'codex': 'Install it: npm install -g @openai/codex, then run codex login.',
+}
 AGENTS = {
     'claude': (DEFAULT_CMD, 'claude'),
     'codex': ('codex exec --json --skip-git-repo-check --sandbox danger-full-access -', 'codex'),   # verified, 0.160.1
@@ -34,6 +44,13 @@ def agents(spec=None):
             raise SystemExit(f"Hive doesn't know the agent '{n}'. Choose one of: {', '.join(AGENTS)} (or a mix such as "
                              "claude,codex), or set HIVE_WORKER_CMD to any command that reads its task on stdin.")
     return names
+
+def missing_agents(spec=None):
+    """The chosen agents whose command is not installed on this machine (none under HIVE_WORKER_CMD)."""
+    import shutil
+    if os.environ.get('HIVE_WORKER_CMD'):
+        return []
+    return [a for a in agents(spec) if not shutil.which(AGENTS[a][1])]
 
 def builder_cmd(agent=None, k=1):
     """The command that runs builder k (1-based): HIVE_WORKER_CMD if set, else its agent's preset (default Claude Code).
@@ -153,6 +170,9 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
     """Run every worker (at most max_parallel at once), wait for all, and write <run>/agents.csv."""
     run = os.path.abspath(run)
     agents(); kth = lambda me: int(me[1:]) if me[1:].isdigit() else 1   # an unknown agent stops here, before any start
+    missing = missing_agents()
+    if missing:   # an agent that is not here would fail every builder on it, one by one: say so once, before any start
+        raise SystemExit(' '.join(f"{a} isn't installed here. {AGENT_HELP.get(a, '')}".strip() for a in missing))
     env =dict(os.environ, PYTHONPATH=HIVE_ROOT + os.pathsep + os.environ.get('PYTHONPATH', ''),
                HIVE_GUARD_CACHE=os.path.join(run, 'guard_cache'), HIVE_RUN=run)
     queue = sorted(f[:-3] for f in os.listdir(os.path.join(run, 'prompts')) if f.endswith('.md'))
