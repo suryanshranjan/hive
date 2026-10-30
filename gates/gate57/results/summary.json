@@ -1,0 +1,46 @@
+{
+ "name": "g57",
+ "arms": {
+  "N0": {
+   "hidden_pass": 0.332,
+   "ci95_by_function": [
+    0.176,
+    0.492
+   ],
+   "tests": 250
+  },
+  "SL": {
+   "hidden_pass": 0.488,
+   "ci95_by_function": [
+    0.268,
+    0.7
+   ],
+   "tests": 250
+  },
+  "SP": {
+   "hidden_pass": 0.512,
+   "ci95_by_function": [
+    0.308,
+    0.7
+   ],
+   "tests": 250
+  }
+ },
+ "diffs": {
+  "SL-N0": {
+   "points": 15.6,
+   "ci95": [
+    2.4,
+    30.4
+   ]
+  },
+  "SP-N0": {
+   "points": 18.0,
+   "ci95": [
+    8.8,
+    27.2
+   ]
+  }
+ },
+ "allowance": {}
+}

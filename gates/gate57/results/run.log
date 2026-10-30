@@ -1,0 +1,98 @@
+[06:43:55] predictions registered on origin/main: gates/gate57/prompts/PREDICTIONS.md
+[06:43:55] reusing oracle private/g55/oracle.py (test mode)
+[06:43:55] rules checked: 10 functions, 138 calls, deterministic
+[06:43:55] declared decisions per function: 1:2, 2:3, 3:3, 4:2
+[06:43:55] starting repo and hidden suite built
+[06:43:55] pre-launch: python3 gates/gate57/referee/review57.py pre {run} {oracle}
+[06:43:55] wind tunnel: documenter writing the owner's policy in prose...
+[06:44:34] wind tunnel: R: 54 rules; ask text for N0 written
+[06:44:34] stage 1: N0 alone
+N0: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g57/upN0.git
+next: python3 lab/launch.py --run g57
+[06:44:34] launching workers...
+launched N0-w1 
+launched N0-w2 
+launched N0-w3 
+N0-w3 finished: exit 0, 0.9 min, tokens 695987, cost 0.22629090000000002
+N0-w2 finished: exit 0, 1.0 min, tokens 746723, cost 0.24418819999999997
+N0-w1 finished: exit 0, 1.1 min, tokens 765084, cost 0.2550019
+wrote /home/claude/hive/runs/g57/agents.csv
+[06:45:45] after N0: python3 gates/gate57/referee/review57.py after {run} {oracle} {base}
+[06:48:11] wind tunnel: D: 81 rules; 30 spot checks
+[06:48:16] wind tunnel: SL owner #1: '6, 29, 30, 37, 39, 52. Fees have a 5-day grace period and a $5 minimum, bulk tot'
+[06:48:18] wind tunnel: SL owner #2: 'Round to the nearest 5 cents, halves up, and a 500-cent minimum.'
+[06:48:31] wind tunnel: SL owner #3: 'Grace period of 5 days, then 2% per started 30 days, rounded up, $5 minimum, cap'
+[06:48:36] wind tunnel: SL owner #4: 'Rule 30: Same idea, a started 30-day period adds 2% each, so 31 days is 4%, 61 d'
+[06:48:42] wind tunnel: SL owner #5: "Platinum is missing: 20000 or more is platinum, and negative points are 'suspend"
+[06:48:50] wind tunnel: SL owner #6: 'Gold is 5000 up to 20000; 20000 or more is platinum.'
+[06:48:55] wind tunnel: SL owner #7: 'Never wrap past midnight: anything later than 23:59 should return 23:59.'
+[06:49:02] wind tunnel: SL owner #8: ''
+[06:49:10] wind tunnel: SL owner #9: ''
+[06:49:16] wind tunnel: SL owner #10: ''
+[06:49:22] wind tunnel: SL owner #11: ''
+[06:49:22] wind tunnel: SL: 81 rules after review, 11 replies, 1.2 min
+[06:49:26] wind tunnel: SP owner #1: 'No, the minimum fee is 5 rupees, so both 30 days and 31 days late cost 5 rupees.'
+[06:49:30] wind tunnel: SP owner #2: 'No, the fee keeps growing with each 30 days late, up to a cap of one fifth of th'
+[06:49:33] wind tunnel: SP owner #3: ''
+[06:49:37] wind tunnel: SP owner #4: ''
+[06:49:41] wind tunnel: SP owner #5: ''
+[06:49:44] wind tunnel: SP owner #6: ''
+[06:49:49] wind tunnel: SP owner #7: 'No, round to the nearest 5 cents, so it should be 94.55 dollars.'
+[06:49:54] wind tunnel: SP owner #8: 'No, 2.5 items at 10 dollars should be billed exactly, so 25 dollars.'
+[06:49:58] wind tunnel: SP owner #9: ''
+[06:50:03] wind tunnel: SP owner #10: 'No, it should come to 0.'
+[06:50:06] wind tunnel: SP owner #11: ''
+[06:50:09] wind tunnel: SP owner #12: 'No, 31 March should be the year-end close, FY2026-CLOSE, not a quarter.'
+[06:50:13] wind tunnel: SP owner #13: 'No, it should give the label INVALID, not nothing.'
+[06:50:16] wind tunnel: SP owner #14: 'No, it should still get a label: FY2027-Q1, ignoring the time.'
+[06:50:19] wind tunnel: SP owner #15: ''
+[06:50:22] wind tunnel: SP owner #16: 'No, 5 days late is still the grace period, so the fee is 0.'
+[06:50:26] wind tunnel: SP owner #17: 'No, the minimum fee is 5 rupees, so it should be 5 rupees, not 4.'
+[06:50:28] wind tunnel: SP owner #18: ''
+[06:50:31] wind tunnel: SP owner #19: ''
+[06:50:33] wind tunnel: SP owner #20: 'No, negative points should be suspended, not bronze.'
+[06:50:36] wind tunnel: SP owner #21: 'No, bookings never wrap past midnight, so it should end at 23:59.'
+[06:50:38] wind tunnel: SP owner #22: 'No, it should end at 23:59.'
+[06:50:41] wind tunnel: SP owner #23: 'No, an unreadable length should give no end time (NULL), not 09:00.'
+[06:50:44] wind tunnel: SP owner #24: 'No, a negative length adds nothing, so it should end at 09:00.'
+[06:50:47] wind tunnel: SP owner #25: ''
+[06:50:50] wind tunnel: SP owner #26: 'No, an unreadable figure should give no result (NULL), not a 100% drop.'
+[06:50:53] wind tunnel: SP owner #27: 'No, it should give 0.0, not nothing.'
+[06:50:56] wind tunnel: SP owner #28: ''
+[06:50:59] wind tunnel: SP owner #29: ''
+[06:51:05] wind tunnel: SP owner #30: ''
+[06:52:21] wind tunnel: SP: 17 of 30 outcomes corrected, 84 rules after applying, 3.0 min
+[06:52:21] wind tunnel: judge labelling every declared decision...
+[06:53:30] wind tunnel: ask texts for SL and SP written
+[06:53:30] stage 2: SL, SP
+SL: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g57/upSL.git
+SP: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g57/upSP.git
+next: python3 lab/launch.py --run g57
+[06:53:31] launching workers...
+launched SL-w1 
+launched SL-w2 
+launched SL-w3 
+launched SP-w1 
+launched SP-w2 
+launched SP-w3 
+SL-w2 finished: exit 0, 0.7 min, tokens 508495, cost 0.20057540000000001
+SL-w3 finished: exit 0, 0.9 min, tokens 516808, cost 0.22436369999999997
+SP-w1 finished: exit 0, 1.0 min, tokens 709663, cost 0.24868329999999997
+SP-w3 finished: exit 0, 1.0 min, tokens 455857, cost 0.2229171
+SL-w1 finished: exit 0, 1.1 min, tokens 533998, cost 0.2555238
+SP-w2 finished: exit 0, 1.1 min, tokens 788511, cost 0.275042
+wrote /home/claude/hive/runs/g57/agents.csv
+[06:54:41] scoring every arm call by call...
+# g57: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 33.2% | 17.6%–49.2% |
+| SL | 48.8% | 26.8%–70.0% |
+| SP | 51.2% | 30.8%–70.0% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| SL-N0 | +15.6 | +2.4 to +30.4 |
+| SP-N0 | +18.0 | +8.8 to +27.2 |
+[06:54:41] done. Next: write the gate RESULTS.md from runs/g57/summary.md, update BRAIN.md and lab/QUEUE.md, push.
