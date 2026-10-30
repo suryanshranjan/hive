@@ -1,0 +1,34 @@
+[17:08:17] predictions registered on origin/main: gates/gate63/prompts/PREDICTIONS.md
+[17:08:18] wind tunnel: g63a: 20 spot checks on the 4 functions the list touched, after CB's sheet
+[17:08:20] wind tunnel: CA case #1: ''
+[17:08:23] wind tunnel: CA case #2: ''
+[17:08:28] wind tunnel: CA case #3: ''
+[17:08:32] wind tunnel: CA case #4: ''
+[17:08:37] wind tunnel: CA case #5: ''
+[17:08:42] wind tunnel: CA case #6: "1-5: Yes, that's right.\n6: No, 30 days late is past the 5-day grace period, so h"
+[17:09:00] wind tunnel: CA case #7: 'No, the fee should be 5 dollars. Our minimum late fee is 5 dollars, and 4 dollar'
+[17:09:20] wind tunnel: CA case #8: "No, on day 60 it's 5 dollars, because 4 dollars is below our 5-dollar minimum."
+[17:09:45] wind tunnel: CA case #9: 'No, a 12-cent invoice is charged 2 cents (the 500-cent minimum is capped at a fi'
+[17:10:07] wind tunnel: CA case #10: ''
+[17:10:10] wind tunnel: CA case #11: ''
+[17:10:13] wind tunnel: CA case #12: ''
+[17:10:16] wind tunnel: CA case #13: 'No, negative points should be "suspended", not bronze.'
+[17:10:28] wind tunnel: CA case #14: ''
+[17:10:32] wind tunnel: CA case #15: ''
+[17:10:35] wind tunnel: CA case #16: 'No, it should end at 23:59. Bookings never run past midnight into the next day.'
+[17:10:53] wind tunnel: CA case #17: 'No, it should end at 23:59. Bookings never run past midnight.'
+[17:11:11] wind tunnel: CA case #18: 'No, it should just end at 09:00. Zero or negative minutes add nothing.'
+[17:11:27] wind tunnel: CA case #19: "No, a duration that isn't a number should give no end time at all, not 09:00."
+[17:11:43] wind tunnel: CA case #20: 'No, a part-minute counts as a started block, so it should end at 10:00.'
+[17:12:12] wind tunnel: g63a: CA 10 corrected, 10 confirmed on re-show
+CA: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g63a/upCA.git
+next: python3 lab/launch.py --run g63a
+launched CA-w1 
+launched CA-w2 
+launched CA-w3 
+CA-w2 finished: exit 0, 0.8 min, tokens 472874, cost 0.2304909
+CA-w3 finished: exit 0, 0.9 min, tokens 747540, cost 0.26765669999999997
+CA-w1 finished: exit 0, 0.9 min, tokens 591624, cost 0.2493641
+wrote /home/claude/hive/runs/g63a/agents.csv
+700 calls, 601 correct; hidden tests 173/250; edge calls 399/498
+[17:14:20] wind tunnel: g63a done

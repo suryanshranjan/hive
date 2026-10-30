@@ -1,0 +1,59 @@
+[16:56:07] predictions registered on origin/main: gates/gate63/prompts/PREDICTIONS.md
+[16:56:07] wind tunnel: g63b: 45 spot checks on the 10 functions the list touched, after CB's sheet
+[16:56:09] wind tunnel: CA case #1: ''
+[16:56:13] wind tunnel: CA case #2: 'No. Christmas Day is never a working day, so it should be 1.'
+[16:56:30] wind tunnel: CA case #3: 'No. It should be 0, never a negative count.'
+[16:56:42] wind tunnel: CA case #4: 'No. A date in the wrong format should give -1, not blank.'
+[16:56:57] wind tunnel: CA case #5: ''
+[16:56:59] wind tunnel: CA case #6: 'No. A number without an area code should come back as an empty string, not as ty'
+[16:57:15] wind tunnel: CA case #7: 'No. An extension should be split off and shown as (415) 555-0132 x12.'
+[16:57:33] wind tunnel: CA case #8: 'No. An area code starting in 0 is still accepted and formatted, so it should com'
+[16:57:48] wind tunnel: CA case #9: 'No. Non-North-American numbers should come back as an empty string, not as typed'
+[16:58:02] wind tunnel: CA case #10: 'No. 90 is a B. An A starts at 92.'
+[16:58:14] wind tunnel: CA case #11: ''
+[16:58:17] wind tunnel: CA case #12: 'No. A score above 100 is invalid and should come back as X, not an A.'
+[16:58:29] wind tunnel: CA case #13: "No. Blank text isn't a number, so it should come back empty, not an F."
+[16:58:47] wind tunnel: CA case #14: 'No. A score below 0 is invalid and should come back as X, not an F.'
+[16:59:00] wind tunnel: CA case #15: ''
+[16:59:03] wind tunnel: CA case #16: "No. There's a cap: the fee can't exceed 20% of the invoice, so it should be 2,00"
+[16:59:16] wind tunnel: CA case #17: 'No. 1 day late is within the 5 free days, so the fee should be 0.'
+[16:59:36] wind tunnel: CA case #18: ''
+[16:59:38] wind tunnel: CA case #19: 'No. 2.5 days rounds down to 2, which is within the 5 free days, so the fee shoul'
+[16:59:54] wind tunnel: CA case #20: 'No. Spaces stay in place, so it should print as **** **** **** 1111.'
+[17:00:15] wind tunnel: CA case #21: 'No. A card with fewer than 13 digits should come back as INVALID, not stars.'
+[17:00:32] wind tunnel: CA case #22: 'No. Too many digits should come back as INVALID, not stars.'
+[17:00:52] wind tunnel: CA case #23: "No. Letters aren't a card number, so it should come back as INVALID, not an empt"
+[17:01:04] wind tunnel: CA case #24: ''
+[17:01:06] wind tunnel: CA case #25: ''
+[17:01:08] wind tunnel: CA case #26: ''
+[17:01:11] wind tunnel: CA case #27: 'No. A zone 0 should be billed as zone 3, not left blank.'
+[17:01:24] wind tunnel: CA case #28: 'No. Over 30 kg is a flat 9999 whatever the zone, so it should be 9,999 cents.'
+[17:01:40] wind tunnel: CA case #29: ''
+[17:01:42] wind tunnel: CA case #30: ''
+[17:01:44] wind tunnel: CA case #31: "No. It should come back as 'untitled', not an empty address."
+[17:01:57] wind tunnel: CA case #32: ''
+[17:02:00] wind tunnel: CA case #33: ''
+[17:02:02] wind tunnel: CA case #34: ''
+[17:02:05] wind tunnel: CA case #35: 'No. 50 or more items gets 20% off, so it should be 80,000 cents (800.00).'
+[17:02:20] wind tunnel: CA case #36: ''
+[17:02:22] wind tunnel: CA case #37: 'No. A quantity of zero or less should give a total of 0, not blank.'
+[17:02:37] wind tunnel: CA case #38: "No. With fewer than 5 votes there's no rating, so it should come back empty, not"
+[17:02:53] wind tunnel: CA case #39: "No. With fewer than 5 votes there's no rating, so it should come back empty, not"
+[17:03:07] wind tunnel: CA case #40: ''
+[17:03:09] wind tunnel: CA case #41: ''
+[17:03:11] wind tunnel: CA case #42: ''
+[17:03:13] wind tunnel: CA case #43: ''
+[17:03:15] wind tunnel: CA case #44: 'No. With no valid payments it should come back blank (NULL), not 0.'
+[17:03:29] wind tunnel: CA case #45: 'No. With no payments it should come back blank (NULL), not 0.'
+[17:03:40] wind tunnel: g63b: CA 27 corrected, 26 confirmed on re-show
+CA: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g63b/upCA.git
+next: python3 lab/launch.py --run g63b
+launched CA-w1 
+launched CA-w2 
+launched CA-w3 
+CA-w1 finished: exit 0, 1.4 min, tokens 710428, cost 0.3270133
+CA-w3 finished: exit 0, 1.6 min, tokens 791545, cost 0.3736794
+CA-w2 finished: exit 0, 1.7 min, tokens 527542, cost 0.3434473
+wrote /home/claude/hive/runs/g63b/agents.csv
+700 calls, 607 correct; hidden tests 180/250; edge calls 415/486
+[17:07:19] wind tunnel: g63b done

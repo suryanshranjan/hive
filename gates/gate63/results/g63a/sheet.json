@@ -1,0 +1,682 @@
+{
+ "src": "g60a",
+ "touched": [
+  "bulk_price",
+  "late_fee",
+  "loyalty_tier",
+  "meeting_end"
+ ],
+ "shown": [
+  {
+   "function": "bulk_price",
+   "call": "SELECT bulk_price(1000, 10)",
+   "got": 9500,
+   "say": "Meera orders 10 units at 10 dollars each and the whole order gets 5% off, so she pays 95 dollars instead of 100."
+  },
+  {
+   "function": "bulk_price",
+   "call": "SELECT bulk_price(1000, 9)",
+   "got": 9000,
+   "say": "Meera orders 9 units at 10 dollars each and gets no discount, so she pays 90 dollars; one unit more would make the order cheaper than this one."
+  },
+  {
+   "function": "bulk_price",
+   "call": "SELECT bulk_price(1000, 50)",
+   "got": 45000,
+   "say": "Omar orders 50 units at 10 dollars each and the 10% discount applies to the whole order, so he pays 450 dollars, while 49 units would cost 465.50."
+  },
+  {
+   "function": "bulk_price",
+   "call": "SELECT bulk_price(1000, -3)",
+   "got": 0,
+   "say": "A negative order of minus 3 units at 10 dollars each is not flagged as an error and simply totals 0 dollars."
+  },
+  {
+   "function": "bulk_price",
+   "call": "SELECT bulk_price('1000', 10)",
+   "got": null,
+   "say": "If a unit price of 10 dollars arrives as text instead of a number, the 10-unit order gets no total at all."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 30)",
+   "got": 0,
+   "say": "Ravi's 100-dollar invoice paid exactly 30 days late carries no late fee, because the grace period runs through day 30."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 31)",
+   "got": 400,
+   "say": "Ravi's 100-dollar invoice paid 31 days late is charged a 4-dollar fee, which is 4% of the invoice."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 61)",
+   "got": 600,
+   "say": "Ravi's 100-dollar invoice paid 61 days late is charged 6 dollars, while on day 60 it is still 4 dollars."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(12, 31)",
+   "got": 0,
+   "say": "A 12-cent invoice paid 31 days late is charged no fee, because 4% of it rounds down to nothing, while a 13-cent invoice is charged 1 cent."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(-5000, 40)",
+   "got": 0,
+   "say": "A 50-dollar credit note (a negative amount) that is 40 days overdue is charged no fee, with no warning."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(1000)",
+   "got": "silver",
+   "say": "A customer with exactly 1000 points is already silver, and one with 999 is still bronze."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(5000)",
+   "got": "gold",
+   "say": "A customer with exactly 5000 points becomes gold, and one with 4999 is still silver."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(-100)",
+   "got": "bronze",
+   "say": "A customer with a negative balance of minus 100 points is simply listed as bronze, not flagged as a data error."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(NULL)",
+   "got": null,
+   "say": "A customer with no points balance recorded gets no tier at all, not even bronze."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier('5000')",
+   "got": null,
+   "say": "A customer whose 5000-point balance is stored as text gets no tier at all instead of gold."
+  },
+  {
+   "function": "meeting_end",
+   "call": "SELECT meeting_end('23:30', 60)",
+   "got": "00:30",
+   "say": "Priya's room booking from 23:30 for an hour ends at 00:30, and the result does not say it falls on the next day."
+  },
+  {
+   "function": "meeting_end",
+   "call": "SELECT meeting_end('23:30', 1500)",
+   "got": "00:30",
+   "say": "A booking from 23:30 lasting 25 hours is shown as ending at 00:30, the same as a booking lasting one hour."
+  },
+  {
+   "function": "meeting_end",
+   "call": "SELECT meeting_end('09:00', -30)",
+   "got": "08:30",
+   "say": "A booking from 09:00 with a duration of minus 30 minutes is not rejected and is shown as ending at 08:30, before it starts."
+  },
+  {
+   "function": "meeting_end",
+   "call": "SELECT meeting_end('09:00', 'abc')",
+   "got": "09:00",
+   "say": "A booking from 09:00 whose duration was typed as 'abc' is shown as ending at 09:00, as if it lasted no time."
+  },
+  {
+   "function": "meeting_end",
+   "call": "SELECT meeting_end('09:00', 45.9)",
+   "got": "09:45",
+   "say": "A booking from 09:00 lasting 45.9 minutes ends at 09:45, because the part-minute is dropped, not rounded up."
+  }
+ ],
+ "fixes": [
+  {
+   "shown": "Ravi's 100-dollar invoice paid exactly 30 days late carries no late fee, because the grace period runs through day 30.",
+   "said": "1-5: Yes, that's right.\n6: No, 30 days late is past the 5-day grace period, so he should be charged a fee. On a 100-dollar invoice that's the 5-dollar minimum.",
+   "function": "late_fee",
+   "rounds": 1,
+   "now": "Ravi's 100-dollar invoice paid exactly 30 days late is past the 5-day grace period, so it owes one 30-day period's fee of 2% (2 dollars), which is raised to the 5-dollar (500-cent) minimum and is well under the 20-dollar cap: the late fee comes to 5 dollars, not zero.",
+   "confirmed": true
+  },
+  {
+   "shown": "Ravi's 100-dollar invoice paid 31 days late is charged a 4-dollar fee, which is 4% of the invoice.",
+   "said": "No, the fee should be 5 dollars. Our minimum late fee is 5 dollars, and 4 dollars is below it.",
+   "function": "late_fee",
+   "rounds": 1,
+   "now": "Ravi's 100-dollar invoice paid 31 days late is past the grace period and in the two-period band, so the 4% fee works out to 4 dollars, but that is below the 500-cent (5-dollar) minimum, so the late fee comes to 5 dollars, not 4 (the 20% cap of 20 dollars does not bite).",
+   "confirmed": true
+  },
+  {
+   "shown": "Ravi's 100-dollar invoice paid 61 days late is charged 6 dollars, while on day 60 it is still 4 dollars.",
+   "said": "No, on day 60 it's 5 dollars, because 4 dollars is below our 5-dollar minimum.",
+   "function": "late_fee",
+   "rounds": 1,
+   "now": "Ravi's 100-dollar invoice (10,000 cents) paid 61 days late falls in the third started 30-day period, so the fee is 6% = 600 cents, which is within the 500-cent minimum and the 2,000-cent cap, so he is charged 6 dollars; paid on day 60 it is only two periods, whose 4% figure of 4 dollars is below the minimum, so the fee is raised to the 500-cent minimum, 5 dollars, not 4 dollars.",
+   "confirmed": true
+  },
+  {
+   "shown": "A 12-cent invoice paid 31 days late is charged no fee, because 4% of it rounds down to nothing, while a 13-cent invoice is charged 1 cent.",
+   "said": "No, a 12-cent invoice is charged 2 cents (the 500-cent minimum is capped at a fifth of the invoice), and a 13-cent invoice is also charged 2 cents.",
+   "function": "late_fee",
+   "rounds": 1,
+   "now": "A 12-cent invoice paid 31 days late is not let off: the 4% figure rounds to 0 and the 13-cent invoice's rounds to 1, but both are then raised to the 500-cent minimum and cut back to their 20% cap (2 cents for each), so each invoice owes a late fee of 2 cents.",
+   "confirmed": true
+  },
+  {
+   "shown": "A customer with a negative balance of minus 100 points is simply listed as bronze, not flagged as a data error.",
+   "said": "No, negative points should be \"suspended\", not bronze.",
+   "function": "loyalty_tier",
+   "rounds": 1,
+   "now": "A customer with a negative balance of minus 100 points is not listed as bronze: the loyalty tier comes back as 'suspended', because any balance below 0 points is suspended and only 0 up to 999.9 points is bronze.",
+   "confirmed": true
+  },
+  {
+   "shown": "Priya's room booking from 23:30 for an hour ends at 00:30, and the result does not say it falls on the next day.",
+   "said": "No, it should end at 23:59. Bookings never run past midnight into the next day.",
+   "function": "meeting_end",
+   "rounds": 1,
+   "now": "Priya's room booking from 23:30 for an hour would pass midnight, so the system never wraps to the next day's 00:30: it ends the booking at 23:59 instead.",
+   "confirmed": true
+  },
+  {
+   "shown": "A booking from 23:30 lasting 25 hours is shown as ending at 00:30, the same as a booking lasting one hour.",
+   "said": "No, it should end at 23:59. Bookings never run past midnight.",
+   "function": "meeting_end",
+   "rounds": 1,
+   "now": "A booking from 23:30 lasting 25 hours (1500 minutes) would run past midnight, so it is capped and shown as ending at 23:59, not wrapped round to 00:30. A one-hour booking from 23:30 also ends at 23:59.",
+   "confirmed": true
+  },
+  {
+   "shown": "A booking from 09:00 with a duration of minus 30 minutes is not rejected and is shown as ending at 08:30, before it starts.",
+   "said": "No, it should just end at 09:00. Zero or negative minutes add nothing.",
+   "function": "meeting_end",
+   "rounds": 1,
+   "now": "A booking that starts at 09:00 with a duration of minus 30 minutes adds nothing, so it is not counted backwards: it ends at 09:00, the same time it starts.",
+   "confirmed": true
+  },
+  {
+   "shown": "A booking from 09:00 whose duration was typed as 'abc' is shown as ending at 09:00, as if it lasted no time.",
+   "said": "No, a duration that isn't a number should give no end time at all, not 09:00.",
+   "function": "meeting_end",
+   "rounds": 1,
+   "now": "A booking that starts at 09:00 with a duration typed as 'abc' (not a number at all) gets no end time: the software shows nothing (NULL) instead of 09:00, because it never treats an unreadable duration as zero minutes.",
+   "confirmed": true
+  },
+  {
+   "shown": "A booking from 09:00 lasting 45.9 minutes ends at 09:45, because the part-minute is dropped, not rounded up.",
+   "said": "No, a part-minute counts as a started block, so it should end at 10:00.",
+   "function": "meeting_end",
+   "rounds": 1,
+   "now": "A booking from 09:00 lasting 45.9 minutes is not cut to 45 minutes: the part-minute counts as a started 15-minute block, so the length is rounded up to 60 minutes and the booking ends at 10:00, not 09:45.",
+   "confirmed": true
+  }
+ ],
+ "review": {
+  "replies": 30,
+  "cost": 1.788,
+  "log": [
+   {
+    "prompt": "\nCase 1 of 20. Meera orders 10 units at 10 dollars each and the whole order gets 5% off, so she pays 95 dollars instead of 100.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 2 of 20. Meera orders 9 units at 10 dollars each and gets no discount, so she pays 90 dollars; one unit more would make the order cheaper than this one.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 3 of 20. Omar orders 50 units at 10 dollars each and the 10% discount applies to the whole order, so he pays 450 dollars, while 49 units would cost 465.50.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 4 of 20. A negative order of minus 3 units at 10 dollars each is not flagged as an error and simply totals 0 dollars.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 5 of 20. If a unit price of 10 dollars arrives as text instead of a number, the 10-unit order gets no total at all.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 6 of 20. Ravi's 100-dollar invoice paid exactly 30 days late carries no late fee, because the grace period runs through day 30.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "1-5: Yes, that's right.\n6: No, 30 days late is past the 5-day grace period, so he should be charged a fee. On a 100-dollar invoice that's the 5-dollar minimum."
+   },
+   {
+    "prompt": "\n  With your correction: Ravi's 100-dollar invoice paid exactly 30 days late is past the 5-day grace period, so it owes one 30-day period's fee of 2% (2 dollars), which is raised to the 5-dollar (500-cent) minimum and is well under the 20-dollar cap: the late fee comes to 5 dollars, not zero.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 7 of 20. Ravi's 100-dollar invoice paid 31 days late is charged a 4-dollar fee, which is 4% of the invoice.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, the fee should be 5 dollars. Our minimum late fee is 5 dollars, and 4 dollars is below it."
+   },
+   {
+    "prompt": "\n  With your correction: Ravi's 100-dollar invoice paid 31 days late is past the grace period and in the two-period band, so the 4% fee works out to 4 dollars, but that is below the 500-cent (5-dollar) minimum, so the late fee comes to 5 dollars, not 4 (the 20% cap of 20 dollars does not bite).\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 8 of 20. Ravi's 100-dollar invoice paid 61 days late is charged 6 dollars, while on day 60 it is still 4 dollars.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, on day 60 it's 5 dollars, because 4 dollars is below our 5-dollar minimum."
+   },
+   {
+    "prompt": "\n  With your correction: Ravi's 100-dollar invoice (10,000 cents) paid 61 days late falls in the third started 30-day period, so the fee is 6% = 600 cents, which is within the 500-cent minimum and the 2,000-cent cap, so he is charged 6 dollars; paid on day 60 it is only two periods, whose 4% figure of 4 dollars is below the minimum, so the fee is raised to the 500-cent minimum, 5 dollars, not 4 dollars.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 9 of 20. A 12-cent invoice paid 31 days late is charged no fee, because 4% of it rounds down to nothing, while a 13-cent invoice is charged 1 cent.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, a 12-cent invoice is charged 2 cents (the 500-cent minimum is capped at a fifth of the invoice), and a 13-cent invoice is also charged 2 cents."
+   },
+   {
+    "prompt": "\n  With your correction: A 12-cent invoice paid 31 days late is not let off: the 4% figure rounds to 0 and the 13-cent invoice's rounds to 1, but both are then raised to the 500-cent minimum and cut back to their 20% cap (2 cents for each), so each invoice owes a late fee of 2 cents.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 10 of 20. A 50-dollar credit note (a negative amount) that is 40 days overdue is charged no fee, with no warning.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 11 of 20. A customer with exactly 1000 points is already silver, and one with 999 is still bronze.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 12 of 20. A customer with exactly 5000 points becomes gold, and one with 4999 is still silver.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 13 of 20. A customer with a negative balance of minus 100 points is simply listed as bronze, not flagged as a data error.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, negative points should be \"suspended\", not bronze."
+   },
+   {
+    "prompt": "\n  With your correction: A customer with a negative balance of minus 100 points is not listed as bronze: the loyalty tier comes back as 'suspended', because any balance below 0 points is suspended and only 0 up to 999.9 points is bronze.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 14 of 20. A customer with no points balance recorded gets no tier at all, not even bronze.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 15 of 20. A customer whose 5000-point balance is stored as text gets no tier at all instead of gold.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 16 of 20. Priya's room booking from 23:30 for an hour ends at 00:30, and the result does not say it falls on the next day.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, it should end at 23:59. Bookings never run past midnight into the next day."
+   },
+   {
+    "prompt": "\n  With your correction: Priya's room booking from 23:30 for an hour would pass midnight, so the system never wraps to the next day's 00:30: it ends the booking at 23:59 instead.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 17 of 20. A booking from 23:30 lasting 25 hours is shown as ending at 00:30, the same as a booking lasting one hour.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, it should end at 23:59. Bookings never run past midnight."
+   },
+   {
+    "prompt": "\n  With your correction: A booking from 23:30 lasting 25 hours (1500 minutes) would run past midnight, so it is capped and shown as ending at 23:59, not wrapped round to 00:30. A one-hour booking from 23:30 also ends at 23:59.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 18 of 20. A booking from 09:00 with a duration of minus 30 minutes is not rejected and is shown as ending at 08:30, before it starts.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, it should just end at 09:00. Zero or negative minutes add nothing."
+   },
+   {
+    "prompt": "\n  With your correction: A booking that starts at 09:00 with a duration of minus 30 minutes adds nothing, so it is not counted backwards: it ends at 09:00, the same time it starts.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 19 of 20. A booking from 09:00 whose duration was typed as 'abc' is shown as ending at 09:00, as if it lasted no time.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, a duration that isn't a number should give no end time at all, not 09:00."
+   },
+   {
+    "prompt": "\n  With your correction: A booking that starts at 09:00 with a duration typed as 'abc' (not a number at all) gets no end time: the software shows nothing (NULL) instead of 09:00, because it never treats an unreadable duration as zero minutes.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 20 of 20. A booking from 09:00 lasting 45.9 minutes ends at 09:45, because the part-minute is dropped, not rounded up.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, a part-minute counts as a started block, so it should end at 10:00."
+   },
+   {
+    "prompt": "\n  With your correction: A booking from 09:00 lasting 45.9 minutes is not cut to 45 minutes: the part-minute counts as a started 15-minute block, so the length is rounded up to 60 minutes and the booking ends at 10:00, not 09:45.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   }
+  ],
+  "transcript": "Hive: Now 20 quick checks on what the build does in real cases. Press Enter if a result is right, or say what should happen instead.\n\nCase 1 of 20. Meera orders 10 units at 10 dollars each and the whole order gets 5% off, so she pays 95 dollars instead of 100.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 2 of 20. Meera orders 9 units at 10 dollars each and gets no discount, so she pays 90 dollars; one unit more would make the order cheaper than this one.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 3 of 20. Omar orders 50 units at 10 dollars each and the 10% discount applies to the whole order, so he pays 450 dollars, while 49 units would cost 465.50.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 4 of 20. A negative order of minus 3 units at 10 dollars each is not flagged as an error and simply totals 0 dollars.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 5 of 20. If a unit price of 10 dollars arrives as text instead of a number, the 10-unit order gets no total at all.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 6 of 20. Ravi's 100-dollar invoice paid exactly 30 days late carries no late fee, because the grace period runs through day 30.\n  Right? (Enter = yes, or say what should happen) > 1-5: Yes, that's right.\n6: No, 30 days late is past the 5-day grace period, so he should be charged a fee. On a 100-dollar invoice that's the 5-dollar minimum.\n\n  With your correction: Ravi's 100-dollar invoice paid exactly 30 days late is past the 5-day grace period, so it owes one 30-day period's fee of 2% (2 dollars), which is raised to the 5-dollar (500-cent) minimum and is well under the 20-dollar cap: the late fee comes to 5 dollars, not zero.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 7 of 20. Ravi's 100-dollar invoice paid 31 days late is charged a 4-dollar fee, which is 4% of the invoice.\n  Right? (Enter = yes, or say what should happen) > No, the fee should be 5 dollars. Our minimum late fee is 5 dollars, and 4 dollars is below it.\n\n  With your correction: Ravi's 100-dollar invoice paid 31 days late is past the grace period and in the two-period band, so the 4% fee works out to 4 dollars, but that is below the 500-cent (5-dollar) minimum, so the late fee comes to 5 dollars, not 4 (the 20% cap of 20 dollars does not bite).\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 8 of 20. Ravi's 100-dollar invoice paid 61 days late is charged 6 dollars, while on day 60 it is still 4 dollars.\n  Right? (Enter = yes, or say what should happen) > No, on day 60 it's 5 dollars, because 4 dollars is below our 5-dollar minimum.\n\n  With your correction: Ravi's 100-dollar invoice (10,000 cents) paid 61 days late falls in the third started 30-day period, so the fee is 6% = 600 cents, which is within the 500-cent minimum and the 2,000-cent cap, so he is charged 6 dollars; paid on day 60 it is only two periods, whose 4% figure of 4 dollars is below the minimum, so the fee is raised to the 500-cent minimum, 5 dollars, not 4 dollars.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 9 of 20. A 12-cent invoice paid 31 days late is charged no fee, because 4% of it rounds down to nothing, while a 13-cent invoice is charged 1 cent.\n  Right? (Enter = yes, or say what should happen) > No, a 12-cent invoice is charged 2 cents (the 500-cent minimum is capped at a fifth of the invoice), and a 13-cent invoice is also charged 2 cents.\n\n  With your correction: A 12-cent invoice paid 31 days late is not let off: the 4% figure rounds to 0 and the 13-cent invoice's rounds to 1, but both are then raised to the 500-cent minimum and cut back to their 20% cap (2 cents for each), so each invoice owes a late fee of 2 cents.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 10 of 20. A 50-dollar credit note (a negative amount) that is 40 days overdue is charged no fee, with no warning.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 11 of 20. A customer with exactly 1000 points is already silver, and one with 999 is still bronze.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 12 of 20. A customer with exactly 5000 points becomes gold, and one with 4999 is still silver.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 13 of 20. A customer with a negative balance of minus 100 points is simply listed as bronze, not flagged as a data error.\n  Right? (Enter = yes, or say what should happen) > No, negative points should be \"suspended\", not bronze.\n\n  With your correction: A customer with a negative balance of minus 100 points is not listed as bronze: the loyalty tier comes back as 'suspended', because any balance below 0 points is suspended and only 0 up to 999.9 points is bronze.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 14 of 20. A customer with no points balance recorded gets no tier at all, not even bronze.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 15 of 20. A customer whose 5000-point balance is stored as text gets no tier at all instead of gold.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 16 of 20. Priya's room booking from 23:30 for an hour ends at 00:30, and the result does not say it falls on the next day.\n  Right? (Enter = yes, or say what should happen) > No, it should end at 23:59. Bookings never run past midnight into the next day.\n\n  With your correction: Priya's room booking from 23:30 for an hour would pass midnight, so the system never wraps to the next day's 00:30: it ends the booking at 23:59 instead.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 17 of 20. A booking from 23:30 lasting 25 hours is shown as ending at 00:30, the same as a booking lasting one hour.\n  Right? (Enter = yes, or say what should happen) > No, it should end at 23:59. Bookings never run past midnight.\n\n  With your correction: A booking from 23:30 lasting 25 hours (1500 minutes) would run past midnight, so it is capped and shown as ending at 23:59, not wrapped round to 00:30. A one-hour booking from 23:30 also ends at 23:59.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 18 of 20. A booking from 09:00 with a duration of minus 30 minutes is not rejected and is shown as ending at 08:30, before it starts.\n  Right? (Enter = yes, or say what should happen) > No, it should just end at 09:00. Zero or negative minutes add nothing.\n\n  With your correction: A booking that starts at 09:00 with a duration of minus 30 minutes adds nothing, so it is not counted backwards: it ends at 09:00, the same time it starts.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 19 of 20. A booking from 09:00 whose duration was typed as 'abc' is shown as ending at 09:00, as if it lasted no time.\n  Right? (Enter = yes, or say what should happen) > No, a duration that isn't a number should give no end time at all, not 09:00.\n\n  With your correction: A booking that starts at 09:00 with a duration typed as 'abc' (not a number at all) gets no end time: the software shows nothing (NULL) instead of 09:00, because it never treats an unreadable duration as zero minutes.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 20 of 20. A booking from 09:00 lasting 45.9 minutes ends at 09:45, because the part-minute is dropped, not rounded up.\n  Right? (Enter = yes, or say what should happen) > No, a part-minute counts as a started block, so it should end at 10:00.\n\n  With your correction: A booking from 09:00 lasting 45.9 minutes is not cut to 45 minutes: the part-minute counts as a started 15-minute block, so the length is rounded up to 60 minutes and the booking ends at 10:00, not 09:45.\n  Right now? (Enter = yes, or say what should happen) > \n"
+ },
+ "CA": [
+  "Whenever bulk_price is given a unit price and a quantity of fewer than 10, it returns unit price times quantity with no discount.",
+  "Whenever bulk_price is given a quantity of 10 to 49, it takes 5% off the whole order (not just the units above 10), so 10 units at 100 cents cost 950.",
+  "Whenever bulk_price is given a quantity of 100 or more, it takes 15% off the whole order. When it is given a quantity of 50 to 99, it takes 10% off the whole order, so 50 units at 100 cents cost 4500.",
+  "Whenever a bulk_price discount leaves a fraction of a cent, bulk_price rounds half a cent up to the next whole cent (15 cents x 10 units gives 143, 3 x 10 gives 29).",
+  "Whenever bulk_price is given a quantity of zero or less, or a negative unit price, it returns 0 rather than a negative or error value.",
+  "Whenever either input to bulk_price is NULL, empty text, or any text (even '100' or '5'), bulk_price returns NULL; only real numbers are accepted, and this check comes before the zero/negative rule.",
+  "Whenever bulk_price is given a fractional quantity or price and no discount applies, it drops the fraction of the total (10.5 cents x 3 gives 31, 100 x 9.99 gives 999, while 100 x 2.5 gives 250).",
+  "Whenever bulk_price is given a fractional quantity of 10 or more or a fractional unit price with a discount, the discount tier is judged on the exact quantity (10.5 counts as 10 or more) and the discounted total is rounded half up, though it may come back in decimal form such as 998.0.",
+  "Whenever late_fee is given an invoice that is 5 days late or fewer (including zero or negative days), the fee is 0, because the 5-day grace period runs through day 5 only.",
+  "Rule 10: Whenever late_fee is given an invoice that is more than 5 days late, the fee is 2% of the invoice amount per started 30-day period, after a 5-day grace. An invoice that is 6 to 30 days late is one period, so the percentage is 2% of the invoice amount (a 30-day-late invoice is past the grace and does owe this fee). An invoice that is 31 to 60 days late is two periods, so the percentage is 4% of the invoice amount. These percentages are the figure before the limits. In every band, including the 31-to-60-day band, the fee is never less than the minimum of 500 cents and never more than the cap of 20% of the invoice amount, with the cap rounded down to a whole cent. The cap always wins: when the cap is lower than the 500-cent minimum (any invoice under 2,500 cents), the fee is the cap, not the minimum. So a 100-dollar invoice that is 60 days late has a 4% figure of 4 dollars, which is below the minimum, so it owes the 500-cent minimum (5 dollars), which is under its cap of 20 dollars. A 12-cent invoice that is 31 days late owes 2 cents (its cap, 20% of 12 cents is 2.4, rounded down to 2), and a 13-cent invoice owes 2 cents too (20% is 2.6, rounded down to 2).",
+  "Whenever late_fee is given an invoice that is 61 or more days late, the fee is 2% of the whole invoice amount for each started 30-day period, so 61 to 90 days late is 6%, 91 to 120 days late is 8%, and so on, not in addition to the 4%. The fee has a minimum of 500 cents and a cap of 20% of the invoice amount, with the cap rounded down to a whole cent. The cap always wins: when the cap is lower than the 500-cent minimum, the fee is the cap.",
+  "Whenever a late_fee percentage leaves a fraction of a cent, late_fee rounds half a cent up (4% of 12 cents is 0 and 4% of 13 cents is 1 before the limits are applied). The minimum of 500 cents and the cap of 20% of the invoice amount from rules 10 and 11 are then applied to that rounded figure; the cap itself is rounded down to a whole cent, and where the cap is lower than the minimum the cap is the fee. So a small invoice that is past the grace period and has an amount above zero does not owe no fee: it owes the 500-cent minimum, or its cap if that is lower (a 12-cent invoice and a 13-cent invoice both owe 2 cents).",
+  "Whenever late_fee is given an invoice amount of zero or less, the fee is 0, whatever the days late.",
+  "Whenever late_fee is given a fractional days_late, it applies the same limits to the exact value (30.5 days is already in the 4% band, 60.5 days in the 6% band), and a fractional amount gives a whole-cent fee. The percentage is rounded to a whole cent first (100.5 cents at 4% rounds to 4 cents), and the minimum of 500 cents and the cap of 20% of the invoice amount from rules 10 and 11 are then applied to that figure, with the cap rounded down to a whole cent and winning over the minimum when lower. So that invoice owes its cap of 20 cents (20% of 100.5 is 20.1, rounded down to 20), not the 500-cent minimum.",
+  "Whenever either input to late_fee is NULL, empty text or text of any kind (even '1000' or '40'), late_fee returns NULL, even when the amount is zero or the days are negative.",
+  "Whenever loyalty_tier is given fewer than 0 points (a negative balance), it returns 'suspended'. Whenever loyalty_tier is given 0 up to 999.9 points, it returns 'bronze'; this includes 0 and 999.9.",
+  "Whenever loyalty_tier is given 1000 to 4999 points (4999.5 included), it returns 'silver'; exactly 1000 is silver.",
+  "Whenever loyalty_tier is given 20000 points or more, it returns 'platinum'. Whenever loyalty_tier is given 5000 points or more but fewer than 20000 points, it returns 'gold'; exactly 5000 is gold and exactly 20000 is platinum.",
+  "Whenever loyalty_tier is given NULL, empty text or any text (even '5000'), it returns NULL.",
+  "Whenever make_slug is given a title, it lowercases it and turns every run of characters that are not English letters a-z or digits 0-9 (spaces, punctuation, underscores, slashes, hyphens) into a single hyphen, and removes hyphens from the start and end ('  Hello,   World!! ' becomes 'hello-world').",
+  "Whenever a title contains accented or non-English letters, make_slug does not transliterate them but treats them as separators ('Caf\u00e9 Cr\u00e8me' becomes 'caf-cr-me'). Whenever the slug would be empty, whether because the title has no a-z or digits at all or because the title is an empty title, make_slug returns the text 'untitled' instead of empty text.",
+  "Whenever make_slug is given a maxlen, it cuts the slug to at most that many characters. If the cut falls in the middle of a word (the character right after the kept part is not a hyphen) and the kept part contains a hyphen, it backs up to the last hyphen and drops the partial word, so only whole words are kept ('Hello World Today' with maxlen 8 gives 'hello', not 'hello-wo'). If the cut falls exactly at the end of a word, the word is kept ('Hello World' with maxlen 5 gives 'hello'). If the kept part has no hyphen, the single partial word is still cut at the limit ('Hello World' with maxlen 1 gives 'h'). Afterwards any hyphen left at the end is removed ('Hello World' with maxlen 6 gives 'hello').",
+  "Whenever make_slug is given a maxlen of zero or less, empty text, or text that is not a number, it returns the text 'untitled' instead of an empty address ('Hello World' with maxlen 0 or with a negative maxlen gives 'untitled'); a numeric text such as '5' works as 5 and a fractional maxlen such as 5.9 is cut down to 5.",
+  "Whenever make_slug is given a NULL maxlen (no length limit given), it returns NULL instead of a slug, whatever the title ('Hello World' with a NULL maxlen gives NULL, not 'hello-world'); a NULL title returns NULL whatever the maxlen.",
+  "Whenever make_slug is given a number as the title, it uses the number's text (12345 becomes '12345', 1.5 becomes '1-5').",
+  "Whenever isbn_check is given 0 to 9 digits, it multiplies the digits by 10, 9, 8 ... from left to right (the first digit by 10, the next by 9, and so on, one weight per digit present, with no zeros added), adds them, and returns the digit that brings the total to a multiple of 11; if that digit would be 10 it returns 'X'; the result is text ('030640615' gives '2', '123456789' gives 'X', '000000000' gives '0', '30640615' gives 'X'). With no digits at all (an empty code, or one that is empty once outer spaces and hyphens are ignored) the total is 0, so it returns '0'.",
+  "Whenever isbn_check is given a code with leading or trailing spaces around 0 to 9 digits, it ignores those outer spaces. It also ignores hyphens wherever they appear in the code, so '0-306-40615' is treated as '030640615' and gets '2'. A code that is empty, only spaces, only hyphens, or only spaces and hyphens is treated as empty and gets '0'. Spaces inside the code still make it invalid.",
+  "Whenever isbn_check is given anything that, once the outer spaces and any hyphens are ignored, is neither empty nor 1 to 9 ASCII digits (10 or more digits, letters including an X, spaces inside the code, non-Western digits, or NULL), it returns NULL. An empty code is not in this rule: it gets '0'.",
+  "Whenever isbn_check is given a whole number of 1 to 9 digits (123456789, or 30640615 which has lost its leading zero), it treats it as text exactly as written, with no leading zero added, and works out the check digit from the digits present; a whole number of more than 9 digits, or a decimal such as 30640615.0, returns NULL.",
+  "Whenever fiscal_label is given a valid YYYY-MM-DD date, the fiscal year starts on 1 April and is named for the calendar year it ends in, so 2024-04-01 is 'FY2025-Q1' and 2025-03-31 is 'FY2025-CLOSE' (the last five days of March are the year-end close, see rule 31).",
+  "Whenever fiscal_label is given a date, quarters run Q1 April-June, Q2 July-September, Q3 October-December and Q4 1 January-26 March, so 2024-06-30 is Q1, 2024-07-01 is Q2, 2024-10-01 is Q3 and 2025-01-01 is Q4. In every year, 27 to 31 March (inclusive) is the year-end close and is labelled 'CLOSE' instead of Q4, so 2026-03-26 is 'FY2026-Q4' and 2026-03-27 and 2026-03-31 are 'FY2026-CLOSE'. The label looks like 'FY2025-Q1' or, during the year-end close, 'FY2025-CLOSE'; the fiscal year number is the same as for the quarter it replaces.",
+  "Whenever fiscal_label is given a date that does not exist (2024-02-30, 2023-02-29, 2026-02-30, month 13, month 00), it returns the text 'INVALID' instead of NULL or an error, while a real leap day such as 2024-02-29 is accepted and labelled 'FY2024-Q4'.",
+  "Whenever fiscal_label is given text that does not start with a date in the exact form of four-digit year, two-digit month and two-digit day separated by hyphens (2024-1-5, 2024/04/01, 20240401, empty text, a number, or NULL), it returns NULL; spaces around a valid date are ignored. A date with a time of day after it (such as '2026-04-01 10:00:00' or '2026-04-01T10:00') is accepted and the time is ignored, so the label is worked out from the date alone under rules 30 to 32: 2026-04-01 10:00:00 is 'FY2027-Q1', 2026-03-27 23:59 is 'FY2026-CLOSE', and a date that does not exist with a time attached, such as 2024-02-30 10:00, returns 'INVALID'.",
+  "Whenever fiscal_label is given an extreme year, it still applies the same rule without a range check: year 0001 gives 'FY2-Q1' with no zero padding, and 9999-12-31 gives 'FY10000-Q3'.",
+  "Whenever meeting_end is given a start time and a number of minutes, it returns the start plus those minutes as HH:MM on the 24-hour clock with zero padding ('09:00' plus 60 gives '10:00', '9:05' plus 30 gives '09:35'), except that a booking never runs past midnight into the next day: when the start plus the minutes is past 23:59 or exactly 24:00, however far past (a few minutes, a full day, or several days), it returns '23:59' instead, as rule 36 says. The total is never reduced by whole days or wrapped around the clock ('23:30' plus 60 gives '23:59', not '00:30'; '23:30' plus 1500 minutes, which is 25 hours, also gives '23:59', not '00:30').",
+  "Whenever a booking runs past midnight, meeting_end must never wrap around to the next day's clock time, no matter how long the booking is. Any meeting_end whose start plus minutes is past 23:59, or exactly 24:00, gives '23:59', including bookings longer than 24 hours. For example, '23:30' plus 60 gives '23:59', '23:30' plus 1500 minutes (25 hours) gives '23:59', 1440 minutes gives '23:59', and 1500 minutes gives '23:59' from any start.",
+  "Whenever meeting_end is given zero or negative minutes, the booking adds nothing: it never counts backwards from the start and never wraps to the previous evening. It returns the start itself as HH:MM on the 24-hour clock with zero padding ('09:00' minus 30 gives '09:00', '00:10' minus 30 gives '00:10', '9:05' plus 0 gives '09:05', '10:00' minus 30 gives '10:00'). A negative amount with a fraction, such as -0.5 or -45.9, is still negative, so it also adds nothing and returns the start; the part-minute rule in rule 40 applies only to positive amounts. A bad start still gives NULL (rule 38) and NULL minutes still give NULL (rule 39).",
+  "Whenever meeting_end is given a start that is not H:MM or HH:MM with two-digit minutes (24:00, 12:60, '9am', '09:00:00', '9:5', empty text, a number, or NULL), it returns NULL; one or two digit hours and spaces around the start are accepted.",
+  "Whenever meeting_end is given NULL minutes, or minutes that are text with no leading number (such as 'abc' or empty text), it returns NULL. It never treats such minutes as 0 and never returns the start time for them.",
+  "Whenever meeting_end is given positive minutes with a fraction, the part-minute counts as a started block of 15 minutes. The booking is rounded up, never down, to the next whole 15-minute block, and the end is the start plus that rounded length (45.9 minutes counts as 60, so '09:00' ends at '10:00'; 30.5 counts as 45; 0.5 counts as 15; 15.2 counts as 30). Minutes with no fraction are used exactly as given (45 gives 45, 46 gives 46) and are not rounded to blocks. A negative amount with a fraction is not rounded up and adds nothing (rule 37). Numeric text such as '30' or '1e2' is read as a number, and text that begins with a number ('30 min') uses that number, with the same rounding for a fraction. Text with no leading number, such as 'abc', and empty text is not a duration at all, so meeting_end returns NULL for it (rule 39), not the start time. The midnight limit of rules 35 and 36 is applied to the start plus the rounded-up length.",
+  "Whenever pct_change is given an old and a new value, it returns (new minus old) divided by the size of old, times 100, rounded to 1 decimal, as a decimal number: 100 to 150 is 50.0 and 150 to 100 is -33.3.",
+  "Whenever pct_change is given a negative old value, it divides by the old value's size without its sign, so a rise reads as positive (-100 to -50 is 50.0, -100 to 50 is 150.0).",
+  "Whenever pct_change is given an old value of 0, it returns 0.0, whatever the new value is (0 to 50 is 0.0, and 0 to 0 is 0.0); with a nonzero old value, a new value of 0 gives -100.0, and no change gives 0.0.",
+  "Whenever pct_change is given a NULL for either value, it returns NULL.",
+  "Whenever pct_change is given numeric text such as '100' or ' 100 ', it uses the number; text starting with a number ('150abc') uses the leading number. Text that does not start with a number, or is empty, is not a number, so pct_change returns NULL, whether that text is the old value or the new value and whatever the other value is (an old value of 'abc' gives NULL, and so does a new value of 'abc'). It is not treated as 0, so it does not give 0.0 or -100.0. A real numeric old value of 0 still gives 0.0 (rule 43), and a real numeric new value of 0 still gives -100.0 when the old value is nonzero.",
+  "Whenever pct_change is given a binary (blob) value for either side, it returns NULL.",
+  "Whenever the pct_change result falls exactly halfway at the second decimal, it rounds away from zero (2000 to 2001 gives 0.1, 2000 to 1999 gives -0.1), but values that are only a hair below the halfway point because of decimal inexactness round down (100 to 100.05 gives 0.0).",
+  "Whenever phone_fmt is given a phone number with 10 digits, it ignores every non-digit character (brackets, hyphens, dots, spaces, plus sign, even letters or surrounding words) and returns it as (AAA) EEE-NNNN ('212.555.1234' and 'call 212-555-1234 now' both give '(212) 555-1234').",
+  "Whenever phone_fmt finds 11 digits, whatever the first digit is (including a leading 1 used as the country code), it does not drop any digit and does not format the number. It returns the input exactly as it was given ('1-415-555-1234' gives '1-415-555-1234', and '+1 212 555 1234' gives '+1 212 555 1234').",
+  "Whenever phone_fmt is given anything with some other count of digits (7, 9, 12 digits, no digits, empty text, an international number like '+44 20 7946 0958', or non-Western digits), it returns the input exactly as it was given.",
+  "Whenever phone_fmt is given NULL, it returns NULL.",
+  "Whenever phone_fmt is given a whole number of 10 digits (2125551234), it formats it as text. A whole number of 11 digits (even one starting with 1), a number with a decimal point (2125551234.0), or one with too few digits is returned unchanged as a number.",
+  "Whenever phone_fmt is given 10 digits, it does not check that the area code or exchange is valid, so '0125551234' gives '(012) 555-1234' and '0000000000' gives '(000) 000-0000'.",
+  "Whenever avg_rating is applied to a group of rows, it returns the plain average of the ratings between 1 and 5 inclusive, always rounded to 1 decimal place, never shown with more decimals (ratings 4 and 5 give 4.5, 5, 4 and 3.5 give 4.2, 5, 3, 1, 2.5 give 2.9, and 5, 4 and 4 give 4.3, not 4.333333333333333).",
+  "Whenever a row's rating is NULL, below 1, above 5, or text (even '4'), avg_rating leaves it out of the average completely, counting neither its value nor the row.",
+  "Whenever a group has no ratings that count (no rows, all NULL, empty text, or all outside 1 to 5), avg_rating returns NULL.",
+  "Whenever avg_rating is used with GROUP BY, it gives one average per group, and without GROUP BY it averages across all selected rows; it is not available on a single value outside a group of rows (avg_rating(5) gives NULL).",
+  "Bulk prices round to the nearest 5 cents, with a 500-cent minimum order.",
+  "A customer with a negative balance of minus 100 points is simply listed as bronze, not flagged as a data error. The owner says: No, negative points should be \"suspended\", not bronze."
+ ],
+ "labels": [
+  {
+   "function": "late_fee",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "wrong",
+   "CA": "right",
+   "R": "right",
+   "note": "D/SL/CB say 30 days or fewer -> 0 (and SL/CB also say 5-day grace: conflict); CA fixes to 5"
+  },
+  {
+   "function": "late_fee",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "wrong",
+   "CA": "right",
+   "R": "right",
+   "note": "D: small invoices owe no fee. SL/CB state min 500 but rule 11 says small invoices can owe nothing (conflict). CA resolves"
+  },
+  {
+   "function": "late_fee",
+   "decision": 2,
+   "label": "right",
+   "D": "absent",
+   "SL": "partial",
+   "CB": "partial",
+   "CA": "right",
+   "R": "right",
+   "note": "D no cap. SL/CB state 20% cap but not that it wins over min or floors; CA explicit"
+  },
+  {
+   "function": "late_fee",
+   "decision": 3,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "wrong",
+   "CA": "wrong",
+   "R": "right",
+   "note": "D/SL/CB/CA round half up; oracle rounds up (ceil); only R correct"
+  },
+  {
+   "function": "make_slug",
+   "decision": 0,
+   "label": "right",
+   "D": "absent",
+   "SL": "absent",
+   "CB": "absent",
+   "CA": "absent",
+   "R": "right",
+   "note": "stopwords only in R"
+  },
+  {
+   "function": "make_slug",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "wrong",
+   "CA": "wrong",
+   "R": "right",
+   "note": "D-CA treat & as separator; only R says 'and'"
+  },
+  {
+   "function": "make_slug",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D/SL cut at maxlen only; CB adds exact word-boundary rule"
+  },
+  {
+   "function": "make_slug",
+   "decision": 3,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D/SL empty text; CB/CA 'untitled'"
+  },
+  {
+   "function": "loyalty_tier",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "right",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D bronze for negatives; CA's extra owner-case also says suspended"
+  },
+  {
+   "function": "loyalty_tier",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "right",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D tops at gold"
+  },
+  {
+   "function": "fiscal_label",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D/SL Q4 for Mar 27-31; CB adds CLOSE"
+  },
+  {
+   "function": "fiscal_label",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D/SL NULL for time; CB accepts time (incl. INVALID with time)"
+  },
+  {
+   "function": "fiscal_label",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "partial",
+   "CA": "partial",
+   "R": "right",
+   "note": "D/SL NULL; CB/CA INVALID only for nonexistent dates, malformed text still NULL (oracle INVALID)"
+  },
+  {
+   "function": "bulk_price",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "wrong",
+   "CA": "wrong",
+   "R": "right",
+   "note": "D rounds to whole cent; SL+ add a 5-cent line but rule 3 still says whole-cent (conflict)"
+  },
+  {
+   "function": "bulk_price",
+   "decision": 1,
+   "label": "right",
+   "D": "absent",
+   "SL": "right",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D none; SL+ state 500-cent minimum order (positive orders; 0 rule separate)"
+  },
+  {
+   "function": "isbn_check",
+   "decision": 0,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "X for 10 stated; formula equals oracle for 9 digits"
+  },
+  {
+   "function": "isbn_check",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "partial",
+   "CA": "partial",
+   "R": "right",
+   "note": "D/SL non-digits -> NULL; CB/CA ignore only hyphens/outer spaces, letters/inner spaces NULL"
+  },
+  {
+   "function": "isbn_check",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "wrong",
+   "CA": "wrong",
+   "R": "right",
+   "note": "D-CA return NULL for 10+ digits; oracle uses first 9"
+  },
+  {
+   "function": "meeting_end",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "wrong",
+   "CA": "wrong",
+   "R": "right",
+   "note": "CA says non-fractional minutes are not block-rounded (46 stays 46): contradicts oracle"
+  },
+  {
+   "function": "meeting_end",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "right",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D wraps past midnight; SL+ cap 23:59"
+  },
+  {
+   "function": "pct_change",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D/SL NULL; CB+ 0.0"
+  },
+  {
+   "function": "phone_fmt",
+   "decision": 0,
+   "label": "right",
+   "D": "partial",
+   "SL": "partial",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "D/SL format 11 digits with leading 1; CB+ leave all non-10 unchanged"
+  },
+  {
+   "function": "avg_rating",
+   "decision": 0,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "CB": "right",
+   "CA": "right",
+   "R": "right",
+   "note": "ignoring out-of-range/non-numeric stated everywhere"
+  },
+  {
+   "function": "avg_rating",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "wrong",
+   "CA": "wrong",
+   "R": "right",
+   "note": "D-CA plain average, no trimming"
+  },
+  {
+   "function": "avg_rating",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "SL": "wrong",
+   "CB": "partial",
+   "CA": "partial",
+   "R": "right",
+   "note": "D/SL no rounding; CB/CA 1 decimal but half-up tie not stated"
+  }
+ ],
+ "cost_usd": {
+  "owner": 1.788,
+  "judge": 0.271044
+ }
+}

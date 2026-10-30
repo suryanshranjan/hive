@@ -497,10 +497,13 @@ def handover(state, ch=None, poll=20, rounds=3, sheet=None):
                                        note='Each one is what the product will do. Mark any that is not your policy.',
                                        missing=True, goal=state.get('goal', ''), code=state.get('sheet_source'),
                                        save=state.get('home') and os.path.join(state['home'], 'sheet_review.json'))   # resumes
-        if state.get('sheet_source'):   # Gate 58: spot checks on every part his review left as it was
-            mine = lambda rules, p: [r for r in rules if r.startswith(p)]
-            untouched = [p for p in spotcheck.parts_of(done) if mine(show, p) == mine(done, p)]
-            spots = spotcheck.find(state['sheet_source'], state.get('goal', ''), untouched)
+        if state.get('sheet_source'):   # Gate 58: spot checks on concrete cases; Gate 63: on every part, the ones his
+            # review left as they were first, then the ones he changed (a part he corrected for its headline rule still
+            # has details he skimmed: 32 vs 24 of 50 decisions right, hidden +7.6)
+            order = spotcheck.order(show, done)
+            spots = spotcheck.find(state['sheet_source'], state.get('goal', ''), order)
+            rank = {p: k for k, p in enumerate(order)}
+            spots.sort(key=lambda s: rank.get(s.get('part'), len(order)))
             done, state['spot_checks'] = spotcheck.review(done, spots, ch, None if ch else (lambda p: _ask(p, '')), poll,
                                                           code=state['sheet_source'], goal=state.get('goal', ''))
             shutil.rmtree(state.pop('sheet_source'), ignore_errors=True)
