@@ -1,0 +1,118 @@
+[19:41:52] predictions registered on origin/main: gates/gate65/prompts/PREDICTIONS.md
+[19:43:17] wind tunnel: g65b: Sonnet spotter 45 cases (Gate 60), Opus spotter 50 cases ($0.53)
+[19:43:19] wind tunnel: CS case #1: ''
+[19:43:22] wind tunnel: CS case #2: "No, Christmas Day isn't a working day, so it should be 1."
+[19:43:39] wind tunnel: CS case #3: 'No, it should return 0, never a negative count.'
+[19:43:49] wind tunnel: CS case #4: 'No, a wrong date format should return -1, not blank.'
+[19:44:05] wind tunnel: CS case #5: ''
+[19:44:08] wind tunnel: CS case #6: 'No, a seven-digit number should come out as an empty string, not as typed.'
+[19:44:24] wind tunnel: CS case #7: 'No, an extension should be removed and shown as " x12", so it should be (415) 55'
+[19:44:42] wind tunnel: CS case #8: 'No, a number with an area code starting in 0 is still formatted as (015) 555-013'
+[19:44:55] wind tunnel: CS case #9: 'No, a number with a country code other than 1 or the wrong digit count should co'
+[19:45:09] wind tunnel: CS case #10: 'No, 90 is a B. A starts at 92.'
+[19:45:22] wind tunnel: CS case #11: "No, 89.99 is a B only if it's 83 or more, and it is, so yes, that's right."
+[19:45:32] wind tunnel: CS case #12: 'No, 105 is above 100, so it should be X.'
+[19:45:43] wind tunnel: CS case #13: 'No, blank text should return NULL? Actually policy says non-numbers return NULL,'
+[19:45:57] wind tunnel: CS case #14: 'No, minus 5 should be X.'
+[19:46:09] wind tunnel: CS case #15: ''
+[19:46:11] wind tunnel: CS case #16: 'No, the fee is capped at 20% of the invoice, so it should be 2,000 cents.'
+[19:46:25] wind tunnel: CS case #17: 'No, one day late is within the first 5 days, so the fee is 0.'
+[19:46:49] wind tunnel: CS case #18: 'Case 18: paying early gives days_late of 3 or less (negative), so it returns 0 a'
+[19:47:02] wind tunnel: CS case #19: 'No, fractional days are rounded down to a whole number first, so 2.5 becomes 2, '
+[19:47:19] wind tunnel: CS case #20: 'No, spaces stay where they are: it should print as **** **** **** 1111.'
+[19:47:37] wind tunnel: CS case #21: 'No, fewer than 13 digits should come out as INVALID.'
+[19:47:54] wind tunnel: CS case #22: ''
+[19:47:57] wind tunnel: CS case #23: 'No, letters should give INVALID, not an empty string.'
+[19:48:09] wind tunnel: CS case #24: ''
+[19:48:11] wind tunnel: CS case #25: ''
+[19:48:14] wind tunnel: CS case #26: ''
+[19:48:16] wind tunnel: CS case #27: 'No, zone 0 is billed as zone 3, so it still gets a price.'
+[19:48:33] wind tunnel: CS case #28: 'No, over 30 kg is a flat 9999 cents, so it should be 9999.'
+[19:48:50] wind tunnel: CS case #29: ''
+[19:48:52] wind tunnel: CS case #30: ''
+[19:48:54] wind tunnel: CS case #31: "No, it should come out as 'untitled', not empty."
+[19:49:08] wind tunnel: CS case #32: ''
+[19:49:11] wind tunnel: CS case #33: ''
+[19:49:13] wind tunnel: CS case #34: ''
+[19:49:16] wind tunnel: CS case #35: 'No, 100 items get 20% off, so she pays 80,000 cents (800.00).'
+[19:49:31] wind tunnel: CS case #36: ''
+[19:49:33] wind tunnel: CS case #37: 'No, a negative quantity should give 0, not blank.'
+[19:49:45] wind tunnel: CS case #38: "No, with only one vote the rating isn't trusted yet, so it should be NULL."
+[19:49:58] wind tunnel: CS case #39: 'No, with no votes it should be NULL, not 3.0.'
+[19:50:13] wind tunnel: CS case #40: ''
+[19:50:15] wind tunnel: CS case #41: ''
+[19:50:19] wind tunnel: CS case #42: ''
+[19:50:21] wind tunnel: CS case #43: ''
+[19:50:24] wind tunnel: CS case #44: 'No, with only a refund and no valid rows it should be NULL, not 0.'
+[19:50:39] wind tunnel: CS case #45: 'No, with no payments at all it should be NULL, not 0.'
+[19:50:48] wind tunnel: g65b CS: 45 cases, 28 corrected, 28 confirmed
+[19:50:51] wind tunnel: CO case #1: 'No, Christmas Day is a holiday, so it should be 3 working days.'
+[19:51:03] wind tunnel: CO case #2: ''
+[19:51:07] wind tunnel: CO case #3: ''
+[19:51:09] wind tunnel: CO case #4: 'No, it should be 0 working days, never negative.'
+[19:51:21] wind tunnel: CO case #5: 'No, it should return -1 for a bad or impossible date, not blank.'
+[19:51:35] wind tunnel: CO case #6: 'No, a phone number with an extension should be formatted as (555) 123-4567 x89.'
+[19:51:55] wind tunnel: CO case #7: "No, a seven-digit number with no area code isn't 10 digits, so it should be an e"
+[19:52:11] wind tunnel: CO case #8: ''
+[19:52:13] wind tunnel: CO case #9: "No, a London number with the +44 isn't 10 digits after dropping the country code"
+[19:52:29] wind tunnel: CO case #10: ''
+[19:52:31] wind tunnel: CO case #11: ''
+[19:52:33] wind tunnel: CO case #12: 'No, a missing or non-numeric score should return NULL, not an F.'
+[19:52:46] wind tunnel: CO case #13: ''
+[19:52:49] wind tunnel: CO case #14: "No, a score over 100 should return 'X', not an A."
+[19:53:00] wind tunnel: CO case #15: "No, a score of -5 is below 0, so it should return 'X', not an F."
+[19:53:15] wind tunnel: CO case #16: 'No, the fee is capped at 20% of the invoice, so it should be 20 dollars.'
+[19:53:32] wind tunnel: CO case #17: ''
+[19:53:34] wind tunnel: CO case #18: 'No, 1 day late is within the first 5 days, so the fee is 0.'
+[19:53:55] wind tunnel: CO case #19: 'No, 2.5 days rounds down to 2, which is within the first 5 days, so the fee is 0'
+[19:54:10] wind tunnel: CO case #20: ''
+[19:54:12] wind tunnel: CO case #21: 'No, a card with fewer than 13 digits should come back as INVALID.'
+[19:54:31] wind tunnel: CO case #22: 'No, spaces stay where they were, so it should show **** **** **** 1111.'
+[19:54:46] wind tunnel: CO case #23: 'No, a card with only 4 digits has fewer than 13 digits, so it should come back a'
+[19:55:00] wind tunnel: CO case #24: "No, 'abc' isn't a valid card, so it should return INVALID, not an empty field."
+[19:55:12] wind tunnel: CO case #25: 'No, Amex keeps the last 5 digits visible, so it should show ten stars and then 0'
+[19:55:31] wind tunnel: CO case #26: ''
+[19:55:33] wind tunnel: CO case #27: 'No, an invalid zone like 99 should be billed as zone 3, so it costs 12 dollars.'
+[19:55:51] wind tunnel: CO case #28: ''
+[19:55:53] wind tunnel: CO case #29: 'No, a zone of 2.5 or 0 should be billed as zone 3, not left blank.'
+[19:56:26] wind tunnel: CO case #30: 'No, anything over 30 kg is a flat 99.99 dollars, whatever the zone.'
+[19:56:44] wind tunnel: CO case #31: "No, it should come out as 'untitled', not empty."
+[19:56:58] wind tunnel: CO case #32: ''
+[19:57:01] wind tunnel: CO case #33: "No, the ampersand should become 'and', so it should be rock-and-roll."
+[19:57:17] wind tunnel: CO case #34: ''
+[19:57:19] wind tunnel: CO case #35: "No, an empty title or only punctuation should come out as 'untitled', not empty."
+[19:57:31] wind tunnel: CO case #36: ''
+[19:57:34] wind tunnel: CO case #37: 'No, 50 or more items get 20% off the whole order, so it should be 8000 dollars.'
+[19:57:49] wind tunnel: CO case #38: ''
+[19:57:52] wind tunnel: CO case #39: 'No, totals round half up to the nearest 5 cents, so this should be 30.00 dollars'
+[19:58:22] wind tunnel: CO case #40: 'No, a qty of zero or less should return 0, not a blank.'
+[19:58:47] wind tunnel: CO case #41: "No, with fewer than 5 votes the rating isn't trusted yet, so it should be NULL, "
+[19:59:02] wind tunnel: CO case #42: "No, with fewer than 5 votes the rating isn't trusted yet, so it should be NULL, "
+[19:59:14] wind tunnel: CO case #43: ''
+[19:59:16] wind tunnel: CO case #44: ''
+[19:59:18] wind tunnel: CO case #45: ''
+[19:59:20] wind tunnel: CO case #46: ''
+[19:59:23] wind tunnel: CO case #47: "No, a garbled entry like '12abc' isn't a number, so it's skipped. Receipts are 1"
+[19:59:39] wind tunnel: CO case #48: 'No, with no valid payments it should be blank (NULL), not 0.'
+[19:59:51] wind tunnel: CO case #49: ''
+[19:59:54] wind tunnel: CO case #50: ''
+[19:59:54] wind tunnel: g65b CO: 50 cases, 30 corrected, 28 confirmed
+CS: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g65b/upCS.git
+CO: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g65b/upCO.git
+next: python3 lab/launch.py --run g65b
+launched CO-w1 
+launched CO-w2 
+launched CO-w3 
+launched CS-w1 
+launched CS-w2 
+launched CS-w3 
+CS-w1 finished: exit 0, 0.9 min, tokens 485418, cost 0.2344933
+CO-w2 finished: exit 0, 1.0 min, tokens 490219, cost 0.2468004
+CS-w2 finished: exit 0, 1.2 min, tokens 692661, cost 0.2871043
+CS-w3 finished: exit 0, 1.2 min, tokens 693161, cost 0.2937099
+CO-w1 finished: exit 0, 1.3 min, tokens 1034703, cost 0.33994500000000005
+CO-w3 finished: exit 0, 3.0 min, tokens 492915, cost 0.24508399999999994
+wrote /home/claude/hive/runs/g65b/agents.csv
+700 calls, 602 correct; hidden tests 174/250; edge calls 410/486
+700 calls, 629 correct; hidden tests 194/250; edge calls 437/486
+[20:04:48] wind tunnel: g65b done

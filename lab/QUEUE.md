@@ -2,7 +2,7 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 30 2026 IST, after Gate 64; Gate 45 day 2 next, with the founder)
+## Where we left off (Oct 30 2026 IST, after Gate 65; Gate 45 day 2 next, with the founder)
 
 - **Gate 60 done** (the user, travelling: "Run the tests as required"): two wings. The cases where two independent builds disagree did not find the owner's decisions: pooled over two rule sets, 20 of 50 decisions right vs 26 for Gate 58's spot checks, from 10 cases vs 29. Two Claude builds disagree on only 19% of the first build's errors. Kill fired; the spotter stays. Gate 58 replicated. Found: on the fresh rule set the skimmer touched every function in the list review, so the skip rule showed him no spot checks (BRAIN §8, 000c).
 - **Fast or cheap (product, no gate):** `hive pace fast|cheap`, asked once at the first `hive start` that would use more than one builder; cheap means one builder.
@@ -10,6 +10,7 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 - **Gate 62 done:** a second build from Opus or Haiku disagrees with the first on at most 25% of its errors (all three extra models 29%); stop fired; two wings is closed for Claude models.
 - **Gate 63 done (ship fired):** spot checks on the parts the list review touched, too: 32 vs 24 of 50 decisions, hidden +7.6. The hand-over now spot-checks every part (`spotcheck.order`). For Gate 45 day 2: the founder may now see 40-70 cases after the list; watch where he stops.
 - **Gate 64 done** (the user's idea: a strong planner over cheap builders, escalation when stuck): Haiku finished the deep project but at Sonnet's cost and twice the time; the Opus planner did not help; escalation never needed. Kill fired; no change.
+- **Gate 65 done:** an Opus spotter found different decisions, not more (32 vs 31 of 50); no change. Bigger models helped in no role tried (Gates 62, 64, 65).
 - **Next without the founder:** none is pressing. Ideas: rank spot checks by what is at stake and measure where a tiring skimmer stops; a second vendor's build only after a mechanical test like Gate 62.
 
 ## Earlier (Oct 31 2026, after Gate 58)
