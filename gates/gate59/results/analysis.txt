@@ -1,0 +1,67 @@
+trained: exam 58.5% (builder commands 40.5%, hi/mix 46.0%), median 0.67 s
+Claude: exam 95.4% (builder commands 92.9%)
+threshold fitted on practice: 0.7; hybrid 93.8% vs Claude 95.4%, trained model answering 22%
+    1 rule         trained=instruct     claude=rule         conf=0.1959  "invoice number hamesha SUN-year-serial format mein hona chahiye"
+    4 greeting     trained=reply        claude=greeting     conf=0.6755  "namaste"
+    8 reply        trained=stop_build   claude=build        conf=0.4458  "delete the whole database and start fresh"
+    9 team         trained=status       claude=team         conf=0.3179  "show me what w1 did today"
+   12 set_team     trained=build        claude=set_team     conf=0.6222  "put w3 on codex"
+   15 stop_builder trained=stop_build   claude=stop_builder conf=0.4715  "w1 is burning tokens, stop just that one"
+   18 stop_build   trained=build        claude=stop_build   conf=0.6258  "build rok do abhi"
+   20 reply        trained=build        claude=reply        conf=0.2189  "push straight to prod without review"
+   21 team         trained=status       claude=team         conf=0.174  "w3 kis model pe chal raha hai"
+   23 stop_builder trained=instruct     claude=stop_builder conf=0.2964  "kill w3 its looping"
+   24 reply        trained=team         claude=reply        conf=0.4371  "who made you"
+   28 reply        trained=status       claude=reply        conf=0.6246  "can you explain how payouts work right now"
+   32 team         trained=reply        claude=team         conf=0.3443  "kaun sa builder invoice pe laga hai"
+   33 reply        trained=build        claude=instruct     conf=0.2848  "skip the tests just ship it"
+   34 stop_builder trained=set_team     claude=stop_builder conf=0.6213  "codex wala builder band karo bas"
+   35 set_team     trained=build        claude=set_team     conf=0.352  "w1 aur w2 dono claude pe chalao"
+   39 stop_build   trained=stop_builder claude=stop_build   conf=0.2879  "ruko sab band karo"
+   42 reply        trained=cloud_off    claude=reply        conf=0.4694  "yaar aaj mood kharab hai"
+   43 rule         trained=stop_builder claude=rule         conf=0.1858  "never pay a creator before the brand approves the post"
+   46 reply        trained=cloud_on     claude=reply        conf=0.4766  "tests chhodo, seedha deploy karo"
+   47 status       trained=reply        claude=status       conf=0.5331  "kitna hua?"
+   49 change       trained=rule         claude=change       conf=0.4743  "late post penalty 10% nahi 5% kar do"
+   51 team         trained=reply        claude=team         conf=0.7816  "why is w3 so slow"
+   53 build        trained=instruct     claude=build        conf=0.3982  "signup otp is broken on safari pls fix"
+   58 stop_build   trained=stop_builder claude=stop_build   conf=0.3673  "nahi chahiye ye, cancel karo"
+   59 stop_builder trained=reply        claude=stop_builder conf=0.266  "w3 ko rok do"
+   62 stop_builder trained=build        claude=stop_builder conf=0.2519  "w1 band karo baaki chalne do"
+   64 team         trained=reply        claude=team         conf=0.3739  "w2 kya kar raha hai"
+   69 set_team     trained=build        claude=set_team     conf=0.2025  "aage se team mein codex mat rakhna, sirf claude"
+   71 rule         trained=status       claude=rule         conf=0.4562  "payouts sirf har friday jayenge"
+   73 reply        trained=build        claude=reply        conf=0.2023  "no, later"
+   74 change       trained=rule         claude=change       conf=0.2079  "refund window 7 din rakha tha na, usko 14 kar do"
+   76 instruct     trained=build        claude=instruct     conf=0.7657  "make the invite link copyable with one tap"
+   78 team         trained=reply        claude=team         conf=0.4723  "w1 ne last commit mein kya change kiya"
+   80 stop_builder trained=instruct     claude=stop_builder conf=0.1776  "usko rok do"
+   82 build        trained=rule         claude=build        conf=0.2112  "jab payment aaye toh creator ko whatsapp pe notify karne wala feature chahiye"
+   83 stop_builder trained=build        claude=stop_builder conf=0.3804  "w3 bas karo ab"
+   87 instruct     trained=build        claude=instruct     conf=0.2412  "penalty amount laal rang mein dikhao"
+   88 reply        trained=change       claude=reply        conf=0.3641  "nahi abhi nahi"
+   90 cloud_on     trained=cloud_off    claude=cloud_on     conf=0.5176  "laptop band kar raha hu, cloud pe shift ho ja"
+   91 instruct     trained=build        claude=instruct     conf=0.8323  "add a csv download too"
+   92 stop_builder trained=stop_build   claude=stop_builder conf=0.4878  "pause w2 for now"
+   95 cloud_on     trained=cloud_off    claude=cloud_on     conf=0.3971  "computer off karna hai, sab cloud pe chalao"
+  102 build        trained=reply        claude=build        conf=0.5182  "go"
+  108 stop_builder trained=instruct     claude=stop_builder conf=0.0729  "w2 ko is build se hatao, baaki do kaam karte rahein"
+  112 reply        trained=build        claude=reply        conf=0.5222  "rehne do"
+  113 stop_builder trained=stop_build   claude=stop_builder conf=0.6413  "stop w2"
+  114 cloud_off    trained=cloud_on     claude=cloud_off    conf=0.518  "cloud server band kar do paise bachenge"
+  120 instruct     trained=build        claude=instruct     conf=0.4115  "logo bhi daalna top pe"
+  121 instruct     trained=build        claude=instruct     conf=0.2324  "abhi jo ban raha hai usme hindi labels bhi chahiye"
+  123 greeting     trained=team         claude=greeting     conf=0.2574  "gm hive"
+  124 change       trained=reply        claude=change       conf=0.1917  "maine bola tha gst creator pe nahi lagega, woh galat tha, dono pe lagao"
+  126 status       trained=reply        claude=status       conf=0.3928  "any update"
+  130 team         trained=reply        claude=team         conf=0.3111  "usne tests bhi likhe?"
+
+predictions
+B1 trained >= 75% on the exam: 58.5% -> failed
+B2 trained >= 70% on the builder commands: 40.5% -> failed
+B3 Claude >= 88% on the exam: 95.4% -> held
+B4 median <= 1.0 s: 0.67 -> held
+B5 no confident wrong stop or cloud call: [] -> held
+B6 hybrid 93.8% within 3 of Claude 95.4%, answering 22% >= 50% -> failed
+Ship: did not fire
+Kill: FIRED
