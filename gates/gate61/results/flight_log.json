@@ -1,0 +1,637 @@
+{
+ "log": [
+  {
+   "id": "bulk_price_f01",
+   "category": "bulk_price",
+   "setup": [],
+   "query": "SELECT bulk_price(1000, 49)",
+   "expected": [
+    [
+     46550
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "bulk_price_f02",
+   "category": "bulk_price",
+   "setup": [],
+   "query": "SELECT bulk_price(1000, 10)",
+   "expected": [
+    [
+     9500
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "bulk_price_f03",
+   "category": "bulk_price",
+   "setup": [],
+   "query": "SELECT bulk_price(100, 3)",
+   "expected": [
+    [
+     500
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "bulk_price_f04",
+   "category": "bulk_price",
+   "setup": [],
+   "query": "SELECT bulk_price(333, 10)",
+   "expected": [
+    [
+     3165
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "bulk_price_f05",
+   "category": "bulk_price",
+   "setup": [],
+   "query": "SELECT bulk_price(1000, 0)",
+   "expected": [
+    [
+     0
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "fiscal_label_f01",
+   "category": "fiscal_label",
+   "setup": [],
+   "query": "SELECT fiscal_label('2026-03-27')",
+   "expected": [
+    [
+     "FY2026-CLOSE"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "fiscal_label_f02",
+   "category": "fiscal_label",
+   "setup": [],
+   "query": "SELECT fiscal_label('2026-04-01')",
+   "expected": [
+    [
+     "FY2027-Q1"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "fiscal_label_f03",
+   "category": "fiscal_label",
+   "setup": [],
+   "query": "SELECT fiscal_label('2026-01-15')",
+   "expected": [
+    [
+     "FY2026-Q4"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "fiscal_label_f04",
+   "category": "fiscal_label",
+   "setup": [],
+   "query": "SELECT fiscal_label('2026-02-30')",
+   "expected": [
+    [
+     "INVALID"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "fiscal_label_f05",
+   "category": "fiscal_label",
+   "setup": [],
+   "query": "SELECT fiscal_label(NULL)",
+   "expected": [
+    [
+     null
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "isbn_check_f01",
+   "category": "isbn_check",
+   "setup": [],
+   "query": "SELECT isbn_check('080442957')",
+   "expected": [
+    [
+     "X"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "isbn_check_f02",
+   "category": "isbn_check",
+   "setup": [],
+   "query": "SELECT isbn_check('12345')",
+   "expected": [
+    [
+     "0"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "isbn_check_f03",
+   "category": "isbn_check",
+   "setup": [],
+   "query": "SELECT isbn_check('abcdefghi')",
+   "expected": [
+    [
+     "0"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "isbn_check_f04",
+   "category": "isbn_check",
+   "setup": [],
+   "query": "SELECT isbn_check('1234567890123')",
+   "expected": [
+    [
+     "X"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "isbn_check_f05",
+   "category": "isbn_check",
+   "setup": [],
+   "query": "SELECT isbn_check(NULL)",
+   "expected": [
+    [
+     null
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "late_fee_f01",
+   "category": "late_fee",
+   "setup": [],
+   "query": "SELECT late_fee(10000, 5)",
+   "expected": [
+    [
+     0
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "late_fee_f02",
+   "category": "late_fee",
+   "setup": [],
+   "query": "SELECT late_fee(10000, 6)",
+   "expected": [
+    [
+     500
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "late_fee_f03",
+   "category": "late_fee",
+   "setup": [],
+   "query": "SELECT late_fee(10000, 61)",
+   "expected": [
+    [
+     600
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "late_fee_f04",
+   "category": "late_fee",
+   "setup": [],
+   "query": "SELECT late_fee(100, 31)",
+   "expected": [
+    [
+     20
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "late_fee_f05",
+   "category": "late_fee",
+   "setup": [],
+   "query": "SELECT late_fee(-500, 40)",
+   "expected": [
+    [
+     0
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "loyalty_tier_f01",
+   "category": "loyalty_tier",
+   "setup": [],
+   "query": "SELECT loyalty_tier(1000)",
+   "expected": [
+    [
+     "silver"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "loyalty_tier_f02",
+   "category": "loyalty_tier",
+   "setup": [],
+   "query": "SELECT loyalty_tier(5000)",
+   "expected": [
+    [
+     "gold"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "loyalty_tier_f03",
+   "category": "loyalty_tier",
+   "setup": [],
+   "query": "SELECT loyalty_tier(20000)",
+   "expected": [
+    [
+     "platinum"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "loyalty_tier_f04",
+   "category": "loyalty_tier",
+   "setup": [],
+   "query": "SELECT loyalty_tier(-1)",
+   "expected": [
+    [
+     "suspended"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "loyalty_tier_f05",
+   "category": "loyalty_tier",
+   "setup": [],
+   "query": "SELECT loyalty_tier(NULL)",
+   "expected": [
+    [
+     null
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "make_slug_f01",
+   "category": "make_slug",
+   "setup": [],
+   "query": "SELECT make_slug('The Lord of the Rings', 50)",
+   "expected": [
+    [
+     "lord-rings"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "make_slug_f02",
+   "category": "make_slug",
+   "setup": [],
+   "query": "SELECT make_slug('Caf\u00e9 M\u00fcnster Stra\u00dfe', 50)",
+   "expected": [
+    [
+     "caf-m-nster-stra-e"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "make_slug_f03",
+   "category": "make_slug",
+   "setup": [],
+   "query": "SELECT make_slug('Summer Sale Collection 2026', 15)",
+   "expected": [
+    [
+     "summer-sale"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "make_slug_f04",
+   "category": "make_slug",
+   "setup": [],
+   "query": "SELECT make_slug('Fish & Chips', 50)",
+   "expected": [
+    [
+     "fish-and-chips"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "make_slug_f05",
+   "category": "make_slug",
+   "setup": [],
+   "query": "SELECT make_slug('!!!', 10)",
+   "expected": [
+    [
+     "untitled"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "meeting_end_f01",
+   "category": "meeting_end",
+   "setup": [],
+   "query": "SELECT meeting_end('09:00', 50)",
+   "expected": [
+    [
+     "10:00"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "meeting_end_f02",
+   "category": "meeting_end",
+   "setup": [],
+   "query": "SELECT meeting_end('23:00', 120)",
+   "expected": [
+    [
+     "23:59"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "meeting_end_f03",
+   "category": "meeting_end",
+   "setup": [],
+   "query": "SELECT meeting_end('09:00', -30)",
+   "expected": [
+    [
+     "09:00"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "meeting_end_f04",
+   "category": "meeting_end",
+   "setup": [],
+   "query": "SELECT meeting_end('24:00', 30)",
+   "expected": [
+    [
+     null
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "meeting_end_f05",
+   "category": "meeting_end",
+   "setup": [],
+   "query": "SELECT meeting_end('9:00', 30)",
+   "expected": [
+    [
+     null
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "pct_change_f01",
+   "category": "pct_change",
+   "setup": [],
+   "query": "SELECT pct_change(0, 50)",
+   "expected": [
+    [
+     0.0
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "pct_change_f02",
+   "category": "pct_change",
+   "setup": [],
+   "query": "SELECT pct_change(-100, 50)",
+   "expected": [
+    [
+     -150.0
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "pct_change_f03",
+   "category": "pct_change",
+   "setup": [],
+   "query": "SELECT pct_change(3, 4)",
+   "expected": [
+    [
+     33.3
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "pct_change_f04",
+   "category": "pct_change",
+   "setup": [],
+   "query": "SELECT pct_change(100, 0)",
+   "expected": [
+    [
+     -100.0
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "pct_change_f05",
+   "category": "pct_change",
+   "setup": [],
+   "query": "SELECT pct_change(NULL, 50)",
+   "expected": [
+    [
+     null
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "phone_fmt_f01",
+   "category": "phone_fmt",
+   "setup": [],
+   "query": "SELECT phone_fmt('14155551234')",
+   "expected": [
+    [
+     "14155551234"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "phone_fmt_f02",
+   "category": "phone_fmt",
+   "setup": [],
+   "query": "SELECT phone_fmt('+1 (415) 555-1234')",
+   "expected": [
+    [
+     "+1 (415) 555-1234"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "phone_fmt_f03",
+   "category": "phone_fmt",
+   "setup": [],
+   "query": "SELECT phone_fmt('555-1234')",
+   "expected": [
+    [
+     "555-1234"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "phone_fmt_f04",
+   "category": "phone_fmt",
+   "setup": [],
+   "query": "SELECT phone_fmt('0155551234')",
+   "expected": [
+    [
+     "(015) 555-1234"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "phone_fmt_f05",
+   "category": "phone_fmt",
+   "setup": [],
+   "query": "SELECT phone_fmt('415 555 1234 ext 12')",
+   "expected": [
+    [
+     "415 555 1234 ext 12"
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "avg_rating_f01",
+   "category": "avg_rating",
+   "setup": [
+    "CREATE TABLE reviews (id INTEGER, rating INTEGER)",
+    "INSERT INTO reviews VALUES (0, 5)",
+    "INSERT INTO reviews VALUES (1, 5)",
+    "INSERT INTO reviews VALUES (2, 5)",
+    "INSERT INTO reviews VALUES (3, 5)",
+    "INSERT INTO reviews VALUES (4, 1)"
+   ],
+   "query": "SELECT avg_rating(rating) FROM reviews",
+   "expected": [
+    [
+     5.0
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "avg_rating_f02",
+   "category": "avg_rating",
+   "setup": [
+    "CREATE TABLE reviews (id INTEGER, rating INTEGER)",
+    "INSERT INTO reviews VALUES (0, 5)",
+    "INSERT INTO reviews VALUES (1, 5)",
+    "INSERT INTO reviews VALUES (2, 5)",
+    "INSERT INTO reviews VALUES (3, 1)"
+   ],
+   "query": "SELECT avg_rating(rating) FROM reviews",
+   "expected": [
+    [
+     4.0
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "avg_rating_f03",
+   "category": "avg_rating",
+   "setup": [
+    "CREATE TABLE reviews (id INTEGER, rating INTEGER)",
+    "INSERT INTO reviews VALUES (0, 5)",
+    "INSERT INTO reviews VALUES (1, 4)",
+    "INSERT INTO reviews VALUES (2, 0)",
+    "INSERT INTO reviews VALUES (3, 6)",
+    "INSERT INTO reviews VALUES (4, 9)",
+    "INSERT INTO reviews VALUES (5, 3)"
+   ],
+   "query": "SELECT avg_rating(rating) FROM reviews",
+   "expected": [
+    [
+     4.0
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "avg_rating_f04",
+   "category": "avg_rating",
+   "setup": [
+    "CREATE TABLE reviews (id INTEGER, rating INTEGER)",
+    "INSERT INTO reviews VALUES (0, 1)",
+    "INSERT INTO reviews VALUES (1, 3)",
+    "INSERT INTO reviews VALUES (2, 3)",
+    "INSERT INTO reviews VALUES (3, 4)",
+    "INSERT INTO reviews VALUES (4, 5)",
+    "INSERT INTO reviews VALUES (5, 2)",
+    "INSERT INTO reviews VALUES (6, 2)"
+   ],
+   "query": "SELECT avg_rating(rating) FROM reviews",
+   "expected": [
+    [
+     2.8
+    ]
+   ],
+   "ordered": true
+  },
+  {
+   "id": "avg_rating_f05",
+   "category": "avg_rating",
+   "setup": [
+    "CREATE TABLE reviews (id INTEGER, rating INTEGER)"
+   ],
+   "query": "SELECT avg_rating(rating) FROM reviews",
+   "expected": [
+    [
+     null
+    ]
+   ],
+   "ordered": true
+  }
+ ],
+ "dropped": []
+}

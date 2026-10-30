@@ -1,0 +1,16 @@
+build 1: 700/700 hidden calls right; flight log 50 tests over 10 functions (0 cases dropped)
+N1: hidden 100.0%, broke 0 (0.0%), invoice_total 60/60, clean-up done, 73 commits
+N2: hidden 100.0%, broke 0 (0.0%), invoice_total 60/60, clean-up done, 73 commits
+N3: hidden 100.0%, broke 0 (0.0%), invoice_total 60/60, clean-up done, 73 commits
+T1: hidden 100.0%, broke 0 (0.0%), invoice_total 60/60, clean-up done, 75 commits
+T2: hidden 100.0%, broke 0 (0.0%), invoice_total 60/60, clean-up done, 73 commits
+T3: hidden 100.0%, broke 0 (0.0%), invoice_total 60/60, clean-up done, 73 commits
+mean broke share: N 0.0%, T 0.0%; mean hidden: N 100.0%, T 100.0%
+
+predictions
+F1 an N team breaks ≥ 2%: max 0.0% -> failed
+F2 T broke share ≤ half of N: 0.0% vs 0.0% -> failed
+F3 T hidden ≥ N + 2: +0.0 -> failed
+F4 all 6 teams finish the clean-up: 6 of 6 -> held
+Ship (the flight log): did not fire
+Kill: FIRED
