@@ -233,6 +233,17 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     job_parts = law.parts(goal_text) if auto else None   # Gate 52: size the team by the work, not only the machine
     if auto:
         workers, why = law.builders(t_g, parts=job_parts)
+        chosen = law.pace()
+        if workers > 1 and chosen is None and not overnight:   # asked once, kept for every later build (Gate 50's trade)
+            ans = _ask(f"\nOne choice before I start, asked only once: {_n(workers, 'builder')} would finish about "
+                       f"{law.speedup(workers):.1f}× sooner than one, for about {law.cost_vs_one(workers):.1f}× the cost. "
+                       "Should I build fast or cheap, from now on? (Enter = fast)")
+            chosen = law.read_pace(ans)
+            if chosen:
+                law.set_pace(chosen)
+                say(f"  Got it: {chosen}, from now on. (`hive pace fast` or `hive pace cheap` changes it.)")
+        if chosen == 'cheap':
+            workers, why = law.builders(t_g, parts=job_parts, pace='cheap')
         say(f"\nI'll put {_n(workers, 'builder')} on it ({why}): {law.trade(workers)}. "
             + ("They work on copies" if workers > 1 else "It works on a copy")
             + ", so your branches stay exactly as they are.")   # the trade from Gate 50, so he knows what speed costs
@@ -270,7 +281,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
             rules += interview.instructions(asked)
             say(f"  Thank you. The builders will encode your {_n(len(asked), 'rule')} as tests before anything lands.")
             if auto:
-                n, why = law.builders(t_g, decisions=len(asked), parts=job_parts)
+                n, why = law.builders(t_g, decisions=len(asked), parts=job_parts, pace=law.pace())
                 if n < workers:
                     workers = n
                     say(f"  For a job this size I'll use {_n(n, 'builder')} ({why}).")
