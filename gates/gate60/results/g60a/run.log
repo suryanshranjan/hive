@@ -1,0 +1,123 @@
+[16:04:20] predictions registered on origin/main: gates/gate60/prompts/PREDICTIONS.md
+[16:04:20] reusing oracle gates/gate55/referee/oracle.py (test mode)
+[16:04:20] rules checked: 10 functions, 138 calls, deterministic
+[16:04:20] declared decisions per function: 1:2, 2:3, 3:3, 4:2
+[16:04:21] starting repo and hidden suite built
+[16:04:21] pre-launch: python3 gates/gate60/referee/review60.py pre {run} {oracle}
+[16:04:21] wind tunnel: documenter writing the owner's policy in prose...
+[16:05:06] wind tunnel: R: 64 rules; ask text for N0 written
+[16:05:06] stage 1: N0, B
+N0: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g60a/upN0.git
+B: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g60a/upB.git
+next: python3 lab/launch.py --run g60a
+[16:05:07] launching workers...
+launched B-w1 
+launched B-w2 
+launched B-w3 
+launched N0-w1 
+launched N0-w2 
+launched N0-w3 
+B-w1 finished: exit 0, 0.7 min, tokens 412247, cost 0.1702015
+N0-w3 finished: exit 0, 0.7 min, tokens 461355, cost 0.17680490000000001
+B-w3 finished: exit 0, 0.8 min, tokens 503200, cost 0.1748153
+N0-w2 finished: exit 0, 0.8 min, tokens 526211, cost 0.1890581
+N0-w1 finished: exit 0, 0.9 min, tokens 747484, cost 0.2196402
+B-w2 finished: exit 0, 1.0 min, tokens 665876, cost 0.24821590000000002
+wrote /home/claude/hive/runs/g60a/agents.csv
+[16:06:07] after N0: python3 gates/gate60/referee/review60.py after {run} {oracle} {base}
+[16:09:33] wind tunnel: D: 57 rules; 49 spot checks; 300 probe calls, 46 disagree; 22 disagreement cases
+[16:09:38] wind tunnel: SL owner #1: '3, 10, 11, 16, 18, 36'
+[16:09:40] wind tunnel: SL owner #2: 'Quantity 100 or more should be 15% off the whole order. 50 to 99 stays 10%.'
+[16:09:45] wind tunnel: SL owner #3: 'Rule 10: 2% per started 30-day period after a 5-day grace, so 31 to 60 days late'
+[16:09:53] wind tunnel: SL owner #4: 'Rule 11: 2% per started 30-day period, so 61 to 90 days is 6%, 91 to 120 is 8%, '
+[16:10:03] wind tunnel: SL owner #5: "Negative points should be 'suspended'. Only 0 up to 999.9 is bronze."
+[16:10:08] wind tunnel: SL owner #6: "20,000 points or more should be 'platinum'. Gold is 5,000 up to but not includin"
+[16:10:13] wind tunnel: SL owner #7: 'Rule 36: it should never wrap past midnight. Anything past 23:59, or exactly 24:'
+[16:10:20] wind tunnel: SL owner #8: 'Bulk prices round to the nearest 5 cents, with a 500-cent minimum order.'
+[16:10:20] wind tunnel: SL: 58 rules after review, 8 replies, 0.8 min
+[16:10:22] wind tunnel: CB case #1: ''
+[16:10:26] wind tunnel: CB case #2: 'No, 27 to 31 March is the year-end close, so it should be FY2026-CLOSE, not Q4.'
+[16:10:43] wind tunnel: CB case #3: ''
+[16:10:46] wind tunnel: CB case #4: "No, it should return the text 'INVALID', not nothing."
+[16:10:56] wind tunnel: CB case #5: 'No, the time should be ignored, so it should be labelled FY2027-Q1, not left wit'
+[16:11:10] wind tunnel: CB case #6: ''
+[16:11:14] wind tunnel: CB case #7: 'No, hyphens should be ignored, so 0-306-40615 should also get 2.'
+[16:11:29] wind tunnel: CB case #8: 'No, fewer than 9 digits still gets a check digit from the digits present, so it '
+[16:11:52] wind tunnel: CB case #9: ''
+[16:11:55] wind tunnel: CB case #10: "No, an empty code should get the check digit '0', not be left blank."
+[16:12:12] wind tunnel: CB case #11: 'No, the cut is mid-word and the kept part has a hyphen, so it should back up to '
+[16:12:28] wind tunnel: CB case #12: ''
+[16:12:30] wind tunnel: CB case #13: ''
+[16:12:33] wind tunnel: CB case #14: "No, an empty slug should return the text 'untitled', not an empty address."
+[16:12:47] wind tunnel: CB case #15: "No, with no length limit given it should return NULL, not 'hello-world'."
+[16:12:58] wind tunnel: CB case #16: 'No, an old value of zero should return 0.0, not nothing.'
+[16:13:11] wind tunnel: CB case #17: ''
+[16:13:13] wind tunnel: CB case #18: ''
+[16:13:16] wind tunnel: CB case #19: 'No, a non-number new value should return NULL, not down 100%.'
+[16:13:29] wind tunnel: CB case #20: "No, 'abc' as the new figure should also give NULL, not be treated as zero."
+[16:13:45] wind tunnel: CB case #21: 'No, 11 digits should return the original text unchanged, "1-415-555-1234".'
+[16:13:58] wind tunnel: CB case #22: ''
+[16:14:01] wind tunnel: CB case #23: ''
+[16:14:03] wind tunnel: CB case #24: ''
+[16:14:05] wind tunnel: CB case #25: ''
+[16:14:08] wind tunnel: CB case #26: 'No, it should round to 1 decimal, so 4.2, not 4.17.'
+[16:14:21] wind tunnel: CB case #27: ''
+[16:14:24] wind tunnel: CB case #28: ''
+[16:14:26] wind tunnel: CB case #29: 'No, it should be rounded to 1 decimal, so 4.3.'
+[16:14:37] wind tunnel: CB: 29 cases shown (4 functions skipped as changed by the list), 15 corrected, 15 confirmed on re-show
+[16:14:39] wind tunnel: DG case #1: 'Not right: a date with a time after it should still be labelled. 1 July 2026 is '
+[16:14:53] wind tunnel: DG case #2: ''
+[16:14:56] wind tunnel: DG case #3: ''
+[16:15:01] wind tunnel: DG case #4: ''
+[16:15:04] wind tunnel: DG case #5: 'Not right: a mistyped "x" should give no percentage at all, not a 100% drop.'
+[16:15:18] wind tunnel: DG case #6: ''
+[16:15:21] wind tunnel: DG case #7: ''
+[16:15:24] wind tunnel: DG case #8: ''
+[16:15:27] wind tunnel: DG case #9: ''
+[16:15:31] wind tunnel: DG case #10: ''
+[16:15:31] wind tunnel: DG: 10 cases shown (4 functions skipped as changed by the list), 2 corrected, 2 confirmed on re-show
+[16:15:31] wind tunnel: judge labelling every declared decision...
+[16:17:04] wind tunnel: ask texts for SL, CB and DG written
+[16:17:04] stage 2: SL, CB, DG
+SL: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g60a/upSL.git
+CB: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g60a/upCB.git
+DG: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g60a/upDG.git
+next: python3 lab/launch.py --run g60a
+[16:17:05] launching workers...
+launched CB-w1 
+launched CB-w2 
+launched CB-w3 
+launched DG-w1 
+launched DG-w2 
+launched DG-w3 
+launched SL-w1 
+CB-w2 finished: exit 0, 0.8 min, tokens 549572, cost 0.2139055
+launched SL-w2 
+DG-w1 finished: exit 0, 0.9 min, tokens 460537, cost 0.2184224
+launched SL-w3 
+DG-w3 finished: exit 0, 1.0 min, tokens 589665, cost 0.2531193
+CB-w3 finished: exit 0, 1.1 min, tokens 530575, cost 0.25356219999999996
+SL-w3 finished: exit 0, 0.1 min, tokens 100509, cost 0.08881149999999999
+CB-w1 finished: exit 0, 1.2 min, tokens 541098, cost 0.2676215
+DG-w2 finished: exit 0, 1.2 min, tokens 718367, cost 0.286802
+SL-w1 finished: exit 0, 1.1 min, tokens 522090, cost 0.25018050000000003
+SL-w2 finished: exit 0, 1.3 min, tokens 533304, cost 0.29633980000000004
+wrote /home/claude/hive/runs/g60a/agents.csv
+[16:19:17] scoring every arm call by call...
+# g60a: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 41.6% | 24.0%–60.0% |
+| B | 35.6% | 21.6%–52.0% |
+| SL | 47.2% | 26.0%–67.2% |
+| CB | 59.6% | 38.8%–79.6% |
+| DG | 47.2% | 27.6%–67.6% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| B-N0 | -6.0 | -17.6 to +2.4 |
+| SL-N0 | +5.6 | +1.2 to +10.8 |
+| CB-N0 | +18.0 | +11.6 to +25.2 |
+| DG-N0 | +5.6 | +1.2 to +11.2 |
+[16:19:19] done. Next: write the gate RESULTS.md from runs/g60a/summary.md, update BRAIN.md and lab/QUEUE.md, push.

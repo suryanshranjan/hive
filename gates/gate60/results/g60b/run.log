@@ -1,0 +1,92 @@
+[16:19:20] predictions registered on origin/main: gates/gate60/prompts/PREDICTIONS.md
+[16:19:20] rule-giver writing private rules (headless Claude Code)...
+[16:21:48] rules checked: 10 functions, 142 calls, deterministic
+[16:21:48] declared decisions per function: 1:2, 2:3, 3:3, 4:2
+[16:21:49] starting repo and hidden suite built
+[16:21:49] pre-launch: python3 gates/gate60/referee/review60.py pre {run} {oracle}
+[16:21:49] wind tunnel: documenter writing the owner's policy in prose...
+[16:22:23] wind tunnel: R: 63 rules; ask text for N0 written
+[16:22:23] stage 1: N0, B
+N0: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g60b/upN0.git
+B: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g60b/upB.git
+next: python3 lab/launch.py --run g60b
+[16:22:24] launching workers...
+launched B-w1 
+launched B-w2 
+launched B-w3 
+launched N0-w1 
+launched N0-w2 
+launched N0-w3 
+N0-w2 finished: exit 0, 0.6 min, tokens 499025, cost 0.16204790000000002
+N0-w1 finished: exit 0, 0.6 min, tokens 389832, cost 0.14420929999999998
+B-w2 finished: exit 0, 1.0 min, tokens 375927, cost 0.2238073
+N0-w3 finished: exit 0, 1.1 min, tokens 661298, cost 0.2483637
+B-w1 finished: exit 0, 1.1 min, tokens 541627, cost 0.2447628
+B-w3 finished: exit 0, 1.2 min, tokens 430550, cost 0.23790580000000003
+wrote /home/claude/hive/runs/g60b/agents.csv
+[16:23:36] after N0: python3 gates/gate60/referee/review60.py after {run} {oracle} {base}
+[16:27:43] wind tunnel: D: 75 rules; 45 spot checks; 300 probe calls, 31 disagree; 15 disagreement cases
+[16:27:50] wind tunnel: SL owner #1: '5, 13, 19, 21, 25, 34, 37, 39, 40, 48, 55, 64, 65, 69'
+[16:27:53] wind tunnel: SL owner #2: 'Jan 1 and Dec 25 should be non-working days. No other holidays count.'
+[16:27:57] wind tunnel: SL owner #3: "It should return an empty string, not the original text, whenever it doesn't end"
+[16:28:06] wind tunnel: SL owner #4: 'A is 92 and up, B is 83 and up, C is 71 and up, D is 60 and up, and anything low'
+[16:28:11] wind tunnel: SL owner #5: "Above 100 or below 0 should return 'X'. Exactly 0 is valid and gives F, and 100 "
+[16:28:16] wind tunnel: SL owner #6: 'Cap it at 20% of the invoice (rounded down), with a 500-cent minimum, but the ca'
+[16:28:26] wind tunnel: SL owner #7: "Cap and minimum are fine, but rule 34 is wrong: a zone that's not a whole number"
+[16:28:32] wind tunnel: SL owner #8: 'Over 30000 g should be a flat 9999, whatever the zone. Exactly 30000 is priced n'
+[16:28:38] wind tunnel: SL owner #9: '10 to 49 units get 10% off the whole order, and 50 or more get 20% off the whole'
+[16:28:43] wind tunnel: SL owner #10: 'Round half up to the nearest 5 cents, so the total is always a multiple of 5.'
+[16:28:53] wind tunnel: SL owner #11: 'Fewer than 5 votes should return NULL, and that includes 0 votes. Exactly 5 vote'
+[16:28:58] wind tunnel: SL owner #12: 'It should return NULL, not 0, when there are no valid rows.'
+[16:29:05] wind tunnel: SL owner #13: 'A plain apostrophe should just be deleted, so "dog\'s" gives "dogs", not "dog-s".'
+[16:29:09] wind tunnel: SL owner #14: "It should return 'untitled', not empty text."
+[16:29:15] wind tunnel: SL owner #15: 'Spaces and hyphens should stay exactly where they are, and any other character l'
+[16:29:19] wind tunnel: SL owner #16: 'Nothing else. Enter'
+[16:29:19] wind tunnel: SL: 76 rules after review, 16 replies, 1.6 min
+[16:29:19] wind tunnel: CB: 0 cases shown (10 functions skipped as changed by the list), 0 corrected, 0 confirmed on re-show
+[16:29:19] wind tunnel: DG: 0 cases shown (10 functions skipped as changed by the list), 0 corrected, 0 confirmed on re-show
+[16:29:19] wind tunnel: judge labelling every declared decision...
+[16:30:24] wind tunnel: ask texts for SL, CB and DG written
+[16:30:24] stage 2: SL, CB, DG
+SL: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g60b/upSL.git
+CB: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g60b/upCB.git
+DG: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g60b/upDG.git
+next: python3 lab/launch.py --run g60b
+[16:30:25] launching workers...
+launched CB-w1 
+launched CB-w2 
+launched CB-w3 
+launched DG-w1 
+launched DG-w2 
+launched DG-w3 
+launched SL-w1 
+CB-w2 finished: exit 0, 0.2 min, tokens 215800, cost 0.1223815
+launched SL-w2 
+DG-w3 finished: exit 0, 0.8 min, tokens 531048, cost 0.22814379999999998
+launched SL-w3 
+DG-w2 finished: exit 0, 0.9 min, tokens 531657, cost 0.24126379999999997
+DG-w1 finished: exit 0, 1.4 min, tokens 746364, cost 0.31848550000000003
+SL-w1 finished: exit 0, 1.2 min, tokens 716412, cost 0.3039331
+SL-w2 finished: exit 0, 1.2 min, tokens 808042, cost 0.3030211
+CB-w3 finished: exit 0, 2.3 min, tokens 711939, cost 0.42956
+SL-w3 finished: exit 0, 3.2 min, tokens 684827, cost 0.2985364
+CB-w1 finished: exit 0, 4.2 min, tokens 827503, cost 0.31208949999999996
+wrote /home/claude/hive/runs/g60b/agents.csv
+[16:34:37] scoring every arm call by call...
+# g60b: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 34.8% | 20.4%–51.2% |
+| B | 32.4% | 18.8%–49.2% |
+| SL | 69.2% | 50.4%–87.2% |
+| CB | 66.4% | 44.8%–86.0% |
+| DG | 66.8% | 46.4%–86.0% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| B-N0 | -2.4 | -5.6 to +0.0 |
+| SL-N0 | +34.4 | +18.0 to +50.4 |
+| CB-N0 | +31.6 | +11.2 to +49.6 |
+| DG-N0 | +32.0 | +14.4 to +50.4 |
+[16:34:39] done. Next: write the gate RESULTS.md from runs/g60b/summary.md, update BRAIN.md and lab/QUEUE.md, push.
