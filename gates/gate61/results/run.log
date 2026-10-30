@@ -1,0 +1,47 @@
+[16:35:08] predictions registered on origin/main: gates/gate61/prompts/PREDICTIONS.md
+[16:35:08] build 1: 700 of 700 hidden calls right
+[16:36:23] flight log: 50 confirmed outcomes over 10 functions (0 cases dropped); spotter $0.29
+[16:36:24] seed N: TOTAL          1360/1362
+[16:36:25] seed T: TOTAL          1410/1412
+N1: 2 workers, tools/ask.py port None, repo /home/claude/hive/runs/g61/upN1.git
+N2: 2 workers, tools/ask.py port None, repo /home/claude/hive/runs/g61/upN2.git
+N3: 2 workers, tools/ask.py port None, repo /home/claude/hive/runs/g61/upN3.git
+next: python3 lab/launch.py --run g61
+T1: 2 workers, tools/ask.py port None, repo /home/claude/hive/runs/g61/upT1.git
+T2: 2 workers, tools/ask.py port None, repo /home/claude/hive/runs/g61/upT2.git
+T3: 2 workers, tools/ask.py port None, repo /home/claude/hive/runs/g61/upT3.git
+next: python3 lab/launch.py --run g61
+[16:36:27] launching 12 builders (6 at a time)...
+launched N1-w1 
+launched N1-w2 
+launched N2-w1 
+launched N2-w2 
+launched N3-w1 
+launched N3-w2 
+launched T1-w1 
+N3-w1 finished: exit 0, 1.0 min, tokens 432079, cost 0.2144923
+launched T1-w2 
+N2-w1 finished: exit 0, 1.0 min, tokens 604110, cost 0.23657870000000003
+launched T2-w1 
+N1-w2 finished: exit 0, 1.2 min, tokens 615816, cost 0.24720139999999996
+launched T2-w2 
+N3-w2 finished: exit 0, 1.4 min, tokens 639012, cost 0.19386279999999997
+launched T3-w1 
+N2-w2 finished: exit 0, 1.7 min, tokens 699995, cost 0.21097939999999996
+launched T3-w2 
+N1-w1 finished: exit 0, 1.7 min, tokens 695130, cost 0.20511639999999998
+T1-w2 finished: exit 0, 1.0 min, tokens 660107, cost 0.2289096
+T2-w1 finished: exit 0, 0.9 min, tokens 725940, cost 0.2528808
+T3-w2 finished: exit 0, 1.1 min, tokens 793377, cost 0.27051949999999997
+T3-w1 finished: exit 0, 1.6 min, tokens 468384, cost 0.16683649999999994
+T1-w1 finished: exit 0, 4.1 min, tokens 412213, cost 0.1495492
+T2-w2 finished: exit 0, 4.4 min, tokens 740234, cost 0.20493280000000003
+wrote /home/claude/hive/runs/g61/agents.csv
+[16:42:13] builds done in 5.8 min; scoring...
+[16:42:16] N1: 700/700 hidden right, broke 0, invoice 52/60, clean-up done
+[16:42:18] T1: 700/700 hidden right, broke 0, invoice 60/60, clean-up done
+[16:42:20] T2: 700/700 hidden right, broke 0, invoice 60/60, clean-up done
+[16:42:23] N2: 700/700 hidden right, broke 0, invoice 52/60, clean-up done
+[16:42:25] N3: 700/700 hidden right, broke 0, invoice 52/60, clean-up done
+[16:42:27] T3: 700/700 hidden right, broke 0, invoice 60/60, clean-up done
+[16:42:27] done: python3 gates/gate61/referee/analyze.py runs/g61/results.json
