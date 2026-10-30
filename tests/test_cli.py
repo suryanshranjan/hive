@@ -80,6 +80,14 @@ check('a chosen agent is used for every builder', 'gemini --yolo' in swarm.build
 os.environ['HIVE_WORKER_CMD'] = 'my-agent --run'
 check('HIVE_WORKER_CMD still overrides any preset (any other agent)', swarm.builder_cmd('codex'), 'my-agent --run')
 os.environ.pop('HIVE_WORKER_CMD'); os.environ.pop('HIVE_AGENT')
+# an agent that is not installed is named before any builder starts, with how to get it (Oct 31: the Antigravity IDE
+# has no command-line mode, so the antigravity preset cannot run here)
+import shutil as _sh
+_which = _sh.which
+_sh.which = lambda exe: None if exe in ('agy', 'gemini') else _which(exe)
+check('agents missing here are found before a build', swarm.missing_agents('claude,antigravity,gemini'), ['antigravity', 'gemini'])
+check('and Antigravity says why, pointing to Gemini', 'use --agent gemini' in swarm.AGENT_HELP['antigravity'], True)
+_sh.which = _which
 # a mixed swarm: Claude and Codex builders in one build, taking the agents in turn
 check('claude,codex gives w1 Claude, w2 Codex, w3 Claude', [swarm.builder_agent('claude,codex', k) for k in (1, 2, 3)],
       ['claude', 'codex', 'claude'])

@@ -31,7 +31,8 @@ def checks(repo='.', claude_probe=True):
             continue
         exe = swarm.AGENTS[agent][1]
         out.append((bool(shutil.which(exe)), True, f'{agent} is installed (your builders run on it)',
-                    f'Install {agent} and log in once in a terminal ({exe}), or build with --agent claude.'))
+                    swarm.AGENT_HELP.get(agent, f'Install {agent} and log in once in a terminal ({exe})') +
+                    ' Or build with --agent claude.'))
     if claude and claude_probe:
         p = _run([claude, '-p', 'Reply with the single word OK'], timeout=90)   # the full path: on Windows it is a .cmd
         ok = bool(p and p.returncode == 0 and 'OK' in p.stdout.upper())
