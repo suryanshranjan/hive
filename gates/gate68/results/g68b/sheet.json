@@ -1,0 +1,1465 @@
+{
+ "R": [
+  "Whenever late_fee receives a NULL or non-numeric balance or days_late, it returns NULL; numeric text such as '200' is accepted as a number.",
+  "Whenever late_fee gets a balance that is zero or negative, it returns 0.",
+  "Whenever late_fee gets days_late of 3 or fewer (including zero or negative), it returns 0, because the first 3 days are a grace period; 3.5 days is already past the grace period.",
+  "Whenever late_fee charges a fee, the base fee is 1.5% of the balance for each week late.",
+  "Whenever late_fee counts weeks, it rounds days_late/7 up, so any partial week counts as a full week (4 days is 1 week, 8 days is 2 weeks).",
+  "Whenever late_fee computes a fee below 5.00, it raises the fee to the minimum of 5.00.",
+  "Whenever late_fee computes a fee above 25% of the balance, it lowers the fee to 25% of the balance.",
+  "Whenever late_fee applies both limits, the 25% cap is applied after the 5.00 minimum, so for balances under 20.00 the fee is 25% of the balance (below 5.00).",
+  "Whenever late_fee has a final fee with fractions of a cent, it rounds down (floors) to whole cents, never up.",
+  "Whenever loyalty_tier receives NULL or a non-numeric value, it returns NULL; numeric text such as '3000' is accepted as a number.",
+  "Whenever loyalty_tier gets negative points, it returns 'Closed'.",
+  "Whenever loyalty_tier gets points from 0 up to but not including 1000, it returns 'Bronze'.",
+  "Whenever loyalty_tier gets points from 1000 up to but not including 5000, it returns 'Silver'.",
+  "Whenever loyalty_tier gets points from 5000 up to but not including 20000, it returns 'Gold'.",
+  "Whenever loyalty_tier gets 20000 points or more, it returns 'Platinum'.",
+  "Whenever loyalty_tier gets fractional points, it compares the exact value to the thresholds without rounding (4999.5 is Silver).",
+  "Whenever mask_card receives NULL, it returns NULL.",
+  "Whenever mask_card receives a value, it first converts it to text (a numeric card number is treated as its digits) and removes every non-digit character such as spaces, hyphens and letters.",
+  "Whenever mask_card has more than 4 digits left, it outputs one '*' for each digit except the last 4, followed by the last 4 digits, with no separators or grouping in the output.",
+  "Whenever mask_card has 4 or fewer digits left, it masks all of them with one '*' per digit, so the last 4 are not revealed.",
+  "Whenever mask_card has no digits left (empty text or letters only), it returns an empty string, not NULL.",
+  "Whenever biz_days receives a NULL start or end, it returns NULL.",
+  "Whenever biz_days receives a start or end that is not text in strict YYYY-MM-DD form or is not a real calendar date (such as 2024-02-30 or month 13), it returns -1; surrounding whitespace is ignored.",
+  "Whenever biz_days gets an end date before the start date, it returns 0 (never a negative count).",
+  "Whenever biz_days gets equal start and end dates, it returns 0.",
+  "Whenever biz_days counts days, it counts each day after the start date up to and including the end date, so the start date itself is never counted.",
+  "Whenever biz_days counts days, only Monday to Friday count as business days; Saturdays and Sundays are excluded.",
+  "Whenever biz_days counts days, December 25 and January 1 of any year are excluded even when they fall on a weekday.",
+  "Whenever biz_days counts days, no holidays other than December 25 and January 1 are excluded, and holidays falling on weekends are not shifted to another day.",
+  "Whenever split_bill receives a NULL or non-numeric total, people or tip_pct, it returns NULL; numeric text is accepted as a number.",
+  "Whenever split_bill gets people of zero or less, it returns NULL.",
+  "Whenever split_bill gets tip_pct above 30, it uses 30 instead.",
+  "Whenever split_bill gets a tip_pct of 0 it adds no tip, and a negative tip_pct is not raised to 0 (it reduces the bill).",
+  "Whenever split_bill computes the share, it is total times (1 + tip_pct/100) divided by people.",
+  "Whenever split_bill has a share with fractions of a cent, it rounds up to the next whole cent, never down, even for an exact tiny remainder.",
+  "Whenever split_bill gets a total of 0, it returns 0.",
+  "Whenever review_stars receives a NULL or non-numeric avg or votes, it returns NULL; numeric text is accepted as a number.",
+  "Whenever review_stars gets fewer than 5 votes (including zero or negative votes), it returns the text 'n/a' whatever the average is; 5 votes is enough to show a rating.",
+  "Whenever review_stars has enough votes, it first clamps avg into the range 0 to 5, so values above 5 give 5 and negative values give 0.",
+  "Whenever review_stars shows a rating, it rounds avg to the nearest half star and returns a number such as 4.5 or 3.0.",
+  "Whenever review_stars has an avg exactly halfway between two half-star steps (such as 4.25 or 4.75), it rounds up to the higher half star.",
+  "Whenever make_slug receives NULL, it returns NULL; a non-text value is converted to text first.",
+  "Whenever make_slug builds a slug, it first replaces every '&' with the word 'and' (surrounded by spaces, so it is always a separate word, even in 'Tom&Jerry').",
+  "Whenever make_slug sees accented letters, it replaces them with their plain base letters (\u00e9 becomes e, \u00fc becomes u).",
+  "Whenever make_slug builds a slug, it converts all letters to lower case.",
+  "Whenever make_slug sees any run of characters that are not letters a-z or digits 0-9 (spaces, punctuation, symbols, hyphens, and letters with no plain Latin equivalent), it replaces the whole run with a single hyphen.",
+  "Whenever make_slug builds a slug, it removes hyphens from the start and the end.",
+  "Whenever make_slug produces more than 40 characters, it cuts the slug to 40 characters and then removes any trailing hyphen left by the cut.",
+  "Whenever make_slug ends up with an empty slug (empty text, or text with no letters or digits), it returns 'untitled'.",
+  "Whenever overtime_pay receives a NULL or non-numeric hours or rate, it returns NULL; numeric text is accepted as a number.",
+  "Whenever overtime_pay gets negative hours, it returns 0.",
+  "Whenever overtime_pay gets zero hours, it returns 0.",
+  "Whenever overtime_pay computes pay, hours up to 40 are paid at 1x the rate.",
+  "Whenever overtime_pay computes pay, hours above 40 and up to 60 are paid at 1.5x the rate.",
+  "Whenever overtime_pay computes pay, hours above 60 are paid at 2x the rate (double time).",
+  "Whenever overtime_pay gets fractional hours, it pays the fraction at the rate of the band it falls in (40.5 hours pays 0.5 hour at 1.5x).",
+  "Whenever overtime_pay rounds the total, it rounds to the nearest cent with exact halves rounding up.",
+  "Whenever overtime_pay gets a negative rate, it applies no special handling and the pay is negative by the same formula.",
+  "Whenever norm_phone receives NULL, it returns NULL.",
+  "Whenever norm_phone receives a value, it converts it to text and drops everything from the first occurrence of 'ext' or 'x' (any case) to the end, treating that as an extension that is never kept in the output.",
+  "Whenever norm_phone has the remaining text, it keeps only the digits, ignoring spaces, hyphens, parentheses, dots, a plus sign and any other characters.",
+  "Whenever norm_phone has exactly 10 digits, it returns '+1' followed by the 10 digits.",
+  "Whenever norm_phone has exactly 11 digits starting with 1, it returns '+' followed by the 11 digits.",
+  "Whenever norm_phone has any other digit count (fewer than 10, more than 11, 11 not starting with 1, or no digits, including empty text), it returns the text 'INVALID' rather than NULL; other country codes are not supported.",
+  "Whenever mid_value aggregates a column, it ignores NULLs, text values (even numeric-looking text) and non-finite numbers.",
+  "Whenever mid_value has no numeric values left (empty column or only ignored values), it returns NULL.",
+  "Whenever mid_value has an odd count of numeric values, it returns the middle value in sorted order.",
+  "Whenever mid_value has an even count of numeric values, it returns the lower of the two middle values and does not average them.",
+  "Whenever mid_value returns a value, it is one of the original column values, unchanged (not converted to a float), and duplicates each count as separate values."
+ ],
+ "D": [
+  "biz_days: Whenever both dates are valid 'YYYY-MM-DD' dates, the result is the number of Monday-to-Friday days after the start date up to and including the end date; the start date itself is never counted (e.g. Mon 2024-01-01 to Mon 2024-01-08 gives 5).",
+  "biz_days: Whenever the end date is the same as or earlier than the start date, the result is 0.",
+  "biz_days: Whenever a day in the range falls on a Saturday or Sunday, it is not counted (Saturday 2024-01-06 to Sunday 2024-01-07 gives 0).",
+  "biz_days: Whenever a day in the range is December 25 or January 1, it is not counted, even if it is a weekday, in every year (2024-12-24 to 2024-12-26 gives 1). No other holidays are recognised.",
+  "biz_days: Whenever the start date is a holiday or weekend, it makes no difference, because the start date is never counted; whenever the end date is a weekday that is not a holiday, it is counted.",
+  "biz_days: Whenever either date is NULL, the result is NULL, even if the other date is not a valid date.",
+  "biz_days: Whenever either date is not valid text in exactly the form YYYY-MM-DD with a real calendar date (empty text, a number, a missing leading zero like '2024-1-1', a date with a time, an impossible date like 2024-02-30, or year 0000), the result is -1.",
+  "biz_days: Whenever a valid date has spaces before or after it, the spaces are ignored and the date is used normally.",
+  "biz_days: Whenever the range includes February 29 of a leap year, that day is counted like any other weekday (2024-02-28 to 2024-03-01 gives 2; 2023-02-28 to 2023-03-01 gives 1).",
+  "late_fee: Whenever the invoice is 3 days late or fewer (including 0 or negative days), the fee is 0.00; the fee starts only at more than 3 days (3.01 days already counts as late).",
+  "late_fee: Whenever the invoice is more than 3 days late, the base fee is 1.5% of the balance for each week late, and any part of a week counts as a full week (4 to 7 days is one week, 8 to 14 days is two weeks; a 1000.00 balance gives 15.00 at 7 days and 30.00 at 8 days).",
+  "late_fee: Whenever the base fee is under 5.00 and the invoice is more than 3 days late, the fee is raised to a minimum of 5.00 (a 100.00 balance 4 days late is charged 5.00).",
+  "late_fee: Whenever the fee would be more than 25% of the balance, it is capped at 25% of the balance, and this cap overrides the 5.00 minimum (a 10.00 balance more than 3 days late is charged 2.50; a 4.00 balance 10 days late is charged 1.00).",
+  "late_fee: Whenever the fee has fractions of a cent, it is rounded down to the whole cent, never up (a 1234.57 balance 10 days late gives 37.03, not 37.04; a 0.01 balance gives 0.00).",
+  "late_fee: Whenever the balance is zero or negative, the fee is 0.00, however late the invoice is.",
+  "late_fee: Whenever either the balance or the days late is NULL, the result is NULL.",
+  "late_fee: Whenever the balance or days late is given as text, the number at the start of the text is used (' 500 ' and '10' work, '10abc' counts as 10), and text with no leading number such as 'abc' or empty text counts as 0, which gives a fee of 0.00.",
+  "late_fee: Whenever the days late is a fraction, any amount over 3 days is charged and rounded up to a whole week (3.5 days on a 500.00 balance gives 7.50).",
+  "loyalty_tier: Whenever the points balance is from 0 up to just under 1000, the tier is 'Bronze'.",
+  "loyalty_tier: Whenever the points balance is 1000 or more but under 5000, the tier is 'Silver'; exactly 1000 is Silver and 4999 is still Silver.",
+  "loyalty_tier: Whenever the points balance is 5000 or more but under 20000, the tier is 'Gold'; exactly 5000 is Gold and 19999.9 is still Gold.",
+  "loyalty_tier: Whenever the points balance is 20000 or more, the tier is 'Platinum'; exactly 20000 is Platinum.",
+  "loyalty_tier: Whenever the points balance is below zero (even -0.5), the tier is 'Closed'.",
+  "loyalty_tier: Whenever the points balance has a fraction, it is not rounded; 999.99 is Bronze.",
+  "loyalty_tier: Whenever the points balance is NULL, the result is NULL.",
+  "loyalty_tier: Whenever the points are given as text, the number at the start of the text is used ('5000' is Gold, '1500abc' is Silver), and text with no leading number or empty text counts as 0 and gives 'Bronze'.",
+  "make_slug: Whenever a title is given, the slug is the title in lower case with every run of characters other than letters a-z and digits 0-9 (spaces, punctuation, underscores, slashes, apostrophes, dots, commas) replaced by a single hyphen ('A_B/C.D!' gives 'a-b-c-d'; 'Tom''s' gives 'tom-s'; '1,000 items' gives '1-000-items').",
+  "make_slug: Whenever the title has leading or trailing spaces or symbols, or repeated spaces, no leading, trailing or doubled hyphens appear ('  Hello   World  ' gives 'hello-world').",
+  "make_slug: Whenever the title contains an ampersand, it is read as the word 'and' ('Rock & Roll' and 'Rock&Roll' both give 'rock-and-roll').",
+  "make_slug: Whenever the title has accented letters that can be split into a plain letter and an accent, the accent is dropped and the plain letter kept ('Caf\u00e9 Cr\u00e8me' gives 'cafe-creme'); full-width letters such as '\uff21\uff22\uff23' become plain 'abc'.",
+  "make_slug: Whenever the title has letters with no plain-letter equivalent (Japanese, \u00c6, \u00d8, \u00df), those characters are treated as symbols and dropped, becoming a hyphen between other words.",
+  "make_slug: Whenever the slug would be longer than 40 characters, it is cut at 40 characters, and a hyphen left at the end by the cut is removed, so the slug may be 39 characters.",
+  "make_slug: Whenever the title is empty, only spaces, only symbols, or only characters with no Latin equivalent, the slug is 'untitled'.",
+  "make_slug: Whenever the title is NULL, the result is NULL.",
+  "make_slug: Whenever the title is a number, it is treated as its text ('12345' gives '12345', 1.5 gives '1-5', and 1.0 gives '1').",
+  "mask_card: Whenever the card number has 5 or more digits, every digit except the last 4 is replaced by '*' and the last 4 are shown, giving one '*' per hidden digit ('4111111111111111' gives '************1111').",
+  "mask_card: Whenever the card number contains spaces, hyphens, letters or other non-digit characters, those are removed first and are not shown in the result ('4111-1111-1111-1111' gives '************1111').",
+  "mask_card: Whenever the card number has 1 to 4 digits, all of them are hidden: the result is one '*' per digit ('1234' gives '****', '12' gives '**').",
+  "mask_card: Whenever the card number has no digits at all (empty text, only spaces, or only letters), the result is empty text.",
+  "mask_card: Whenever the card number is given as a numeric value instead of text, it is treated as its digits; a minus sign and decimal point are dropped (-1234567 gives '***4567'; 123456.5 gives '***4565'; 0 gives '*').",
+  "mask_card: Whenever the card number is NULL, the result is NULL.",
+  "mask_card: Whenever the number is very long (more than 16 digits), the same rule applies with no limit: all but the last 4 digits are starred.",
+  "norm_phone: Whenever the text holds exactly 10 digits after removing all non-digit characters (spaces, brackets, hyphens, dots, plus signs), the result is '+1' followed by those 10 digits ('(555) 123-4567' gives '+15551234567').",
+  "norm_phone: Whenever the text holds exactly 11 digits that begin with 1, the result is '+' followed by the 11 digits ('1-555-123-4567' and '+1 555 123 4567' give '+15551234567').",
+  "norm_phone: Whenever the text contains the letter x or the letters ext (in any letter case), everything from the first such marker onwards is ignored as an extension, and the rest is judged as above ('555-123-4567 ext. 89' gives '+15551234567'; a bare trailing 'x' is also ignored).",
+  "norm_phone: Whenever an x or 'ext' appears before the digits, such as 'x555-123-4567', everything is cut off and the result is 'INVALID'.",
+  "norm_phone: Whenever any other letters sit in the text, they are ignored when counting digits; but a word containing an x or 'ext' (such as 'extra') cuts the text off there ('555-123-4567 extra' still works; 'Text 555 123 4567' becomes INVALID because the cut leaves no digits).",
+  "norm_phone: Whenever the digit count is anything other than 10, or 11 starting with 1 (international numbers like '+44 20 7946 0958', 11 digits starting with another digit, 12 digits, short numbers, empty text, or text with no digits), the result is 'INVALID'.",
+  "norm_phone: Whenever a 10-digit number starts with 0 or 1 (for example '0555123456'), it is accepted without checking the area code, and '+1' is put in front.",
+  "norm_phone: Whenever the phone is a numeric value (5551234567 or 15551234567), it is treated as its digits and normalised the same way.",
+  "norm_phone: Whenever the text is NULL, the result is NULL (not 'INVALID').",
+  "overtime_pay: Whenever hours are 40 or fewer, pay is hours times rate (37.5 hours at 18.50 gives 693.75).",
+  "overtime_pay: Whenever hours are above 40 up to 60, the first 40 hours are paid at the normal rate and each hour from 40 to 60 at 1.5 times the rate (41 hours at 10.00 gives 415.00; 60 hours gives 700.00).",
+  "overtime_pay: Whenever hours are above 60, each hour above 60 is paid at double the rate, on top of the earlier bands (61 hours at 10.00 gives 720.00; 80 hours gives 1100.00).",
+  "overtime_pay: Whenever hours are negative, the pay is 0.00, even if the rate is also negative.",
+  "overtime_pay: Whenever the rate is negative and hours are not negative, the pay is negative by the same calculation (10 hours at -10 gives -100.00); a zero rate or zero hours gives 0.00.",
+  "overtime_pay: Whenever the pay has fractions of a cent, it is rounded to the nearest cent with exactly half a cent rounding up (rate 0.005 for 1 hour gives 0.01; 41 hours at 10.005 gives 415.21).",
+  "overtime_pay: Whenever hours or rate is NULL, the result is NULL, even if the other value is negative or text.",
+  "overtime_pay: Whenever hours or rate is given as text that is wholly a number (spaces around it allowed, such as ' 45 ' or '4e1'), it is used as that number.",
+  "overtime_pay: Whenever hours or rate is text that is not wholly a number ('abc', empty text, '45abc', '1,5'), it counts as 0, so '45abc' hours gives 0.00 pay.",
+  "overtime_pay: Whenever hours or rate is infinite or not-a-number (including the text 'inf' or 'nan', or a value too large to store), the result is NULL.",
+  "review_stars: Whenever there are 5 or more votes, the stars shown are the average rounded to the nearest half star, with an exact quarter point rounding up (4.24 gives 4.0, 4.25 gives 4.5, 4.74 gives 4.5, 4.75 gives 5.0, 2.25 gives 2.5).",
+  "review_stars: Whenever there are fewer than 5 votes (including 0, negative, 4.9, or non-numeric text), the result is the text 'n/a' no matter the average; exactly 5 votes is enough.",
+  "review_stars: Whenever the average is above 5, the stars shown are 5.0; whenever it is below 0, they are 0.0.",
+  "review_stars: Whenever the average is text that is wholly a number ('4.5'), it is used as that number; whenever it is any other text or empty, it counts as 0 and gives 0.0 stars (when there are enough votes).",
+  "review_stars: Whenever the average or votes is NULL, the result is NULL, even if the other value would give 'n/a'.",
+  "review_stars: Whenever the average or votes is infinite or too large to store, the result is NULL, and this check happens before the votes check.",
+  "split_bill: Whenever the bill is shared, each person pays (total plus tip percent of the total) divided by the number of people (100 with 20% tip among 4 gives 30.00).",
+  "split_bill: Whenever the share has fractions of a cent, it is rounded up to the next whole cent, never down (100 split 3 ways with no tip gives 33.34).",
+  "split_bill: Whenever the tip percentage is above 30, it is treated as 30 (100 among 4 with 50% tip gives 32.50).",
+  "split_bill: Whenever the tip percentage is negative, it is applied as a discount with no lower limit (-10% on 100 among 4 gives 22.50; -200% gives -25.00).",
+  "split_bill: Whenever the number of people is 0 or negative, or NULL, the result is NULL.",
+  "split_bill: Whenever the number of people is a fraction above 0, it is used as is, with no rounding (2.5 people gives 44.00 for 100 with 10% tip).",
+  "split_bill: Whenever the total is negative, the result is negative by the same calculation (-100 among 4 with 10% tip gives -27.50); a zero total gives 0.00.",
+  "split_bill: Whenever the total, people or tip is NULL, the result is NULL, even if the people number is 0.",
+  "split_bill: Whenever the total or tip is text that is not wholly a number ('abc', empty text), it counts as 0, so a bad total gives 0.00 and a bad tip means no tip; numeric text like '100' is used as a number.",
+  "split_bill: Whenever the people value is text that is not wholly a number ('abc'), the result is NULL because it counts as 0 people.",
+  "split_bill: Whenever the total, people or tip is infinite or too large to store, the result is NULL.",
+  "mid_value: Whenever a column has an odd number of numeric values, the result is the middle one when sorted from smallest to largest (3, 1, 2 gives 2).",
+  "mid_value: Whenever a column has an even number of numeric values, the result is the lower of the two middle values, not their average (1, 2, 3, 4 gives 2; 4, 1 gives 1).",
+  "mid_value: Whenever values are NULL or text (including numeric-looking text such as '5'), they are ignored and not counted.",
+  "mid_value: Whenever there are no numeric values at all (no rows, all NULL, only text, or no rows matching a filter), the result is NULL.",
+  "mid_value: Whenever the aggregate is used with GROUP BY, each group gets its own middle value, calculated only from that group's numeric values.",
+  "mid_value: Whenever the middle value is a whole number or a decimal, it is returned exactly as stored, with no rounding."
+ ],
+ "SL": [
+  "biz_days: Whenever both dates are valid 'YYYY-MM-DD' dates, the result is the number of Monday-to-Friday days after the start date up to and including the end date; the start date itself is never counted (e.g. Mon 2024-01-01 to Mon 2024-01-08 gives 5).",
+  "biz_days: Whenever the end date is the same as or earlier than the start date, the result is 0.",
+  "biz_days: Whenever a day in the range falls on a Saturday or Sunday, it is not counted (Saturday 2024-01-06 to Sunday 2024-01-07 gives 0).",
+  "biz_days: Whenever a day in the range is December 25 or January 1, it is not counted, even if it is a weekday, in every year (2024-12-24 to 2024-12-26 gives 1). No other holidays are recognised.",
+  "biz_days: Whenever the start date is a holiday or weekend, it makes no difference, because the start date is never counted; whenever the end date is a weekday that is not a holiday, it is counted.",
+  "biz_days: Whenever either date is NULL, the result is NULL, even if the other date is not a valid date.",
+  "biz_days: Whenever either date is not valid text in exactly the form YYYY-MM-DD with a real calendar date (empty text, a number, a missing leading zero like '2024-1-1', a date with a time, an impossible date like 2024-02-30, or year 0000), the result is -1.",
+  "biz_days: Whenever a valid date has spaces before or after it, the spaces are ignored and the date is used normally.",
+  "biz_days: Whenever the range includes February 29 of a leap year, that day is counted like any other weekday (2024-02-28 to 2024-03-01 gives 2; 2023-02-28 to 2023-03-01 gives 1).",
+  "late_fee: Whenever the invoice is 3 days late or fewer (including 0 or negative days), the fee is 0.00; the fee starts only at more than 3 days (3.01 days already counts as late).",
+  "late_fee: Whenever the invoice is more than 3 days late, the base fee is 1.5% of the balance for each week late, and any part of a week counts as a full week (4 to 7 days is one week, 8 to 14 days is two weeks; a 1000.00 balance gives 15.00 at 7 days and 30.00 at 8 days).",
+  "late_fee: Whenever the base fee is under 5.00 and the invoice is more than 3 days late, the fee is raised to a minimum of 5.00 (a 100.00 balance 4 days late is charged 5.00).",
+  "late_fee: Whenever the fee would be more than 25% of the balance, it is capped at 25% of the balance, and this cap overrides the 5.00 minimum (a 10.00 balance more than 3 days late is charged 2.50; a 4.00 balance 10 days late is charged 1.00).",
+  "late_fee: Whenever the fee has fractions of a cent, it is rounded down to the whole cent, never up (a 1234.57 balance 10 days late gives 37.03, not 37.04; a 0.01 balance gives 0.00).",
+  "late_fee: Whenever the balance is zero or negative, the fee is 0.00, however late the invoice is.",
+  "late_fee: Whenever either the balance or the days late is NULL, the result is NULL.",
+  "late_fee: Whenever the balance or days late is given as text, numeric text such as '200' or ' 500 ' is accepted and its number is used. Text that is not entirely a number, such as '10abc', 'abc' or empty text, gives NULL instead of 0 (the fee is NULL, not 0.00); the number at the start of the text is not used.",
+  "late_fee: Whenever the days late is a fraction, any amount over 3 days is charged and rounded up to a whole week (3.5 days on a 500.00 balance gives 7.50).",
+  "loyalty_tier: Whenever the points balance is from 0 up to just under 1000, the tier is 'Bronze'.",
+  "loyalty_tier: Whenever the points balance is 1000 or more but under 5000, the tier is 'Silver'; exactly 1000 is Silver and 4999 is still Silver.",
+  "loyalty_tier: Whenever the points balance is 5000 or more but under 20000, the tier is 'Gold'; exactly 5000 is Gold and 19999.9 is still Gold.",
+  "loyalty_tier: Whenever the points balance is 20000 or more, the tier is 'Platinum'; exactly 20000 is Platinum.",
+  "loyalty_tier: Whenever the points balance is below zero (even -0.5), the tier is 'Closed'.",
+  "loyalty_tier: Whenever the points balance has a fraction, it is not rounded; 999.99 is Bronze.",
+  "loyalty_tier: Whenever the points balance is NULL, the result is NULL.",
+  "loyalty_tier: Whenever the points are given as text, the whole text must be a number ('5000' is Gold, '1500' is Silver). Text that isn't a number, including text with a leading number followed by other characters such as '1500abc', and empty text, gives NULL.",
+  "make_slug: Whenever a title is given, the slug is the title in lower case with every run of characters other than letters a-z and digits 0-9 (spaces, punctuation, underscores, slashes, apostrophes, dots, commas) replaced by a single hyphen ('A_B/C.D!' gives 'a-b-c-d'; 'Tom''s' gives 'tom-s'; '1,000 items' gives '1-000-items').",
+  "make_slug: Whenever the title has leading or trailing spaces or symbols, or repeated spaces, no leading, trailing or doubled hyphens appear ('  Hello   World  ' gives 'hello-world').",
+  "make_slug: Whenever the title contains an ampersand, it is read as the word 'and' ('Rock & Roll' and 'Rock&Roll' both give 'rock-and-roll').",
+  "make_slug: Whenever the title has accented letters that can be split into a plain letter and an accent, the accent is dropped and the plain letter kept ('Caf\u00e9 Cr\u00e8me' gives 'cafe-creme'); full-width letters such as '\uff21\uff22\uff23' become plain 'abc'.",
+  "make_slug: Whenever the title has letters with no plain-letter equivalent (Japanese, \u00c6, \u00d8, \u00df), those characters are treated as symbols and dropped, becoming a hyphen between other words.",
+  "make_slug: Whenever the slug would be longer than 40 characters, it is cut at 40 characters, and a hyphen left at the end by the cut is removed, so the slug may be 39 characters.",
+  "make_slug: Whenever the title is empty, only spaces, only symbols, or only characters with no Latin equivalent, the slug is 'untitled'.",
+  "make_slug: Whenever the title is NULL, the result is NULL.",
+  "make_slug: Whenever the title is a number, it is treated as its text ('12345' gives '12345', 1.5 gives '1-5', and 1.0 gives '1').",
+  "mask_card: Whenever the card number has 5 or more digits, every digit except the last 4 is replaced by '*' and the last 4 are shown, giving one '*' per hidden digit ('4111111111111111' gives '************1111').",
+  "mask_card: Whenever the card number contains spaces, hyphens, letters or other non-digit characters, those are removed first and are not shown in the result ('4111-1111-1111-1111' gives '************1111').",
+  "mask_card: Whenever the card number has 1 to 4 digits, all of them are hidden: the result is one '*' per digit ('1234' gives '****', '12' gives '**').",
+  "mask_card: Whenever the card number has no digits at all (empty text, only spaces, or only letters), the result is empty text.",
+  "mask_card: Whenever the card number is given as a numeric value instead of text, it is treated as its digits; a minus sign and decimal point are dropped (-1234567 gives '***4567'; 123456.5 gives '***4565'; 0 gives '*').",
+  "mask_card: Whenever the card number is NULL, the result is NULL.",
+  "mask_card: Whenever the number is very long (more than 16 digits), the same rule applies with no limit: all but the last 4 digits are starred.",
+  "norm_phone: Whenever the text holds exactly 10 digits after removing all non-digit characters (spaces, brackets, hyphens, dots, plus signs), the result is '+1' followed by those 10 digits ('(555) 123-4567' gives '+15551234567').",
+  "norm_phone: Whenever the text holds exactly 11 digits that begin with 1, the result is '+' followed by the 11 digits ('1-555-123-4567' and '+1 555 123 4567' give '+15551234567').",
+  "norm_phone: Whenever the text contains the letter x or the letters ext (in any letter case), everything from the first such marker onwards is ignored as an extension, and the rest is judged as above ('555-123-4567 ext. 89' gives '+15551234567'; a bare trailing 'x' is also ignored).",
+  "norm_phone: Whenever an x or 'ext' appears before the digits, such as 'x555-123-4567', everything is cut off and the result is 'INVALID'.",
+  "norm_phone: Whenever any other letters sit in the text, they are ignored when counting digits; but a word containing an x or 'ext' (such as 'extra') cuts the text off there ('555-123-4567 extra' still works; 'Text 555 123 4567' becomes INVALID because the cut leaves no digits).",
+  "norm_phone: Whenever the digit count is anything other than 10, or 11 starting with 1 (international numbers like '+44 20 7946 0958', 11 digits starting with another digit, 12 digits, short numbers, empty text, or text with no digits), the result is 'INVALID'.",
+  "norm_phone: Whenever a 10-digit number starts with 0 or 1 (for example '0555123456'), it is accepted without checking the area code, and '+1' is put in front.",
+  "norm_phone: Whenever the phone is a numeric value (5551234567 or 15551234567), it is treated as its digits and normalised the same way.",
+  "norm_phone: Whenever the text is NULL, the result is NULL (not 'INVALID').",
+  "overtime_pay: Whenever hours are 40 or fewer, pay is hours times rate (37.5 hours at 18.50 gives 693.75).",
+  "overtime_pay: Whenever hours are above 40 up to 60, the first 40 hours are paid at the normal rate and each hour from 40 to 60 at 1.5 times the rate (41 hours at 10.00 gives 415.00; 60 hours gives 700.00).",
+  "overtime_pay: Whenever hours are above 60, each hour above 60 is paid at double the rate, on top of the earlier bands (61 hours at 10.00 gives 720.00; 80 hours gives 1100.00).",
+  "overtime_pay: Whenever hours are negative, the pay is 0.00, even if the rate is also negative.",
+  "overtime_pay: Whenever the rate is negative and hours are not negative, the pay is negative by the same calculation (10 hours at -10 gives -100.00); a zero rate or zero hours gives 0.00.",
+  "overtime_pay: Whenever the pay has fractions of a cent, it is rounded to the nearest cent with exactly half a cent rounding up (rate 0.005 for 1 hour gives 0.01; 41 hours at 10.005 gives 415.21).",
+  "overtime_pay: Whenever hours or rate is NULL, the result is NULL, even if the other value is negative or text.",
+  "overtime_pay: Whenever hours or rate is given as text that is wholly a number (spaces around it allowed, such as ' 45 ' or '4e1'), it is used as that number.",
+  "overtime_pay: Whenever hours or rate is text that is not wholly a number ('abc', empty text, '45abc', '1,5'), the pay is NULL, so '45abc' hours gives NULL pay. Numeric text such as ' 45 ' or '4e1' is still accepted as a number.",
+  "overtime_pay: Whenever hours or rate is infinite or not-a-number (including the text 'inf' or 'nan', or a value too large to store), the result is NULL.",
+  "review_stars: Whenever there are 5 or more votes, the stars shown are the average rounded to the nearest half star, with an exact quarter point rounding up (4.24 gives 4.0, 4.25 gives 4.5, 4.74 gives 4.5, 4.75 gives 5.0, 2.25 gives 2.5).",
+  "review_stars: Whenever there are fewer than 5 votes (including 0, negative, 4.9, or non-numeric text), the result is the text 'n/a' no matter the average; exactly 5 votes is enough.",
+  "review_stars: Whenever the average is above 5, the stars shown are 5.0; whenever it is below 0, they are 0.0.",
+  "review_stars: Whenever the average is text that is wholly a number ('4.5'), it is used as that number; whenever it is any other text or empty, it is NULL (not 0, and not 0.0 stars) (when there are enough votes).",
+  "review_stars: Whenever the average or votes is NULL, the result is NULL, even if the other value would give 'n/a'.",
+  "review_stars: Whenever the average or votes is infinite or too large to store, the result is NULL, and this check happens before the votes check.",
+  "split_bill: Whenever the bill is shared, each person pays (total plus tip percent of the total) divided by the number of people (100 with 20% tip among 4 gives 30.00).",
+  "split_bill: Whenever the share has fractions of a cent, it is rounded up to the next whole cent, never down (100 split 3 ways with no tip gives 33.34).",
+  "split_bill: Whenever the tip percentage is above 30, it is treated as 30 (100 among 4 with 50% tip gives 32.50).",
+  "split_bill: Whenever the tip percentage is negative, it is applied as a discount with no lower limit (-10% on 100 among 4 gives 22.50; -200% gives -25.00).",
+  "split_bill: Whenever the number of people is 0 or negative, or NULL, the result is NULL.",
+  "split_bill: Whenever the number of people is a fraction above 0, it is used as is, with no rounding (2.5 people gives 44.00 for 100 with 10% tip).",
+  "split_bill: Whenever the total is negative, the result is negative by the same calculation (-100 among 4 with 10% tip gives -27.50); a zero total gives 0.00.",
+  "split_bill: Whenever the total, people or tip is NULL, the result is NULL, even if the people number is 0.",
+  "split_bill: Whenever the total or tip is text that is not wholly a number ('abc', empty text), it counts as NULL, so a bad total gives NULL and a bad tip gives NULL; numeric text like '100' is still accepted and used as a number.",
+  "split_bill: Whenever the people value is text that is not wholly a number ('abc'), the result is NULL because it counts as 0 people.",
+  "split_bill: Whenever the total, people or tip is infinite or too large to store, the result is NULL.",
+  "mid_value: Whenever a column has an odd number of numeric values, the result is the middle one when sorted from smallest to largest (3, 1, 2 gives 2).",
+  "mid_value: Whenever a column has an even number of numeric values, the result is the lower of the two middle values, not their average (1, 2, 3, 4 gives 2; 4, 1 gives 1).",
+  "mid_value: Whenever values are NULL or text (including numeric-looking text such as '5'), they are ignored and not counted.",
+  "mid_value: Whenever there are no numeric values at all (no rows, all NULL, only text, or no rows matching a filter), the result is NULL.",
+  "mid_value: Whenever the aggregate is used with GROUP BY, each group gets its own middle value, calculated only from that group's numeric values.",
+  "mid_value: Whenever the middle value is a whole number or a decimal, it is returned exactly as stored, with no rounding."
+ ],
+ "HV": [
+  "biz_days: Whenever both dates are valid 'YYYY-MM-DD' dates, the result is the number of Monday-to-Friday days after the start date up to and including the end date; the start date itself is never counted (e.g. Mon 2024-01-01 to Mon 2024-01-08 gives 5).",
+  "biz_days: Whenever the end date is the same as or earlier than the start date, the result is 0.",
+  "biz_days: Whenever a day in the range falls on a Saturday or Sunday, it is not counted (Saturday 2024-01-06 to Sunday 2024-01-07 gives 0).",
+  "biz_days: Whenever a day in the range is December 25 or January 1, it is not counted, even if it is a weekday, in every year (2024-12-24 to 2024-12-26 gives 1). No other holidays are recognised.",
+  "biz_days: Whenever the start date is a holiday or weekend, it makes no difference, because the start date is never counted; whenever the end date is a weekday that is not a holiday, it is counted.",
+  "biz_days: Whenever either date is NULL, the result is NULL, even if the other date is not a valid date.",
+  "biz_days: Whenever either date is not valid text in exactly the form YYYY-MM-DD with a real calendar date (empty text, a number, a missing leading zero like '2024-1-1', a date with a time, an impossible date like 2024-02-30, or year 0000), the result is -1.",
+  "biz_days: Whenever a valid date has spaces before or after it, the spaces are ignored and the date is used normally.",
+  "biz_days: Whenever the range includes February 29 of a leap year, that day is counted like any other weekday (2024-02-28 to 2024-03-01 gives 2; 2023-02-28 to 2023-03-01 gives 1).",
+  "late_fee: Whenever the invoice is 3 days late or fewer (including 0 or negative days), the fee is 0.00; the fee starts only at more than 3 days (3.01 days already counts as late).",
+  "late_fee: Whenever the invoice is more than 3 days late, the base fee is 1.5% of the balance for each week late, and any part of a week counts as a full week (4 to 7 days is one week, 8 to 14 days is two weeks; a 1000.00 balance gives 15.00 at 7 days and 30.00 at 8 days).",
+  "late_fee: Whenever the base fee is under 5.00 and the invoice is more than 3 days late, the fee is raised to a minimum of 5.00 (a 100.00 balance 4 days late is charged 5.00).",
+  "late_fee: Whenever the fee would be more than 25% of the balance, it is capped at 25% of the balance, and this cap overrides the 5.00 minimum (a 10.00 balance more than 3 days late is charged 2.50; a 4.00 balance 10 days late is charged 1.00).",
+  "late_fee: Whenever the fee has fractions of a cent, it is rounded down to the whole cent, never up (a 1234.57 balance 10 days late gives 37.03, not 37.04; a 0.01 balance gives 0.00).",
+  "late_fee: Whenever the balance is zero or negative, the fee is 0.00, however late the invoice is.",
+  "late_fee: Whenever either the balance or the days late is NULL, the result is NULL.",
+  "late_fee: Whenever the balance or days late is given as text, numeric text such as '200' or ' 500 ' is accepted and its number is used. Text that is not entirely a number, such as '10abc', 'abc' or empty text, gives NULL instead of 0 (the fee is NULL, not 0.00); the number at the start of the text is not used.",
+  "late_fee: Whenever the days late is a fraction, any amount over 3 days is charged and rounded up to a whole week (3.5 days on a 500.00 balance gives 7.50).",
+  "loyalty_tier: Whenever the points balance is from 0 up to just under 1000, the tier is 'Bronze'.",
+  "loyalty_tier: Whenever the points balance is 1000 or more but under 5000, the tier is 'Silver'; exactly 1000 is Silver and 4999 is still Silver.",
+  "loyalty_tier: Whenever the points balance is 5000 or more but under 20000, the tier is 'Gold'; exactly 5000 is Gold and 19999.9 is still Gold.",
+  "loyalty_tier: Whenever the points balance is 20000 or more, the tier is 'Platinum'; exactly 20000 is Platinum.",
+  "loyalty_tier: Whenever the points balance is below zero (even -0.5), the tier is 'Closed'.",
+  "loyalty_tier: Whenever the points balance has a fraction, it is not rounded; 999.99 is Bronze.",
+  "loyalty_tier: Whenever the points balance is NULL, the result is NULL.",
+  "loyalty_tier: Whenever the points are given as text, the whole text must be a number ('5000' is Gold, '1500' is Silver). Text that isn't a number gives NULL and is never treated as zero points or given a tier. This includes words such as 'abc', text with a leading number followed by other characters such as '1500abc', and empty text.",
+  "make_slug: Whenever a title is given, the slug is the title in lower case with every run of characters other than letters a-z and digits 0-9 (spaces, punctuation, underscores, slashes, apostrophes, dots, commas) replaced by a single hyphen ('A_B/C.D!' gives 'a-b-c-d'; 'Tom''s' gives 'tom-s'; '1,000 items' gives '1-000-items').",
+  "make_slug: Whenever the title has leading or trailing spaces or symbols, or repeated spaces, no leading, trailing or doubled hyphens appear ('  Hello   World  ' gives 'hello-world').",
+  "make_slug: Whenever the title contains an ampersand, it is read as the word 'and' ('Rock & Roll' and 'Rock&Roll' both give 'rock-and-roll').",
+  "make_slug: Whenever the title has accented letters that can be split into a plain letter and an accent, the accent is dropped and the plain letter kept ('Caf\u00e9 Cr\u00e8me' gives 'cafe-creme'); full-width letters such as '\uff21\uff22\uff23' become plain 'abc'.",
+  "make_slug: Whenever the title has letters with no plain-letter equivalent (Japanese, \u00c6, \u00d8, \u00df), those characters are treated as symbols and dropped, becoming a hyphen between other words.",
+  "make_slug: Whenever the slug would be longer than 40 characters, it is cut at 40 characters, and a hyphen left at the end by the cut is removed, so the slug may be 39 characters.",
+  "make_slug: Whenever the title is empty, only spaces, only symbols, or only characters with no Latin equivalent, the slug is 'untitled'.",
+  "make_slug: Whenever the title is NULL, the result is NULL.",
+  "make_slug: Whenever the title is a number, it is treated as its text ('12345' gives '12345', 1.5 gives '1-5', and 1.0 gives '1').",
+  "mask_card: Whenever the card number has 5 or more digits, every digit except the last 4 is replaced by '*' and the last 4 are shown, giving one '*' per hidden digit ('4111111111111111' gives '************1111').",
+  "mask_card: Whenever the card number contains spaces, hyphens, letters or other non-digit characters, those are removed first and are not shown in the result ('4111-1111-1111-1111' gives '************1111').",
+  "mask_card: Whenever the card number has 1 to 4 digits, all of them are hidden: the result is one '*' per digit ('1234' gives '****', '12' gives '**').",
+  "mask_card: Whenever the card number has no digits at all (empty text, only spaces, or only letters), the result is empty text.",
+  "mask_card: Whenever the card number is given as a numeric value instead of text, it is treated as its digits; a minus sign and decimal point are dropped (-1234567 gives '***4567'; 123456.5 gives '***4565'; 0 gives '*').",
+  "mask_card: Whenever the card number is NULL, the result is NULL.",
+  "mask_card: Whenever the number is very long (more than 16 digits), the same rule applies with no limit: all but the last 4 digits are starred.",
+  "norm_phone: Whenever the text holds exactly 10 digits after removing all non-digit characters (spaces, brackets, hyphens, dots, plus signs), the result is '+1' followed by those 10 digits ('(555) 123-4567' gives '+15551234567').",
+  "norm_phone: Whenever the text holds exactly 11 digits that begin with 1, the result is '+' followed by the 11 digits ('1-555-123-4567' and '+1 555 123 4567' give '+15551234567').",
+  "norm_phone: Whenever the text contains the letter x or the letters ext (in any letter case), everything from the first such marker onwards is ignored as an extension, and the rest is judged as above ('555-123-4567 ext. 89' gives '+15551234567'; a bare trailing 'x' is also ignored).",
+  "norm_phone: Whenever an x or 'ext' appears before the digits, such as 'x555-123-4567', everything is cut off and the result is 'INVALID'.",
+  "norm_phone: Whenever any other letters sit in the text, they are ignored when counting digits; but a word containing an x or 'ext' (such as 'extra') cuts the text off there ('555-123-4567 extra' still works; 'Text 555 123 4567' becomes INVALID because the cut leaves no digits).",
+  "norm_phone: Whenever the digit count is anything other than 10, or 11 starting with 1 (international numbers like '+44 20 7946 0958', 11 digits starting with another digit, 12 digits, short numbers, empty text, or text with no digits), the result is 'INVALID'.",
+  "norm_phone: Whenever a 10-digit number starts with 0 or 1 (for example '0555123456'), it is accepted without checking the area code, and '+1' is put in front.",
+  "norm_phone: Whenever the phone is a numeric value (5551234567 or 15551234567), it is treated as its digits and normalised the same way.",
+  "norm_phone: Whenever the text is NULL, the result is NULL (not 'INVALID').",
+  "overtime_pay: Whenever hours are 40 or fewer, pay is hours times rate (37.5 hours at 18.50 gives 693.75).",
+  "overtime_pay: Whenever hours are above 40 up to 60, the first 40 hours are paid at the normal rate and each hour from 40 to 60 at 1.5 times the rate (41 hours at 10.00 gives 415.00; 60 hours gives 700.00).",
+  "overtime_pay: Whenever hours are above 60, each hour above 60 is paid at double the rate, on top of the earlier bands (61 hours at 10.00 gives 720.00; 80 hours gives 1100.00).",
+  "overtime_pay: Whenever hours are negative, the pay is 0.00, even if the rate is also negative.",
+  "overtime_pay: Whenever the rate is negative and hours are not negative, the pay is negative by the same calculation (10 hours at -10 gives -100.00); a zero rate or zero hours gives 0.00.",
+  "overtime_pay: Whenever the pay has fractions of a cent, it is rounded to the nearest cent with exactly half a cent rounding up (rate 0.005 for 1 hour gives 0.01; 41 hours at 10.005 gives 415.21).",
+  "overtime_pay: Whenever hours or rate is NULL, the result is NULL, even if the other value is negative or text.",
+  "overtime_pay: Whenever hours or rate is given as text that is wholly a number (spaces around it allowed, such as ' 45 ' or '4e1'), it is used as that number.",
+  "overtime_pay: Whenever hours or rate is text that is not wholly a number ('abc', empty text, '45abc', '1,5'), the pay is NULL, so '45abc' hours gives NULL pay. Numeric text such as ' 45 ' or '4e1' is still accepted as a number.",
+  "overtime_pay: Whenever hours or rate is infinite or not-a-number (including the text 'inf' or 'nan', or a value too large to store), the result is NULL.",
+  "review_stars: Whenever there are 5 or more votes, the stars shown are the average rounded to the nearest half star, with an exact quarter point rounding up (4.24 gives 4.0, 4.25 gives 4.5, 4.74 gives 4.5, 4.75 gives 5.0, 2.25 gives 2.5).",
+  "review_stars: Whenever there are fewer than 5 votes (including 0, negative, or 4.9), the result is the text 'n/a' no matter the average; exactly 5 votes is enough. (Votes that are not a number at all are not covered here; see rule 65.)",
+  "review_stars: Whenever the average is above 5, the stars shown are 5.0; whenever it is below 0, they are 0.0.",
+  "review_stars: Whenever the average is text that is wholly a number ('4.5'), it is used as that number; whenever it is any other text or empty, it is NULL (not 0, and not 0.0 stars) (when there are enough votes). Likewise, whenever the votes is text that is not a number (such as 'abc') or is empty, the result is NULL, not 'n/a', no matter what the average is.",
+  "review_stars: Whenever the average or votes is NULL, the result is NULL, even if the other value would give 'n/a'.",
+  "review_stars: Whenever the average or votes is infinite or too large to store, the result is NULL, and this check happens before the votes check.",
+  "split_bill: Whenever the bill is shared, each person pays (total plus tip percent of the total) divided by the number of people (100 with 20% tip among 4 gives 30.00).",
+  "split_bill: Whenever the share has fractions of a cent, it is rounded up to the next whole cent, never down (100 split 3 ways with no tip gives 33.34).",
+  "split_bill: Whenever the tip percentage is above 30, it is treated as 30 (100 among 4 with 50% tip gives 32.50).",
+  "split_bill: Whenever the tip percentage is negative, it is applied as a discount with no lower limit (-10% on 100 among 4 gives 22.50; -200% gives -25.00).",
+  "split_bill: Whenever the number of people is 0 or negative, or NULL, the result is NULL.",
+  "split_bill: Whenever the number of people is a fraction above 0, it is used as is, with no rounding (2.5 people gives 44.00 for 100 with 10% tip).",
+  "split_bill: Whenever the total is negative, the result is negative by the same calculation (-100 among 4 with 10% tip gives -27.50); a zero total gives 0.00.",
+  "split_bill: Whenever the total, people or tip is NULL, the result is NULL, even if the people number is 0.",
+  "split_bill: Whenever the total or tip is text that is not wholly a number ('abc', empty text), it counts as NULL, so a bad total gives NULL and a bad tip gives NULL; numeric text like '100' is still accepted and used as a number.",
+  "split_bill: Whenever the people value is text that is not wholly a number ('abc'), the result is NULL because it counts as 0 people.",
+  "split_bill: Whenever the total, people or tip is infinite or too large to store, the result is NULL.",
+  "mid_value: Whenever a column has an odd number of numeric values, the result is the middle one when sorted from smallest to largest (3, 1, 2 gives 2).",
+  "mid_value: Whenever a column has an even number of numeric values, the result is the lower of the two middle values, not their average (1, 2, 3, 4 gives 2; 4, 1 gives 1).",
+  "mid_value: Whenever values are NULL or text (including numeric-looking text such as '5'), they are ignored and not counted.",
+  "mid_value: Whenever there are no numeric values at all (no rows, all NULL, only text, or no rows matching a filter), the result is NULL.",
+  "mid_value: Whenever the aggregate is used with GROUP BY, each group gets its own middle value, calculated only from that group's numeric values.",
+  "mid_value: Whenever the middle value is a whole number or a decimal, it is returned exactly as stored, with no rounding.",
+  "Hours entered as the word abc at 20 dollars an hour pay 0 dollars, with no warning. The owner says: Case 39 is wrong: \"abc\" isn't a number, so it should give a blank (NULL), not 0 dollars."
+ ],
+ "spots": [
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2026-11-06','2026-11-09')",
+   "got": 1,
+   "say": "An order placed on Friday 6 November and due on Monday 9 November counts as 1 business day, because the start day is not counted and the due day is."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2026-12-24','2026-12-28')",
+   "got": 1,
+   "say": "A parcel sent on 24 December and due on 28 December gets only 1 business day, since Christmas Day (a Friday) is skipped along with the weekend."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2026-11-26','2026-11-30')",
+   "got": 2,
+   "say": "A delivery promised from Thursday 26 November to Monday 30 November counts 2 business days, because US Thanksgiving and other movable holidays are not skipped, only 25 December and 1 January."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2026-11-09','2026-11-02')",
+   "got": 0,
+   "say": "If the due date (2 November) is earlier than the ship date (9 November), the estimate is quietly 0 business days instead of a warning or a negative number."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2026-11-02','2026-13-45')",
+   "got": -1,
+   "say": "A delivery date typed as the 45th of month 13 gives an answer of -1 business days instead of a blank or an error."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 31)",
+   "got": 750.0,
+   "say": "Ravi's 10,000-dollar invoice is paid 31 days late: the late fee comes to 750 dollars (1.5% for each started week, 5 weeks)."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 4)",
+   "got": 150.0,
+   "say": "A 10,000-dollar invoice only 4 days late already costs 150 dollars, a full week's fee, while at 3 days late it costs nothing."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(100, 10)",
+   "got": 5.0,
+   "say": "A 100-dollar invoice that is 10 days late is charged the 5-dollar minimum fee, even though the weekly rate would only give 3 dollars."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(3, 10)",
+   "got": 0.75,
+   "say": "A 3-dollar invoice that is 10 days late is charged 0.75 dollars, because the fee is never allowed to exceed a quarter of the balance, which overrides the 5-dollar minimum."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(1234.56, 15)",
+   "got": 55.55,
+   "say": "A 1,234.56-dollar invoice paid 15 days late is charged 55.55 dollars: the exact 55.56 is cut down, never rounded up, to the cent."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(1000)",
+   "got": "Silver",
+   "say": "A customer with exactly 1,000 points is already Silver, while one with 999 points is still Bronze."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(-1)",
+   "got": "Closed",
+   "say": "A customer whose points balance has gone to minus 1 is shown as Closed, not as Bronze."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(4999.5)",
+   "got": "Silver",
+   "say": "A customer with 4,999.5 points stays Silver, since Gold starts at exactly 5,000 points."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier('abc')",
+   "got": "Bronze",
+   "say": "A points balance mistakenly entered as the word abc is treated as zero points, so the customer is shown as Bronze."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(NULL)",
+   "got": null,
+   "say": "A customer with no points balance on file gets no tier at all, not Bronze."
+  },
+  {
+   "function": "make_slug",
+   "call": "SELECT make_slug('The Complete Guide to Building a Profitable Online Store From Scratch')",
+   "got": "the-complete-guide-to-building-a-profita",
+   "say": "The article 'The Complete Guide to Building a Profitable Online Store From Scratch' gets its web address cut off mid-word at 40 characters, ending in 'profita'."
+  },
+  {
+   "function": "make_slug",
+   "call": "SELECT make_slug('\u65e5\u672c\u8a9e\u306e\u5546\u54c1')",
+   "got": "untitled",
+   "say": "A product titled in Japanese gets the web address 'untitled', so every non-Latin title collides on the same address."
+  },
+  {
+   "function": "make_slug",
+   "call": "SELECT make_slug('Ben & Jerry''s Caf\u00e9 Cr\u00e8me!')",
+   "got": "ben-and-jerry-s-cafe-creme",
+   "say": "The product 'Ben & Jerry's Caf\u00e9 Cr\u00e8me!' becomes 'ben-and-jerry-s-cafe-creme': the ampersand turns into 'and', accents are dropped and the apostrophe splits Jerry's into 'jerry-s'."
+  },
+  {
+   "function": "make_slug",
+   "call": "SELECT make_slug('!!!')",
+   "got": "untitled",
+   "say": "A title made only of punctuation such as '!!!' gets the web address 'untitled'."
+  },
+  {
+   "function": "make_slug",
+   "call": "SELECT make_slug('')",
+   "got": "untitled",
+   "say": "An empty title gets the web address 'untitled' rather than a blank."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('4111 1111 1111 1111')",
+   "got": "************1111",
+   "say": "A card typed as 4111 1111 1111 1111 shows on the receipt as twelve stars followed by 1111, with the spaces removed."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('1234')",
+   "got": "****",
+   "say": "A 4-digit number is shown fully hidden as four stars, while a 5-digit number shows its last four digits."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('4111-1111-1111-1111 exp 12/27')",
+   "got": "****************1227",
+   "say": "If a support agent types the expiry date after the card number, the receipt shows the expiry digits 1227 as the visible ending and hides the real last four card digits."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('abcd')",
+   "got": "",
+   "say": "A card field containing only letters gives an empty result instead of a warning."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card(NULL)",
+   "got": null,
+   "say": "A missing card number shows nothing at all on the receipt."
+  },
+  {
+   "function": "norm_phone",
+   "call": "SELECT norm_phone('+44 20 7946 0958')",
+   "got": "INVALID",
+   "say": "A London customer's number +44 20 7946 0958 is marked INVALID, because only US and Canada numbers are accepted."
+  },
+  {
+   "function": "norm_phone",
+   "call": "SELECT norm_phone('415-555-2671 ext 12')",
+   "got": "+14155552671",
+   "say": "Priya's office line 415-555-2671 ext 12 is saved as +14155552671, and the extension 12 is silently thrown away."
+  },
+  {
+   "function": "norm_phone",
+   "call": "SELECT norm_phone('555-2671')",
+   "got": "INVALID",
+   "say": "A 7-digit local number such as 555-2671 with no area code is marked INVALID rather than guessed."
+  },
+  {
+   "function": "norm_phone",
+   "call": "SELECT norm_phone('1-800-FLOWERS')",
+   "got": "INVALID",
+   "say": "The vanity number 1-800-FLOWERS is marked INVALID because letters are not turned into digits."
+  },
+  {
+   "function": "norm_phone",
+   "call": "SELECT norm_phone('')",
+   "got": "INVALID",
+   "say": "An empty phone field is saved as the word INVALID, whereas a missing one stays blank."
+  },
+  {
+   "function": "overtime_pay",
+   "call": "SELECT overtime_pay(45, 20)",
+   "got": 950.0,
+   "say": "Maria works 45 hours at 20 dollars an hour: her weekly pay comes to 950 dollars, with the 5 hours past 40 paid at time and a half."
+  },
+  {
+   "function": "overtime_pay",
+   "call": "SELECT overtime_pay(65, 20)",
+   "got": 1600.0,
+   "say": "Maria works 65 hours at 20 dollars an hour: her weekly pay is 1,600 dollars, since hours beyond 60 are paid at double time."
+  },
+  {
+   "function": "overtime_pay",
+   "call": "SELECT overtime_pay(-5, 20)",
+   "got": 0.0,
+   "say": "Negative hours worked (minus 5 at 20 dollars an hour) pay 0 dollars instead of raising an error."
+  },
+  {
+   "function": "overtime_pay",
+   "call": "SELECT overtime_pay(45, -20)",
+   "got": -950.0,
+   "say": "A pay rate typed as minus 20 dollars an hour for 45 hours gives a pay of minus 950 dollars instead of being rejected."
+  },
+  {
+   "function": "overtime_pay",
+   "call": "SELECT overtime_pay('abc', 20)",
+   "got": 0.0,
+   "say": "Hours entered as the word abc at 20 dollars an hour pay 0 dollars, with no warning."
+  },
+  {
+   "function": "review_stars",
+   "call": "SELECT review_stars(4.3, 4)",
+   "got": "n/a",
+   "say": "A product with a 4.3 average from only 4 reviews shows no stars (n/a), while with 5 reviews it would show stars."
+  },
+  {
+   "function": "review_stars",
+   "call": "SELECT review_stars(4.74, 10)",
+   "got": 4.5,
+   "say": "A product rated 4.74 on average from 10 reviews is shown as 4.5 stars, while 4.75 would be shown as 5 stars."
+  },
+  {
+   "function": "review_stars",
+   "call": "SELECT review_stars(7, 10)",
+   "got": 5.0,
+   "say": "An average score of 7 out of 5 (a data mistake) is quietly shown as 5 stars."
+  },
+  {
+   "function": "review_stars",
+   "call": "SELECT review_stars(-2, 10)",
+   "got": 0.0,
+   "say": "An average score of minus 2 from 10 reviews is quietly shown as 0 stars."
+  },
+  {
+   "function": "review_stars",
+   "call": "SELECT review_stars(4.8, 'abc')",
+   "got": "n/a",
+   "say": "A product with a 4.8 average but a vote count entered as the word abc shows no stars (n/a)."
+  },
+  {
+   "function": "split_bill",
+   "call": "SELECT split_bill(100, 3, 15)",
+   "got": 38.34,
+   "say": "Three friends split a 100-dollar bill with a 15% tip: each pays 38.34 dollars, rounded up so the restaurant is never short (3 times 38.34 is 115.02)."
+  },
+  {
+   "function": "split_bill",
+   "call": "SELECT split_bill(100, 4, 50)",
+   "got": 32.5,
+   "say": "Four friends split a 100-dollar bill with a 50% tip typed in: each pays 32.50 dollars, because the tip is capped at 30%."
+  },
+  {
+   "function": "split_bill",
+   "call": "SELECT split_bill(100, 3, -10)",
+   "got": 30.0,
+   "say": "Three friends split a 100-dollar bill and a tip of minus 10% is applied: each pays 30 dollars, less than the bill itself."
+  },
+  {
+   "function": "split_bill",
+   "call": "SELECT split_bill(100, 0, 15)",
+   "got": null,
+   "say": "A 100-dollar bill split among 0 people gives a blank result instead of an error."
+  },
+  {
+   "function": "split_bill",
+   "call": "SELECT split_bill(100, 2.5, 15)",
+   "got": 46.0,
+   "say": "A 100-dollar bill with a 15% tip split among 2.5 people gives 46 dollars each, instead of rejecting a half person."
+  },
+  {
+   "function": "mid_value",
+   "call": "SELECT mid_value(x) FROM t",
+   "got": 2,
+   "say": "For order totals of 1, 2, 3 and 10 dollars, the typical value comes out as 2 dollars, the lower of the two middle orders, not 2.50."
+  },
+  {
+   "function": "mid_value",
+   "call": "SELECT mid_value(x) FROM u",
+   "got": 200,
+   "say": "For orders of 100, 200, 300 and 40,000 dollars, the typical order is 200 dollars, and the 40,000 outlier does not move it."
+  },
+  {
+   "function": "mid_value",
+   "call": "SELECT mid_value(x) FROM w",
+   "got": null,
+   "say": "Order totals saved as text, such as '5' and '7', give no typical value at all instead of 6."
+  },
+  {
+   "function": "mid_value",
+   "call": "SELECT mid_value(x) FROM v",
+   "got": null,
+   "say": "A column where every order total is missing gives a blank typical value."
+  }
+ ],
+ "shown": [
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2026-11-06','2026-11-09')",
+   "got": 1,
+   "say": "An order placed on Friday 6 November and due on Monday 9 November counts as 1 business day, because the start day is not counted and the due day is."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2026-12-24','2026-12-28')",
+   "got": 1,
+   "say": "A parcel sent on 24 December and due on 28 December gets only 1 business day, since Christmas Day (a Friday) is skipped along with the weekend."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2026-11-26','2026-11-30')",
+   "got": 2,
+   "say": "A delivery promised from Thursday 26 November to Monday 30 November counts 2 business days, because US Thanksgiving and other movable holidays are not skipped, only 25 December and 1 January."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2026-11-09','2026-11-02')",
+   "got": 0,
+   "say": "If the due date (2 November) is earlier than the ship date (9 November), the estimate is quietly 0 business days instead of a warning or a negative number."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2026-11-02','2026-13-45')",
+   "got": -1,
+   "say": "A delivery date typed as the 45th of month 13 gives an answer of -1 business days instead of a blank or an error."
+  },
+  {
+   "function": "make_slug",
+   "call": "SELECT make_slug('The Complete Guide to Building a Profitable Online Store From Scratch')",
+   "got": "the-complete-guide-to-building-a-profita",
+   "say": "The article 'The Complete Guide to Building a Profitable Online Store From Scratch' gets its web address cut off mid-word at 40 characters, ending in 'profita'."
+  },
+  {
+   "function": "make_slug",
+   "call": "SELECT make_slug('\u65e5\u672c\u8a9e\u306e\u5546\u54c1')",
+   "got": "untitled",
+   "say": "A product titled in Japanese gets the web address 'untitled', so every non-Latin title collides on the same address."
+  },
+  {
+   "function": "make_slug",
+   "call": "SELECT make_slug('Ben & Jerry''s Caf\u00e9 Cr\u00e8me!')",
+   "got": "ben-and-jerry-s-cafe-creme",
+   "say": "The product 'Ben & Jerry's Caf\u00e9 Cr\u00e8me!' becomes 'ben-and-jerry-s-cafe-creme': the ampersand turns into 'and', accents are dropped and the apostrophe splits Jerry's into 'jerry-s'."
+  },
+  {
+   "function": "make_slug",
+   "call": "SELECT make_slug('!!!')",
+   "got": "untitled",
+   "say": "A title made only of punctuation such as '!!!' gets the web address 'untitled'."
+  },
+  {
+   "function": "make_slug",
+   "call": "SELECT make_slug('')",
+   "got": "untitled",
+   "say": "An empty title gets the web address 'untitled' rather than a blank."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('4111 1111 1111 1111')",
+   "got": "************1111",
+   "say": "A card typed as 4111 1111 1111 1111 shows on the receipt as twelve stars followed by 1111, with the spaces removed."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('1234')",
+   "got": "****",
+   "say": "A 4-digit number is shown fully hidden as four stars, while a 5-digit number shows its last four digits."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('4111-1111-1111-1111 exp 12/27')",
+   "got": "****************1227",
+   "say": "If a support agent types the expiry date after the card number, the receipt shows the expiry digits 1227 as the visible ending and hides the real last four card digits."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('abcd')",
+   "got": "",
+   "say": "A card field containing only letters gives an empty result instead of a warning."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card(NULL)",
+   "got": null,
+   "say": "A missing card number shows nothing at all on the receipt."
+  },
+  {
+   "function": "norm_phone",
+   "call": "SELECT norm_phone('+44 20 7946 0958')",
+   "got": "INVALID",
+   "say": "A London customer's number +44 20 7946 0958 is marked INVALID, because only US and Canada numbers are accepted."
+  },
+  {
+   "function": "norm_phone",
+   "call": "SELECT norm_phone('415-555-2671 ext 12')",
+   "got": "+14155552671",
+   "say": "Priya's office line 415-555-2671 ext 12 is saved as +14155552671, and the extension 12 is silently thrown away."
+  },
+  {
+   "function": "norm_phone",
+   "call": "SELECT norm_phone('555-2671')",
+   "got": "INVALID",
+   "say": "A 7-digit local number such as 555-2671 with no area code is marked INVALID rather than guessed."
+  },
+  {
+   "function": "norm_phone",
+   "call": "SELECT norm_phone('1-800-FLOWERS')",
+   "got": "INVALID",
+   "say": "The vanity number 1-800-FLOWERS is marked INVALID because letters are not turned into digits."
+  },
+  {
+   "function": "norm_phone",
+   "call": "SELECT norm_phone('')",
+   "got": "INVALID",
+   "say": "An empty phone field is saved as the word INVALID, whereas a missing one stays blank."
+  },
+  {
+   "function": "mid_value",
+   "call": "SELECT mid_value(x) FROM t",
+   "got": 2,
+   "say": "For order totals of 1, 2, 3 and 10 dollars, the typical value comes out as 2 dollars, the lower of the two middle orders, not 2.50."
+  },
+  {
+   "function": "mid_value",
+   "call": "SELECT mid_value(x) FROM u",
+   "got": 200,
+   "say": "For orders of 100, 200, 300 and 40,000 dollars, the typical order is 200 dollars, and the 40,000 outlier does not move it."
+  },
+  {
+   "function": "mid_value",
+   "call": "SELECT mid_value(x) FROM w",
+   "got": null,
+   "say": "Order totals saved as text, such as '5' and '7', give no typical value at all instead of 6."
+  },
+  {
+   "function": "mid_value",
+   "call": "SELECT mid_value(x) FROM v",
+   "got": null,
+   "say": "A column where every order total is missing gives a blank typical value."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 31)",
+   "got": 750.0,
+   "say": "Ravi's 10,000-dollar invoice is paid 31 days late: the late fee comes to 750 dollars (1.5% for each started week, 5 weeks)."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 4)",
+   "got": 150.0,
+   "say": "A 10,000-dollar invoice only 4 days late already costs 150 dollars, a full week's fee, while at 3 days late it costs nothing."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(100, 10)",
+   "got": 5.0,
+   "say": "A 100-dollar invoice that is 10 days late is charged the 5-dollar minimum fee, even though the weekly rate would only give 3 dollars."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(3, 10)",
+   "got": 0.75,
+   "say": "A 3-dollar invoice that is 10 days late is charged 0.75 dollars, because the fee is never allowed to exceed a quarter of the balance, which overrides the 5-dollar minimum."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(1234.56, 15)",
+   "got": 55.55,
+   "say": "A 1,234.56-dollar invoice paid 15 days late is charged 55.55 dollars: the exact 55.56 is cut down, never rounded up, to the cent."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(1000)",
+   "got": "Silver",
+   "say": "A customer with exactly 1,000 points is already Silver, while one with 999 points is still Bronze."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(-1)",
+   "got": "Closed",
+   "say": "A customer whose points balance has gone to minus 1 is shown as Closed, not as Bronze."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(4999.5)",
+   "got": "Silver",
+   "say": "A customer with 4,999.5 points stays Silver, since Gold starts at exactly 5,000 points."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier('abc')",
+   "got": "Bronze",
+   "say": "A points balance mistakenly entered as the word abc is treated as zero points, so the customer is shown as Bronze."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(NULL)",
+   "got": null,
+   "say": "A customer with no points balance on file gets no tier at all, not Bronze."
+  },
+  {
+   "function": "overtime_pay",
+   "call": "SELECT overtime_pay(45, 20)",
+   "got": 950.0,
+   "say": "Maria works 45 hours at 20 dollars an hour: her weekly pay comes to 950 dollars, with the 5 hours past 40 paid at time and a half."
+  },
+  {
+   "function": "overtime_pay",
+   "call": "SELECT overtime_pay(65, 20)",
+   "got": 1600.0,
+   "say": "Maria works 65 hours at 20 dollars an hour: her weekly pay is 1,600 dollars, since hours beyond 60 are paid at double time."
+  },
+  {
+   "function": "overtime_pay",
+   "call": "SELECT overtime_pay(-5, 20)",
+   "got": 0.0,
+   "say": "Negative hours worked (minus 5 at 20 dollars an hour) pay 0 dollars instead of raising an error."
+  },
+  {
+   "function": "overtime_pay",
+   "call": "SELECT overtime_pay(45, -20)",
+   "got": -950.0,
+   "say": "A pay rate typed as minus 20 dollars an hour for 45 hours gives a pay of minus 950 dollars instead of being rejected."
+  },
+  {
+   "function": "overtime_pay",
+   "call": "SELECT overtime_pay('abc', 20)",
+   "got": 0.0,
+   "say": "Hours entered as the word abc at 20 dollars an hour pay 0 dollars, with no warning."
+  },
+  {
+   "function": "review_stars",
+   "call": "SELECT review_stars(4.3, 4)",
+   "got": "n/a",
+   "say": "A product with a 4.3 average from only 4 reviews shows no stars (n/a), while with 5 reviews it would show stars."
+  },
+  {
+   "function": "review_stars",
+   "call": "SELECT review_stars(4.74, 10)",
+   "got": 4.5,
+   "say": "A product rated 4.74 on average from 10 reviews is shown as 4.5 stars, while 4.75 would be shown as 5 stars."
+  },
+  {
+   "function": "review_stars",
+   "call": "SELECT review_stars(7, 10)",
+   "got": 5.0,
+   "say": "An average score of 7 out of 5 (a data mistake) is quietly shown as 5 stars."
+  },
+  {
+   "function": "review_stars",
+   "call": "SELECT review_stars(-2, 10)",
+   "got": 0.0,
+   "say": "An average score of minus 2 from 10 reviews is quietly shown as 0 stars."
+  },
+  {
+   "function": "review_stars",
+   "call": "SELECT review_stars(4.8, 'abc')",
+   "got": "n/a",
+   "say": "A product with a 4.8 average but a vote count entered as the word abc shows no stars (n/a)."
+  },
+  {
+   "function": "split_bill",
+   "call": "SELECT split_bill(100, 3, 15)",
+   "got": 38.34,
+   "say": "Three friends split a 100-dollar bill with a 15% tip: each pays 38.34 dollars, rounded up so the restaurant is never short (3 times 38.34 is 115.02)."
+  },
+  {
+   "function": "split_bill",
+   "call": "SELECT split_bill(100, 4, 50)",
+   "got": 32.5,
+   "say": "Four friends split a 100-dollar bill with a 50% tip typed in: each pays 32.50 dollars, because the tip is capped at 30%."
+  },
+  {
+   "function": "split_bill",
+   "call": "SELECT split_bill(100, 3, -10)",
+   "got": 30.0,
+   "say": "Three friends split a 100-dollar bill and a tip of minus 10% is applied: each pays 30 dollars, less than the bill itself."
+  },
+  {
+   "function": "split_bill",
+   "call": "SELECT split_bill(100, 0, 15)",
+   "got": null,
+   "say": "A 100-dollar bill split among 0 people gives a blank result instead of an error."
+  },
+  {
+   "function": "split_bill",
+   "call": "SELECT split_bill(100, 2.5, 15)",
+   "got": 46.0,
+   "say": "A 100-dollar bill with a 15% tip split among 2.5 people gives 46 dollars each, instead of rejecting a half person."
+  }
+ ],
+ "fixes": [
+  {
+   "shown": "A points balance mistakenly entered as the word abc is treated as zero points, so the customer is shown as Bronze.",
+   "said": "Case 33 is wrong: \"abc\" isn't a number, so it should give a blank (NULL), not Bronze. The rest are fine.",
+   "function": "loyalty_tier",
+   "rounds": 1,
+   "now": "A customer's points balance is mistakenly entered as the word abc: since the text is not a number, no tier is given and the result is empty (NULL), not zero points, so the customer is not shown as Bronze.",
+   "confirmed": true
+  },
+  {
+   "shown": "Hours entered as the word abc at 20 dollars an hour pay 0 dollars, with no warning.",
+   "said": "Case 39 is wrong: \"abc\" isn't a number, so it should give a blank (NULL), not 0 dollars.",
+   "function": "overtime_pay",
+   "rounds": 1,
+   "now": "Hours entered as the word abc at 20 dollars an hour are not a number, so the software gives no pay at all (a blank NULL result, not 0 dollars) and raises no warning: the claimed 0-dollar pay is wrong, because the rules say text that is not wholly a number makes the pay NULL.",
+   "confirmed": true
+  },
+  {
+   "shown": "A product with a 4.8 average but a vote count entered as the word abc shows no stars (n/a).",
+   "said": "Case 44 is wrong: \"abc\" votes isn't a number, so it should give a blank (NULL), not n/a.",
+   "function": "review_stars",
+   "rounds": 1,
+   "now": "A product with a 4.8 average but a vote count entered as the word abc gets no star rating at all: the result is NULL (unknown), not 'n/a', because a vote count that isn't a number makes the result NULL whatever the average is.",
+   "confirmed": true
+  }
+ ],
+ "list_review": {
+  "replies": 7,
+  "cost": 0.602,
+  "log": [
+   {
+    "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+    "typed": "17, 26, 60, 65 and 76 are wrong. Text that isn't a number should give NULL, not 0."
+   },
+   {
+    "prompt": "  Rule 17: late_fee: Whenever the balance or days late is given as text, the number at the start of the text is used (' 500 ' and '10' work, '10abc' counts as 10), and text with no leading number such as 'abc' or empty text counts as 0, which gives a fee of 0.00.\n  What should it be? > ",
+    "typed": "Text that isn't a number should give NULL, not 0. The number at the start isn't used either: '10abc' should be NULL, while numeric text like '200' or ' 500 ' is still accepted."
+   },
+   {
+    "prompt": "  Rule 26: loyalty_tier: Whenever the points are given as text, the number at the start of the text is used ('5000' is Gold, '1500abc' is Silver), and text with no leading number or empty text counts as 0 and gives 'Bronze'.\n  What should it be? > ",
+    "typed": "Text that isn't a number should give NULL, not 0. The number at the start isn't used either: '1500abc' should be NULL, while numeric text like '5000' is still accepted."
+   },
+   {
+    "prompt": "  Rule 60: overtime_pay: Whenever hours or rate is text that is not wholly a number ('abc', empty text, '45abc', '1,5'), it counts as 0, so '45abc' hours gives 0.00 pay.\n  What should it be? > ",
+    "typed": "Text that isn't wholly a number should give NULL, not 0. '45abc' should be NULL, while numeric text like ' 45 ' or '4e1' is still accepted."
+   },
+   {
+    "prompt": "  Rule 65: review_stars: Whenever the average is text that is wholly a number ('4.5'), it is used as that number; whenever it is any other text or empty, it counts as 0 and gives 0.0 stars (when there are enough votes).\n  What should it be? > ",
+    "typed": "Text that isn't a number should give NULL, not 0. Any other text or empty should be NULL, while text like '4.5' is still accepted."
+   },
+   {
+    "prompt": "  Rule 76: split_bill: Whenever the total or tip is text that is not wholly a number ('abc', empty text), it counts as 0, so a bad total gives 0.00 and a bad tip means no tip; numeric text like '100' is used as a number.\n  What should it be? > ",
+    "typed": "Text that isn't a number should give NULL, not 0. A bad total or tip should be NULL, while numeric text like '100' is still accepted."
+   },
+   {
+    "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+    "typed": ""
+   }
+  ],
+  "transcript": "\nWhat the built code does now, as rules (each one is what the product will do. Mark any that is not your policy):\n  1. biz_days: Whenever both dates are valid 'YYYY-MM-DD' dates, the result is the number of Monday-to-Friday days after the start date up to and including the end date; the start date itself is never counted (e.g. Mon 2024-01-01 to Mon 2024-01-08 gives 5).\n  2. biz_days: Whenever the end date is the same as or earlier than the start date, the result is 0.\n  3. biz_days: Whenever a day in the range falls on a Saturday or Sunday, it is not counted (Saturday 2024-01-06 to Sunday 2024-01-07 gives 0).\n  4. biz_days: Whenever a day in the range is December 25 or January 1, it is not counted, even if it is a weekday, in every year (2024-12-24 to 2024-12-26 gives 1). No other holidays are recognised.\n  5. biz_days: Whenever the start date is a holiday or weekend, it makes no difference, because the start date is never counted; whenever the end date is a weekday that is not a holiday, it is counted.\n  6. biz_days: Whenever either date is NULL, the result is NULL, even if the other date is not a valid date.\n  7. biz_days: Whenever either date is not valid text in exactly the form YYYY-MM-DD with a real calendar date (empty text, a number, a missing leading zero like '2024-1-1', a date with a time, an impossible date like 2024-02-30, or year 0000), the result is -1.\n  8. biz_days: Whenever a valid date has spaces before or after it, the spaces are ignored and the date is used normally.\n  9. biz_days: Whenever the range includes February 29 of a leap year, that day is counted like any other weekday (2024-02-28 to 2024-03-01 gives 2; 2023-02-28 to 2023-03-01 gives 1).\n  10. late_fee: Whenever the invoice is 3 days late or fewer (including 0 or negative days), the fee is 0.00; the fee starts only at more than 3 days (3.01 days already counts as late).\n  11. late_fee: Whenever the invoice is more than 3 days late, the base fee is 1.5% of the balance for each week late, and any part of a week counts as a full week (4 to 7 days is one week, 8 to 14 days is two weeks; a 1000.00 balance gives 15.00 at 7 days and 30.00 at 8 days).\n  12. late_fee: Whenever the base fee is under 5.00 and the invoice is more than 3 days late, the fee is raised to a minimum of 5.00 (a 100.00 balance 4 days late is charged 5.00).\n  13. late_fee: Whenever the fee would be more than 25% of the balance, it is capped at 25% of the balance, and this cap overrides the 5.00 minimum (a 10.00 balance more than 3 days late is charged 2.50; a 4.00 balance 10 days late is charged 1.00).\n  14. late_fee: Whenever the fee has fractions of a cent, it is rounded down to the whole cent, never up (a 1234.57 balance 10 days late gives 37.03, not 37.04; a 0.01 balance gives 0.00).\n  15. late_fee: Whenever the balance is zero or negative, the fee is 0.00, however late the invoice is.\n  16. late_fee: Whenever either the balance or the days late is NULL, the result is NULL.\n  17. late_fee: Whenever the balance or days late is given as text, the number at the start of the text is used (' 500 ' and '10' work, '10abc' counts as 10), and text with no leading number such as 'abc' or empty text counts as 0, which gives a fee of 0.00.\n  18. late_fee: Whenever the days late is a fraction, any amount over 3 days is charged and rounded up to a whole week (3.5 days on a 500.00 balance gives 7.50).\n  19. loyalty_tier: Whenever the points balance is from 0 up to just under 1000, the tier is 'Bronze'.\n  20. loyalty_tier: Whenever the points balance is 1000 or more but under 5000, the tier is 'Silver'; exactly 1000 is Silver and 4999 is still Silver.\n  21. loyalty_tier: Whenever the points balance is 5000 or more but under 20000, the tier is 'Gold'; exactly 5000 is Gold and 19999.9 is still Gold.\n  22. loyalty_tier: Whenever the points balance is 20000 or more, the tier is 'Platinum'; exactly 20000 is Platinum.\n  23. loyalty_tier: Whenever the points balance is below zero (even -0.5), the tier is 'Closed'.\n  24. loyalty_tier: Whenever the points balance has a fraction, it is not rounded; 999.99 is Bronze.\n  25. loyalty_tier: Whenever the points balance is NULL, the result is NULL.\n  26. loyalty_tier: Whenever the points are given as text, the number at the start of the text is used ('5000' is Gold, '1500abc' is Silver), and text with no leading number or empty text counts as 0 and gives 'Bronze'.\n  27. make_slug: Whenever a title is given, the slug is the title in lower case with every run of characters other than letters a-z and digits 0-9 (spaces, punctuation, underscores, slashes, apostrophes, dots, commas) replaced by a single hyphen ('A_B/C.D!' gives 'a-b-c-d'; 'Tom''s' gives 'tom-s'; '1,000 items' gives '1-000-items').\n  28. make_slug: Whenever the title has leading or trailing spaces or symbols, or repeated spaces, no leading, trailing or doubled hyphens appear ('  Hello   World  ' gives 'hello-world').\n  29. make_slug: Whenever the title contains an ampersand, it is read as the word 'and' ('Rock & Roll' and 'Rock&Roll' both give 'rock-and-roll').\n  30. make_slug: Whenever the title has accented letters that can be split into a plain letter and an accent, the accent is dropped and the plain letter kept ('Caf\u00e9 Cr\u00e8me' gives 'cafe-creme'); full-width letters such as '\uff21\uff22\uff23' become plain 'abc'.\n  31. make_slug: Whenever the title has letters with no plain-letter equivalent (Japanese, \u00c6, \u00d8, \u00df), those characters are treated as symbols and dropped, becoming a hyphen between other words.\n  32. make_slug: Whenever the slug would be longer than 40 characters, it is cut at 40 characters, and a hyphen left at the end by the cut is removed, so the slug may be 39 characters.\n  33. make_slug: Whenever the title is empty, only spaces, only symbols, or only characters with no Latin equivalent, the slug is 'untitled'.\n  34. make_slug: Whenever the title is NULL, the result is NULL.\n  35. make_slug: Whenever the title is a number, it is treated as its text ('12345' gives '12345', 1.5 gives '1-5', and 1.0 gives '1').\n  36. mask_card: Whenever the card number has 5 or more digits, every digit except the last 4 is replaced by '*' and the last 4 are shown, giving one '*' per hidden digit ('4111111111111111' gives '************1111').\n  37. mask_card: Whenever the card number contains spaces, hyphens, letters or other non-digit characters, those are removed first and are not shown in the result ('4111-1111-1111-1111' gives '************1111').\n  38. mask_card: Whenever the card number has 1 to 4 digits, all of them are hidden: the result is one '*' per digit ('1234' gives '****', '12' gives '**').\n  39. mask_card: Whenever the card number has no digits at all (empty text, only spaces, or only letters), the result is empty text.\n  40. mask_card: Whenever the card number is given as a numeric value instead of text, it is treated as its digits; a minus sign and decimal point are dropped (-1234567 gives '***4567'; 123456.5 gives '***4565'; 0 gives '*').\n  41. mask_card: Whenever the card number is NULL, the result is NULL.\n  42. mask_card: Whenever the number is very long (more than 16 digits), the same rule applies with no limit: all but the last 4 digits are starred.\n  43. norm_phone: Whenever the text holds exactly 10 digits after removing all non-digit characters (spaces, brackets, hyphens, dots, plus signs), the result is '+1' followed by those 10 digits ('(555) 123-4567' gives '+15551234567').\n  44. norm_phone: Whenever the text holds exactly 11 digits that begin with 1, the result is '+' followed by the 11 digits ('1-555-123-4567' and '+1 555 123 4567' give '+15551234567').\n  45. norm_phone: Whenever the text contains the letter x or the letters ext (in any letter case), everything from the first such marker onwards is ignored as an extension, and the rest is judged as above ('555-123-4567 ext. 89' gives '+15551234567'; a bare trailing 'x' is also ignored).\n  46. norm_phone: Whenever an x or 'ext' appears before the digits, such as 'x555-123-4567', everything is cut off and the result is 'INVALID'.\n  47. norm_phone: Whenever any other letters sit in the text, they are ignored when counting digits; but a word containing an x or 'ext' (such as 'extra') cuts the text off there ('555-123-4567 extra' still works; 'Text 555 123 4567' becomes INVALID because the cut leaves no digits).\n  48. norm_phone: Whenever the digit count is anything other than 10, or 11 starting with 1 (international numbers like '+44 20 7946 0958', 11 digits starting with another digit, 12 digits, short numbers, empty text, or text with no digits), the result is 'INVALID'.\n  49. norm_phone: Whenever a 10-digit number starts with 0 or 1 (for example '0555123456'), it is accepted without checking the area code, and '+1' is put in front.\n  50. norm_phone: Whenever the phone is a numeric value (5551234567 or 15551234567), it is treated as its digits and normalised the same way.\n  51. norm_phone: Whenever the text is NULL, the result is NULL (not 'INVALID').\n  52. overtime_pay: Whenever hours are 40 or fewer, pay is hours times rate (37.5 hours at 18.50 gives 693.75).\n  53. overtime_pay: Whenever hours are above 40 up to 60, the first 40 hours are paid at the normal rate and each hour from 40 to 60 at 1.5 times the rate (41 hours at 10.00 gives 415.00; 60 hours gives 700.00).\n  54. overtime_pay: Whenever hours are above 60, each hour above 60 is paid at double the rate, on top of the earlier bands (61 hours at 10.00 gives 720.00; 80 hours gives 1100.00).\n  55. overtime_pay: Whenever hours are negative, the pay is 0.00, even if the rate is also negative.\n  56. overtime_pay: Whenever the rate is negative and hours are not negative, the pay is negative by the same calculation (10 hours at -10 gives -100.00); a zero rate or zero hours gives 0.00.\n  57. overtime_pay: Whenever the pay has fractions of a cent, it is rounded to the nearest cent with exactly half a cent rounding up (rate 0.005 for 1 hour gives 0.01; 41 hours at 10.005 gives 415.21).\n  58. overtime_pay: Whenever hours or rate is NULL, the result is NULL, even if the other value is negative or text.\n  59. overtime_pay: Whenever hours or rate is given as text that is wholly a number (spaces around it allowed, such as ' 45 ' or '4e1'), it is used as that number.\n  60. overtime_pay: Whenever hours or rate is text that is not wholly a number ('abc', empty text, '45abc', '1,5'), it counts as 0, so '45abc' hours gives 0.00 pay.\n  61. overtime_pay: Whenever hours or rate is infinite or not-a-number (including the text 'inf' or 'nan', or a value too large to store), the result is NULL.\n  62. review_stars: Whenever there are 5 or more votes, the stars shown are the average rounded to the nearest half star, with an exact quarter point rounding up (4.24 gives 4.0, 4.25 gives 4.5, 4.74 gives 4.5, 4.75 gives 5.0, 2.25 gives 2.5).\n  63. review_stars: Whenever there are fewer than 5 votes (including 0, negative, 4.9, or non-numeric text), the result is the text 'n/a' no matter the average; exactly 5 votes is enough.\n  64. review_stars: Whenever the average is above 5, the stars shown are 5.0; whenever it is below 0, they are 0.0.\n  65. review_stars: Whenever the average is text that is wholly a number ('4.5'), it is used as that number; whenever it is any other text or empty, it counts as 0 and gives 0.0 stars (when there are enough votes).\n  66. review_stars: Whenever the average or votes is NULL, the result is NULL, even if the other value would give 'n/a'.\n  67. review_stars: Whenever the average or votes is infinite or too large to store, the result is NULL, and this check happens before the votes check.\n  68. split_bill: Whenever the bill is shared, each person pays (total plus tip percent of the total) divided by the number of people (100 with 20% tip among 4 gives 30.00).\n  69. split_bill: Whenever the share has fractions of a cent, it is rounded up to the next whole cent, never down (100 split 3 ways with no tip gives 33.34).\n  70. split_bill: Whenever the tip percentage is above 30, it is treated as 30 (100 among 4 with 50% tip gives 32.50).\n  71. split_bill: Whenever the tip percentage is negative, it is applied as a discount with no lower limit (-10% on 100 among 4 gives 22.50; -200% gives -25.00).\n  72. split_bill: Whenever the number of people is 0 or negative, or NULL, the result is NULL.\n  73. split_bill: Whenever the number of people is a fraction above 0, it is used as is, with no rounding (2.5 people gives 44.00 for 100 with 10% tip).\n  74. split_bill: Whenever the total is negative, the result is negative by the same calculation (-100 among 4 with 10% tip gives -27.50); a zero total gives 0.00.\n  75. split_bill: Whenever the total, people or tip is NULL, the result is NULL, even if the people number is 0.\n  76. split_bill: Whenever the total or tip is text that is not wholly a number ('abc', empty text), it counts as 0, so a bad total gives 0.00 and a bad tip means no tip; numeric text like '100' is used as a number.\n  77. split_bill: Whenever the people value is text that is not wholly a number ('abc'), the result is NULL because it counts as 0 people.\n  78. split_bill: Whenever the total, people or tip is infinite or too large to store, the result is NULL.\n  79. mid_value: Whenever a column has an odd number of numeric values, the result is the middle one when sorted from smallest to largest (3, 1, 2 gives 2).\n  80. mid_value: Whenever a column has an even number of numeric values, the result is the lower of the two middle values, not their average (1, 2, 3, 4 gives 2; 4, 1 gives 1).\n  81. mid_value: Whenever values are NULL or text (including numeric-looking text such as '5'), they are ignored and not counted.\n  82. mid_value: Whenever there are no numeric values at all (no rows, all NULL, only text, or no rows matching a filter), the result is NULL.\n  83. mid_value: Whenever the aggregate is used with GROUP BY, each group gets its own middle value, calculated only from that group's numeric values.\n  84. mid_value: Whenever the middle value is a whole number or a decimal, it is returned exactly as stored, with no rounding.\n  Numbers of any that are wrong (Enter = all correct) > 17, 26, 60, 65 and 76 are wrong. Text that isn't a number should give NULL, not 0.\n  Rule 17: late_fee: Whenever the balance or days late is given as text, the number at the start of the text is used (' 500 ' and '10' work, '10abc' counts as 10), and text with no leading number such as 'abc' or empty text counts as 0, which gives a fee of 0.00.\n  What should it be? > Text that isn't a number should give NULL, not 0. The number at the start isn't used either: '10abc' should be NULL, while numeric text like '200' or ' 500 ' is still accepted.\n  Rule 26: loyalty_tier: Whenever the points are given as text, the number at the start of the text is used ('5000' is Gold, '1500abc' is Silver), and text with no leading number or empty text counts as 0 and gives 'Bronze'.\n  What should it be? > Text that isn't a number should give NULL, not 0. The number at the start isn't used either: '1500abc' should be NULL, while numeric text like '5000' is still accepted.\n  Rule 60: overtime_pay: Whenever hours or rate is text that is not wholly a number ('abc', empty text, '45abc', '1,5'), it counts as 0, so '45abc' hours gives 0.00 pay.\n  What should it be? > Text that isn't wholly a number should give NULL, not 0. '45abc' should be NULL, while numeric text like ' 45 ' or '4e1' is still accepted.\n  Rule 65: review_stars: Whenever the average is text that is wholly a number ('4.5'), it is used as that number; whenever it is any other text or empty, it counts as 0 and gives 0.0 stars (when there are enough votes).\n  What should it be? > Text that isn't a number should give NULL, not 0. Any other text or empty should be NULL, while text like '4.5' is still accepted.\n  Rule 76: split_bill: Whenever the total or tip is text that is not wholly a number ('abc', empty text), it counts as 0, so a bad total gives 0.00 and a bad tip means no tip; numeric text like '100' is used as a number.\n  What should it be? > Text that isn't a number should give NULL, not 0. A bad total or tip should be NULL, while numeric text like '100' is still accepted.\n  Anything the builders should know that is not on this list? (Enter = nothing) > \n",
+  "minutes": 0.9
+ },
+ "spot_review": {
+  "replies": 52,
+  "cost": 3.903,
+  "log": [
+   {
+    "prompt": "\nCase 1 of 49. An order placed on Friday 6 November and due on Monday 9 November counts as 1 business day, because the start day is not counted and the due day is.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 2 of 49. A parcel sent on 24 December and due on 28 December gets only 1 business day, since Christmas Day (a Friday) is skipped along with the weekend.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 3 of 49. A delivery promised from Thursday 26 November to Monday 30 November counts 2 business days, because US Thanksgiving and other movable holidays are not skipped, only 25 December and 1 January.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 4 of 49. If the due date (2 November) is earlier than the ship date (9 November), the estimate is quietly 0 business days instead of a warning or a negative number.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 5 of 49. A delivery date typed as the 45th of month 13 gives an answer of -1 business days instead of a blank or an error.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 6 of 49. The article 'The Complete Guide to Building a Profitable Online Store From Scratch' gets its web address cut off mid-word at 40 characters, ending in 'profita'.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 7 of 49. A product titled in Japanese gets the web address 'untitled', so every non-Latin title collides on the same address.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 8 of 49. The product 'Ben & Jerry's Caf\u00e9 Cr\u00e8me!' becomes 'ben-and-jerry-s-cafe-creme': the ampersand turns into 'and', accents are dropped and the apostrophe splits Jerry's into 'jerry-s'.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 9 of 49. A title made only of punctuation such as '!!!' gets the web address 'untitled'.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 10 of 49. An empty title gets the web address 'untitled' rather than a blank.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 11 of 49. A card typed as 4111 1111 1111 1111 shows on the receipt as twelve stars followed by 1111, with the spaces removed.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 12 of 49. A 4-digit number is shown fully hidden as four stars, while a 5-digit number shows its last four digits.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 13 of 49. If a support agent types the expiry date after the card number, the receipt shows the expiry digits 1227 as the visible ending and hides the real last four card digits.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 14 of 49. A card field containing only letters gives an empty result instead of a warning.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 15 of 49. A missing card number shows nothing at all on the receipt.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 16 of 49. A London customer's number +44 20 7946 0958 is marked INVALID, because only US and Canada numbers are accepted.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 17 of 49. Priya's office line 415-555-2671 ext 12 is saved as +14155552671, and the extension 12 is silently thrown away.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 18 of 49. A 7-digit local number such as 555-2671 with no area code is marked INVALID rather than guessed.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 19 of 49. The vanity number 1-800-FLOWERS is marked INVALID because letters are not turned into digits.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 20 of 49. An empty phone field is saved as the word INVALID, whereas a missing one stays blank.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 21 of 49. For order totals of 1, 2, 3 and 10 dollars, the typical value comes out as 2 dollars, the lower of the two middle orders, not 2.50.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 22 of 49. For orders of 100, 200, 300 and 40,000 dollars, the typical order is 200 dollars, and the 40,000 outlier does not move it.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 23 of 49. Order totals saved as text, such as '5' and '7', give no typical value at all instead of 6.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 24 of 49. A column where every order total is missing gives a blank typical value.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 25 of 49. Ravi's 10,000-dollar invoice is paid 31 days late: the late fee comes to 750 dollars (1.5% for each started week, 5 weeks).\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 26 of 49. A 10,000-dollar invoice only 4 days late already costs 150 dollars, a full week's fee, while at 3 days late it costs nothing.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 27 of 49. A 100-dollar invoice that is 10 days late is charged the 5-dollar minimum fee, even though the weekly rate would only give 3 dollars.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 28 of 49. A 3-dollar invoice that is 10 days late is charged 0.75 dollars, because the fee is never allowed to exceed a quarter of the balance, which overrides the 5-dollar minimum.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 29 of 49. A 1,234.56-dollar invoice paid 15 days late is charged 55.55 dollars: the exact 55.56 is cut down, never rounded up, to the cent.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 30 of 49. A customer with exactly 1,000 points is already Silver, while one with 999 points is still Bronze.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 31 of 49. A customer whose points balance has gone to minus 1 is shown as Closed, not as Bronze.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 32 of 49. A customer with 4,999.5 points stays Silver, since Gold starts at exactly 5,000 points.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 33 of 49. A points balance mistakenly entered as the word abc is treated as zero points, so the customer is shown as Bronze.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Case 33 is wrong: \"abc\" isn't a number, so it should give a blank (NULL), not Bronze. The rest are fine."
+   },
+   {
+    "prompt": "\n  With your correction: A customer's points balance is mistakenly entered as the word abc: since the text is not a number, no tier is given and the result is empty (NULL), not zero points, so the customer is not shown as Bronze.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 34 of 49. A customer with no points balance on file gets no tier at all, not Bronze.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 35 of 49. Maria works 45 hours at 20 dollars an hour: her weekly pay comes to 950 dollars, with the 5 hours past 40 paid at time and a half.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 36 of 49. Maria works 65 hours at 20 dollars an hour: her weekly pay is 1,600 dollars, since hours beyond 60 are paid at double time.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 37 of 49. Negative hours worked (minus 5 at 20 dollars an hour) pay 0 dollars instead of raising an error.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 38 of 49. A pay rate typed as minus 20 dollars an hour for 45 hours gives a pay of minus 950 dollars instead of being rejected.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 39 of 49. Hours entered as the word abc at 20 dollars an hour pay 0 dollars, with no warning.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Case 39 is wrong: \"abc\" isn't a number, so it should give a blank (NULL), not 0 dollars."
+   },
+   {
+    "prompt": "\n  With your correction: Hours entered as the word abc at 20 dollars an hour are not a number, so the software gives no pay at all (a blank NULL result, not 0 dollars) and raises no warning: the claimed 0-dollar pay is wrong, because the rules say text that is not wholly a number makes the pay NULL.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 40 of 49. A product with a 4.3 average from only 4 reviews shows no stars (n/a), while with 5 reviews it would show stars.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 41 of 49. A product rated 4.74 on average from 10 reviews is shown as 4.5 stars, while 4.75 would be shown as 5 stars.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 42 of 49. An average score of 7 out of 5 (a data mistake) is quietly shown as 5 stars.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 43 of 49. An average score of minus 2 from 10 reviews is quietly shown as 0 stars.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 44 of 49. A product with a 4.8 average but a vote count entered as the word abc shows no stars (n/a).\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Case 44 is wrong: \"abc\" votes isn't a number, so it should give a blank (NULL), not n/a."
+   },
+   {
+    "prompt": "\n  With your correction: A product with a 4.8 average but a vote count entered as the word abc gets no star rating at all: the result is NULL (unknown), not 'n/a', because a vote count that isn't a number makes the result NULL whatever the average is.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 45 of 49. Three friends split a 100-dollar bill with a 15% tip: each pays 38.34 dollars, rounded up so the restaurant is never short (3 times 38.34 is 115.02).\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 46 of 49. Four friends split a 100-dollar bill with a 50% tip typed in: each pays 32.50 dollars, because the tip is capped at 30%.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 47 of 49. Three friends split a 100-dollar bill and a tip of minus 10% is applied: each pays 30 dollars, less than the bill itself.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 48 of 49. A 100-dollar bill split among 0 people gives a blank result instead of an error.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 49 of 49. A 100-dollar bill with a 15% tip split among 2.5 people gives 46 dollars each, instead of rejecting a half person.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   }
+  ],
+  "transcript": "Hive: Now 49 quick checks on what the build does in real cases. Press Enter if a result is right, or say what should happen instead.\n\nCase 1 of 49. An order placed on Friday 6 November and due on Monday 9 November counts as 1 business day, because the start day is not counted and the due day is.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 2 of 49. A parcel sent on 24 December and due on 28 December gets only 1 business day, since Christmas Day (a Friday) is skipped along with the weekend.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 3 of 49. A delivery promised from Thursday 26 November to Monday 30 November counts 2 business days, because US Thanksgiving and other movable holidays are not skipped, only 25 December and 1 January.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 4 of 49. If the due date (2 November) is earlier than the ship date (9 November), the estimate is quietly 0 business days instead of a warning or a negative number.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 5 of 49. A delivery date typed as the 45th of month 13 gives an answer of -1 business days instead of a blank or an error.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 6 of 49. The article 'The Complete Guide to Building a Profitable Online Store From Scratch' gets its web address cut off mid-word at 40 characters, ending in 'profita'.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 7 of 49. A product titled in Japanese gets the web address 'untitled', so every non-Latin title collides on the same address.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 8 of 49. The product 'Ben & Jerry's Caf\u00e9 Cr\u00e8me!' becomes 'ben-and-jerry-s-cafe-creme': the ampersand turns into 'and', accents are dropped and the apostrophe splits Jerry's into 'jerry-s'.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 9 of 49. A title made only of punctuation such as '!!!' gets the web address 'untitled'.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 10 of 49. An empty title gets the web address 'untitled' rather than a blank.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 11 of 49. A card typed as 4111 1111 1111 1111 shows on the receipt as twelve stars followed by 1111, with the spaces removed.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 12 of 49. A 4-digit number is shown fully hidden as four stars, while a 5-digit number shows its last four digits.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 13 of 49. If a support agent types the expiry date after the card number, the receipt shows the expiry digits 1227 as the visible ending and hides the real last four card digits.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 14 of 49. A card field containing only letters gives an empty result instead of a warning.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 15 of 49. A missing card number shows nothing at all on the receipt.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 16 of 49. A London customer's number +44 20 7946 0958 is marked INVALID, because only US and Canada numbers are accepted.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 17 of 49. Priya's office line 415-555-2671 ext 12 is saved as +14155552671, and the extension 12 is silently thrown away.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 18 of 49. A 7-digit local number such as 555-2671 with no area code is marked INVALID rather than guessed.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 19 of 49. The vanity number 1-800-FLOWERS is marked INVALID because letters are not turned into digits.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 20 of 49. An empty phone field is saved as the word INVALID, whereas a missing one stays blank.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 21 of 49. For order totals of 1, 2, 3 and 10 dollars, the typical value comes out as 2 dollars, the lower of the two middle orders, not 2.50.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 22 of 49. For orders of 100, 200, 300 and 40,000 dollars, the typical order is 200 dollars, and the 40,000 outlier does not move it.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 23 of 49. Order totals saved as text, such as '5' and '7', give no typical value at all instead of 6.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 24 of 49. A column where every order total is missing gives a blank typical value.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 25 of 49. Ravi's 10,000-dollar invoice is paid 31 days late: the late fee comes to 750 dollars (1.5% for each started week, 5 weeks).\n  Right? (Enter = yes, or say what should happen) > \n\nCase 26 of 49. A 10,000-dollar invoice only 4 days late already costs 150 dollars, a full week's fee, while at 3 days late it costs nothing.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 27 of 49. A 100-dollar invoice that is 10 days late is charged the 5-dollar minimum fee, even though the weekly rate would only give 3 dollars.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 28 of 49. A 3-dollar invoice that is 10 days late is charged 0.75 dollars, because the fee is never allowed to exceed a quarter of the balance, which overrides the 5-dollar minimum.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 29 of 49. A 1,234.56-dollar invoice paid 15 days late is charged 55.55 dollars: the exact 55.56 is cut down, never rounded up, to the cent.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 30 of 49. A customer with exactly 1,000 points is already Silver, while one with 999 points is still Bronze.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 31 of 49. A customer whose points balance has gone to minus 1 is shown as Closed, not as Bronze.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 32 of 49. A customer with 4,999.5 points stays Silver, since Gold starts at exactly 5,000 points.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 33 of 49. A points balance mistakenly entered as the word abc is treated as zero points, so the customer is shown as Bronze.\n  Right? (Enter = yes, or say what should happen) > Case 33 is wrong: \"abc\" isn't a number, so it should give a blank (NULL), not Bronze. The rest are fine.\n\n  With your correction: A customer's points balance is mistakenly entered as the word abc: since the text is not a number, no tier is given and the result is empty (NULL), not zero points, so the customer is not shown as Bronze.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 34 of 49. A customer with no points balance on file gets no tier at all, not Bronze.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 35 of 49. Maria works 45 hours at 20 dollars an hour: her weekly pay comes to 950 dollars, with the 5 hours past 40 paid at time and a half.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 36 of 49. Maria works 65 hours at 20 dollars an hour: her weekly pay is 1,600 dollars, since hours beyond 60 are paid at double time.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 37 of 49. Negative hours worked (minus 5 at 20 dollars an hour) pay 0 dollars instead of raising an error.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 38 of 49. A pay rate typed as minus 20 dollars an hour for 45 hours gives a pay of minus 950 dollars instead of being rejected.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 39 of 49. Hours entered as the word abc at 20 dollars an hour pay 0 dollars, with no warning.\n  Right? (Enter = yes, or say what should happen) > Case 39 is wrong: \"abc\" isn't a number, so it should give a blank (NULL), not 0 dollars.\n\n  With your correction: Hours entered as the word abc at 20 dollars an hour are not a number, so the software gives no pay at all (a blank NULL result, not 0 dollars) and raises no warning: the claimed 0-dollar pay is wrong, because the rules say text that is not wholly a number makes the pay NULL.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 40 of 49. A product with a 4.3 average from only 4 reviews shows no stars (n/a), while with 5 reviews it would show stars.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 41 of 49. A product rated 4.74 on average from 10 reviews is shown as 4.5 stars, while 4.75 would be shown as 5 stars.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 42 of 49. An average score of 7 out of 5 (a data mistake) is quietly shown as 5 stars.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 43 of 49. An average score of minus 2 from 10 reviews is quietly shown as 0 stars.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 44 of 49. A product with a 4.8 average but a vote count entered as the word abc shows no stars (n/a).\n  Right? (Enter = yes, or say what should happen) > Case 44 is wrong: \"abc\" votes isn't a number, so it should give a blank (NULL), not n/a.\n\n  With your correction: A product with a 4.8 average but a vote count entered as the word abc gets no star rating at all: the result is NULL (unknown), not 'n/a', because a vote count that isn't a number makes the result NULL whatever the average is.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 45 of 49. Three friends split a 100-dollar bill with a 15% tip: each pays 38.34 dollars, rounded up so the restaurant is never short (3 times 38.34 is 115.02).\n  Right? (Enter = yes, or say what should happen) > \n\nCase 46 of 49. Four friends split a 100-dollar bill with a 50% tip typed in: each pays 32.50 dollars, because the tip is capped at 30%.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 47 of 49. Three friends split a 100-dollar bill and a tip of minus 10% is applied: each pays 30 dollars, less than the bill itself.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 48 of 49. A 100-dollar bill split among 0 people gives a blank result instead of an error.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 49 of 49. A 100-dollar bill with a 15% tip split among 2.5 people gives 46 dollars each, instead of rejecting a half person.\n  Right? (Enter = yes, or say what should happen) > \n"
+ },
+ "minutes": {
+  "list": 0.9,
+  "spots": 6.1
+ },
+ "cost_usd": {
+  "documenter": 0.14366189999999998,
+  "describer": 0.28636259999999997,
+  "spotter": 0.2495166,
+  "judge": 0.2093641,
+  "owner_SL": 0.602,
+  "owner_HV_spots": 3.903
+ },
+ "labels": [
+  {
+   "function": "late_fee",
+   "decision": 0,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (grace period of 3 days); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "late_fee",
+   "decision": 1,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "D/SL/HV: cap overrides the 5.00 minimum (cap applied last). R: cap after minimum. Matches oracle."
+  },
+  {
+   "function": "late_fee",
+   "decision": 2,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (minimum fee of 5.00); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "late_fee",
+   "decision": 3,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (result floored to whole cents); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "loyalty_tier",
+   "decision": 0,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (negative points give Closed); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "mask_card",
+   "decision": 0,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (separators dropped from output); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "mask_card",
+   "decision": 1,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (numbers of 4 or fewer digits fully masked); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "biz_days",
+   "decision": 0,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (reversed range gives 0); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "biz_days",
+   "decision": 1,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (invalid date gives -1); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "biz_days",
+   "decision": 2,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (Dec 25 and Jan 1 are not business days); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "split_bill",
+   "decision": 0,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (per-person share rounded up to the cent); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "split_bill",
+   "decision": 1,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (people <= 0 gives NULL); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "split_bill",
+   "decision": 2,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (tip capped at 30%); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "review_stars",
+   "decision": 0,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "All sheets state <5 votes -> n/a correctly. D and SL also say non-numeric text votes give n/a (oracle gives NULL); that is a separate text-handling point, not this decision, and HV fixes it."
+  },
+  {
+   "function": "review_stars",
+   "decision": 1,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (ties round half up to the next half star); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "review_stars",
+   "decision": 2,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (average clamped to 0..5); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "make_slug",
+   "decision": 0,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (& becomes and); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "make_slug",
+   "decision": 1,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (accents transliterated); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "make_slug",
+   "decision": 2,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (truncated to 40 chars without trailing hyphen); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "make_slug",
+   "decision": 3,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (empty result becomes untitled); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "overtime_pay",
+   "decision": 0,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (double time beyond 60 hours); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "overtime_pay",
+   "decision": 1,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (negative hours pay 0); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "norm_phone",
+   "decision": 0,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Cut at first 'x' or 'ext', any case, all sheets (D also notes words like 'extra')."
+  },
+  {
+   "function": "norm_phone",
+   "decision": 1,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (unusable numbers give INVALID); SL/HV edits only touch text-input handling."
+  },
+  {
+   "function": "mid_value",
+   "decision": 0,
+   "label": "right",
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Stated correctly in all four sheets (even count returns the lower middle value); SL/HV edits only touch text-input handling."
+  }
+ ]
+}

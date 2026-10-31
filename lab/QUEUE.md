@@ -2,11 +2,14 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 1 2026 IST, after Gate 66; Gates 67 and 68 running)
+## Where we left off (Nov 1 2026 IST, after Gate 69; Gate 70 running)
 
 - **Gate 66 done (the user, travelling: "test something that makes Hive the best tool"):** one Claude Code agent that asks the owner beat Hive's hand-over by 21-30 hidden points (CQ 93.0, CC 84.6, HV 63.4, N0 34.8%) at 1/13 of his reading. Wind tunnel, synthetic owner who answers from his policy.
-- **Gate 67 running:** compounding across three features (fresh, standing rulings, house rules).
-- **Gate 68 queued after 66:** Hive's swarm asking (SQ) vs one agent asking (CQ), and the hand-over after asking (SQH).
+- **Gate 67 done:** the hand-over's memory does not compound (neither rule fired).
+- **Gate 68 done (rule fired, shipped):** Hive's swarm asking first = one agent asking (98.4%); the hand-over after added +1.6. Builders now ask first; the hand-over is skipped after a build whose builders asked 3+ questions.
+- **Gate 69 done:** memory of answers and house rules did not compound with asking builders.
+- **Gate 70 running:** overnight, questions saved for the morning (QA) vs the morning hand-over (HV).
+- **For Gate 45 day 2 with the founder:** test builders asking him live (his answers drift; does asking still win?).
 
 ## Earlier (Oct 30 2026 IST, after Gate 65)
 

@@ -1,0 +1,163 @@
+{
+ "feature": 3,
+ "arm": "M",
+ "questions": [
+  {
+   "t": 1793475017,
+   "worker": "Q3M-w2",
+   "question": "--help",
+   "answer": "Not sure what you're asking. Can you send the actual question?",
+   "cost": 0.0583347,
+   "seconds": 2.8
+  },
+  {
+   "t": 1793475020,
+   "worker": "Q3M-w1",
+   "question": "Late fee: what is the exact rule? Examples suggest half a percent of the invoice per day late (20 days on 500 = 50). Is that right, and is there a cap on the percentage (30 days on 1000 gave 150, i.e. 15%)?",
+   "answer": "Yes, 0.5% of the invoice per day late, but only when it's more than 5 days late (0 otherwise), and the fee is capped at 25% of the invoice. Your 15% example is just under the cap. The cap would kick in at 50 days.",
+   "cost": 0.0601147,
+   "seconds": 3.4
+  },
+  {
+   "t": 1793475024,
+   "worker": "Q3M-w1",
+   "question": "Late fee: is there a grace period or a minimum fee? What fee for 0 days late, negative days, or blank/NULL days?",
+   "answer": "Grace period: yes, anything 5 days late or less costs nothing. There's no minimum fee, and 0, negative, or blank/NULL days all give a fee of 0.",
+   "cost": 0.0588647,
+   "seconds": 3.6
+  },
+  {
+   "t": 1793475027,
+   "worker": "Q3M-w1",
+   "question": "Late fee: if days late has decimals (e.g. 10.5 days), round up, cut off, round to nearest, or count as is?",
+   "answer": "Count it as is. Don't round the days. 5.5 days is already late, and 10.5 days is charged at 0.5% \u00d7 10.5.",
+   "cost": 0.0587547,
+   "seconds": 4.5
+  },
+  {
+   "t": 1793475032,
+   "worker": "Q3M-w1",
+   "question": "Late fee: what fee when the invoice amount is zero, negative, blank or NULL, and should the fee be rounded to cents (up, down or nearest) when it has fractions?",
+   "answer": "Fee is 0 when the invoice amount is zero, negative, blank or NULL. If there are fractions of a cent, round the fee up to the next whole cent.",
+   "cost": 0.0588847,
+   "seconds": 3.3
+  },
+  {
+   "t": 1793475035,
+   "worker": "Q3M-w2",
+   "question": "Pet insurance payout: our examples suggest the insurer pays 80% of the claim after the deductible is taken off. Is that right, and is there a maximum payout per claim?",
+   "answer": "Only partly. It's 80% after the deductible when the claim is 1000 or less, but if the claim is over 1000 it drops to 50% of the amount after the deductible. There's no maximum payout per claim.",
+   "cost": 0.0590307,
+   "seconds": 3.7
+  },
+  {
+   "t": 1793475039,
+   "worker": "Q3M-w2",
+   "question": "Pet insurance payout: if the claim is less than or equal to the deductible, what do we pay?",
+   "answer": "We pay 0. The reimbursable part never goes below 0.",
+   "cost": 0.0584607,
+   "seconds": 3.5
+  },
+  {
+   "t": 1793475042,
+   "worker": "Q3M-w1",
+   "question": "Invoice code: the number is padded to 4 digits (0099). What if the number is above 9999, zero, negative, blank/NULL, or has decimals?",
+   "answer": "Above 9999 just prints in full (e.g. 12345), and the 12-character cut still applies to the whole code. Zero, negative, blank or NULL all become 0000, and decimals drop downward (42.9 gives 0042).",
+   "cost": 0.0590867,
+   "seconds": 3.7
+  },
+  {
+   "t": 1793475046,
+   "worker": "Q3M-w1",
+   "question": "Instalment date: what should we show when the first due date is blank, missing or not a valid YYYY-MM-DD date? Are spaces around the date OK? Any weekend adjustment, or a maximum number of instalments?",
+   "answer": "Use 1970-01-01 as the first due date if it's blank, missing or not a valid YYYY-MM-DD date, and spaces around a valid date are fine. No weekend adjustment, and installments are capped at 12 (anything below 1 counts as 1).",
+   "cost": 0.0592667,
+   "seconds": 3.0
+  },
+  {
+   "t": 1793475049,
+   "worker": "Q3M-w1",
+   "question": "Invoice code: the year shows as 2 digits (2022 -> 22). What if the year is blank/NULL, a 3-digit or 5-digit year, negative, or has decimals?",
+   "answer": "Blank, NULL or unreadable year gives '00'. Otherwise drop decimals downward and use the last two digits, zero-padded, so 123 gives '23' and 12345 gives '45'. For a negative year, I'd round down and take the last two digits, so -5 gives '05'. I haven't covered negatives specifically.",
+   "cost": 0.059446700000000005,
+   "seconds": 3.2
+  },
+  {
+   "t": 1793475052,
+   "worker": "Q3M-w1",
+   "question": "Instalment date: what should we show when the instalment number is zero, negative, blank/NULL, or has decimals?",
+   "answer": "Zero, negative, blank or NULL all count as instalment 1, so we show the first due date. Decimals get rounded down (2.7 counts as 2), and anything above 12 counts as 12.",
+   "cost": 0.058910699999999996,
+   "seconds": 2.9
+  },
+  {
+   "t": 1793475055,
+   "worker": "Q3M-w1",
+   "question": "Instalment date: the n-th instalment is the first due date plus (n-1) months. When the day doesn't exist (31 Jan + 1 month), roll into March or use the last day of February?",
+   "answer": "Roll into March: 31 Jan plus 1 month gives 2 or 3 March, depending on whether it's a leap year. Don't clamp to the last day of February.",
+   "cost": 0.0589167,
+   "seconds": 3.1
+  },
+  {
+   "t": 1793475058,
+   "worker": "Q3M-w1",
+   "question": "Invoice code: should the prefix be trimmed and upper-cased? What if the prefix is blank or missing?",
+   "answer": "Keep only the ASCII letters of the prefix (spaces and everything else dropped), upper-case them, and take the first 3. If there are fewer than 3 letters, including blank or missing, pad on the right with X, so blank gives \"XXX\".",
+   "cost": 0.0590707,
+   "seconds": 3.6
+  },
+  {
+   "t": 1793475062,
+   "worker": "Q3M-w2",
+   "question": "Pet insurance payout: what should we pay if the claim amount is blank/NULL or negative? And if the deductible is blank/NULL or negative?",
+   "answer": "Blank, NULL or negative claim: pay 0. Blank, NULL or negative deductible: treat it as 0, so we pay on the full claim.",
+   "cost": 0.0588187,
+   "seconds": 3.6
+  },
+  {
+   "t": 1793475066,
+   "worker": "Q3M-w2",
+   "question": "Pet insurance payout: should the payout be rounded to cents when it has fractions (e.g. 80% of 33.33)? Round up, down or to nearest?",
+   "answer": "Round up to the next whole cent, never down. Any money result gets rounded up, so 80% of 33.33 = 26.664 becomes 26.67, returned as a number.",
+   "cost": 0.0588947,
+   "seconds": 3.7
+  },
+  {
+   "t": 1793475073,
+   "worker": "Q3M-w2",
+   "question": "SMS reminder: our examples read like 'Bo in 5d'. What should the text say when the appointment is today (0 days) or tomorrow (1 day)?",
+   "answer": "Today: \"Bo today\". Tomorrow: \"Bo tomorrow\". Only 2+ days uses \"in Nd\".",
+   "cost": 0.0587547,
+   "seconds": 2.8
+  },
+  {
+   "t": 1793475075,
+   "worker": "Q3M-w2",
+   "question": "SMS reminder: what should the text say if the appointment date has already passed (negative days)?",
+   "answer": "It should end with \"overdue\", e.g. \"Bella overdue\". The whole message is cut to 12 characters, so a long pet name will cut it short.",
+   "cost": 0.0587187,
+   "seconds": 3.9
+  },
+  {
+   "t": 1793475079,
+   "worker": "Q3M-w2",
+   "question": "SMS reminder: what should we send if days_until is blank/NULL or not a number, and what if days has decimals like 2.5?",
+   "answer": "Blank, NULL, or non-numeric days_until counts as 0, so the message ends with \"today\". Decimals get rounded down, so 2.5 becomes 2 and the message ends with \"in 2d\".",
+   "cost": 0.058960700000000005,
+   "seconds": 2.8
+  },
+  {
+   "t": 1793475082,
+   "worker": "Q3M-w2",
+   "question": "SMS reminder: if the pet name is blank or missing what do we show? Should we trim spaces or fix capitalisation of the name? Is there a maximum length for the name or text?",
+   "answer": "Blank or missing name: just show the ending, like \"today\" or \"in 14d\", with no leading space. Yes, trim spaces from the name, but don't change its capitalisation. The whole message is cut to 12 characters, so a long name can cut the ending short.",
+   "cost": 0.0591747,
+   "seconds": 2.9
+  }
+ ],
+ "earlier_in": 34,
+ "house_in": [],
+ "hidden_tests": 125,
+ "hidden_total": 125,
+ "minutes": 1.8
+}

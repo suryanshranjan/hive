@@ -1,0 +1,171 @@
+{
+ "feature": 2,
+ "arm": "M",
+ "questions": [
+  {
+   "t": 1793474893,
+   "worker": "Q2M-w2",
+   "question": "Adoption anniversary: if the pet was adopted on Feb 29 and the anniversary year is not a leap year, which date should we show: Feb 28 or Mar 1?",
+   "answer": "Mar 1. A 29 Feb adoption date in a non-leap year shows as 1 Mar.",
+   "cost": 0.0587047,
+   "seconds": 3.4
+  },
+  {
+   "t": 1793474896,
+   "worker": "Q2M-w1",
+   "question": "Boarding: is there any discount for long stays or a minimum charge (e.g. a minimum number of days)? If so what are the exact thresholds?",
+   "answer": "No minimum number of days or minimum charge. Days of 0 or less cost 0, and fractional days round up to a whole day. The first 7 days are at the full daily rate, and every day after the 7th is 80% of the rate.",
+   "cost": 0.0590447,
+   "seconds": 3.9
+  },
+  {
+   "t": 1793474900,
+   "worker": "Q2M-w3",
+   "question": "For the appointment-sheet owner name (shown like 'Walker, E.'): if the first name is blank or missing, what should we show?",
+   "answer": "Just show the last name on its own, with no comma or initial (e.g. \"Walker\").",
+   "cost": 0.0585747,
+   "seconds": 3.0
+  },
+  {
+   "t": 1793474903,
+   "worker": "Q2M-w1",
+   "question": "Boarding: what should the price be when days is zero, negative, blank/NULL, or the daily rate is zero, negative or NULL?",
+   "answer": "Zero, negative, blank or NULL days: the price is 0, whatever the rate. If days is positive and the rate is zero, negative or NULL, the rate counts as 0, so the price is also 0. Boarding has no minimum fee.",
+   "cost": 0.0600987,
+   "seconds": 4.2
+  },
+  {
+   "t": 1793474908,
+   "worker": "Q2M-w2",
+   "question": "Adoption anniversary: what should we show when the adoption date is blank, missing or not a valid YYYY-MM-DD date?",
+   "answer": "Treat it as 1970-01-01, so the anniversary is calculated from that date. With 0 years (or blank years) it just shows 1970-01-01.",
+   "cost": 0.0588047,
+   "seconds": 3.2
+  },
+  {
+   "t": 1793474911,
+   "worker": "Q2M-w3",
+   "question": "If the last name is blank or missing, what should we show?",
+   "answer": "Show \"Unknown\" as the surname. If there's a first name, it'll read \"Unknown, J.\" \u2014 otherwise just \"Unknown\".",
+   "cost": 0.058640700000000004,
+   "seconds": 2.8
+  },
+  {
+   "t": 1793474914,
+   "worker": "Q2M-w1",
+   "question": "Boarding: should the price be rounded to cents when days or rate has fractions (e.g. 2.5 days at 33.33)? Round up, down or nearest?",
+   "answer": "Round up to the next whole cent, never down, since it's a money result. Days also round up to a whole day first, so 2.5 days becomes 3.",
+   "cost": 0.0588047,
+   "seconds": 2.8
+  },
+  {
+   "t": 1793474916,
+   "worker": "Q2M-w2",
+   "question": "Adoption anniversary: what should we show when the number of years is blank/missing, zero, or negative?",
+   "answer": "Blank or missing years counts as 0, so show the adoption date itself. Zero years also shows the adoption date itself. Negative years (after rounding) shows nothing, NULL.",
+   "cost": 0.0588447,
+   "seconds": 2.8
+  },
+  {
+   "t": 1793474919,
+   "worker": "Q2M-w3",
+   "question": "Should extra spaces around names be trimmed, and should capitalisation be fixed (e.g. 'eve' / 'WALKER' -> 'Walker, E.')? Or keep the last name exactly as typed?",
+   "answer": "Yes, trim the spaces and fix the capitalisation. 'eve' / 'WALKER' becomes 'Walker, E.' with the surname as first letter capital and the rest lower-case.",
+   "cost": 0.059056700000000004,
+   "seconds": 3.4
+  },
+  {
+   "t": 1793474923,
+   "worker": "Q2M-w1",
+   "question": "Loyalty tier: what are the exact cut-offs (visits AND/OR total spent) for silver, gold and platinum? Is each limit inclusive (e.g. exactly 1500 spent)?",
+   "answer": "It's a combined score: 10 points per visit (max 30 visits) plus 1 point per whole 10 spent. Silver is above 100 up to and including 300, gold is above 300 up to and including 600, and platinum is above 600. Each upper limit is inclusive, so a score of exactly 300 is still silver and exactly 600 is still gold. Bronze is 100 or less.",
+   "cost": 0.0596407,
+   "seconds": 3.9
+  },
+  {
+   "t": 1793474927,
+   "worker": "Q2M-w2",
+   "question": "Membership expiry: when the start is e.g. 31 Jan and the plan is 1 month, there is no 31 Feb. Should expiry be the last day of that month (28/29 Feb) or roll into March (2/3 Mar)?",
+   "answer": "Roll into March (2 or 3 Mar), not the last day of Feb. If that lands on a Sunday, move it to the following Monday.",
+   "cost": 0.0588947,
+   "seconds": 3.5
+  },
+  {
+   "t": 1793474930,
+   "worker": "Q2M-w3",
+   "question": "If the first name starts with a non-letter (e.g. a digit or quote) or has multiple words (e.g. 'Mary Ann'), which initial do we use?",
+   "answer": "Use the first character of the trimmed first name, upper-cased, whatever it is. So \"Mary Ann\" gives \"M.\" and a digit or quote just stays as is.",
+   "cost": 0.0588747,
+   "seconds": 3.3
+  },
+  {
+   "t": 1793474933,
+   "worker": "Q2M-w1",
+   "question": "Loyalty tier: what tier for a client with blank/NULL visits or spend, or negative or zero numbers?",
+   "answer": "Bronze. Blank, NULL, negative or unreadable numbers all count as 0, so the score is 0, which is 100 or less.",
+   "cost": 0.058724700000000005,
+   "seconds": 2.9
+  },
+  {
+   "t": 1793474936,
+   "worker": "Q2M-w2",
+   "question": "Membership expiry: what should we show when the start date is blank, missing or not a valid YYYY-MM-DD date?",
+   "answer": "Treat it as 1970-01-01 and calculate from there, so the expiry shows as that date plus the months. If months is 0, it's 1970-01-01 itself. 1970-01-01 is a Thursday, so there's no Sunday shift unless the months land on one.",
+   "cost": 0.059158699999999995,
+   "seconds": 3.7
+  },
+  {
+   "t": 1793474940,
+   "worker": "Q2M-w2",
+   "question": "Membership expiry: what should we show when the number of months is blank/missing, zero, or negative? And if months has decimals (e.g. 2.5), round, cut off, or reject?",
+   "answer": "Blank, zero or negative months all count as 0, so the expiry is just the start date (moved to Monday if it falls on a Sunday). Decimals get cut off toward zero, so 2.5 becomes 2, and anything over 60 is capped at 60.",
+   "cost": 0.059194699999999996,
+   "seconds": 4.5
+  },
+  {
+   "t": 1793474945,
+   "worker": "Q2M-w2",
+   "question": "Dates with spaces around them (e.g. ' 2024-03-05 ') or a time part, or years like 2022.0 -- accept as valid, or treat as invalid?",
+   "answer": "Spaces around a date are fine, so ' 2024-03-05 ' is valid. A date with a time part isn't in the exact YYYY-MM-DD form, so treat it as invalid (1970-01-01). A year like 2022.0 is fine because we drop the fraction, so it gives 2022.",
+   "cost": 0.0604407,
+   "seconds": 4.3
+  },
+  {
+   "t": 1793474954,
+   "worker": "Q2M-w2",
+   "question": "Adoption anniversary: you said negative years 'after rounding' show nothing. How should decimal years like 2.5 be handled: round to nearest, or cut off toward zero? Is there a maximum number of years?",
+   "answer": "Round to nearest, with halves going up, so 2.5 becomes 3. I don't have a maximum on years, but if the date goes past year 9999 it returns NULL.",
+   "cost": 0.0589587,
+   "seconds": 4.3
+  },
+  {
+   "t": 1793474958,
+   "worker": "Q2M-w2",
+   "question": "Adoption anniversary: does the Sunday-to-Monday move apply to anniversaries too, or only to membership expiry?",
+   "answer": "Only membership expiry. Anniversaries get no weekday adjustment, even if they land on a Sunday.",
+   "cost": 0.0586507,
+   "seconds": 3.4
+  },
+  {
+   "t": 1793474962,
+   "worker": "Q2M-w2",
+   "question": "Adoption anniversary: if the date is invalid AND years is negative, show nothing (NULL) or 1970-01-01?",
+   "answer": "NULL. Negative years returns NULL, and that check comes first, so the bad date doesn't matter.",
+   "cost": 0.0586307,
+   "seconds": 2.9
+  },
+  {
+   "t": 1793474964,
+   "worker": "Q2M-w2",
+   "question": "Membership expiry: if months is text that is not a number (e.g. 'abc'), treat as 0?",
+   "answer": "Yes, non-numeric text like 'abc' counts as 0 months, so the expiry is just the start date. If that date lands on a Sunday, it moves to the following Monday.",
+   "cost": 0.0588387,
+   "seconds": 2.9
+  }
+ ],
+ "earlier_in": 14,
+ "house_in": [],
+ "hidden_tests": 114,
+ "hidden_total": 125,
+ "minutes": 2.1
+}

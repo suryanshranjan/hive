@@ -1,0 +1,107 @@
+[00:52:01] predictions registered on origin/main: gates/gate68/prompts/PREDICTIONS.md
+[00:52:01] rule-giver writing private rules (headless Claude Code)...
+[00:54:03] rules checked: 10 functions, 132 calls, deterministic
+[00:54:03] declared decisions per function: 1:2, 2:3, 3:3, 4:2
+[00:54:03] starting repo and hidden suite built
+[00:54:03] pre-launch: python3 gates/gate68/referee/review68.py pre {run} {oracle}
+[00:54:03] wind tunnel: documenter writing the owner's policy in prose...
+[00:54:38] wind tunnel: R: 69 rules; ask text for N0 written
+[00:54:40] wind tunnel: owner on call for CQ and SQ
+[00:54:40] stage 1: SQ, CQ
+SQ: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g68b/upSQ.git
+CQ: 1 workers, tools/ask.py port None, repo /home/claude/hive/runs/g68b/upCQ.git
+next: python3 lab/launch.py --run g68b
+[00:54:41] launching workers...
+launched CQ-w1 
+launched SQ-w1 
+launched SQ-w2 
+launched SQ-w3 
+SQ-w1 finished: exit 0, 1.6 min, tokens 744649, cost 0.2314342
+SQ-w3 finished: exit 0, 1.6 min, tokens 680132, cost 0.22279890000000002
+SQ-w2 finished: exit 0, 1.7 min, tokens 670481, cost 0.21631770000000006
+CQ-w1 finished: exit 0, 1.7 min, tokens 650008, cost 0.2634174
+wrote /home/claude/hive/runs/g68b/agents.csv
+[00:56:25] after SQ: python3 gates/gate68/referee/review68.py after {run} {oracle} {base}
+[00:58:56] wind tunnel: SL owner #1: "17, 26, 60, 65 and 76 are wrong. Text that isn't a number should give NULL, not "
+[00:59:01] wind tunnel: SL owner #2: "Text that isn't a number should give NULL, not 0. The number at the start isn't "
+[00:59:09] wind tunnel: SL owner #3: "Text that isn't a number should give NULL, not 0. The number at the start isn't "
+[00:59:18] wind tunnel: SL owner #4: "Text that isn't wholly a number should give NULL, not 0. '45abc' should be NULL,"
+[00:59:26] wind tunnel: SL owner #5: "Text that isn't a number should give NULL, not 0. Any other text or empty should"
+[00:59:32] wind tunnel: SL owner #6: "Text that isn't a number should give NULL, not 0. A bad total or tip should be N"
+[00:59:38] wind tunnel: SL owner #7: ''
+[00:59:41] wind tunnel: SQH case #1: ''
+[00:59:44] wind tunnel: SQH case #2: ''
+[00:59:49] wind tunnel: SQH case #3: ''
+[00:59:54] wind tunnel: SQH case #4: ''
+[00:59:58] wind tunnel: SQH case #5: ''
+[01:00:03] wind tunnel: SQH case #6: ''
+[01:00:10] wind tunnel: SQH case #7: ''
+[01:00:17] wind tunnel: SQH case #8: ''
+[01:00:23] wind tunnel: SQH case #9: ''
+[01:00:28] wind tunnel: SQH case #10: ''
+[01:00:36] wind tunnel: SQH case #11: ''
+[01:00:42] wind tunnel: SQH case #12: ''
+[01:00:51] wind tunnel: SQH case #13: ''
+[01:00:57] wind tunnel: SQH case #14: ''
+[01:01:04] wind tunnel: SQH case #15: ''
+[01:01:11] wind tunnel: SQH case #16: ''
+[01:01:19] wind tunnel: SQH case #17: ''
+[01:01:25] wind tunnel: SQH case #18: ''
+[01:01:32] wind tunnel: SQH case #19: ''
+[01:01:40] wind tunnel: SQH case #20: ''
+[01:01:48] wind tunnel: SQH case #21: ''
+[01:01:55] wind tunnel: SQH case #22: ''
+[01:02:02] wind tunnel: SQH case #23: ''
+[01:02:11] wind tunnel: SQH case #24: ''
+[01:02:19] wind tunnel: SQH case #25: ''
+[01:02:29] wind tunnel: SQH case #26: ''
+[01:02:36] wind tunnel: SQH case #27: ''
+[01:02:44] wind tunnel: SQH case #28: ''
+[01:02:51] wind tunnel: SQH case #29: ''
+[01:03:00] wind tunnel: SQH case #30: ''
+[01:03:09] wind tunnel: SQH case #31: ''
+[01:03:18] wind tunnel: SQH case #32: ''
+[01:03:28] wind tunnel: SQH case #33: 'Case 33 is wrong: "abc" isn\'t a number, so it should give a blank (NULL), not Br'
+[01:03:42] wind tunnel: SQH case #34: ''
+[01:03:46] wind tunnel: SQH case #35: ''
+[01:03:50] wind tunnel: SQH case #36: ''
+[01:03:53] wind tunnel: SQH case #37: ''
+[01:03:58] wind tunnel: SQH case #38: ''
+[01:04:01] wind tunnel: SQH case #39: 'Case 39 is wrong: "abc" isn\'t a number, so it should give a blank (NULL), not 0 '
+[01:04:17] wind tunnel: SQH case #40: ''
+[01:04:20] wind tunnel: SQH case #41: ''
+[01:04:23] wind tunnel: SQH case #42: ''
+[01:04:26] wind tunnel: SQH case #43: ''
+[01:04:30] wind tunnel: SQH case #44: 'Case 44 is wrong: "abc" votes isn\'t a number, so it should give a blank (NULL), '
+[01:04:49] wind tunnel: SQH case #45: ''
+[01:04:52] wind tunnel: SQH case #46: ''
+[01:04:55] wind tunnel: SQH case #47: ''
+[01:04:59] wind tunnel: SQH case #48: ''
+[01:05:07] wind tunnel: SQH case #49: ''
+[01:05:07] wind tunnel: D 84 rules; SL 7 replies; SQH 49 cases, 3 corrected
+[01:05:45] wind tunnel: ask text for SQH written
+[01:05:45] stage 2: SQH
+SQH: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g68b/upSQH.git
+next: python3 lab/launch.py --run g68b
+[01:05:46] launching workers...
+launched SQH-w1 
+launched SQH-w2 
+launched SQH-w3 
+SQH-w2 finished: exit 0, 0.8 min, tokens 624579, cost 0.21907770000000001
+SQH-w3 finished: exit 0, 0.8 min, tokens 620848, cost 0.22024010000000002
+SQH-w1 finished: exit 0, 1.1 min, tokens 649554, cost 0.26139830000000003
+wrote /home/claude/hive/runs/g68b/agents.csv
+[01:06:52] scoring every arm call by call...
+# g68b: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| SQ | 100.0% | 100.0%–100.0% |
+| CQ | 100.0% | 100.0%–100.0% |
+| SQH | 100.0% | 100.0%–100.0% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| CQ-SQ | +0.0 | +0.0 to +0.0 |
+| SQH-SQ | +0.0 | +0.0 to +0.0 |
+[01:06:53] done. Next: write the gate RESULTS.md from runs/g68b/summary.md, update BRAIN.md and lab/QUEUE.md, push.

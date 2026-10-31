@@ -1,0 +1,105 @@
+[00:36:13] predictions registered on origin/main: gates/gate68/prompts/PREDICTIONS.md
+[00:36:13] rule-giver writing private rules (headless Claude Code)...
+[00:38:27] rules checked: 10 functions, 137 calls, deterministic
+[00:38:27] declared decisions per function: 1:2, 2:3, 3:3, 4:2
+[00:38:27] starting repo and hidden suite built
+[00:38:27] pre-launch: python3 gates/gate68/referee/review68.py pre {run} {oracle}
+[00:38:27] wind tunnel: documenter writing the owner's policy in prose...
+[00:39:06] wind tunnel: R: 51 rules; ask text for N0 written
+[00:39:08] wind tunnel: owner on call for CQ and SQ
+[00:39:08] stage 1: SQ, CQ
+SQ: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g68a/upSQ.git
+CQ: 1 workers, tools/ask.py port None, repo /home/claude/hive/runs/g68a/upCQ.git
+next: python3 lab/launch.py --run g68a
+[00:39:09] launching workers...
+launched CQ-w1 
+launched SQ-w1 
+launched SQ-w2 
+launched SQ-w3 
+SQ-w1 finished: exit 0, 1.9 min, tokens 885804, cost 0.24388690000000005
+SQ-w2 finished: exit 0, 2.0 min, tokens 556638, cost 0.19151779999999996
+SQ-w3 finished: exit 0, 2.2 min, tokens 1035539, cost 0.29470409999999997
+CQ-w1 finished: exit 0, 3.4 min, tokens 1145883, cost 0.3629702999999999
+wrote /home/claude/hive/runs/g68a/agents.csv
+[00:42:33] after SQ: python3 gates/gate68/referee/review68.py after {run} {oracle} {base}
+[00:45:54] wind tunnel: SL owner #1: '13, 36'
+[00:45:57] wind tunnel: SL owner #2: 'It should return the text BAD_DATE, not NULL.'
+[00:46:04] wind tunnel: SL owner #3: 'It should cap the spend at 5000 before the tier multiplier, so gold earns at mos'
+[00:46:11] wind tunnel: SL owner #4: ''
+[00:46:13] wind tunnel: SQH case #1: ''
+[00:46:16] wind tunnel: SQH case #2: ''
+[00:46:20] wind tunnel: SQH case #3: ''
+[00:46:24] wind tunnel: SQH case #4: ''
+[00:46:31] wind tunnel: SQH case #5: ''
+[00:46:36] wind tunnel: SQH case #6: ''
+[00:46:40] wind tunnel: SQH case #7: ''
+[00:46:45] wind tunnel: SQH case #8: ''
+[00:46:49] wind tunnel: SQH case #9: ''
+[00:46:53] wind tunnel: SQH case #10: ''
+[00:46:57] wind tunnel: SQH case #11: ''
+[00:47:04] wind tunnel: SQH case #12: ''
+[00:47:07] wind tunnel: SQH case #13: ''
+[00:47:13] wind tunnel: SQH case #14: ''
+[00:47:18] wind tunnel: SQH case #15: ''
+[00:47:23] wind tunnel: SQH case #16: ''
+[00:47:29] wind tunnel: SQH case #17: ''
+[00:47:36] wind tunnel: SQH case #18: ''
+[00:47:44] wind tunnel: SQH case #19: ''
+[00:47:50] wind tunnel: SQH case #20: ''
+[00:47:55] wind tunnel: SQH case #21: ''
+[00:48:02] wind tunnel: SQH case #22: ''
+[00:48:07] wind tunnel: SQH case #23: ''
+[00:48:14] wind tunnel: SQH case #24: ''
+[00:48:21] wind tunnel: SQH case #25: "Yes, that's right. Everything looks fine."
+[00:48:33] wind tunnel: SQH case #26: ''
+[00:48:37] wind tunnel: SQH case #27: ''
+[00:48:40] wind tunnel: SQH case #28: ''
+[00:48:43] wind tunnel: SQH case #29: ''
+[00:48:46] wind tunnel: SQH case #30: ''
+[00:48:49] wind tunnel: SQH case #31: ''
+[00:48:52] wind tunnel: SQH case #32: ''
+[00:48:55] wind tunnel: SQH case #33: ''
+[00:48:58] wind tunnel: SQH case #34: ''
+[00:49:01] wind tunnel: SQH case #35: ''
+[00:49:04] wind tunnel: SQH case #36: ''
+[00:49:07] wind tunnel: SQH case #37: ''
+[00:49:11] wind tunnel: SQH case #38: ''
+[00:49:13] wind tunnel: SQH case #39: ''
+[00:49:18] wind tunnel: SQH case #40: 'Text "3" shouldn\'t be counted, so the average is 4.0.'
+[00:49:37] wind tunnel: SQH case #41: ''
+[00:49:41] wind tunnel: SQH case #42: ''
+[00:49:45] wind tunnel: SQH case #43: ''
+[00:49:48] wind tunnel: SQH case #44: ''
+[00:49:51] wind tunnel: SQH case #45: ''
+[00:49:54] wind tunnel: SQH case #46: ''
+[00:49:57] wind tunnel: SQH case #47: ''
+[00:50:00] wind tunnel: SQH case #48: ''
+[00:50:03] wind tunnel: SQH case #49: ''
+[00:50:05] wind tunnel: SQH case #50: ''
+[00:50:05] wind tunnel: D 82 rules; SL 4 replies; SQH 50 cases, 2 corrected
+[00:50:57] wind tunnel: ask text for SQH written
+[00:50:57] stage 2: SQH
+SQH: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g68a/upSQH.git
+next: python3 lab/launch.py --run g68a
+[00:50:57] launching workers...
+launched SQH-w1 
+launched SQH-w2 
+launched SQH-w3 
+SQH-w1 finished: exit 0, 0.9 min, tokens 449959, cost 0.19850009999999998
+SQH-w3 finished: exit 0, 1.0 min, tokens 723274, cost 0.25573819999999997
+SQH-w2 finished: exit 0, 1.0 min, tokens 511410, cost 0.21745810000000002
+wrote /home/claude/hive/runs/g68a/agents.csv
+[00:51:59] scoring every arm call by call...
+# g68a: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| SQ | 96.8% | 90.4%–100.0% |
+| CQ | 96.8% | 90.4%–100.0% |
+| SQH | 100.0% | 100.0%–100.0% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| CQ-SQ | +0.0 | +0.0 to +0.0 |
+| SQH-SQ | +3.2 | +0.0 to +9.6 |
+[00:52:01] done. Next: write the gate RESULTS.md from runs/g68a/summary.md, update BRAIN.md and lab/QUEUE.md, push.

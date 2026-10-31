@@ -290,7 +290,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
                  rules=rules, workers=workers, minutes=minutes, before=before, started=time.time(), overnight=overnight,
                  asked=asked, spent0=spent0)
     run1 = os.path.join(home, 'build')
-    b, code = _phase(source, run1, workers, goal_text + rules, minutes, 0 if overnight else 4 * workers, True,
+    b, code = _phase(source, run1, workers, goal_text + rules, minutes, 0 if overnight else QUESTIONS_PER_BUILDER * workers, True,
                      not overnight, phone)
     state.update(b=b, code=code, final=run1, cost=_cost(run1))
     json.dump(state, open(os.path.join(home, 'state.json'), 'w'), indent=1)
@@ -318,6 +318,16 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
                 f"`hive morning` to check {'it' if len(found) == 1 else 'them'}; I'll fix anything you correct and update "
                 f"the branch.")
         return rc
+    answered = _answered(run1)
+    if answered >= ASKED_ENOUGH:   # Gate 68: after builders asked him, the full review added +1.6 points (98.4 -> 100%)
+        rc = _deliver(state)
+        msg = (f"{_who(state)} asked you {_n(answered, 'question')} while building, and your answers are built in. "
+               f"{state.get('check', '')} It's ready on branch hive/{name}.")
+        if phone:
+            phone.send('🎉 ' + msg)
+        else:
+            say('\n' + msg)
+        return rc
     sheet = _code_sheet(state) if found else None   # Gate 52: one review, not two (20 assumptions, then the sheet)
     if found and sheet:
         say(f"{_who(state)} made {_n(len(found), 'assumption')} your description didn't cover. Rather than going through them one "
@@ -334,6 +344,14 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     rc = _deliver(state)
     handover(state, phone, sheet=sheet)
     return rc
+
+QUESTIONS_PER_BUILDER = 10   # Gate 68: 3 builders told to ask first asked 24.5 questions on a 10-function job
+ASKED_ENOUGH = 3             # answered builder questions after which the hand-over is skipped (Gate 68 saw 11-26; the
+                             # threshold itself is untested)
+
+def _answered(run):
+    """How many of the builders' questions the owner answered during this build."""
+    return len(glob.glob(os.path.join(run, 'owner', 'answers', '*.json')))
 
 def _review_and_fix(state, phone=None):
     """The owner checks the business assumptions (here, or on the phone); anything corrected goes back to the builders
