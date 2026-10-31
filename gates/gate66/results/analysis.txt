@@ -1,0 +1,18 @@
+== runs/g66a: hidden N0 35.2%, CC 88.8%, CQ 93.2%, HV 55.6%; questions CC 11, CQ 20; HV owner replies 78; chars read CC 1867, CQ 2558, HV 31588; cost N0 $0.70, CC $0.27, CQ $0.30, HV $1.95; sheet right D 1, SL 3, HV 5, R 25
+== runs/g66b: hidden N0 34.4%, CC 80.4%, CQ 92.8%, HV 71.2%; questions CC 10, CQ 12; HV owner replies 87; chars read CC 2193, CQ 2276, HV 30090; cost N0 $0.63, CC $0.39, CQ $0.36, HV $1.98; sheet right D 3, SL 12, HV 18, R 25
+
+pooled hidden: N0 34.8%, CC 84.6%, CQ 93.0%, HV 63.4%
+HV − CC: -21.2 (95% CI -32.8 to -10.2)
+HV − CQ: -29.6 (95% CI -40.0 to -19.0)
+CQ − CC: +8.4 (95% CI +1.0 to +16.8)
+CC − N0: +49.8 (95% CI +40.2 to +59.6)
+owner: questions CC 10.5, CQ 16.0 per run; HV replies 82.5; chars read CC 2030, CQ 2417, HV 30839; cost per run N0 $0.67, CC $0.33, CQ $0.33, HV $1.96
+
+predictions
+B1 HV ≥ CC + 10: -21.2 -> failed
+B2 HV ≥ CQ + 5: -29.6 -> failed
+B3 CQ asks ≥ 15 per run: 16.0 -> held
+B4 CC asks ≤ 5 per run: 10.5 -> failed
+B5 HV owner reads ≥ 2× CQ's: 12.8× -> held
+Headline (Hive beats Claude Code with the same owner): did not fire
+Asking first matches the hand-over (CQ ≥ HV): YES

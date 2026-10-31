@@ -1,0 +1,112 @@
+[23:56:57] predictions registered on origin/main: gates/gate66/prompts/PREDICTIONS.md
+[23:56:57] rule-giver writing private rules (headless Claude Code)...
+[23:59:07] rules checked: 10 functions, 135 calls, deterministic
+[23:59:07] declared decisions per function: 1:2, 2:3, 3:3, 4:2
+[23:59:08] starting repo and hidden suite built
+[23:59:08] pre-launch: python3 gates/gate66/referee/review66.py pre {run} {oracle}
+[23:59:08] wind tunnel: documenter writing the owner's policy in prose...
+[23:59:39] wind tunnel: R: 62 rules; ask text for N0 written
+[23:59:41] wind tunnel: owner on call for CC and CQ
+[23:59:41] stage 1: N0, CC, CQ
+N0: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g66a/upN0.git
+CC: 1 workers, tools/ask.py port None, repo /home/claude/hive/runs/g66a/upCC.git
+CQ: 1 workers, tools/ask.py port None, repo /home/claude/hive/runs/g66a/upCQ.git
+next: python3 lab/launch.py --run g66a
+[23:59:42] launching workers...
+launched CC-w1 
+launched CQ-w1 
+launched N0-w1 
+launched N0-w2 
+launched N0-w3 
+N0-w1 finished: exit 0, 0.8 min, tokens 418996, cost 0.19096580000000002
+N0-w3 finished: exit 0, 0.9 min, tokens 478967, cost 0.20696740000000002
+N0-w2 finished: exit 0, 1.4 min, tokens 800812, cost 0.30594790000000005
+CC-w1 finished: exit 0, 1.7 min, tokens 670560, cost 0.2735483
+CQ-w1 finished: exit 0, 2.3 min, tokens 834056, cost 0.2977825
+wrote /home/claude/hive/runs/g66a/agents.csv
+[00:02:04] after N0: python3 gates/gate66/referee/review66.py after {run} {oracle} {base}
+[00:04:15] wind tunnel: SL owner #1: '5, 16, 17, 18, 31, 50, 59, 75'
+[00:04:18] wind tunnel: SL owner #2: "January 1 and December 25 aren't working days when they fall on a weekday. No ot"
+[00:04:33] wind tunnel: SL owner #3: 'Round halves up to the next cent, toward positive infinity.'
+[00:04:40] wind tunnel: SL owner #4: "Don't clamp it: a negative percentage should raise the price."
+[00:04:46] wind tunnel: SL owner #5: 'Cap it at 50 percent, not 100.'
+[00:04:53] wind tunnel: SL owner #6: 'Wrap negatives in parentheses with no minus sign, like ($1,234.56). Same for the'
+[00:04:59] wind tunnel: SL owner #7: 'Above 4.5 is A, above 3.5 up to 4.5 is B, above 2.5 up to 3.5 is C, and anything'
+[00:05:06] wind tunnel: SL owner #8: 'Zones above 4 are priced as zone 4, not unlimited. Fractional zones are cut down'
+[00:05:14] wind tunnel: SL owner #9: 'Zero or negative values are left out of the average, and fewer than 3 valid valu'
+[00:05:20] wind tunnel: SL owner #10: ''
+[00:05:24] wind tunnel: HV case #1: ''
+[00:05:28] wind tunnel: HV case #2: ''
+[00:05:33] wind tunnel: HV case #3: 'Letters should just be ignored, so 12A4 gets the check digit for 124, which is 3'
+[00:05:52] wind tunnel: HV case #4: 'A blank code should get a check digit of 0, not none.'
+[00:06:10] wind tunnel: HV case #5: ''
+[00:06:13] wind tunnel: HV case #6: ''
+[00:06:17] wind tunnel: HV case #7: "A refund should take points back: a gold member's 50-dollar refund should be -10"
+[00:06:36] wind tunnel: HV case #8: 'Platinum spending 0.99 dollars should earn 0 points, because only whole dollars '
+[00:06:57] wind tunnel: HV case #9: 'A customer with no tier should earn basic points, so 100 points, not no answer.'
+[00:07:12] wind tunnel: HV case #10: 'Dashes should be removed, so it shows ************1111 with only the last four d'
+[00:07:32] wind tunnel: HV case #11: ''
+[00:07:35] wind tunnel: HV case #12: 'A card entry with only letters should come out empty, not shown as abcd.'
+[00:07:51] wind tunnel: HV case #13: ''
+[00:07:55] wind tunnel: HV case #14: 'Accents should just be dropped, not turned into plain letters, so it should be c'
+[00:08:13] wind tunnel: HV case #15: ''
+[00:08:18] wind tunnel: HV case #16: 'The ß is just dropped, with no hyphen, so it should be strae.'
+[00:08:38] wind tunnel: HV case #17: ''
+[00:08:41] wind tunnel: HV case #18: ''
+[00:08:44] wind tunnel: HV case #19: ''
+[00:08:51] wind tunnel: HV case #20: "Christmas Day isn't a working day, so it should count 1 working day, not 2."
+[00:09:10] wind tunnel: HV case #21: 'Backwards dates should give 0 working days, not minus 5.'
+[00:09:23] wind tunnel: HV case #22: "Backwards or invalid dates should give no answer (NULL), so that's right.\n\nActua"
+[00:09:38] wind tunnel: HV case #23: ''
+[00:09:41] wind tunnel: HV case #24: 'A 150 percent discount should be capped at 50 percent, so the 10-dollar item sho'
+[00:09:57] wind tunnel: HV case #25: 'Case 25: a minus 20 percent discount should raise the price, so the 10-dollar it'
+[00:10:13] wind tunnel: HV case #26: ''
+[00:10:16] wind tunnel: HV case #27: ''
+[00:10:19] wind tunnel: HV case #28: 'It should show as ($0.05), in parentheses with no minus sign.'
+[00:10:35] wind tunnel: HV case #29: ''
+[00:10:39] wind tunnel: HV case #30: "Yen should show as JPY 12,345.67: it's just a regular currency, so the code goes"
+[00:10:58] wind tunnel: HV case #31: ''
+[00:11:02] wind tunnel: HV case #32: 'It should round to the even number, so $10.50, not $10.51.'
+[00:11:18] wind tunnel: HV case #33: ''
+[00:11:21] wind tunnel: HV case #34: ''
+[00:11:24] wind tunnel: HV case #35: ''
+[00:11:28] wind tunnel: HV case #36: ''
+[00:11:31] wind tunnel: HV case #37: ''
+[00:11:34] wind tunnel: HV case #38: ''
+[00:11:37] wind tunnel: HV case #39: 'A parcel to zone 0 should be priced as zone 4, so it does get a price.'
+[00:11:57] wind tunnel: HV case #40: 'Zone 9 should be priced as zone 4, so 850 cents, not 1600.'
+[00:12:14] wind tunnel: HV case #41: 'A 0-gram parcel should cost 0, not 400.'
+[00:12:37] wind tunnel: HV case #42: ''
+[00:12:41] wind tunnel: HV case #43: ''
+[00:12:45] wind tunnel: HV case #44: ''
+[00:12:49] wind tunnel: HV case #45: "Zero and refund orders shouldn't count, so there's no average: it should come ba"
+[00:13:13] wind tunnel: HV case #46: 'With only 2 orders there should be no average. It should come back empty.'
+[00:13:27] wind tunnel: D 75 rules; SL 10 replies; HV 46 cases, 22 corrected
+[00:15:01] wind tunnel: ask text for HV written
+[00:15:01] stage 2: HV
+HV: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g66a/upHV.git
+next: python3 lab/launch.py --run g66a
+[00:15:01] launching workers...
+launched HV-w1 
+launched HV-w2 
+launched HV-w3 
+HV-w2 finished: exit 0, 0.9 min, tokens 574842, cost 0.2231053
+HV-w3 finished: exit 0, 1.0 min, tokens 475351, cost 0.24624340000000003
+HV-w1 finished: exit 0, 1.2 min, tokens 605023, cost 0.28121870000000004
+wrote /home/claude/hive/runs/g66a/agents.csv
+[00:16:13] scoring every arm call by call...
+# g66a: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 35.2% | 25.2%–46.0% |
+| CC | 88.8% | 74.8%–100.0% |
+| CQ | 93.2% | 79.6%–100.0% |
+| HV | 55.6% | 41.6%–71.6% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| CC-N0 | +53.6 | +39.2 to +67.2 |
+| CQ-N0 | +58.0 | +43.6 to +71.2 |
+| HV-N0 | +20.4 | +10.4 to +32.0 |
+[00:16:15] done. Next: write the gate RESULTS.md from runs/g66a/summary.md, update BRAIN.md and lab/QUEUE.md, push.

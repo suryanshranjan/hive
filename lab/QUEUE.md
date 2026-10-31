@@ -2,7 +2,13 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Oct 30 2026 IST, after Gate 65; Gate 45 day 2 next, with the founder)
+## Where we left off (Nov 1 2026 IST, after Gate 66; Gates 67 and 68 running)
+
+- **Gate 66 done (the user, travelling: "test something that makes Hive the best tool"):** one Claude Code agent that asks the owner beat Hive's hand-over by 21-30 hidden points (CQ 93.0, CC 84.6, HV 63.4, N0 34.8%) at 1/13 of his reading. Wind tunnel, synthetic owner who answers from his policy.
+- **Gate 67 running:** compounding across three features (fresh, standing rulings, house rules).
+- **Gate 68 queued after 66:** Hive's swarm asking (SQ) vs one agent asking (CQ), and the hand-over after asking (SQH).
+
+## Earlier (Oct 30 2026 IST, after Gate 65)
 
 - **Gate 60 done** (the user, travelling: "Run the tests as required"): two wings. The cases where two independent builds disagree did not find the owner's decisions: pooled over two rule sets, 20 of 50 decisions right vs 26 for Gate 58's spot checks, from 10 cases vs 29. Two Claude builds disagree on only 19% of the first build's errors. Kill fired; the spotter stays. Gate 58 replicated. Found: on the fresh rule set the skimmer touched every function in the list review, so the skip rule showed him no spot checks (BRAIN §8, 000c).
 - **Fast or cheap (product, no gate):** `hive pace fast|cheap`, asked once at the first `hive start` that would use more than one builder; cheap means one builder.
