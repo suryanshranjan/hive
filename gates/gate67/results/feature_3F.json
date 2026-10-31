@@ -1,0 +1,1014 @@
+{
+ "feature": 3,
+ "arm": "F",
+ "rulings_in": [],
+ "house_in": [],
+ "cost": {
+  "describer": 0.2088292,
+  "spotter": 0.1712228,
+  "judge": 0.20411229999999997,
+  "owner_list": 0.47,
+  "owner_spots": 2.555
+ },
+ "decisions": {
+  "late_fee": [
+   "convention: money rounds up to the cent",
+   "convention: missing or unreadable input becomes zero value",
+   "convention: value equal to a threshold falls in the lower tier",
+   "fee capped at 25 percent of invoice"
+  ],
+  "insurance_payout": [
+   "convention: money rounds up to the cent",
+   "convention: missing or unreadable input becomes zero value",
+   "convention: value equal to a threshold falls in the lower tier",
+   "claims over 1000 reimbursed at 50 percent of whole claim"
+  ],
+  "installment_date": [
+   "convention: missing or unreadable input becomes zero value",
+   "convention: nonexistent day in target month spills into next month",
+   "installment number limited to 12",
+   "installment number below 1 counts as 1"
+  ],
+  "invoice_code": [
+   "convention: missing or unreadable input becomes zero value",
+   "convention: text results cut to 12 characters",
+   "prefix cut to first 3 letters",
+   "short prefix padded with X"
+  ],
+  "reminder_text": [
+   "convention: missing or unreadable input becomes zero value",
+   "convention: text results cut to 12 characters",
+   "special words for today and tomorrow",
+   "past days say overdue"
+  ]
+ },
+ "D": [
+  "Whenever installment_date is given a valid YYYY-MM-DD first due date and an instalment number n of 1 or more, it returns the date that is n-1 whole months after the first due date, in YYYY-MM-DD form (instalment 1 is the first due date itself, instalment 3 of 2024-11-15 is 2025-01-15).",
+  "Whenever the first due date's day does not exist in the target month, installment_date uses the last day of that month instead (2024-01-31 gives 2024-02-29 for instalment 2, 2023-01-31 gives 2023-02-28), and the following months go back to day 31 where it exists (instalment 3 is 2024-03-31).",
+  "Whenever the instalment number given to installment_date is below 1 (zero or negative), including a fraction that truncates to zero such as 0.5, installment_date returns NULL.",
+  "Whenever the instalment number given to installment_date has a fractional part, installment_date drops the fraction (2.9 counts as 2).",
+  "Whenever the instalment number given to installment_date is text that looks like a number (such as '3', ' 3 ' with spaces, or '1e2' meaning 100), installment_date reads it as that number.",
+  "Whenever the instalment number given to installment_date is NULL, empty text, text that is not a number, or infinite, installment_date returns NULL.",
+  "Whenever the first due date given to installment_date is NULL, empty text, a number, or text not in exact YYYY-MM-DD layout (slashes, single-digit month or day, a time added), installment_date returns NULL.",
+  "Whenever the first due date given to installment_date has spaces around an otherwise valid YYYY-MM-DD date, installment_date ignores the spaces and works normally.",
+  "Whenever the first due date given to installment_date is in YYYY-MM-DD layout but is not a real calendar date (such as 2024-02-30 or 2024-13-01), installment_date treats it as 1970-01-01 and counts from there (instalment 2 gives 1970-02-01).",
+  "Whenever the instalment would fall after the year 9999, installment_date returns NULL (9999-12-15 gives NULL for instalment 2 but 9999-12-15 for instalment 1), and a very large instalment number such as 1e30 also gives NULL.",
+  "Whenever insurance_payout is given a claim amount and a deductible, it returns 80% of (claim amount minus deductible), as a number rounded to cents (1000 claim with 200 deductible pays 640.00).",
+  "Whenever insurance_payout rounds to cents, it rounds halves upward on the exact decimal value (0.0625 pays 0.05, 0.07 pays 0.06, 100.555 pays 80.44).",
+  "Whenever the deductible is equal to or larger than the claim amount, insurance_payout returns 0.0.",
+  "Whenever the claim amount is zero or negative, insurance_payout returns 0.0 (when the deductible is a readable number).",
+  "Whenever the deductible given to insurance_payout is negative, insurance_payout treats it as zero, so the payout is 80% of the full claim (1000 with deductible -50 pays 800.00).",
+  "Whenever either amount given to insurance_payout is NULL, empty text, text that is not a number, or infinite, insurance_payout returns NULL, even if the other amount would give a zero payout.",
+  "Whenever an amount given to insurance_payout is text that looks like a number (such as '1000', ' 1000 ' with spaces, or '1e3'), insurance_payout reads it as that number.",
+  "Whenever invoice_code is given a prefix, a number and a year, it prints the prefix in capitals, then the last two digits of the year, a hyphen, and the invoice number padded with zeros to at least 4 digits (inv, 42, 2024 gives INV24-0042).",
+  "Whenever the invoice number given to invoice_code has more than 4 digits, invoice_code prints all of them without cutting (12345 gives INV24-12345).",
+  "Whenever the invoice number given to invoice_code is zero, it prints 0000 (INV24-0000).",
+  "Whenever the year given to invoice_code has more than two digits, invoice_code uses only its last two digits (1999 gives 99, 12345 gives 45), and a year such as 5 or 0 is printed as 05 or 00.",
+  "Whenever the invoice number or the year given to invoice_code is negative, invoice_code returns NULL.",
+  "Whenever the invoice number or year given to invoice_code has a fractional part, invoice_code drops the fraction first (1.9 counts as 1, 2024.9 as 2024), so a value between -1 and 0 such as -0.5 counts as 0 and is accepted.",
+  "Whenever the invoice number or year given to invoice_code is NULL, empty text, text that is not a number, or infinite, invoice_code returns NULL.",
+  "Whenever the invoice number or year given to invoice_code is text that looks like a number (such as '12' or ' 24 ' with spaces), invoice_code reads it as that number.",
+  "Whenever the prefix given to invoice_code is NULL, invoice_code returns NULL.",
+  "Whenever the prefix given to invoice_code is empty text, invoice_code still returns a code, with nothing before the year (24-0001).",
+  "Whenever the prefix given to invoice_code contains spaces, hyphens, slashes or other symbols, invoice_code keeps them exactly as given, spaces included and not trimmed, and only changes letters to capitals (' ab c ' gives ' AB C 24-0001').",
+  "Whenever the prefix given to invoice_code contains accented or special letters, invoice_code capitalises them in the usual way (\u00e9 becomes \u00c9, \u00df becomes SS).",
+  "Whenever the prefix given to invoice_code is a number rather than text, invoice_code writes it out as text in front of the year (123 gives 12324-0001, 1.5 gives 1.524-0001).",
+  "Whenever late_fee is given a number of days late and an invoice amount that are both above zero, it returns 0.5% of the invoice amount for each whole day late (10 days on 1000 gives 50.0), rounded to cents.",
+  "Whenever late_fee rounds to cents, it rounds halves upward on the exact value (1 day on 1.00 gives 0.01, 3 days on 33.33 gives 0.50), and a fee below half a cent such as 1 day on 0.99 comes out as 0.0.",
+  "Whenever the days late given to late_fee has a fractional part, late_fee counts only the whole days (10.9 counts as 10), so under one day (0.9) gives 0.0.",
+  "Whenever the days late given to late_fee is zero or negative, late_fee returns 0.0.",
+  "Whenever the invoice amount given to late_fee is zero or negative, late_fee returns 0.0.",
+  "Whenever late_fee is given a large number of days, it keeps charging 0.5% a day with no upper limit (1000 days on 1000 gives 5000.0, five times the invoice).",
+  "Whenever either value given to late_fee is NULL, empty text, text that is not a number, or infinite, late_fee returns NULL, even if the other value would have given 0.0 (for example days of -1 with a NULL amount).",
+  "Whenever a value given to late_fee is text that looks like a number (such as '10', ' 1000 ' with spaces), late_fee reads it as that number.",
+  "Whenever reminder_text is given a pet name and a number of days until the appointment of 1 or more, it returns the name, then ' in ', the number of days and the letter d (Rex, 3 gives 'Rex in 3d').",
+  "Whenever the days until the appointment given to reminder_text is zero, reminder_text returns the name followed by ' today' (Rex today).",
+  "Whenever the days given to reminder_text is negative, reminder_text returns NULL, except that a fraction between -1 and 0 (such as -0.5) drops to zero and gives 'Rex today'.",
+  "Whenever the days given to reminder_text has a fractional part, reminder_text drops the fraction (2.9 gives 'Rex in 2d', 0.5 gives 'Rex today').",
+  "Whenever the days given to reminder_text is text that looks like a number (such as '5', ' 5 ' with spaces, or '1e2' meaning 100), reminder_text reads it as that number.",
+  "Whenever the days given to reminder_text is NULL, empty text, text that is not a number, or infinite, reminder_text returns NULL.",
+  "Whenever the pet name given to reminder_text is NULL, reminder_text returns NULL.",
+  "Whenever the pet name given to reminder_text is empty text, reminder_text still returns a message with nothing before the wording (' in 3d' or ' today').",
+  "Whenever the pet name given to reminder_text is given in any letter case or with extra spaces, reminder_text prints it exactly as given, without changing case or trimming spaces ('  rex  ' gives '  rex   in 3d').",
+  "Whenever the pet name given to reminder_text is a number rather than text, reminder_text writes it out as text (123 gives '123 in 3d').",
+  "Whenever the days given to reminder_text is very large, reminder_text prints the full number with no limit (100 gives 'Rex in 100d')."
+ ],
+ "shown": [
+  "Whenever installment_date is given a valid YYYY-MM-DD first due date and an instalment number n of 1 or more, it returns the date that is n-1 whole months after the first due date, in YYYY-MM-DD form (instalment 1 is the first due date itself, instalment 3 of 2024-11-15 is 2025-01-15).",
+  "Whenever the first due date's day does not exist in the target month, installment_date uses the last day of that month instead (2024-01-31 gives 2024-02-29 for instalment 2, 2023-01-31 gives 2023-02-28), and the following months go back to day 31 where it exists (instalment 3 is 2024-03-31).",
+  "Whenever the instalment number given to installment_date is below 1 (zero or negative), including a fraction that truncates to zero such as 0.5, installment_date returns NULL.",
+  "Whenever the instalment number given to installment_date has a fractional part, installment_date drops the fraction (2.9 counts as 2).",
+  "Whenever the instalment number given to installment_date is text that looks like a number (such as '3', ' 3 ' with spaces, or '1e2' meaning 100), installment_date reads it as that number.",
+  "Whenever the instalment number given to installment_date is NULL, empty text, text that is not a number, or infinite, installment_date returns NULL.",
+  "Whenever the first due date given to installment_date is NULL, empty text, a number, or text not in exact YYYY-MM-DD layout (slashes, single-digit month or day, a time added), installment_date returns NULL.",
+  "Whenever the first due date given to installment_date has spaces around an otherwise valid YYYY-MM-DD date, installment_date ignores the spaces and works normally.",
+  "Whenever the first due date given to installment_date is in YYYY-MM-DD layout but is not a real calendar date (such as 2024-02-30 or 2024-13-01), installment_date treats it as 1970-01-01 and counts from there (instalment 2 gives 1970-02-01).",
+  "Whenever the instalment would fall after the year 9999, installment_date returns NULL (9999-12-15 gives NULL for instalment 2 but 9999-12-15 for instalment 1), and a very large instalment number such as 1e30 also gives NULL.",
+  "Whenever insurance_payout is given a claim amount and a deductible, it returns 80% of (claim amount minus deductible), as a number rounded to cents (1000 claim with 200 deductible pays 640.00).",
+  "Whenever insurance_payout rounds to cents, it rounds halves upward on the exact decimal value (0.0625 pays 0.05, 0.07 pays 0.06, 100.555 pays 80.44).",
+  "Whenever the deductible is equal to or larger than the claim amount, insurance_payout returns 0.0.",
+  "Whenever the claim amount is zero or negative, insurance_payout returns 0.0 (when the deductible is a readable number).",
+  "Whenever the deductible given to insurance_payout is negative, insurance_payout treats it as zero, so the payout is 80% of the full claim (1000 with deductible -50 pays 800.00).",
+  "Whenever either amount given to insurance_payout is NULL, empty text, text that is not a number, or infinite, insurance_payout returns NULL, even if the other amount would give a zero payout.",
+  "Whenever an amount given to insurance_payout is text that looks like a number (such as '1000', ' 1000 ' with spaces, or '1e3'), insurance_payout reads it as that number.",
+  "Whenever invoice_code is given a prefix, a number and a year, it prints the prefix in capitals, then the last two digits of the year, a hyphen, and the invoice number padded with zeros to at least 4 digits (inv, 42, 2024 gives INV24-0042).",
+  "Whenever the invoice number given to invoice_code has more than 4 digits, invoice_code prints all of them without cutting (12345 gives INV24-12345).",
+  "Whenever the invoice number given to invoice_code is zero, it prints 0000 (INV24-0000).",
+  "Whenever the year given to invoice_code has more than two digits, invoice_code uses only its last two digits (1999 gives 99, 12345 gives 45), and a year such as 5 or 0 is printed as 05 or 00.",
+  "Whenever the invoice number or the year given to invoice_code is negative, invoice_code returns NULL.",
+  "Whenever the invoice number or year given to invoice_code has a fractional part, invoice_code drops the fraction first (1.9 counts as 1, 2024.9 as 2024), so a value between -1 and 0 such as -0.5 counts as 0 and is accepted.",
+  "Whenever the invoice number or year given to invoice_code is NULL, empty text, text that is not a number, or infinite, invoice_code returns NULL.",
+  "Whenever the invoice number or year given to invoice_code is text that looks like a number (such as '12' or ' 24 ' with spaces), invoice_code reads it as that number.",
+  "Whenever the prefix given to invoice_code is NULL, invoice_code returns NULL.",
+  "Whenever the prefix given to invoice_code is empty text, invoice_code still returns a code, with nothing before the year (24-0001).",
+  "Whenever the prefix given to invoice_code contains spaces, hyphens, slashes or other symbols, invoice_code keeps them exactly as given, spaces included and not trimmed, and only changes letters to capitals (' ab c ' gives ' AB C 24-0001').",
+  "Whenever the prefix given to invoice_code contains accented or special letters, invoice_code capitalises them in the usual way (\u00e9 becomes \u00c9, \u00df becomes SS).",
+  "Whenever the prefix given to invoice_code is a number rather than text, invoice_code writes it out as text in front of the year (123 gives 12324-0001, 1.5 gives 1.524-0001).",
+  "Whenever late_fee is given a number of days late and an invoice amount that are both above zero, it returns 0.5% of the invoice amount for each whole day late (10 days on 1000 gives 50.0), rounded to cents.",
+  "Whenever late_fee rounds to cents, it rounds halves upward on the exact value (1 day on 1.00 gives 0.01, 3 days on 33.33 gives 0.50), and a fee below half a cent such as 1 day on 0.99 comes out as 0.0.",
+  "Whenever the days late given to late_fee has a fractional part, late_fee counts only the whole days (10.9 counts as 10), so under one day (0.9) gives 0.0.",
+  "Whenever the days late given to late_fee is zero or negative, late_fee returns 0.0.",
+  "Whenever the invoice amount given to late_fee is zero or negative, late_fee returns 0.0.",
+  "Whenever late_fee is given a large number of days, it keeps charging 0.5% a day with no upper limit (1000 days on 1000 gives 5000.0, five times the invoice).",
+  "Whenever either value given to late_fee is NULL, empty text, text that is not a number, or infinite, late_fee returns NULL, even if the other value would have given 0.0 (for example days of -1 with a NULL amount).",
+  "Whenever a value given to late_fee is text that looks like a number (such as '10', ' 1000 ' with spaces), late_fee reads it as that number.",
+  "Whenever reminder_text is given a pet name and a number of days until the appointment of 1 or more, it returns the name, then ' in ', the number of days and the letter d (Rex, 3 gives 'Rex in 3d').",
+  "Whenever the days until the appointment given to reminder_text is zero, reminder_text returns the name followed by ' today' (Rex today).",
+  "Whenever the days given to reminder_text is negative, reminder_text returns NULL, except that a fraction between -1 and 0 (such as -0.5) drops to zero and gives 'Rex today'.",
+  "Whenever the days given to reminder_text has a fractional part, reminder_text drops the fraction (2.9 gives 'Rex in 2d', 0.5 gives 'Rex today').",
+  "Whenever the days given to reminder_text is text that looks like a number (such as '5', ' 5 ' with spaces, or '1e2' meaning 100), reminder_text reads it as that number.",
+  "Whenever the days given to reminder_text is NULL, empty text, text that is not a number, or infinite, reminder_text returns NULL.",
+  "Whenever the pet name given to reminder_text is NULL, reminder_text returns NULL.",
+  "Whenever the pet name given to reminder_text is empty text, reminder_text still returns a message with nothing before the wording (' in 3d' or ' today').",
+  "Whenever the pet name given to reminder_text is given in any letter case or with extra spaces, reminder_text prints it exactly as given, without changing case or trimming spaces ('  rex  ' gives '  rex   in 3d').",
+  "Whenever the pet name given to reminder_text is a number rather than text, reminder_text writes it out as text (123 gives '123 in 3d').",
+  "Whenever the days given to reminder_text is very large, reminder_text prints the full number with no limit (100 gives 'Rex in 100d')."
+ ],
+ "repeats": [],
+ "SL": [
+  "Whenever installment_date is given a valid YYYY-MM-DD first due date and an instalment number n of 1 or more, it returns the date that is n-1 whole months after the first due date, in YYYY-MM-DD form (instalment 1 is the first due date itself, instalment 3 of 2024-11-15 is 2025-01-15).",
+  "Whenever the first due date's day does not exist in the target month, installment_date spills into the next month by the number of missing days, instead of using the last day of that month. For example, 2024-01-31 gives 2024-03-02 for instalment 2 (February 2024 has 29 days, so 2 days are missing), and 2023-01-31 gives 2023-03-03 (February 2023 has 28 days, so 3 days are missing). The following months go back to day 31 where it exists (instalment 3 is 2024-03-31).",
+  "Whenever the instalment number given to installment_date is below 1 (zero or negative), including a fraction that truncates to zero such as 0.5, installment_date treats it as 1 and returns the first due date, not NULL.",
+  "Whenever the instalment number given to installment_date has a fractional part, installment_date drops the fraction (2.9 counts as 2).",
+  "Whenever the instalment number given to installment_date is text that looks like a number (such as '3', ' 3 ' with spaces, or '1e2' meaning 100), installment_date reads it as that number.",
+  "Whenever the instalment number given to installment_date is NULL, empty text, text that is not a number, or infinite, installment_date returns NULL.",
+  "Whenever the first due date given to installment_date is NULL, empty text, a number, or text not in exact YYYY-MM-DD layout (slashes, single-digit month or day, a time added), installment_date returns NULL.",
+  "Whenever the first due date given to installment_date has spaces around an otherwise valid YYYY-MM-DD date, installment_date ignores the spaces and works normally.",
+  "Whenever the first due date given to installment_date is in YYYY-MM-DD layout but is not a real calendar date (such as 2024-02-30 or 2024-13-01), installment_date treats it as 1970-01-01 and counts from there (instalment 2 gives 1970-02-01).",
+  "Whenever the instalment would fall after the year 9999, installment_date returns NULL (9999-12-15 gives NULL for instalment 2 but 9999-12-15 for instalment 1), and a very large instalment number such as 1e30 also gives NULL.",
+  "Whenever insurance_payout is given a claim amount and a deductible, if the claim amount is 1000 or less it returns 80% of (claim amount minus deductible); if the claim amount is above 1000 it returns 50% of (claim amount minus deductible), rounded up to the cent. The result is a number rounded to cents (1000 claim with 200 deductible pays 640.00).",
+  "Whenever insurance_payout rounds to cents, it rounds halves upward on the exact decimal value (0.0625 pays 0.05, 0.07 pays 0.06, 100.555 pays 80.44).",
+  "Whenever the deductible is equal to or larger than the claim amount, insurance_payout returns 0.0.",
+  "Whenever the claim amount is zero or negative, insurance_payout returns 0.0 (when the deductible is a readable number).",
+  "Whenever the deductible given to insurance_payout is negative, insurance_payout treats it as zero, so the payout is 80% of the full claim (1000 with deductible -50 pays 800.00).",
+  "Whenever either amount given to insurance_payout is NULL, empty text, text that is not a number, or infinite, insurance_payout returns NULL, even if the other amount would give a zero payout.",
+  "Whenever an amount given to insurance_payout is text that looks like a number (such as '1000', ' 1000 ' with spaces, or '1e3'), insurance_payout reads it as that number.",
+  "Whenever invoice_code is given a prefix, a number and a year, it prints the prefix in capitals, then the last two digits of the year, a hyphen, and the invoice number padded with zeros to at least 4 digits (inv, 42, 2024 gives INV24-0042).",
+  "Whenever the invoice number given to invoice_code has more than 4 digits, invoice_code prints all of them without cutting (12345 gives INV24-12345).",
+  "Whenever the invoice number given to invoice_code is zero, it prints 0000 (INV24-0000).",
+  "Whenever the year given to invoice_code has more than two digits, invoice_code uses only its last two digits (1999 gives 99, 12345 gives 45), and a year such as 5 or 0 is printed as 05 or 00.",
+  "Whenever the invoice number or the year given to invoice_code is negative, invoice_code returns NULL.",
+  "Whenever the invoice number or year given to invoice_code has a fractional part, invoice_code drops the fraction first (1.9 counts as 1, 2024.9 as 2024), so a value between -1 and 0 such as -0.5 counts as 0 and is accepted.",
+  "Whenever the invoice number or year given to invoice_code is NULL, empty text, text that is not a number, or infinite, invoice_code returns NULL.",
+  "Whenever the invoice number or year given to invoice_code is text that looks like a number (such as '12' or ' 24 ' with spaces), invoice_code reads it as that number.",
+  "Whenever the prefix given to invoice_code is NULL, invoice_code returns NULL.",
+  "Whenever the prefix given to invoice_code is empty text, invoice_code still returns a code, with nothing before the year (24-0001).",
+  "Whenever the prefix given to invoice_code contains spaces, hyphens, slashes or other symbols, invoice_code keeps them exactly as given, spaces included and not trimmed, and only changes letters to capitals (' ab c ' gives ' AB C 24-0001').",
+  "Whenever the prefix given to invoice_code contains accented or special letters, invoice_code capitalises them in the usual way (\u00e9 becomes \u00c9, \u00df becomes SS).",
+  "Whenever the prefix given to invoice_code is a number rather than text, invoice_code writes it out as text in front of the year (123 gives 12324-0001, 1.5 gives 1.524-0001).",
+  "Whenever late_fee is given a number of days late and an invoice amount that are both above zero, it returns 0.5% of the invoice amount for each whole day late (10 days on 1000 gives 50.0), rounded to cents.",
+  "Whenever late_fee rounds to cents, it rounds halves upward on the exact value (1 day on 1.00 gives 0.01, 3 days on 33.33 gives 0.50), and a fee below half a cent such as 1 day on 0.99 comes out as 0.0.",
+  "Whenever the days late given to late_fee has a fractional part, late_fee counts only the whole days (10.9 counts as 10), so under one day (0.9) gives 0.0.",
+  "Whenever the days late given to late_fee is zero or negative, late_fee returns 0.0.",
+  "Whenever the invoice amount given to late_fee is zero or negative, late_fee returns 0.0.",
+  "late_fee charges 0.5% of the invoice per day late, but nothing is charged for the first 5 days late. The total late fee is capped at 25% of the invoice. (For example, 1000 days late on an invoice of 1000 gives 250.0.)",
+  "Whenever either value given to late_fee is NULL, empty text, text that is not a number, or infinite, late_fee returns NULL, even if the other value would have given 0.0 (for example days of -1 with a NULL amount).",
+  "Whenever a value given to late_fee is text that looks like a number (such as '10', ' 1000 ' with spaces), late_fee reads it as that number.",
+  "Whenever reminder_text is given a pet name and a number of days until the appointment of 1 or more, it returns the name, then ' in ', the number of days and the letter d (Rex, 3 gives 'Rex in 3d').",
+  "Whenever the days until the appointment given to reminder_text is zero, reminder_text returns the name followed by ' today' (Rex today).",
+  "Whenever the days given to reminder_text is negative, reminder_text returns NULL, except that a fraction between -1 and 0 (such as -0.5) drops to zero and gives 'Rex today'.",
+  "Whenever the days given to reminder_text has a fractional part, reminder_text drops the fraction (2.9 gives 'Rex in 2d', 0.5 gives 'Rex today').",
+  "Whenever the days given to reminder_text is text that looks like a number (such as '5', ' 5 ' with spaces, or '1e2' meaning 100), reminder_text reads it as that number.",
+  "Whenever the days given to reminder_text is NULL, empty text, text that is not a number, or infinite, reminder_text returns NULL.",
+  "Whenever the pet name given to reminder_text is NULL, reminder_text returns NULL.",
+  "Whenever the pet name given to reminder_text is empty text, reminder_text still returns a message with nothing before the wording (' in 3d' or ' today').",
+  "Whenever the pet name given to reminder_text is given in any letter case or with extra spaces, reminder_text prints it exactly as given, without changing case or trimming spaces ('  rex  ' gives '  rex   in 3d').",
+  "Whenever the pet name given to reminder_text is a number rather than text, reminder_text writes it out as text (123 gives '123 in 3d').",
+  "Whenever the days given to reminder_text is very large, reminder_text prints the full number with no limit (100 gives 'Rex in 100d')."
+ ],
+ "HV": [
+  "Whenever installment_date is given a valid YYYY-MM-DD first due date and an instalment number n of 1 or more, it returns the date that is n-1 whole months after the first due date, in YYYY-MM-DD form (instalment 1 is the first due date itself, instalment 3 of 2024-11-15 is 2025-01-15).",
+  "Whenever the first due date's day does not exist in the target month, installment_date spills into the next month by the number of missing days, instead of using the last day of that month. This applies to every instalment number once it has been read as a whole number under the other rules (a fraction like 2.9 is first cut to 2, and text numbers are read first), and to every start day that is missing from the target month, not only 31 January. For example, 2024-01-31 gives 2024-03-02 for instalment 2 or 2.9 (February 2024 has 29 days, so 2 days are missing), and 2023-01-31 gives 2023-03-03 (February 2023 has 28 days, so 3 days are missing). The following months go back to day 31 where it exists (instalment 3 is 2024-03-31).",
+  "Whenever the instalment number given to installment_date is below 1 (zero or negative), including a fraction that truncates to zero such as 0.5, installment_date treats it as 1 and returns the first due date, not NULL.",
+  "Whenever the instalment number given to installment_date has a fractional part, installment_date drops the fraction (2.9 counts as 2).",
+  "Whenever the instalment number given to installment_date is text that looks like a number (such as '3', ' 3 ' with spaces, or '1e2' meaning 100), installment_date reads it as that number.",
+  "Whenever the instalment number given to installment_date is NULL, empty text, text that is not a number, or infinite, installment_date returns NULL.",
+  "Whenever the first due date given to installment_date is NULL, empty text, a number, or text not in exact YYYY-MM-DD layout (slashes, single-digit month or day, a time added), installment_date returns NULL.",
+  "Whenever the first due date given to installment_date has spaces around an otherwise valid YYYY-MM-DD date, installment_date ignores the spaces and works normally.",
+  "Whenever the first due date given to installment_date is in YYYY-MM-DD layout but is not a real calendar date (such as 2024-02-30 or 2024-13-01), installment_date treats it as 1970-01-01 and counts from there (instalment 2 gives 1970-02-01).",
+  "Whenever the instalment would fall after the year 9999, installment_date returns NULL (9999-12-15 gives NULL for instalment 2 but 9999-12-15 for instalment 1), and a very large instalment number such as 1e30 also gives NULL.",
+  "Whenever insurance_payout is given a claim amount and a deductible, if the claim amount is 1000 or less it returns 80% of (claim amount minus deductible); if the claim amount is above 1000 it returns 50% of (claim amount minus deductible), rounded up to the cent. The result is a number rounded to cents (1000 claim with 200 deductible pays 640.00).",
+  "Whenever insurance_payout rounds to cents, it rounds halves upward on the exact decimal value (0.0625 pays 0.05, 0.07 pays 0.06, 100.555 pays 80.44).",
+  "Whenever the deductible is equal to or larger than the claim amount, insurance_payout returns 0.0.",
+  "Whenever the claim amount is zero or negative, insurance_payout returns 0.0 (when the deductible is a readable number or is missing, since a missing deductible counts as 0).",
+  "Whenever the deductible given to insurance_payout is negative, insurance_payout treats it as zero, so the payout is 80% of the full claim (1000 with deductible -50 pays 800.00).",
+  "Whenever the claim amount given to insurance_payout is NULL, empty text, text that is not a number, or infinite, insurance_payout returns NULL, even if the deductible would give a zero payout. Whenever the deductible is text that is not a number, or infinite, insurance_payout also returns NULL, even if the claim amount would give a zero payout. A deductible that is missing (NULL or empty text) is not an error: it is treated as 0, so the payout is worked out as if the deductible were 0 (1000 with no deductible pays 800.00).",
+  "Whenever an amount given to insurance_payout is text that looks like a number (such as '1000', ' 1000 ' with spaces, or '1e3'), insurance_payout reads it as that number.",
+  "Whenever invoice_code is given a prefix, a number and a year, it prints the prefix in capitals, then the last two digits of the year, a hyphen, and the invoice number padded with zeros to at least 4 digits (inv, 42, 2024 gives INV24-0042).",
+  "Whenever the invoice number given to invoice_code has more than 4 digits, invoice_code prints all of them without cutting (12345 gives INV24-12345).",
+  "Whenever the invoice number given to invoice_code is zero, it prints 0000 (INV24-0000).",
+  "Whenever the year given to invoice_code has more than two digits, invoice_code uses only its last two digits (1999 gives 99, 12345 gives 45), and a year such as 5 or 0 is printed as 05 or 00.",
+  "Whenever the invoice number given to invoice_code is negative (after any fraction is dropped), invoice_code treats it as 0 and prints the reference with 0000 as the number (inv, -5, 2024 gives INV24-0000). Whenever the year given to invoice_code is negative, invoice_code returns NULL.",
+  "Whenever the invoice number or year given to invoice_code has a fractional part, invoice_code drops the fraction first (1.9 counts as 1, 2024.9 as 2024), so a value between -1 and 0 such as -0.5 counts as 0 and is accepted.",
+  "Whenever the invoice number or year given to invoice_code is NULL, empty text, text that is not a number, or infinite, invoice_code returns NULL.",
+  "Whenever the invoice number or year given to invoice_code is text that looks like a number (such as '12' or ' 24 ' with spaces), invoice_code reads it as that number.",
+  "Whenever the prefix given to invoice_code is NULL, invoice_code returns NULL.",
+  "Whenever the prefix given to invoice_code is empty text, invoice_code still returns a code, and the prefix is filled in as three X letters, so the code starts with XXX before the year (XXX24-0001; invoice 42 of 2026 gives XXX26-0042).",
+  "Whenever the prefix given to invoice_code contains spaces, hyphens, slashes or other symbols, invoice_code keeps them exactly as given, spaces included and not trimmed, and only changes letters to capitals (' ab c ' gives ' AB C 24-0001').",
+  "Whenever the prefix given to invoice_code contains accented or special letters, invoice_code capitalises them in the usual way (\u00e9 becomes \u00c9, \u00df becomes SS).",
+  "Whenever the prefix given to invoice_code is a number rather than text, invoice_code writes it out as text in front of the year (123 gives 12324-0001, 1.5 gives 1.524-0001).",
+  "Whenever late_fee is given a number of days late and an invoice amount that are both above zero, nothing is charged if the days late are 5 or fewer; once the days late are over 5, there are no free days and every day late is charged, counting part-days in proportion, at 0.5% of the invoice amount per day (so 5 days or fewer late gives 0.0, 6 days on 1000 gives 30.0, 10 days on 1000 gives 50.0, 10.9 days on 1000 gives 54.5), rounded to cents, but never more than 25% of the invoice amount, however many days late (1000 days late on 1000 gives 250.0).",
+  "Whenever late_fee rounds to cents, it rounds halves upward on the exact value (6 days late on 0.50 gives 0.02, because the exact fee is 0.015; 8 days late on 33.33 gives 1.33), and a fee below half a cent such as 6 days late on 0.10 (exact fee 0.003) comes out as 0.0.",
+  "Whenever the days late given to late_fee has a fractional part, late_fee counts the part-day in proportion and does not drop it (10.9 counts as 10.9 days, so once over 5 days late all 10.9 days are charged at 0.5% of the invoice per day, and 5.5 days on 1000 gives 27.5); days late of 5 or fewer, such as 0.9 or exactly 5, are within the 5-day grace limit and give 0.0.",
+  "Whenever the days late given to late_fee is zero or negative, late_fee returns 0.0.",
+  "Whenever the invoice amount given to late_fee is zero or negative, late_fee returns 0.0.",
+  "late_fee charges 0.5% of the invoice per day late, counting part-days in proportion, but only when the days late are over 5; when they are over 5, all the days are charged, with no free days taken off, and when they are 5 or fewer nothing is charged. The total late fee is capped at 25% of the invoice. (For example, 10.9 days late on an invoice of 1000 gives 54.5, and 1000 days late on an invoice of 1000 gives 250.0.)",
+  "Whenever either value given to late_fee is NULL, empty text, text that is not a number, or infinite, late_fee returns NULL, even if the other value would have given 0.0 (for example days of -1 with a NULL amount).",
+  "Whenever a value given to late_fee is text that looks like a number (such as '10', ' 1000 ' with spaces), late_fee reads it as that number.",
+  "Whenever reminder_text is given a pet name and a number of days until the appointment of 1 or more, it returns the name, then ' in ', the number of days and the letter d (Rex, 3 gives 'Rex in 3d').",
+  "Whenever the days until the appointment given to reminder_text is zero, reminder_text returns the name followed by ' today' (Rex today).",
+  "Whenever the days given to reminder_text is negative, reminder_text returns the name followed by ' overdue' (Bruno, -1 gives 'Bruno overdue'), no matter how many days past, and the name is printed exactly as given; the one exception is a fraction between -1 and 0 (such as -0.5), which drops to zero and gives 'Rex today'.",
+  "Whenever the days given to reminder_text has a fractional part, reminder_text drops the fraction (2.9 gives 'Rex in 2d', 0.5 gives 'Rex today').",
+  "Whenever the days given to reminder_text is text that looks like a number (such as '5', ' 5 ' with spaces, or '1e2' meaning 100), reminder_text reads it as that number.",
+  "Whenever the days given to reminder_text is NULL, empty text, text that is not a number, or infinite, reminder_text returns NULL.",
+  "Whenever the pet name given to reminder_text is NULL, reminder_text returns NULL.",
+  "Whenever the pet name given to reminder_text is empty text, reminder_text still returns a message, but with no name and no leading space before the wording ('in 3d', 'today' or 'overdue').",
+  "Whenever the pet name given to reminder_text is given in any letter case or with extra spaces, reminder_text prints it exactly as given, without changing case or trimming spaces ('  rex  ' gives '  rex   in 3d').",
+  "Whenever the pet name given to reminder_text is a number rather than text, reminder_text writes it out as text (123 gives '123 in 3d').",
+  "Whenever the days given to reminder_text is very large, reminder_text prints the full number with no limit (100 gives 'Rex in 100d').",
+  "Meera's payment plan starts on 31 January and the second instalment would fall on a 31st that February lacks: it is due on 28 February. The owner says: It should spill into March, so 3 March (2 March in a leap year), not 28 February.",
+  "Meera's plan is asked for instalment number 0, which doesn't exist: no due date comes back at all. The owner says: Instalment number 0 should count as instalment 1, so the due date is the first due date itself.",
+  "Meera's plan is asked for instalment 2.9: it quietly drops the fraction and treats it as instalment 2, due 28 February. The owner says: Instalment 2 should spill into March, so 3 March (2 March in a leap year), not 28 February."
+ ],
+ "spots": [
+  {
+   "function": "installment_date",
+   "call": "SELECT installment_date('2026-01-31', 2)",
+   "got": "2026-02-28",
+   "say": "Meera's payment plan starts on 31 January and the second instalment would fall on a 31st that February lacks: it is due on 28 February."
+  },
+  {
+   "function": "installment_date",
+   "call": "SELECT installment_date('2026-01-31', 0)",
+   "got": null,
+   "say": "Meera's plan is asked for instalment number 0, which doesn't exist: no due date comes back at all."
+  },
+  {
+   "function": "installment_date",
+   "call": "SELECT installment_date('2026-02-30', 2)",
+   "got": "1970-02-01",
+   "say": "Meera's plan is entered with a first due date of 30 February, which isn't a real day: the engine silently treats it as 1 January 1970 and gives 1 February 1970 as the second due date."
+  },
+  {
+   "function": "installment_date",
+   "call": "SELECT installment_date('2026-01-31', 2.9)",
+   "got": "2026-02-28",
+   "say": "Meera's plan is asked for instalment 2.9: it quietly drops the fraction and treats it as instalment 2, due 28 February."
+  },
+  {
+   "function": "installment_date",
+   "call": "SELECT installment_date(NULL, 2)",
+   "got": null,
+   "say": "Meera's plan has no first due date recorded: the second instalment has no due date."
+  },
+  {
+   "function": "insurance_payout",
+   "call": "SELECT insurance_payout(1000, 200)",
+   "got": 640.0,
+   "say": "Bruno's vet bill is 1,000 rupees with a 200-rupee deductible: the insurer pays 640 rupees, because it covers only 80% of what is left after the deductible."
+  },
+  {
+   "function": "insurance_payout",
+   "call": "SELECT insurance_payout(1000, 1000)",
+   "got": 0.0,
+   "say": "Bruno's 1,000-rupee claim equals his 1,000-rupee deductible: the insurer pays nothing."
+  },
+  {
+   "function": "insurance_payout",
+   "call": "SELECT insurance_payout(1000, -200)",
+   "got": 800.0,
+   "say": "Bruno's 1,000-rupee claim is entered with a deductible of minus 200 rupees: the negative is treated as no deductible and the insurer pays 800 rupees."
+  },
+  {
+   "function": "insurance_payout",
+   "call": "SELECT insurance_payout(-500, 0)",
+   "got": 0.0,
+   "say": "A claim of minus 500 rupees (a mistaken or reversed entry) is accepted without complaint: the insurer pays 0 rupees."
+  },
+  {
+   "function": "insurance_payout",
+   "call": "SELECT insurance_payout(1000, NULL)",
+   "got": null,
+   "say": "Bruno's 1,000-rupee claim has no deductible filled in: no payout amount is produced, rather than assuming a zero deductible."
+  },
+  {
+   "function": "invoice_code",
+   "call": "SELECT invoice_code('inv', 42, 2026)",
+   "got": "INV26-0042",
+   "say": "Invoice number 42 of 2026 with the prefix typed as lowercase 'inv' prints as INV26-0042, with capital letters, a two-digit year and the number padded to four digits."
+  },
+  {
+   "function": "invoice_code",
+   "call": "SELECT invoice_code('INV', 123456, 2026)",
+   "got": "INV26-123456",
+   "say": "Invoice number 123,456 of 2026 prints as INV26-123456: past 9,999 invoices the number simply gets longer, so references no longer have a fixed width."
+  },
+  {
+   "function": "invoice_code",
+   "call": "SELECT invoice_code('INV', 42, 1999)",
+   "got": "INV99-0042",
+   "say": "Invoice 42 of 1999 prints as INV99-0042: only the last two digits of the year are shown, so 1999 and 2099 would give the same reference."
+  },
+  {
+   "function": "invoice_code",
+   "call": "SELECT invoice_code('INV', -5, 2026)",
+   "got": null,
+   "say": "An invoice numbered minus 5 is rejected: no reference is printed."
+  },
+  {
+   "function": "invoice_code",
+   "call": "SELECT invoice_code('', 42, 2026)",
+   "got": "26-0042",
+   "say": "Invoice 42 of 2026 with a blank prefix still prints, as 26-0042, with nothing in front of the year."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(31, 10000)",
+   "got": 1550.0,
+   "say": "Ravi's 10,000-rupee invoice is paid 31 days late: the late fee comes to 1,550 rupees, because it is 0.5% of the invoice for every day."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(1000, 1000)",
+   "got": 5000.0,
+   "say": "Ravi's 1,000-rupee invoice stays unpaid for 1,000 days: the late fee grows to 5,000 rupees, five times the invoice, because there is no upper limit."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(0, 10000)",
+   "got": 0.0,
+   "say": "Ravi's 10,000-rupee invoice is paid on the due date itself, 0 days late: no late fee is charged, and there is no grace period beyond that, so one day late already costs 0.5%."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10.9, 1000)",
+   "got": 50.0,
+   "say": "Ravi's 1,000-rupee invoice is 10.9 days late: the part-day is dropped, only 10 full days are charged, and the fee is 50 rupees."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(30, -1000)",
+   "got": 0.0,
+   "say": "A credit note of minus 1,000 rupees that is 30 days overdue is accepted without complaint: the late fee is 0 rupees."
+  },
+  {
+   "function": "reminder_text",
+   "call": "SELECT reminder_text('Bruno', 3)",
+   "got": "Bruno in 3d",
+   "say": "Bruno's appointment is 3 days away: the text message reads 'Bruno in 3d', which gives no word about an appointment, a clinic or a date."
+  },
+  {
+   "function": "reminder_text",
+   "call": "SELECT reminder_text('Bruno', 0)",
+   "got": "Bruno today",
+   "say": "Bruno's appointment is today: the text message reads 'Bruno today'."
+  },
+  {
+   "function": "reminder_text",
+   "call": "SELECT reminder_text('Bruno', -1)",
+   "got": null,
+   "say": "Bruno's appointment was yesterday: no message is produced at all."
+  },
+  {
+   "function": "reminder_text",
+   "call": "SELECT reminder_text('', 3)",
+   "got": " in 3d",
+   "say": "Appointment in 3 days for a pet whose name was left blank: the text message still goes out, reading ' in 3d', with a leading space and no name."
+  },
+  {
+   "function": "reminder_text",
+   "call": "SELECT reminder_text('Bruno', 2.7)",
+   "got": "Bruno in 2d",
+   "say": "Bruno's appointment is 2.7 days away: the message rounds down and says 'Bruno in 2d'."
+  }
+ ],
+ "shown_cases": [
+  {
+   "function": "invoice_code",
+   "call": "SELECT invoice_code('inv', 42, 2026)",
+   "got": "INV26-0042",
+   "say": "Invoice number 42 of 2026 with the prefix typed as lowercase 'inv' prints as INV26-0042, with capital letters, a two-digit year and the number padded to four digits."
+  },
+  {
+   "function": "invoice_code",
+   "call": "SELECT invoice_code('INV', 123456, 2026)",
+   "got": "INV26-123456",
+   "say": "Invoice number 123,456 of 2026 prints as INV26-123456: past 9,999 invoices the number simply gets longer, so references no longer have a fixed width."
+  },
+  {
+   "function": "invoice_code",
+   "call": "SELECT invoice_code('INV', 42, 1999)",
+   "got": "INV99-0042",
+   "say": "Invoice 42 of 1999 prints as INV99-0042: only the last two digits of the year are shown, so 1999 and 2099 would give the same reference."
+  },
+  {
+   "function": "invoice_code",
+   "call": "SELECT invoice_code('INV', -5, 2026)",
+   "got": null,
+   "say": "An invoice numbered minus 5 is rejected: no reference is printed."
+  },
+  {
+   "function": "invoice_code",
+   "call": "SELECT invoice_code('', 42, 2026)",
+   "got": "26-0042",
+   "say": "Invoice 42 of 2026 with a blank prefix still prints, as 26-0042, with nothing in front of the year."
+  },
+  {
+   "function": "reminder_text",
+   "call": "SELECT reminder_text('Bruno', 3)",
+   "got": "Bruno in 3d",
+   "say": "Bruno's appointment is 3 days away: the text message reads 'Bruno in 3d', which gives no word about an appointment, a clinic or a date."
+  },
+  {
+   "function": "reminder_text",
+   "call": "SELECT reminder_text('Bruno', 0)",
+   "got": "Bruno today",
+   "say": "Bruno's appointment is today: the text message reads 'Bruno today'."
+  },
+  {
+   "function": "reminder_text",
+   "call": "SELECT reminder_text('Bruno', -1)",
+   "got": null,
+   "say": "Bruno's appointment was yesterday: no message is produced at all."
+  },
+  {
+   "function": "reminder_text",
+   "call": "SELECT reminder_text('', 3)",
+   "got": " in 3d",
+   "say": "Appointment in 3 days for a pet whose name was left blank: the text message still goes out, reading ' in 3d', with a leading space and no name."
+  },
+  {
+   "function": "reminder_text",
+   "call": "SELECT reminder_text('Bruno', 2.7)",
+   "got": "Bruno in 2d",
+   "say": "Bruno's appointment is 2.7 days away: the message rounds down and says 'Bruno in 2d'."
+  },
+  {
+   "function": "installment_date",
+   "call": "SELECT installment_date('2026-01-31', 2)",
+   "got": "2026-02-28",
+   "say": "Meera's payment plan starts on 31 January and the second instalment would fall on a 31st that February lacks: it is due on 28 February."
+  },
+  {
+   "function": "installment_date",
+   "call": "SELECT installment_date('2026-01-31', 0)",
+   "got": null,
+   "say": "Meera's plan is asked for instalment number 0, which doesn't exist: no due date comes back at all."
+  },
+  {
+   "function": "installment_date",
+   "call": "SELECT installment_date('2026-02-30', 2)",
+   "got": "1970-02-01",
+   "say": "Meera's plan is entered with a first due date of 30 February, which isn't a real day: the engine silently treats it as 1 January 1970 and gives 1 February 1970 as the second due date."
+  },
+  {
+   "function": "installment_date",
+   "call": "SELECT installment_date('2026-01-31', 2.9)",
+   "got": "2026-02-28",
+   "say": "Meera's plan is asked for instalment 2.9: it quietly drops the fraction and treats it as instalment 2, due 28 February."
+  },
+  {
+   "function": "installment_date",
+   "call": "SELECT installment_date(NULL, 2)",
+   "got": null,
+   "say": "Meera's plan has no first due date recorded: the second instalment has no due date."
+  },
+  {
+   "function": "insurance_payout",
+   "call": "SELECT insurance_payout(1000, 200)",
+   "got": 640.0,
+   "say": "Bruno's vet bill is 1,000 rupees with a 200-rupee deductible: the insurer pays 640 rupees, because it covers only 80% of what is left after the deductible."
+  },
+  {
+   "function": "insurance_payout",
+   "call": "SELECT insurance_payout(1000, 1000)",
+   "got": 0.0,
+   "say": "Bruno's 1,000-rupee claim equals his 1,000-rupee deductible: the insurer pays nothing."
+  },
+  {
+   "function": "insurance_payout",
+   "call": "SELECT insurance_payout(1000, -200)",
+   "got": 800.0,
+   "say": "Bruno's 1,000-rupee claim is entered with a deductible of minus 200 rupees: the negative is treated as no deductible and the insurer pays 800 rupees."
+  },
+  {
+   "function": "insurance_payout",
+   "call": "SELECT insurance_payout(-500, 0)",
+   "got": 0.0,
+   "say": "A claim of minus 500 rupees (a mistaken or reversed entry) is accepted without complaint: the insurer pays 0 rupees."
+  },
+  {
+   "function": "insurance_payout",
+   "call": "SELECT insurance_payout(1000, NULL)",
+   "got": null,
+   "say": "Bruno's 1,000-rupee claim has no deductible filled in: no payout amount is produced, rather than assuming a zero deductible."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(31, 10000)",
+   "got": 1550.0,
+   "say": "Ravi's 10,000-rupee invoice is paid 31 days late: the late fee comes to 1,550 rupees, because it is 0.5% of the invoice for every day."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(1000, 1000)",
+   "got": 5000.0,
+   "say": "Ravi's 1,000-rupee invoice stays unpaid for 1,000 days: the late fee grows to 5,000 rupees, five times the invoice, because there is no upper limit."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(0, 10000)",
+   "got": 0.0,
+   "say": "Ravi's 10,000-rupee invoice is paid on the due date itself, 0 days late: no late fee is charged, and there is no grace period beyond that, so one day late already costs 0.5%."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10.9, 1000)",
+   "got": 50.0,
+   "say": "Ravi's 1,000-rupee invoice is 10.9 days late: the part-day is dropped, only 10 full days are charged, and the fee is 50 rupees."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(30, -1000)",
+   "got": 0.0,
+   "say": "A credit note of minus 1,000 rupees that is 30 days overdue is accepted without complaint: the late fee is 0 rupees."
+  }
+ ],
+ "fixes": [
+  {
+   "shown": "An invoice numbered minus 5 is rejected: no reference is printed.",
+   "said": "Don't reject it. Treat the negative number as 0 and print the reference with 0000 as the number.",
+   "function": "invoice_code",
+   "rounds": 1,
+   "now": "An invoice numbered minus 5 is not rejected: the negative number is treated as 0, so the reference is still printed, with 0000 as its number (for example INV24-0000 for prefix inv and year 2024).",
+   "confirmed": true
+  },
+  {
+   "shown": "Invoice 42 of 2026 with a blank prefix still prints, as 26-0042, with nothing in front of the year.",
+   "said": "It should still have a 3-letter prefix, padded with X, so it prints as XXX26-0042.",
+   "function": "invoice_code",
+   "rounds": 1,
+   "now": "Invoice 42 of 2026 with an empty prefix does not print as 26-0042: the missing prefix is filled in with XXX, so the invoice reference comes out as XXX26-0042. (If the prefix were only spaces, those spaces would be kept in front of the year and nothing would be filled in.)",
+   "confirmed": true
+  },
+  {
+   "shown": "Bruno's appointment was yesterday: no message is produced at all.",
+   "said": "It should still produce a message, \"Bruno overdue\".",
+   "function": "reminder_text",
+   "rounds": 1,
+   "now": "Bruno's appointment was yesterday (-1 days), so a message is produced after all: the reminder reads 'Bruno overdue'.",
+   "confirmed": true
+  },
+  {
+   "shown": "Appointment in 3 days for a pet whose name was left blank: the text message still goes out, reading ' in 3d', with a leading space and no name.",
+   "said": "No leading space. It should just say \"in 3d\".",
+   "function": "reminder_text",
+   "rounds": 1,
+   "now": "An appointment 3 days away for a pet whose name was left blank still gets a reminder: the message goes out as 'in 3d', with no name and no leading space.",
+   "confirmed": true
+  },
+  {
+   "shown": "Meera's payment plan starts on 31 January and the second instalment would fall on a 31st that February lacks: it is due on 28 February.",
+   "said": "It should spill into March, so 3 March (2 March in a leap year), not 28 February.",
+   "function": "installment_date",
+   "rounds": 1,
+   "now": "Meera's payment plan starts on 31 January, and her second instalment is not due on 28 February: February lacks a 31st, so the due date spills into March by the number of missing days, which makes it 3 March in a 28-day February (for example 2023) or 2 March in a leap year (for example 2024).",
+   "confirmed": true
+  },
+  {
+   "shown": "Meera's plan is asked for instalment number 0, which doesn't exist: no due date comes back at all.",
+   "said": "Instalment number 0 should count as instalment 1, so the due date is the first due date itself.",
+   "function": "installment_date",
+   "rounds": 1,
+   "now": "Meera's plan is asked for instalment number 0, which doesn't exist, but it is treated as instalment 1: the plan returns her first due date, not an empty answer.",
+   "confirmed": true
+  },
+  {
+   "shown": "Meera's plan is asked for instalment 2.9: it quietly drops the fraction and treats it as instalment 2, due 28 February.",
+   "said": "Instalment 2 should spill into March, so 3 March (2 March in a leap year), not 28 February.",
+   "function": "installment_date",
+   "rounds": 2,
+   "now": "Meera's plan is asked for instalment 2.9: the fraction is dropped so it counts as instalment 2, which is one whole month after the first due date (28 January, since 28 exists in February and nothing spills over), and the due date comes out as 28 February.",
+   "confirmed": false,
+   "said_again": "Still wrong: from a 31 January start, instalment 2 spills into March, so 3 March (2 March in a leap year)."
+  },
+  {
+   "shown": "Bruno's 1,000-rupee claim has no deductible filled in: no payout amount is produced, rather than assuming a zero deductible.",
+   "said": "Wrong: a missing deductible should count as 0, so the insurer pays 800 rupees.",
+   "function": "insurance_payout",
+   "rounds": 1,
+   "now": "Bruno's 1,000-rupee claim has no deductible filled in, and a missing deductible is not an error but counts as 0, so the claim is paid as if there were no deductible: at 1,000 rupees it falls in the 80% band, and the payout comes to 800.00 rupees.",
+   "confirmed": true
+  },
+  {
+   "shown": "Ravi's 1,000-rupee invoice stays unpaid for 1,000 days: the late fee grows to 5,000 rupees, five times the invoice, because there is no upper limit.",
+   "said": "Wrong: the late fee should be capped at 25% of the invoice, so 250 rupees.",
+   "function": "late_fee",
+   "rounds": 1,
+   "now": "Ravi's 1,000-rupee invoice stays unpaid for 1,000 days: the first 5 days are free, but the fee at 0.5% a day for the rest is far over the cap, so the late fee is held at the 25% limit and comes to 250 rupees, not 5,000.",
+   "confirmed": true
+  },
+  {
+   "shown": "Ravi's 10,000-rupee invoice is paid on the due date itself, 0 days late: no late fee is charged, and there is no grace period beyond that, so one day late already costs 0.5%.",
+   "said": "There is a grace period: nothing is charged for the first 5 days late, so one day late costs 0, not 0.5%.",
+   "function": "late_fee",
+   "rounds": 1,
+   "now": "Ravi's 10,000-rupee invoice is paid on the due date, 0 days late, and because zero days late is not above zero the late fee comes to 0.0 rupees; the rules also give a 5-day grace period, so even one day late would cost nothing, not 0.5%.",
+   "confirmed": true
+  },
+  {
+   "shown": "Ravi's 1,000-rupee invoice is 10.9 days late: the part-day is dropped, only 10 full days are charged, and the fee is 50 rupees.",
+   "said": "Wrong: the part-day counts, so 10.9 days at 0.5% a day is 54.50 rupees.",
+   "function": "late_fee",
+   "rounds": 2,
+   "now": "Ravi's 1,000-rupee invoice is 10.9 days late: the first 5 days are free, the part-day is counted in proportion rather than dropped, so 5.9 days are charged at 0.5% of the invoice each (5 rupees a day), and the late fee comes to 29.5 rupees, not 50, which is well under the 250-rupee cap.",
+   "confirmed": false,
+   "said_again": "Still wrong: there are no free days once it's over 5 days late, so 10.9 days at 0.5% a day is 54.50 rupees."
+  }
+ ],
+ "changed": [
+  "Whenever the first due date's day does not exist in the target month, installment_date spills into the next month by the number of missing days, instead of using the last day of that month. This applies to every instalment number once it has been read as a whole number under the other rules (a fraction like 2.9 is first cut to 2, and text numbers are read first), and to every start day that is missing from the target month, not only 31 January. For example, 2024-01-31 gives 2024-03-02 for instalment 2 or 2.9 (February 2024 has 29 days, so 2 days are missing), and 2023-01-31 gives 2023-03-03 (February 2023 has 28 days, so 3 days are missing). The following months go back to day 31 where it exists (instalment 3 is 2024-03-31).",
+  "Whenever the instalment number given to installment_date is below 1 (zero or negative), including a fraction that truncates to zero such as 0.5, installment_date treats it as 1 and returns the first due date, not NULL.",
+  "Whenever insurance_payout is given a claim amount and a deductible, if the claim amount is 1000 or less it returns 80% of (claim amount minus deductible); if the claim amount is above 1000 it returns 50% of (claim amount minus deductible), rounded up to the cent. The result is a number rounded to cents (1000 claim with 200 deductible pays 640.00).",
+  "Whenever the claim amount is zero or negative, insurance_payout returns 0.0 (when the deductible is a readable number or is missing, since a missing deductible counts as 0).",
+  "Whenever the claim amount given to insurance_payout is NULL, empty text, text that is not a number, or infinite, insurance_payout returns NULL, even if the deductible would give a zero payout. Whenever the deductible is text that is not a number, or infinite, insurance_payout also returns NULL, even if the claim amount would give a zero payout. A deductible that is missing (NULL or empty text) is not an error: it is treated as 0, so the payout is worked out as if the deductible were 0 (1000 with no deductible pays 800.00).",
+  "Whenever the invoice number given to invoice_code is negative (after any fraction is dropped), invoice_code treats it as 0 and prints the reference with 0000 as the number (inv, -5, 2024 gives INV24-0000). Whenever the year given to invoice_code is negative, invoice_code returns NULL.",
+  "Whenever the prefix given to invoice_code is empty text, invoice_code still returns a code, and the prefix is filled in as three X letters, so the code starts with XXX before the year (XXX24-0001; invoice 42 of 2026 gives XXX26-0042).",
+  "Whenever late_fee is given a number of days late and an invoice amount that are both above zero, nothing is charged if the days late are 5 or fewer; once the days late are over 5, there are no free days and every day late is charged, counting part-days in proportion, at 0.5% of the invoice amount per day (so 5 days or fewer late gives 0.0, 6 days on 1000 gives 30.0, 10 days on 1000 gives 50.0, 10.9 days on 1000 gives 54.5), rounded to cents, but never more than 25% of the invoice amount, however many days late (1000 days late on 1000 gives 250.0).",
+  "Whenever late_fee rounds to cents, it rounds halves upward on the exact value (6 days late on 0.50 gives 0.02, because the exact fee is 0.015; 8 days late on 33.33 gives 1.33), and a fee below half a cent such as 6 days late on 0.10 (exact fee 0.003) comes out as 0.0.",
+  "Whenever the days late given to late_fee has a fractional part, late_fee counts the part-day in proportion and does not drop it (10.9 counts as 10.9 days, so once over 5 days late all 10.9 days are charged at 0.5% of the invoice per day, and 5.5 days on 1000 gives 27.5); days late of 5 or fewer, such as 0.9 or exactly 5, are within the 5-day grace limit and give 0.0.",
+  "late_fee charges 0.5% of the invoice per day late, counting part-days in proportion, but only when the days late are over 5; when they are over 5, all the days are charged, with no free days taken off, and when they are 5 or fewer nothing is charged. The total late fee is capped at 25% of the invoice. (For example, 10.9 days late on an invoice of 1000 gives 54.5, and 1000 days late on an invoice of 1000 gives 250.0.)",
+  "Whenever the days given to reminder_text is negative, reminder_text returns the name followed by ' overdue' (Bruno, -1 gives 'Bruno overdue'), no matter how many days past, and the name is printed exactly as given; the one exception is a fraction between -1 and 0 (such as -0.5), which drops to zero and gives 'Rex today'.",
+  "Whenever the pet name given to reminder_text is empty text, reminder_text still returns a message, but with no name and no leading space before the wording ('in 3d', 'today' or 'overdue').",
+  "Meera's payment plan starts on 31 January and the second instalment would fall on a 31st that February lacks: it is due on 28 February. The owner says: It should spill into March, so 3 March (2 March in a leap year), not 28 February.",
+  "Meera's plan is asked for instalment number 0, which doesn't exist: no due date comes back at all. The owner says: Instalment number 0 should count as instalment 1, so the due date is the first due date itself.",
+  "Meera's plan is asked for instalment 2.9: it quietly drops the fraction and treats it as instalment 2, due 28 February. The owner says: Instalment 2 should spill into March, so 3 March (2 March in a leap year), not 28 February."
+ ],
+ "list_review": {
+  "replies": 6,
+  "cost": 0.47,
+  "log": [
+   {
+    "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+    "typed": "11, 36, 2, 3"
+   },
+   {
+    "prompt": "  Rule 11: Whenever insurance_payout is given a claim amount and a deductible, it returns 80% of (claim amount minus deductible), as a number rounded to cents (1000 claim with 200 deductible pays 640.00).\n  What should it be? > ",
+    "typed": "80% only if the claim is 1000 or less. Above 1000 it's 50% of (claim minus deductible), and round up to the cent."
+   },
+   {
+    "prompt": "  Rule 36: Whenever late_fee is given a large number of days, it keeps charging 0.5% a day with no upper limit (1000 days on 1000 gives 5000.0, five times the invoice).\n  What should it be? > ",
+    "typed": "Cap it at 25% of the invoice, and don't charge anything for the first 5 days late."
+   },
+   {
+    "prompt": "  Rule 2: Whenever the first due date's day does not exist in the target month, installment_date uses the last day of that month instead (2024-01-31 gives 2024-02-29 for instalment 2, 2023-01-31 gives 2023-02-28), and the following months go back to day 31 where it exists (instalment 3 is 2024-03-31).\n  What should it be? > ",
+    "typed": "Wrong: it should spill into the next month by the missing days. 31 Jan plus 1 month is 2 or 3 March, not the last day of February."
+   },
+   {
+    "prompt": "  Rule 3: Whenever the instalment number given to installment_date is below 1 (zero or negative), including a fraction that truncates to zero such as 0.5, installment_date returns NULL.\n  What should it be? > ",
+    "typed": "Below 1 should count as 1, so it returns the first due date, not NULL."
+   },
+   {
+    "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+    "typed": ""
+   }
+  ],
+  "transcript": "\nWhat the built code does now, as rules (each one is what the product will do. Mark any that is not your policy):\n  1. Whenever installment_date is given a valid YYYY-MM-DD first due date and an instalment number n of 1 or more, it returns the date that is n-1 whole months after the first due date, in YYYY-MM-DD form (instalment 1 is the first due date itself, instalment 3 of 2024-11-15 is 2025-01-15).\n  2. Whenever the first due date's day does not exist in the target month, installment_date uses the last day of that month instead (2024-01-31 gives 2024-02-29 for instalment 2, 2023-01-31 gives 2023-02-28), and the following months go back to day 31 where it exists (instalment 3 is 2024-03-31).\n  3. Whenever the instalment number given to installment_date is below 1 (zero or negative), including a fraction that truncates to zero such as 0.5, installment_date returns NULL.\n  4. Whenever the instalment number given to installment_date has a fractional part, installment_date drops the fraction (2.9 counts as 2).\n  5. Whenever the instalment number given to installment_date is text that looks like a number (such as '3', ' 3 ' with spaces, or '1e2' meaning 100), installment_date reads it as that number.\n  6. Whenever the instalment number given to installment_date is NULL, empty text, text that is not a number, or infinite, installment_date returns NULL.\n  7. Whenever the first due date given to installment_date is NULL, empty text, a number, or text not in exact YYYY-MM-DD layout (slashes, single-digit month or day, a time added), installment_date returns NULL.\n  8. Whenever the first due date given to installment_date has spaces around an otherwise valid YYYY-MM-DD date, installment_date ignores the spaces and works normally.\n  9. Whenever the first due date given to installment_date is in YYYY-MM-DD layout but is not a real calendar date (such as 2024-02-30 or 2024-13-01), installment_date treats it as 1970-01-01 and counts from there (instalment 2 gives 1970-02-01).\n  10. Whenever the instalment would fall after the year 9999, installment_date returns NULL (9999-12-15 gives NULL for instalment 2 but 9999-12-15 for instalment 1), and a very large instalment number such as 1e30 also gives NULL.\n  11. Whenever insurance_payout is given a claim amount and a deductible, it returns 80% of (claim amount minus deductible), as a number rounded to cents (1000 claim with 200 deductible pays 640.00).\n  12. Whenever insurance_payout rounds to cents, it rounds halves upward on the exact decimal value (0.0625 pays 0.05, 0.07 pays 0.06, 100.555 pays 80.44).\n  13. Whenever the deductible is equal to or larger than the claim amount, insurance_payout returns 0.0.\n  14. Whenever the claim amount is zero or negative, insurance_payout returns 0.0 (when the deductible is a readable number).\n  15. Whenever the deductible given to insurance_payout is negative, insurance_payout treats it as zero, so the payout is 80% of the full claim (1000 with deductible -50 pays 800.00).\n  16. Whenever either amount given to insurance_payout is NULL, empty text, text that is not a number, or infinite, insurance_payout returns NULL, even if the other amount would give a zero payout.\n  17. Whenever an amount given to insurance_payout is text that looks like a number (such as '1000', ' 1000 ' with spaces, or '1e3'), insurance_payout reads it as that number.\n  18. Whenever invoice_code is given a prefix, a number and a year, it prints the prefix in capitals, then the last two digits of the year, a hyphen, and the invoice number padded with zeros to at least 4 digits (inv, 42, 2024 gives INV24-0042).\n  19. Whenever the invoice number given to invoice_code has more than 4 digits, invoice_code prints all of them without cutting (12345 gives INV24-12345).\n  20. Whenever the invoice number given to invoice_code is zero, it prints 0000 (INV24-0000).\n  21. Whenever the year given to invoice_code has more than two digits, invoice_code uses only its last two digits (1999 gives 99, 12345 gives 45), and a year such as 5 or 0 is printed as 05 or 00.\n  22. Whenever the invoice number or the year given to invoice_code is negative, invoice_code returns NULL.\n  23. Whenever the invoice number or year given to invoice_code has a fractional part, invoice_code drops the fraction first (1.9 counts as 1, 2024.9 as 2024), so a value between -1 and 0 such as -0.5 counts as 0 and is accepted.\n  24. Whenever the invoice number or year given to invoice_code is NULL, empty text, text that is not a number, or infinite, invoice_code returns NULL.\n  25. Whenever the invoice number or year given to invoice_code is text that looks like a number (such as '12' or ' 24 ' with spaces), invoice_code reads it as that number.\n  26. Whenever the prefix given to invoice_code is NULL, invoice_code returns NULL.\n  27. Whenever the prefix given to invoice_code is empty text, invoice_code still returns a code, with nothing before the year (24-0001).\n  28. Whenever the prefix given to invoice_code contains spaces, hyphens, slashes or other symbols, invoice_code keeps them exactly as given, spaces included and not trimmed, and only changes letters to capitals (' ab c ' gives ' AB C 24-0001').\n  29. Whenever the prefix given to invoice_code contains accented or special letters, invoice_code capitalises them in the usual way (\u00e9 becomes \u00c9, \u00df becomes SS).\n  30. Whenever the prefix given to invoice_code is a number rather than text, invoice_code writes it out as text in front of the year (123 gives 12324-0001, 1.5 gives 1.524-0001).\n  31. Whenever late_fee is given a number of days late and an invoice amount that are both above zero, it returns 0.5% of the invoice amount for each whole day late (10 days on 1000 gives 50.0), rounded to cents.\n  32. Whenever late_fee rounds to cents, it rounds halves upward on the exact value (1 day on 1.00 gives 0.01, 3 days on 33.33 gives 0.50), and a fee below half a cent such as 1 day on 0.99 comes out as 0.0.\n  33. Whenever the days late given to late_fee has a fractional part, late_fee counts only the whole days (10.9 counts as 10), so under one day (0.9) gives 0.0.\n  34. Whenever the days late given to late_fee is zero or negative, late_fee returns 0.0.\n  35. Whenever the invoice amount given to late_fee is zero or negative, late_fee returns 0.0.\n  36. Whenever late_fee is given a large number of days, it keeps charging 0.5% a day with no upper limit (1000 days on 1000 gives 5000.0, five times the invoice).\n  37. Whenever either value given to late_fee is NULL, empty text, text that is not a number, or infinite, late_fee returns NULL, even if the other value would have given 0.0 (for example days of -1 with a NULL amount).\n  38. Whenever a value given to late_fee is text that looks like a number (such as '10', ' 1000 ' with spaces), late_fee reads it as that number.\n  39. Whenever reminder_text is given a pet name and a number of days until the appointment of 1 or more, it returns the name, then ' in ', the number of days and the letter d (Rex, 3 gives 'Rex in 3d').\n  40. Whenever the days until the appointment given to reminder_text is zero, reminder_text returns the name followed by ' today' (Rex today).\n  41. Whenever the days given to reminder_text is negative, reminder_text returns NULL, except that a fraction between -1 and 0 (such as -0.5) drops to zero and gives 'Rex today'.\n  42. Whenever the days given to reminder_text has a fractional part, reminder_text drops the fraction (2.9 gives 'Rex in 2d', 0.5 gives 'Rex today').\n  43. Whenever the days given to reminder_text is text that looks like a number (such as '5', ' 5 ' with spaces, or '1e2' meaning 100), reminder_text reads it as that number.\n  44. Whenever the days given to reminder_text is NULL, empty text, text that is not a number, or infinite, reminder_text returns NULL.\n  45. Whenever the pet name given to reminder_text is NULL, reminder_text returns NULL.\n  46. Whenever the pet name given to reminder_text is empty text, reminder_text still returns a message with nothing before the wording (' in 3d' or ' today').\n  47. Whenever the pet name given to reminder_text is given in any letter case or with extra spaces, reminder_text prints it exactly as given, without changing case or trimming spaces ('  rex  ' gives '  rex   in 3d').\n  48. Whenever the pet name given to reminder_text is a number rather than text, reminder_text writes it out as text (123 gives '123 in 3d').\n  49. Whenever the days given to reminder_text is very large, reminder_text prints the full number with no limit (100 gives 'Rex in 100d').\n  Numbers of any that are wrong (Enter = all correct) > 11, 36, 2, 3\n  Rule 11: Whenever insurance_payout is given a claim amount and a deductible, it returns 80% of (claim amount minus deductible), as a number rounded to cents (1000 claim with 200 deductible pays 640.00).\n  What should it be? > 80% only if the claim is 1000 or less. Above 1000 it's 50% of (claim minus deductible), and round up to the cent.\n  Rule 36: Whenever late_fee is given a large number of days, it keeps charging 0.5% a day with no upper limit (1000 days on 1000 gives 5000.0, five times the invoice).\n  What should it be? > Cap it at 25% of the invoice, and don't charge anything for the first 5 days late.\n  Rule 2: Whenever the first due date's day does not exist in the target month, installment_date uses the last day of that month instead (2024-01-31 gives 2024-02-29 for instalment 2, 2023-01-31 gives 2023-02-28), and the following months go back to day 31 where it exists (instalment 3 is 2024-03-31).\n  What should it be? > Wrong: it should spill into the next month by the missing days. 31 Jan plus 1 month is 2 or 3 March, not the last day of February.\n  Rule 3: Whenever the instalment number given to installment_date is below 1 (zero or negative), including a fraction that truncates to zero such as 0.5, installment_date returns NULL.\n  What should it be? > Below 1 should count as 1, so it returns the first due date, not NULL.\n  Anything the builders should know that is not on this list? (Enter = nothing) > \n"
+ },
+ "spot_review": {
+  "replies": 36,
+  "cost": 2.555,
+  "log": [
+   {
+    "prompt": "\nCase 1 of 25. Invoice number 42 of 2026 with the prefix typed as lowercase 'inv' prints as INV26-0042, with capital letters, a two-digit year and the number padded to four digits.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 2 of 25. Invoice number 123,456 of 2026 prints as INV26-123456: past 9,999 invoices the number simply gets longer, so references no longer have a fixed width.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 3 of 25. Invoice 42 of 1999 prints as INV99-0042: only the last two digits of the year are shown, so 1999 and 2099 would give the same reference.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 4 of 25. An invoice numbered minus 5 is rejected: no reference is printed.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Don't reject it. Treat the negative number as 0 and print the reference with 0000 as the number."
+   },
+   {
+    "prompt": "\n  With your correction: An invoice numbered minus 5 is not rejected: the negative number is treated as 0, so the reference is still printed, with 0000 as its number (for example INV24-0000 for prefix inv and year 2024).\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 5 of 25. Invoice 42 of 2026 with a blank prefix still prints, as 26-0042, with nothing in front of the year.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should still have a 3-letter prefix, padded with X, so it prints as XXX26-0042."
+   },
+   {
+    "prompt": "\n  With your correction: Invoice 42 of 2026 with an empty prefix does not print as 26-0042: the missing prefix is filled in with XXX, so the invoice reference comes out as XXX26-0042. (If the prefix were only spaces, those spaces would be kept in front of the year and nothing would be filled in.)\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 6 of 25. Bruno's appointment is 3 days away: the text message reads 'Bruno in 3d', which gives no word about an appointment, a clinic or a date.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 7 of 25. Bruno's appointment is today: the text message reads 'Bruno today'.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 8 of 25. Bruno's appointment was yesterday: no message is produced at all.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should still produce a message, \"Bruno overdue\"."
+   },
+   {
+    "prompt": "\n  With your correction: Bruno's appointment was yesterday (-1 days), so a message is produced after all: the reminder reads 'Bruno overdue'.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 9 of 25. Appointment in 3 days for a pet whose name was left blank: the text message still goes out, reading ' in 3d', with a leading space and no name.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No leading space. It should just say \"in 3d\"."
+   },
+   {
+    "prompt": "\n  With your correction: An appointment 3 days away for a pet whose name was left blank still gets a reminder: the message goes out as 'in 3d', with no name and no leading space.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 10 of 25. Bruno's appointment is 2.7 days away: the message rounds down and says 'Bruno in 2d'.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 11 of 25. Meera's payment plan starts on 31 January and the second instalment would fall on a 31st that February lacks: it is due on 28 February.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should spill into March, so 3 March (2 March in a leap year), not 28 February."
+   },
+   {
+    "prompt": "\n  With your correction: Meera's payment plan starts on 31 January, and her second instalment is not due on 28 February: February lacks a 31st, so the due date spills into March by the number of missing days, which makes it 3 March in a 28-day February (for example 2023) or 2 March in a leap year (for example 2024).\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 12 of 25. Meera's plan is asked for instalment number 0, which doesn't exist: no due date comes back at all.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Instalment number 0 should count as instalment 1, so the due date is the first due date itself."
+   },
+   {
+    "prompt": "\n  With your correction: Meera's plan is asked for instalment number 0, which doesn't exist, but it is treated as instalment 1: the plan returns her first due date, not an empty answer.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 13 of 25. Meera's plan is entered with a first due date of 30 February, which isn't a real day: the engine silently treats it as 1 January 1970 and gives 1 February 1970 as the second due date.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 14 of 25. Meera's plan is asked for instalment 2.9: it quietly drops the fraction and treats it as instalment 2, due 28 February.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Instalment 2 should spill into March, so 3 March (2 March in a leap year), not 28 February."
+   },
+   {
+    "prompt": "\n  With your correction: Meera's plan is asked for instalment 2.9: the fraction is dropped so it counts as instalment 2, which is one whole month after the first due date (28 January, since 28 exists in February and nothing spills over), and the due date comes out as 28 February.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": "Still wrong: from a 31 January start, instalment 2 spills into March, so 3 March (2 March in a leap year)."
+   },
+   {
+    "prompt": "\nCase 15 of 25. Meera's plan has no first due date recorded: the second instalment has no due date.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 16 of 25. Bruno's vet bill is 1,000 rupees with a 200-rupee deductible: the insurer pays 640 rupees, because it covers only 80% of what is left after the deductible.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 17 of 25. Bruno's 1,000-rupee claim equals his 1,000-rupee deductible: the insurer pays nothing.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 18 of 25. Bruno's 1,000-rupee claim is entered with a deductible of minus 200 rupees: the negative is treated as no deductible and the insurer pays 800 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 19 of 25. A claim of minus 500 rupees (a mistaken or reversed entry) is accepted without complaint: the insurer pays 0 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 20 of 25. Bruno's 1,000-rupee claim has no deductible filled in: no payout amount is produced, rather than assuming a zero deductible.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Wrong: a missing deductible should count as 0, so the insurer pays 800 rupees."
+   },
+   {
+    "prompt": "\n  With your correction: Bruno's 1,000-rupee claim has no deductible filled in, and a missing deductible is not an error but counts as 0, so the claim is paid as if there were no deductible: at 1,000 rupees it falls in the 80% band, and the payout comes to 800.00 rupees.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 21 of 25. Ravi's 10,000-rupee invoice is paid 31 days late: the late fee comes to 1,550 rupees, because it is 0.5% of the invoice for every day.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 22 of 25. Ravi's 1,000-rupee invoice stays unpaid for 1,000 days: the late fee grows to 5,000 rupees, five times the invoice, because there is no upper limit.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Wrong: the late fee should be capped at 25% of the invoice, so 250 rupees."
+   },
+   {
+    "prompt": "\n  With your correction: Ravi's 1,000-rupee invoice stays unpaid for 1,000 days: the first 5 days are free, but the fee at 0.5% a day for the rest is far over the cap, so the late fee is held at the 25% limit and comes to 250 rupees, not 5,000.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 23 of 25. Ravi's 10,000-rupee invoice is paid on the due date itself, 0 days late: no late fee is charged, and there is no grace period beyond that, so one day late already costs 0.5%.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "There is a grace period: nothing is charged for the first 5 days late, so one day late costs 0, not 0.5%."
+   },
+   {
+    "prompt": "\n  With your correction: Ravi's 10,000-rupee invoice is paid on the due date, 0 days late, and because zero days late is not above zero the late fee comes to 0.0 rupees; the rules also give a 5-day grace period, so even one day late would cost nothing, not 0.5%.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 24 of 25. Ravi's 1,000-rupee invoice is 10.9 days late: the part-day is dropped, only 10 full days are charged, and the fee is 50 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Wrong: the part-day counts, so 10.9 days at 0.5% a day is 54.50 rupees."
+   },
+   {
+    "prompt": "\n  With your correction: Ravi's 1,000-rupee invoice is 10.9 days late: the first 5 days are free, the part-day is counted in proportion rather than dropped, so 5.9 days are charged at 0.5% of the invoice each (5 rupees a day), and the late fee comes to 29.5 rupees, not 50, which is well under the 250-rupee cap.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": "Still wrong: there are no free days once it's over 5 days late, so 10.9 days at 0.5% a day is 54.50 rupees."
+   },
+   {
+    "prompt": "\nCase 25 of 25. A credit note of minus 1,000 rupees that is 30 days overdue is accepted without complaint: the late fee is 0 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   }
+  ],
+  "transcript": "Hive: Now 25 quick checks on what the build does in real cases. Press Enter if a result is right, or say what should happen instead.\n\nCase 1 of 25. Invoice number 42 of 2026 with the prefix typed as lowercase 'inv' prints as INV26-0042, with capital letters, a two-digit year and the number padded to four digits.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 2 of 25. Invoice number 123,456 of 2026 prints as INV26-123456: past 9,999 invoices the number simply gets longer, so references no longer have a fixed width.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 3 of 25. Invoice 42 of 1999 prints as INV99-0042: only the last two digits of the year are shown, so 1999 and 2099 would give the same reference.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 4 of 25. An invoice numbered minus 5 is rejected: no reference is printed.\n  Right? (Enter = yes, or say what should happen) > Don't reject it. Treat the negative number as 0 and print the reference with 0000 as the number.\n\n  With your correction: An invoice numbered minus 5 is not rejected: the negative number is treated as 0, so the reference is still printed, with 0000 as its number (for example INV24-0000 for prefix inv and year 2024).\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 5 of 25. Invoice 42 of 2026 with a blank prefix still prints, as 26-0042, with nothing in front of the year.\n  Right? (Enter = yes, or say what should happen) > It should still have a 3-letter prefix, padded with X, so it prints as XXX26-0042.\n\n  With your correction: Invoice 42 of 2026 with an empty prefix does not print as 26-0042: the missing prefix is filled in with XXX, so the invoice reference comes out as XXX26-0042. (If the prefix were only spaces, those spaces would be kept in front of the year and nothing would be filled in.)\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 6 of 25. Bruno's appointment is 3 days away: the text message reads 'Bruno in 3d', which gives no word about an appointment, a clinic or a date.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 7 of 25. Bruno's appointment is today: the text message reads 'Bruno today'.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 8 of 25. Bruno's appointment was yesterday: no message is produced at all.\n  Right? (Enter = yes, or say what should happen) > It should still produce a message, \"Bruno overdue\".\n\n  With your correction: Bruno's appointment was yesterday (-1 days), so a message is produced after all: the reminder reads 'Bruno overdue'.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 9 of 25. Appointment in 3 days for a pet whose name was left blank: the text message still goes out, reading ' in 3d', with a leading space and no name.\n  Right? (Enter = yes, or say what should happen) > No leading space. It should just say \"in 3d\".\n\n  With your correction: An appointment 3 days away for a pet whose name was left blank still gets a reminder: the message goes out as 'in 3d', with no name and no leading space.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 10 of 25. Bruno's appointment is 2.7 days away: the message rounds down and says 'Bruno in 2d'.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 11 of 25. Meera's payment plan starts on 31 January and the second instalment would fall on a 31st that February lacks: it is due on 28 February.\n  Right? (Enter = yes, or say what should happen) > It should spill into March, so 3 March (2 March in a leap year), not 28 February.\n\n  With your correction: Meera's payment plan starts on 31 January, and her second instalment is not due on 28 February: February lacks a 31st, so the due date spills into March by the number of missing days, which makes it 3 March in a 28-day February (for example 2023) or 2 March in a leap year (for example 2024).\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 12 of 25. Meera's plan is asked for instalment number 0, which doesn't exist: no due date comes back at all.\n  Right? (Enter = yes, or say what should happen) > Instalment number 0 should count as instalment 1, so the due date is the first due date itself.\n\n  With your correction: Meera's plan is asked for instalment number 0, which doesn't exist, but it is treated as instalment 1: the plan returns her first due date, not an empty answer.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 13 of 25. Meera's plan is entered with a first due date of 30 February, which isn't a real day: the engine silently treats it as 1 January 1970 and gives 1 February 1970 as the second due date.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 14 of 25. Meera's plan is asked for instalment 2.9: it quietly drops the fraction and treats it as instalment 2, due 28 February.\n  Right? (Enter = yes, or say what should happen) > Instalment 2 should spill into March, so 3 March (2 March in a leap year), not 28 February.\n\n  With your correction: Meera's plan is asked for instalment 2.9: the fraction is dropped so it counts as instalment 2, which is one whole month after the first due date (28 January, since 28 exists in February and nothing spills over), and the due date comes out as 28 February.\n  Right now? (Enter = yes, or say what should happen) > Still wrong: from a 31 January start, instalment 2 spills into March, so 3 March (2 March in a leap year).\n\nCase 15 of 25. Meera's plan has no first due date recorded: the second instalment has no due date.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 16 of 25. Bruno's vet bill is 1,000 rupees with a 200-rupee deductible: the insurer pays 640 rupees, because it covers only 80% of what is left after the deductible.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 17 of 25. Bruno's 1,000-rupee claim equals his 1,000-rupee deductible: the insurer pays nothing.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 18 of 25. Bruno's 1,000-rupee claim is entered with a deductible of minus 200 rupees: the negative is treated as no deductible and the insurer pays 800 rupees.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 19 of 25. A claim of minus 500 rupees (a mistaken or reversed entry) is accepted without complaint: the insurer pays 0 rupees.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 20 of 25. Bruno's 1,000-rupee claim has no deductible filled in: no payout amount is produced, rather than assuming a zero deductible.\n  Right? (Enter = yes, or say what should happen) > Wrong: a missing deductible should count as 0, so the insurer pays 800 rupees.\n\n  With your correction: Bruno's 1,000-rupee claim has no deductible filled in, and a missing deductible is not an error but counts as 0, so the claim is paid as if there were no deductible: at 1,000 rupees it falls in the 80% band, and the payout comes to 800.00 rupees.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 21 of 25. Ravi's 10,000-rupee invoice is paid 31 days late: the late fee comes to 1,550 rupees, because it is 0.5% of the invoice for every day.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 22 of 25. Ravi's 1,000-rupee invoice stays unpaid for 1,000 days: the late fee grows to 5,000 rupees, five times the invoice, because there is no upper limit.\n  Right? (Enter = yes, or say what should happen) > Wrong: the late fee should be capped at 25% of the invoice, so 250 rupees.\n\n  With your correction: Ravi's 1,000-rupee invoice stays unpaid for 1,000 days: the first 5 days are free, but the fee at 0.5% a day for the rest is far over the cap, so the late fee is held at the 25% limit and comes to 250 rupees, not 5,000.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 23 of 25. Ravi's 10,000-rupee invoice is paid on the due date itself, 0 days late: no late fee is charged, and there is no grace period beyond that, so one day late already costs 0.5%.\n  Right? (Enter = yes, or say what should happen) > There is a grace period: nothing is charged for the first 5 days late, so one day late costs 0, not 0.5%.\n\n  With your correction: Ravi's 10,000-rupee invoice is paid on the due date, 0 days late, and because zero days late is not above zero the late fee comes to 0.0 rupees; the rules also give a 5-day grace period, so even one day late would cost nothing, not 0.5%.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 24 of 25. Ravi's 1,000-rupee invoice is 10.9 days late: the part-day is dropped, only 10 full days are charged, and the fee is 50 rupees.\n  Right? (Enter = yes, or say what should happen) > Wrong: the part-day counts, so 10.9 days at 0.5% a day is 54.50 rupees.\n\n  With your correction: Ravi's 1,000-rupee invoice is 10.9 days late: the first 5 days are free, the part-day is counted in proportion rather than dropped, so 5.9 days are charged at 0.5% of the invoice each (5 rupees a day), and the late fee comes to 29.5 rupees, not 50, which is well under the 250-rupee cap.\n  Right now? (Enter = yes, or say what should happen) > Still wrong: there are no free days once it's over 5 days late, so 10.9 days at 0.5% a day is 54.50 rupees.\n\nCase 25 of 25. A credit note of minus 1,000 rupees that is 30 days overdue is accepted without complaint: the late fee is 0 rupees.\n  Right? (Enter = yes, or say what should happen) > \n"
+ },
+ "labels": [
+  {
+   "function": "late_fee",
+   "decision": 0,
+   "D": "wrong",
+   "FINAL": "wrong",
+   "R": "right",
+   "note": "D/FINAL halves-upward/below-half-cent contradicts round-up"
+  },
+  {
+   "function": "late_fee",
+   "decision": 1,
+   "D": "wrong",
+   "FINAL": "wrong",
+   "R": "right",
+   "note": "D/FINAL return NULL on unreadable; policy treats as 0 (fee 0.0)"
+  },
+  {
+   "function": "late_fee",
+   "decision": 2,
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D charges from day 1; FINAL fee 0 at 5 or fewer days"
+  },
+  {
+   "function": "late_fee",
+   "decision": 3,
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D says no upper limit; FINAL 25% cap"
+  },
+  {
+   "function": "insurance_payout",
+   "decision": 0,
+   "D": "wrong",
+   "FINAL": "wrong",
+   "R": "right",
+   "note": "halves-upward contradicts ceil; FINAL examples (100.555->80.44) conflict with its own round-up phrase"
+  },
+  {
+   "function": "insurance_payout",
+   "decision": 1,
+   "D": "wrong",
+   "FINAL": "wrong",
+   "R": "right",
+   "note": "claim NULL/unreadable gives NULL; policy gives 0.0"
+  },
+  {
+   "function": "insurance_payout",
+   "decision": 2,
+   "D": "absent",
+   "FINAL": "right",
+   "R": "right",
+   "note": "no 1000 tier in D"
+  },
+  {
+   "function": "insurance_payout",
+   "decision": 3,
+   "D": "absent",
+   "FINAL": "right",
+   "R": "right",
+   "note": "50% over 1000 absent in D"
+  },
+  {
+   "function": "installment_date",
+   "decision": 0,
+   "D": "wrong",
+   "FINAL": "wrong",
+   "R": "right",
+   "note": "NULL/unreadable n or date gives NULL in D/FINAL; policy: n->1, date->1970-01-01"
+  },
+  {
+   "function": "installment_date",
+   "decision": 1,
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D clamps to month end; FINAL spills"
+  },
+  {
+   "function": "installment_date",
+   "decision": 2,
+   "D": "wrong",
+   "FINAL": "wrong",
+   "R": "right",
+   "note": "D/FINAL say 1e30 gives NULL; policy caps at 12"
+  },
+  {
+   "function": "installment_date",
+   "decision": 3,
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D gives NULL below 1; FINAL treats as 1"
+  },
+  {
+   "function": "invoice_code",
+   "decision": 0,
+   "D": "wrong",
+   "FINAL": "wrong",
+   "R": "right",
+   "note": "NULL/unreadable gives NULL; policy treats as 0"
+  },
+  {
+   "function": "invoice_code",
+   "decision": 1,
+   "D": "wrong",
+   "FINAL": "wrong",
+   "R": "right",
+   "note": "D/FINAL print without cutting; policy cuts to 12"
+  },
+  {
+   "function": "invoice_code",
+   "decision": 2,
+   "D": "wrong",
+   "FINAL": "wrong",
+   "R": "right",
+   "note": "D/FINAL keep whole prefix with symbols; policy first 3 ASCII letters"
+  },
+  {
+   "function": "invoice_code",
+   "decision": 3,
+   "D": "wrong",
+   "FINAL": "partial",
+   "R": "right",
+   "note": "D empty prefix gives nothing; FINAL XXX only for empty prefix, not short ones"
+  },
+  {
+   "function": "reminder_text",
+   "decision": 0,
+   "D": "wrong",
+   "FINAL": "wrong",
+   "R": "right",
+   "note": "NULL/unreadable gives NULL; policy treats as 0/empty"
+  },
+  {
+   "function": "reminder_text",
+   "decision": 1,
+   "D": "wrong",
+   "FINAL": "wrong",
+   "R": "right",
+   "note": "D/FINAL print full, no 12-char cut"
+  },
+  {
+   "function": "reminder_text",
+   "decision": 2,
+   "D": "wrong",
+   "FINAL": "wrong",
+   "R": "right",
+   "note": "1 day gives \"in 1d\" not tomorrow"
+  },
+  {
+   "function": "reminder_text",
+   "decision": 3,
+   "D": "wrong",
+   "FINAL": "partial",
+   "R": "right",
+   "note": "D gives NULL for negatives; FINAL overdue but wrongly says -0.5 gives today (policy floors to -1, overdue)"
+  }
+ ],
+ "hidden_tests": 27,
+ "hidden_total": 125,
+ "minutes": 10.3
+}

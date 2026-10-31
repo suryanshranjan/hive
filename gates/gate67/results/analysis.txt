@@ -1,0 +1,21 @@
+feature arm  conv D/FINAL (of n)  own D/FINAL (of n)  hidden   rules shown (repeats left out)  cases  replies  fixes  changed  rulings/house in
+1  S     0 /  5 (8)         0 /  8 (8)       73.6%    38 (0)                        25     61     20     32     0/0
+2  C     4 /  4 (9)         2 /  8 (11)       55.2%    47 (0)                        25     46     11     19     32/7
+2  F     1 /  6 (9)         2 /  8 (11)       66.4%    52 (0)                        25     51     16     27     0/0
+2  M     0 /  5 (9)         2 /  5 (11)       51.2%    45 (0)                        25     45     13     22     32/0
+3  C     0 /  2 (12)         1 /  2 (8)       22.4%    52 (0)                        26     41      8     15     51/14
+3  F     0 /  3 (12)         0 /  3 (8)       21.6%    49 (0)                        25     42     11     16     0/0
+3  M     0 /  3 (12)         1 /  5 (8)       37.6%    49 (0)                        26     43     10     13     54/0
+
+features 2-3 pooled:
+F: conventions right first build 1/21, given to second build 9/21; own decisions 2/19 -> 11/19; hidden 44.0%; owner: 101 rules, 50 cases, 93 replies, 27 corrected cases, 43 rules changed
+M: conventions right first build 0/21, given to second build 8/21; own decisions 3/19 -> 10/19; hidden 44.4%; owner: 94 rules, 51 cases, 88 replies, 23 corrected cases, 35 rules changed
+C: conventions right first build 4/21, given to second build 6/21; own decisions 3/19 -> 10/19; hidden 38.8%; owner: 99 rules, 51 cases, 87 replies, 19 corrected cases, 34 rules changed
+
+predictions
+C1 conv_D C ≥ F + 4: 4 vs 1 -> failed
+C2 conv_D M ≥ F + 2: 0 vs 1 -> failed
+C3 hidden C ≥ F + 5: -5.2 -> failed
+C4 owner corrections C ≤ 0.7 × F: 34 vs 43 -> failed
+Ship (house rules): did not fire
+Kill (nothing compounds): did not fire
