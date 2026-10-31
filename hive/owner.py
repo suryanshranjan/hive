@@ -90,7 +90,8 @@ def setup(run, examples=None, questions=None, assumptions=False, later=False):
                  "owner about every business decision the goal leaves open for it (cut-offs and boundaries, rounding, minimums "
                  "and caps, what happens with blank, missing, negative or oddly formatted information), one decision per "
                  "question, and build to his answers. Read `python3 -m hive answers` first and never ask what a teammate has "
-                 "already asked." + (" With a fixed number of questions, spread them: at most 2 about one area before every "
+                 "already asked. If he has not answered within about 90 seconds, `hive ask` says so and the question stays "
+                 "with him: work on another part meanwhile, and read `hive answers` before you build the part it decides." + (" With a fixed number of questions, spread them: at most 2 about one area before every "
                                      "area you own has had one (Gate 11)." if questions else '') + "\n")
     if assumptions:
         text += ("\n## Recording your assumptions\nThe owner will read, after the build, every default you chose that the goal "
@@ -111,7 +112,9 @@ def setup(run, examples=None, questions=None, assumptions=False, later=False):
                     "the same value that way\"). In Gate 28 a stretched answer broke a rule the owner held.\n" if questions != 0 else ''))
     return text
 
-def ask(question, timeout_min=30):
+ASK_WAIT_MIN = 1.5   # Gate 71: a builder's command is cut off at 2 minutes; a longer wait lost the answer
+
+def ask(question, timeout_min=ASK_WAIT_MIN):
     problems = plain_language_problems(question)
     if problems:
         print('Not asked: the owner is not an engineer. Rephrase it as one real-life situation in plain words, with amounts '
@@ -139,7 +142,8 @@ def ask(question, timeout_min=30):
             a = json.load(open(path))
             print('ANSWER: ' + a['answer']); return 0
         time.sleep(3)
-    print(f'no answer within {timeout_min} minutes; decide from the goal and examples, and say so when you land'); return 4
+    print('The owner has your question but has not answered yet. It stays with him: work on another part meanwhile, and '
+          'read `python3 -m hive answers` before you build the part this question decides (his answer appears there).'); return 4
 
 def assume(text, technical=False):
     """Record a default the goal does not state. Business defaults go to the owner's review; technical ones (Gate 28: most
@@ -239,8 +243,8 @@ def answers():
     for p in sorted(glob.glob(os.path.join(d, 'answers', '*.json'))):
         a = json.load(open(p)); q = json.load(open(os.path.join(d, 'questions', a['id'] + '.json')))
         rows.append(f"Q ({q['worker']}): {q['question']}\nA: {a['answer']}\n")
-    if _later(d):
-        rows += [f"Q ({q['worker']}): {q['question']}\n(recorded for the owner's morning)\n" for q in pending(os.path.dirname(d))]
+    rows += [f"Q ({q['worker']}): {q['question']}\n" + ("(recorded for the owner's morning)" if _later(d) else
+             '(he has not answered yet)') + '\n' for q in pending(os.path.dirname(d))]
     print('\n'.join(rows) if rows else 'no answers yet'); return 0
 
 def format_question(q, number, budget=None, width=72):

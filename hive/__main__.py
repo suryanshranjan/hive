@@ -165,7 +165,7 @@ def build_parser():
     r.add_argument('--minutes', type=positive, default=40); r.add_argument('--max-parallel', type=int, default=0)
     r.add_argument('--examples'); r.add_argument('--questions', type=int); r.add_argument('--assumptions', action='store_true')
     o = sub.add_parser('owner'); o.add_argument('--run', required=True)
-    q = sub.add_parser('ask'); q.add_argument('question'); q.add_argument('--timeout', type=int, default=30)
+    q = sub.add_parser('ask'); q.add_argument('question'); q.add_argument('--timeout', type=float, default=1.5)
     sub.add_parser('answers')
     v = sub.add_parser('review'); v.add_argument('--run', required=True)
     s_ = sub.add_parser('assume'); s_.add_argument('text'); s_.add_argument('--technical', action='store_true')
