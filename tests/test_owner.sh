@@ -39,4 +39,10 @@ check "with the input closed, the run still finishes" $? 0
 kill $OWNER 2>/dev/null
 check "the builder is told to decide and record its assumption" "$(grep -c 'not at the keyboard' $T/run2/got_answer)" 1
 check "the question is not shown again and again" "$(grep -c 'show it again' $T/owner2.out) $(grep -c 'No one can answer here' $T/owner2.out)" "0 1"
+# Gate 71: with a busy owner, hive ask never blocks past its wait; the question stays queued and hive answers shows it
+mkdir -p $T/run3 && echo '{}' > $T/run3/run.json
+HIVE_RUN=$T/run3 $PY -c "from hive import owner; owner.setup('$T/run3', questions=None)" >/dev/null
+HIVE_RUN=$T/run3 HIVE_WORKER=w1 $PY -m hive ask "A deal of Rs 999 comes in. Is there a minimum fee? A) no B) Rs 100 C) something else (please say)" --timeout 0.03 > $T/ask3.txt; code=$?
+check "an unanswered question returns after the wait, and stays with the owner (Gate 71)" "$code $(grep -c 'stays with him' $T/ask3.txt)" "4 1"
+check "hive answers shows it as not answered yet" "$(HIVE_RUN=$T/run3 $PY -m hive answers | grep -c 'has not answered yet')" 1
 rm -rf $T; exit $fail
