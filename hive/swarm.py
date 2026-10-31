@@ -139,7 +139,7 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
         raise SystemExit(f'{run} exists: choose a new run folder')
     for d in ('work', 'prompts', 'logs', 'out'):
         os.makedirs(os.path.join(run, d))
-    owner_text = owner.setup(run, examples, questions, assumptions)
+    owner_text = owner.setup(run, examples, None if questions == 'later' else questions, assumptions, later=questions == 'later')
     up = os.path.join(run, 'up.git')
     sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--bare', '--branch', b, repo, up)
     sh('git', '-C', up, 'symbolic-ref', 'HEAD', f'refs/heads/{b}')

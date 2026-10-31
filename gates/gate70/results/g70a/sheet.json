@@ -1,0 +1,1904 @@
+{
+ "R": [
+  "late_fee: Whenever amount_cents or days_late is NULL or cannot be read as a number (text that is not numeric, a boolean, NaN), return NULL.",
+  "late_fee: Numeric text such as ' 12 ' is accepted as a number after trimming spaces.",
+  "late_fee: Whenever days_late is 5 or less (including zero and negative values), return 0 regardless of amount (grace period).",
+  "late_fee: Whenever days_late is more than 5, count late weeks as days_late divided by 7, rounded up to a whole number (a part-week counts as a full week); fractional days_late is allowed.",
+  "late_fee: The base fee is 1% of amount_cents per late week, with fractions of a cent cut off downward.",
+  "late_fee: The fee is never less than 500 cents before the cap is applied.",
+  "late_fee: The fee is capped at 25% of amount_cents (cut down to a whole cent), and the cap wins over the 500-cent minimum, so small invoices pay at most a quarter of the amount.",
+  "late_fee: Whenever amount_cents is zero and the invoice is past the grace period, return 0 because the cap is 0.",
+  "late_fee: Whenever amount_cents is negative and days_late is above 5, return the negative cap (amount_cents divided by 4, rounded down toward minus infinity); there is no special handling for negative amounts.",
+  "late_fee: Whenever days_late is positive infinity, treat it as a very large number of days (so the cap normally applies); negative infinity counts as within the grace period.",
+  "ship_cost: Whenever weight_g is NULL or not readable as a number, or zone is NULL, return NULL.",
+  "ship_cost: Whenever weight_g is zero or negative, return 0, whatever the zone is.",
+  "ship_cost: Cost is a base charge plus a per-block charge, where blocks are weight_g divided by 500 rounded up (any part of 500 g is a full block).",
+  "ship_cost: Zone A has base 300 cents and 100 cents per block.",
+  "ship_cost: Zone B has base 500 cents and 150 cents per block.",
+  "ship_cost: Zone C has base 800 cents and 200 cents per block.",
+  "ship_cost: Zone matching ignores letter case and leading or trailing spaces, so ' b ' is zone B.",
+  "ship_cost: Whenever the zone is not A, B or C (including empty text or a non-text value), charge zone C rates.",
+  "ship_cost: Whenever weight_g is strictly more than 20000, add a 1500-cent oversize surcharge; exactly 20000 g has no surcharge.",
+  "ship_cost: Infinite weight is treated as an enormous weight (so the oversize surcharge applies).",
+  "mask_card: Whenever text is NULL, return NULL.",
+  "mask_card: Non-text input (such as a number) is first converted to its text form and then masked.",
+  "mask_card: Only the characters 0-9 count as digits; every other character (spaces, hyphens, letters) is kept unchanged in its position.",
+  "mask_card: Whenever the text contains no digits at all (including empty text), return the word INVALID.",
+  "mask_card: Whenever the text has fewer than 5 digits, replace every digit with '*'.",
+  "mask_card: Whenever the text has exactly 15 digits and the first digit is 3, show the last 5 digits and replace all earlier digits with '*'.",
+  "mask_card: In every other case (5 or more digits, including more than 16), show only the last 4 digits and replace all earlier digits with '*'.",
+  "grade_letter: Whenever score is NULL or cannot be read as a number (non-numeric text, boolean, NaN), return NULL; numeric text such as '88' is accepted after trimming.",
+  "grade_letter: Round the score to the nearest whole number, with exact halves going up, before grading (89.5 becomes 90, 59.5 becomes 60).",
+  "grade_letter: Whenever the rounded score is below 0 or above 100, return INVALID; infinite scores are INVALID too.",
+  "grade_letter: Because rounding happens first, scores from -0.5 up to 0 round to 0 and grade F, and 99.5 up to 100.49 round to 100.",
+  "grade_letter: A rounded score of exactly 100 gives 'A+'.",
+  "grade_letter: A rounded score from 90 to 99 gives 'A'.",
+  "grade_letter: A rounded score from 80 to 89 gives 'B'.",
+  "grade_letter: A rounded score from 70 to 79 gives 'C'.",
+  "grade_letter: A rounded score from 60 to 69 gives 'D'.",
+  "grade_letter: A rounded score from 0 to 59 gives 'F'.",
+  "biz_days: Whenever either date is NULL, not text, or not a valid ISO date (YYYY-MM-DD, e.g. month 13 or a missing day), return NULL; surrounding spaces are ignored.",
+  "biz_days: Whenever end_date is the same as or earlier than start_date, return 0.",
+  "biz_days: Count the days from start_date up to but not including end_date: the start day is counted if it is a working day, the end day is never counted.",
+  "biz_days: Saturdays and Sundays are not working days.",
+  "biz_days: December 25 and January 1, in every year, are not working days; no other holidays exist.",
+  "biz_days: A holiday that falls on a weekend has no extra effect (it is simply not counted once).",
+  "loyalty_pts: Whenever amount_cents is NULL or cannot be read as a number, return NULL; numeric text is accepted.",
+  "loyalty_pts: Points are amount_cents times the tier multiplier divided by 100, with fractions cut off downward.",
+  "loyalty_pts: Tier 'basic' has multiplier 1.0, 'silver' 1.5 and 'gold' 2.0.",
+  "loyalty_pts: Tier matching ignores letter case and surrounding spaces.",
+  "loyalty_pts: Whenever tier is NULL, not text, or not a known tier name, treat the customer as basic (multiplier 1.0).",
+  "loyalty_pts: Points are capped at 5000 per purchase.",
+  "loyalty_pts: Whenever amount_cents is negative, return the negative points figure (rounded down toward minus infinity) with no floor at zero.",
+  "loyalty_pts: Positive infinity gives 5000 and negative infinity gives NULL.",
+  "slugify: Whenever text is NULL, return NULL; non-text input is converted to text first.",
+  "slugify: Convert accented letters to their plain ASCII base letter (e.g. e with an accent becomes e) by removing the accent marks.",
+  "slugify: Lowercase everything.",
+  "slugify: Keep only the letters a-z and digits 0-9; every other character, including underscores, punctuation, symbols and letters that have no ASCII base (such as Japanese), acts as a separator and is otherwise dropped.",
+  "slugify: Each run of one or more separator characters between kept characters becomes a single hyphen.",
+  "slugify: Never put a hyphen at the start of the slug, and never at the end.",
+  "slugify: Cut the slug to at most 30 characters, then remove any hyphen left at the end by the cut.",
+  "slugify: Whenever the text has no kept characters (empty text, only punctuation), return empty text, not NULL.",
+  "shift_pay: Whenever hours or rate_cents is NULL or cannot be read as a number, return NULL; numeric text is accepted.",
+  "shift_pay: Round hours to the nearest quarter hour first, with exact halves of a quarter going up (7.125 becomes 7.25, 7.12 becomes 7.0).",
+  "shift_pay: Hours up to 40 are paid at the normal rate.",
+  "shift_pay: Hours above 40 and up to 60 are paid at 1.5 times the rate.",
+  "shift_pay: Hours above 60 are paid at 2 times the rate.",
+  "shift_pay: Pay is rate_cents times the weighted hours, rounded to a whole cent with exact halves going up.",
+  "shift_pay: Whenever hours is zero, return 0.",
+  "shift_pay: Whenever hours is negative, the pay is negative at the normal rate (negative hours are not clamped to zero); a negative rate likewise gives negative pay.",
+  "shift_pay: Infinite hours are treated as an enormous number of hours; an infinite rate_cents returns NULL.",
+  "age_years: Whenever either date is NULL, not text, or not a valid ISO date (YYYY-MM-DD), return NULL; surrounding spaces are ignored.",
+  "age_years: Age is the difference in calendar years, minus one if the as-of date is before the birthday in that year; on the birthday itself the new age counts.",
+  "age_years: For a birth date of Feb 29, in a non-leap as-of year the birthday counts from Mar 1, not Feb 28; in a leap year it counts on Feb 29.",
+  "age_years: Whenever birth_date is after as_of_date, return the negative number that the same year rule gives; there is no clamp to zero.",
+  "robust_mean: Ignore NULL values and text values; only numbers are used.",
+  "robust_mean: Whenever fewer than 3 numeric values are present (including an empty column or all NULLs), return NULL.",
+  "robust_mean: Remove exactly one smallest and one largest value (if the minimum or maximum is repeated, only one copy of each is removed), then return the average of the remaining values as a decimal number."
+ ],
+ "D": [
+  "Whenever age_years is given a birth date and an as-of date, it returns the number of whole years completed, counting a birthday as reached on the same month and day of the as-of year (e.g. born 1990-05-15, as of 2024-05-15 gives 34; one day earlier gives 33).",
+  "Whenever age_years is asked about someone born on 29 February, the birthday is treated as reached on 1 March in non-leap years (born 2000-02-29 is 0 on 2001-02-28 and 1 on 2001-03-01) and on 29 February in leap years.",
+  "Whenever age_years gets an as-of date equal to the birth date, it returns 0; whenever the as-of date is earlier than the birth date, it returns NULL rather than a negative age.",
+  "Whenever either date given to age_years is NULL, empty, not a real calendar date (such as month 13), or not in the strict YYYY-MM-DD form (no slashes, no compact 20000101, no missing zero padding like 2000-1-1), age_years returns NULL.",
+  "Whenever a date given to age_years has surrounding spaces, or has extra text after the first 10 characters (such as a time '2000-01-01 12:00:00' or even junk like '2000-01-01abc'), age_years ignores the spaces and the extra text and uses only the date part.",
+  "Whenever a date given to age_years is a plain number such as 20000101, age_years returns NULL because it is not in YYYY-MM-DD form.",
+  "Whenever biz_days is given a start and end date in order, it counts the Monday-to-Friday days from the start date up to but not including the end date (2024-01-01 to 2024-01-08 gives 5; 2024-01-01 to 2024-01-05 gives 4).",
+  "Whenever the start date of biz_days is itself a weekday, that day is counted; whenever the end date is a weekday it is not counted (2024-01-05 Friday to 2024-01-06 gives 1; 2024-01-06 Saturday to 2024-01-08 gives 0).",
+  "Whenever biz_days is given the same start and end date, it returns 0, whatever day of the week it is.",
+  "Whenever the end date given to biz_days is earlier than the start date, it returns the working-day count of the reversed range as a negative number (2024-01-08 to 2024-01-01 gives -5); a reversed range containing only weekend days gives 0.",
+  "Whenever biz_days counts working days, it treats only Saturday and Sunday as non-working and does not exclude any public holidays (2024-12-24 to 2024-12-26 gives 2).",
+  "Whenever either date given to biz_days is NULL, empty, not a real date, or not in strict YYYY-MM-DD form, biz_days returns NULL.",
+  "Whenever a date given to biz_days has surrounding spaces or extra text after its first 10 characters (such as a time of day), biz_days ignores that and uses only the date part.",
+  "Whenever grade_letter is given a score of 90 or more it returns A; 80 up to under 90 gives B; 70 up to under 80 gives C; 60 up to under 70 gives D; anything lower gives F. Each boundary score belongs to the higher grade (90 is A, 89.99 is B, 60 is D, 59.9 is F).",
+  "Whenever grade_letter is given a score above 100 (such as 150) it returns A, and whenever it is given zero or a negative score it returns F; there is no upper or lower limit check.",
+  "Whenever grade_letter is given a score as text that is entirely a number (such as '85', ' 85 ' with spaces, or '9e1'), it reads it as that number and grades it normally.",
+  "Whenever grade_letter is given NULL, empty text, or text that is not wholly a number (such as 'abc' or '85abc'), it returns NULL rather than F.",
+  "Whenever grade_letter is given the text 'inf' it treats it as infinitely high and returns A, and whenever it is given the text 'nan' it returns NULL.",
+  "Whenever late_fee is given an overdue amount in cents and days late of 7 or fewer, it returns 0 because the first 7 days are a grace period.",
+  "Whenever late_fee is given days late from 8 up to and including 14, the fee is 2% of the amount; from 15 up to and including 30 it is 5%; for 31 or more it is 9%, with no upper cap on days (365 days still gives 9%).",
+  "Whenever late_fee computes a fee, it rounds to a whole cent with halves rounding up (a fee of 20.5 cents becomes 21; a 2% fee on 24 cents is 0.48 and gives 0, on 25 cents is 0.5 and gives 1).",
+  "Whenever late_fee is given an amount of zero or less, or days late that are negative or zero, it returns 0 (a fee is never negative).",
+  "Whenever days late given to late_fee is a fraction, the bands apply to the exact value (14.5 days falls in the 5% band because it is above 14), and a fractional amount is used as given before rounding.",
+  "Whenever either amount or days late given to late_fee is NULL, empty text, or text that is not wholly a number, it returns NULL, even if the other value would have given 0; numeric text such as '10000' and '20' is read as a number.",
+  "Whenever loyalty_pts is given a purchase amount in cents and a tier, it awards whole points based on 1 point per 100 cents for basic, 1.5 for silver, 2 for gold and 3 for platinum, rounding down any fraction of a point (10000 cents gives 100, 150, 200 and 300 points respectively; 99 cents basic gives 0, 199 cents gold gives 3).",
+  "Whenever the tier given to loyalty_pts is not one of basic, silver, gold or platinum (such as 'bronze', an empty text, or a number), it is treated as basic and earns 1 point per 100 cents.",
+  "Whenever the tier given to loyalty_pts is written in any letter case or with spaces around it (' GOLD ', 'Gold'), it is recognised as that tier; spaces inside a name (such as 'bro nze') stop it matching and it counts as basic.",
+  "Whenever the amount given to loyalty_pts is zero or negative, it returns 0 points.",
+  "Whenever the amount given to loyalty_pts is text that is not a number (such as 'abc' or empty text), it is treated as zero and returns 0 points; numeric text such as '5000' is read as a number.",
+  "Whenever the amount given to loyalty_pts has a fraction (such as 5050.7 cents), the fraction counts in the calculation before rounding points down.",
+  "Whenever either the amount or the tier given to loyalty_pts is NULL, it returns NULL, even when the amount is zero.",
+  "Whenever mask_card is given text containing more than 4 digits, it replaces every digit except the last 4 digits with an asterisk, so 4111111111111111 becomes ************1111.",
+  "Whenever mask_card is given a card number with spaces or dashes between groups, it keeps those separators and any other non-digit characters in place and masks only the digits (4111 1111 1111 1111 becomes **** **** **** 1111; 4111-1111-1111-1111 becomes ****-****-****-1111).",
+  "Whenever the text given to mask_card contains 4 or fewer digits in total, it returns the text unchanged (1234, 123, 12-34, 'abcd' and empty text come back as they are); exactly 5 digits leaves only the first masked.",
+  "Whenever mask_card is given text with other words and digits mixed (such as 'card 1234567890 ok'), it masks all digits in the whole text except the last 4 digits found anywhere in it, leaving letters untouched ('card ******7890 ok'; 'x1y2z3w4v5' becomes 'x*y2z3w4v5').",
+  "Whenever mask_card is given a number rather than text (such as 4111111111111111), it treats it as text of its digits and masks it the same way; a decimal such as 12345.5 counts all its digits and keeps the point ('**345.5').",
+  "Whenever mask_card is given NULL it returns NULL.",
+  "Whenever mask_card is given spaces around the number, it keeps them unchanged and does not count them as digits; it counts digits from other scripts and superscript digits as digits too and masks them in the same way.",
+  "Whenever shift_pay is given hours worked up to 40 and an hourly rate in cents, it returns hours times the rate (40 hours at 1000 cents gives 40000; 39.5 hours gives 39500).",
+  "Whenever shift_pay is given more than 40 hours, the first 40 hours are paid at the normal rate and each hour beyond 40 is paid at 1.5 times the rate (45 hours at 1000 cents gives 47500; 100 hours gives 130000), with no cap on hours.",
+  "Whenever shift_pay computes pay that has a fraction of a cent, it rounds to a whole cent with halves rounding up (10.5 hours at 1001 cents is 10510.5 and gives 10511; 0.5 hours at 1 cent gives 1).",
+  "Whenever the hours or the rate given to shift_pay is zero or negative, it returns 0 rather than a negative pay.",
+  "Whenever either hours or rate given to shift_pay is NULL, empty text, or text that is not wholly a number, it returns NULL; numeric text such as '45' and '1000' is read as a number.",
+  "Whenever ship_cost is given a parcel weight in grams and a zone, the first started kilogram costs a base charge of 400 cents for zone A, 800 for zone B and 1200 for zone C.",
+  "Whenever a parcel given to ship_cost weighs more than 1000 grams, each further started kilogram (any part of a kilogram rounds up) adds 300 cents to the base charge (1000 g in zone A is 400; 1001 g is 700; 2001 g in zone C is 1800; 10500 g in zone C is 4200).",
+  "Whenever a parcel given to ship_cost weighs 0 grams or less than a kilogram, it is charged the zone's base charge as one started kilogram (0 g and 0.1 g in zone A both give 400).",
+  "Whenever the weight given to ship_cost is negative, it returns NULL (no charge is quoted).",
+  "Whenever the zone given to ship_cost is written in lower case or with spaces around it (' b ', 'c'), it is recognised as that zone.",
+  "Whenever the zone given to ship_cost is anything other than A, B or C (such as 'D', 'AA', empty text or a number), it returns NULL.",
+  "Whenever the weight or zone given to ship_cost is NULL, it returns NULL.",
+  "Whenever the weight given to ship_cost is text, a leading number is used ('2500' or '2500kg' is 2500 g), and text with no leading number (such as 'abc' or empty text) is treated as 0 grams and gets the base charge for the zone.",
+  "Whenever slugify is given a title, it returns it in lower case with every run of characters other than the English letters a-z and digits 0-9 (spaces, punctuation, underscores, slashes, tabs, dots) replaced by a single hyphen ('Hello, World!' becomes 'hello-world'; 'a_b-c/d.e' becomes 'a-b-c-d-e').",
+  "Whenever slugify produces hyphens at the start or end, it removes them, so leading and trailing spaces or punctuation leave no hyphen ('  Hello   World  ' becomes 'hello-world', '---x---' becomes 'x'), and repeated separators collapse to one hyphen.",
+  "Whenever slugify is given accented letters (Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e, \u00d1and\u00fa, \u00dcber), it drops the accent and keeps the base letter ('cafe-creme-brulee', 'nandu', 'uber').",
+  "Whenever slugify is given letters with no plain-letter equivalent after removing accents (such as \u00df, \u00e6, \u0153, \u00f8, or Japanese characters), it treats them as separators and drops them, so 'Stra\u00dfe' becomes 'stra-e' and '\u0152uvre \u00e6 \u00f8' becomes 'uvre'.",
+  "Whenever slugify is given full-width letters and digits, ligatures or circled digits, it converts them to their plain forms ('\uff21\uff22\uff23 \uff11\uff12\uff13' becomes 'abc-123', '\ufb01ne' becomes 'fine', '\u2460\u2461' becomes '12'); symbols such as \u2122 and \u00a9 are dropped ('x\u2122 y\u00a9' becomes 'xtm-y').",
+  "Whenever slugify is given NULL it returns NULL; whenever it is given empty text, or text with no letters or digits at all (such as '!!!'), it returns empty text.",
+  "Whenever slugify is given a number, it uses the number's text, so 12345 becomes '12345' and 1.5 becomes '1-5'.",
+  "Whenever robust_mean is given a column with 3 or more non-NULL values, it sets aside exactly one lowest and one highest value and returns the average of the rest (1, 2, 3, 4, 100 gives 3; 1, 2, 100 gives 2).",
+  "Whenever the lowest or highest value in robust_mean is repeated, only one copy of each is set aside (1, 1, 1, 10 gives 1).",
+  "Whenever robust_mean is given only 1 or 2 non-NULL values, nothing is set aside and it returns their plain average (5 gives 5; 1 and 3 give 2).",
+  "Whenever robust_mean meets NULL values, it ignores them completely and does not count them toward the 3 values needed for trimming (1, 2, NULL, 3, NULL gives 2).",
+  "Whenever robust_mean has no rows or only NULL values, it returns NULL.",
+  "Whenever robust_mean is given a text value in a numeric column, it counts text that starts with a number as that leading number ('5x' as 5, '10' as 10) and text with no leading number (such as 'abc' or empty text) as 0, and that value still takes part in the trimming and the average.",
+  "Whenever robust_mean is used with a filter or grouping, it is calculated separately on the rows of each group (1,3,20 gives 3 and 2,10,30 gives 10), and the result is always a decimal number (such as 5.0)."
+ ],
+ "SL": [
+  "Whenever age_years is given a birth date and an as-of date, it returns the number of whole years completed, counting a birthday as reached on the same month and day of the as-of year (e.g. born 1990-05-15, as of 2024-05-15 gives 34; one day earlier gives 33).",
+  "Whenever age_years is asked about someone born on 29 February, the birthday is treated as reached on 1 March in non-leap years (born 2000-02-29 is 0 on 2001-02-28 and 1 on 2001-03-01) and on 29 February in leap years.",
+  "Whenever age_years gets an as-of date equal to the birth date, it returns 0; whenever the as-of date is earlier than the birth date, it returns NULL rather than a negative age.",
+  "Whenever either date given to age_years is NULL, empty, not a real calendar date (such as month 13), or not in the strict YYYY-MM-DD form (no slashes, no compact 20000101, no missing zero padding like 2000-1-1), age_years returns NULL.",
+  "Whenever a date given to age_years has surrounding spaces, or has extra text after the first 10 characters (such as a time '2000-01-01 12:00:00' or even junk like '2000-01-01abc'), age_years ignores the spaces and the extra text and uses only the date part.",
+  "Whenever a date given to age_years is a plain number such as 20000101, age_years returns NULL because it is not in YYYY-MM-DD form.",
+  "Whenever biz_days is given a start and end date in order, it counts the Monday-to-Friday days from the start date up to but not including the end date (2024-01-01 to 2024-01-08 gives 5; 2024-01-01 to 2024-01-05 gives 4).",
+  "Whenever the start date of biz_days is itself a weekday, that day is counted; whenever the end date is a weekday it is not counted (2024-01-05 Friday to 2024-01-06 gives 1; 2024-01-06 Saturday to 2024-01-08 gives 0).",
+  "Whenever biz_days is given the same start and end date, it returns 0, whatever day of the week it is.",
+  "Whenever the end date given to biz_days is earlier than the start date, it returns the working-day count of the reversed range as a negative number (2024-01-08 to 2024-01-01 gives -5); a reversed range containing only weekend days gives 0.",
+  "Whenever biz_days counts working days, it treats Saturday and Sunday as non-working. It also treats December 25 and January 1 of every year as non-working holidays. No other public holidays are excluded (2024-12-24 to 2024-12-26 gives 1).",
+  "Whenever either date given to biz_days is NULL, empty, not a real date, or not in strict YYYY-MM-DD form, biz_days returns NULL.",
+  "Whenever a date given to biz_days has surrounding spaces or extra text after its first 10 characters (such as a time of day), biz_days ignores that and uses only the date part.",
+  "Whenever grade_letter is given a score of 90 or more it returns A; 80 up to under 90 gives B; 70 up to under 80 gives C; 60 up to under 70 gives D; anything lower gives F. Each boundary score belongs to the higher grade (90 is A, 89.99 is B, 60 is D, 59.9 is F).",
+  "grade_letter first rounds the score to a whole number. After rounding, a score above 100 or below 0 is INVALID, a score of exactly 100 returns A+, and a score of zero returns F.",
+  "Whenever grade_letter is given a score as text that is entirely a number (such as '85', ' 85 ' with spaces, or '9e1'), it reads it as that number and grades it normally.",
+  "Whenever grade_letter is given NULL, empty text, or text that is not wholly a number (such as 'abc' or '85abc'), it returns NULL rather than F.",
+  "Whenever grade_letter is given the text 'inf' it treats it as infinitely high and returns A, and whenever it is given the text 'nan' it returns NULL.",
+  "Whenever late_fee is given an overdue amount in cents and days late of 5 or fewer, it returns 0 because the first 5 days are a grace period. Past 5 days late, the fee is 1% of the amount per late week (rounded up), with a minimum of 500 cents and a cap of 25% of the amount.",
+  "The 2%, 5% and 9% late_fee bands (8 to 14 days, 15 to 30 days, and 31 or more days late) are dropped. Rule 20, the 1%-per-week answer, covers what late_fee charges for days late.",
+  "Whenever late_fee computes a fee, it rounds to a whole cent with halves rounding up (a fee of 20.5 cents becomes 21; a 2% fee on 24 cents is 0.48 and gives 0, on 25 cents is 0.5 and gives 1).",
+  "Whenever late_fee is given an amount of zero or less, or days late that are negative or zero, it returns 0 (a fee is never negative).",
+  "Whenever days late given to late_fee is a fraction, the bands apply to the exact value (14.5 days falls in the 5% band because it is above 14), and a fractional amount is used as given before rounding.",
+  "Whenever either amount or days late given to late_fee is NULL, empty text, or text that is not wholly a number, it returns NULL, even if the other value would have given 0; numeric text such as '10000' and '20' is read as a number.",
+  "Whenever loyalty_pts is given a purchase amount in cents and a tier, it awards whole points based on 1 point per 100 cents for basic, 1.5 for silver, 2 for gold and 3 for platinum, rounding down any fraction of a point (10000 cents gives 100, 150, 200 and 300 points respectively; 99 cents basic gives 0, 199 cents gold gives 3).",
+  "Whenever the tier given to loyalty_pts is not one of basic, silver, gold or platinum (such as 'bronze', an empty text, or a number), it is treated as basic and earns 1 point per 100 cents.",
+  "Whenever the tier given to loyalty_pts is written in any letter case or with spaces around it (' GOLD ', 'Gold'), it is recognised as that tier; spaces inside a name (such as 'bro nze') stop it matching and it counts as basic.",
+  "Whenever the amount given to loyalty_pts is zero or negative, it returns 0 points.",
+  "Whenever the amount given to loyalty_pts is text that is not a number (such as 'abc' or empty text), it is treated as zero and returns 0 points; numeric text such as '5000' is read as a number.",
+  "Whenever the amount given to loyalty_pts has a fraction (such as 5050.7 cents), the fraction counts in the calculation before rounding points down.",
+  "Whenever either the amount or the tier given to loyalty_pts is NULL, it returns NULL, even when the amount is zero.",
+  "Whenever mask_card is given text containing more than 4 digits, it replaces every digit except the last 4 digits with an asterisk, so 4111111111111111 becomes ************1111.",
+  "Whenever mask_card is given a card number with spaces or dashes between groups, it keeps those separators and any other non-digit characters in place and masks only the digits (4111 1111 1111 1111 becomes **** **** **** 1111; 4111-1111-1111-1111 becomes ****-****-****-1111).",
+  "Whenever the text given to mask_card contains no digits at all (including empty text and text such as 'abcd'), it returns INVALID. Whenever the text contains 1 to 4 digits in total, every digit becomes '*' (for example 1234 returns ****, 123 returns ***, 12-34 returns **-**). Exactly 5 digits leaves only the first masked.",
+  "Whenever mask_card is given text with other words and digits mixed (such as 'card 1234567890 ok'), it masks all digits in the whole text except the last 4 digits found anywhere in it, leaving letters untouched ('card ******7890 ok'; 'x1y2z3w4v5' becomes 'x*y2z3w4v5').",
+  "Whenever mask_card is given a number rather than text (such as 4111111111111111), it treats it as text of its digits and masks it the same way; a decimal such as 12345.5 counts all its digits and keeps the point ('**345.5').",
+  "Whenever mask_card is given NULL it returns NULL.",
+  "Whenever mask_card is given spaces around the number, it keeps them unchanged and does not count them as digits; it counts digits from other scripts and superscript digits as digits too and masks them in the same way.",
+  "Whenever shift_pay is given hours worked up to 40 and an hourly rate in cents, it returns hours times the rate (40 hours at 1000 cents gives 40000; 39.5 hours gives 39500).",
+  "Whenever shift_pay is given more than 40 hours, the first 40 hours are paid at the normal rate and each hour beyond 40 is paid at 1.5 times the rate (45 hours at 1000 cents gives 47500; 100 hours gives 130000), with no cap on hours.",
+  "Whenever shift_pay computes pay that has a fraction of a cent, it rounds to a whole cent with halves rounding up (10.5 hours at 1001 cents is 10510.5 and gives 10511; 0.5 hours at 1 cent gives 1).",
+  "Whenever the hours or the rate given to shift_pay is zero or negative, it returns 0 rather than a negative pay.",
+  "Whenever either hours or rate given to shift_pay is NULL, empty text, or text that is not wholly a number, it returns NULL; numeric text such as '45' and '1000' is read as a number.",
+  "Whenever ship_cost is given a parcel weight in grams and a zone, the first started kilogram costs a base charge of 300 cents for zone A, 500 for zone B and 800 for zone C. Then add 100 cents for zone A, 150 for zone B or 200 for zone C per 500 g block of weight beyond the first kilogram, with the number of blocks rounded up.",
+  "Whenever a parcel given to ship_cost weighs more than 1000 grams, each further started kilogram (any part of a kilogram rounds up) adds 300 cents to the base charge (1000 g in zone A is 400; 1001 g is 700; 2001 g in zone C is 1800; 10500 g in zone C is 4200).",
+  "Whenever a parcel given to ship_cost weighs 0 grams or less than a kilogram, it is charged the zone's base charge as one started kilogram (0 g and 0.1 g in zone A both give 400).",
+  "Whenever the weight given to ship_cost is negative, it returns NULL (no charge is quoted).",
+  "Whenever the zone given to ship_cost is written in lower case or with spaces around it (' b ', 'c'), it is recognised as that zone.",
+  "Whenever the zone given to ship_cost is anything other than A, B or C (such as 'D', 'AA', empty text or a number), it returns NULL.",
+  "Whenever the weight or zone given to ship_cost is NULL, it returns NULL.",
+  "Whenever the weight given to ship_cost is text, a leading number is used ('2500' or '2500kg' is 2500 g), and text with no leading number (such as 'abc' or empty text) is treated as 0 grams and gets the base charge for the zone.",
+  "Whenever slugify is given a title, it returns it in lower case with every run of characters other than the English letters a-z and digits 0-9 (spaces, punctuation, underscores, slashes, tabs, dots) replaced by a single hyphen ('Hello, World!' becomes 'hello-world'; 'a_b-c/d.e' becomes 'a-b-c-d-e').",
+  "Whenever slugify produces hyphens at the start or end, it removes them, so leading and trailing spaces or punctuation leave no hyphen ('  Hello   World  ' becomes 'hello-world', '---x---' becomes 'x'), and repeated separators collapse to one hyphen.",
+  "Whenever slugify is given accented letters (Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e, \u00d1and\u00fa, \u00dcber), it drops the accent and keeps the base letter ('cafe-creme-brulee', 'nandu', 'uber').",
+  "Whenever slugify is given letters with no plain-letter equivalent after removing accents (such as \u00df, \u00e6, \u0153, \u00f8, or Japanese characters), it treats them as separators and drops them, so 'Stra\u00dfe' becomes 'stra-e' and '\u0152uvre \u00e6 \u00f8' becomes 'uvre'.",
+  "Whenever slugify is given full-width letters and digits, ligatures or circled digits, it converts them to their plain forms ('\uff21\uff22\uff23 \uff11\uff12\uff13' becomes 'abc-123', '\ufb01ne' becomes 'fine', '\u2460\u2461' becomes '12'); symbols such as \u2122 and \u00a9 are dropped ('x\u2122 y\u00a9' becomes 'xtm-y').",
+  "Whenever slugify is given NULL it returns NULL; whenever it is given empty text, or text with no letters or digits at all (such as '!!!'), it returns empty text.",
+  "Whenever slugify is given a number, it uses the number's text, so 12345 becomes '12345' and 1.5 becomes '1-5'.",
+  "Whenever robust_mean is given a column with 3 or more non-NULL values, it sets aside exactly one lowest and one highest value and returns the average of the rest (1, 2, 3, 4, 100 gives 3; 1, 2, 100 gives 2).",
+  "Whenever the lowest or highest value in robust_mean is repeated, only one copy of each is set aside (1, 1, 1, 10 gives 1).",
+  "Whenever robust_mean is given only 1 or 2 non-NULL values, nothing is set aside and it returns their plain average (5 gives 5; 1 and 3 give 2).",
+  "Whenever robust_mean meets NULL values, it ignores them completely and does not count them toward the 3 values needed for trimming (1, 2, NULL, 3, NULL gives 2).",
+  "Whenever robust_mean has no rows or only NULL values, it returns NULL.",
+  "Whenever robust_mean is given a text value in a numeric column, it counts text that starts with a number as that leading number ('5x' as 5, '10' as 10) and text with no leading number (such as 'abc' or empty text) as 0, and that value still takes part in the trimming and the average.",
+  "Whenever robust_mean is used with a filter or grouping, it is calculated separately on the rows of each group (1,3,20 gives 3 and 2,10,30 gives 10), and the result is always a decimal number (such as 5.0)."
+ ],
+ "HV": [
+  "Whenever age_years is given a birth date and an as-of date, it returns the number of whole years completed, counting a birthday as reached on the same month and day of the as-of year (e.g. born 1990-05-15, as of 2024-05-15 gives 34; one day earlier gives 33).",
+  "Whenever age_years is asked about someone born on 29 February, the birthday is treated as reached on 1 March in non-leap years (born 2000-02-29 is 0 on 2001-02-28 and 1 on 2001-03-01) and on 29 February in leap years.",
+  "Whenever age_years gets an as-of date equal to the birth date, it returns 0; whenever the as-of date is earlier than the birth date, it returns -1 (not NULL and not blank), however far earlier the as-of date is.",
+  "Whenever either date given to age_years is NULL, empty, not a real calendar date (such as month 13), or not in the strict YYYY-MM-DD form (no slashes, no compact 20000101, no missing zero padding like 2000-1-1), age_years returns NULL.",
+  "Whenever a date given to age_years has surrounding spaces, or has extra text after the first 10 characters (such as a time '2000-01-01 12:00:00' or even junk like '2000-01-01abc'), age_years ignores the spaces and the extra text and uses only the date part.",
+  "Whenever a date given to age_years is a plain number such as 20000101, age_years returns NULL because it is not in YYYY-MM-DD form.",
+  "Whenever biz_days is given a start and end date in order, it counts the Monday-to-Friday days from the start date up to but not including the end date (2024-01-01 to 2024-01-08 gives 5; 2024-01-01 to 2024-01-05 gives 4).",
+  "Whenever the start date of biz_days is itself a weekday, that day is counted; whenever the end date is a weekday it is not counted (2024-01-05 Friday to 2024-01-06 gives 1; 2024-01-06 Saturday to 2024-01-08 gives 0).",
+  "Whenever biz_days is given the same start and end date, it returns 0, whatever day of the week it is.",
+  "Whenever the end date given to biz_days is earlier than the start date, it returns 0 (it never returns a negative number and does not give an error), whatever days of the week the dates fall on (2024-01-08 to 2024-01-01 gives 0; 2024-03-08 to 2024-03-04 gives 0).",
+  "Whenever biz_days counts working days, it treats Saturday and Sunday as non-working. It also treats December 25 and January 1 of every year as non-working holidays. No other public holidays are excluded, and December 26 is a normal working day when it falls on a weekday (2024-12-24 to 2024-12-26 gives 2; 2024-12-23 to 2024-12-28 gives 4).",
+  "Whenever either date given to biz_days is NULL, empty, not a real date, or not in strict YYYY-MM-DD form, biz_days returns NULL.",
+  "Whenever a date given to biz_days has surrounding spaces or extra text after its first 10 characters (such as a time of day), biz_days ignores that and uses only the date part.",
+  "Whenever grade_letter is given a score, it grades the score after rounding it to a whole number (see rule 15). A rounded score of 90 or more, up to and including 100, returns A (except that exactly 100 returns A+, see rule 15); 80 up to under 90 gives B; 70 up to under 80 gives C; 60 up to under 70 gives D; 0 up to under 60 gives F. A rounded score above 100 is never graded: it is INVALID (see rule 15), however high it is. A rounded score below 0 is never graded either: it is INVALID (see rule 15), however low it is, and it does not get an F. Each boundary score belongs to the higher grade, and the cut-offs apply to the rounded score, not the original one. So 90 is A, 89.99 rounds to 90 and is A, 89.4 rounds to 89 and is B, 60 is D, 59.6 rounds to 60 and is D, 59.4 rounds to 59 and is F, 0 is F, -0.4 rounds to 0 and is F, -5 is INVALID, not F, and 150 is INVALID, not A.",
+  "grade_letter first rounds the score to a whole number. After rounding, a score above 100 or below 0 is INVALID, a score of exactly 100 returns A+, and a score of zero returns F.",
+  "Whenever grade_letter is given a score as text that is entirely a number (such as '85', ' 85 ' with spaces, or '9e1'), it reads it as that number and grades it normally.",
+  "Whenever grade_letter is given NULL, empty text, or text that is not wholly a number (such as 'abc' or '85abc'), it returns NULL rather than F.",
+  "Whenever grade_letter is given the text 'inf' it treats it as infinitely high, which is above 100, so it returns INVALID (not A); whenever it is given the text '-inf' it treats it as infinitely low, which is below 0, so it returns INVALID (not F); and whenever it is given the text 'nan' it returns NULL.",
+  "Whenever late_fee is given an overdue amount in cents and days late of 5 or fewer, it returns 0 because the first 5 days are a grace period. Past 5 days late, the fee is 1% of the amount per late week (rounded up). The minimum of 500 cents always applies to any fee charged past the grace period: if the 1%-per-week figure is less than 500 cents, the fee is raised to 500 cents (for example, 10000 cents that is 8 days late gives 2 weeks, which is 200 cents, so the fee is 500 cents). The fee is also capped at 25% of the amount.",
+  "The 2%, 5% and 9% late_fee bands (8 to 14 days, 15 to 30 days, and 31 or more days late) are dropped and never apply, however many days late. For any days late past the 5-day grace period, late_fee charges only the 1%-per-late-week fee from rule 19, with the same rounding, 500-cent minimum and 25% cap. For example, 100 rupees (10000 cents) is 5 rupees (500 cents) at 30 days late and still 5 rupees at 31 days late, because both are 5 late weeks, not 9%.",
+  "Whenever late_fee computes the percentage part of a fee, it rounds to a whole cent with halves rounding up (a fee of 20.5 cents becomes 21; 0.5 cents becomes 1; 0.48 cents becomes 0). This rounding is done on the percentage figure before the 500-cent minimum and the 25% cap are applied, so a rounded figure below 500 cents, including 0, is still raised to the minimum whenever the days late are past the grace period.",
+  "Whenever late_fee is given an amount of exactly zero, or days late that are negative or zero, it returns 0. Whenever the amount is negative (a credit) and days late are past the 5-day grace period (more than 5, fractions included), the fee is the negative cap: 25% of the amount, so it is also negative (for example, -10000 cents that is 31 days late gives -2500 cents, which is -25 rupees). For a negative amount the 1%-per-late-week fee, the 500-cent minimum and the percentage bands do not apply, and this fee is rounded to a whole cent with halves rounding up, as in rule 21. A negative amount with 5 or fewer days late is still within the grace period and returns 0, as in rule 19. Positive amounts are not affected by this rule.",
+  "Whenever days late given to late_fee is a fraction, the exact value is used, and any part of a week counts as a whole late week (14.5 days is past the 5-day grace period and counts as 3 late weeks, because 14.5 divided by 7 is a little over 2 and is rounded up). The fee is the usual 1% of the amount per late week, with no percentage bands. A fractional amount is used as given before rounding.",
+  "Whenever either amount or days late given to late_fee is NULL, empty text, or text that is not wholly a number, it returns NULL, even if the other value would have given 0; numeric text such as '10000' and '20' is read as a number.",
+  "Whenever loyalty_pts is given a purchase amount in cents and a tier, it awards whole points based on 1 point per 100 cents for basic, 1.5 for silver, 2 for gold and 3 for platinum, rounding down any fraction of a point (10000 cents gives 100, 150, 200 and 300 points respectively; 99 cents basic gives 0, 199 cents gold gives 3).",
+  "Whenever the tier given to loyalty_pts is missing (NULL) or is not one of basic, silver, gold or platinum (such as 'bronze', an empty text, or a number), it is treated as basic and earns 1 point per 100 cents (for example, a missing tier on 10000 cents gives 100 points).",
+  "Whenever the tier given to loyalty_pts is written in any letter case or with spaces around it (' GOLD ', 'Gold'), it is recognised as that tier; spaces inside a name (such as 'bro nze') stop it matching and it counts as basic.",
+  "Whenever the amount given to loyalty_pts is zero, it returns 0 points. Whenever the amount is negative (a return or refund), it returns negative points: the points taken back are the same as the points the matching positive amount would earn for that tier, using the same rates, the same tier rules and the same rounding down of any fraction of a point, then shown as a negative number (for example, -5000 cents for gold gives -100, and -99 cents for basic gives 0).",
+  "Whenever the amount given to loyalty_pts is text that is not a number (such as 'abc' or empty text), it is treated as zero and returns 0 points; numeric text such as '5000' is read as a number.",
+  "Whenever the amount given to loyalty_pts has a fraction (such as 5050.7 cents), the fraction counts in the calculation before rounding points down.",
+  "Whenever the amount given to loyalty_pts is NULL, it returns NULL, even when the tier is given. A NULL tier does not make the result NULL: a missing tier is treated as basic (see rule 26), so a NULL tier with a given amount returns the basic-rate points, including 0 for a zero amount and negative points for a negative amount.",
+  "Whenever mask_card is given text containing more than 4 digits, it replaces every digit except the last 4 digits with an asterisk, so 4111111111111111 becomes ************1111.",
+  "Whenever mask_card is given a card number with spaces or dashes between groups, it keeps those separators and any other non-digit characters in place and masks only the digits (4111 1111 1111 1111 becomes **** **** **** 1111; 4111-1111-1111-1111 becomes ****-****-****-1111).",
+  "Whenever the text given to mask_card contains no digits at all, it returns INVALID. This includes empty text (a blank card field, which must show INVALID and never come back as empty text), text made only of spaces, and text such as 'abcd'. Whenever the text contains 1 to 4 digits in total, every digit becomes '*' (for example 1234 returns ****, 123 returns ***, 12-34 returns **-**). Exactly 5 digits leaves only the first masked.",
+  "Whenever mask_card is given text with other words and digits mixed (such as 'card 1234567890 ok'), it masks all digits in the whole text except the last 4 digits found anywhere in it, leaving letters untouched ('card ******7890 ok'; 'x1y2z3w4v5' becomes 'x*y2z3w4v5'). This keep-the-last-4 step applies only when the whole text has more than 4 digits in total. If the text has 1 to 4 digits in total, every digit is masked and none is shown, as in rule 34 ('card 1234 ok' becomes 'card **** ok').",
+  "Whenever mask_card is given a number rather than text (such as 4111111111111111), it treats it as text of its digits and masks it the same way; a decimal such as 12345.5 counts all its digits and keeps the point ('**345.5').",
+  "Whenever mask_card is given NULL it returns NULL.",
+  "Whenever mask_card is given spaces around the number, it keeps them unchanged and does not count them as digits; it counts digits from other scripts and superscript digits as digits too and masks them in the same way.",
+  "Whenever shift_pay is given hours worked up to 40 and an hourly rate in cents, it returns hours times the rate (40 hours at 1000 cents gives 40000; 39.5 hours gives 39500).",
+  "Whenever shift_pay is given more than 40 hours, the first 40 hours are paid at the normal rate and each hour beyond 40 is paid at 1.5 times the rate (45 hours at 1000 cents gives 47500; 100 hours gives 130000), with no cap on hours.",
+  "Whenever shift_pay computes pay that has a fraction of a cent, it rounds to a whole cent with halves rounding up (10.5 hours at 1001 cents is 10510.5 and gives 10511; 0.5 hours at 1 cent gives 1).",
+  "Whenever the hours given to shift_pay is zero, or the rate given to it is zero or negative, it returns 0 rather than a negative pay. Whenever the hours are negative and the rate is positive, it returns a negative pay equal to hours times the rate, with no overtime rate (-5 hours at 2000 cents gives -10000 cents, which is -100 rupees).",
+  "Whenever either hours or rate given to shift_pay is NULL, empty text, or text that is not wholly a number, it returns NULL; numeric text such as '45' and '1000' is read as a number.",
+  "Whenever ship_cost is given a parcel weight in grams and a zone, a parcel weighing more than 0 grams has its first started kilogram charged a base charge of 300 cents for zone A, 500 for zone B and 800 for zone C. Then add 100 cents for zone A, 150 for zone B or 200 for zone C per 500 g block of weight beyond the first kilogram, with the number of blocks rounded up. A parcel weighing 0 grams costs 0 cents (see rule 46).",
+  "Whenever a parcel given to ship_cost weighs more than 1000 grams, it is charged what a 1000 g parcel in that zone costs (the zone's base charge plus one 500 g block charge, as in rule 72), plus one 500 g block charge for that zone (100 cents for zone A, 150 for zone B, 200 for zone C) for each started 500 g block of weight beyond 1000 g, where any part of a block rounds up to a full block, so a further started kilogram is no longer charged as a full 300 cents (1001 g in zone A is 600 cents, which is 6 rupees: 500 for the first 1000 g plus 100 for the one started block beyond it).",
+  "Whenever a parcel given to ship_cost weighs 0 grams, it costs 0 cents (0 rupees) in every valid zone, with no base charge. Whenever it weighs more than 0 grams but less than a kilogram, it is charged the zone's base charge as one started kilogram (0.1 g in zone A gives 400).",
+  "Whenever the weight given to ship_cost is negative, it returns NULL (no charge is quoted).",
+  "Whenever the zone given to ship_cost is written in lower case or with spaces around it (' b ', 'c'), it is recognised as that zone.",
+  "Whenever the zone given to ship_cost is anything other than A, B or C (such as 'D', 'AA', empty text or a number), the zone is treated as unknown and the parcel is charged at zone C rates (a base charge of 800 cents for the first started kilogram, and 200 cents per started 500 g block beyond the first kilogram), with weight handled exactly as in the other rules (0 grams costs 0 cents, and a negative weight still returns NULL). A NULL zone is not an unknown zone: it still returns NULL (see rule 50).",
+  "Whenever the weight or zone given to ship_cost is NULL, it returns NULL.",
+  "Whenever the weight given to ship_cost is text, a leading number is used ('2500' or '2500kg' is 2500 g), and text with no leading number (such as 'abc' or empty text) is treated as 0 grams and therefore costs 0 cents, the same as a 0 g parcel, provided the zone is not NULL (an unknown zone is treated as zone C, see rule 49).",
+  "Whenever slugify is given a title, it returns it in lower case with every run of characters other than the English letters a-z and digits 0-9 (spaces, punctuation, underscores, slashes, tabs, dots) replaced by a single hyphen ('Hello, World!' becomes 'hello-world'; 'a_b-c/d.e' becomes 'a-b-c-d-e').",
+  "Whenever slugify produces hyphens at the start or end, it removes them, so leading and trailing spaces or punctuation leave no hyphen ('  Hello   World  ' becomes 'hello-world', '---x---' becomes 'x'), and repeated separators collapse to one hyphen.",
+  "Whenever slugify is given accented letters (Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e, \u00d1and\u00fa, \u00dcber), it drops the accent and keeps the base letter ('cafe-creme-brulee', 'nandu', 'uber').",
+  "Whenever slugify is given letters that have a standard plain-letter spelling but are not just an accented base letter, it writes them out in plain letters: \u00e6 becomes 'ae', \u0153 becomes 'oe', and \u00f8 becomes 'o', so '\u0152uvre \u00e6 \u00f8' becomes 'oeuvre-ae-o'. The letter \u00df (and capital \u1e9e) is not written out as 'ss'. It is treated like any other letter with no plain-letter equivalent, so it acts as a separator and is dropped, and 'Gr\u00f6\u00dfe Stra\u00dfe' becomes 'gro-e-stra-e' (\u00f6 still loses its accent and becomes o under the accent rule). Whenever slugify is given letters with no plain-letter equivalent at all (such as Japanese characters), it treats them as separators and drops them.",
+  "Whenever slugify is given full-width letters and digits, ligatures or circled digits, it converts them to their plain forms ('\uff21\uff22\uff23 \uff11\uff12\uff13' becomes 'abc-123', '\ufb01ne' becomes 'fine', '\u2460\u2461' becomes '12'); symbols such as \u2122 and \u00a9 are dropped ('x\u2122 y\u00a9' becomes 'xtm-y').",
+  "Whenever slugify is given NULL it returns NULL; whenever it is given empty text, or text with no letters or digits at all (such as '!!!'), it returns empty text.",
+  "Whenever slugify is given a number, it uses the number's text, so 12345 becomes '12345' and 1.5 becomes '1-5'.",
+  "Whenever robust_mean is given a column with 3 or more non-NULL values, it sets aside exactly one lowest and one highest value and returns the average of the rest (1, 2, 3, 4, 100 gives 3; 1, 2, 100 gives 2).",
+  "Whenever the lowest or highest value in robust_mean is repeated, only one copy of each is set aside (1, 1, 1, 10 gives 1).",
+  "Whenever robust_mean is given only 1 or 2 non-NULL values, nothing is set aside and it returns NULL (blank), not an average (5 gives NULL; 1 and 3 give NULL; 10 and 1000 give NULL).",
+  "Whenever robust_mean meets NULL values, it ignores them completely and does not count them toward the 3 values needed for trimming (1, 2, NULL, 3, NULL gives 2; 1, 2, NULL gives NULL because only 2 values count).",
+  "Whenever robust_mean has no rows, only NULL values, or fewer than 3 non-NULL values, it returns NULL.",
+  "Whenever robust_mean is given a text value in a numeric column, it counts text that starts with a number as that leading number ('5x' as 5, '10' as 10) and text with no leading number (such as 'abc' or empty text) as 0, and that value still takes part in the trimming and the average.",
+  "Whenever robust_mean is used with a filter or grouping, it is calculated separately on the rows of each group (1,3,20 gives 3 and 2,10,30 gives 10), a group with fewer than 3 non-NULL values gives NULL, and when the result is a number it is always a decimal number (such as 5.0).",
+  "Leela works 41 hours at 20 rupees an hour: the 41st hour is paid at one and a half times, so her pay comes to 830 rupees. The owner says: Right now? 3: Enter\n9: Enter\n10: Enter\n11: Enter\n12: Enter",
+  "Whenever an amount in hours is converted to rupees, it is charged at 35 rupees per hour, so 200 hours comes to 7,000 rupees.",
+  "A title made only of spaces becomes an empty web address. The owner says: 19: Enter\n20: Enter",
+  "A shop whose sales amounts are all missing: the average is blank. The owner says: 22: Enter\n23: Enter\n24: Enter",
+  "An order placed Monday 4 March 2024 is delivered Saturday 9 March: it comes to 5 working days. The owner says: 25: Enter\n26: Enter",
+  "Ravi's 100-rupee invoice is paid 7 days late: it is within the grace period, so the late fee is 0 rupees. The owner says: No, 7 days late is past the grace period, so the fee should be 5 rupees.",
+  "Whenever a parcel given to ship_cost weighs exactly 1000 grams (1 kg), it is charged the zone's base charge plus one 500 g block charge for that zone (100 cents for zone A, 150 for zone B, 200 for zone C), so 1000 g in zone A costs 500 cents (5 rupees)."
+ ],
+ "QA": [
+  {
+   "t": 1793475646,
+   "worker": "QN-w2",
+   "question": "Shift pay: overtime starts after how many hours in a week, and at what multiple of the hourly rate (we assumed after 40 hours at 1.5x)?",
+   "answer": "Yes, 1.5x after 40 hours, but it's per shift, not per week. Over 60 hours it goes to 2x."
+  },
+  {
+   "t": 1793475646,
+   "worker": "QN-w2",
+   "question": "Shift pay: when the overtime or fractional-hour pay has a fraction of a cent, do we round to the nearest cent (half up) or round down?",
+   "answer": "Round to the nearest cent, with exact halves going up. Don't round down."
+  },
+  {
+   "t": 1793475646,
+   "worker": "QN-w2",
+   "question": "Shift pay: if hours or rate is negative, should pay be 0 (our guess), blank, or an error?",
+   "answer": "Neither, don't clamp it. Negative hours or a negative rate should give negative pay (negative hours at the normal rate), not 0, blank, or an error."
+  },
+  {
+   "t": 1793475646,
+   "worker": "QN-w2",
+   "question": "Shipping: what is the charge for each zone (A, B, C and any others) and each weight band? We assumed first 500 g costs A 400 / B 600 / C 800 cents, plus 100 / 200 / 250 cents per further started 500 g.",
+   "answer": "No, your assumption is off. There's no separate first-500g price, just a base plus a per-block charge, where each started 500 g is a block, including the first.\n\n- **A:** 300 base + 100 per block\n- **B:** 500 base + 150 per block\n- **C:** 800 base + 200 per block\n\nZone matching ignores case and spaces. Any other zone is charged at C rates.\n\nOver 20000 g, add 1500 for oversize. Exactly 20000 g gets no surcharge. Weight of 0 or less costs 0."
+  },
+  {
+   "t": 1793475646,
+   "worker": "QN-w2",
+   "question": "Shipping: what should happen for an unknown or blank zone (we return blank), and for zero or negative weight (we charge 0)?",
+   "answer": "Unknown or blank zone should charge zone C rates, not return blank. Only a NULL zone returns blank. Zero or negative weight returning 0 is correct."
+  },
+  {
+   "t": 1793475646,
+   "worker": "QN-w2",
+   "question": "Shipping: is there a maximum weight we ship, or a cap on the charge?",
+   "answer": "No max weight, we ship anything. Only extra is a flat 1500 cents surcharge once it's over 20,000 g, and there's no cap on the charge."
+  },
+  {
+   "t": 1793475647,
+   "worker": "QN-w2",
+   "question": "Card masking: how many trailing digits should stay visible (we assumed last 4)?",
+   "answer": "Last 4 by default. Exception: a 15-digit card starting with 3 (Amex) shows the last 5. Anything with fewer than 5 digits gets fully starred."
+  },
+  {
+   "t": 1793475647,
+   "worker": "QN-w2",
+   "question": "Card masking: if the text has 4 or fewer digits, should we mask all of them (our guess) or show it unchanged?",
+   "answer": "Mask them all: with fewer than 5 digits, every digit becomes '*'."
+  },
+  {
+   "t": 1793475647,
+   "worker": "QN-w2",
+   "question": "Card masking: should spaces and dashes be kept in place (we keep them), and what about letters or other characters in the text?",
+   "answer": "Yes, keep spaces and dashes in place. Letters and any other non-digit characters get kept unchanged too. Only the digits 0-9 get masked."
+  },
+  {
+   "t": 1793475648,
+   "worker": "QN-w1",
+   "question": "For the outlier-resistant average (robust_mean), do we always drop exactly the single highest and single lowest value, or drop a percentage (e.g. 20%) from each end? My guess: drop one from each end.",
+   "answer": "Yes, drop exactly one lowest and one highest, not a percentage. If the min or max repeats, only remove one copy of each."
+  },
+  {
+   "t": 1793475648,
+   "worker": "QN-w1",
+   "question": "For robust_mean, what should it return when there are fewer than 3 values (1 or 2)? My guess: the plain average of what is there; NULL only if there are no values.",
+   "answer": "No, return NULL whenever there are fewer than 3 numeric values, so 1 or 2 values gives NULL, not a plain average."
+  },
+  {
+   "t": 1793475648,
+   "worker": "QN-w1",
+   "question": "For robust_mean, should blank or non-numeric text values be ignored like empty values, or counted as zero? My guess: NULLs ignored, numeric-looking text treated as numbers.",
+   "answer": "Text values get ignored, same as NULLs, and only actual numbers count. Don't convert text to numbers, even numeric-looking text, and never treat anything as zero."
+  },
+  {
+   "t": 1793475648,
+   "worker": "QN-w1",
+   "question": "For slugify, should accented letters be converted to plain letters (caf\u00e9 -> cafe) or dropped/kept? My guess: converted to plain letters.",
+   "answer": "Yes, convert them to plain letters (caf\u00e9 -> cafe) by removing the accent marks. Your guess is right."
+  },
+  {
+   "t": 1793475648,
+   "worker": "QN-w1",
+   "question": "For slugify, should there be a maximum slug length? My guess: no limit.",
+   "answer": "Yes, cap it at 30 characters. If the cut leaves a hyphen at the end, remove it."
+  },
+  {
+   "t": 1793475648,
+   "worker": "QN-w1",
+   "question": "For slugify, what should a title with no letters or digits (e.g. '!!!' or blank) return: empty text or NULL? My guess: empty text; a missing (NULL) title gives NULL.",
+   "answer": "Yes, your guess is right. No letters or digits gives empty text, and a NULL title gives NULL."
+  },
+  {
+   "t": 1793475648,
+   "worker": "QN-w1",
+   "question": "For slugify, should an ampersand be spelled out as 'and' (Tom & Jerry -> tom-and-jerry) or just treated as a separator? My guess: separator.",
+   "answer": "Separator. Every non-a-z/0-9 character is just a separator, so \"Tom & Jerry\" becomes tom-jerry."
+  },
+  {
+   "t": 1793475656,
+   "worker": "QN-w3",
+   "question": "Age in years: if someone was born on 29 February, do they turn a year older on 28 February or 1 March in non-leap years? We assumed 1 March.",
+   "answer": "1 March is right. In non-leap years they turn a year older on 1 March, and in leap years on 29 February."
+  },
+  {
+   "t": 1793475657,
+   "worker": "QN-w3",
+   "question": "Age in years: if the birth date is after the as-of date, or either date is blank or not a valid date, do we return blank (our guess), 0, or a negative age?",
+   "answer": "Blank for a missing or invalid date. If the birth date is after the as-of date, return a negative age (no clamping to 0)."
+  },
+  {
+   "t": 1793475657,
+   "worker": "QN-w3",
+   "question": "Working days: is the end date counted? We assumed the start date counts and the end date does not (Mon 4 Mar to Mon 11 Mar = 5), and that Saturday/Sunday are the only days off.",
+   "answer": "Right on the counting: start day counts if it's a working day, end day never does. But Saturday and Sunday aren't the only days off. Dec 25 and Jan 1 are also non-working every year."
+  },
+  {
+   "t": 1793475657,
+   "worker": "QN-w3",
+   "question": "Working days: should public holidays be excluded, and if so which calendar? We assumed none.",
+   "answer": "Only Dec 25 and Jan 1, every year, are non-working days. No other holidays and no regional calendar. Weekends are off too."
+  },
+  {
+   "t": 1793475657,
+   "worker": "QN-w3",
+   "question": "Working days: if the end date is before the start date, return a negative count (our guess), 0, or blank?",
+   "answer": "Return 0."
+  },
+  {
+   "t": 1793475657,
+   "worker": "QN-w3",
+   "question": "Course grades: are the cut-offs A 90, B 80, C 70, D 60 and F below 60? We assumed so, with no rounding (89.9 is a B).",
+   "answer": "Cut-offs are right, but round the score to the nearest whole number first (halves up), so 89.5 becomes 90 and is an A. 89.9 is an A, not a B. Anything under 0 or over 100 after rounding is INVALID."
+  },
+  {
+   "t": 1793475657,
+   "worker": "QN-w3",
+   "question": "Course grades: what letter for a score above 100 (we give A), a negative score (F), and a blank or non-numeric score (blank)?",
+   "answer": "Above 100 and below 0 should both be INVALID, not A or F. Blank or non-numeric should return NULL, as you said.\n\nOne exception: scores from -0.5 up to 0 round to 0 and get an F, and 100.01 to 100.49 round to 100 and get an A+."
+  },
+  {
+   "t": 1793475657,
+   "worker": "QN-w3",
+   "question": "Late fee: what are the fee percentages by days late? We assumed no fee up to 7 days, 2% from 8 days, 5% from 30 days, 9% from 60 days.",
+   "answer": "Not quite. No fee up to 5 days late. After that it's 1% of the amount per late week (part-week counts as a full week), minimum 500 cents, capped at 25% of the amount."
+  },
+  {
+   "t": 1793475657,
+   "worker": "QN-w3",
+   "question": "Late fee: is there a minimum or maximum fee, and do we round fractions of a cent to nearest (our guess) or down? What about zero/negative amounts or days (we charge 0)?",
+   "answer": "Round down, not to nearest. Minimum is 500 cents and the max is 25% of the amount, and the cap wins, so small invoices pay at most a quarter. 5 days late or fewer is 0, and zero amount past the grace period is 0, but a negative amount past the grace period gives the negative cap (amount/4, rounded down)."
+  },
+  {
+   "t": 1793475657,
+   "worker": "QN-w3",
+   "question": "Loyalty points: what is the earning rate for each tier? We assumed 1 point per dollar basic, 1.5 silver, 2 gold, 3 platinum, rounded down.",
+   "answer": "Close, but there's no platinum tier. Basic is 1.0, silver is 1.5 and gold is 2.0, so points are the amount in cents times the multiplier, divided by 100 and rounded down. Anything unknown or missing counts as basic, and points are capped at 5000 per purchase."
+  },
+  {
+   "t": 1793475657,
+   "worker": "QN-w3",
+   "question": "Loyalty points: what should an unknown or blank tier earn (we assume basic rate), and a zero or negative purchase (we give 0)?",
+   "answer": "Unknown or blank tier: yes, basic rate. Zero purchase gives 0, but a negative purchase shouldn't be 0. Return the negative points (amount \u00d7 multiplier \u00f7 100, rounded down), with no floor at zero."
+  }
+ ],
+ "spots": [
+  {
+   "function": "age_years",
+   "call": "SELECT age_years('2000-02-29','2023-02-28')",
+   "got": 22,
+   "say": "Meera was born on 29 February 2000 and is checked on 28 February 2023, one day before 1 March: she is counted as not yet having had her birthday, so her age comes to 22."
+  },
+  {
+   "function": "age_years",
+   "call": "SELECT age_years('2000-02-29','2023-03-01')",
+   "got": 23,
+   "say": "Meera, born on 29 February 2000, is checked on 1 March 2023: her age comes to 23."
+  },
+  {
+   "function": "age_years",
+   "call": "SELECT age_years('2020-05-01','2019-05-01')",
+   "got": null,
+   "say": "Arjun's birth date is entered as 1 May 2020 but the check date is 1 May 2019, a year before he was born: no age is given, the answer is blank."
+  },
+  {
+   "function": "age_years",
+   "call": "SELECT age_years('1990-05-01','2024-13-45')",
+   "got": null,
+   "say": "Check date 2024-13-45 is typed for Kavita, who was born 1 May 1990: no age is given, the answer is blank."
+  },
+  {
+   "function": "age_years",
+   "call": "SELECT age_years('1990-05-01','')",
+   "got": null,
+   "say": "Kavita's check date is left empty: no age is given, the answer is blank."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2024-03-04','2024-03-08')",
+   "got": 4,
+   "say": "A job runs from Monday 4 March to Friday 8 March 2024: the end day is not counted, so it comes to 4 working days."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2024-03-04','2024-03-09')",
+   "got": 5,
+   "say": "An order placed Monday 4 March 2024 is delivered Saturday 9 March: it comes to 5 working days."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2024-12-23','2024-12-27')",
+   "got": 4,
+   "say": "Neha is on a project from Monday 23 December to Friday 27 December 2024, which includes Christmas Day: public holidays are not taken off, so it comes to 4 working days."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2024-03-08','2024-03-04')",
+   "got": -4,
+   "say": "A contract's start is entered as 8 March 2024 and its end as 4 March 2024, the wrong way round: instead of an error it returns -4 working days."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2024-03-04','2024-03-04')",
+   "got": 0,
+   "say": "A task starts and ends on the same Monday, 4 March 2024: it comes to 0 working days."
+  },
+  {
+   "function": "grade_letter",
+   "call": "SELECT grade_letter(90)",
+   "got": "A",
+   "say": "Priya scores exactly 90 in her course: she gets an A."
+  },
+  {
+   "function": "grade_letter",
+   "call": "SELECT grade_letter(89.99)",
+   "got": "B",
+   "say": "Rohan scores 89.99, a hair under the cut-off: he gets a B, with no rounding up."
+  },
+  {
+   "function": "grade_letter",
+   "call": "SELECT grade_letter(150)",
+   "got": "A",
+   "say": "A score of 150 is typed in by mistake for Sana, whose course is marked out of 100: it is accepted and she gets an A."
+  },
+  {
+   "function": "grade_letter",
+   "call": "SELECT grade_letter(-5)",
+   "got": "F",
+   "say": "A score of -5 is entered for Dev: it is accepted and he gets an F."
+  },
+  {
+   "function": "grade_letter",
+   "call": "SELECT grade_letter('abc')",
+   "got": null,
+   "say": "The score for Ishaan is entered as the text abc: no grade is given, the answer is blank."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000,7)",
+   "got": 0,
+   "say": "Ravi's 100-rupee invoice is paid 7 days late: it is within the grace period, so the late fee is 0 rupees."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000,8)",
+   "got": 200,
+   "say": "Ravi's 100-rupee invoice is paid 8 days late: the late fee comes to 2 rupees."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000,31)",
+   "got": 900,
+   "say": "Ravi's 100-rupee invoice is paid 31 days late: the late fee comes to 9 rupees."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000,30)",
+   "got": 500,
+   "say": "Ravi's 100-rupee invoice is paid 30 days late: the late fee comes to 5 rupees, so one more day takes it from 5 to 9 rupees."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(-10000,31)",
+   "got": 0,
+   "say": "A credit note of minus 100 rupees is 31 days overdue for Ravi: no fee is charged, the late fee is 0 rupees."
+  },
+  {
+   "function": "loyalty_pts",
+   "call": "SELECT loyalty_pts(9999,'gold')",
+   "got": 199,
+   "say": "Asha, a gold member, spends 99.99 rupees: she earns 199 points, because the fraction is dropped rather than rounded."
+  },
+  {
+   "function": "loyalty_pts",
+   "call": "SELECT loyalty_pts(10000,'diamond')",
+   "got": 100,
+   "say": "Vikram is recorded with a tier called diamond, which the company has no rule for: he is treated like a basic member and earns 100 points on 100 rupees."
+  },
+  {
+   "function": "loyalty_pts",
+   "call": "SELECT loyalty_pts(10000,'silver')",
+   "got": 150,
+   "say": "Tara, a silver member, spends 100 rupees: she earns 150 points."
+  },
+  {
+   "function": "loyalty_pts",
+   "call": "SELECT loyalty_pts(-5000,'gold')",
+   "got": 0,
+   "say": "Asha, a gold member, returns 50 rupees of goods and the amount is passed as negative: she earns 0 points, and none are taken back."
+  },
+  {
+   "function": "loyalty_pts",
+   "call": "SELECT loyalty_pts(10000,NULL)",
+   "got": null,
+   "say": "Vikram's membership tier is missing on a 100-rupee purchase: no points are given, the answer is blank, not even the basic rate."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('4111 1111 1111 1111')",
+   "got": "**** **** **** 1111",
+   "say": "Anil's card 4111 1111 1111 1111 is printed on a receipt: it shows as stars in groups of four with only the last four digits, 1111, visible."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('Paid with 4111111111111111 today, order 99')",
+   "got": "Paid with **************11 today, order 99",
+   "say": "A note reads 'Paid with 4111111111111111 today, order 99': the order number is counted as card digits, so two card digits stay visible and the real last four are partly hidden, giving 'Paid with **************11 today, order 99'."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('1234')",
+   "got": "1234",
+   "say": "A short number 1234 is passed in for Anil: it is shown in full, nothing is hidden."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('12345')",
+   "got": "*2345",
+   "say": "A 5-digit number 12345 is passed in: only the first digit is hidden, so it shows as *2345."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('')",
+   "got": "",
+   "say": "An empty card field on a receipt for Anil: it returns empty text, nothing is shown."
+  },
+  {
+   "function": "shift_pay",
+   "call": "SELECT shift_pay(40,2000)",
+   "got": 80000,
+   "say": "Leela works exactly 40 hours at 20 rupees an hour: she earns 800 rupees, with no overtime."
+  },
+  {
+   "function": "shift_pay",
+   "call": "SELECT shift_pay(41,2000)",
+   "got": 83000,
+   "say": "Leela works 41 hours at 20 rupees an hour: the 41st hour is paid at one and a half times, so her pay comes to 830 rupees."
+  },
+  {
+   "function": "shift_pay",
+   "call": "SELECT shift_pay(7.5,1999)",
+   "got": 14993,
+   "say": "Ben works 7.5 hours at 19.99 rupees an hour: the pay is rounded half up to the nearest paisa, 149.93 rupees."
+  },
+  {
+   "function": "shift_pay",
+   "call": "SELECT shift_pay(-5,2000)",
+   "got": 0,
+   "say": "A timesheet for Leela shows -5 hours at 20 rupees an hour: no error is raised, her pay is 0 rupees."
+  },
+  {
+   "function": "shift_pay",
+   "call": "SELECT shift_pay(200,2000)",
+   "got": 560000,
+   "say": "A timesheet typo gives Leela 200 hours in one week at 20 rupees an hour: it is accepted with no cap, and her pay comes to 5,600 rupees."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(1000,'A')",
+   "got": 400,
+   "say": "A parcel of exactly 1 kg to zone A costs 4 rupees."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(1001,'A')",
+   "got": 700,
+   "say": "A parcel of 1 kg and 1 gram to zone A costs 7 rupees, because any part of a kilo is charged as a full extra kilo."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(0,'A')",
+   "got": 400,
+   "say": "A parcel weighing 0 grams to zone A still costs 4 rupees, the minimum charge."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(500,'D')",
+   "got": null,
+   "say": "A parcel to zone D, which the company has no price for: no charge is given, the answer is blank."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(500000,'A')",
+   "got": 150100,
+   "say": "A 500 kg pallet to zone A is accepted with no weight limit: the charge comes to 1,501 rupees."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e')",
+   "got": "cafe-creme-brulee",
+   "say": "The title 'Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' becomes the web address cafe-creme-brulee, with the accents removed."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('Mumbai \u091a\u093e\u092f Shop')",
+   "got": "mumbai-shop",
+   "say": "The title 'Mumbai \u091a\u093e\u092f Shop' loses its Hindi word entirely and becomes mumbai-shop."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('Gr\u00f6\u00dfe Stra\u00dfe')",
+   "got": "gro-e-stra-e",
+   "say": "The title 'Gr\u00f6\u00dfe Stra\u00dfe' loses its \u00df letters and becomes gro-e-stra-e instead of a readable word."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('C++ & C# Guide')",
+   "got": "c-c-guide",
+   "say": "The title 'C++ & C# Guide' loses its plus and hash signs and becomes c-c-guide, the same as a 'C & C Guide' title would."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('  ')",
+   "got": "",
+   "say": "A title made only of spaces becomes an empty web address."
+  },
+  {
+   "function": "robust_mean",
+   "call": "SELECT robust_mean(v) FROM m",
+   "got": 25.0,
+   "say": "Four daily sales of 10, 20, 30 and 1000 rupees: the smallest and largest are dropped and the average comes to 25 rupees."
+  },
+  {
+   "function": "robust_mean",
+   "call": "SELECT robust_mean(v) FROM two",
+   "got": 505.0,
+   "say": "Only two sales of 10 and 1000 rupees are recorded: nothing is dropped, so the average comes to 505 rupees, outlier included."
+  },
+  {
+   "function": "robust_mean",
+   "call": "SELECT robust_mean(v) FROM e",
+   "got": null,
+   "say": "A shop with no sales rows at all: the average is blank."
+  },
+  {
+   "function": "robust_mean",
+   "call": "SELECT robust_mean(v) FROM tn",
+   "got": null,
+   "say": "A shop whose sales amounts are all missing: the average is blank."
+  }
+ ],
+ "shown": [
+  {
+   "function": "age_years",
+   "call": "SELECT age_years('2000-02-29','2023-02-28')",
+   "got": 22,
+   "say": "Meera was born on 29 February 2000 and is checked on 28 February 2023, one day before 1 March: she is counted as not yet having had her birthday, so her age comes to 22."
+  },
+  {
+   "function": "age_years",
+   "call": "SELECT age_years('2000-02-29','2023-03-01')",
+   "got": 23,
+   "say": "Meera, born on 29 February 2000, is checked on 1 March 2023: her age comes to 23."
+  },
+  {
+   "function": "age_years",
+   "call": "SELECT age_years('2020-05-01','2019-05-01')",
+   "got": null,
+   "say": "Arjun's birth date is entered as 1 May 2020 but the check date is 1 May 2019, a year before he was born: no age is given, the answer is blank."
+  },
+  {
+   "function": "age_years",
+   "call": "SELECT age_years('1990-05-01','2024-13-45')",
+   "got": null,
+   "say": "Check date 2024-13-45 is typed for Kavita, who was born 1 May 1990: no age is given, the answer is blank."
+  },
+  {
+   "function": "age_years",
+   "call": "SELECT age_years('1990-05-01','')",
+   "got": null,
+   "say": "Kavita's check date is left empty: no age is given, the answer is blank."
+  },
+  {
+   "function": "loyalty_pts",
+   "call": "SELECT loyalty_pts(9999,'gold')",
+   "got": 199,
+   "say": "Asha, a gold member, spends 99.99 rupees: she earns 199 points, because the fraction is dropped rather than rounded."
+  },
+  {
+   "function": "loyalty_pts",
+   "call": "SELECT loyalty_pts(10000,'diamond')",
+   "got": 100,
+   "say": "Vikram is recorded with a tier called diamond, which the company has no rule for: he is treated like a basic member and earns 100 points on 100 rupees."
+  },
+  {
+   "function": "loyalty_pts",
+   "call": "SELECT loyalty_pts(10000,'silver')",
+   "got": 150,
+   "say": "Tara, a silver member, spends 100 rupees: she earns 150 points."
+  },
+  {
+   "function": "loyalty_pts",
+   "call": "SELECT loyalty_pts(-5000,'gold')",
+   "got": 0,
+   "say": "Asha, a gold member, returns 50 rupees of goods and the amount is passed as negative: she earns 0 points, and none are taken back."
+  },
+  {
+   "function": "loyalty_pts",
+   "call": "SELECT loyalty_pts(10000,NULL)",
+   "got": null,
+   "say": "Vikram's membership tier is missing on a 100-rupee purchase: no points are given, the answer is blank, not even the basic rate."
+  },
+  {
+   "function": "shift_pay",
+   "call": "SELECT shift_pay(40,2000)",
+   "got": 80000,
+   "say": "Leela works exactly 40 hours at 20 rupees an hour: she earns 800 rupees, with no overtime."
+  },
+  {
+   "function": "shift_pay",
+   "call": "SELECT shift_pay(41,2000)",
+   "got": 83000,
+   "say": "Leela works 41 hours at 20 rupees an hour: the 41st hour is paid at one and a half times, so her pay comes to 830 rupees."
+  },
+  {
+   "function": "shift_pay",
+   "call": "SELECT shift_pay(7.5,1999)",
+   "got": 14993,
+   "say": "Ben works 7.5 hours at 19.99 rupees an hour: the pay is rounded half up to the nearest paisa, 149.93 rupees."
+  },
+  {
+   "function": "shift_pay",
+   "call": "SELECT shift_pay(-5,2000)",
+   "got": 0,
+   "say": "A timesheet for Leela shows -5 hours at 20 rupees an hour: no error is raised, her pay is 0 rupees."
+  },
+  {
+   "function": "shift_pay",
+   "call": "SELECT shift_pay(200,2000)",
+   "got": 560000,
+   "say": "A timesheet typo gives Leela 200 hours in one week at 20 rupees an hour: it is accepted with no cap, and her pay comes to 5,600 rupees."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e')",
+   "got": "cafe-creme-brulee",
+   "say": "The title 'Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' becomes the web address cafe-creme-brulee, with the accents removed."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('Mumbai \u091a\u093e\u092f Shop')",
+   "got": "mumbai-shop",
+   "say": "The title 'Mumbai \u091a\u093e\u092f Shop' loses its Hindi word entirely and becomes mumbai-shop."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('Gr\u00f6\u00dfe Stra\u00dfe')",
+   "got": "gro-e-stra-e",
+   "say": "The title 'Gr\u00f6\u00dfe Stra\u00dfe' loses its \u00df letters and becomes gro-e-stra-e instead of a readable word."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('C++ & C# Guide')",
+   "got": "c-c-guide",
+   "say": "The title 'C++ & C# Guide' loses its plus and hash signs and becomes c-c-guide, the same as a 'C & C Guide' title would."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('  ')",
+   "got": "",
+   "say": "A title made only of spaces becomes an empty web address."
+  },
+  {
+   "function": "robust_mean",
+   "call": "SELECT robust_mean(v) FROM m",
+   "got": 25.0,
+   "say": "Four daily sales of 10, 20, 30 and 1000 rupees: the smallest and largest are dropped and the average comes to 25 rupees."
+  },
+  {
+   "function": "robust_mean",
+   "call": "SELECT robust_mean(v) FROM two",
+   "got": 505.0,
+   "say": "Only two sales of 10 and 1000 rupees are recorded: nothing is dropped, so the average comes to 505 rupees, outlier included."
+  },
+  {
+   "function": "robust_mean",
+   "call": "SELECT robust_mean(v) FROM e",
+   "got": null,
+   "say": "A shop with no sales rows at all: the average is blank."
+  },
+  {
+   "function": "robust_mean",
+   "call": "SELECT robust_mean(v) FROM tn",
+   "got": null,
+   "say": "A shop whose sales amounts are all missing: the average is blank."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2024-03-04','2024-03-08')",
+   "got": 4,
+   "say": "A job runs from Monday 4 March to Friday 8 March 2024: the end day is not counted, so it comes to 4 working days."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2024-03-04','2024-03-09')",
+   "got": 5,
+   "say": "An order placed Monday 4 March 2024 is delivered Saturday 9 March: it comes to 5 working days."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2024-12-23','2024-12-27')",
+   "got": 4,
+   "say": "Neha is on a project from Monday 23 December to Friday 27 December 2024, which includes Christmas Day: public holidays are not taken off, so it comes to 4 working days."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2024-03-08','2024-03-04')",
+   "got": -4,
+   "say": "A contract's start is entered as 8 March 2024 and its end as 4 March 2024, the wrong way round: instead of an error it returns -4 working days."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2024-03-04','2024-03-04')",
+   "got": 0,
+   "say": "A task starts and ends on the same Monday, 4 March 2024: it comes to 0 working days."
+  },
+  {
+   "function": "grade_letter",
+   "call": "SELECT grade_letter(90)",
+   "got": "A",
+   "say": "Priya scores exactly 90 in her course: she gets an A."
+  },
+  {
+   "function": "grade_letter",
+   "call": "SELECT grade_letter(89.99)",
+   "got": "B",
+   "say": "Rohan scores 89.99, a hair under the cut-off: he gets a B, with no rounding up."
+  },
+  {
+   "function": "grade_letter",
+   "call": "SELECT grade_letter(150)",
+   "got": "A",
+   "say": "A score of 150 is typed in by mistake for Sana, whose course is marked out of 100: it is accepted and she gets an A."
+  },
+  {
+   "function": "grade_letter",
+   "call": "SELECT grade_letter(-5)",
+   "got": "F",
+   "say": "A score of -5 is entered for Dev: it is accepted and he gets an F."
+  },
+  {
+   "function": "grade_letter",
+   "call": "SELECT grade_letter('abc')",
+   "got": null,
+   "say": "The score for Ishaan is entered as the text abc: no grade is given, the answer is blank."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000,7)",
+   "got": 0,
+   "say": "Ravi's 100-rupee invoice is paid 7 days late: it is within the grace period, so the late fee is 0 rupees."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000,8)",
+   "got": 200,
+   "say": "Ravi's 100-rupee invoice is paid 8 days late: the late fee comes to 2 rupees."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000,31)",
+   "got": 900,
+   "say": "Ravi's 100-rupee invoice is paid 31 days late: the late fee comes to 9 rupees."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000,30)",
+   "got": 500,
+   "say": "Ravi's 100-rupee invoice is paid 30 days late: the late fee comes to 5 rupees, so one more day takes it from 5 to 9 rupees."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(-10000,31)",
+   "got": 0,
+   "say": "A credit note of minus 100 rupees is 31 days overdue for Ravi: no fee is charged, the late fee is 0 rupees."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('4111 1111 1111 1111')",
+   "got": "**** **** **** 1111",
+   "say": "Anil's card 4111 1111 1111 1111 is printed on a receipt: it shows as stars in groups of four with only the last four digits, 1111, visible."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('Paid with 4111111111111111 today, order 99')",
+   "got": "Paid with **************11 today, order 99",
+   "say": "A note reads 'Paid with 4111111111111111 today, order 99': the order number is counted as card digits, so two card digits stay visible and the real last four are partly hidden, giving 'Paid with **************11 today, order 99'."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('1234')",
+   "got": "1234",
+   "say": "A short number 1234 is passed in for Anil: it is shown in full, nothing is hidden."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('12345')",
+   "got": "*2345",
+   "say": "A 5-digit number 12345 is passed in: only the first digit is hidden, so it shows as *2345."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('')",
+   "got": "",
+   "say": "An empty card field on a receipt for Anil: it returns empty text, nothing is shown."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(1000,'A')",
+   "got": 400,
+   "say": "A parcel of exactly 1 kg to zone A costs 4 rupees."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(1001,'A')",
+   "got": 700,
+   "say": "A parcel of 1 kg and 1 gram to zone A costs 7 rupees, because any part of a kilo is charged as a full extra kilo."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(0,'A')",
+   "got": 400,
+   "say": "A parcel weighing 0 grams to zone A still costs 4 rupees, the minimum charge."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(500,'D')",
+   "got": null,
+   "say": "A parcel to zone D, which the company has no price for: no charge is given, the answer is blank."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(500000,'A')",
+   "got": 150100,
+   "say": "A 500 kg pallet to zone A is accepted with no weight limit: the charge comes to 1,501 rupees."
+  }
+ ],
+ "fixes": [
+  {
+   "shown": "Arjun's birth date is entered as 1 May 2020 but the check date is 1 May 2019, a year before he was born: no age is given, the answer is blank.",
+   "said": "1: Enter\n2: Enter\n3: It should show -1, not blank.",
+   "function": "age_years",
+   "rounds": 1,
+   "now": "Arjun's birth date is entered as 1 May 2020 and the check date is 1 May 2019, a year before he was born: the age is not blank, the software returns -1.",
+   "confirmed": true
+  },
+  {
+   "shown": "Asha, a gold member, returns 50 rupees of goods and the amount is passed as negative: she earns 0 points, and none are taken back.",
+   "said": "3: Enter\n4: Enter\n5: Enter\n6: Enter\n7: Enter\n8: Enter\n9: No, points should be taken back: -100.",
+   "function": "loyalty_pts",
+   "rounds": 1,
+   "now": "Asha, a gold member, returns 50 rupees (5,000 cents) of goods, passed as a negative amount: the software takes back the 100 points that a 5,000-cent gold purchase would earn (2 points per 100 cents), so her points change by -100.",
+   "confirmed": true
+  },
+  {
+   "shown": "Vikram's membership tier is missing on a 100-rupee purchase: no points are given, the answer is blank, not even the basic rate.",
+   "said": "Missing tier should count as basic, so 100 points.",
+   "function": "loyalty_pts",
+   "rounds": 1,
+   "now": "Vikram's membership tier is missing on a 100-rupee purchase (10,000 cents), so it is treated as basic and earns 1 point per 100 cents: he is given 100 points, not a blank answer.",
+   "confirmed": true
+  },
+  {
+   "shown": "Leela works 41 hours at 20 rupees an hour: the 41st hour is paid at one and a half times, so her pay comes to 830 rupees.",
+   "said": "Right now? 3: Enter\n9: Enter\n10: Enter\n11: Enter\n12: Enter",
+   "function": "shift_pay",
+   "rounds": 1,
+   "now": "Leela works 41 hours at 20 rupees an hour: her first 40 hours are paid at the normal rate (800 rupees) and the 41st hour at one and a half times (30 rupees), so her pay comes to 830 rupees.",
+   "confirmed": true
+  },
+  {
+   "shown": "A timesheet for Leela shows -5 hours at 20 rupees an hour: no error is raised, her pay is 0 rupees.",
+   "said": "13: Enter\n14: No, negative hours should give negative pay: -100 rupees.",
+   "function": "shift_pay",
+   "rounds": 1,
+   "now": "Leela's timesheet shows -5 hours at 20 rupees an hour (2000 cents): no error is raised, and no overtime rate applies, so her pay comes to -100 rupees (-10000 cents), a negative amount rather than 0.",
+   "confirmed": true
+  },
+  {
+   "shown": "The title 'Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' becomes the web address cafe-creme-brulee, with the accents removed.",
+   "said": "15: No, 200 hours should come to 7,000 rupees.\n16: Enter",
+   "function": "slugify",
+   "rounds": 1,
+   "now": "The title 'Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' is turned into the web address 'cafe-creme-brulee': the accents are dropped and the base letters kept, the spaces become single hyphens, and everything is lower case.",
+   "confirmed": true
+  },
+  {
+   "shown": "The title 'Gr\u00f6\u00dfe Stra\u00dfe' loses its \u00df letters and becomes gro-e-stra-e instead of a readable word.",
+   "said": "17: Enter\n18: Enter",
+   "function": "slugify",
+   "rounds": 2,
+   "now": "The title 'Gr\u00f6\u00dfe Stra\u00dfe' is not mangled: \u00f6 loses its accent and becomes o, and each \u00df is written out as 'ss', so the slug comes out as the readable 'grosse-strasse', not 'gro-e-stra-e'.",
+   "confirmed": false,
+   "said_again": "No, I said Enter on 18. It should stay gro-e-stra-e."
+  },
+  {
+   "shown": "A title made only of spaces becomes an empty web address.",
+   "said": "19: Enter\n20: Enter",
+   "function": "slugify",
+   "rounds": 1,
+   "now": "A title made only of spaces becomes an empty web address: the spaces are replaced by a hyphen, that leading and trailing hyphen is then removed, and nothing is left, so the result is empty text (not NULL).",
+   "confirmed": true
+  },
+  {
+   "shown": "Only two sales of 10 and 1000 rupees are recorded: nothing is dropped, so the average comes to 505 rupees, outlier included.",
+   "said": "No, with only two sales it should give blank, not 505.",
+   "function": "robust_mean",
+   "rounds": 1,
+   "now": "With only two sales recorded, of 10 and 1000 rupees, the system sets nothing aside and doesn't average them, because it needs at least 3 sales to trim: the robust average comes back blank (NULL), not 505 rupees.",
+   "confirmed": true
+  },
+  {
+   "shown": "A shop whose sales amounts are all missing: the average is blank.",
+   "said": "22: Enter\n23: Enter\n24: Enter",
+   "function": "robust_mean",
+   "rounds": 1,
+   "now": "The shop's sales amounts are all missing (NULL), so none of them count toward the 3 values needed for trimming, and the average sales figure comes back blank (NULL) rather than a number.",
+   "confirmed": true
+  },
+  {
+   "shown": "An order placed Monday 4 March 2024 is delivered Saturday 9 March: it comes to 5 working days.",
+   "said": "25: Enter\n26: Enter",
+   "function": "biz_days",
+   "rounds": 1,
+   "now": "An order placed Monday 4 March 2024 is delivered Saturday 9 March: the working days are counted from Monday 4 March up to but not including the delivery date, so Monday to Friday count (5 days), the Saturday delivery day is not counted, and no holiday falls in that range, so the order comes to 5 working days.",
+   "confirmed": true
+  },
+  {
+   "shown": "Neha is on a project from Monday 23 December to Friday 27 December 2024, which includes Christmas Day: public holidays are not taken off, so it comes to 4 working days.",
+   "said": "No, holidays should come off: Christmas isn't a working day, so 3 working days.",
+   "function": "biz_days",
+   "rounds": 2,
+   "now": "Neha's project runs from Monday 23 December to Friday 27 December 2024: the software counts the start day but not the end day, and it skips both Christmas Day (25 December) and 26 December as holidays, so only Monday 23 and Tuesday 24 count, which comes to 2 working days, not 4.",
+   "confirmed": false,
+   "said_again": "No, only Christmas comes off, not 26 December, so it should be 3 working days."
+  },
+  {
+   "shown": "A contract's start is entered as 8 March 2024 and its end as 4 March 2024, the wrong way round: instead of an error it returns -4 working days.",
+   "said": "No, it should be 0, not -4.",
+   "function": "biz_days",
+   "rounds": 1,
+   "now": "A contract that starts on 8 March 2024 and ends on 4 March 2024 has its dates entered the wrong way round: the software gives no error and does not return -4, because an end date earlier than the start date always counts as 0 working days, so the contract comes to 0 working days.",
+   "confirmed": true
+  },
+  {
+   "shown": "Rohan scores 89.99, a hair under the cut-off: he gets a B, with no rounding up.",
+   "said": "No, 89.99 rounds to 90, so Rohan should get an A.",
+   "function": "grade_letter",
+   "rounds": 1,
+   "now": "Rohan scores 89.99: the score is first rounded to 90, and a rounded 90 meets the A cut-off, so he gets an A, not a B.",
+   "confirmed": true
+  },
+  {
+   "shown": "A score of 150 is typed in by mistake for Sana, whose course is marked out of 100: it is accepted and she gets an A.",
+   "said": "No, 150 should be INVALID, not an A.",
+   "function": "grade_letter",
+   "rounds": 1,
+   "now": "Sana's score of 150, typed in by mistake for a course marked out of 100, is rejected as INVALID because it is above 100 and is never graded, so she gets no grade at all and does not get an A.",
+   "confirmed": true
+  },
+  {
+   "shown": "A score of -5 is entered for Dev: it is accepted and he gets an F.",
+   "said": "No, -5 should be INVALID, not an F.",
+   "function": "grade_letter",
+   "rounds": 1,
+   "now": "Dev's score of -5 is not accepted and graded as an F: it is rounded to -5, which is below 0, so it is INVALID and gets no grade at all, not an F.",
+   "confirmed": true
+  },
+  {
+   "shown": "Ravi's 100-rupee invoice is paid 7 days late: it is within the grace period, so the late fee is 0 rupees.",
+   "said": "No, 7 days late is past the grace period, so the fee should be 5 rupees.",
+   "function": "late_fee",
+   "rounds": 1,
+   "now": "Ravi's 100-rupee invoice is paid 7 days late: that is past the 5-day grace period, so the fee is 1% for one late week (1 rupee), which is raised to the 5-rupee minimum and is under the 25-rupee cap, so the late fee comes to 5 rupees, not 0.",
+   "confirmed": true
+  },
+  {
+   "shown": "Ravi's 100-rupee invoice is paid 8 days late: the late fee comes to 2 rupees.",
+   "said": "No, the fee should be 5 rupees. The minimum fee applies.",
+   "function": "late_fee",
+   "rounds": 1,
+   "now": "Ravi's 100-rupee invoice is paid 8 days late: that is past the 5-day grace period, so the fee is 1% per late week, which is 2 weeks and comes to 2 rupees, but the 5-rupee minimum fee applies, so the late fee comes to 5 rupees (well under the 25-rupee cap), not 2.",
+   "confirmed": true
+  },
+  {
+   "shown": "Ravi's 100-rupee invoice is paid 31 days late: the late fee comes to 9 rupees.",
+   "said": "No, it should be 5 rupees.",
+   "function": "late_fee",
+   "rounds": 1,
+   "now": "Ravi's 100-rupee invoice is paid 31 days late, which is past the 5-day grace period and counts as 5 late weeks at 1% of the amount each, so the fee is 5 rupees (5%, which equals the 5-rupee minimum and is well under the 25-rupee cap): the late fee comes to 5 rupees, not 9, because the old 9% band for 31 or more days no longer applies.",
+   "confirmed": true
+  },
+  {
+   "shown": "Ravi's 100-rupee invoice is paid 30 days late: the late fee comes to 5 rupees, so one more day takes it from 5 to 9 rupees.",
+   "said": "No, 31 days is still 5 rupees, not 9.",
+   "function": "late_fee",
+   "rounds": 1,
+   "now": "Ravi's 100-rupee invoice is paid 30 days late, which counts as 5 late weeks at 1% each, so the late fee comes to 5 rupees; one more day (31 days late) is still 5 late weeks, because the 9% band no longer applies, so the fee stays at 5 rupees and does not rise to 9.",
+   "confirmed": true
+  },
+  {
+   "shown": "A credit note of minus 100 rupees is 31 days overdue for Ravi: no fee is charged, the late fee is 0 rupees.",
+   "said": "No, it should be -25 rupees, the negative cap.",
+   "function": "late_fee",
+   "rounds": 1,
+   "now": "Ravi's credit note of minus 100 rupees is 31 days overdue, which is past the 5-day grace period: the late fee is the negative cap of 25% of the amount, so it comes to minus 25 rupees, a 25-rupee credit and not 0.",
+   "confirmed": true
+  },
+  {
+   "shown": "A short number 1234 is passed in for Anil: it is shown in full, nothing is hidden.",
+   "said": "No, 1234 should be hidden as ****.",
+   "function": "mask_card",
+   "rounds": 1,
+   "now": "Anil's short number 1234 has only 4 digits in total, so every digit is masked and none is shown: the card comes back as ****.",
+   "confirmed": true
+  },
+  {
+   "shown": "An empty card field on a receipt for Anil: it returns empty text, nothing is shown.",
+   "said": "No, an empty card should show INVALID, not empty text.",
+   "function": "mask_card",
+   "rounds": 1,
+   "now": "Anil's receipt has a blank card field, so the card-masking step shows INVALID rather than empty text, because text with no digits (including empty text) always returns INVALID.",
+   "confirmed": true
+  },
+  {
+   "shown": "A parcel of exactly 1 kg to zone A costs 4 rupees.",
+   "said": "No, it should be 5 rupees.",
+   "function": "ship_cost",
+   "rounds": 1,
+   "now": "A parcel of exactly 1 kg (1000 g) going to zone A is not charged 4 rupees: it gets the zone A base charge plus one 500 g block charge (100 cents), so the shipping cost comes to 500 cents, which is 5 rupees.",
+   "confirmed": true
+  },
+  {
+   "shown": "A parcel of 1 kg and 1 gram to zone A costs 7 rupees, because any part of a kilo is charged as a full extra kilo.",
+   "said": "No, it should be 6 rupees.",
+   "function": "ship_cost",
+   "rounds": 1,
+   "now": "A parcel of 1 kg and 1 gram to zone A costs 6 rupees (600 cents), not 7: it is charged the 500 cents of a 1000 g parcel plus 100 cents for the one started 500 g block beyond that, so the extra gram is not charged as a full extra kilogram.",
+   "confirmed": true
+  },
+  {
+   "shown": "A parcel weighing 0 grams to zone A still costs 4 rupees, the minimum charge.",
+   "said": "No, a 0 g parcel should cost 0 rupees.",
+   "function": "ship_cost",
+   "rounds": 1,
+   "now": "A parcel weighing 0 grams to zone A does not cost 4 rupees, because there is no minimum charge and no base charge for a 0 g parcel: the shipping cost comes to 0 cents (0 rupees).",
+   "confirmed": true
+  },
+  {
+   "shown": "A parcel to zone D, which the company has no price for: no charge is given, the answer is blank.",
+   "said": "No, an unknown zone should be charged at zone C rates, not left blank.",
+   "function": "ship_cost",
+   "rounds": 1,
+   "now": "The parcel to zone D, which the company has no price for, is not left blank: an unknown zone is treated as zone C, so the parcel is charged zone C rates (800 cents for the first started kilogram, plus 200 cents for each started 500 g block beyond the first kilogram, or 0 cents if it weighs 0 grams), and the case gives no weight, so the outcome is a zone C charge and not a blank answer.",
+   "confirmed": true
+  }
+ ],
+ "list_review": {
+  "replies": 8,
+  "cost": 0.679,
+  "log": [
+   {
+    "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+    "typed": "19, 20, 44, 11, 15, 34"
+   },
+   {
+    "prompt": "  Rule 19: Whenever late_fee is given an overdue amount in cents and days late of 7 or fewer, it returns 0 because the first 7 days are a grace period.\n  What should it be? > ",
+    "typed": "Grace period is 5 days or less, not 7. Past that, it's 1% of the amount per late week (rounded up), with a 500-cent minimum and a cap of 25% of the amount."
+   },
+   {
+    "prompt": "  Rule 20: Whenever late_fee is given days late from 8 up to and including 14, the fee is 2% of the amount; from 15 up to and including 30 it is 5%; for 31 or more it is 9%, with no upper cap on days (365 days still gives 9%).\n  What should it be? > ",
+    "typed": "Rule 20 is covered by the 1%-per-week answer. Drop the 2%/5%/9% bands."
+   },
+   {
+    "prompt": "  Rule 44: Whenever ship_cost is given a parcel weight in grams and a zone, the first started kilogram costs a base charge of 400 cents for zone A, 800 for zone B and 1200 for zone C.\n  What should it be? > ",
+    "typed": "Base is 300 for A, 500 for B and 800 for C. Then add 100, 150 or 200 per 500 g block, rounded up."
+   },
+   {
+    "prompt": "  Rule 11: Whenever biz_days counts working days, it treats only Saturday and Sunday as non-working and does not exclude any public holidays (2024-12-24 to 2024-12-26 gives 2).\n  What should it be? > ",
+    "typed": "Dec 25 and Jan 1 are holidays, every year, so they aren't working days. 2024-12-24 to 2024-12-26 should give 1."
+   },
+   {
+    "prompt": "  Rule 15: Whenever grade_letter is given a score above 100 (such as 150) it returns A, and whenever it is given zero or a negative score it returns F; there is no upper or lower limit check.\n  What should it be? > ",
+    "typed": "Above 100 or below 0 should be INVALID. Exactly 100 is A+, and scores are rounded to a whole number first."
+   },
+   {
+    "prompt": "  Rule 34: Whenever the text given to mask_card contains 4 or fewer digits in total, it returns the text unchanged (1234, 123, 12-34, 'abcd' and empty text come back as they are); exactly 5 digits leaves only the first masked.\n  What should it be? > ",
+    "typed": "With fewer than 5 digits, every digit becomes '*'. With no digits at all, including empty text, it should return INVALID."
+   },
+   {
+    "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+    "typed": ""
+   }
+  ],
+  "transcript": "\nWhat the built code does now, as rules (each one is what the product will do. Mark any that is not your policy):\n  1. Whenever age_years is given a birth date and an as-of date, it returns the number of whole years completed, counting a birthday as reached on the same month and day of the as-of year (e.g. born 1990-05-15, as of 2024-05-15 gives 34; one day earlier gives 33).\n  2. Whenever age_years is asked about someone born on 29 February, the birthday is treated as reached on 1 March in non-leap years (born 2000-02-29 is 0 on 2001-02-28 and 1 on 2001-03-01) and on 29 February in leap years.\n  3. Whenever age_years gets an as-of date equal to the birth date, it returns 0; whenever the as-of date is earlier than the birth date, it returns NULL rather than a negative age.\n  4. Whenever either date given to age_years is NULL, empty, not a real calendar date (such as month 13), or not in the strict YYYY-MM-DD form (no slashes, no compact 20000101, no missing zero padding like 2000-1-1), age_years returns NULL.\n  5. Whenever a date given to age_years has surrounding spaces, or has extra text after the first 10 characters (such as a time '2000-01-01 12:00:00' or even junk like '2000-01-01abc'), age_years ignores the spaces and the extra text and uses only the date part.\n  6. Whenever a date given to age_years is a plain number such as 20000101, age_years returns NULL because it is not in YYYY-MM-DD form.\n  7. Whenever biz_days is given a start and end date in order, it counts the Monday-to-Friday days from the start date up to but not including the end date (2024-01-01 to 2024-01-08 gives 5; 2024-01-01 to 2024-01-05 gives 4).\n  8. Whenever the start date of biz_days is itself a weekday, that day is counted; whenever the end date is a weekday it is not counted (2024-01-05 Friday to 2024-01-06 gives 1; 2024-01-06 Saturday to 2024-01-08 gives 0).\n  9. Whenever biz_days is given the same start and end date, it returns 0, whatever day of the week it is.\n  10. Whenever the end date given to biz_days is earlier than the start date, it returns the working-day count of the reversed range as a negative number (2024-01-08 to 2024-01-01 gives -5); a reversed range containing only weekend days gives 0.\n  11. Whenever biz_days counts working days, it treats only Saturday and Sunday as non-working and does not exclude any public holidays (2024-12-24 to 2024-12-26 gives 2).\n  12. Whenever either date given to biz_days is NULL, empty, not a real date, or not in strict YYYY-MM-DD form, biz_days returns NULL.\n  13. Whenever a date given to biz_days has surrounding spaces or extra text after its first 10 characters (such as a time of day), biz_days ignores that and uses only the date part.\n  14. Whenever grade_letter is given a score of 90 or more it returns A; 80 up to under 90 gives B; 70 up to under 80 gives C; 60 up to under 70 gives D; anything lower gives F. Each boundary score belongs to the higher grade (90 is A, 89.99 is B, 60 is D, 59.9 is F).\n  15. Whenever grade_letter is given a score above 100 (such as 150) it returns A, and whenever it is given zero or a negative score it returns F; there is no upper or lower limit check.\n  16. Whenever grade_letter is given a score as text that is entirely a number (such as '85', ' 85 ' with spaces, or '9e1'), it reads it as that number and grades it normally.\n  17. Whenever grade_letter is given NULL, empty text, or text that is not wholly a number (such as 'abc' or '85abc'), it returns NULL rather than F.\n  18. Whenever grade_letter is given the text 'inf' it treats it as infinitely high and returns A, and whenever it is given the text 'nan' it returns NULL.\n  19. Whenever late_fee is given an overdue amount in cents and days late of 7 or fewer, it returns 0 because the first 7 days are a grace period.\n  20. Whenever late_fee is given days late from 8 up to and including 14, the fee is 2% of the amount; from 15 up to and including 30 it is 5%; for 31 or more it is 9%, with no upper cap on days (365 days still gives 9%).\n  21. Whenever late_fee computes a fee, it rounds to a whole cent with halves rounding up (a fee of 20.5 cents becomes 21; a 2% fee on 24 cents is 0.48 and gives 0, on 25 cents is 0.5 and gives 1).\n  22. Whenever late_fee is given an amount of zero or less, or days late that are negative or zero, it returns 0 (a fee is never negative).\n  23. Whenever days late given to late_fee is a fraction, the bands apply to the exact value (14.5 days falls in the 5% band because it is above 14), and a fractional amount is used as given before rounding.\n  24. Whenever either amount or days late given to late_fee is NULL, empty text, or text that is not wholly a number, it returns NULL, even if the other value would have given 0; numeric text such as '10000' and '20' is read as a number.\n  25. Whenever loyalty_pts is given a purchase amount in cents and a tier, it awards whole points based on 1 point per 100 cents for basic, 1.5 for silver, 2 for gold and 3 for platinum, rounding down any fraction of a point (10000 cents gives 100, 150, 200 and 300 points respectively; 99 cents basic gives 0, 199 cents gold gives 3).\n  26. Whenever the tier given to loyalty_pts is not one of basic, silver, gold or platinum (such as 'bronze', an empty text, or a number), it is treated as basic and earns 1 point per 100 cents.\n  27. Whenever the tier given to loyalty_pts is written in any letter case or with spaces around it (' GOLD ', 'Gold'), it is recognised as that tier; spaces inside a name (such as 'bro nze') stop it matching and it counts as basic.\n  28. Whenever the amount given to loyalty_pts is zero or negative, it returns 0 points.\n  29. Whenever the amount given to loyalty_pts is text that is not a number (such as 'abc' or empty text), it is treated as zero and returns 0 points; numeric text such as '5000' is read as a number.\n  30. Whenever the amount given to loyalty_pts has a fraction (such as 5050.7 cents), the fraction counts in the calculation before rounding points down.\n  31. Whenever either the amount or the tier given to loyalty_pts is NULL, it returns NULL, even when the amount is zero.\n  32. Whenever mask_card is given text containing more than 4 digits, it replaces every digit except the last 4 digits with an asterisk, so 4111111111111111 becomes ************1111.\n  33. Whenever mask_card is given a card number with spaces or dashes between groups, it keeps those separators and any other non-digit characters in place and masks only the digits (4111 1111 1111 1111 becomes **** **** **** 1111; 4111-1111-1111-1111 becomes ****-****-****-1111).\n  34. Whenever the text given to mask_card contains 4 or fewer digits in total, it returns the text unchanged (1234, 123, 12-34, 'abcd' and empty text come back as they are); exactly 5 digits leaves only the first masked.\n  35. Whenever mask_card is given text with other words and digits mixed (such as 'card 1234567890 ok'), it masks all digits in the whole text except the last 4 digits found anywhere in it, leaving letters untouched ('card ******7890 ok'; 'x1y2z3w4v5' becomes 'x*y2z3w4v5').\n  36. Whenever mask_card is given a number rather than text (such as 4111111111111111), it treats it as text of its digits and masks it the same way; a decimal such as 12345.5 counts all its digits and keeps the point ('**345.5').\n  37. Whenever mask_card is given NULL it returns NULL.\n  38. Whenever mask_card is given spaces around the number, it keeps them unchanged and does not count them as digits; it counts digits from other scripts and superscript digits as digits too and masks them in the same way.\n  39. Whenever shift_pay is given hours worked up to 40 and an hourly rate in cents, it returns hours times the rate (40 hours at 1000 cents gives 40000; 39.5 hours gives 39500).\n  40. Whenever shift_pay is given more than 40 hours, the first 40 hours are paid at the normal rate and each hour beyond 40 is paid at 1.5 times the rate (45 hours at 1000 cents gives 47500; 100 hours gives 130000), with no cap on hours.\n  41. Whenever shift_pay computes pay that has a fraction of a cent, it rounds to a whole cent with halves rounding up (10.5 hours at 1001 cents is 10510.5 and gives 10511; 0.5 hours at 1 cent gives 1).\n  42. Whenever the hours or the rate given to shift_pay is zero or negative, it returns 0 rather than a negative pay.\n  43. Whenever either hours or rate given to shift_pay is NULL, empty text, or text that is not wholly a number, it returns NULL; numeric text such as '45' and '1000' is read as a number.\n  44. Whenever ship_cost is given a parcel weight in grams and a zone, the first started kilogram costs a base charge of 400 cents for zone A, 800 for zone B and 1200 for zone C.\n  45. Whenever a parcel given to ship_cost weighs more than 1000 grams, each further started kilogram (any part of a kilogram rounds up) adds 300 cents to the base charge (1000 g in zone A is 400; 1001 g is 700; 2001 g in zone C is 1800; 10500 g in zone C is 4200).\n  46. Whenever a parcel given to ship_cost weighs 0 grams or less than a kilogram, it is charged the zone's base charge as one started kilogram (0 g and 0.1 g in zone A both give 400).\n  47. Whenever the weight given to ship_cost is negative, it returns NULL (no charge is quoted).\n  48. Whenever the zone given to ship_cost is written in lower case or with spaces around it (' b ', 'c'), it is recognised as that zone.\n  49. Whenever the zone given to ship_cost is anything other than A, B or C (such as 'D', 'AA', empty text or a number), it returns NULL.\n  50. Whenever the weight or zone given to ship_cost is NULL, it returns NULL.\n  51. Whenever the weight given to ship_cost is text, a leading number is used ('2500' or '2500kg' is 2500 g), and text with no leading number (such as 'abc' or empty text) is treated as 0 grams and gets the base charge for the zone.\n  52. Whenever slugify is given a title, it returns it in lower case with every run of characters other than the English letters a-z and digits 0-9 (spaces, punctuation, underscores, slashes, tabs, dots) replaced by a single hyphen ('Hello, World!' becomes 'hello-world'; 'a_b-c/d.e' becomes 'a-b-c-d-e').\n  53. Whenever slugify produces hyphens at the start or end, it removes them, so leading and trailing spaces or punctuation leave no hyphen ('  Hello   World  ' becomes 'hello-world', '---x---' becomes 'x'), and repeated separators collapse to one hyphen.\n  54. Whenever slugify is given accented letters (Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e, \u00d1and\u00fa, \u00dcber), it drops the accent and keeps the base letter ('cafe-creme-brulee', 'nandu', 'uber').\n  55. Whenever slugify is given letters with no plain-letter equivalent after removing accents (such as \u00df, \u00e6, \u0153, \u00f8, or Japanese characters), it treats them as separators and drops them, so 'Stra\u00dfe' becomes 'stra-e' and '\u0152uvre \u00e6 \u00f8' becomes 'uvre'.\n  56. Whenever slugify is given full-width letters and digits, ligatures or circled digits, it converts them to their plain forms ('\uff21\uff22\uff23 \uff11\uff12\uff13' becomes 'abc-123', '\ufb01ne' becomes 'fine', '\u2460\u2461' becomes '12'); symbols such as \u2122 and \u00a9 are dropped ('x\u2122 y\u00a9' becomes 'xtm-y').\n  57. Whenever slugify is given NULL it returns NULL; whenever it is given empty text, or text with no letters or digits at all (such as '!!!'), it returns empty text.\n  58. Whenever slugify is given a number, it uses the number's text, so 12345 becomes '12345' and 1.5 becomes '1-5'.\n  59. Whenever robust_mean is given a column with 3 or more non-NULL values, it sets aside exactly one lowest and one highest value and returns the average of the rest (1, 2, 3, 4, 100 gives 3; 1, 2, 100 gives 2).\n  60. Whenever the lowest or highest value in robust_mean is repeated, only one copy of each is set aside (1, 1, 1, 10 gives 1).\n  61. Whenever robust_mean is given only 1 or 2 non-NULL values, nothing is set aside and it returns their plain average (5 gives 5; 1 and 3 give 2).\n  62. Whenever robust_mean meets NULL values, it ignores them completely and does not count them toward the 3 values needed for trimming (1, 2, NULL, 3, NULL gives 2).\n  63. Whenever robust_mean has no rows or only NULL values, it returns NULL.\n  64. Whenever robust_mean is given a text value in a numeric column, it counts text that starts with a number as that leading number ('5x' as 5, '10' as 10) and text with no leading number (such as 'abc' or empty text) as 0, and that value still takes part in the trimming and the average.\n  65. Whenever robust_mean is used with a filter or grouping, it is calculated separately on the rows of each group (1,3,20 gives 3 and 2,10,30 gives 10), and the result is always a decimal number (such as 5.0).\n  Numbers of any that are wrong (Enter = all correct) > 19, 20, 44, 11, 15, 34\n  Rule 19: Whenever late_fee is given an overdue amount in cents and days late of 7 or fewer, it returns 0 because the first 7 days are a grace period.\n  What should it be? > Grace period is 5 days or less, not 7. Past that, it's 1% of the amount per late week (rounded up), with a 500-cent minimum and a cap of 25% of the amount.\n  Rule 20: Whenever late_fee is given days late from 8 up to and including 14, the fee is 2% of the amount; from 15 up to and including 30 it is 5%; for 31 or more it is 9%, with no upper cap on days (365 days still gives 9%).\n  What should it be? > Rule 20 is covered by the 1%-per-week answer. Drop the 2%/5%/9% bands.\n  Rule 44: Whenever ship_cost is given a parcel weight in grams and a zone, the first started kilogram costs a base charge of 400 cents for zone A, 800 for zone B and 1200 for zone C.\n  What should it be? > Base is 300 for A, 500 for B and 800 for C. Then add 100, 150 or 200 per 500 g block, rounded up.\n  Rule 11: Whenever biz_days counts working days, it treats only Saturday and Sunday as non-working and does not exclude any public holidays (2024-12-24 to 2024-12-26 gives 2).\n  What should it be? > Dec 25 and Jan 1 are holidays, every year, so they aren't working days. 2024-12-24 to 2024-12-26 should give 1.\n  Rule 15: Whenever grade_letter is given a score above 100 (such as 150) it returns A, and whenever it is given zero or a negative score it returns F; there is no upper or lower limit check.\n  What should it be? > Above 100 or below 0 should be INVALID. Exactly 100 is A+, and scores are rounded to a whole number first.\n  Rule 34: Whenever the text given to mask_card contains 4 or fewer digits in total, it returns the text unchanged (1234, 123, 12-34, 'abcd' and empty text come back as they are); exactly 5 digits leaves only the first masked.\n  What should it be? > With fewer than 5 digits, every digit becomes '*'. With no digits at all, including empty text, it should return INVALID.\n  Anything the builders should know that is not on this list? (Enter = nothing) > \n",
+  "minutes": 1.0
+ },
+ "spot_review": {
+  "replies": 76,
+  "cost": 5.87,
+  "log": [
+   {
+    "prompt": "\nCase 1 of 49. Meera was born on 29 February 2000 and is checked on 28 February 2023, one day before 1 March: she is counted as not yet having had her birthday, so her age comes to 22.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 2 of 49. Meera, born on 29 February 2000, is checked on 1 March 2023: her age comes to 23.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 3 of 49. Arjun's birth date is entered as 1 May 2020 but the check date is 1 May 2019, a year before he was born: no age is given, the answer is blank.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "1: Enter\n2: Enter\n3: It should show -1, not blank."
+   },
+   {
+    "prompt": "\n  With your correction: Arjun's birth date is entered as 1 May 2020 and the check date is 1 May 2019, a year before he was born: the age is not blank, the software returns -1.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 4 of 49. Check date 2024-13-45 is typed for Kavita, who was born 1 May 1990: no age is given, the answer is blank.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 5 of 49. Kavita's check date is left empty: no age is given, the answer is blank.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 6 of 49. Asha, a gold member, spends 99.99 rupees: she earns 199 points, because the fraction is dropped rather than rounded.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 7 of 49. Vikram is recorded with a tier called diamond, which the company has no rule for: he is treated like a basic member and earns 100 points on 100 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 8 of 49. Tara, a silver member, spends 100 rupees: she earns 150 points.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 9 of 49. Asha, a gold member, returns 50 rupees of goods and the amount is passed as negative: she earns 0 points, and none are taken back.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "3: Enter\n4: Enter\n5: Enter\n6: Enter\n7: Enter\n8: Enter\n9: No, points should be taken back: -100."
+   },
+   {
+    "prompt": "\n  With your correction: Asha, a gold member, returns 50 rupees (5,000 cents) of goods, passed as a negative amount: the software takes back the 100 points that a 5,000-cent gold purchase would earn (2 points per 100 cents), so her points change by -100.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 10 of 49. Vikram's membership tier is missing on a 100-rupee purchase: no points are given, the answer is blank, not even the basic rate.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Missing tier should count as basic, so 100 points."
+   },
+   {
+    "prompt": "\n  With your correction: Vikram's membership tier is missing on a 100-rupee purchase (10,000 cents), so it is treated as basic and earns 1 point per 100 cents: he is given 100 points, not a blank answer.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 11 of 49. Leela works exactly 40 hours at 20 rupees an hour: she earns 800 rupees, with no overtime.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 12 of 49. Leela works 41 hours at 20 rupees an hour: the 41st hour is paid at one and a half times, so her pay comes to 830 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Right now? 3: Enter\n9: Enter\n10: Enter\n11: Enter\n12: Enter"
+   },
+   {
+    "prompt": "\n  With your correction: Leela works 41 hours at 20 rupees an hour: her first 40 hours are paid at the normal rate (800 rupees) and the 41st hour at one and a half times (30 rupees), so her pay comes to 830 rupees.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 13 of 49. Ben works 7.5 hours at 19.99 rupees an hour: the pay is rounded half up to the nearest paisa, 149.93 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 14 of 49. A timesheet for Leela shows -5 hours at 20 rupees an hour: no error is raised, her pay is 0 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "13: Enter\n14: No, negative hours should give negative pay: -100 rupees."
+   },
+   {
+    "prompt": "\n  With your correction: Leela's timesheet shows -5 hours at 20 rupees an hour (2000 cents): no error is raised, and no overtime rate applies, so her pay comes to -100 rupees (-10000 cents), a negative amount rather than 0.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 15 of 49. A timesheet typo gives Leela 200 hours in one week at 20 rupees an hour: it is accepted with no cap, and her pay comes to 5,600 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 16 of 49. The title 'Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' becomes the web address cafe-creme-brulee, with the accents removed.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "15: No, 200 hours should come to 7,000 rupees.\n16: Enter"
+   },
+   {
+    "prompt": "\n  With your correction: The title 'Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' is turned into the web address 'cafe-creme-brulee': the accents are dropped and the base letters kept, the spaces become single hyphens, and everything is lower case.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 17 of 49. The title 'Mumbai \u091a\u093e\u092f Shop' loses its Hindi word entirely and becomes mumbai-shop.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 18 of 49. The title 'Gr\u00f6\u00dfe Stra\u00dfe' loses its \u00df letters and becomes gro-e-stra-e instead of a readable word.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "17: Enter\n18: Enter"
+   },
+   {
+    "prompt": "\n  With your correction: The title 'Gr\u00f6\u00dfe Stra\u00dfe' is not mangled: \u00f6 loses its accent and becomes o, and each \u00df is written out as 'ss', so the slug comes out as the readable 'grosse-strasse', not 'gro-e-stra-e'.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": "No, I said Enter on 18. It should stay gro-e-stra-e."
+   },
+   {
+    "prompt": "\nCase 19 of 49. The title 'C++ & C# Guide' loses its plus and hash signs and becomes c-c-guide, the same as a 'C & C Guide' title would.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 20 of 49. A title made only of spaces becomes an empty web address.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "19: Enter\n20: Enter"
+   },
+   {
+    "prompt": "\n  With your correction: A title made only of spaces becomes an empty web address: the spaces are replaced by a hyphen, that leading and trailing hyphen is then removed, and nothing is left, so the result is empty text (not NULL).\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 21 of 49. Four daily sales of 10, 20, 30 and 1000 rupees: the smallest and largest are dropped and the average comes to 25 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 22 of 49. Only two sales of 10 and 1000 rupees are recorded: nothing is dropped, so the average comes to 505 rupees, outlier included.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, with only two sales it should give blank, not 505."
+   },
+   {
+    "prompt": "\n  With your correction: With only two sales recorded, of 10 and 1000 rupees, the system sets nothing aside and doesn't average them, because it needs at least 3 sales to trim: the robust average comes back blank (NULL), not 505 rupees.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 23 of 49. A shop with no sales rows at all: the average is blank.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 24 of 49. A shop whose sales amounts are all missing: the average is blank.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "22: Enter\n23: Enter\n24: Enter"
+   },
+   {
+    "prompt": "\n  With your correction: The shop's sales amounts are all missing (NULL), so none of them count toward the 3 values needed for trimming, and the average sales figure comes back blank (NULL) rather than a number.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 25 of 49. A job runs from Monday 4 March to Friday 8 March 2024: the end day is not counted, so it comes to 4 working days.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 26 of 49. An order placed Monday 4 March 2024 is delivered Saturday 9 March: it comes to 5 working days.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "25: Enter\n26: Enter"
+   },
+   {
+    "prompt": "\n  With your correction: An order placed Monday 4 March 2024 is delivered Saturday 9 March: the working days are counted from Monday 4 March up to but not including the delivery date, so Monday to Friday count (5 days), the Saturday delivery day is not counted, and no holiday falls in that range, so the order comes to 5 working days.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 27 of 49. Neha is on a project from Monday 23 December to Friday 27 December 2024, which includes Christmas Day: public holidays are not taken off, so it comes to 4 working days.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, holidays should come off: Christmas isn't a working day, so 3 working days."
+   },
+   {
+    "prompt": "\n  With your correction: Neha's project runs from Monday 23 December to Friday 27 December 2024: the software counts the start day but not the end day, and it skips both Christmas Day (25 December) and 26 December as holidays, so only Monday 23 and Tuesday 24 count, which comes to 2 working days, not 4.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": "No, only Christmas comes off, not 26 December, so it should be 3 working days."
+   },
+   {
+    "prompt": "\nCase 28 of 49. A contract's start is entered as 8 March 2024 and its end as 4 March 2024, the wrong way round: instead of an error it returns -4 working days.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, it should be 0, not -4."
+   },
+   {
+    "prompt": "\n  With your correction: A contract that starts on 8 March 2024 and ends on 4 March 2024 has its dates entered the wrong way round: the software gives no error and does not return -4, because an end date earlier than the start date always counts as 0 working days, so the contract comes to 0 working days.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 29 of 49. A task starts and ends on the same Monday, 4 March 2024: it comes to 0 working days.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 30 of 49. Priya scores exactly 90 in her course: she gets an A.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 31 of 49. Rohan scores 89.99, a hair under the cut-off: he gets a B, with no rounding up.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, 89.99 rounds to 90, so Rohan should get an A."
+   },
+   {
+    "prompt": "\n  With your correction: Rohan scores 89.99: the score is first rounded to 90, and a rounded 90 meets the A cut-off, so he gets an A, not a B.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 32 of 49. A score of 150 is typed in by mistake for Sana, whose course is marked out of 100: it is accepted and she gets an A.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, 150 should be INVALID, not an A."
+   },
+   {
+    "prompt": "\n  With your correction: Sana's score of 150, typed in by mistake for a course marked out of 100, is rejected as INVALID because it is above 100 and is never graded, so she gets no grade at all and does not get an A.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 33 of 49. A score of -5 is entered for Dev: it is accepted and he gets an F.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, -5 should be INVALID, not an F."
+   },
+   {
+    "prompt": "\n  With your correction: Dev's score of -5 is not accepted and graded as an F: it is rounded to -5, which is below 0, so it is INVALID and gets no grade at all, not an F.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 34 of 49. The score for Ishaan is entered as the text abc: no grade is given, the answer is blank.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 35 of 49. Ravi's 100-rupee invoice is paid 7 days late: it is within the grace period, so the late fee is 0 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, 7 days late is past the grace period, so the fee should be 5 rupees."
+   },
+   {
+    "prompt": "\n  With your correction: Ravi's 100-rupee invoice is paid 7 days late: that is past the 5-day grace period, so the fee is 1% for one late week (1 rupee), which is raised to the 5-rupee minimum and is under the 25-rupee cap, so the late fee comes to 5 rupees, not 0.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 36 of 49. Ravi's 100-rupee invoice is paid 8 days late: the late fee comes to 2 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, the fee should be 5 rupees. The minimum fee applies."
+   },
+   {
+    "prompt": "\n  With your correction: Ravi's 100-rupee invoice is paid 8 days late: that is past the 5-day grace period, so the fee is 1% per late week, which is 2 weeks and comes to 2 rupees, but the 5-rupee minimum fee applies, so the late fee comes to 5 rupees (well under the 25-rupee cap), not 2.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 37 of 49. Ravi's 100-rupee invoice is paid 31 days late: the late fee comes to 9 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, it should be 5 rupees."
+   },
+   {
+    "prompt": "\n  With your correction: Ravi's 100-rupee invoice is paid 31 days late, which is past the 5-day grace period and counts as 5 late weeks at 1% of the amount each, so the fee is 5 rupees (5%, which equals the 5-rupee minimum and is well under the 25-rupee cap): the late fee comes to 5 rupees, not 9, because the old 9% band for 31 or more days no longer applies.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 38 of 49. Ravi's 100-rupee invoice is paid 30 days late: the late fee comes to 5 rupees, so one more day takes it from 5 to 9 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, 31 days is still 5 rupees, not 9."
+   },
+   {
+    "prompt": "\n  With your correction: Ravi's 100-rupee invoice is paid 30 days late, which counts as 5 late weeks at 1% each, so the late fee comes to 5 rupees; one more day (31 days late) is still 5 late weeks, because the 9% band no longer applies, so the fee stays at 5 rupees and does not rise to 9.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 39 of 49. A credit note of minus 100 rupees is 31 days overdue for Ravi: no fee is charged, the late fee is 0 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, it should be -25 rupees, the negative cap."
+   },
+   {
+    "prompt": "\n  With your correction: Ravi's credit note of minus 100 rupees is 31 days overdue, which is past the 5-day grace period: the late fee is the negative cap of 25% of the amount, so it comes to minus 25 rupees, a 25-rupee credit and not 0.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 40 of 49. Anil's card 4111 1111 1111 1111 is printed on a receipt: it shows as stars in groups of four with only the last four digits, 1111, visible.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 41 of 49. A note reads 'Paid with 4111111111111111 today, order 99': the order number is counted as card digits, so two card digits stay visible and the real last four are partly hidden, giving 'Paid with **************11 today, order 99'.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 42 of 49. A short number 1234 is passed in for Anil: it is shown in full, nothing is hidden.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, 1234 should be hidden as ****."
+   },
+   {
+    "prompt": "\n  With your correction: Anil's short number 1234 has only 4 digits in total, so every digit is masked and none is shown: the card comes back as ****.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 43 of 49. A 5-digit number 12345 is passed in: only the first digit is hidden, so it shows as *2345.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 44 of 49. An empty card field on a receipt for Anil: it returns empty text, nothing is shown.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, an empty card should show INVALID, not empty text."
+   },
+   {
+    "prompt": "\n  With your correction: Anil's receipt has a blank card field, so the card-masking step shows INVALID rather than empty text, because text with no digits (including empty text) always returns INVALID.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 45 of 49. A parcel of exactly 1 kg to zone A costs 4 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, it should be 5 rupees."
+   },
+   {
+    "prompt": "\n  With your correction: A parcel of exactly 1 kg (1000 g) going to zone A is not charged 4 rupees: it gets the zone A base charge plus one 500 g block charge (100 cents), so the shipping cost comes to 500 cents, which is 5 rupees.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 46 of 49. A parcel of 1 kg and 1 gram to zone A costs 7 rupees, because any part of a kilo is charged as a full extra kilo.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, it should be 6 rupees."
+   },
+   {
+    "prompt": "\n  With your correction: A parcel of 1 kg and 1 gram to zone A costs 6 rupees (600 cents), not 7: it is charged the 500 cents of a 1000 g parcel plus 100 cents for the one started 500 g block beyond that, so the extra gram is not charged as a full extra kilogram.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 47 of 49. A parcel weighing 0 grams to zone A still costs 4 rupees, the minimum charge.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, a 0 g parcel should cost 0 rupees."
+   },
+   {
+    "prompt": "\n  With your correction: A parcel weighing 0 grams to zone A does not cost 4 rupees, because there is no minimum charge and no base charge for a 0 g parcel: the shipping cost comes to 0 cents (0 rupees).\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 48 of 49. A parcel to zone D, which the company has no price for: no charge is given, the answer is blank.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, an unknown zone should be charged at zone C rates, not left blank."
+   },
+   {
+    "prompt": "\n  With your correction: The parcel to zone D, which the company has no price for, is not left blank: an unknown zone is treated as zone C, so the parcel is charged zone C rates (800 cents for the first started kilogram, plus 200 cents for each started 500 g block beyond the first kilogram, or 0 cents if it weighs 0 grams), and the case gives no weight, so the outcome is a zone C charge and not a blank answer.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 49 of 49. A 500 kg pallet to zone A is accepted with no weight limit: the charge comes to 1,501 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   }
+  ],
+  "transcript": "Hive: Now 49 quick checks on what the build does in real cases. Press Enter if a result is right, or say what should happen instead.\n\nCase 1 of 49. Meera was born on 29 February 2000 and is checked on 28 February 2023, one day before 1 March: she is counted as not yet having had her birthday, so her age comes to 22.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 2 of 49. Meera, born on 29 February 2000, is checked on 1 March 2023: her age comes to 23.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 3 of 49. Arjun's birth date is entered as 1 May 2020 but the check date is 1 May 2019, a year before he was born: no age is given, the answer is blank.\n  Right? (Enter = yes, or say what should happen) > 1: Enter\n2: Enter\n3: It should show -1, not blank.\n\n  With your correction: Arjun's birth date is entered as 1 May 2020 and the check date is 1 May 2019, a year before he was born: the age is not blank, the software returns -1.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 4 of 49. Check date 2024-13-45 is typed for Kavita, who was born 1 May 1990: no age is given, the answer is blank.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 5 of 49. Kavita's check date is left empty: no age is given, the answer is blank.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 6 of 49. Asha, a gold member, spends 99.99 rupees: she earns 199 points, because the fraction is dropped rather than rounded.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 7 of 49. Vikram is recorded with a tier called diamond, which the company has no rule for: he is treated like a basic member and earns 100 points on 100 rupees.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 8 of 49. Tara, a silver member, spends 100 rupees: she earns 150 points.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 9 of 49. Asha, a gold member, returns 50 rupees of goods and the amount is passed as negative: she earns 0 points, and none are taken back.\n  Right? (Enter = yes, or say what should happen) > 3: Enter\n4: Enter\n5: Enter\n6: Enter\n7: Enter\n8: Enter\n9: No, points should be taken back: -100.\n\n  With your correction: Asha, a gold member, returns 50 rupees (5,000 cents) of goods, passed as a negative amount: the software takes back the 100 points that a 5,000-cent gold purchase would earn (2 points per 100 cents), so her points change by -100.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 10 of 49. Vikram's membership tier is missing on a 100-rupee purchase: no points are given, the answer is blank, not even the basic rate.\n  Right? (Enter = yes, or say what should happen) > Missing tier should count as basic, so 100 points.\n\n  With your correction: Vikram's membership tier is missing on a 100-rupee purchase (10,000 cents), so it is treated as basic and earns 1 point per 100 cents: he is given 100 points, not a blank answer.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 11 of 49. Leela works exactly 40 hours at 20 rupees an hour: she earns 800 rupees, with no overtime.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 12 of 49. Leela works 41 hours at 20 rupees an hour: the 41st hour is paid at one and a half times, so her pay comes to 830 rupees.\n  Right? (Enter = yes, or say what should happen) > Right now? 3: Enter\n9: Enter\n10: Enter\n11: Enter\n12: Enter\n\n  With your correction: Leela works 41 hours at 20 rupees an hour: her first 40 hours are paid at the normal rate (800 rupees) and the 41st hour at one and a half times (30 rupees), so her pay comes to 830 rupees.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 13 of 49. Ben works 7.5 hours at 19.99 rupees an hour: the pay is rounded half up to the nearest paisa, 149.93 rupees.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 14 of 49. A timesheet for Leela shows -5 hours at 20 rupees an hour: no error is raised, her pay is 0 rupees.\n  Right? (Enter = yes, or say what should happen) > 13: Enter\n14: No, negative hours should give negative pay: -100 rupees.\n\n  With your correction: Leela's timesheet shows -5 hours at 20 rupees an hour (2000 cents): no error is raised, and no overtime rate applies, so her pay comes to -100 rupees (-10000 cents), a negative amount rather than 0.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 15 of 49. A timesheet typo gives Leela 200 hours in one week at 20 rupees an hour: it is accepted with no cap, and her pay comes to 5,600 rupees.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 16 of 49. The title 'Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' becomes the web address cafe-creme-brulee, with the accents removed.\n  Right? (Enter = yes, or say what should happen) > 15: No, 200 hours should come to 7,000 rupees.\n16: Enter\n\n  With your correction: The title 'Caf\u00e9 Cr\u00e8me Br\u00fbl\u00e9e' is turned into the web address 'cafe-creme-brulee': the accents are dropped and the base letters kept, the spaces become single hyphens, and everything is lower case.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 17 of 49. The title 'Mumbai \u091a\u093e\u092f Shop' loses its Hindi word entirely and becomes mumbai-shop.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 18 of 49. The title 'Gr\u00f6\u00dfe Stra\u00dfe' loses its \u00df letters and becomes gro-e-stra-e instead of a readable word.\n  Right? (Enter = yes, or say what should happen) > 17: Enter\n18: Enter\n\n  With your correction: The title 'Gr\u00f6\u00dfe Stra\u00dfe' is not mangled: \u00f6 loses its accent and becomes o, and each \u00df is written out as 'ss', so the slug comes out as the readable 'grosse-strasse', not 'gro-e-stra-e'.\n  Right now? (Enter = yes, or say what should happen) > No, I said Enter on 18. It should stay gro-e-stra-e.\n\nCase 19 of 49. The title 'C++ & C# Guide' loses its plus and hash signs and becomes c-c-guide, the same as a 'C & C Guide' title would.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 20 of 49. A title made only of spaces becomes an empty web address.\n  Right? (Enter = yes, or say what should happen) > 19: Enter\n20: Enter\n\n  With your correction: A title made only of spaces becomes an empty web address: the spaces are replaced by a hyphen, that leading and trailing hyphen is then removed, and nothing is left, so the result is empty text (not NULL).\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 21 of 49. Four daily sales of 10, 20, 30 and 1000 rupees: the smallest and largest are dropped and the average comes to 25 rupees.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 22 of 49. Only two sales of 10 and 1000 rupees are recorded: nothing is dropped, so the average comes to 505 rupees, outlier included.\n  Right? (Enter = yes, or say what should happen) > No, with only two sales it should give blank, not 505.\n\n  With your correction: With only two sales recorded, of 10 and 1000 rupees, the system sets nothing aside and doesn't average them, because it needs at least 3 sales to trim: the robust average comes back blank (NULL), not 505 rupees.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 23 of 49. A shop with no sales rows at all: the average is blank.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 24 of 49. A shop whose sales amounts are all missing: the average is blank.\n  Right? (Enter = yes, or say what should happen) > 22: Enter\n23: Enter\n24: Enter\n\n  With your correction: The shop's sales amounts are all missing (NULL), so none of them count toward the 3 values needed for trimming, and the average sales figure comes back blank (NULL) rather than a number.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 25 of 49. A job runs from Monday 4 March to Friday 8 March 2024: the end day is not counted, so it comes to 4 working days.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 26 of 49. An order placed Monday 4 March 2024 is delivered Saturday 9 March: it comes to 5 working days.\n  Right? (Enter = yes, or say what should happen) > 25: Enter\n26: Enter\n\n  With your correction: An order placed Monday 4 March 2024 is delivered Saturday 9 March: the working days are counted from Monday 4 March up to but not including the delivery date, so Monday to Friday count (5 days), the Saturday delivery day is not counted, and no holiday falls in that range, so the order comes to 5 working days.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 27 of 49. Neha is on a project from Monday 23 December to Friday 27 December 2024, which includes Christmas Day: public holidays are not taken off, so it comes to 4 working days.\n  Right? (Enter = yes, or say what should happen) > No, holidays should come off: Christmas isn't a working day, so 3 working days.\n\n  With your correction: Neha's project runs from Monday 23 December to Friday 27 December 2024: the software counts the start day but not the end day, and it skips both Christmas Day (25 December) and 26 December as holidays, so only Monday 23 and Tuesday 24 count, which comes to 2 working days, not 4.\n  Right now? (Enter = yes, or say what should happen) > No, only Christmas comes off, not 26 December, so it should be 3 working days.\n\nCase 28 of 49. A contract's start is entered as 8 March 2024 and its end as 4 March 2024, the wrong way round: instead of an error it returns -4 working days.\n  Right? (Enter = yes, or say what should happen) > No, it should be 0, not -4.\n\n  With your correction: A contract that starts on 8 March 2024 and ends on 4 March 2024 has its dates entered the wrong way round: the software gives no error and does not return -4, because an end date earlier than the start date always counts as 0 working days, so the contract comes to 0 working days.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 29 of 49. A task starts and ends on the same Monday, 4 March 2024: it comes to 0 working days.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 30 of 49. Priya scores exactly 90 in her course: she gets an A.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 31 of 49. Rohan scores 89.99, a hair under the cut-off: he gets a B, with no rounding up.\n  Right? (Enter = yes, or say what should happen) > No, 89.99 rounds to 90, so Rohan should get an A.\n\n  With your correction: Rohan scores 89.99: the score is first rounded to 90, and a rounded 90 meets the A cut-off, so he gets an A, not a B.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 32 of 49. A score of 150 is typed in by mistake for Sana, whose course is marked out of 100: it is accepted and she gets an A.\n  Right? (Enter = yes, or say what should happen) > No, 150 should be INVALID, not an A.\n\n  With your correction: Sana's score of 150, typed in by mistake for a course marked out of 100, is rejected as INVALID because it is above 100 and is never graded, so she gets no grade at all and does not get an A.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 33 of 49. A score of -5 is entered for Dev: it is accepted and he gets an F.\n  Right? (Enter = yes, or say what should happen) > No, -5 should be INVALID, not an F.\n\n  With your correction: Dev's score of -5 is not accepted and graded as an F: it is rounded to -5, which is below 0, so it is INVALID and gets no grade at all, not an F.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 34 of 49. The score for Ishaan is entered as the text abc: no grade is given, the answer is blank.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 35 of 49. Ravi's 100-rupee invoice is paid 7 days late: it is within the grace period, so the late fee is 0 rupees.\n  Right? (Enter = yes, or say what should happen) > No, 7 days late is past the grace period, so the fee should be 5 rupees.\n\n  With your correction: Ravi's 100-rupee invoice is paid 7 days late: that is past the 5-day grace period, so the fee is 1% for one late week (1 rupee), which is raised to the 5-rupee minimum and is under the 25-rupee cap, so the late fee comes to 5 rupees, not 0.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 36 of 49. Ravi's 100-rupee invoice is paid 8 days late: the late fee comes to 2 rupees.\n  Right? (Enter = yes, or say what should happen) > No, the fee should be 5 rupees. The minimum fee applies.\n\n  With your correction: Ravi's 100-rupee invoice is paid 8 days late: that is past the 5-day grace period, so the fee is 1% per late week, which is 2 weeks and comes to 2 rupees, but the 5-rupee minimum fee applies, so the late fee comes to 5 rupees (well under the 25-rupee cap), not 2.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 37 of 49. Ravi's 100-rupee invoice is paid 31 days late: the late fee comes to 9 rupees.\n  Right? (Enter = yes, or say what should happen) > No, it should be 5 rupees.\n\n  With your correction: Ravi's 100-rupee invoice is paid 31 days late, which is past the 5-day grace period and counts as 5 late weeks at 1% of the amount each, so the fee is 5 rupees (5%, which equals the 5-rupee minimum and is well under the 25-rupee cap): the late fee comes to 5 rupees, not 9, because the old 9% band for 31 or more days no longer applies.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 38 of 49. Ravi's 100-rupee invoice is paid 30 days late: the late fee comes to 5 rupees, so one more day takes it from 5 to 9 rupees.\n  Right? (Enter = yes, or say what should happen) > No, 31 days is still 5 rupees, not 9.\n\n  With your correction: Ravi's 100-rupee invoice is paid 30 days late, which counts as 5 late weeks at 1% each, so the late fee comes to 5 rupees; one more day (31 days late) is still 5 late weeks, because the 9% band no longer applies, so the fee stays at 5 rupees and does not rise to 9.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 39 of 49. A credit note of minus 100 rupees is 31 days overdue for Ravi: no fee is charged, the late fee is 0 rupees.\n  Right? (Enter = yes, or say what should happen) > No, it should be -25 rupees, the negative cap.\n\n  With your correction: Ravi's credit note of minus 100 rupees is 31 days overdue, which is past the 5-day grace period: the late fee is the negative cap of 25% of the amount, so it comes to minus 25 rupees, a 25-rupee credit and not 0.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 40 of 49. Anil's card 4111 1111 1111 1111 is printed on a receipt: it shows as stars in groups of four with only the last four digits, 1111, visible.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 41 of 49. A note reads 'Paid with 4111111111111111 today, order 99': the order number is counted as card digits, so two card digits stay visible and the real last four are partly hidden, giving 'Paid with **************11 today, order 99'.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 42 of 49. A short number 1234 is passed in for Anil: it is shown in full, nothing is hidden.\n  Right? (Enter = yes, or say what should happen) > No, 1234 should be hidden as ****.\n\n  With your correction: Anil's short number 1234 has only 4 digits in total, so every digit is masked and none is shown: the card comes back as ****.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 43 of 49. A 5-digit number 12345 is passed in: only the first digit is hidden, so it shows as *2345.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 44 of 49. An empty card field on a receipt for Anil: it returns empty text, nothing is shown.\n  Right? (Enter = yes, or say what should happen) > No, an empty card should show INVALID, not empty text.\n\n  With your correction: Anil's receipt has a blank card field, so the card-masking step shows INVALID rather than empty text, because text with no digits (including empty text) always returns INVALID.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 45 of 49. A parcel of exactly 1 kg to zone A costs 4 rupees.\n  Right? (Enter = yes, or say what should happen) > No, it should be 5 rupees.\n\n  With your correction: A parcel of exactly 1 kg (1000 g) going to zone A is not charged 4 rupees: it gets the zone A base charge plus one 500 g block charge (100 cents), so the shipping cost comes to 500 cents, which is 5 rupees.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 46 of 49. A parcel of 1 kg and 1 gram to zone A costs 7 rupees, because any part of a kilo is charged as a full extra kilo.\n  Right? (Enter = yes, or say what should happen) > No, it should be 6 rupees.\n\n  With your correction: A parcel of 1 kg and 1 gram to zone A costs 6 rupees (600 cents), not 7: it is charged the 500 cents of a 1000 g parcel plus 100 cents for the one started 500 g block beyond that, so the extra gram is not charged as a full extra kilogram.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 47 of 49. A parcel weighing 0 grams to zone A still costs 4 rupees, the minimum charge.\n  Right? (Enter = yes, or say what should happen) > No, a 0 g parcel should cost 0 rupees.\n\n  With your correction: A parcel weighing 0 grams to zone A does not cost 4 rupees, because there is no minimum charge and no base charge for a 0 g parcel: the shipping cost comes to 0 cents (0 rupees).\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 48 of 49. A parcel to zone D, which the company has no price for: no charge is given, the answer is blank.\n  Right? (Enter = yes, or say what should happen) > No, an unknown zone should be charged at zone C rates, not left blank.\n\n  With your correction: The parcel to zone D, which the company has no price for, is not left blank: an unknown zone is treated as zone C, so the parcel is charged zone C rates (800 cents for the first started kilogram, plus 200 cents for each started 500 g block beyond the first kilogram, or 0 cents if it weighs 0 grams), and the case gives no weight, so the outcome is a zone C charge and not a blank answer.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 49 of 49. A 500 kg pallet to zone A is accepted with no weight limit: the charge comes to 1,501 rupees.\n  Right? (Enter = yes, or say what should happen) > \n"
+ },
+ "minutes": {
+  "list": 1.0,
+  "spots": 11.5
+ },
+ "cost_usd": {
+  "documenter": 0.1561547,
+  "describer": 0.292581,
+  "spotter": 0.24526599999999996,
+  "owner_morning": 1.5833229,
+  "judge": 0.3795166,
+  "owner_SL": 0.679,
+  "owner_HV_spots": 5.87
+ },
+ "labels": [
+  {
+   "function": "late_fee",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "right",
+   "HV": "right",
+   "QA": "right",
+   "R": "right",
+   "note": "D says 7-day grace (rule 18); later sheets say 5.",
+   "label": "right"
+  },
+  {
+   "function": "late_fee",
+   "decision": 1,
+   "D": "absent",
+   "SL": "right",
+   "HV": "right",
+   "QA": "right",
+   "R": "right",
+   "note": "D has banded % and no 25% cap.",
+   "label": "right"
+  },
+  {
+   "function": "late_fee",
+   "decision": 2,
+   "D": "absent",
+   "SL": "right",
+   "HV": "right",
+   "QA": "right",
+   "R": "right",
+   "note": "D has no 500 minimum.",
+   "label": "right"
+  },
+  {
+   "function": "late_fee",
+   "decision": 3,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "wrong",
+   "QA": "right",
+   "R": "right",
+   "note": "D/SL/HV round half up (rule 20; HV rule 21 also for negative cap); policy truncates (floor). QA Q24 and R correct.",
+   "label": "right"
+  },
+  {
+   "function": "ship_cost",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "right",
+   "QA": "right",
+   "R": "right",
+   "note": "D/SL: unknown zone gives NULL; HV corrected to zone C.",
+   "label": "right"
+  },
+  {
+   "function": "ship_cost",
+   "decision": 1,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "QA": "right",
+   "R": "right",
+   "note": "",
+   "label": "right"
+  },
+  {
+   "function": "ship_cost",
+   "decision": 2,
+   "D": "absent",
+   "SL": "absent",
+   "HV": "absent",
+   "QA": "right",
+   "R": "right",
+   "note": "Surcharge >20000 g first appears in QA.",
+   "label": "right"
+  },
+  {
+   "function": "ship_cost",
+   "decision": 3,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "wrong",
+   "QA": "right",
+   "R": "right",
+   "note": "D/SL: 0 g gets base, negative NULL. HV: 0 g costs 0 (right) but negative weight still NULL (rules 46, 48), policy gives 0.",
+   "label": "right"
+  },
+  {
+   "function": "mask_card",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "right",
+   "HV": "right",
+   "QA": "right",
+   "R": "right",
+   "note": "D returns <5-digit text unchanged.",
+   "label": "right"
+  },
+  {
+   "function": "mask_card",
+   "decision": 1,
+   "D": "absent",
+   "SL": "absent",
+   "HV": "absent",
+   "QA": "right",
+   "R": "right",
+   "note": "Amex last-5 exception only in QA and R.",
+   "label": "right"
+  },
+  {
+   "function": "mask_card",
+   "decision": 2,
+   "D": "wrong",
+   "SL": "right",
+   "HV": "right",
+   "QA": "absent",
+   "R": "right",
+   "note": "D returns text unchanged (no digits); QA never addresses no-digit text.",
+   "label": "right"
+  },
+  {
+   "function": "grade_letter",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "right",
+   "QA": "right",
+   "R": "right",
+   "note": "D no rounding. SL rule 14 says round first but rule 13 keeps unrounded cut-offs (89.99 is B, 59.9 is F), a conflict. HV rewrote rule 13 consistently.",
+   "label": "right"
+  },
+  {
+   "function": "grade_letter",
+   "decision": 1,
+   "D": "wrong",
+   "SL": "partial",
+   "HV": "right",
+   "QA": "right",
+   "R": "right",
+   "note": "D: >100 gives A, <0 gives F. SL rule 14 gives INVALID but rule 17 still says inf gives A (policy INVALID). HV fixed inf/-inf.",
+   "label": "right"
+  },
+  {
+   "function": "grade_letter",
+   "decision": 2,
+   "D": "wrong",
+   "SL": "right",
+   "HV": "right",
+   "QA": "right",
+   "R": "right",
+   "note": "D has no A+.",
+   "label": "right"
+  },
+  {
+   "function": "biz_days",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "right",
+   "QA": "right",
+   "R": "right",
+   "note": "D/SL return negative for reversed range.",
+   "label": "right"
+  },
+  {
+   "function": "biz_days",
+   "decision": 1,
+   "D": "wrong",
+   "SL": "right",
+   "HV": "wrong",
+   "QA": "right",
+   "R": "right",
+   "note": "D excludes no holidays. SL right. HV rule 10 prose right but its example (2024-12-24 to 12-26 gives 2) contradicts it and policy (gives 1), so conflicting.",
+   "label": "right"
+  },
+  {
+   "function": "loyalty_pts",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "partial",
+   "QA": "right",
+   "R": "right",
+   "note": "D/SL: NULL tier gives NULL and platinum is 3x (policy: platinum unknown so basic). HV fixes NULL but still keeps platinum at 3x.",
+   "label": "right"
+  },
+  {
+   "function": "loyalty_pts",
+   "decision": 1,
+   "D": "absent",
+   "SL": "absent",
+   "HV": "absent",
+   "QA": "right",
+   "R": "right",
+   "note": "5000 cap only in QA and R.",
+   "label": "right"
+  },
+  {
+   "function": "loyalty_pts",
+   "decision": 2,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "QA": "right",
+   "R": "right",
+   "note": "",
+   "label": "right"
+  },
+  {
+   "function": "slugify",
+   "decision": 0,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "QA": "right",
+   "R": "right",
+   "note": "HV rule 54 turns ae/oe/o-slash into ae/oe/o, unlike policy (separators), but that is not accent removal.",
+   "label": "right"
+  },
+  {
+   "function": "slugify",
+   "decision": 1,
+   "D": "absent",
+   "SL": "absent",
+   "HV": "absent",
+   "QA": "right",
+   "R": "right",
+   "note": "30-char cap only in QA and R.",
+   "label": "right"
+  },
+  {
+   "function": "shift_pay",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "wrong",
+   "QA": "right",
+   "R": "right",
+   "note": "D/SL/HV: 1.5x for all hours past 40, no double time.",
+   "label": "right"
+  },
+  {
+   "function": "shift_pay",
+   "decision": 1,
+   "D": "absent",
+   "SL": "absent",
+   "HV": "absent",
+   "QA": "absent",
+   "R": "right",
+   "note": "QA only covers cent rounding; quarter-hour rounding only in R.",
+   "label": "right"
+  },
+  {
+   "function": "age_years",
+   "decision": 0,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "QA": "right",
+   "R": "right",
+   "note": "",
+   "label": "right"
+  },
+  {
+   "function": "robust_mean",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "partial",
+   "QA": "right",
+   "R": "right",
+   "note": "D/SL: 1-2 values give plain average. HV: NULL for <3 non-NULL, but rule 63 still counts text as numbers, so [1,2,text] differs from policy.",
+   "label": "right"
+  }
+ ]
+}

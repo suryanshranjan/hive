@@ -1,0 +1,61 @@
+{
+ "name": "g70b",
+ "arms": {
+  "N0": {
+   "hidden_pass": 0.312,
+   "ci95_by_function": [
+    0.208,
+    0.412
+   ],
+   "tests": 250
+  },
+  "QN": {
+   "hidden_pass": 0.376,
+   "ci95_by_function": [
+    0.264,
+    0.488
+   ],
+   "tests": 250
+  },
+  "HV": {
+   "hidden_pass": 0.804,
+   "ci95_by_function": [
+    0.688,
+    0.912
+   ],
+   "tests": 250
+  },
+  "QA": {
+   "hidden_pass": 1.0,
+   "ci95_by_function": [
+    1.0,
+    1.0
+   ],
+   "tests": 250
+  }
+ },
+ "diffs": {
+  "QN-N0": {
+   "points": 6.4,
+   "ci95": [
+    1.6,
+    11.6
+   ]
+  },
+  "HV-N0": {
+   "points": 49.2,
+   "ci95": [
+    34.8,
+    64.4
+   ]
+  },
+  "QA-N0": {
+   "points": 68.8,
+   "ci95": [
+    58.8,
+    78.8
+   ]
+  }
+ },
+ "allowance": {}
+}

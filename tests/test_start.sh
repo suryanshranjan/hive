@@ -95,6 +95,15 @@ check "with a code sheet, it exits cleanly" $? 0
 check "the assumptions are covered by the code sheet, not reviewed one by one" \
   "$(grep -c "Rather than going through them one by one" $T/sheet.txt) $(grep -c "Assumption 1 of" $T/sheet.txt) $(grep -c "What the build does now, as rules" $T/sheet.txt)" "1 0 1"
 check "after the rules, spot checks on concrete cases of the parts his review left alone (Gate 58)"   "$(grep -c "quick check.* on what the build does in real cases" $T/sheet.txt) $(grep -q "2 of 2." $T/sheet.txt && echo shown)" "1 shown"
+# Gate 70: overnight, builders record their questions for his morning; hive morning asks them, then builds his answers in
+git checkout -q main
+printf 'Implement creator fees and payouts.\n' | HIVE_WORKER_CMD="sh $HIVE/tests/fake_later_worker.sh" \
+  $PY -m hive start --workers 1 --overnight > $T/later.txt 2>&1
+check "overnight, the builders' questions are recorded, not waited on, and he is told to answer them in the morning" \
+  "$(grep -c 'wrote down 2 questions only you can answer' $T/later.txt) $(grep -c 'Recorded for the owner' $(ls -td $T/.hive/runs/*/ | head -1)build/ask_out.txt)" "1 1"
+printf 'B\nA\n' | HIVE_WORKER_CMD="sh $HIVE/tests/fake_later_worker.sh" $PY -m hive morning > $T/later_morning.txt 2>&1
+check "in the morning he answers them, and a fix round builds his answers in" \
+  "$(grep -c 'Your answers are built in' $T/later_morning.txt) $(ls $(ls -td $T/.hive/runs/*/ | head -1)fix/answers_seen 2>/dev/null | wc -l)" "2 1"
 # Gate 68: after builders asked him (here 3 questions), the long hand-over is skipped: his answers are built in
 git checkout -q main
 printf 'Implement creator fees and payouts.\nA\nB\nA\n' | HIVE_WORKER_CMD="sh $HIVE/tests/fake_three_asks_worker.sh" \

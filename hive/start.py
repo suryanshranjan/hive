@@ -290,12 +290,27 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
                  rules=rules, workers=workers, minutes=minutes, before=before, started=time.time(), overnight=overnight,
                  asked=asked, spent0=spent0)
     run1 = os.path.join(home, 'build')
-    b, code = _phase(source, run1, workers, goal_text + rules, minutes, 0 if overnight else QUESTIONS_PER_BUILDER * workers, True,
+    b, code = _phase(source, run1, workers, goal_text + rules, minutes, 'later' if overnight else QUESTIONS_PER_BUILDER * workers, True,
                      not overnight, phone)
     state.update(b=b, code=code, final=run1, cost=_cost(run1))
     json.dump(state, open(os.path.join(home, 'state.json'), 'w'), indent=1)
     say(f'\n[{_now()}] ' + (f'All {workers} builders are done.' if workers > 1 else 'The builder is done.'))
     found = owner._assumptions(os.path.join(run1, 'owner'), False)   # business defaults only; technical ones go to engineers
+    recorded = owner.pending(run1) if overnight else []
+    if recorded:   # Gate 70: the night's questions, answered in the morning, beat reviewing the finished build (94 vs 75%)
+        rc = _deliver(state)
+        if phone:
+            phone.send(f"🐝 {'Good morning' if 4 <= time.localtime().tm_hour < 12 else 'Hello'}"
+                       f"{', ' + phone.name() if phone.name() else ''}. The build is done, and {_who(state).lower()} wrote down "
+                       f"{_n(len(recorded), 'question')} only you can answer. I'll send them one at a time; a tap or a few words "
+                       "is enough.")
+            if _answer_and_fix(state, phone):
+                rc = _deliver(state)
+                phone.send(f"🎉 Done. Your answers are built in. {state.get('check', '')} It's ready on branch hive/{name}.")
+            return rc
+        say(f"\n{_who(state)} wrote down {_n(len(recorded), 'question')} only you can answer. When you're back, type "
+            "`hive morning`: answer them, and I'll change the build to your answers and update the branch.")
+        return rc
     if overnight and phone:
         rc = _deliver(state)
         if not found:
@@ -352,6 +367,38 @@ ASKED_ENOUGH = 3             # answered builder questions after which the hand-o
 def _answered(run):
     """How many of the builders' questions the owner answered during this build."""
     return len(glob.glob(os.path.join(run, 'owner', 'answers', '*.json')))
+
+def _answer_and_fix(state, ch=None):
+    """Gate 70: he answers the questions the builders recorded overnight (here, or on the phone), then one fix round
+    changes the build to his answers. Returns True when a fix round ran."""
+    run1 = os.path.join(state['home'], 'build')
+    if ch:
+        telegram.bridge_questions(run1, ch, until=lambda: True)
+    else:
+        owner.serve(run1, until=lambda: True, greet=False)
+    d = os.path.join(run1, 'owner'); qa = []
+    for p in sorted(glob.glob(os.path.join(d, 'answers', '*.json'))):
+        a = json.load(open(p))
+        if not a.get('no_owner'):
+            qa.append((json.load(open(os.path.join(d, 'questions', a['id'] + '.json')))['question'], a['answer']))
+    if not qa:
+        return False
+    say(f'\n[{_now()}] Sending the builders back to build your {_n(len(qa), "answer")} in.')
+    fsrc = os.path.join(state['home'], 'fix_source')
+    sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', state['b'], os.path.join(run1, 'up.git'), fsrc)
+    _link(state['repo'], fsrc, state['links'])
+    note = ("\n\n# The owner's answers\n\nWhile this was built overnight, the team recorded these questions, and the owner "
+            "answered them this morning. Change the code to follow every answer, encode each as a test, change any existing "
+            "test that asserts a guess he overturned (the guard accepts an edited test that passes; name it in your land "
+            "message), and leave everything else alone. Do not stretch an answer beyond the situation it settles.\n\n"
+            + '\n'.join(f'- Q: {q}\n  A: {a}' for q, a in qa) + '\n')
+    run2 = os.path.join(state['home'], 'fix')
+    _phase(fsrc, run2, min(state['workers'], max(1, (len(qa) + 3) // 4)), state['goal'] + state.get('rules', '') + note,
+           state['minutes'], 0, False, False, ch)
+    state.update(final=run2, cost=state['cost'] + _cost(run2), started=time.time())
+    json.dump(state, open(os.path.join(state['home'], 'state.json'), 'w'), indent=1)
+    say(f'[{_now()}] Your answers are built in.')
+    return True
 
 def _review_and_fix(state, phone=None):
     """The owner checks the business assumptions (here, or on the phone); anything corrected goes back to the builders
@@ -470,6 +517,24 @@ def morning(name=None, phone=False):
             if not os.path.exists(os.path.join(run1, 'owner', 'reviews', a['id'] + '.json'))]
     from .explain import _goal_summary
     say(f"\nWelcome back. While you were away, the builders worked on: {_goal_summary(state['goal']).splitlines()[0][:120]}")
+    recorded = owner.pending(run1)
+    if recorded:   # Gate 70: answer the night's questions, then a fix round builds the answers in
+        state['started'] = time.time()
+        ch = None
+        if phone:
+            cfg = telegram.load()
+            if not cfg:
+                say('Telegram is not connected yet: run hive telegram setup first.'); return 1
+            ch = telegram.Channel(cfg)
+            say(f"I'm sending {_who(state).lower()}'s {_n(len(recorded), 'question')} to your phone.")
+        else:
+            say(f"{_who(state)} wrote down {_n(len(recorded), 'question')} only you can answer. Pick a letter, or answer in "
+                "your own words, and press Enter.")
+        fixed = _answer_and_fix(state, ch)
+        rc = _deliver(state)
+        msg = (f"Your answers are built in. {state.get('check', '')} " if fixed else '') + f"It's ready on branch hive/{state['name']}."
+        (ch.send('🎉 ' + msg) if ch else say('\n' + msg))
+        return rc
     if not todo:
         say('There is nothing left for you to check. The result is on branch hive/' + state['name'] + '.'); return 0
     state['started'] = time.time()
