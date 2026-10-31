@@ -29,7 +29,9 @@ def ask_text(arm, port):
          "decision per question; he answers in a sentence or two, at a person's pace. **Before you build each business function, "
          "ask him about every decision its one-line spec leaves open** (cut-offs and boundaries, rounding, minimums and caps, "
          "what happens with blank, missing, negative or oddly formatted input), and build to his answers. (`tools/ask.py` is "
-         "not used on this project.)")
+         "not used on this project.) He answers one question at a time; if he has not answered within 90 seconds, the tool says "
+         f"so and your question stays with him: work on another part meanwhile, and read `{tool} --answers` before you build "
+         "the part it decides.")
     if arm == 'S7':
         t += f" Your teammates ask him too: first read every answer so far with `{tool} --answers`, and never ask again what he has answered."
     return t
