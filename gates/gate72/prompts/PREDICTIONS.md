@@ -44,3 +44,12 @@ Registered Nov 1 2026, before any team runs. The user: "I think a swarm of agent
 - One run per arm per order, on a 2-CPU machine. Gate 46's identical teams differed by about 30% in time.
 - A synthetic owner whose answers never drift; his pace is simulated.
 - About $30 and about 3 hours.
+
+## Amendment, Nov 1 2026, before any team ran
+
+Gate 71's first run found that a swarm loses answers when a slow owner is shared. A builder's command is cut off at 2 minutes, and with 7 builders queued on one owner answering every 60 s, questions waited longer than that. Builders guessed, and the answers arrived too late (S7 85.0% vs A1 97.6%). Before any Gate 72 team ran, the owner on call was changed:
+- questions queue at once;
+- the ask tool waits at most 90 s, then says the question is with him;
+- builders are told to work on another part meanwhile, and to read the answers before building the part it decides.
+
+The same applies to both arms (A1 never waits long). Hive's `hive ask` gets the same change. The predictions and the analysis are unchanged.
