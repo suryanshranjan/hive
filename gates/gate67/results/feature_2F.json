@@ -1,0 +1,1132 @@
+{
+ "feature": 2,
+ "arm": "F",
+ "rulings_in": [],
+ "house_in": [],
+ "cost": {
+  "describer": 0.2792881,
+  "spotter": 0.2197976,
+  "judge": 0.22293260000000004,
+  "owner_list": 0.794,
+  "owner_spots": 2.983
+ },
+ "decisions": {
+  "boarding_cost": [
+   "convention: money rounds up to the cent",
+   "convention: missing or unreadable input becomes zero value",
+   "days beyond the 7th at 80 percent",
+   "partial days round up to whole days"
+  ],
+  "loyalty_tier": [
+   "convention: missing or unreadable input becomes zero value",
+   "convention: value equal to a threshold falls in the lower tier",
+   "spend counts one point per whole 10",
+   "visits counted up to 30"
+  ],
+  "membership_expiry": [
+   "convention: missing or unreadable input becomes zero value",
+   "convention: nonexistent day in target month spills into next month",
+   "expiry on a Sunday moves to Monday",
+   "membership length limited to 60 months"
+  ],
+  "adoption_anniversary": [
+   "convention: missing or unreadable input becomes zero value",
+   "convention: nonexistent day in target month spills into next month",
+   "fractional years round half up",
+   "negative years give NULL"
+  ],
+  "owner_label": [
+   "convention: text results cut to 12 characters",
+   "surname capitalised first letter only",
+   "blank first name gives surname alone",
+   "blank surname becomes Unknown"
+  ]
+ },
+ "D": [
+  "Whenever adoption_anniversary is given a valid adoption date and a whole number of years, it returns the adoption date moved forward by that many years, as YYYY-MM-DD, keeping the same month and day.",
+  "Whenever adoption_anniversary lands on a day that does not exist in the target year (29 February in a non-leap year), it returns the last day of that month instead (29 February 2020 plus 1 year gives 2021-02-28, plus 4 years gives 2024-02-29).",
+  "Whenever adoption_anniversary is given 0 years, it returns the adoption date unchanged.",
+  "Whenever adoption_anniversary is given a fractional number of years, it drops the fraction and does not round (1.9 years counts as 1 year).",
+  "Whenever adoption_anniversary is given a negative number of years (including -0.5), it returns NULL.",
+  "Whenever the years given to adoption_anniversary are NULL, empty text, text that is not a plain number, or an infinite value, it returns NULL.",
+  "Whenever the years given to adoption_anniversary are text that looks like a plain number (for example '2', ' 2 ', '+2' or '1e1'), it reads them as that number; spaces around the number are ignored.",
+  "Whenever the adoption date given to adoption_anniversary is NULL, empty text, a real number, or not written exactly as four-digit year, two-digit month and two-digit day separated by dashes (such as '2020-3-5', '2020/03/15' or a date followed by a time), it returns NULL.",
+  "Whenever the adoption date given to adoption_anniversary is a date that does not exist (such as 2020-02-30 or month 13) or has year 0000, it returns NULL.",
+  "Whenever the adoption date given to adoption_anniversary has spaces before or after it, the spaces are ignored and the anniversary is calculated normally.",
+  "Whenever the anniversary computed by adoption_anniversary would fall after the year 9999, it returns NULL (9990-03-15 plus 9 years is 9999-03-15, plus 10 years is NULL).",
+  "Whenever membership_expiry is given a valid start date and a number of months, it returns the start date moved forward by that many months, as YYYY-MM-DD, keeping the same day of the month.",
+  "Whenever membership_expiry lands on a day that does not exist in the target month, it returns the last day of that month (2020-01-31 plus 1 month gives 2020-02-29; 2021-01-31 plus 1 month gives 2021-02-28).",
+  "Whenever membership_expiry moves past December, it rolls into the next year (2020-12-15 plus 1 month gives 2021-01-15; 12 months gives the same day next year).",
+  "Whenever membership_expiry is given a fractional number of months, it drops the fraction and does not round (1.5 months counts as 1 month, 0.9 months counts as 0).",
+  "Whenever membership_expiry is given 0 months, or a negative amount smaller than one month such as -0.5 or -0.9, it returns the start date unchanged.",
+  "Whenever membership_expiry is given a negative number of months of -1 or less, it returns NULL.",
+  "Whenever the months given to membership_expiry are NULL, empty text, text that is not a plain number (such as 'six', '1,5', '0x3' or 'inf'), or an infinite value, it returns NULL.",
+  "Whenever the months given to membership_expiry are text that looks like a plain number (such as '6', ' 6 ', '+3', '3.' or '2e0'), it reads them as that number; spaces around the number are ignored.",
+  "Whenever the start date given to membership_expiry is NULL, empty text, a real number, a non-existent date, or not written exactly as YYYY-MM-DD with dashes, it returns NULL; spaces around a valid date are ignored.",
+  "Whenever the expiry computed by membership_expiry would fall after the year 9999, it returns NULL (for example 9999-12-15 plus 1 month).",
+  "Whenever membership_expiry is given a start date in November 9999 and a number of months that lands exactly in December 9999 (for example '9999-11-15' plus 1 month), it fails with an error instead of returning a date.",
+  "Whenever boarding_cost is given days and a daily rate that are both positive, it returns days multiplied by the daily rate as a decimal number (3 days at 25 gives 75.0).",
+  "Whenever boarding_cost is given a fractional number of days, it charges for the fraction (2.5 days at 30 gives 75.0).",
+  "Whenever the total in boarding_cost has more than two decimals, it rounds to cents, and an exact half-cent goes to the even cent (2.675 gives 2.68, 0.125 gives 0.12, 0.135 gives 0.14, 10.005 gives 10.0).",
+  "Whenever the total in boarding_cost is under half a cent (such as 0.001 days at 5), it returns 0.0.",
+  "Whenever the days given to boarding_cost are zero or negative, it returns 0.0.",
+  "Whenever the daily rate given to boarding_cost is zero or negative, it returns 0.0.",
+  "Whenever either the days or the daily rate given to boarding_cost is NULL, it returns NULL, even if the other value is zero or negative.",
+  "Whenever either the days or the daily rate given to boarding_cost is empty text or text that is not a plain number, it returns NULL, even if the other value is zero or negative.",
+  "Whenever the days or daily rate given to boarding_cost are text that looks like a plain number (such as '3', ' 25 ', '2.50' or '1e2'), it reads them as that number; spaces around the number are ignored.",
+  "Whenever boarding_cost is given an infinite days or rate (for example 1e999) together with a positive other value, it returns infinity; if the other value is zero or negative it returns 0.0.",
+  "Whenever loyalty_tier is called, it places the client in the highest tier reached by either their visit count or their total spent, using bronze, silver, gold and platinum.",
+  "Whenever a client has 10 or more visits, loyalty_tier gives at least silver; 25 or more visits gives at least gold; 40 or more visits gives platinum; fewer than 10 visits gives bronze on visits alone.",
+  "Whenever a client has spent 500 or more, loyalty_tier gives at least silver; 1000 or more gives at least gold; 2500 or more gives platinum; under 500 gives bronze on spending alone.",
+  "Whenever a client is exactly on a threshold (10, 25 or 40 visits; 500, 1000 or 2500 spent), loyalty_tier puts them in the higher tier, while just below it (9.99 visits, 499.99 spent) keeps them in the lower tier.",
+  "Whenever the visits or the total spent given to loyalty_tier is NULL, empty text, or text that is not a plain number, loyalty_tier treats it as zero and never returns NULL.",
+  "Whenever the visits or the total spent given to loyalty_tier is negative, loyalty_tier gives no credit for it; with both negative the tier is bronze.",
+  "Whenever the visits or the total spent given to loyalty_tier is text that looks like a plain number (such as '30', ' 30 ' or '1e3'), it reads it as that number; spaces around the number are ignored.",
+  "Whenever the visits or the total spent given to loyalty_tier is infinite (for example 1e999), the client is platinum; the text 'inf' is not a number and counts as zero.",
+  "Whenever the visits or total spent given to loyalty_tier is fractional, it is compared as is without rounding.",
+  "Whenever owner_label is given a first and a last name, it returns the last name, a comma, a space, the first letter of the first name in capitals, and a full stop (John Smith gives 'Smith, J.').",
+  "Whenever owner_label shows the last name, it keeps the last name's letter case as typed ('smith' stays 'smith', 'SMITH' stays 'SMITH'); only the first initial is capitalised.",
+  "Whenever owner_label is given a first name with several words or a hyphen (such as 'Mary Ann' or 'Jean-Luc'), only its first letter is shown as the initial.",
+  "Whenever a name given to owner_label has spaces, tabs or line breaks at the start or end, they are removed, and any run of spaces or line breaks inside the name becomes one single space ('van   der  berg' gives 'van der berg').",
+  "Whenever the last name given to owner_label is NULL, empty, or only spaces, it uses 'Unknown' as the last name (so 'John' with no last name gives 'Unknown, J.').",
+  "Whenever the first name given to owner_label is NULL, empty, or only spaces, it returns just the last name with no comma and no initial ('Smith').",
+  "Whenever both names given to owner_label are NULL, empty or blank, it returns 'Unknown'.",
+  "Whenever the first name given to owner_label starts with something other than a plain letter, that first character is still used as the initial (a digit stays as is, '1abc' gives '1.', a full stop gives '..').",
+  "Whenever the first name given to owner_label starts with an accented letter, the initial is that letter in capitals ('\u00e9ric' gives '\u00c9.'); a letter that capitalises to two letters gives both ('\u00dfeta' gives 'SS.').",
+  "Whenever a name given to owner_label is a number rather than text, it is used as if typed as text (first name 123 gives initial '1'; last name 12 gives '12').",
+  "Whenever the last name given to owner_label contains punctuation such as a comma or an apostrophe, it is kept as is ('Smith, Jr.' gives 'Smith, Jr., J.')."
+ ],
+ "shown": [
+  "Whenever adoption_anniversary is given a valid adoption date and a whole number of years, it returns the adoption date moved forward by that many years, as YYYY-MM-DD, keeping the same month and day.",
+  "Whenever adoption_anniversary lands on a day that does not exist in the target year (29 February in a non-leap year), it returns the last day of that month instead (29 February 2020 plus 1 year gives 2021-02-28, plus 4 years gives 2024-02-29).",
+  "Whenever adoption_anniversary is given 0 years, it returns the adoption date unchanged.",
+  "Whenever adoption_anniversary is given a fractional number of years, it drops the fraction and does not round (1.9 years counts as 1 year).",
+  "Whenever adoption_anniversary is given a negative number of years (including -0.5), it returns NULL.",
+  "Whenever the years given to adoption_anniversary are NULL, empty text, text that is not a plain number, or an infinite value, it returns NULL.",
+  "Whenever the years given to adoption_anniversary are text that looks like a plain number (for example '2', ' 2 ', '+2' or '1e1'), it reads them as that number; spaces around the number are ignored.",
+  "Whenever the adoption date given to adoption_anniversary is NULL, empty text, a real number, or not written exactly as four-digit year, two-digit month and two-digit day separated by dashes (such as '2020-3-5', '2020/03/15' or a date followed by a time), it returns NULL.",
+  "Whenever the adoption date given to adoption_anniversary is a date that does not exist (such as 2020-02-30 or month 13) or has year 0000, it returns NULL.",
+  "Whenever the adoption date given to adoption_anniversary has spaces before or after it, the spaces are ignored and the anniversary is calculated normally.",
+  "Whenever the anniversary computed by adoption_anniversary would fall after the year 9999, it returns NULL (9990-03-15 plus 9 years is 9999-03-15, plus 10 years is NULL).",
+  "Whenever membership_expiry is given a valid start date and a number of months, it returns the start date moved forward by that many months, as YYYY-MM-DD, keeping the same day of the month.",
+  "Whenever membership_expiry lands on a day that does not exist in the target month, it returns the last day of that month (2020-01-31 plus 1 month gives 2020-02-29; 2021-01-31 plus 1 month gives 2021-02-28).",
+  "Whenever membership_expiry moves past December, it rolls into the next year (2020-12-15 plus 1 month gives 2021-01-15; 12 months gives the same day next year).",
+  "Whenever membership_expiry is given a fractional number of months, it drops the fraction and does not round (1.5 months counts as 1 month, 0.9 months counts as 0).",
+  "Whenever membership_expiry is given 0 months, or a negative amount smaller than one month such as -0.5 or -0.9, it returns the start date unchanged.",
+  "Whenever membership_expiry is given a negative number of months of -1 or less, it returns NULL.",
+  "Whenever the months given to membership_expiry are NULL, empty text, text that is not a plain number (such as 'six', '1,5', '0x3' or 'inf'), or an infinite value, it returns NULL.",
+  "Whenever the months given to membership_expiry are text that looks like a plain number (such as '6', ' 6 ', '+3', '3.' or '2e0'), it reads them as that number; spaces around the number are ignored.",
+  "Whenever the start date given to membership_expiry is NULL, empty text, a real number, a non-existent date, or not written exactly as YYYY-MM-DD with dashes, it returns NULL; spaces around a valid date are ignored.",
+  "Whenever the expiry computed by membership_expiry would fall after the year 9999, it returns NULL (for example 9999-12-15 plus 1 month).",
+  "Whenever membership_expiry is given a start date in November 9999 and a number of months that lands exactly in December 9999 (for example '9999-11-15' plus 1 month), it fails with an error instead of returning a date.",
+  "Whenever boarding_cost is given days and a daily rate that are both positive, it returns days multiplied by the daily rate as a decimal number (3 days at 25 gives 75.0).",
+  "Whenever boarding_cost is given a fractional number of days, it charges for the fraction (2.5 days at 30 gives 75.0).",
+  "Whenever the total in boarding_cost has more than two decimals, it rounds to cents, and an exact half-cent goes to the even cent (2.675 gives 2.68, 0.125 gives 0.12, 0.135 gives 0.14, 10.005 gives 10.0).",
+  "Whenever the total in boarding_cost is under half a cent (such as 0.001 days at 5), it returns 0.0.",
+  "Whenever the days given to boarding_cost are zero or negative, it returns 0.0.",
+  "Whenever the daily rate given to boarding_cost is zero or negative, it returns 0.0.",
+  "Whenever either the days or the daily rate given to boarding_cost is NULL, it returns NULL, even if the other value is zero or negative.",
+  "Whenever either the days or the daily rate given to boarding_cost is empty text or text that is not a plain number, it returns NULL, even if the other value is zero or negative.",
+  "Whenever the days or daily rate given to boarding_cost are text that looks like a plain number (such as '3', ' 25 ', '2.50' or '1e2'), it reads them as that number; spaces around the number are ignored.",
+  "Whenever boarding_cost is given an infinite days or rate (for example 1e999) together with a positive other value, it returns infinity; if the other value is zero or negative it returns 0.0.",
+  "Whenever loyalty_tier is called, it places the client in the highest tier reached by either their visit count or their total spent, using bronze, silver, gold and platinum.",
+  "Whenever a client has 10 or more visits, loyalty_tier gives at least silver; 25 or more visits gives at least gold; 40 or more visits gives platinum; fewer than 10 visits gives bronze on visits alone.",
+  "Whenever a client has spent 500 or more, loyalty_tier gives at least silver; 1000 or more gives at least gold; 2500 or more gives platinum; under 500 gives bronze on spending alone.",
+  "Whenever a client is exactly on a threshold (10, 25 or 40 visits; 500, 1000 or 2500 spent), loyalty_tier puts them in the higher tier, while just below it (9.99 visits, 499.99 spent) keeps them in the lower tier.",
+  "Whenever the visits or the total spent given to loyalty_tier is NULL, empty text, or text that is not a plain number, loyalty_tier treats it as zero and never returns NULL.",
+  "Whenever the visits or the total spent given to loyalty_tier is negative, loyalty_tier gives no credit for it; with both negative the tier is bronze.",
+  "Whenever the visits or the total spent given to loyalty_tier is text that looks like a plain number (such as '30', ' 30 ' or '1e3'), it reads it as that number; spaces around the number are ignored.",
+  "Whenever the visits or the total spent given to loyalty_tier is infinite (for example 1e999), the client is platinum; the text 'inf' is not a number and counts as zero.",
+  "Whenever the visits or total spent given to loyalty_tier is fractional, it is compared as is without rounding.",
+  "Whenever owner_label is given a first and a last name, it returns the last name, a comma, a space, the first letter of the first name in capitals, and a full stop (John Smith gives 'Smith, J.').",
+  "Whenever owner_label shows the last name, it keeps the last name's letter case as typed ('smith' stays 'smith', 'SMITH' stays 'SMITH'); only the first initial is capitalised.",
+  "Whenever owner_label is given a first name with several words or a hyphen (such as 'Mary Ann' or 'Jean-Luc'), only its first letter is shown as the initial.",
+  "Whenever a name given to owner_label has spaces, tabs or line breaks at the start or end, they are removed, and any run of spaces or line breaks inside the name becomes one single space ('van   der  berg' gives 'van der berg').",
+  "Whenever the last name given to owner_label is NULL, empty, or only spaces, it uses 'Unknown' as the last name (so 'John' with no last name gives 'Unknown, J.').",
+  "Whenever the first name given to owner_label is NULL, empty, or only spaces, it returns just the last name with no comma and no initial ('Smith').",
+  "Whenever both names given to owner_label are NULL, empty or blank, it returns 'Unknown'.",
+  "Whenever the first name given to owner_label starts with something other than a plain letter, that first character is still used as the initial (a digit stays as is, '1abc' gives '1.', a full stop gives '..').",
+  "Whenever the first name given to owner_label starts with an accented letter, the initial is that letter in capitals ('\u00e9ric' gives '\u00c9.'); a letter that capitalises to two letters gives both ('\u00dfeta' gives 'SS.').",
+  "Whenever a name given to owner_label is a number rather than text, it is used as if typed as text (first name 123 gives initial '1'; last name 12 gives '12').",
+  "Whenever the last name given to owner_label contains punctuation such as a comma or an apostrophe, it is kept as is ('Smith, Jr.' gives 'Smith, Jr., J.')."
+ ],
+ "repeats": [],
+ "SL": [
+  "Whenever adoption_anniversary is given a valid adoption date and a whole number of years, it returns the adoption date moved forward by that many years, as YYYY-MM-DD, keeping the same month and day.",
+  "Whenever adoption_anniversary lands on a day that does not exist in the target year (29 February in a non-leap year), it spills into March by the number of missing days instead (29 February 2020 plus 1 year gives 2021-03-01, plus 4 years gives 2024-02-29).",
+  "Whenever adoption_anniversary is given 0 years, it returns the adoption date unchanged.",
+  "Whenever adoption_anniversary is given a fractional number of years, it rounds to the nearest whole year, with halves rounding up (1.9 years counts as 2 years, and 2.5 years counts as 3 years).",
+  "Whenever adoption_anniversary is given a negative number of years (including -0.5), it returns NULL.",
+  "Whenever the years given to adoption_anniversary are NULL, empty text, text that is not a plain number, or an infinite value, it returns NULL.",
+  "Whenever the years given to adoption_anniversary are text that looks like a plain number (for example '2', ' 2 ', '+2' or '1e1'), it reads them as that number; spaces around the number are ignored.",
+  "Whenever the adoption date given to adoption_anniversary is NULL, empty text, a real number, or not written exactly as four-digit year, two-digit month and two-digit day separated by dashes (such as '2020-3-5', '2020/03/15' or a date followed by a time), it returns NULL.",
+  "Whenever the adoption date given to adoption_anniversary is a date that does not exist (such as 2020-02-30 or month 13) or has year 0000, it returns NULL.",
+  "Whenever the adoption date given to adoption_anniversary has spaces before or after it, the spaces are ignored and the anniversary is calculated normally.",
+  "Whenever the anniversary computed by adoption_anniversary would fall after the year 9999, it returns NULL (9990-03-15 plus 9 years is 9999-03-15, plus 10 years is NULL).",
+  "Whenever membership_expiry is given a valid start date and a number of months, it returns the start date moved forward by that many months, as YYYY-MM-DD, keeping the same day of the month.",
+  "Whenever membership_expiry lands on a day that does not exist in the target month, it spills into the following month by the number of missing days (2020-01-31 plus 1 month gives 2020-03-02; 2021-01-31 plus 1 month gives 2021-03-03).",
+  "Whenever membership_expiry moves past December, it rolls into the next year (2020-12-15 plus 1 month gives 2021-01-15; 12 months gives the same day next year).",
+  "Whenever membership_expiry is given a fractional number of months, it drops the fraction and does not round (1.5 months counts as 1 month, 0.9 months counts as 0).",
+  "Whenever membership_expiry is given 0 months, or a negative amount smaller than one month such as -0.5 or -0.9, it returns the start date unchanged.",
+  "Whenever membership_expiry is given a negative number of months of -1 or less, it returns NULL.",
+  "Whenever the months given to membership_expiry are NULL, empty text, text that is not a plain number (such as 'six', '1,5', '0x3' or 'inf'), or an infinite value, it returns NULL.",
+  "Whenever the months given to membership_expiry are text that looks like a plain number (such as '6', ' 6 ', '+3', '3.' or '2e0'), it reads them as that number; spaces around the number are ignored.",
+  "Whenever the start date given to membership_expiry is NULL, empty text, a real number, a non-existent date, or not written exactly as YYYY-MM-DD with dashes, it returns NULL; spaces around a valid date are ignored.",
+  "Whenever the expiry computed by membership_expiry would fall after the year 9999, it returns NULL (for example 9999-12-15 plus 1 month).",
+  "Whenever membership_expiry is given a start date in November 9999 and a number of months that lands exactly in December 9999 (for example '9999-11-15' plus 1 month), it fails with an error instead of returning a date.",
+  "Whenever boarding_cost is given days and a daily rate that are both positive, it returns days multiplied by the daily rate as a decimal number (3 days at 25 gives 75.0).",
+  "Whenever boarding_cost is given a number of days, it rounds the days up to a whole day. The first 7 days are charged at the full rate, and each day after that is charged at 80% of the rate (for example, 2.5 days at 30 is rounded up to 3 days and gives 90.0).",
+  "Whenever the total in boarding_cost has more than two decimals, it rounds up to the next whole cent, never down.",
+  "Whenever the total in boarding_cost is under half a cent (such as 0.001 days at 5), it returns 0.0.",
+  "Whenever the days given to boarding_cost are zero or negative, it returns 0.0.",
+  "Whenever the daily rate given to boarding_cost is zero or negative, it returns 0.0.",
+  "Whenever either the days or the daily rate given to boarding_cost is NULL, it returns NULL, even if the other value is zero or negative.",
+  "Whenever either the days or the daily rate given to boarding_cost is empty text or text that is not a plain number, it returns NULL, even if the other value is zero or negative.",
+  "Whenever the days or daily rate given to boarding_cost are text that looks like a plain number (such as '3', ' 25 ', '2.50' or '1e2'), it reads them as that number; spaces around the number are ignored.",
+  "Whenever boarding_cost is given an infinite days or rate (for example 1e999) together with a positive other value, it returns infinity; if the other value is zero or negative it returns 0.0.",
+  "Whenever loyalty_tier is called, it places the client in the highest tier reached by either their visit count or their total spent, using bronze, silver, gold and platinum.",
+  "A client's loyalty_tier is decided by the client's total score. The score is 10 points per visit, counting at most 30 visits. A total score of 100 or less is bronze. A total score above 100 is silver. A total score above 300 is gold. A total score above 600 is platinum.",
+  "loyalty_tier: loyalty score is 10 points per whole 10 of total_spent (1 point per whole 10 of total_spent, fraction dropped), added to the visit score. Bronze is a score up to 100, silver is above 100, gold is above 300, and platinum is above 600.",
+  "Whenever a client is exactly on a threshold (10, 25 or 40 visits; 500, 1000 or 2500 spent), loyalty_tier puts them in the higher tier, while just below it (9.99 visits, 499.99 spent) keeps them in the lower tier.",
+  "Whenever the visits or the total spent given to loyalty_tier is NULL, empty text, or text that is not a plain number, loyalty_tier treats it as zero and never returns NULL.",
+  "Whenever the visits or the total spent given to loyalty_tier is negative, loyalty_tier gives no credit for it; with both negative the tier is bronze.",
+  "Whenever the visits or the total spent given to loyalty_tier is text that looks like a plain number (such as '30', ' 30 ' or '1e3'), it reads it as that number; spaces around the number are ignored.",
+  "Whenever the visits or the total spent given to loyalty_tier is infinite (for example 1e999), the client is platinum; the text 'inf' is not a number and counts as zero.",
+  "Whenever the visits or total spent given to loyalty_tier is fractional, it is compared as is without rounding.",
+  "Whenever owner_label is given a first and a last name, it returns the last name, a comma, a space, the first letter of the first name in capitals, and a full stop (John Smith gives 'Smith, J.').",
+  "Whenever owner_label shows the last name, it shows the last name with only its first letter capitalised and the rest lower-case ('McDONALD' becomes 'Mcdonald'); the first initial is capitalised.",
+  "Whenever owner_label is given a first name with several words or a hyphen (such as 'Mary Ann' or 'Jean-Luc'), only its first letter is shown as the initial.",
+  "Whenever a name given to owner_label has spaces, tabs or line breaks at the start or end, they are removed, and any run of spaces or line breaks inside the name becomes one single space ('van   der  berg' gives 'van der berg').",
+  "Whenever the last name given to owner_label is NULL, empty, or only spaces, it uses 'Unknown' as the last name (so 'John' with no last name gives 'Unknown, J.').",
+  "Whenever the first name given to owner_label is NULL, empty, or only spaces, it returns just the last name with no comma and no initial ('Smith').",
+  "Whenever both names given to owner_label are NULL, empty or blank, it returns 'Unknown'.",
+  "Whenever the first name given to owner_label starts with something other than a plain letter, that first character is still used as the initial (a digit stays as is, '1abc' gives '1.', a full stop gives '..').",
+  "Whenever the first name given to owner_label starts with an accented letter, the initial is that letter in capitals ('\u00e9ric' gives '\u00c9.'); a letter that capitalises to two letters gives both ('\u00dfeta' gives 'SS.').",
+  "Whenever a name given to owner_label is a number rather than text, it is used as if typed as text (first name 123 gives initial '1'; last name 12 gives '12').",
+  "Whenever the last name given to owner_label contains punctuation such as a comma or an apostrophe, it is kept as is ('Smith, Jr.' gives 'Smith, Jr., J.')."
+ ],
+ "HV": [
+  "Whenever adoption_anniversary is given a valid adoption date and a whole number of years, it returns the adoption date moved forward by that many years, as YYYY-MM-DD, keeping the same month and day.",
+  "Whenever adoption_anniversary lands on a day that does not exist in the target year (29 February in a non-leap year), it spills into March by the number of missing days instead (29 February 2020 plus 1 year gives 2021-03-01, plus 4 years gives 2024-02-29).",
+  "Whenever adoption_anniversary is given 0 years, or no years at all (the years are NULL), it returns the adoption date unchanged, as YYYY-MM-DD. If the adoption date is written in the correct format but does not exist (or has year 0000), it counts as 1970-01-01, so the result is 1970-01-01.",
+  "Whenever adoption_anniversary is given a fractional number of years, it rounds to the nearest whole year, with halves rounding up, and then uses that whole number of years (1.9 years counts as 2 years, 2.5 years counts as 3 years, and 2.9 years counts as 3 years, so an adoption on 2020-06-15 with 2.9 years gives 2023-06-15). The part-year is never simply dropped.",
+  "Whenever adoption_anniversary is given a negative number of years (including -0.5), it returns NULL.",
+  "Whenever the years given to adoption_anniversary are empty text, text that is not a plain number, or an infinite value, it returns NULL. (NULL years are not covered here: they count as 0 years, see rule 3.)",
+  "Whenever the years given to adoption_anniversary are text that looks like a plain number (for example '2', ' 2 ', '+2' or '1e1'), it reads them as that number; spaces around the number are ignored.",
+  "Whenever the adoption date given to adoption_anniversary is NULL, empty text, a real number, or not written exactly as four-digit year, two-digit month and two-digit day separated by dashes (such as '2020-3-5', '2020/03/15' or a date followed by a time), it returns NULL.",
+  "Whenever the adoption date given to adoption_anniversary is written in the correct format but is a date that does not exist (such as 2020-02-30 or month 13) or has year 0000, it counts as 1970-01-01. The anniversary is then worked out from 1970-01-01 in the usual way, using the years given (NULL years count as 0 years, so the result is 1970-01-01), and it returns a date, not NULL. For example, 2020-02-30 with 1 year gives 1971-01-01, and 2020-02-30 with no years gives 1970-01-01. The years rules still apply: if the years are invalid (empty text, text that is not a plain number, or infinite) or negative, the result is still NULL.",
+  "Whenever the adoption date given to adoption_anniversary has spaces before or after it, the spaces are ignored and the anniversary is calculated normally.",
+  "Whenever the anniversary computed by adoption_anniversary would fall after the year 9999, it returns NULL (9990-03-15 plus 9 years is 9999-03-15, plus 10 years is NULL).",
+  "Whenever membership_expiry is given a valid start date and a number of months, it returns the start date moved forward by that many months, as YYYY-MM-DD, keeping the same day of the month.",
+  "Whenever membership_expiry lands on a day that does not exist in the target month, it spills into the following month by the number of missing days (2020-01-31 plus 1 month gives 2020-03-02; 2021-01-31 plus 1 month gives 2021-03-03).",
+  "Whenever membership_expiry moves past December, it rolls into the next year (2020-12-15 plus 1 month gives 2021-01-15; 12 months gives the same day next year).",
+  "Whenever membership_expiry is given a fractional number of months, it drops the fraction and does not round (1.5 months counts as 1 month, 0.9 months counts as 0).",
+  "Whenever membership_expiry is given 0 months, or any finite negative number of months (such as -0.5, -0.9, -1 or -3), it counts as 0 months and returns the start date unchanged.",
+  "Whenever membership_expiry is given a negative number of months of -1 or less (for example -3 or -12), it does not return NULL; it counts the months as 0 and returns the start date unchanged, as YYYY-MM-DD. An infinite value is still NULL under rule 18.",
+  "Whenever the months given to membership_expiry are NULL, empty text, text that is not a plain number (such as 'six', '1,5', '0x3' or 'inf'), or an infinite value, it returns NULL.",
+  "Whenever the months given to membership_expiry are text that looks like a plain number (such as '6', ' 6 ', '+3', '3.' or '2e0'), it reads them as that number; spaces around the number are ignored.",
+  "Whenever the start date given to membership_expiry is NULL, empty text, or a real number, it returns NULL. Whenever the start date is text that is not written exactly as YYYY-MM-DD with dashes (such as 15/01/2025), or is a non-existent date, it is treated as 1970-01-01, and the expiry is worked out from 1970-01-01 using the months given, under the other rules. Spaces around a valid date are ignored.",
+  "Whenever the expiry computed by membership_expiry would fall after the year 9999, it returns NULL (for example 9999-12-15 plus 1 month).",
+  "Whenever membership_expiry is given a start date in November 9999 and a number of months that lands exactly in December 9999 (for example '9999-11-15' plus 1 month), it fails with an error instead of returning a date.",
+  "Whenever boarding_cost is given days and a daily rate that are both positive, it first rounds the days up to a whole day (so 2.5 days counts as 3 days, and any part of a day counts as a full day), then returns those whole days multiplied by the daily rate as a decimal number (3 days at 25 gives 75.0; 2.5 days at 40 gives 3 days at 40, which is 120.0). Days past the 7th are charged as rule 24 says.",
+  "Whenever boarding_cost is given a number of days, it rounds the days up to a whole day. The first 7 days are charged at the full rate, and each day after that is charged at 80% of the rate (for example, 2.5 days at 30 is rounded up to 3 days and gives 90.0).",
+  "Whenever the total in boarding_cost has more than two decimals, it rounds up to the next whole cent, never down. This includes an exact half-cent, which always goes up and is never rounded to the even cent (1 day at 100.125 gives 100.13, and 1 day at 100.135 gives 100.14). A total with two decimals or fewer is left as it is. The one exception is a total under half a cent, which rule 26 sets to 0.0.",
+  "Whenever the total in boarding_cost, after the days have been rounded up to whole days, is under half a cent (such as 1 day at a rate of 0.004), it returns 0.0. A part of a day is never charged pro rata, so a tiny number of days such as 0.001 days at 5 counts as 1 full day and gives 5.0.",
+  "Whenever the days given to boarding_cost are zero or negative, it returns 0.0.",
+  "Whenever the daily rate given to boarding_cost is zero or negative, it returns 0.0.",
+  "Whenever either the days or the daily rate given to boarding_cost is NULL (left blank), it returns 0.0, whatever the other value is (positive, zero, negative or infinite), unless the other value is text that is not a plain number (rule 30), in which case it returns NULL.",
+  "Whenever either the days or the daily rate given to boarding_cost is empty text, it returns 0.0, the same as NULL, even if the other value is positive, zero or negative. Whenever either of them is text that is not a plain number (and is not empty), it returns NULL, even if the other value is zero, negative, NULL or empty.",
+  "Whenever the days or daily rate given to boarding_cost are text that looks like a plain number (such as '3', ' 25 ', '2.50' or '1e2'), it reads them as that number; spaces around the number are ignored.",
+  "Whenever boarding_cost is given an infinite days or rate (for example 1e999) together with a positive other value, it returns infinity; if the other value is zero or negative it returns 0.0.",
+  "Whenever loyalty_tier is called, it places the client in one of the tiers bronze, silver, gold or platinum using a single total score. The total score is the visit score added to the spend score. The client is not placed by taking the higher of a tier from visits alone and a tier from spending alone. For example, 2 visits (20 points) and 2600 spent (260 points) make a score of 280, which is silver.",
+  "A client's loyalty_tier is decided by the client's total score. The score is 10 points per visit, counting at most 30 visits. A total score of 100 or less is bronze. A total score above 100 is silver. A total score above 300 is gold. A total score above 600 is platinum.",
+  "loyalty_tier: the spend score is 1 point per whole 10 of total_spent (fraction dropped, so 499.99 gives 49 points, not 50), added to the visit score. Bronze is a score up to 100, silver is above 100, gold is above 300, and platinum is above 600.",
+  "Whenever a client's total score is exactly on a tier limit (100, 300 or 600), loyalty_tier keeps them in the lower tier: a score of exactly 100 is bronze, exactly 300 is silver and exactly 600 is gold (for example, 10 visits and nothing spent is a score of 100, so bronze). The client moves to the higher tier only when the score is above the limit (above 100 is silver, above 300 is gold, above 600 is platinum).",
+  "Whenever the visits or the total spent given to loyalty_tier is NULL, empty text, or text that is not a plain number (such as 'abc'), loyalty_tier treats that value as zero (zero visits, or zero spent) and never returns NULL. The bad value is not skipped and does not change how the other value is scored: the client is still placed by the single total score, which is the visit score added to the spend score, with the bad value contributing 0 points. For example, visits 'abc' and 1200 spent make 0 + 120 = a score of 120, which is silver, not gold.",
+  "Whenever the visits or the total spent given to loyalty_tier is negative, loyalty_tier gives no credit for it; with both negative the tier is bronze.",
+  "Whenever the visits or the total spent given to loyalty_tier is text that looks like a plain number (such as '30', ' 30 ' or '1e3'), it reads it as that number; spaces around the number are ignored.",
+  "Whenever the visits or the total spent given to loyalty_tier is infinite (for example 1e999), the client is platinum; the text 'inf' is not a number and counts as zero.",
+  "Whenever the visits or total spent given to loyalty_tier is fractional, it is compared as is without rounding.",
+  "Whenever owner_label is given a first and a last name, it returns the last name, a comma, a space, the first letter of the first name in capitals, and a full stop (John Smith gives 'Smith, J.'). The returned label is never longer than 12 characters: anything past the 12th character is cut off, including a trailing space, comma or initial (last name 'Kumar Singh' with first name 'Ravi' gives 'Kumar singh,').",
+  "Whenever owner_label shows the last name, it always starts with a capital letter, whatever case it was typed in, and all the rest is lower-case, including the first letter of any later word in it ('McDONALD' becomes 'Mcdonald'; 'sharma' becomes 'Sharma'; 'Kumar Singh' becomes 'Kumar singh'); the first initial is capitalised.",
+  "Whenever owner_label is given a first name with several words or a hyphen (such as 'Mary Ann' or 'Jean-Luc'), only its first letter is shown as the initial.",
+  "Whenever a name given to owner_label has spaces, tabs or line breaks at the start or end, they are removed, and any run of spaces or line breaks inside the name becomes one single space ('van   der  berg' as a last name gives 'Van der berg', with the first letter capitalised as in the rule on how the last name is shown).",
+  "Whenever the last name given to owner_label is NULL, empty, or only spaces, it uses 'Unknown' as the last name (so 'John' with no last name gives 'Unknown, J.').",
+  "Whenever the first name given to owner_label is NULL, empty, or only spaces, it returns just the last name with no comma and no initial ('Smith'). This label is also cut to at most 12 characters, so a longer last name loses its end.",
+  "Whenever both names given to owner_label are NULL, empty or blank, it returns 'Unknown'.",
+  "Whenever the first name given to owner_label starts with something other than a plain letter, that first character is still used as the initial (a digit stays as is, '1abc' gives '1.', a full stop gives '..').",
+  "Whenever the first name given to owner_label starts with an accented letter, the initial is that letter in capitals ('\u00e9ric' gives '\u00c9.'); a letter that capitalises to two letters gives both ('\u00dfeta' gives 'SS.').",
+  "Whenever a name given to owner_label is a number rather than text, it is used as if typed as text (first name 123 gives initial '1'; last name 12 gives '12').",
+  "Whenever the last name given to owner_label contains punctuation such as a comma or an apostrophe, it is kept as is ('Smith, Jr.' gives 'Smith, Jr., J.').",
+  "Biscuit the dog was adopted on 29 February 2024, a leap day: the first anniversary is shown as 28 February 2025, the day before the first of March. The owner says: Policy says 29 Feb in a non-leap target year becomes 1 March, so it should be 1 March 2025.",
+  "Mia's cat was adopted on 15 June 2020 and someone asks for the anniversary minus 2 years: nothing is returned, no date at all. The owner says: Policy says a negative number of years should give a date, not nothing. Wait, no: negative years return NULL, so that's right.\n\nYes, that's right",
+  "Asha's one-month care plan starts on 31 January 2025: it expires on 28 February 2025, the last day of the shorter month. The owner says: It should be 3 March 2025. A short month spills into March, so 31 Jan plus 1 month isn't 28 Feb."
+ ],
+ "spots": [
+  {
+   "function": "adoption_anniversary",
+   "call": "SELECT adoption_anniversary('2024-02-29', 1)",
+   "got": "2025-02-28",
+   "say": "Biscuit the dog was adopted on 29 February 2024, a leap day: the first anniversary is shown as 28 February 2025, the day before the first of March."
+  },
+  {
+   "function": "adoption_anniversary",
+   "call": "SELECT adoption_anniversary('2020-06-15', -2)",
+   "got": null,
+   "say": "Mia's cat was adopted on 15 June 2020 and someone asks for the anniversary minus 2 years: nothing is returned, no date at all."
+  },
+  {
+   "function": "adoption_anniversary",
+   "call": "SELECT adoption_anniversary('2020-06-15', 2.9)",
+   "got": "2022-06-15",
+   "say": "Mia's cat was adopted on 15 June 2020 and the staff ask for 2.9 years: the anniversary comes out as 15 June 2022, the part-year is simply dropped, not rounded up to 3."
+  },
+  {
+   "function": "adoption_anniversary",
+   "call": "SELECT adoption_anniversary('2020-02-30', 1)",
+   "got": null,
+   "say": "A record shows Mia's cat adopted on 30 February 2020, a date that does not exist: no anniversary is given and no error is raised."
+  },
+  {
+   "function": "adoption_anniversary",
+   "call": "SELECT adoption_anniversary('2020-06-15', 0)",
+   "got": "2020-06-15",
+   "say": "Asking for the anniversary after 0 years for a pet adopted on 15 June 2020 returns the adoption day itself, 15 June 2020."
+  },
+  {
+   "function": "membership_expiry",
+   "call": "SELECT membership_expiry('2025-01-31', 1)",
+   "got": "2025-02-28",
+   "say": "Asha's one-month care plan starts on 31 January 2025: it expires on 28 February 2025, the last day of the shorter month."
+  },
+  {
+   "function": "membership_expiry",
+   "call": "SELECT membership_expiry('2025-01-15', 0)",
+   "got": "2025-01-15",
+   "say": "A care plan bought on 15 January 2025 with 0 months expires the same day, 15 January 2025, so it is over as soon as it begins."
+  },
+  {
+   "function": "membership_expiry",
+   "call": "SELECT membership_expiry('2025-01-15', -3)",
+   "got": null,
+   "say": "A care plan starting 15 January 2025 with minus 3 months gives no expiry date at all instead of an error or an earlier date."
+  },
+  {
+   "function": "membership_expiry",
+   "call": "SELECT membership_expiry('2025-01-15', 1.9)",
+   "got": "2025-02-15",
+   "say": "Asha buys a plan of 1.9 months starting 15 January 2025: it expires on 15 February 2025, so she gets only 1 month, not 2."
+  },
+  {
+   "function": "membership_expiry",
+   "call": "SELECT membership_expiry('15/01/2025', 12)",
+   "got": null,
+   "say": "A plan whose start date is typed as 15/01/2025 instead of year-month-day gets no expiry date, so that member would show as having no end date."
+  },
+  {
+   "function": "boarding_cost",
+   "call": "SELECT boarding_cost(2.5, 40)",
+   "got": 100.0,
+   "say": "Rex stays 2.5 days at 40 per day: the stay is charged 100, with the half day charged pro rata."
+  },
+  {
+   "function": "boarding_cost",
+   "call": "SELECT boarding_cost(-2, 40)",
+   "got": 0.0,
+   "say": "A stay entered as minus 2 days at 40 per day is billed 0, with no warning that the number of days was wrong."
+  },
+  {
+   "function": "boarding_cost",
+   "call": "SELECT boarding_cost(3, -40)",
+   "got": 0.0,
+   "say": "Rex boards 3 days but the daily rate was entered as minus 40: the total comes to 0 instead of flagging the bad rate."
+  },
+  {
+   "function": "boarding_cost",
+   "call": "SELECT boarding_cost(NULL, 40)",
+   "got": null,
+   "say": "A stay with the number of days left blank at 40 per day has no total: the result is empty, not 0."
+  },
+  {
+   "function": "boarding_cost",
+   "call": "SELECT boarding_cost(1, 100.125)",
+   "got": 100.12,
+   "say": "One night at 100.125 is billed 100.12, because an exact half-cent is rounded to the even cent, which here is down."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(10, 0)",
+   "got": "silver",
+   "say": "Meena has 10 visits and has spent nothing: she reaches silver exactly at 10 visits."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(2, 2600)",
+   "got": "platinum",
+   "say": "Kiran has visited only twice but has spent 2600: Kiran is platinum, because the higher of the visit tier and the spend tier wins."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(9, 499.99)",
+   "got": "bronze",
+   "say": "Meena has 9 visits and has spent 499.99, one cent below 500: she stays bronze."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(NULL, NULL)",
+   "got": "bronze",
+   "say": "A new client with no visit count and no spend recorded is bronze."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier('abc', 1200)",
+   "got": "gold",
+   "say": "Kiran's visit count was typed as the word abc and the spend is 1200: the bad visit count is ignored and Kiran is gold on spend alone."
+  },
+  {
+   "function": "owner_label",
+   "call": "SELECT owner_label('  Ravi  ', '  Kumar   Singh ')",
+   "got": "Kumar Singh, R.",
+   "say": "Ravi Kumar Singh, typed with stray spaces, is shown on the appointment sheet as Kumar Singh, R."
+  },
+  {
+   "function": "owner_label",
+   "call": "SELECT owner_label('Ravi', NULL)",
+   "got": "Unknown, R.",
+   "say": "Ravi has no surname on file: the appointment sheet shows Unknown, R."
+  },
+  {
+   "function": "owner_label",
+   "call": "SELECT owner_label(NULL, 'Sharma')",
+   "got": "Sharma",
+   "say": "Mrs Sharma has no first name on file: the sheet shows just Sharma, with no initial."
+  },
+  {
+   "function": "owner_label",
+   "call": "SELECT owner_label('Ravi', 'sharma')",
+   "got": "sharma, R.",
+   "say": "Ravi's surname typed in lowercase as sharma is shown as sharma, R., so the capital letter is not fixed for the surname."
+  },
+  {
+   "function": "owner_label",
+   "call": "SELECT owner_label(NULL, NULL)",
+   "got": "Unknown",
+   "say": "An owner with neither first nor last name on file shows as Unknown on the appointment sheet."
+  }
+ ],
+ "shown_cases": [
+  {
+   "function": "adoption_anniversary",
+   "call": "SELECT adoption_anniversary('2024-02-29', 1)",
+   "got": "2025-02-28",
+   "say": "Biscuit the dog was adopted on 29 February 2024, a leap day: the first anniversary is shown as 28 February 2025, the day before the first of March."
+  },
+  {
+   "function": "adoption_anniversary",
+   "call": "SELECT adoption_anniversary('2020-06-15', -2)",
+   "got": null,
+   "say": "Mia's cat was adopted on 15 June 2020 and someone asks for the anniversary minus 2 years: nothing is returned, no date at all."
+  },
+  {
+   "function": "adoption_anniversary",
+   "call": "SELECT adoption_anniversary('2020-06-15', 2.9)",
+   "got": "2022-06-15",
+   "say": "Mia's cat was adopted on 15 June 2020 and the staff ask for 2.9 years: the anniversary comes out as 15 June 2022, the part-year is simply dropped, not rounded up to 3."
+  },
+  {
+   "function": "adoption_anniversary",
+   "call": "SELECT adoption_anniversary('2020-02-30', 1)",
+   "got": null,
+   "say": "A record shows Mia's cat adopted on 30 February 2020, a date that does not exist: no anniversary is given and no error is raised."
+  },
+  {
+   "function": "adoption_anniversary",
+   "call": "SELECT adoption_anniversary('2020-06-15', 0)",
+   "got": "2020-06-15",
+   "say": "Asking for the anniversary after 0 years for a pet adopted on 15 June 2020 returns the adoption day itself, 15 June 2020."
+  },
+  {
+   "function": "membership_expiry",
+   "call": "SELECT membership_expiry('2025-01-31', 1)",
+   "got": "2025-02-28",
+   "say": "Asha's one-month care plan starts on 31 January 2025: it expires on 28 February 2025, the last day of the shorter month."
+  },
+  {
+   "function": "membership_expiry",
+   "call": "SELECT membership_expiry('2025-01-15', 0)",
+   "got": "2025-01-15",
+   "say": "A care plan bought on 15 January 2025 with 0 months expires the same day, 15 January 2025, so it is over as soon as it begins."
+  },
+  {
+   "function": "membership_expiry",
+   "call": "SELECT membership_expiry('2025-01-15', -3)",
+   "got": null,
+   "say": "A care plan starting 15 January 2025 with minus 3 months gives no expiry date at all instead of an error or an earlier date."
+  },
+  {
+   "function": "membership_expiry",
+   "call": "SELECT membership_expiry('2025-01-15', 1.9)",
+   "got": "2025-02-15",
+   "say": "Asha buys a plan of 1.9 months starting 15 January 2025: it expires on 15 February 2025, so she gets only 1 month, not 2."
+  },
+  {
+   "function": "membership_expiry",
+   "call": "SELECT membership_expiry('15/01/2025', 12)",
+   "got": null,
+   "say": "A plan whose start date is typed as 15/01/2025 instead of year-month-day gets no expiry date, so that member would show as having no end date."
+  },
+  {
+   "function": "boarding_cost",
+   "call": "SELECT boarding_cost(2.5, 40)",
+   "got": 100.0,
+   "say": "Rex stays 2.5 days at 40 per day: the stay is charged 100, with the half day charged pro rata."
+  },
+  {
+   "function": "boarding_cost",
+   "call": "SELECT boarding_cost(-2, 40)",
+   "got": 0.0,
+   "say": "A stay entered as minus 2 days at 40 per day is billed 0, with no warning that the number of days was wrong."
+  },
+  {
+   "function": "boarding_cost",
+   "call": "SELECT boarding_cost(3, -40)",
+   "got": 0.0,
+   "say": "Rex boards 3 days but the daily rate was entered as minus 40: the total comes to 0 instead of flagging the bad rate."
+  },
+  {
+   "function": "boarding_cost",
+   "call": "SELECT boarding_cost(NULL, 40)",
+   "got": null,
+   "say": "A stay with the number of days left blank at 40 per day has no total: the result is empty, not 0."
+  },
+  {
+   "function": "boarding_cost",
+   "call": "SELECT boarding_cost(1, 100.125)",
+   "got": 100.12,
+   "say": "One night at 100.125 is billed 100.12, because an exact half-cent is rounded to the even cent, which here is down."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(10, 0)",
+   "got": "silver",
+   "say": "Meena has 10 visits and has spent nothing: she reaches silver exactly at 10 visits."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(2, 2600)",
+   "got": "platinum",
+   "say": "Kiran has visited only twice but has spent 2600: Kiran is platinum, because the higher of the visit tier and the spend tier wins."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(9, 499.99)",
+   "got": "bronze",
+   "say": "Meena has 9 visits and has spent 499.99, one cent below 500: she stays bronze."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier(NULL, NULL)",
+   "got": "bronze",
+   "say": "A new client with no visit count and no spend recorded is bronze."
+  },
+  {
+   "function": "loyalty_tier",
+   "call": "SELECT loyalty_tier('abc', 1200)",
+   "got": "gold",
+   "say": "Kiran's visit count was typed as the word abc and the spend is 1200: the bad visit count is ignored and Kiran is gold on spend alone."
+  },
+  {
+   "function": "owner_label",
+   "call": "SELECT owner_label('  Ravi  ', '  Kumar   Singh ')",
+   "got": "Kumar Singh, R.",
+   "say": "Ravi Kumar Singh, typed with stray spaces, is shown on the appointment sheet as Kumar Singh, R."
+  },
+  {
+   "function": "owner_label",
+   "call": "SELECT owner_label('Ravi', NULL)",
+   "got": "Unknown, R.",
+   "say": "Ravi has no surname on file: the appointment sheet shows Unknown, R."
+  },
+  {
+   "function": "owner_label",
+   "call": "SELECT owner_label(NULL, 'Sharma')",
+   "got": "Sharma",
+   "say": "Mrs Sharma has no first name on file: the sheet shows just Sharma, with no initial."
+  },
+  {
+   "function": "owner_label",
+   "call": "SELECT owner_label('Ravi', 'sharma')",
+   "got": "sharma, R.",
+   "say": "Ravi's surname typed in lowercase as sharma is shown as sharma, R., so the capital letter is not fixed for the surname."
+  },
+  {
+   "function": "owner_label",
+   "call": "SELECT owner_label(NULL, NULL)",
+   "got": "Unknown",
+   "say": "An owner with neither first nor last name on file shows as Unknown on the appointment sheet."
+  }
+ ],
+ "fixes": [
+  {
+   "shown": "Biscuit the dog was adopted on 29 February 2024, a leap day: the first anniversary is shown as 28 February 2025, the day before the first of March.",
+   "said": "Policy says 29 Feb in a non-leap target year becomes 1 March, so it should be 1 March 2025.",
+   "function": "adoption_anniversary",
+   "rounds": 1,
+   "now": "Biscuit the dog, adopted on 29 February 2024, has a first anniversary that the software shows as 1 March 2025, not 28 February 2025, because 29 February doesn't exist in 2025 and the one missing day spills into March: the anniversary date is 2025-03-01.",
+   "confirmed": true
+  },
+  {
+   "shown": "Mia's cat was adopted on 15 June 2020 and someone asks for the anniversary minus 2 years: nothing is returned, no date at all.",
+   "said": "Policy says a negative number of years should give a date, not nothing. Wait, no: negative years return NULL, so that's right.\n\nYes, that's right",
+   "function": "adoption_anniversary",
+   "rounds": 1,
+   "now": "Mia's cat, adopted on 15 June 2020, is asked for its anniversary minus 2 years: a negative number of years is not allowed, so no anniversary date is returned at all (NULL).",
+   "confirmed": true
+  },
+  {
+   "shown": "Mia's cat was adopted on 15 June 2020 and the staff ask for 2.9 years: the anniversary comes out as 15 June 2022, the part-year is simply dropped, not rounded up to 3.",
+   "said": "Policy says to round years to the nearest whole year, with halves rounding up, so 2.9 years should be 3 years: 15 June 2023.",
+   "function": "adoption_anniversary",
+   "rounds": 1,
+   "now": "Mia's cat, adopted on 15 June 2020, is checked with 2.9 years: the part-year is rounded to the nearest whole year, so it counts as 3 years and the anniversary comes out as 15 June 2023, not 15 June 2022.",
+   "confirmed": true
+  },
+  {
+   "shown": "A record shows Mia's cat adopted on 30 February 2020, a date that does not exist: no anniversary is given and no error is raised.",
+   "said": "Policy says a bad date counts as 1970-01-01, so it should give a date, not nothing.",
+   "function": "adoption_anniversary",
+   "rounds": 2,
+   "now": "Mia's cat is recorded as adopted on 30 February 2020, a date that doesn't exist, which the software would treat as 1970-01-01, but because no number of years was given the anniversary can't be worked out: no anniversary date is returned (it comes back empty, NULL), and no error is raised.",
+   "confirmed": false,
+   "said_again": "It should give 1970-01-01, since a bad date counts as that and missing years means the adoption date itself."
+  },
+  {
+   "shown": "Asha's one-month care plan starts on 31 January 2025: it expires on 28 February 2025, the last day of the shorter month.",
+   "said": "It should be 3 March 2025. A short month spills into March, so 31 Jan plus 1 month isn't 28 Feb.",
+   "function": "membership_expiry",
+   "rounds": 1,
+   "now": "Asha's one-month care plan starts on 31 January 2025, and February 2025 has no 31st, so the expiry spills over by the 3 missing days: it expires on 2025-03-03 (3 March 2025), not on 28 February.",
+   "confirmed": true
+  },
+  {
+   "shown": "A care plan starting 15 January 2025 with minus 3 months gives no expiry date at all instead of an error or an earlier date.",
+   "said": "It should give 15 January 2025: negative months count as 0, so the expiry is the start date itself, not empty.",
+   "function": "membership_expiry",
+   "rounds": 1,
+   "now": "The care plan starting 15 January 2025 with minus 3 months does not get a blank expiry: negative months count as 0, so the expiry is the start date unchanged, 2025-01-15.",
+   "confirmed": true
+  },
+  {
+   "shown": "A plan whose start date is typed as 15/01/2025 instead of year-month-day gets no expiry date, so that member would show as having no end date.",
+   "said": "It should still give a date: a badly typed start date counts as 1970-01-01, so the expiry is worked out from that.",
+   "function": "membership_expiry",
+   "rounds": 1,
+   "now": "A plan whose start date is typed as 15/01/2025 instead of year-month-day does get an expiry date, because the software treats the badly typed start date as 1970-01-01 and counts the plan's months forward from that date (with 0 months the expiry is 1970-01-01), so the member shows an end date in 1970 or soon after, not a blank one.",
+   "confirmed": true
+  },
+  {
+   "shown": "Rex stays 2.5 days at 40 per day: the stay is charged 100, with the half day charged pro rata.",
+   "said": "Policy says half days round up to a whole day, so 2.5 days is 3 days: 120, not 100.",
+   "function": "boarding_cost",
+   "rounds": 1,
+   "now": "Rex stays 2.5 days at 40 per day: the half day counts as a full day, so the stay is billed as 3 whole days at the full rate (all within the first 7 days), and the boarding charge comes to 120.0, not 100, with nothing charged pro rata.",
+   "confirmed": true
+  },
+  {
+   "shown": "A stay with the number of days left blank at 40 per day has no total: the result is empty, not 0.",
+   "said": "It should be 0, not empty.",
+   "function": "boarding_cost",
+   "rounds": 1,
+   "now": "A boarding stay with the number of days left blank at 40 per day has no total: the boarding cost comes to 0.0, not empty, because a blank days value always gives 0.0 (only non-numeric text in the other value would give an empty result, and 40 is a plain number).",
+   "confirmed": true
+  },
+  {
+   "shown": "One night at 100.125 is billed 100.12, because an exact half-cent is rounded to the even cent, which here is down.",
+   "said": "It should be 100.13. Money always rounds up to the next cent, so an exact half-cent goes up, not down.",
+   "function": "boarding_cost",
+   "rounds": 1,
+   "now": "One night of boarding at a daily rate of 100.125 is billed 100.13, not 100.12: the total has more than two decimals, so it rounds up to the next whole cent, and an exact half-cent always goes up and is never rounded to the even cent.",
+   "confirmed": true
+  },
+  {
+   "shown": "Meena has 10 visits and has spent nothing: she reaches silver exactly at 10 visits.",
+   "said": "It should be bronze: a score of 100 is bronze, and silver starts above 100.",
+   "function": "loyalty_tier",
+   "rounds": 1,
+   "now": "Meena has 10 visits and has spent nothing, so her score is 10 visits \u00d7 10 points = 100 plus 0 for spending, which is exactly on the 100 limit. The rules keep her in the lower tier at a limit, so she is not silver at 10 visits: she stays bronze, and she would only become silver with a score above 100.",
+   "confirmed": true
+  },
+  {
+   "shown": "Kiran has visited only twice but has spent 2600: Kiran is platinum, because the higher of the visit tier and the spend tier wins.",
+   "said": "Should be silver: 2 visits is 20 points plus 260 for spend, so the score is 280, and that is silver.",
+   "function": "loyalty_tier",
+   "rounds": 1,
+   "now": "Kiran, with 2 visits (20 points) and 2600 spent (260 points), has a total score of 280, so Kiran is placed in silver, not platinum, because the tier comes from the combined score and not from the higher of the visit tier and the spend tier.",
+   "confirmed": true
+  },
+  {
+   "shown": "Meena has 9 visits and has spent 499.99, one cent below 500: she stays bronze.",
+   "said": "Should be silver: 9 visits is 90 points plus 49 for spend, so the score is 139, which is above 100.",
+   "function": "loyalty_tier",
+   "rounds": 1,
+   "now": "Meena has 9 visits (90 points) and has spent 499.99, which earns 49 points because the fraction is dropped, so her total score is 139. That is above 100, so she is placed in silver, not bronze.",
+   "confirmed": true
+  },
+  {
+   "shown": "Kiran's visit count was typed as the word abc and the spend is 1200: the bad visit count is ignored and Kiran is gold on spend alone.",
+   "said": "Should be silver: abc counts as 0 visits, and 1200 spent is 120 points, which is silver, not gold.",
+   "function": "loyalty_tier",
+   "rounds": 1,
+   "now": "Kiran's visit count was typed as the word abc and the spend is 1200: the bad visit count is treated as zero visits (0 points) and the 1200 spent gives 120 points, so the total score is 120, which is above 100 but not above 300, and Kiran is placed in silver, not gold.",
+   "confirmed": true
+  },
+  {
+   "shown": "Ravi Kumar Singh, typed with stray spaces, is shown on the appointment sheet as Kumar Singh, R.",
+   "said": "It should be cut to 12 characters, so \"Kumar singh,\" with the surname's later letters in lower case.",
+   "function": "owner_label",
+   "rounds": 1,
+   "now": "Ravi, whose last name is Kumar Singh, is not shown on the appointment sheet as 'Kumar Singh, R.': the stray spaces are trimmed, the last name becomes 'Kumar singh' with only its first letter capitalised, the full label 'Kumar singh, R.' is 15 characters and gets cut to 12, so the sheet shows 'Kumar singh,' with no initial.",
+   "confirmed": true
+  },
+  {
+   "shown": "Ravi's surname typed in lowercase as sharma is shown as sharma, R., so the capital letter is not fixed for the surname.",
+   "said": "It should be \"Sharma, R.\" The surname always gets a capital first letter.",
+   "function": "owner_label",
+   "rounds": 1,
+   "now": "Ravi's surname typed in lowercase as sharma is shown with a capital first letter, not as 'sharma, R.': the label comes out as 'Sharma, R.' (10 characters, under the 12 limit), so the surname's capital letter is fixed.",
+   "confirmed": true
+  }
+ ],
+ "changed": [
+  "Whenever adoption_anniversary lands on a day that does not exist in the target year (29 February in a non-leap year), it spills into March by the number of missing days instead (29 February 2020 plus 1 year gives 2021-03-01, plus 4 years gives 2024-02-29).",
+  "Whenever adoption_anniversary is given 0 years, or no years at all (the years are NULL), it returns the adoption date unchanged, as YYYY-MM-DD. If the adoption date is written in the correct format but does not exist (or has year 0000), it counts as 1970-01-01, so the result is 1970-01-01.",
+  "Whenever adoption_anniversary is given a fractional number of years, it rounds to the nearest whole year, with halves rounding up, and then uses that whole number of years (1.9 years counts as 2 years, 2.5 years counts as 3 years, and 2.9 years counts as 3 years, so an adoption on 2020-06-15 with 2.9 years gives 2023-06-15). The part-year is never simply dropped.",
+  "Whenever the years given to adoption_anniversary are empty text, text that is not a plain number, or an infinite value, it returns NULL. (NULL years are not covered here: they count as 0 years, see rule 3.)",
+  "Whenever the adoption date given to adoption_anniversary is written in the correct format but is a date that does not exist (such as 2020-02-30 or month 13) or has year 0000, it counts as 1970-01-01. The anniversary is then worked out from 1970-01-01 in the usual way, using the years given (NULL years count as 0 years, so the result is 1970-01-01), and it returns a date, not NULL. For example, 2020-02-30 with 1 year gives 1971-01-01, and 2020-02-30 with no years gives 1970-01-01. The years rules still apply: if the years are invalid (empty text, text that is not a plain number, or infinite) or negative, the result is still NULL.",
+  "Whenever membership_expiry lands on a day that does not exist in the target month, it spills into the following month by the number of missing days (2020-01-31 plus 1 month gives 2020-03-02; 2021-01-31 plus 1 month gives 2021-03-03).",
+  "Whenever membership_expiry is given 0 months, or any finite negative number of months (such as -0.5, -0.9, -1 or -3), it counts as 0 months and returns the start date unchanged.",
+  "Whenever membership_expiry is given a negative number of months of -1 or less (for example -3 or -12), it does not return NULL; it counts the months as 0 and returns the start date unchanged, as YYYY-MM-DD. An infinite value is still NULL under rule 18.",
+  "Whenever the start date given to membership_expiry is NULL, empty text, or a real number, it returns NULL. Whenever the start date is text that is not written exactly as YYYY-MM-DD with dashes (such as 15/01/2025), or is a non-existent date, it is treated as 1970-01-01, and the expiry is worked out from 1970-01-01 using the months given, under the other rules. Spaces around a valid date are ignored.",
+  "Whenever boarding_cost is given days and a daily rate that are both positive, it first rounds the days up to a whole day (so 2.5 days counts as 3 days, and any part of a day counts as a full day), then returns those whole days multiplied by the daily rate as a decimal number (3 days at 25 gives 75.0; 2.5 days at 40 gives 3 days at 40, which is 120.0). Days past the 7th are charged as rule 24 says.",
+  "Whenever boarding_cost is given a number of days, it rounds the days up to a whole day. The first 7 days are charged at the full rate, and each day after that is charged at 80% of the rate (for example, 2.5 days at 30 is rounded up to 3 days and gives 90.0).",
+  "Whenever the total in boarding_cost has more than two decimals, it rounds up to the next whole cent, never down. This includes an exact half-cent, which always goes up and is never rounded to the even cent (1 day at 100.125 gives 100.13, and 1 day at 100.135 gives 100.14). A total with two decimals or fewer is left as it is. The one exception is a total under half a cent, which rule 26 sets to 0.0.",
+  "Whenever the total in boarding_cost, after the days have been rounded up to whole days, is under half a cent (such as 1 day at a rate of 0.004), it returns 0.0. A part of a day is never charged pro rata, so a tiny number of days such as 0.001 days at 5 counts as 1 full day and gives 5.0.",
+  "Whenever either the days or the daily rate given to boarding_cost is NULL (left blank), it returns 0.0, whatever the other value is (positive, zero, negative or infinite), unless the other value is text that is not a plain number (rule 30), in which case it returns NULL.",
+  "Whenever either the days or the daily rate given to boarding_cost is empty text, it returns 0.0, the same as NULL, even if the other value is positive, zero or negative. Whenever either of them is text that is not a plain number (and is not empty), it returns NULL, even if the other value is zero, negative, NULL or empty.",
+  "Whenever loyalty_tier is called, it places the client in one of the tiers bronze, silver, gold or platinum using a single total score. The total score is the visit score added to the spend score. The client is not placed by taking the higher of a tier from visits alone and a tier from spending alone. For example, 2 visits (20 points) and 2600 spent (260 points) make a score of 280, which is silver.",
+  "A client's loyalty_tier is decided by the client's total score. The score is 10 points per visit, counting at most 30 visits. A total score of 100 or less is bronze. A total score above 100 is silver. A total score above 300 is gold. A total score above 600 is platinum.",
+  "loyalty_tier: the spend score is 1 point per whole 10 of total_spent (fraction dropped, so 499.99 gives 49 points, not 50), added to the visit score. Bronze is a score up to 100, silver is above 100, gold is above 300, and platinum is above 600.",
+  "Whenever a client's total score is exactly on a tier limit (100, 300 or 600), loyalty_tier keeps them in the lower tier: a score of exactly 100 is bronze, exactly 300 is silver and exactly 600 is gold (for example, 10 visits and nothing spent is a score of 100, so bronze). The client moves to the higher tier only when the score is above the limit (above 100 is silver, above 300 is gold, above 600 is platinum).",
+  "Whenever the visits or the total spent given to loyalty_tier is NULL, empty text, or text that is not a plain number (such as 'abc'), loyalty_tier treats that value as zero (zero visits, or zero spent) and never returns NULL. The bad value is not skipped and does not change how the other value is scored: the client is still placed by the single total score, which is the visit score added to the spend score, with the bad value contributing 0 points. For example, visits 'abc' and 1200 spent make 0 + 120 = a score of 120, which is silver, not gold.",
+  "Whenever owner_label is given a first and a last name, it returns the last name, a comma, a space, the first letter of the first name in capitals, and a full stop (John Smith gives 'Smith, J.'). The returned label is never longer than 12 characters: anything past the 12th character is cut off, including a trailing space, comma or initial (last name 'Kumar Singh' with first name 'Ravi' gives 'Kumar singh,').",
+  "Whenever owner_label shows the last name, it always starts with a capital letter, whatever case it was typed in, and all the rest is lower-case, including the first letter of any later word in it ('McDONALD' becomes 'Mcdonald'; 'sharma' becomes 'Sharma'; 'Kumar Singh' becomes 'Kumar singh'); the first initial is capitalised.",
+  "Whenever a name given to owner_label has spaces, tabs or line breaks at the start or end, they are removed, and any run of spaces or line breaks inside the name becomes one single space ('van   der  berg' as a last name gives 'Van der berg', with the first letter capitalised as in the rule on how the last name is shown).",
+  "Whenever the first name given to owner_label is NULL, empty, or only spaces, it returns just the last name with no comma and no initial ('Smith'). This label is also cut to at most 12 characters, so a longer last name loses its end.",
+  "Biscuit the dog was adopted on 29 February 2024, a leap day: the first anniversary is shown as 28 February 2025, the day before the first of March. The owner says: Policy says 29 Feb in a non-leap target year becomes 1 March, so it should be 1 March 2025.",
+  "Mia's cat was adopted on 15 June 2020 and someone asks for the anniversary minus 2 years: nothing is returned, no date at all. The owner says: Policy says a negative number of years should give a date, not nothing. Wait, no: negative years return NULL, so that's right.\n\nYes, that's right",
+  "Asha's one-month care plan starts on 31 January 2025: it expires on 28 February 2025, the last day of the shorter month. The owner says: It should be 3 March 2025. A short month spills into March, so 31 Jan plus 1 month isn't 28 Feb."
+ ],
+ "list_review": {
+  "replies": 10,
+  "cost": 0.794,
+  "log": [
+   {
+    "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+    "typed": "2, 4, 13, 24, 25, 34, 35, 43"
+   },
+   {
+    "prompt": "  Rule 2: Whenever adoption_anniversary lands on a day that does not exist in the target year (29 February in a non-leap year), it returns the last day of that month instead (29 February 2020 plus 1 year gives 2021-02-28, plus 4 years gives 2024-02-29).\n  What should it be? > ",
+    "typed": "Spills into March by the missing days: 29 Feb 2020 plus 1 year is 1 March 2021."
+   },
+   {
+    "prompt": "  Rule 4: Whenever adoption_anniversary is given a fractional number of years, it drops the fraction and does not round (1.9 years counts as 1 year).\n  What should it be? > ",
+    "typed": "Round to the nearest whole year, with halves rounding up: 1.9 years counts as 2, and 2.5 becomes 3."
+   },
+   {
+    "prompt": "  Rule 13: Whenever membership_expiry lands on a day that does not exist in the target month, it returns the last day of that month (2020-01-31 plus 1 month gives 2020-02-29; 2021-01-31 plus 1 month gives 2021-02-28).\n  What should it be? > ",
+    "typed": "Spills into the following month by the missing days: 31 Jan plus 1 month is 2 or 3 March."
+   },
+   {
+    "prompt": "  Rule 24: Whenever boarding_cost is given a fractional number of days, it charges for the fraction (2.5 days at 30 gives 75.0).\n  What should it be? > ",
+    "typed": "Boarding days: round up to a whole day. First 7 days full rate, after that 80%."
+   },
+   {
+    "prompt": "  Rule 25: Whenever the total in boarding_cost has more than two decimals, it rounds to cents, and an exact half-cent goes to the even cent (2.675 gives 2.68, 0.125 gives 0.12, 0.135 gives 0.14, 10.005 gives 10.0).\n  What should it be? > ",
+    "typed": "Round money up to the next whole cent, never down."
+   },
+   {
+    "prompt": "  Rule 34: Whenever a client has 10 or more visits, loyalty_tier gives at least silver; 25 or more visits gives at least gold; 40 or more visits gives platinum; fewer than 10 visits gives bronze on visits alone.\n  What should it be? > ",
+    "typed": "Score it at 10 points per visit, counting at most 30 visits, with the tiers decided by total score. Up to 100 is bronze, above 100 is silver, above 300 is gold, and above 600 is platinum."
+   },
+   {
+    "prompt": "  Rule 35: Whenever a client has spent 500 or more, loyalty_tier gives at least silver; 1000 or more gives at least gold; 2500 or more gives platinum; under 500 gives bronze on spending alone.\n  What should it be? > ",
+    "typed": "Loyalty: score 10 points per whole 10 spent (1 point per whole 10 of total_spent, fraction dropped), added to the visit score. Bronze up to 100, silver above 100, gold above 300, platinum above 600."
+   },
+   {
+    "prompt": "  Rule 43: Whenever owner_label shows the last name, it keeps the last name's letter case as typed ('smith' stays 'smith', 'SMITH' stays 'SMITH'); only the first initial is capitalised.\n  What should it be? > ",
+    "typed": "Last name should show with only the first letter capitalised and the rest lower-case: 'McDONALD' becomes 'Mcdonald'."
+   },
+   {
+    "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+    "typed": ""
+   }
+  ],
+  "transcript": "\nWhat the built code does now, as rules (each one is what the product will do. Mark any that is not your policy):\n  1. Whenever adoption_anniversary is given a valid adoption date and a whole number of years, it returns the adoption date moved forward by that many years, as YYYY-MM-DD, keeping the same month and day.\n  2. Whenever adoption_anniversary lands on a day that does not exist in the target year (29 February in a non-leap year), it returns the last day of that month instead (29 February 2020 plus 1 year gives 2021-02-28, plus 4 years gives 2024-02-29).\n  3. Whenever adoption_anniversary is given 0 years, it returns the adoption date unchanged.\n  4. Whenever adoption_anniversary is given a fractional number of years, it drops the fraction and does not round (1.9 years counts as 1 year).\n  5. Whenever adoption_anniversary is given a negative number of years (including -0.5), it returns NULL.\n  6. Whenever the years given to adoption_anniversary are NULL, empty text, text that is not a plain number, or an infinite value, it returns NULL.\n  7. Whenever the years given to adoption_anniversary are text that looks like a plain number (for example '2', ' 2 ', '+2' or '1e1'), it reads them as that number; spaces around the number are ignored.\n  8. Whenever the adoption date given to adoption_anniversary is NULL, empty text, a real number, or not written exactly as four-digit year, two-digit month and two-digit day separated by dashes (such as '2020-3-5', '2020/03/15' or a date followed by a time), it returns NULL.\n  9. Whenever the adoption date given to adoption_anniversary is a date that does not exist (such as 2020-02-30 or month 13) or has year 0000, it returns NULL.\n  10. Whenever the adoption date given to adoption_anniversary has spaces before or after it, the spaces are ignored and the anniversary is calculated normally.\n  11. Whenever the anniversary computed by adoption_anniversary would fall after the year 9999, it returns NULL (9990-03-15 plus 9 years is 9999-03-15, plus 10 years is NULL).\n  12. Whenever membership_expiry is given a valid start date and a number of months, it returns the start date moved forward by that many months, as YYYY-MM-DD, keeping the same day of the month.\n  13. Whenever membership_expiry lands on a day that does not exist in the target month, it returns the last day of that month (2020-01-31 plus 1 month gives 2020-02-29; 2021-01-31 plus 1 month gives 2021-02-28).\n  14. Whenever membership_expiry moves past December, it rolls into the next year (2020-12-15 plus 1 month gives 2021-01-15; 12 months gives the same day next year).\n  15. Whenever membership_expiry is given a fractional number of months, it drops the fraction and does not round (1.5 months counts as 1 month, 0.9 months counts as 0).\n  16. Whenever membership_expiry is given 0 months, or a negative amount smaller than one month such as -0.5 or -0.9, it returns the start date unchanged.\n  17. Whenever membership_expiry is given a negative number of months of -1 or less, it returns NULL.\n  18. Whenever the months given to membership_expiry are NULL, empty text, text that is not a plain number (such as 'six', '1,5', '0x3' or 'inf'), or an infinite value, it returns NULL.\n  19. Whenever the months given to membership_expiry are text that looks like a plain number (such as '6', ' 6 ', '+3', '3.' or '2e0'), it reads them as that number; spaces around the number are ignored.\n  20. Whenever the start date given to membership_expiry is NULL, empty text, a real number, a non-existent date, or not written exactly as YYYY-MM-DD with dashes, it returns NULL; spaces around a valid date are ignored.\n  21. Whenever the expiry computed by membership_expiry would fall after the year 9999, it returns NULL (for example 9999-12-15 plus 1 month).\n  22. Whenever membership_expiry is given a start date in November 9999 and a number of months that lands exactly in December 9999 (for example '9999-11-15' plus 1 month), it fails with an error instead of returning a date.\n  23. Whenever boarding_cost is given days and a daily rate that are both positive, it returns days multiplied by the daily rate as a decimal number (3 days at 25 gives 75.0).\n  24. Whenever boarding_cost is given a fractional number of days, it charges for the fraction (2.5 days at 30 gives 75.0).\n  25. Whenever the total in boarding_cost has more than two decimals, it rounds to cents, and an exact half-cent goes to the even cent (2.675 gives 2.68, 0.125 gives 0.12, 0.135 gives 0.14, 10.005 gives 10.0).\n  26. Whenever the total in boarding_cost is under half a cent (such as 0.001 days at 5), it returns 0.0.\n  27. Whenever the days given to boarding_cost are zero or negative, it returns 0.0.\n  28. Whenever the daily rate given to boarding_cost is zero or negative, it returns 0.0.\n  29. Whenever either the days or the daily rate given to boarding_cost is NULL, it returns NULL, even if the other value is zero or negative.\n  30. Whenever either the days or the daily rate given to boarding_cost is empty text or text that is not a plain number, it returns NULL, even if the other value is zero or negative.\n  31. Whenever the days or daily rate given to boarding_cost are text that looks like a plain number (such as '3', ' 25 ', '2.50' or '1e2'), it reads them as that number; spaces around the number are ignored.\n  32. Whenever boarding_cost is given an infinite days or rate (for example 1e999) together with a positive other value, it returns infinity; if the other value is zero or negative it returns 0.0.\n  33. Whenever loyalty_tier is called, it places the client in the highest tier reached by either their visit count or their total spent, using bronze, silver, gold and platinum.\n  34. Whenever a client has 10 or more visits, loyalty_tier gives at least silver; 25 or more visits gives at least gold; 40 or more visits gives platinum; fewer than 10 visits gives bronze on visits alone.\n  35. Whenever a client has spent 500 or more, loyalty_tier gives at least silver; 1000 or more gives at least gold; 2500 or more gives platinum; under 500 gives bronze on spending alone.\n  36. Whenever a client is exactly on a threshold (10, 25 or 40 visits; 500, 1000 or 2500 spent), loyalty_tier puts them in the higher tier, while just below it (9.99 visits, 499.99 spent) keeps them in the lower tier.\n  37. Whenever the visits or the total spent given to loyalty_tier is NULL, empty text, or text that is not a plain number, loyalty_tier treats it as zero and never returns NULL.\n  38. Whenever the visits or the total spent given to loyalty_tier is negative, loyalty_tier gives no credit for it; with both negative the tier is bronze.\n  39. Whenever the visits or the total spent given to loyalty_tier is text that looks like a plain number (such as '30', ' 30 ' or '1e3'), it reads it as that number; spaces around the number are ignored.\n  40. Whenever the visits or the total spent given to loyalty_tier is infinite (for example 1e999), the client is platinum; the text 'inf' is not a number and counts as zero.\n  41. Whenever the visits or total spent given to loyalty_tier is fractional, it is compared as is without rounding.\n  42. Whenever owner_label is given a first and a last name, it returns the last name, a comma, a space, the first letter of the first name in capitals, and a full stop (John Smith gives 'Smith, J.').\n  43. Whenever owner_label shows the last name, it keeps the last name's letter case as typed ('smith' stays 'smith', 'SMITH' stays 'SMITH'); only the first initial is capitalised.\n  44. Whenever owner_label is given a first name with several words or a hyphen (such as 'Mary Ann' or 'Jean-Luc'), only its first letter is shown as the initial.\n  45. Whenever a name given to owner_label has spaces, tabs or line breaks at the start or end, they are removed, and any run of spaces or line breaks inside the name becomes one single space ('van   der  berg' gives 'van der berg').\n  46. Whenever the last name given to owner_label is NULL, empty, or only spaces, it uses 'Unknown' as the last name (so 'John' with no last name gives 'Unknown, J.').\n  47. Whenever the first name given to owner_label is NULL, empty, or only spaces, it returns just the last name with no comma and no initial ('Smith').\n  48. Whenever both names given to owner_label are NULL, empty or blank, it returns 'Unknown'.\n  49. Whenever the first name given to owner_label starts with something other than a plain letter, that first character is still used as the initial (a digit stays as is, '1abc' gives '1.', a full stop gives '..').\n  50. Whenever the first name given to owner_label starts with an accented letter, the initial is that letter in capitals ('\u00e9ric' gives '\u00c9.'); a letter that capitalises to two letters gives both ('\u00dfeta' gives 'SS.').\n  51. Whenever a name given to owner_label is a number rather than text, it is used as if typed as text (first name 123 gives initial '1'; last name 12 gives '12').\n  52. Whenever the last name given to owner_label contains punctuation such as a comma or an apostrophe, it is kept as is ('Smith, Jr.' gives 'Smith, Jr., J.').\n  Numbers of any that are wrong (Enter = all correct) > 2, 4, 13, 24, 25, 34, 35, 43\n  Rule 2: Whenever adoption_anniversary lands on a day that does not exist in the target year (29 February in a non-leap year), it returns the last day of that month instead (29 February 2020 plus 1 year gives 2021-02-28, plus 4 years gives 2024-02-29).\n  What should it be? > Spills into March by the missing days: 29 Feb 2020 plus 1 year is 1 March 2021.\n  Rule 4: Whenever adoption_anniversary is given a fractional number of years, it drops the fraction and does not round (1.9 years counts as 1 year).\n  What should it be? > Round to the nearest whole year, with halves rounding up: 1.9 years counts as 2, and 2.5 becomes 3.\n  Rule 13: Whenever membership_expiry lands on a day that does not exist in the target month, it returns the last day of that month (2020-01-31 plus 1 month gives 2020-02-29; 2021-01-31 plus 1 month gives 2021-02-28).\n  What should it be? > Spills into the following month by the missing days: 31 Jan plus 1 month is 2 or 3 March.\n  Rule 24: Whenever boarding_cost is given a fractional number of days, it charges for the fraction (2.5 days at 30 gives 75.0).\n  What should it be? > Boarding days: round up to a whole day. First 7 days full rate, after that 80%.\n  Rule 25: Whenever the total in boarding_cost has more than two decimals, it rounds to cents, and an exact half-cent goes to the even cent (2.675 gives 2.68, 0.125 gives 0.12, 0.135 gives 0.14, 10.005 gives 10.0).\n  What should it be? > Round money up to the next whole cent, never down.\n  Rule 34: Whenever a client has 10 or more visits, loyalty_tier gives at least silver; 25 or more visits gives at least gold; 40 or more visits gives platinum; fewer than 10 visits gives bronze on visits alone.\n  What should it be? > Score it at 10 points per visit, counting at most 30 visits, with the tiers decided by total score. Up to 100 is bronze, above 100 is silver, above 300 is gold, and above 600 is platinum.\n  Rule 35: Whenever a client has spent 500 or more, loyalty_tier gives at least silver; 1000 or more gives at least gold; 2500 or more gives platinum; under 500 gives bronze on spending alone.\n  What should it be? > Loyalty: score 10 points per whole 10 spent (1 point per whole 10 of total_spent, fraction dropped), added to the visit score. Bronze up to 100, silver above 100, gold above 300, platinum above 600.\n  Rule 43: Whenever owner_label shows the last name, it keeps the last name's letter case as typed ('smith' stays 'smith', 'SMITH' stays 'SMITH'); only the first initial is capitalised.\n  What should it be? > Last name should show with only the first letter capitalised and the rest lower-case: 'McDONALD' becomes 'Mcdonald'.\n  Anything the builders should know that is not on this list? (Enter = nothing) > \n"
+ },
+ "spot_review": {
+  "replies": 41,
+  "cost": 2.983,
+  "log": [
+   {
+    "prompt": "\nCase 1 of 25. Biscuit the dog was adopted on 29 February 2024, a leap day: the first anniversary is shown as 28 February 2025, the day before the first of March.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Policy says 29 Feb in a non-leap target year becomes 1 March, so it should be 1 March 2025."
+   },
+   {
+    "prompt": "\n  With your correction: Biscuit the dog, adopted on 29 February 2024, has a first anniversary that the software shows as 1 March 2025, not 28 February 2025, because 29 February doesn't exist in 2025 and the one missing day spills into March: the anniversary date is 2025-03-01.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 2 of 25. Mia's cat was adopted on 15 June 2020 and someone asks for the anniversary minus 2 years: nothing is returned, no date at all.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Policy says a negative number of years should give a date, not nothing. Wait, no: negative years return NULL, so that's right.\n\nYes, that's right"
+   },
+   {
+    "prompt": "\n  With your correction: Mia's cat, adopted on 15 June 2020, is asked for its anniversary minus 2 years: a negative number of years is not allowed, so no anniversary date is returned at all (NULL).\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 3 of 25. Mia's cat was adopted on 15 June 2020 and the staff ask for 2.9 years: the anniversary comes out as 15 June 2022, the part-year is simply dropped, not rounded up to 3.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Policy says to round years to the nearest whole year, with halves rounding up, so 2.9 years should be 3 years: 15 June 2023."
+   },
+   {
+    "prompt": "\n  With your correction: Mia's cat, adopted on 15 June 2020, is checked with 2.9 years: the part-year is rounded to the nearest whole year, so it counts as 3 years and the anniversary comes out as 15 June 2023, not 15 June 2022.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 4 of 25. A record shows Mia's cat adopted on 30 February 2020, a date that does not exist: no anniversary is given and no error is raised.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Policy says a bad date counts as 1970-01-01, so it should give a date, not nothing."
+   },
+   {
+    "prompt": "\n  With your correction: Mia's cat is recorded as adopted on 30 February 2020, a date that doesn't exist, which the software would treat as 1970-01-01, but because no number of years was given the anniversary can't be worked out: no anniversary date is returned (it comes back empty, NULL), and no error is raised.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": "It should give 1970-01-01, since a bad date counts as that and missing years means the adoption date itself."
+   },
+   {
+    "prompt": "\nCase 5 of 25. Asking for the anniversary after 0 years for a pet adopted on 15 June 2020 returns the adoption day itself, 15 June 2020.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 6 of 25. Asha's one-month care plan starts on 31 January 2025: it expires on 28 February 2025, the last day of the shorter month.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be 3 March 2025. A short month spills into March, so 31 Jan plus 1 month isn't 28 Feb."
+   },
+   {
+    "prompt": "\n  With your correction: Asha's one-month care plan starts on 31 January 2025, and February 2025 has no 31st, so the expiry spills over by the 3 missing days: it expires on 2025-03-03 (3 March 2025), not on 28 February.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 7 of 25. A care plan bought on 15 January 2025 with 0 months expires the same day, 15 January 2025, so it is over as soon as it begins.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 8 of 25. A care plan starting 15 January 2025 with minus 3 months gives no expiry date at all instead of an error or an earlier date.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should give 15 January 2025: negative months count as 0, so the expiry is the start date itself, not empty."
+   },
+   {
+    "prompt": "\n  With your correction: The care plan starting 15 January 2025 with minus 3 months does not get a blank expiry: negative months count as 0, so the expiry is the start date unchanged, 2025-01-15.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 9 of 25. Asha buys a plan of 1.9 months starting 15 January 2025: it expires on 15 February 2025, so she gets only 1 month, not 2.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 10 of 25. A plan whose start date is typed as 15/01/2025 instead of year-month-day gets no expiry date, so that member would show as having no end date.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should still give a date: a badly typed start date counts as 1970-01-01, so the expiry is worked out from that."
+   },
+   {
+    "prompt": "\n  With your correction: A plan whose start date is typed as 15/01/2025 instead of year-month-day does get an expiry date, because the software treats the badly typed start date as 1970-01-01 and counts the plan's months forward from that date (with 0 months the expiry is 1970-01-01), so the member shows an end date in 1970 or soon after, not a blank one.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 11 of 25. Rex stays 2.5 days at 40 per day: the stay is charged 100, with the half day charged pro rata.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Policy says half days round up to a whole day, so 2.5 days is 3 days: 120, not 100."
+   },
+   {
+    "prompt": "\n  With your correction: Rex stays 2.5 days at 40 per day: the half day counts as a full day, so the stay is billed as 3 whole days at the full rate (all within the first 7 days), and the boarding charge comes to 120.0, not 100, with nothing charged pro rata.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 12 of 25. A stay entered as minus 2 days at 40 per day is billed 0, with no warning that the number of days was wrong.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 13 of 25. Rex boards 3 days but the daily rate was entered as minus 40: the total comes to 0 instead of flagging the bad rate.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 14 of 25. A stay with the number of days left blank at 40 per day has no total: the result is empty, not 0.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be 0, not empty."
+   },
+   {
+    "prompt": "\n  With your correction: A boarding stay with the number of days left blank at 40 per day has no total: the boarding cost comes to 0.0, not empty, because a blank days value always gives 0.0 (only non-numeric text in the other value would give an empty result, and 40 is a plain number).\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 15 of 25. One night at 100.125 is billed 100.12, because an exact half-cent is rounded to the even cent, which here is down.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be 100.13. Money always rounds up to the next cent, so an exact half-cent goes up, not down."
+   },
+   {
+    "prompt": "\n  With your correction: One night of boarding at a daily rate of 100.125 is billed 100.13, not 100.12: the total has more than two decimals, so it rounds up to the next whole cent, and an exact half-cent always goes up and is never rounded to the even cent.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 16 of 25. Meena has 10 visits and has spent nothing: she reaches silver exactly at 10 visits.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be bronze: a score of 100 is bronze, and silver starts above 100."
+   },
+   {
+    "prompt": "\n  With your correction: Meena has 10 visits and has spent nothing, so her score is 10 visits \u00d7 10 points = 100 plus 0 for spending, which is exactly on the 100 limit. The rules keep her in the lower tier at a limit, so she is not silver at 10 visits: she stays bronze, and she would only become silver with a score above 100.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 17 of 25. Kiran has visited only twice but has spent 2600: Kiran is platinum, because the higher of the visit tier and the spend tier wins.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Should be silver: 2 visits is 20 points plus 260 for spend, so the score is 280, and that is silver."
+   },
+   {
+    "prompt": "\n  With your correction: Kiran, with 2 visits (20 points) and 2600 spent (260 points), has a total score of 280, so Kiran is placed in silver, not platinum, because the tier comes from the combined score and not from the higher of the visit tier and the spend tier.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 18 of 25. Meena has 9 visits and has spent 499.99, one cent below 500: she stays bronze.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Should be silver: 9 visits is 90 points plus 49 for spend, so the score is 139, which is above 100."
+   },
+   {
+    "prompt": "\n  With your correction: Meena has 9 visits (90 points) and has spent 499.99, which earns 49 points because the fraction is dropped, so her total score is 139. That is above 100, so she is placed in silver, not bronze.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 19 of 25. A new client with no visit count and no spend recorded is bronze.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 20 of 25. Kiran's visit count was typed as the word abc and the spend is 1200: the bad visit count is ignored and Kiran is gold on spend alone.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Should be silver: abc counts as 0 visits, and 1200 spent is 120 points, which is silver, not gold."
+   },
+   {
+    "prompt": "\n  With your correction: Kiran's visit count was typed as the word abc and the spend is 1200: the bad visit count is treated as zero visits (0 points) and the 1200 spent gives 120 points, so the total score is 120, which is above 100 but not above 300, and Kiran is placed in silver, not gold.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 21 of 25. Ravi Kumar Singh, typed with stray spaces, is shown on the appointment sheet as Kumar Singh, R.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be cut to 12 characters, so \"Kumar singh,\" with the surname's later letters in lower case."
+   },
+   {
+    "prompt": "\n  With your correction: Ravi, whose last name is Kumar Singh, is not shown on the appointment sheet as 'Kumar Singh, R.': the stray spaces are trimmed, the last name becomes 'Kumar singh' with only its first letter capitalised, the full label 'Kumar singh, R.' is 15 characters and gets cut to 12, so the sheet shows 'Kumar singh,' with no initial.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 22 of 25. Ravi has no surname on file: the appointment sheet shows Unknown, R.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 23 of 25. Mrs Sharma has no first name on file: the sheet shows just Sharma, with no initial.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 24 of 25. Ravi's surname typed in lowercase as sharma is shown as sharma, R., so the capital letter is not fixed for the surname.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be \"Sharma, R.\" The surname always gets a capital first letter."
+   },
+   {
+    "prompt": "\n  With your correction: Ravi's surname typed in lowercase as sharma is shown with a capital first letter, not as 'sharma, R.': the label comes out as 'Sharma, R.' (10 characters, under the 12 limit), so the surname's capital letter is fixed.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 25 of 25. An owner with neither first nor last name on file shows as Unknown on the appointment sheet.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   }
+  ],
+  "transcript": "Hive: Now 25 quick checks on what the build does in real cases. Press Enter if a result is right, or say what should happen instead.\n\nCase 1 of 25. Biscuit the dog was adopted on 29 February 2024, a leap day: the first anniversary is shown as 28 February 2025, the day before the first of March.\n  Right? (Enter = yes, or say what should happen) > Policy says 29 Feb in a non-leap target year becomes 1 March, so it should be 1 March 2025.\n\n  With your correction: Biscuit the dog, adopted on 29 February 2024, has a first anniversary that the software shows as 1 March 2025, not 28 February 2025, because 29 February doesn't exist in 2025 and the one missing day spills into March: the anniversary date is 2025-03-01.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 2 of 25. Mia's cat was adopted on 15 June 2020 and someone asks for the anniversary minus 2 years: nothing is returned, no date at all.\n  Right? (Enter = yes, or say what should happen) > Policy says a negative number of years should give a date, not nothing. Wait, no: negative years return NULL, so that's right.\n\nYes, that's right\n\n  With your correction: Mia's cat, adopted on 15 June 2020, is asked for its anniversary minus 2 years: a negative number of years is not allowed, so no anniversary date is returned at all (NULL).\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 3 of 25. Mia's cat was adopted on 15 June 2020 and the staff ask for 2.9 years: the anniversary comes out as 15 June 2022, the part-year is simply dropped, not rounded up to 3.\n  Right? (Enter = yes, or say what should happen) > Policy says to round years to the nearest whole year, with halves rounding up, so 2.9 years should be 3 years: 15 June 2023.\n\n  With your correction: Mia's cat, adopted on 15 June 2020, is checked with 2.9 years: the part-year is rounded to the nearest whole year, so it counts as 3 years and the anniversary comes out as 15 June 2023, not 15 June 2022.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 4 of 25. A record shows Mia's cat adopted on 30 February 2020, a date that does not exist: no anniversary is given and no error is raised.\n  Right? (Enter = yes, or say what should happen) > Policy says a bad date counts as 1970-01-01, so it should give a date, not nothing.\n\n  With your correction: Mia's cat is recorded as adopted on 30 February 2020, a date that doesn't exist, which the software would treat as 1970-01-01, but because no number of years was given the anniversary can't be worked out: no anniversary date is returned (it comes back empty, NULL), and no error is raised.\n  Right now? (Enter = yes, or say what should happen) > It should give 1970-01-01, since a bad date counts as that and missing years means the adoption date itself.\n\nCase 5 of 25. Asking for the anniversary after 0 years for a pet adopted on 15 June 2020 returns the adoption day itself, 15 June 2020.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 6 of 25. Asha's one-month care plan starts on 31 January 2025: it expires on 28 February 2025, the last day of the shorter month.\n  Right? (Enter = yes, or say what should happen) > It should be 3 March 2025. A short month spills into March, so 31 Jan plus 1 month isn't 28 Feb.\n\n  With your correction: Asha's one-month care plan starts on 31 January 2025, and February 2025 has no 31st, so the expiry spills over by the 3 missing days: it expires on 2025-03-03 (3 March 2025), not on 28 February.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 7 of 25. A care plan bought on 15 January 2025 with 0 months expires the same day, 15 January 2025, so it is over as soon as it begins.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 8 of 25. A care plan starting 15 January 2025 with minus 3 months gives no expiry date at all instead of an error or an earlier date.\n  Right? (Enter = yes, or say what should happen) > It should give 15 January 2025: negative months count as 0, so the expiry is the start date itself, not empty.\n\n  With your correction: The care plan starting 15 January 2025 with minus 3 months does not get a blank expiry: negative months count as 0, so the expiry is the start date unchanged, 2025-01-15.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 9 of 25. Asha buys a plan of 1.9 months starting 15 January 2025: it expires on 15 February 2025, so she gets only 1 month, not 2.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 10 of 25. A plan whose start date is typed as 15/01/2025 instead of year-month-day gets no expiry date, so that member would show as having no end date.\n  Right? (Enter = yes, or say what should happen) > It should still give a date: a badly typed start date counts as 1970-01-01, so the expiry is worked out from that.\n\n  With your correction: A plan whose start date is typed as 15/01/2025 instead of year-month-day does get an expiry date, because the software treats the badly typed start date as 1970-01-01 and counts the plan's months forward from that date (with 0 months the expiry is 1970-01-01), so the member shows an end date in 1970 or soon after, not a blank one.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 11 of 25. Rex stays 2.5 days at 40 per day: the stay is charged 100, with the half day charged pro rata.\n  Right? (Enter = yes, or say what should happen) > Policy says half days round up to a whole day, so 2.5 days is 3 days: 120, not 100.\n\n  With your correction: Rex stays 2.5 days at 40 per day: the half day counts as a full day, so the stay is billed as 3 whole days at the full rate (all within the first 7 days), and the boarding charge comes to 120.0, not 100, with nothing charged pro rata.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 12 of 25. A stay entered as minus 2 days at 40 per day is billed 0, with no warning that the number of days was wrong.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 13 of 25. Rex boards 3 days but the daily rate was entered as minus 40: the total comes to 0 instead of flagging the bad rate.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 14 of 25. A stay with the number of days left blank at 40 per day has no total: the result is empty, not 0.\n  Right? (Enter = yes, or say what should happen) > It should be 0, not empty.\n\n  With your correction: A boarding stay with the number of days left blank at 40 per day has no total: the boarding cost comes to 0.0, not empty, because a blank days value always gives 0.0 (only non-numeric text in the other value would give an empty result, and 40 is a plain number).\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 15 of 25. One night at 100.125 is billed 100.12, because an exact half-cent is rounded to the even cent, which here is down.\n  Right? (Enter = yes, or say what should happen) > It should be 100.13. Money always rounds up to the next cent, so an exact half-cent goes up, not down.\n\n  With your correction: One night of boarding at a daily rate of 100.125 is billed 100.13, not 100.12: the total has more than two decimals, so it rounds up to the next whole cent, and an exact half-cent always goes up and is never rounded to the even cent.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 16 of 25. Meena has 10 visits and has spent nothing: she reaches silver exactly at 10 visits.\n  Right? (Enter = yes, or say what should happen) > It should be bronze: a score of 100 is bronze, and silver starts above 100.\n\n  With your correction: Meena has 10 visits and has spent nothing, so her score is 10 visits \u00d7 10 points = 100 plus 0 for spending, which is exactly on the 100 limit. The rules keep her in the lower tier at a limit, so she is not silver at 10 visits: she stays bronze, and she would only become silver with a score above 100.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 17 of 25. Kiran has visited only twice but has spent 2600: Kiran is platinum, because the higher of the visit tier and the spend tier wins.\n  Right? (Enter = yes, or say what should happen) > Should be silver: 2 visits is 20 points plus 260 for spend, so the score is 280, and that is silver.\n\n  With your correction: Kiran, with 2 visits (20 points) and 2600 spent (260 points), has a total score of 280, so Kiran is placed in silver, not platinum, because the tier comes from the combined score and not from the higher of the visit tier and the spend tier.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 18 of 25. Meena has 9 visits and has spent 499.99, one cent below 500: she stays bronze.\n  Right? (Enter = yes, or say what should happen) > Should be silver: 9 visits is 90 points plus 49 for spend, so the score is 139, which is above 100.\n\n  With your correction: Meena has 9 visits (90 points) and has spent 499.99, which earns 49 points because the fraction is dropped, so her total score is 139. That is above 100, so she is placed in silver, not bronze.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 19 of 25. A new client with no visit count and no spend recorded is bronze.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 20 of 25. Kiran's visit count was typed as the word abc and the spend is 1200: the bad visit count is ignored and Kiran is gold on spend alone.\n  Right? (Enter = yes, or say what should happen) > Should be silver: abc counts as 0 visits, and 1200 spent is 120 points, which is silver, not gold.\n\n  With your correction: Kiran's visit count was typed as the word abc and the spend is 1200: the bad visit count is treated as zero visits (0 points) and the 1200 spent gives 120 points, so the total score is 120, which is above 100 but not above 300, and Kiran is placed in silver, not gold.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 21 of 25. Ravi Kumar Singh, typed with stray spaces, is shown on the appointment sheet as Kumar Singh, R.\n  Right? (Enter = yes, or say what should happen) > It should be cut to 12 characters, so \"Kumar singh,\" with the surname's later letters in lower case.\n\n  With your correction: Ravi, whose last name is Kumar Singh, is not shown on the appointment sheet as 'Kumar Singh, R.': the stray spaces are trimmed, the last name becomes 'Kumar singh' with only its first letter capitalised, the full label 'Kumar singh, R.' is 15 characters and gets cut to 12, so the sheet shows 'Kumar singh,' with no initial.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 22 of 25. Ravi has no surname on file: the appointment sheet shows Unknown, R.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 23 of 25. Mrs Sharma has no first name on file: the sheet shows just Sharma, with no initial.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 24 of 25. Ravi's surname typed in lowercase as sharma is shown as sharma, R., so the capital letter is not fixed for the surname.\n  Right? (Enter = yes, or say what should happen) > It should be \"Sharma, R.\" The surname always gets a capital first letter.\n\n  With your correction: Ravi's surname typed in lowercase as sharma is shown with a capital first letter, not as 'sharma, R.': the label comes out as 'Sharma, R.' (10 characters, under the 12 limit), so the surname's capital letter is fixed.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 25 of 25. An owner with neither first nor last name on file shows as Unknown on the appointment sheet.\n  Right? (Enter = yes, or say what should happen) > \n"
+ },
+ "labels": [
+  {
+   "function": "boarding_cost",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D rounds half to even; FINAL/R round up"
+  },
+  {
+   "function": "boarding_cost",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "wrong",
+   "R": "right",
+   "note": "D/FINAL return NULL for unreadable text (FINAL also infinity); policy gives zero"
+  },
+  {
+   "function": "boarding_cost",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D has plain days*rate, no 80% tier"
+  },
+  {
+   "function": "boarding_cost",
+   "decision": 3,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D charges fractions pro rata"
+  },
+  {
+   "function": "loyalty_tier",
+   "decision": 0,
+   "label": "right",
+   "D": "right",
+   "FINAL": "right",
+   "R": "right",
+   "note": "all treat bad input as zero"
+  },
+  {
+   "function": "loyalty_tier",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D puts threshold in higher tier"
+  },
+  {
+   "function": "loyalty_tier",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D uses separate spend thresholds, not points"
+  },
+  {
+   "function": "loyalty_tier",
+   "decision": 3,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D has 40+ visits platinum, no cap at 30"
+  },
+  {
+   "function": "membership_expiry",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "wrong",
+   "R": "right",
+   "note": "D/FINAL give NULL for unreadable months or NULL date"
+  },
+  {
+   "function": "membership_expiry",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D clamps to month end; FINAL/R spill"
+  },
+  {
+   "function": "membership_expiry",
+   "decision": 2,
+   "label": "right",
+   "D": "absent",
+   "FINAL": "absent",
+   "R": "right",
+   "note": "Sunday rule only in R"
+  },
+  {
+   "function": "membership_expiry",
+   "decision": 3,
+   "label": "right",
+   "D": "absent",
+   "FINAL": "absent",
+   "R": "right",
+   "note": "60-month cap only in R"
+  },
+  {
+   "function": "adoption_anniversary",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "wrong",
+   "R": "right",
+   "note": "D gives NULL; FINAL gives NULL for non-number years or NULL date"
+  },
+  {
+   "function": "adoption_anniversary",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D clamps to month end"
+  },
+  {
+   "function": "adoption_anniversary",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D truncates"
+  },
+  {
+   "function": "adoption_anniversary",
+   "decision": 3,
+   "label": "right",
+   "D": "partial",
+   "FINAL": "partial",
+   "R": "right",
+   "note": "D/FINAL say -0.5 gives NULL, but policy rounds it to 0 and returns the date"
+  },
+  {
+   "function": "owner_label",
+   "decision": 0,
+   "label": "right",
+   "D": "absent",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D has no 12-char cut; FINAL rules 41,46 cut to 12"
+  },
+  {
+   "function": "owner_label",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D keeps typed case"
+  },
+  {
+   "function": "owner_label",
+   "decision": 2,
+   "label": "right",
+   "D": "right",
+   "FINAL": "right",
+   "R": "right",
+   "note": "blank first gives surname alone"
+  },
+  {
+   "function": "owner_label",
+   "decision": 3,
+   "label": "right",
+   "D": "right",
+   "FINAL": "right",
+   "R": "right",
+   "note": "blank surname gives Unknown"
+  }
+ ],
+ "hidden_tests": 83,
+ "hidden_total": 125,
+ "minutes": 15.5
+}

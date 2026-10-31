@@ -1,0 +1,1114 @@
+{
+ "feature": 1,
+ "arm": "S",
+ "rulings_in": [],
+ "house_in": [],
+ "cost": {
+  "describer": 0.16163509999999998,
+  "spotter": 0.1776553,
+  "judge": 0.18594919999999995,
+  "owner_list": 1.246,
+  "owner_spots": 3.299
+ },
+ "decisions": {
+  "dose_mg": [
+   "convention: missing or unreadable input becomes zero value",
+   "dose rounds up to a whole mg",
+   "dose capped at 500 mg"
+  ],
+  "visit_fee": [
+   "convention: money rounds up to the cent",
+   "convention: missing or unreadable input becomes zero value",
+   "time billed in 15-minute blocks",
+   "minimum fee of 30 for any visit"
+  ],
+  "size_class": [
+   "convention: missing or unreadable input becomes zero value",
+   "convention: value equal to a threshold falls in the lower tier",
+   "extra micro class for pets of 1 kg or less"
+  ],
+  "vaccine_next_due": [
+   "convention: missing or unreadable input becomes zero value",
+   "convention: nonexistent day in target month spills into next month",
+   "interval of zero or less means 12 months"
+  ],
+  "pet_tag": [
+   "convention: text results cut to 12 characters",
+   "non-alphanumerics dropped and upper-cased",
+   "blank part becomes STRAY"
+  ]
+ },
+ "D": [
+  "dose_mg: Whenever a weight and a dose per kg are both given as valid non-negative numbers, the dose in mg is the weight multiplied by the dose per kg (20 kg at 5 mg/kg gives 100).",
+  "dose_mg: Whenever the dose is not a whole number, it is rounded to 2 decimal places (2.5 kg at 3.333 gives 8.33; 10 kg at 0.005 gives 0.05; 2.675 kg at 1 gives 2.67).",
+  "dose_mg: Whenever the rounded dose is a whole number, it is shown without decimals (2.5 kg at 2 gives 5, and 1.005 kg at 1 gives 1).",
+  "dose_mg: Whenever the weight or the dose per kg is NULL, the dose is NULL.",
+  "dose_mg: Whenever the weight or the dose per kg is empty text or text that is not a number (for example 'abc' or '1,5'), the dose is NULL.",
+  "dose_mg: Whenever the weight or the dose per kg is text that looks like a number (for example '20', ' 20 ', '2.0', '+3' or '1e1'), it is read as that number, ignoring surrounding spaces, and the dose is calculated normally.",
+  "dose_mg: Whenever the weight or the dose per kg is negative, the dose is NULL.",
+  "dose_mg: Whenever the weight or the dose per kg is zero, the dose is 0.",
+  "dose_mg: Whenever the weight or the dose per kg is the text 'inf' (infinity), the dose is NULL.",
+  "pet_tag: Whenever both the pet name and the owner surname are non-empty text, the tag is the name in capitals, a hyphen, then the surname in capitals (Rex and Smith give REX-SMITH).",
+  "pet_tag: Whenever the name or surname has spaces at the start or end, those spaces are removed first; spaces inside a name are kept (Mary Ann and de la Cruz give MARY ANN-DE LA CRUZ).",
+  "pet_tag: Whenever the name or surname is empty, or only spaces, the tag is NULL.",
+  "pet_tag: Whenever the name or surname is NULL, the tag is NULL.",
+  "pet_tag: Whenever the name or surname is a number rather than text, the tag is NULL.",
+  "pet_tag: Whenever the name or surname contains hyphens or accented letters, they are kept and capitalised as-is, with no separator escaping (a-b and c-d give A-B-C-D, so the tag can be ambiguous), and the German \u00df becomes SS.",
+  "size_class: Whenever the weight is below 10 kg (including 0), the size is 'small'.",
+  "size_class: Whenever the weight is from 10 kg up to but not including 25 kg, the size is 'medium' (exactly 10 is medium).",
+  "size_class: Whenever the weight is from 25 kg up to but not including 45 kg, the size is 'large' (exactly 25 is large).",
+  "size_class: Whenever the weight is 45 kg or more, the size is 'giant' (exactly 45 is giant, with no upper limit).",
+  "size_class: Whenever the weight is negative, NULL, empty text or text that is not a number, the size is NULL.",
+  "size_class: Whenever the weight is text that looks like a number (for example '12' or ' 30 '), it is read as that number, ignoring surrounding spaces, and classified normally.",
+  "vaccine_next_due: Whenever the last date is a valid YYYY-MM-DD date and the interval is a whole number of months, the due date is the last date moved forward by that many calendar months, keeping the same day of the month, as YYYY-MM-DD (2023-12-15 plus 12 gives 2024-12-15).",
+  "vaccine_next_due: Whenever the same day does not exist in the target month, the due date is the last day of that month (2024-01-31 plus 1 gives 2024-02-29; 2024-01-31 plus 13 gives 2025-02-28; 2024-02-29 plus 12 gives 2025-02-28).",
+  "vaccine_next_due: Whenever the interval is 0 months, the due date is the same as the last date.",
+  "vaccine_next_due: Whenever the interval is negative, the due date is NULL.",
+  "vaccine_next_due: Whenever the interval is not a whole number (for example 1.5), the due date is NULL; a whole value written with a decimal point such as 3.0 or '3.0' is accepted as 3.",
+  "vaccine_next_due: Whenever the interval is NULL, empty, or text that is not a number, the due date is NULL; numeric text such as '3' is read as that number.",
+  "vaccine_next_due: Whenever the last date is NULL, empty text, a number rather than text, or not a real calendar date (2024-02-30), the due date is NULL.",
+  "vaccine_next_due: Whenever the last date uses another format (2024/01-15, 24-01-15, or with a time such as 2024-01-15T10:00), the due date is NULL.",
+  "vaccine_next_due: Whenever the last date has spaces around it or a month or day written without a leading zero (2024-1-5), it is still accepted, and the due date is always output with two-digit month and day.",
+  "vaccine_next_due: Whenever the due date would fall after year 9999, or the interval is so large that it does, the due date is NULL; 9999-01-31 plus 11 months gives 9999-12-31 but 9999-12-31 plus 1 gives NULL.",
+  "visit_fee: Whenever minutes and hourly rate are valid non-negative numbers, the fee is minutes multiplied by the hourly rate divided by 60, rounded to 2 decimal places (20 minutes at 50 gives 16.67; 7 minutes at 10 gives 1.17).",
+  "visit_fee: Whenever the fee is calculated, it is returned as a decimal number even when whole (30 minutes at 100 gives 50.0), and amounts under half a cent round to 0.0 (10 minutes at 0.01 gives 0.0).",
+  "visit_fee: Whenever the minutes or the rate is zero, the fee is 0.0.",
+  "visit_fee: Whenever the minutes or the rate is negative, the fee is NULL.",
+  "visit_fee: Whenever the minutes or the rate is NULL, empty text or text that is not a number, the fee is NULL.",
+  "visit_fee: Whenever the minutes or the rate is text that looks like a number (for example '30' and '100'), it is read as that number and the fee is calculated normally.",
+  "visit_fee: Whenever the visit is longer than an hour, the fee grows in direct proportion with no minimum charge or rounding up of minutes (61 minutes at 60 gives 61.0, and 1 minute at 1 gives 0.02)."
+ ],
+ "shown": [
+  "dose_mg: Whenever a weight and a dose per kg are both given as valid non-negative numbers, the dose in mg is the weight multiplied by the dose per kg (20 kg at 5 mg/kg gives 100).",
+  "dose_mg: Whenever the dose is not a whole number, it is rounded to 2 decimal places (2.5 kg at 3.333 gives 8.33; 10 kg at 0.005 gives 0.05; 2.675 kg at 1 gives 2.67).",
+  "dose_mg: Whenever the rounded dose is a whole number, it is shown without decimals (2.5 kg at 2 gives 5, and 1.005 kg at 1 gives 1).",
+  "dose_mg: Whenever the weight or the dose per kg is NULL, the dose is NULL.",
+  "dose_mg: Whenever the weight or the dose per kg is empty text or text that is not a number (for example 'abc' or '1,5'), the dose is NULL.",
+  "dose_mg: Whenever the weight or the dose per kg is text that looks like a number (for example '20', ' 20 ', '2.0', '+3' or '1e1'), it is read as that number, ignoring surrounding spaces, and the dose is calculated normally.",
+  "dose_mg: Whenever the weight or the dose per kg is negative, the dose is NULL.",
+  "dose_mg: Whenever the weight or the dose per kg is zero, the dose is 0.",
+  "dose_mg: Whenever the weight or the dose per kg is the text 'inf' (infinity), the dose is NULL.",
+  "pet_tag: Whenever both the pet name and the owner surname are non-empty text, the tag is the name in capitals, a hyphen, then the surname in capitals (Rex and Smith give REX-SMITH).",
+  "pet_tag: Whenever the name or surname has spaces at the start or end, those spaces are removed first; spaces inside a name are kept (Mary Ann and de la Cruz give MARY ANN-DE LA CRUZ).",
+  "pet_tag: Whenever the name or surname is empty, or only spaces, the tag is NULL.",
+  "pet_tag: Whenever the name or surname is NULL, the tag is NULL.",
+  "pet_tag: Whenever the name or surname is a number rather than text, the tag is NULL.",
+  "pet_tag: Whenever the name or surname contains hyphens or accented letters, they are kept and capitalised as-is, with no separator escaping (a-b and c-d give A-B-C-D, so the tag can be ambiguous), and the German \u00df becomes SS.",
+  "size_class: Whenever the weight is below 10 kg (including 0), the size is 'small'.",
+  "size_class: Whenever the weight is from 10 kg up to but not including 25 kg, the size is 'medium' (exactly 10 is medium).",
+  "size_class: Whenever the weight is from 25 kg up to but not including 45 kg, the size is 'large' (exactly 25 is large).",
+  "size_class: Whenever the weight is 45 kg or more, the size is 'giant' (exactly 45 is giant, with no upper limit).",
+  "size_class: Whenever the weight is negative, NULL, empty text or text that is not a number, the size is NULL.",
+  "size_class: Whenever the weight is text that looks like a number (for example '12' or ' 30 '), it is read as that number, ignoring surrounding spaces, and classified normally.",
+  "vaccine_next_due: Whenever the last date is a valid YYYY-MM-DD date and the interval is a whole number of months, the due date is the last date moved forward by that many calendar months, keeping the same day of the month, as YYYY-MM-DD (2023-12-15 plus 12 gives 2024-12-15).",
+  "vaccine_next_due: Whenever the same day does not exist in the target month, the due date is the last day of that month (2024-01-31 plus 1 gives 2024-02-29; 2024-01-31 plus 13 gives 2025-02-28; 2024-02-29 plus 12 gives 2025-02-28).",
+  "vaccine_next_due: Whenever the interval is 0 months, the due date is the same as the last date.",
+  "vaccine_next_due: Whenever the interval is negative, the due date is NULL.",
+  "vaccine_next_due: Whenever the interval is not a whole number (for example 1.5), the due date is NULL; a whole value written with a decimal point such as 3.0 or '3.0' is accepted as 3.",
+  "vaccine_next_due: Whenever the interval is NULL, empty, or text that is not a number, the due date is NULL; numeric text such as '3' is read as that number.",
+  "vaccine_next_due: Whenever the last date is NULL, empty text, a number rather than text, or not a real calendar date (2024-02-30), the due date is NULL.",
+  "vaccine_next_due: Whenever the last date uses another format (2024/01-15, 24-01-15, or with a time such as 2024-01-15T10:00), the due date is NULL.",
+  "vaccine_next_due: Whenever the last date has spaces around it or a month or day written without a leading zero (2024-1-5), it is still accepted, and the due date is always output with two-digit month and day.",
+  "vaccine_next_due: Whenever the due date would fall after year 9999, or the interval is so large that it does, the due date is NULL; 9999-01-31 plus 11 months gives 9999-12-31 but 9999-12-31 plus 1 gives NULL.",
+  "visit_fee: Whenever minutes and hourly rate are valid non-negative numbers, the fee is minutes multiplied by the hourly rate divided by 60, rounded to 2 decimal places (20 minutes at 50 gives 16.67; 7 minutes at 10 gives 1.17).",
+  "visit_fee: Whenever the fee is calculated, it is returned as a decimal number even when whole (30 minutes at 100 gives 50.0), and amounts under half a cent round to 0.0 (10 minutes at 0.01 gives 0.0).",
+  "visit_fee: Whenever the minutes or the rate is zero, the fee is 0.0.",
+  "visit_fee: Whenever the minutes or the rate is negative, the fee is NULL.",
+  "visit_fee: Whenever the minutes or the rate is NULL, empty text or text that is not a number, the fee is NULL.",
+  "visit_fee: Whenever the minutes or the rate is text that looks like a number (for example '30' and '100'), it is read as that number and the fee is calculated normally.",
+  "visit_fee: Whenever the visit is longer than an hour, the fee grows in direct proportion with no minimum charge or rounding up of minutes (61 minutes at 60 gives 61.0, and 1 minute at 1 gives 0.02)."
+ ],
+ "repeats": [],
+ "SL": [
+  "dose_mg: Whenever a weight and a dose per kg are both given as valid non-negative numbers, the dose in mg is the weight multiplied by the dose per kg (20 kg at 5 mg/kg gives 100). Negative, NULL or unreadable inputs count as 0. The dose is capped at 500 mg.",
+  "dose_mg: Whenever the dose is not a whole number, it is rounded up to a whole mg (2.5 kg at 3.333 gives 9; 10 kg at 0.005 gives 1; 2.675 kg at 1 gives 3). The dose is never above 500: if it comes out higher than 500, it is 500.",
+  "dose_mg: Whenever the rounded dose is a whole number, it is shown without decimals (2.5 kg at 2 gives 5, and 1.005 kg at 1 gives 1).",
+  "dose_mg: Whenever the weight or the dose per kg is NULL, the dose is NULL.",
+  "dose_mg: Whenever the weight or the dose per kg is empty text or text that is not a number (for example 'abc' or '1,5'), the dose is NULL.",
+  "dose_mg: Whenever the weight or the dose per kg is text that looks like a number (for example '20', ' 20 ', '2.0', '+3' or '1e1'), it is read as that number, ignoring surrounding spaces, and the dose is calculated normally.",
+  "dose_mg: Whenever the weight or the dose per kg is negative, the dose is NULL.",
+  "dose_mg: Whenever the weight or the dose per kg is zero, the dose is 0.",
+  "dose_mg: Whenever the weight or the dose per kg is the text 'inf' (infinity), the dose is NULL.",
+  "pet_tag: Whenever both the pet name and the owner surname are non-empty text, the tag is the name in capitals, a hyphen, then the surname in capitals (Rex and Smith give REX-SMITH).",
+  "pet_tag: Whenever the name or surname has spaces at the start or end, those spaces are removed first; spaces inside a name are kept (Mary Ann and de la Cruz give MARY ANN-DE LA CRUZ).",
+  "pet_tag: Whenever the name or surname is empty, or only spaces, the tag is NULL.",
+  "pet_tag: Whenever the name or surname is NULL, the tag is NULL.",
+  "pet_tag: Whenever the name or surname is a number rather than text, the tag is NULL.",
+  "pet_tag: Whenever the name or surname contains anything other than ASCII letters and digits (hyphens, spaces, accented letters, the German \u00df and so on), only the ASCII letters and digits are kept and everything else is dropped, and the result is capitalised. If a part ends up empty, use STRAY.",
+  "size_class: Whenever the weight is below 1 kg (including 0), the size is 'micro'. Whenever the weight is 1 to 6 kg, the size is 'small'. Whenever the weight is 6 to 25 kg, the size is 'medium'.",
+  "size_class: Whenever the weight is more than 6 kg and less than 25 kg, the size is 'medium' (exactly 6 is small, exactly 25 is large).",
+  "size_class: Whenever the weight is from 25 kg up to but not including 45 kg, the size is 'large' (exactly 25 is large).",
+  "size_class: Whenever the weight is 45 kg or more, the size is 'giant' (exactly 45 is giant, with no upper limit).",
+  "size_class: Whenever the weight is negative, NULL, empty text or text that is not a number, the size is NULL.",
+  "size_class: Whenever the weight is text that looks like a number (for example '12' or ' 30 '), it is read as that number, ignoring surrounding spaces, and classified normally.",
+  "vaccine_next_due: Whenever the last date is a valid YYYY-MM-DD date and the interval is a whole number of months, the due date is the last date moved forward by that many calendar months, keeping the same day of the month, as YYYY-MM-DD (2023-12-15 plus 12 gives 2024-12-15).",
+  "vaccine_next_due: Whenever the same day does not exist in the target month, the due date is the last day of that month (2024-01-31 plus 1 gives 2024-02-29; 2024-01-31 plus 13 gives 2025-02-28; 2024-02-29 plus 12 gives 2025-02-28).",
+  "vaccine_next_due: Whenever the interval is 0 months, the due date is the same as the last date.",
+  "vaccine_next_due: Whenever the interval is negative or unreadable, the due date is calculated using an interval of 12 months.",
+  "vaccine_next_due: Whenever the interval is not a whole number (for example 1.5), the due date is NULL; a whole value written with a decimal point such as 3.0 or '3.0' is accepted as 3.",
+  "vaccine_next_due: Whenever the interval is NULL, empty, or text that is not a number, the due date is NULL; numeric text such as '3' is read as that number.",
+  "vaccine_next_due: Whenever the last date is NULL, empty text, a number rather than text, or not a real calendar date (2024-02-30), the due date is NULL.",
+  "vaccine_next_due: Whenever the last date uses another format (2024/01-15, 24-01-15, or with a time such as 2024-01-15T10:00), the due date is NULL.",
+  "vaccine_next_due: Spaces around the last date are accepted, but only the exact form YYYY-MM-DD counts. A month or day written without a leading zero (such as 2024-1-5) is not valid, and the due date becomes 1970-01-01. The due date is always output with two-digit month and day.",
+  "vaccine_next_due: Whenever the due date would fall after year 9999, or the interval is so large that it does, the due date is NULL; 9999-01-31 plus 11 months gives 9999-12-31 but 9999-12-31 plus 1 gives NULL.",
+  "visit_fee: Bill in 15-minute blocks, rounding partial blocks up (blocks = minutes divided by 15, rounded up to the next whole number). The fee is blocks multiplied by the hourly rate divided by 4, with a minimum fee of 30 whenever minutes are above 0. If minutes are 0 or less, or NULL or unreadable, the fee is 0.",
+  "visit_fee: Whenever the fee is calculated, it is rounded up to the next whole cent and returned as a decimal number even when whole (30 minutes at 100 gives 50.0). Amounts under half a cent also round up to 0.01, not 0.0 (10 minutes at 0.01 gives 0.01).",
+  "visit_fee: Whenever the minutes are 0 or less, the fee is 0.0. If the minutes are above 0 and the rate is 0, the fee is the 30 minimum.",
+  "visit_fee: Whenever the minutes are negative, the fee is 0. Whenever the rate is negative, the rate counts as 0, so the 30 minimum applies.",
+  "visit_fee: If the minutes are NULL, empty text or text that is not a number, the fee is 0. If the rate is NULL, empty text or text that is not a number, the rate counts as 0, so the 30 minimum applies whenever the minutes are above 0.",
+  "visit_fee: Whenever the minutes or the rate is text that looks like a number (for example '30' and '100'), it is read as that number and the fee is calculated normally.",
+  "visit_fee: Whenever the visit is longer than an hour, the visit time is counted in 15-minute blocks, with any part of a block rounded up to a whole block. The fee is the number of blocks \u00d7 the rate \u00f7 4, with a minimum charge of 30.",
+  "Adding months past month-end should spill into the next month (31 Jan plus 1 month is 2 or 3 March), not clamp to the last day."
+ ],
+ "HV": [
+  "dose_mg: Whenever a weight and a dose per kg are both given as valid non-negative numbers, the dose in mg is the weight multiplied by the dose per kg (20 kg at 5 mg/kg gives 100). Negative, NULL or unreadable inputs count as 0. The dose is capped at 500 mg.",
+  "dose_mg: Whenever the dose is not a whole number, it is never shown with decimals (for example, never rounded to two decimals): it is always rounded up to the next whole mg (2.5 kg at 3.333 gives 9; 10 kg at 0.005 gives 1; 2.675 kg at 1 gives 3; 3.333 kg at 7.77 gives 26, not 25.9). The dose is never above 500: if it comes out higher than 500, it is 500.",
+  "dose_mg: Whenever the rounded dose is a whole number, it is shown without decimals (2.5 kg at 2 gives 5, and 1.005 kg at 1 gives 1). This holds for whole-number doses of any size, but the dose is never above 500 mg: whether the dose is a whole number or not, if it comes out higher than 500 it is 500 (for example, 500 kg at 10 mg/kg gives 500, not 5000).",
+  "dose_mg: Whenever the weight or the dose per kg is NULL (missing), it is treated as 0, so the dose is 0 (for example, a NULL weight at 10 mg/kg gives 0, and 20 kg with a NULL dose per kg gives 0).",
+  "dose_mg: Whenever the weight or the dose per kg is empty text or text that is not a number (for example 'abc' or '1,5'), the dose is NULL.",
+  "dose_mg: Whenever the weight or the dose per kg is text that looks like a number (for example '20', ' 20 ', '2.0', '+3' or '1e1'), it is read as that number, ignoring surrounding spaces, and the dose is calculated normally.",
+  "dose_mg: Whenever the weight or the dose per kg is negative (including negative numbers given as text, such as '-5'), it is treated as 0, so the dose is 0 (for example, -5 kg at 10 mg/kg gives 0). This does not change the NULL results for non-numeric text or 'inf' inputs.",
+  "dose_mg: Whenever the weight or the dose per kg is zero, the dose is 0.",
+  "dose_mg: Whenever the weight or the dose per kg is the text 'inf' (infinity), the dose is NULL.",
+  "pet_tag: Whenever both the pet name and the owner surname are non-empty text, the tag is the name in capitals, a hyphen, then the surname in capitals (Rex and Smith give REX-SMITH). If the whole tag, hyphen included, is longer than 12 characters, it is cut to its first 12 characters and the rest is dropped (Bella and de la Cruz give BELLA-DELACR).",
+  "pet_tag: Whenever the name or surname has spaces at the start or end, those spaces are removed first. Spaces inside a name are also dropped, so the words run together (Mary Ann and de la Cruz become MARYANN and DELACRUZ, and the tag is then cut to 12 characters, giving MARYANN-DELA).",
+  "pet_tag: Whenever the name or surname is empty, or only spaces, that part is treated as missing and becomes STRAY. The tag is then built as usual: the name, a hyphen, then the surname, all in capitals, and cut to its first 12 characters if longer (an empty name and Sharma give STRAY-SHARMA; Rex and an empty surname give REX-STRAY; both empty give STRAY-STRAY).",
+  "pet_tag: Whenever the name or surname is NULL, that part is treated as missing and becomes STRAY. The tag is then built as usual: the name, a hyphen, then the surname, all in capitals, and cut to its first 12 characters if longer (a NULL name and Sharma give STRAY-SHARMA; Rex and a NULL surname give REX-STRAY; both NULL give STRAY-STRAY).",
+  "pet_tag: Whenever the name or surname is a number rather than text, it is treated as text made of the number as written (123 becomes \"123\"). The tag is then built as usual: spaces trimmed, anything other than ASCII letters and digits dropped, capitals, the name, a hyphen, then the surname, and cut to its first 12 characters if longer. A number does not make the tag NULL (a name of 123 and Sharma give 123-SHARMA; Rex and a surname of 456 give REX-456).",
+  "pet_tag: Whenever the name or surname contains anything other than ASCII letters and digits (hyphens, spaces, accented letters, the German \u00df and so on), only the ASCII letters and digits are kept and everything else is dropped, and the result is capitalised. If a part ends up empty, use STRAY.",
+  "size_class: Whenever the weight is 1 kg or less (including 0 and any negative weight, such as minus 1), the size is 'micro' (exactly 1 is micro). Whenever the weight is more than 1 kg and up to and including 6 kg, the size is 'small' (exactly 6 is small). Whenever the weight is more than 6 kg and up to and including 25 kg, the size is 'medium'.",
+  "size_class: Whenever the weight is more than 6 kg and up to and including 25 kg, the size is 'medium' (exactly 6 is small, exactly 25 is medium).",
+  "size_class: Whenever the weight is more than 25 kg and up to and including 45 kg, the size is 'large' (exactly 25 is medium, not large; exactly 45 is large, not giant).",
+  "size_class: Whenever the weight is more than 45 kg, the size is 'giant' (exactly 45 is large, not giant, with no upper limit).",
+  "size_class: Whenever the weight is NULL, empty text or text that is not a number, the size is NULL. A negative weight is not NULL; it is 'micro'.",
+  "size_class: Whenever the weight is text that looks like a number (for example '12' or ' 30 '), it is read as that number, ignoring surrounding spaces, and classified normally.",
+  "vaccine_next_due: Whenever the last date is a valid YYYY-MM-DD date and the interval is a whole number of months, the due date is the last date moved forward by that many calendar months, keeping the same day of the month, as YYYY-MM-DD (2023-12-15 plus 12 gives 2024-12-15).",
+  "vaccine_next_due: Whenever the same day does not exist in the target month, the due date spills over into the following month: the days beyond the end of the target month are counted on into the next month, so the due date is the day after the last day of the target month plus the number of days by which the original day exceeds that month's length minus one (equivalently, the date is treated as the nonexistent day, e.g. 31 February, and rolls forward). Examples: 2026-01-31 plus 1 gives 2026-03-03; 2024-01-31 plus 1 gives 2024-03-02; 2024-01-31 plus 13 gives 2025-03-03; 2024-02-29 plus 12 gives 2025-03-01. When the day does exist in the target month, it is kept as before.",
+  "vaccine_next_due: Whenever the interval is 0 months, the interval is treated as 12 months, so the due date is the last date moved forward by 12 calendar months, keeping the same day of the month (2026-03-15 plus 0 gives 2027-03-15). The same spill-over, invalid-date and year-9999 rules apply as for any other interval.",
+  "vaccine_next_due: Whenever the interval is 0, negative or unreadable, the due date is calculated using an interval of 12 months.",
+  "vaccine_next_due: Whenever the interval is a number that is not whole (for example 1.5), the part after the decimal point is dropped and the interval is used as the whole number of months left, so 1.5 is used as 1 and 2.9 as 2 (2026-03-15 plus 1.5 gives 2026-04-15). Numeric text such as '1.5' is treated the same way. The dropped interval is then handled by the other rules like any whole interval: if it comes to 0 (for example 0.5) or is negative, it is treated as 12 months. A whole value written with a decimal point such as 3.0 or '3.0' is accepted as 3.",
+  "vaccine_next_due: Whenever the interval is NULL, empty, or text that is not a number, the due date is NULL; numeric text such as '3' is read as that number.",
+  "vaccine_next_due: Whenever the last date is NULL, empty text, or a number rather than text, the due date is NULL. Whenever the last date is written in the exact form YYYY-MM-DD but is not a real calendar date (such as 2024-02-30, 2026-02-30 or 2025-02-29), it is treated as 1970-01-01, so a due date is still given: 1970-01-01 moved forward by the interval under the same rules as any valid date (the interval rules, the spill-over rule and the year-9999 rule all still apply). Examples: 2026-02-30 plus 12 gives 1971-01-01; 2026-02-30 plus 0 gives 1971-01-01. If the interval itself is NULL, empty or not a number, the due date is still NULL.",
+  "vaccine_next_due: Whenever the last date uses another format (2024/01-15, 24-01-15, or with a time such as 2024-01-15T10:00), the due date is NULL.",
+  "vaccine_next_due: Spaces around the last date are accepted, but only the exact form YYYY-MM-DD counts. A month or day written without a leading zero (such as 2024-1-5) is not valid, and the due date becomes 1970-01-01. The due date is always output with two-digit month and day.",
+  "vaccine_next_due: Whenever the due date would fall after year 9999, or the interval is so large that it does, the due date is NULL; 9999-01-31 plus 11 months gives 9999-12-31 but 9999-12-31 plus 1 gives NULL.",
+  "visit_fee: Bill in 15-minute blocks, rounding partial blocks up (blocks = minutes divided by 15, rounded up to the next whole number). The fee is blocks multiplied by the hourly rate divided by 4, with a minimum fee of 30 whenever minutes are above 0. If minutes are 0 or less, or NULL or unreadable, the fee is 0.0. It is a real zero, never blank or NULL.",
+  "visit_fee: Whenever the fee is calculated, it is rounded up to the next whole cent and returned as a decimal number even when whole (30 minutes at 100 gives 50.0). The minimum fee of 30 is applied whenever the minutes are above 0, so a tiny calculated fee is never left as a few cents. It is raised to the 30 minimum (5 minutes at 0.5 an hour gives 30.0, and 10 minutes at 0.01 gives 30.0, not 0.04 or 0.01).",
+  "visit_fee: Whenever the minutes are 0 or less (zero or any negative number), the fee is 0.0. It is a real zero, never blank or NULL, and it is not a refund. This holds whatever the rate is. If the minutes are above 0 and the rate is 0, the fee is the 30 minimum.",
+  "visit_fee: Whenever the minutes are negative (for example minus 30 minutes at 100 an hour), the fee is 0.0, never blank or NULL and never a negative refund. Whenever the rate is negative, the rate counts as 0, so the 30 minimum applies whenever the minutes are above 0.",
+  "visit_fee: If the minutes are NULL, empty text or text that is not a number, the fee is 0. If the rate is NULL, empty text or text that is not a number, the rate counts as 0, so the 30 minimum applies whenever the minutes are above 0.",
+  "visit_fee: Whenever the minutes or the rate is text that looks like a number (for example '30' and '100'), it is read as that number and the fee is calculated normally.",
+  "visit_fee: Whenever the minutes are above 0, whatever the length of the visit (including visits shorter than an hour, such as one minute), the visit time is counted in 15-minute blocks, with any part of a block rounded up to a whole block. The fee is the number of blocks \u00d7 the rate \u00f7 4, with a minimum charge of 30 (so a one-minute visit at 100 an hour is one block, 25, and is charged the 30 minimum). Short visits are never billed by the minute.",
+  "Adding months past month-end should spill into the next month (31 Jan plus 1 month is 2 or 3 March), not clamp to the last day.",
+  "Rex, owned by the Sharma family, gets a tag reading REX-SHARMA: the full name and full surname in capitals, nothing shortened. The owner says: No: the tag should be REX-SHARMA cut to 12 characters, which is \"REX-SHARMA\" (10 characters), so that's fine, but Rex should be capitalised as shown. Actually, yes, that's right.\n\nYes, that's right",
+  "A cat vaccinated on 29 February 2024 with a yearly interval is next due on 28 February 2025, a day earlier than a strict anniversary. The owner says: No, it should spill into March: 1 March 2025, not 28 February.",
+  "A 20-minute visit at 50 an hour costs 16.67, rounded to the nearest cent. The owner says: No, 20 minutes is two 15-minute blocks, which comes to 25, so the 30 minimum applies and it should be 30."
+ ],
+ "spots": [
+  {
+   "function": "dose_mg",
+   "call": "SELECT dose_mg(-5, 10)",
+   "got": null,
+   "say": "A patient entered with a weight of minus 5 kg at 10 mg per kg gets no dose at all: the dose comes back blank rather than an error or zero."
+  },
+  {
+   "function": "dose_mg",
+   "call": "SELECT dose_mg(3.333, 7.77)",
+   "got": 25.9,
+   "say": "A 3.333 kg kitten on 7.77 mg per kg is rounded to two decimals, so the dose comes to 25.9 mg."
+  },
+  {
+   "function": "dose_mg",
+   "call": "SELECT dose_mg(500, 10)",
+   "got": 5000,
+   "say": "A patient typed in as 500 kg (probably a slip for 50) at 10 mg per kg is accepted with no upper limit: the dose comes to 5000 mg."
+  },
+  {
+   "function": "dose_mg",
+   "call": "SELECT dose_mg(10, 0)",
+   "got": 0,
+   "say": "A 10 kg dog prescribed 0 mg per kg gets a dose of 0 mg, a normal-looking answer rather than a warning."
+  },
+  {
+   "function": "dose_mg",
+   "call": "SELECT dose_mg(NULL, 10)",
+   "got": null,
+   "say": "A patient whose weight was never recorded, at 10 mg per kg, gets a blank dose instead of zero."
+  },
+  {
+   "function": "pet_tag",
+   "call": "SELECT pet_tag('Rex','Sharma')",
+   "got": "REX-SHARMA",
+   "say": "Rex, owned by the Sharma family, gets a tag reading REX-SHARMA: the full name and full surname in capitals, nothing shortened."
+  },
+  {
+   "function": "pet_tag",
+   "call": "SELECT pet_tag('Bella','de la Cruz')",
+   "got": "BELLA-DE LA CRUZ",
+   "say": "Bella, owned by Ms de la Cruz, gets a tag reading BELLA-DE LA CRUZ, so a multi-word surname makes a long tag with spaces in it."
+  },
+  {
+   "function": "pet_tag",
+   "call": "SELECT pet_tag('','Sharma')",
+   "got": null,
+   "say": "A pet with no name entered, owned by the Sharmas, gets no tag at all (blank), not a tag with just the surname."
+  },
+  {
+   "function": "pet_tag",
+   "call": "SELECT pet_tag(123,'Sharma')",
+   "got": null,
+   "say": "A pet whose name was entered as the number 123, owned by the Sharmas, gets no tag."
+  },
+  {
+   "function": "pet_tag",
+   "call": "SELECT pet_tag('  Rex ','Sharma')",
+   "got": "REX-SHARMA",
+   "say": "Rex entered with stray spaces around the name, owned by the Sharmas, still gets a clean tag reading REX-SHARMA."
+  },
+  {
+   "function": "size_class",
+   "call": "SELECT size_class(10)",
+   "got": "medium",
+   "say": "A pet weighing exactly 10 kg counts as medium, not small; the small group stops just below 10 kg."
+  },
+  {
+   "function": "size_class",
+   "call": "SELECT size_class(25)",
+   "got": "large",
+   "say": "A pet weighing exactly 25 kg counts as large, not medium."
+  },
+  {
+   "function": "size_class",
+   "call": "SELECT size_class(45)",
+   "got": "giant",
+   "say": "A pet weighing exactly 45 kg counts as giant, not large."
+  },
+  {
+   "function": "size_class",
+   "call": "SELECT size_class(-1)",
+   "got": null,
+   "say": "A pet recorded at minus 1 kg gets no size category (blank), while one at 0 kg is called small."
+  },
+  {
+   "function": "size_class",
+   "call": "SELECT size_class(300)",
+   "got": "giant",
+   "say": "A pet recorded at 300 kg, which is surely a typing mistake, is simply called giant with no warning."
+  },
+  {
+   "function": "vaccine_next_due",
+   "call": "SELECT vaccine_next_due('2026-01-31', 1)",
+   "got": "2026-02-28",
+   "say": "A dog vaccinated on 31 January 2026 with a one-month interval is next due on 28 February 2026, the last day of the shorter month."
+  },
+  {
+   "function": "vaccine_next_due",
+   "call": "SELECT vaccine_next_due('2024-02-29', 12)",
+   "got": "2025-02-28",
+   "say": "A cat vaccinated on 29 February 2024 with a yearly interval is next due on 28 February 2025, a day earlier than a strict anniversary."
+  },
+  {
+   "function": "vaccine_next_due",
+   "call": "SELECT vaccine_next_due('2026-03-15', 0)",
+   "got": "2026-03-15",
+   "say": "A vaccination given on 15 March 2026 with a zero-month interval is due again the very same day, 15 March 2026."
+  },
+  {
+   "function": "vaccine_next_due",
+   "call": "SELECT vaccine_next_due('2026-03-15', 1.5)",
+   "got": null,
+   "say": "A vaccination on 15 March 2026 with an interval of one and a half months gets no due date; only whole months are accepted."
+  },
+  {
+   "function": "vaccine_next_due",
+   "call": "SELECT vaccine_next_due('2026-02-30', 6)",
+   "got": null,
+   "say": "A vaccination logged on the impossible date 30 February 2026 gets no due date, rather than being rolled into March."
+  },
+  {
+   "function": "visit_fee",
+   "call": "SELECT visit_fee(1, 100)",
+   "got": 1.67,
+   "say": "A one-minute visit at 100 an hour is charged 1.67, so there is no minimum fee and short visits are billed by the minute."
+  },
+  {
+   "function": "visit_fee",
+   "call": "SELECT visit_fee(20, 50)",
+   "got": 16.67,
+   "say": "A 20-minute visit at 50 an hour costs 16.67, rounded to the nearest cent."
+  },
+  {
+   "function": "visit_fee",
+   "call": "SELECT visit_fee(5, 0.5)",
+   "got": 0.04,
+   "say": "A 5-minute visit at half a unit an hour comes to 0.04, so tiny fees round down to a few cents."
+  },
+  {
+   "function": "visit_fee",
+   "call": "SELECT visit_fee(-30, 100)",
+   "got": null,
+   "say": "A visit logged as minus 30 minutes at 100 an hour gets no fee (blank), not a refund or a zero."
+  },
+  {
+   "function": "visit_fee",
+   "call": "SELECT visit_fee(600, 100)",
+   "got": 1000.0,
+   "say": "A 10-hour visit at 100 an hour is charged 1000 with no daily cap."
+  }
+ ],
+ "shown_cases": [
+  {
+   "function": "dose_mg",
+   "call": "SELECT dose_mg(-5, 10)",
+   "got": null,
+   "say": "A patient entered with a weight of minus 5 kg at 10 mg per kg gets no dose at all: the dose comes back blank rather than an error or zero."
+  },
+  {
+   "function": "dose_mg",
+   "call": "SELECT dose_mg(3.333, 7.77)",
+   "got": 25.9,
+   "say": "A 3.333 kg kitten on 7.77 mg per kg is rounded to two decimals, so the dose comes to 25.9 mg."
+  },
+  {
+   "function": "dose_mg",
+   "call": "SELECT dose_mg(500, 10)",
+   "got": 5000,
+   "say": "A patient typed in as 500 kg (probably a slip for 50) at 10 mg per kg is accepted with no upper limit: the dose comes to 5000 mg."
+  },
+  {
+   "function": "dose_mg",
+   "call": "SELECT dose_mg(10, 0)",
+   "got": 0,
+   "say": "A 10 kg dog prescribed 0 mg per kg gets a dose of 0 mg, a normal-looking answer rather than a warning."
+  },
+  {
+   "function": "dose_mg",
+   "call": "SELECT dose_mg(NULL, 10)",
+   "got": null,
+   "say": "A patient whose weight was never recorded, at 10 mg per kg, gets a blank dose instead of zero."
+  },
+  {
+   "function": "pet_tag",
+   "call": "SELECT pet_tag('Rex','Sharma')",
+   "got": "REX-SHARMA",
+   "say": "Rex, owned by the Sharma family, gets a tag reading REX-SHARMA: the full name and full surname in capitals, nothing shortened."
+  },
+  {
+   "function": "pet_tag",
+   "call": "SELECT pet_tag('Bella','de la Cruz')",
+   "got": "BELLA-DE LA CRUZ",
+   "say": "Bella, owned by Ms de la Cruz, gets a tag reading BELLA-DE LA CRUZ, so a multi-word surname makes a long tag with spaces in it."
+  },
+  {
+   "function": "pet_tag",
+   "call": "SELECT pet_tag('','Sharma')",
+   "got": null,
+   "say": "A pet with no name entered, owned by the Sharmas, gets no tag at all (blank), not a tag with just the surname."
+  },
+  {
+   "function": "pet_tag",
+   "call": "SELECT pet_tag(123,'Sharma')",
+   "got": null,
+   "say": "A pet whose name was entered as the number 123, owned by the Sharmas, gets no tag."
+  },
+  {
+   "function": "pet_tag",
+   "call": "SELECT pet_tag('  Rex ','Sharma')",
+   "got": "REX-SHARMA",
+   "say": "Rex entered with stray spaces around the name, owned by the Sharmas, still gets a clean tag reading REX-SHARMA."
+  },
+  {
+   "function": "size_class",
+   "call": "SELECT size_class(10)",
+   "got": "medium",
+   "say": "A pet weighing exactly 10 kg counts as medium, not small; the small group stops just below 10 kg."
+  },
+  {
+   "function": "size_class",
+   "call": "SELECT size_class(25)",
+   "got": "large",
+   "say": "A pet weighing exactly 25 kg counts as large, not medium."
+  },
+  {
+   "function": "size_class",
+   "call": "SELECT size_class(45)",
+   "got": "giant",
+   "say": "A pet weighing exactly 45 kg counts as giant, not large."
+  },
+  {
+   "function": "size_class",
+   "call": "SELECT size_class(-1)",
+   "got": null,
+   "say": "A pet recorded at minus 1 kg gets no size category (blank), while one at 0 kg is called small."
+  },
+  {
+   "function": "size_class",
+   "call": "SELECT size_class(300)",
+   "got": "giant",
+   "say": "A pet recorded at 300 kg, which is surely a typing mistake, is simply called giant with no warning."
+  },
+  {
+   "function": "vaccine_next_due",
+   "call": "SELECT vaccine_next_due('2026-01-31', 1)",
+   "got": "2026-02-28",
+   "say": "A dog vaccinated on 31 January 2026 with a one-month interval is next due on 28 February 2026, the last day of the shorter month."
+  },
+  {
+   "function": "vaccine_next_due",
+   "call": "SELECT vaccine_next_due('2024-02-29', 12)",
+   "got": "2025-02-28",
+   "say": "A cat vaccinated on 29 February 2024 with a yearly interval is next due on 28 February 2025, a day earlier than a strict anniversary."
+  },
+  {
+   "function": "vaccine_next_due",
+   "call": "SELECT vaccine_next_due('2026-03-15', 0)",
+   "got": "2026-03-15",
+   "say": "A vaccination given on 15 March 2026 with a zero-month interval is due again the very same day, 15 March 2026."
+  },
+  {
+   "function": "vaccine_next_due",
+   "call": "SELECT vaccine_next_due('2026-03-15', 1.5)",
+   "got": null,
+   "say": "A vaccination on 15 March 2026 with an interval of one and a half months gets no due date; only whole months are accepted."
+  },
+  {
+   "function": "vaccine_next_due",
+   "call": "SELECT vaccine_next_due('2026-02-30', 6)",
+   "got": null,
+   "say": "A vaccination logged on the impossible date 30 February 2026 gets no due date, rather than being rolled into March."
+  },
+  {
+   "function": "visit_fee",
+   "call": "SELECT visit_fee(1, 100)",
+   "got": 1.67,
+   "say": "A one-minute visit at 100 an hour is charged 1.67, so there is no minimum fee and short visits are billed by the minute."
+  },
+  {
+   "function": "visit_fee",
+   "call": "SELECT visit_fee(20, 50)",
+   "got": 16.67,
+   "say": "A 20-minute visit at 50 an hour costs 16.67, rounded to the nearest cent."
+  },
+  {
+   "function": "visit_fee",
+   "call": "SELECT visit_fee(5, 0.5)",
+   "got": 0.04,
+   "say": "A 5-minute visit at half a unit an hour comes to 0.04, so tiny fees round down to a few cents."
+  },
+  {
+   "function": "visit_fee",
+   "call": "SELECT visit_fee(-30, 100)",
+   "got": null,
+   "say": "A visit logged as minus 30 minutes at 100 an hour gets no fee (blank), not a refund or a zero."
+  },
+  {
+   "function": "visit_fee",
+   "call": "SELECT visit_fee(600, 100)",
+   "got": 1000.0,
+   "say": "A 10-hour visit at 100 an hour is charged 1000 with no daily cap."
+  }
+ ],
+ "fixes": [
+  {
+   "shown": "A patient entered with a weight of minus 5 kg at 10 mg per kg gets no dose at all: the dose comes back blank rather than an error or zero.",
+   "said": "No: a negative weight should be treated as 0, so the dose should be 0.",
+   "function": "dose_mg",
+   "rounds": 1,
+   "now": "A patient entered with a weight of minus 5 kg at 10 mg per kg gets a dose of 0 mg: the negative weight is treated as 0, so the dose is 0 (not blank, as the case suggests), because only NULL, non-numeric text or 'inf' inputs give a blank dose.",
+   "confirmed": true
+  },
+  {
+   "shown": "A 3.333 kg kitten on 7.77 mg per kg is rounded to two decimals, so the dose comes to 25.9 mg.",
+   "said": "No, the dose should be a whole number of mg, rounded up, so 26 mg.",
+   "function": "dose_mg",
+   "rounds": 1,
+   "now": "A 3.333 kg kitten on 7.77 mg per kg works out to 25.89741 mg, and the dose is not rounded to two decimals (25.9 is wrong), because a dose that is not a whole number is always rounded up to the next whole mg, so the kitten's dose comes to 26 mg, which is well under the 500 mg cap.",
+   "confirmed": true
+  },
+  {
+   "shown": "A patient typed in as 500 kg (probably a slip for 50) at 10 mg per kg is accepted with no upper limit: the dose comes to 5000 mg.",
+   "said": "Policy caps the dose at 500 mg, so it should come back as 500, not 5000.",
+   "function": "dose_mg",
+   "rounds": 1,
+   "now": "A patient entered as 500 kg (probably a slip for 50) at 10 mg per kg works out to 5000 mg, but the dose is capped at 500 mg, so the dose comes to 500 mg, not 5000.",
+   "confirmed": true
+  },
+  {
+   "shown": "A patient whose weight was never recorded, at 10 mg per kg, gets a blank dose instead of zero.",
+   "said": "No, a missing weight should count as 0, so the dose should be 0.",
+   "function": "dose_mg",
+   "rounds": 1,
+   "now": "A patient whose weight was never recorded (missing) is prescribed 10 mg per kg: the missing weight counts as 0 kg, so the dose comes out as 0 mg, shown as zero rather than blank.",
+   "confirmed": true
+  },
+  {
+   "shown": "Rex, owned by the Sharma family, gets a tag reading REX-SHARMA: the full name and full surname in capitals, nothing shortened.",
+   "said": "No: the tag should be REX-SHARMA cut to 12 characters, which is \"REX-SHARMA\" (10 characters), so that's fine, but Rex should be capitalised as shown. Actually, yes, that's right.\n\nYes, that's right",
+   "function": "pet_tag",
+   "rounds": 1,
+   "now": "Rex, owned by the Sharma family, gets a pet tag: both the name and surname are non-empty text made only of ASCII letters, so nothing is dropped or trimmed, and the tag is the full name and full surname in capitals joined by a hyphen, REX-SHARMA.",
+   "confirmed": true
+  },
+  {
+   "shown": "Bella, owned by Ms de la Cruz, gets a tag reading BELLA-DE LA CRUZ, so a multi-word surname makes a long tag with spaces in it.",
+   "said": "No, spaces get dropped and the tag is cut to 12 characters, so it should be BELLA-DELACR.",
+   "function": "pet_tag",
+   "rounds": 1,
+   "now": "Bella, owned by Ms de la Cruz, gets the tag BELLA-DELACR, not BELLA-DE LA CRUZ: the spaces inside the surname are dropped so it becomes DELACRUZ, the full tag BELLA-DELACRUZ is 14 characters, and that is cut to the first 12, so the tag is BELLA-DELACR.",
+   "confirmed": true
+  },
+  {
+   "shown": "A pet with no name entered, owned by the Sharmas, gets no tag at all (blank), not a tag with just the surname.",
+   "said": "No, it should get a tag: a missing name becomes STRAY, so STRAY-SHARMA.",
+   "function": "pet_tag",
+   "rounds": 1,
+   "now": "A pet with no name entered, owned by the Sharmas, still gets a tag: the missing name becomes STRAY, so the tag is STRAY-SHARMA (12 characters, so nothing is cut), and it is not blank.",
+   "confirmed": true
+  },
+  {
+   "shown": "A pet whose name was entered as the number 123, owned by the Sharmas, gets no tag.",
+   "said": "No, it should still get a tag: 123-SHARMA.",
+   "function": "pet_tag",
+   "rounds": 1,
+   "now": "A pet whose name was entered as the number 123 and whose owner is Sharma does get a tag: the number is read as the text \"123\", so the tag comes to 123-SHARMA (10 characters, within the 12-character limit), not blank.",
+   "confirmed": true
+  },
+  {
+   "shown": "A pet weighing exactly 25 kg counts as large, not medium.",
+   "said": "No, 25 kg is still medium. Large starts above 25.",
+   "function": "size_class",
+   "rounds": 1,
+   "now": "A pet weighing exactly 25 kg is not counted as large: it is classed as medium, because medium covers anything over 6 kg up to and including 25 kg, and large starts only above 25 kg.",
+   "confirmed": true
+  },
+  {
+   "shown": "A pet weighing exactly 45 kg counts as giant, not large.",
+   "said": "No, 45 kg is still large. Giant starts above 45.",
+   "function": "size_class",
+   "rounds": 1,
+   "now": "A pet weighing exactly 45 kg is not giant, because giant starts only above 45 kg, so the pet is classed as large.",
+   "confirmed": true
+  },
+  {
+   "shown": "A pet recorded at minus 1 kg gets no size category (blank), while one at 0 kg is called small.",
+   "said": "No: 1 kg or less, including minus 1 and 0, is 'micro', never blank or small.",
+   "function": "size_class",
+   "rounds": 1,
+   "now": "A pet recorded at minus 1 kg is classed as micro, not left blank, because a negative weight is not NULL and anything of 1 kg or less is micro. A pet at 0 kg is also micro, not small, because small starts above 1 kg: both pets get the size 'micro'.",
+   "confirmed": true
+  },
+  {
+   "shown": "A dog vaccinated on 31 January 2026 with a one-month interval is next due on 28 February 2026, the last day of the shorter month.",
+   "said": "No, it should spill into March: 3 March 2026, not 28 February.",
+   "function": "vaccine_next_due",
+   "rounds": 1,
+   "now": "A dog vaccinated on 31 January 2026 with a one-month interval has no 31 February, so the due date spills over past the end of February (28 days) by 3 days and lands on 3 March 2026, not 28 February.",
+   "confirmed": true
+  },
+  {
+   "shown": "A cat vaccinated on 29 February 2024 with a yearly interval is next due on 28 February 2025, a day earlier than a strict anniversary.",
+   "said": "No, it should spill into March: 1 March 2025, not 28 February.",
+   "function": "vaccine_next_due",
+   "rounds": 1,
+   "now": "A cat vaccinated on 29 February 2024 with a 12-month interval has no 29 February in 2025, so the extra day rolls over into March: the next vaccination is due on 1 March 2025, not 28 February 2025.",
+   "confirmed": true
+  },
+  {
+   "shown": "A vaccination given on 15 March 2026 with a zero-month interval is due again the very same day, 15 March 2026.",
+   "said": "No, a zero interval should count as 12 months, so it's due 15 March 2027.",
+   "function": "vaccine_next_due",
+   "rounds": 1,
+   "now": "A vaccination given on 15 March 2026 with a zero-month interval is not due again the same day, because a zero interval is treated as 12 months: the next due date is 15 March 2027.",
+   "confirmed": true
+  },
+  {
+   "shown": "A vaccination on 15 March 2026 with an interval of one and a half months gets no due date; only whole months are accepted.",
+   "said": "No, the 1.5 should drop to 1 month, so it's due 15 April 2026.",
+   "function": "vaccine_next_due",
+   "rounds": 1,
+   "now": "A vaccination given on 15 March 2026 with an interval of one and a half months is not rejected, because the part after the decimal point is dropped and 1.5 is used as 1 month: the next vaccination is due on 15 April 2026.",
+   "confirmed": true
+  },
+  {
+   "shown": "A vaccination logged on the impossible date 30 February 2026 gets no due date, rather than being rolled into March.",
+   "said": "No, an impossible date counts as 1970-01-01, so it should still give a due date.",
+   "function": "vaccine_next_due",
+   "rounds": 1,
+   "now": "A vaccination logged on the impossible date 30 February 2026 does get a due date, because the software treats that date as 1 January 1970 and counts the interval forward from there: with a 12-month interval the due date is 1 January 1971, and it is not blank and not rolled into March.",
+   "confirmed": true
+  },
+  {
+   "shown": "A one-minute visit at 100 an hour is charged 1.67, so there is no minimum fee and short visits are billed by the minute.",
+   "said": "No, a one-minute visit is billed as one 15-minute block (25), and the minimum fee of 30 applies, so it should be 30.",
+   "function": "visit_fee",
+   "rounds": 1,
+   "now": "A one-minute visit at 100 an hour is rounded up to one 15-minute block, which comes to 25, but the 30 minimum fee applies, so the visit is charged 30.0 and not 1.67.",
+   "confirmed": true
+  },
+  {
+   "shown": "A 20-minute visit at 50 an hour costs 16.67, rounded to the nearest cent.",
+   "said": "No, 20 minutes is two 15-minute blocks, which comes to 25, so the 30 minimum applies and it should be 30.",
+   "function": "visit_fee",
+   "rounds": 1,
+   "now": "A 20-minute visit at 50 an hour is billed as 2 fifteen-minute blocks, not by the minute, so it comes to 25 (2 \u00d7 50 \u00f7 4), which is below the 30 minimum: the visit fee is 30.0, not 16.67.",
+   "confirmed": true
+  },
+  {
+   "shown": "A 5-minute visit at half a unit an hour comes to 0.04, so tiny fees round down to a few cents.",
+   "said": "No: minutes above 0 are billed in 15-minute blocks and the minimum fee of 30 applies, so it should be 30.",
+   "function": "visit_fee",
+   "rounds": 1,
+   "now": "A 5-minute visit at half a unit an hour is one 15-minute block, which calculates to only 0.125, but because the visit is longer than 0 minutes the 30 minimum applies, so the fee is 30.0 and not 0.04, and tiny fees are never rounded down to a few cents.",
+   "confirmed": true
+  },
+  {
+   "shown": "A visit logged as minus 30 minutes at 100 an hour gets no fee (blank), not a refund or a zero.",
+   "said": "No, minutes of 0 or less should give a fee of 0, not blank.",
+   "function": "visit_fee",
+   "rounds": 1,
+   "now": "A visit logged as minus 30 minutes at 100 an hour is charged a fee of 0.0: because the minutes are negative, the fee is a real zero, not blank and not a negative refund.",
+   "confirmed": true
+  }
+ ],
+ "changed": [
+  "dose_mg: Whenever a weight and a dose per kg are both given as valid non-negative numbers, the dose in mg is the weight multiplied by the dose per kg (20 kg at 5 mg/kg gives 100). Negative, NULL or unreadable inputs count as 0. The dose is capped at 500 mg.",
+  "dose_mg: Whenever the dose is not a whole number, it is never shown with decimals (for example, never rounded to two decimals): it is always rounded up to the next whole mg (2.5 kg at 3.333 gives 9; 10 kg at 0.005 gives 1; 2.675 kg at 1 gives 3; 3.333 kg at 7.77 gives 26, not 25.9). The dose is never above 500: if it comes out higher than 500, it is 500.",
+  "dose_mg: Whenever the rounded dose is a whole number, it is shown without decimals (2.5 kg at 2 gives 5, and 1.005 kg at 1 gives 1). This holds for whole-number doses of any size, but the dose is never above 500 mg: whether the dose is a whole number or not, if it comes out higher than 500 it is 500 (for example, 500 kg at 10 mg/kg gives 500, not 5000).",
+  "dose_mg: Whenever the weight or the dose per kg is NULL (missing), it is treated as 0, so the dose is 0 (for example, a NULL weight at 10 mg/kg gives 0, and 20 kg with a NULL dose per kg gives 0).",
+  "dose_mg: Whenever the weight or the dose per kg is negative (including negative numbers given as text, such as '-5'), it is treated as 0, so the dose is 0 (for example, -5 kg at 10 mg/kg gives 0). This does not change the NULL results for non-numeric text or 'inf' inputs.",
+  "pet_tag: Whenever both the pet name and the owner surname are non-empty text, the tag is the name in capitals, a hyphen, then the surname in capitals (Rex and Smith give REX-SMITH). If the whole tag, hyphen included, is longer than 12 characters, it is cut to its first 12 characters and the rest is dropped (Bella and de la Cruz give BELLA-DELACR).",
+  "pet_tag: Whenever the name or surname has spaces at the start or end, those spaces are removed first. Spaces inside a name are also dropped, so the words run together (Mary Ann and de la Cruz become MARYANN and DELACRUZ, and the tag is then cut to 12 characters, giving MARYANN-DELA).",
+  "pet_tag: Whenever the name or surname is empty, or only spaces, that part is treated as missing and becomes STRAY. The tag is then built as usual: the name, a hyphen, then the surname, all in capitals, and cut to its first 12 characters if longer (an empty name and Sharma give STRAY-SHARMA; Rex and an empty surname give REX-STRAY; both empty give STRAY-STRAY).",
+  "pet_tag: Whenever the name or surname is NULL, that part is treated as missing and becomes STRAY. The tag is then built as usual: the name, a hyphen, then the surname, all in capitals, and cut to its first 12 characters if longer (a NULL name and Sharma give STRAY-SHARMA; Rex and a NULL surname give REX-STRAY; both NULL give STRAY-STRAY).",
+  "pet_tag: Whenever the name or surname is a number rather than text, it is treated as text made of the number as written (123 becomes \"123\"). The tag is then built as usual: spaces trimmed, anything other than ASCII letters and digits dropped, capitals, the name, a hyphen, then the surname, and cut to its first 12 characters if longer. A number does not make the tag NULL (a name of 123 and Sharma give 123-SHARMA; Rex and a surname of 456 give REX-456).",
+  "pet_tag: Whenever the name or surname contains anything other than ASCII letters and digits (hyphens, spaces, accented letters, the German \u00df and so on), only the ASCII letters and digits are kept and everything else is dropped, and the result is capitalised. If a part ends up empty, use STRAY.",
+  "size_class: Whenever the weight is 1 kg or less (including 0 and any negative weight, such as minus 1), the size is 'micro' (exactly 1 is micro). Whenever the weight is more than 1 kg and up to and including 6 kg, the size is 'small' (exactly 6 is small). Whenever the weight is more than 6 kg and up to and including 25 kg, the size is 'medium'.",
+  "size_class: Whenever the weight is more than 6 kg and up to and including 25 kg, the size is 'medium' (exactly 6 is small, exactly 25 is medium).",
+  "size_class: Whenever the weight is more than 25 kg and up to and including 45 kg, the size is 'large' (exactly 25 is medium, not large; exactly 45 is large, not giant).",
+  "size_class: Whenever the weight is more than 45 kg, the size is 'giant' (exactly 45 is large, not giant, with no upper limit).",
+  "size_class: Whenever the weight is NULL, empty text or text that is not a number, the size is NULL. A negative weight is not NULL; it is 'micro'.",
+  "vaccine_next_due: Whenever the same day does not exist in the target month, the due date spills over into the following month: the days beyond the end of the target month are counted on into the next month, so the due date is the day after the last day of the target month plus the number of days by which the original day exceeds that month's length minus one (equivalently, the date is treated as the nonexistent day, e.g. 31 February, and rolls forward). Examples: 2026-01-31 plus 1 gives 2026-03-03; 2024-01-31 plus 1 gives 2024-03-02; 2024-01-31 plus 13 gives 2025-03-03; 2024-02-29 plus 12 gives 2025-03-01. When the day does exist in the target month, it is kept as before.",
+  "vaccine_next_due: Whenever the interval is 0 months, the interval is treated as 12 months, so the due date is the last date moved forward by 12 calendar months, keeping the same day of the month (2026-03-15 plus 0 gives 2027-03-15). The same spill-over, invalid-date and year-9999 rules apply as for any other interval.",
+  "vaccine_next_due: Whenever the interval is 0, negative or unreadable, the due date is calculated using an interval of 12 months.",
+  "vaccine_next_due: Whenever the interval is a number that is not whole (for example 1.5), the part after the decimal point is dropped and the interval is used as the whole number of months left, so 1.5 is used as 1 and 2.9 as 2 (2026-03-15 plus 1.5 gives 2026-04-15). Numeric text such as '1.5' is treated the same way. The dropped interval is then handled by the other rules like any whole interval: if it comes to 0 (for example 0.5) or is negative, it is treated as 12 months. A whole value written with a decimal point such as 3.0 or '3.0' is accepted as 3.",
+  "vaccine_next_due: Whenever the last date is NULL, empty text, or a number rather than text, the due date is NULL. Whenever the last date is written in the exact form YYYY-MM-DD but is not a real calendar date (such as 2024-02-30, 2026-02-30 or 2025-02-29), it is treated as 1970-01-01, so a due date is still given: 1970-01-01 moved forward by the interval under the same rules as any valid date (the interval rules, the spill-over rule and the year-9999 rule all still apply). Examples: 2026-02-30 plus 12 gives 1971-01-01; 2026-02-30 plus 0 gives 1971-01-01. If the interval itself is NULL, empty or not a number, the due date is still NULL.",
+  "vaccine_next_due: Spaces around the last date are accepted, but only the exact form YYYY-MM-DD counts. A month or day written without a leading zero (such as 2024-1-5) is not valid, and the due date becomes 1970-01-01. The due date is always output with two-digit month and day.",
+  "visit_fee: Bill in 15-minute blocks, rounding partial blocks up (blocks = minutes divided by 15, rounded up to the next whole number). The fee is blocks multiplied by the hourly rate divided by 4, with a minimum fee of 30 whenever minutes are above 0. If minutes are 0 or less, or NULL or unreadable, the fee is 0.0. It is a real zero, never blank or NULL.",
+  "visit_fee: Whenever the fee is calculated, it is rounded up to the next whole cent and returned as a decimal number even when whole (30 minutes at 100 gives 50.0). The minimum fee of 30 is applied whenever the minutes are above 0, so a tiny calculated fee is never left as a few cents. It is raised to the 30 minimum (5 minutes at 0.5 an hour gives 30.0, and 10 minutes at 0.01 gives 30.0, not 0.04 or 0.01).",
+  "visit_fee: Whenever the minutes are 0 or less (zero or any negative number), the fee is 0.0. It is a real zero, never blank or NULL, and it is not a refund. This holds whatever the rate is. If the minutes are above 0 and the rate is 0, the fee is the 30 minimum.",
+  "visit_fee: Whenever the minutes are negative (for example minus 30 minutes at 100 an hour), the fee is 0.0, never blank or NULL and never a negative refund. Whenever the rate is negative, the rate counts as 0, so the 30 minimum applies whenever the minutes are above 0.",
+  "visit_fee: If the minutes are NULL, empty text or text that is not a number, the fee is 0. If the rate is NULL, empty text or text that is not a number, the rate counts as 0, so the 30 minimum applies whenever the minutes are above 0.",
+  "visit_fee: Whenever the minutes are above 0, whatever the length of the visit (including visits shorter than an hour, such as one minute), the visit time is counted in 15-minute blocks, with any part of a block rounded up to a whole block. The fee is the number of blocks \u00d7 the rate \u00f7 4, with a minimum charge of 30 (so a one-minute visit at 100 an hour is one block, 25, and is charged the 30 minimum). Short visits are never billed by the minute.",
+  "Adding months past month-end should spill into the next month (31 Jan plus 1 month is 2 or 3 March), not clamp to the last day.",
+  "Rex, owned by the Sharma family, gets a tag reading REX-SHARMA: the full name and full surname in capitals, nothing shortened. The owner says: No: the tag should be REX-SHARMA cut to 12 characters, which is \"REX-SHARMA\" (10 characters), so that's fine, but Rex should be capitalised as shown. Actually, yes, that's right.\n\nYes, that's right",
+  "A cat vaccinated on 29 February 2024 with a yearly interval is next due on 28 February 2025, a day earlier than a strict anniversary. The owner says: No, it should spill into March: 1 March 2025, not 28 February.",
+  "A 20-minute visit at 50 an hour costs 16.67, rounded to the nearest cent. The owner says: No, 20 minutes is two 15-minute blocks, which comes to 25, so the 30 minimum applies and it should be 30."
+ ],
+ "list_review": {
+  "replies": 16,
+  "cost": 1.246,
+  "log": [
+   {
+    "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+    "typed": "Numbers 32, 33, 34, 35, 36, 38, 16, 17 and 2 are wrong. Visit fees bill in 15-minute blocks with a 30 minimum, and size cut-offs are 1, 6, 25 and 45 kg. Doses should be whole mg."
+   },
+   {
+    "prompt": "  Rule 32: visit_fee: Whenever minutes and hourly rate are valid non-negative numbers, the fee is minutes multiplied by the hourly rate divided by 60, rounded to 2 decimal places (20 minutes at 50 gives 16.67; 7 minutes at 10 gives 1.17).\n  What should it be? > ",
+    "typed": "Bill in 15-minute blocks, rounding partial blocks up. The fee is blocks \u00d7 hourly rate \u00f7 4, with a minimum of 30 whenever minutes are above 0. If minutes are 0 or less, or NULL or unreadable, the fee is 0."
+   },
+   {
+    "prompt": "  Rule 33: visit_fee: Whenever the fee is calculated, it is returned as a decimal number even when whole (30 minutes at 100 gives 50.0), and amounts under half a cent round to 0.0 (10 minutes at 0.01 gives 0.0).\n  What should it be? > ",
+    "typed": "Round up to the next whole cent and return it as a number. Under half a cent should round up to 0.01, not 0.0."
+   },
+   {
+    "prompt": "  Rule 34: visit_fee: Whenever the minutes or the rate is zero, the fee is 0.0.\n  What should it be? > ",
+    "typed": "Wrong: if minutes are above 0 and the rate is 0, the fee is the 30 minimum. The fee is 0 only when minutes are 0 or less."
+   },
+   {
+    "prompt": "  Rule 35: visit_fee: Whenever the minutes or the rate is negative, the fee is NULL.\n  What should it be? > ",
+    "typed": "Negative minutes or rate should be treated as 0, not NULL. Negative minutes means fee 0. A negative rate counts as 0, so the 30 minimum applies."
+   },
+   {
+    "prompt": "  Rule 36: visit_fee: Whenever the minutes or the rate is NULL, empty text or text that is not a number, the fee is NULL.\n  What should it be? > ",
+    "typed": "If minutes are NULL, empty or unreadable, the fee is 0. If the rate is NULL, empty or unreadable, it counts as 0, so the 30 minimum applies whenever minutes are above 0."
+   },
+   {
+    "prompt": "  Rule 38: visit_fee: Whenever the visit is longer than an hour, the fee grows in direct proportion with no minimum charge or rounding up of minutes (61 minutes at 60 gives 61.0, and 1 minute at 1 gives 0.02).\n  What should it be? > ",
+    "typed": "Same as above: 15-minute blocks rounded up, blocks \u00d7 rate \u00f7 4, 30 minimum."
+   },
+   {
+    "prompt": "  Rule 16: size_class: Whenever the weight is below 10 kg (including 0), the size is 'small'.\n  What should it be? > ",
+    "typed": "Sizes: under 1 kg is micro, then 1\u20136 small, 6\u201325 medium."
+   },
+   {
+    "prompt": "  Rule 17: size_class: Whenever the weight is from 10 kg up to but not including 25 kg, the size is 'medium' (exactly 10 is medium).\n  What should it be? > ",
+    "typed": "Rule 17: Medium is 6 up to 25 kg (exactly 6 is small, exactly 25 is large)."
+   },
+   {
+    "prompt": "  Rule 2: dose_mg: Whenever the dose is not a whole number, it is rounded to 2 decimal places (2.5 kg at 3.333 gives 8.33; 10 kg at 0.005 gives 0.05; 2.675 kg at 1 gives 2.67).\n  What should it be? > ",
+    "typed": "Round the dose up to a whole mg, and never above 500."
+   },
+   {
+    "prompt": "  Rule 15: pet_tag: Whenever the name or surname contains hyphens or accented letters, they are kept and capitalised as-is, with no separator escaping (a-b and c-d give A-B-C-D, so the tag can be ambiguous), and the German \u00df becomes SS.\n  What should it be? > ",
+    "typed": "Keep only the ASCII letters and digits, drop everything else (hyphens, spaces, accents), and capitalise. If a part ends up empty, use STRAY."
+   },
+   {
+    "prompt": "  Rule 30: vaccine_next_due: Whenever the last date has spaces around it or a month or day written without a leading zero (2024-1-5), it is still accepted, and the due date is always output with two-digit month and day.\n  What should it be? > ",
+    "typed": "Only the exact form YYYY-MM-DD counts. Spaces around it are fine, but 2024-1-5 is not valid, so it becomes 1970-01-01."
+   },
+   {
+    "prompt": "  Rule 1: dose_mg: Whenever a weight and a dose per kg are both given as valid non-negative numbers, the dose in mg is the weight multiplied by the dose per kg (20 kg at 5 mg/kg gives 100).\n  What should it be? > ",
+    "typed": "Rule 1 is fine as far as it goes. Negative, NULL or unreadable inputs should count as 0, and the dose is capped at 500 mg."
+   },
+   {
+    "prompt": "  Rule 6: dose_mg: Whenever the weight or the dose per kg is text that looks like a number (for example '20', ' 20 ', '2.0', '+3' or '1e1'), it is read as that number, ignoring surrounding spaces, and the dose is calculated normally.\n  What should it be? > ",
+    "typed": "Rule 6 is fine as it is."
+   },
+   {
+    "prompt": "  Rule 25: vaccine_next_due: Whenever the interval is negative, the due date is NULL.\n  What should it be? > ",
+    "typed": "Negative or unreadable interval should use 12 months, not NULL."
+   },
+   {
+    "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+    "typed": "Adding months past month-end should spill into the next month (31 Jan plus 1 month is 2 or 3 March), not clamp to the last day."
+   }
+  ],
+  "transcript": "\nWhat the built code does now, as rules (each one is what the product will do. Mark any that is not your policy):\n  1. dose_mg: Whenever a weight and a dose per kg are both given as valid non-negative numbers, the dose in mg is the weight multiplied by the dose per kg (20 kg at 5 mg/kg gives 100).\n  2. dose_mg: Whenever the dose is not a whole number, it is rounded to 2 decimal places (2.5 kg at 3.333 gives 8.33; 10 kg at 0.005 gives 0.05; 2.675 kg at 1 gives 2.67).\n  3. dose_mg: Whenever the rounded dose is a whole number, it is shown without decimals (2.5 kg at 2 gives 5, and 1.005 kg at 1 gives 1).\n  4. dose_mg: Whenever the weight or the dose per kg is NULL, the dose is NULL.\n  5. dose_mg: Whenever the weight or the dose per kg is empty text or text that is not a number (for example 'abc' or '1,5'), the dose is NULL.\n  6. dose_mg: Whenever the weight or the dose per kg is text that looks like a number (for example '20', ' 20 ', '2.0', '+3' or '1e1'), it is read as that number, ignoring surrounding spaces, and the dose is calculated normally.\n  7. dose_mg: Whenever the weight or the dose per kg is negative, the dose is NULL.\n  8. dose_mg: Whenever the weight or the dose per kg is zero, the dose is 0.\n  9. dose_mg: Whenever the weight or the dose per kg is the text 'inf' (infinity), the dose is NULL.\n  10. pet_tag: Whenever both the pet name and the owner surname are non-empty text, the tag is the name in capitals, a hyphen, then the surname in capitals (Rex and Smith give REX-SMITH).\n  11. pet_tag: Whenever the name or surname has spaces at the start or end, those spaces are removed first; spaces inside a name are kept (Mary Ann and de la Cruz give MARY ANN-DE LA CRUZ).\n  12. pet_tag: Whenever the name or surname is empty, or only spaces, the tag is NULL.\n  13. pet_tag: Whenever the name or surname is NULL, the tag is NULL.\n  14. pet_tag: Whenever the name or surname is a number rather than text, the tag is NULL.\n  15. pet_tag: Whenever the name or surname contains hyphens or accented letters, they are kept and capitalised as-is, with no separator escaping (a-b and c-d give A-B-C-D, so the tag can be ambiguous), and the German \u00df becomes SS.\n  16. size_class: Whenever the weight is below 10 kg (including 0), the size is 'small'.\n  17. size_class: Whenever the weight is from 10 kg up to but not including 25 kg, the size is 'medium' (exactly 10 is medium).\n  18. size_class: Whenever the weight is from 25 kg up to but not including 45 kg, the size is 'large' (exactly 25 is large).\n  19. size_class: Whenever the weight is 45 kg or more, the size is 'giant' (exactly 45 is giant, with no upper limit).\n  20. size_class: Whenever the weight is negative, NULL, empty text or text that is not a number, the size is NULL.\n  21. size_class: Whenever the weight is text that looks like a number (for example '12' or ' 30 '), it is read as that number, ignoring surrounding spaces, and classified normally.\n  22. vaccine_next_due: Whenever the last date is a valid YYYY-MM-DD date and the interval is a whole number of months, the due date is the last date moved forward by that many calendar months, keeping the same day of the month, as YYYY-MM-DD (2023-12-15 plus 12 gives 2024-12-15).\n  23. vaccine_next_due: Whenever the same day does not exist in the target month, the due date is the last day of that month (2024-01-31 plus 1 gives 2024-02-29; 2024-01-31 plus 13 gives 2025-02-28; 2024-02-29 plus 12 gives 2025-02-28).\n  24. vaccine_next_due: Whenever the interval is 0 months, the due date is the same as the last date.\n  25. vaccine_next_due: Whenever the interval is negative, the due date is NULL.\n  26. vaccine_next_due: Whenever the interval is not a whole number (for example 1.5), the due date is NULL; a whole value written with a decimal point such as 3.0 or '3.0' is accepted as 3.\n  27. vaccine_next_due: Whenever the interval is NULL, empty, or text that is not a number, the due date is NULL; numeric text such as '3' is read as that number.\n  28. vaccine_next_due: Whenever the last date is NULL, empty text, a number rather than text, or not a real calendar date (2024-02-30), the due date is NULL.\n  29. vaccine_next_due: Whenever the last date uses another format (2024/01-15, 24-01-15, or with a time such as 2024-01-15T10:00), the due date is NULL.\n  30. vaccine_next_due: Whenever the last date has spaces around it or a month or day written without a leading zero (2024-1-5), it is still accepted, and the due date is always output with two-digit month and day.\n  31. vaccine_next_due: Whenever the due date would fall after year 9999, or the interval is so large that it does, the due date is NULL; 9999-01-31 plus 11 months gives 9999-12-31 but 9999-12-31 plus 1 gives NULL.\n  32. visit_fee: Whenever minutes and hourly rate are valid non-negative numbers, the fee is minutes multiplied by the hourly rate divided by 60, rounded to 2 decimal places (20 minutes at 50 gives 16.67; 7 minutes at 10 gives 1.17).\n  33. visit_fee: Whenever the fee is calculated, it is returned as a decimal number even when whole (30 minutes at 100 gives 50.0), and amounts under half a cent round to 0.0 (10 minutes at 0.01 gives 0.0).\n  34. visit_fee: Whenever the minutes or the rate is zero, the fee is 0.0.\n  35. visit_fee: Whenever the minutes or the rate is negative, the fee is NULL.\n  36. visit_fee: Whenever the minutes or the rate is NULL, empty text or text that is not a number, the fee is NULL.\n  37. visit_fee: Whenever the minutes or the rate is text that looks like a number (for example '30' and '100'), it is read as that number and the fee is calculated normally.\n  38. visit_fee: Whenever the visit is longer than an hour, the fee grows in direct proportion with no minimum charge or rounding up of minutes (61 minutes at 60 gives 61.0, and 1 minute at 1 gives 0.02).\n  Numbers of any that are wrong (Enter = all correct) > Numbers 32, 33, 34, 35, 36, 38, 16, 17 and 2 are wrong. Visit fees bill in 15-minute blocks with a 30 minimum, and size cut-offs are 1, 6, 25 and 45 kg. Doses should be whole mg.\n  Rule 32: visit_fee: Whenever minutes and hourly rate are valid non-negative numbers, the fee is minutes multiplied by the hourly rate divided by 60, rounded to 2 decimal places (20 minutes at 50 gives 16.67; 7 minutes at 10 gives 1.17).\n  What should it be? > Bill in 15-minute blocks, rounding partial blocks up. The fee is blocks \u00d7 hourly rate \u00f7 4, with a minimum of 30 whenever minutes are above 0. If minutes are 0 or less, or NULL or unreadable, the fee is 0.\n  Rule 33: visit_fee: Whenever the fee is calculated, it is returned as a decimal number even when whole (30 minutes at 100 gives 50.0), and amounts under half a cent round to 0.0 (10 minutes at 0.01 gives 0.0).\n  What should it be? > Round up to the next whole cent and return it as a number. Under half a cent should round up to 0.01, not 0.0.\n  Rule 34: visit_fee: Whenever the minutes or the rate is zero, the fee is 0.0.\n  What should it be? > Wrong: if minutes are above 0 and the rate is 0, the fee is the 30 minimum. The fee is 0 only when minutes are 0 or less.\n  Rule 35: visit_fee: Whenever the minutes or the rate is negative, the fee is NULL.\n  What should it be? > Negative minutes or rate should be treated as 0, not NULL. Negative minutes means fee 0. A negative rate counts as 0, so the 30 minimum applies.\n  Rule 36: visit_fee: Whenever the minutes or the rate is NULL, empty text or text that is not a number, the fee is NULL.\n  What should it be? > If minutes are NULL, empty or unreadable, the fee is 0. If the rate is NULL, empty or unreadable, it counts as 0, so the 30 minimum applies whenever minutes are above 0.\n  Rule 38: visit_fee: Whenever the visit is longer than an hour, the fee grows in direct proportion with no minimum charge or rounding up of minutes (61 minutes at 60 gives 61.0, and 1 minute at 1 gives 0.02).\n  What should it be? > Same as above: 15-minute blocks rounded up, blocks \u00d7 rate \u00f7 4, 30 minimum.\n  Rule 16: size_class: Whenever the weight is below 10 kg (including 0), the size is 'small'.\n  What should it be? > Sizes: under 1 kg is micro, then 1\u20136 small, 6\u201325 medium.\n  Rule 17: size_class: Whenever the weight is from 10 kg up to but not including 25 kg, the size is 'medium' (exactly 10 is medium).\n  What should it be? > Rule 17: Medium is 6 up to 25 kg (exactly 6 is small, exactly 25 is large).\n  Rule 2: dose_mg: Whenever the dose is not a whole number, it is rounded to 2 decimal places (2.5 kg at 3.333 gives 8.33; 10 kg at 0.005 gives 0.05; 2.675 kg at 1 gives 2.67).\n  What should it be? > Round the dose up to a whole mg, and never above 500.\n  Rule 15: pet_tag: Whenever the name or surname contains hyphens or accented letters, they are kept and capitalised as-is, with no separator escaping (a-b and c-d give A-B-C-D, so the tag can be ambiguous), and the German \u00df becomes SS.\n  What should it be? > Keep only the ASCII letters and digits, drop everything else (hyphens, spaces, accents), and capitalise. If a part ends up empty, use STRAY.\n  Rule 30: vaccine_next_due: Whenever the last date has spaces around it or a month or day written without a leading zero (2024-1-5), it is still accepted, and the due date is always output with two-digit month and day.\n  What should it be? > Only the exact form YYYY-MM-DD counts. Spaces around it are fine, but 2024-1-5 is not valid, so it becomes 1970-01-01.\n  Rule 1: dose_mg: Whenever a weight and a dose per kg are both given as valid non-negative numbers, the dose in mg is the weight multiplied by the dose per kg (20 kg at 5 mg/kg gives 100).\n  What should it be? > Rule 1 is fine as far as it goes. Negative, NULL or unreadable inputs should count as 0, and the dose is capped at 500 mg.\n  Rule 6: dose_mg: Whenever the weight or the dose per kg is text that looks like a number (for example '20', ' 20 ', '2.0', '+3' or '1e1'), it is read as that number, ignoring surrounding spaces, and the dose is calculated normally.\n  What should it be? > Rule 6 is fine as it is.\n  Rule 25: vaccine_next_due: Whenever the interval is negative, the due date is NULL.\n  What should it be? > Negative or unreadable interval should use 12 months, not NULL.\n  Anything the builders should know that is not on this list? (Enter = nothing) > Adding months past month-end should spill into the next month (31 Jan plus 1 month is 2 or 3 March), not clamp to the last day.\n"
+ },
+ "spot_review": {
+  "replies": 45,
+  "cost": 3.299,
+  "log": [
+   {
+    "prompt": "\nCase 1 of 25. A patient entered with a weight of minus 5 kg at 10 mg per kg gets no dose at all: the dose comes back blank rather than an error or zero.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No: a negative weight should be treated as 0, so the dose should be 0."
+   },
+   {
+    "prompt": "\n  With your correction: A patient entered with a weight of minus 5 kg at 10 mg per kg gets a dose of 0 mg: the negative weight is treated as 0, so the dose is 0 (not blank, as the case suggests), because only NULL, non-numeric text or 'inf' inputs give a blank dose.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 2 of 25. A 3.333 kg kitten on 7.77 mg per kg is rounded to two decimals, so the dose comes to 25.9 mg.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, the dose should be a whole number of mg, rounded up, so 26 mg."
+   },
+   {
+    "prompt": "\n  With your correction: A 3.333 kg kitten on 7.77 mg per kg works out to 25.89741 mg, and the dose is not rounded to two decimals (25.9 is wrong), because a dose that is not a whole number is always rounded up to the next whole mg, so the kitten's dose comes to 26 mg, which is well under the 500 mg cap.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 3 of 25. A patient typed in as 500 kg (probably a slip for 50) at 10 mg per kg is accepted with no upper limit: the dose comes to 5000 mg.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Policy caps the dose at 500 mg, so it should come back as 500, not 5000."
+   },
+   {
+    "prompt": "\n  With your correction: A patient entered as 500 kg (probably a slip for 50) at 10 mg per kg works out to 5000 mg, but the dose is capped at 500 mg, so the dose comes to 500 mg, not 5000.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 4 of 25. A 10 kg dog prescribed 0 mg per kg gets a dose of 0 mg, a normal-looking answer rather than a warning.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 5 of 25. A patient whose weight was never recorded, at 10 mg per kg, gets a blank dose instead of zero.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, a missing weight should count as 0, so the dose should be 0."
+   },
+   {
+    "prompt": "\n  With your correction: A patient whose weight was never recorded (missing) is prescribed 10 mg per kg: the missing weight counts as 0 kg, so the dose comes out as 0 mg, shown as zero rather than blank.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 6 of 25. Rex, owned by the Sharma family, gets a tag reading REX-SHARMA: the full name and full surname in capitals, nothing shortened.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No: the tag should be REX-SHARMA cut to 12 characters, which is \"REX-SHARMA\" (10 characters), so that's fine, but Rex should be capitalised as shown. Actually, yes, that's right.\n\nYes, that's right"
+   },
+   {
+    "prompt": "\n  With your correction: Rex, owned by the Sharma family, gets a pet tag: both the name and surname are non-empty text made only of ASCII letters, so nothing is dropped or trimmed, and the tag is the full name and full surname in capitals joined by a hyphen, REX-SHARMA.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 7 of 25. Bella, owned by Ms de la Cruz, gets a tag reading BELLA-DE LA CRUZ, so a multi-word surname makes a long tag with spaces in it.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, spaces get dropped and the tag is cut to 12 characters, so it should be BELLA-DELACR."
+   },
+   {
+    "prompt": "\n  With your correction: Bella, owned by Ms de la Cruz, gets the tag BELLA-DELACR, not BELLA-DE LA CRUZ: the spaces inside the surname are dropped so it becomes DELACRUZ, the full tag BELLA-DELACRUZ is 14 characters, and that is cut to the first 12, so the tag is BELLA-DELACR.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 8 of 25. A pet with no name entered, owned by the Sharmas, gets no tag at all (blank), not a tag with just the surname.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, it should get a tag: a missing name becomes STRAY, so STRAY-SHARMA."
+   },
+   {
+    "prompt": "\n  With your correction: A pet with no name entered, owned by the Sharmas, still gets a tag: the missing name becomes STRAY, so the tag is STRAY-SHARMA (12 characters, so nothing is cut), and it is not blank.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 9 of 25. A pet whose name was entered as the number 123, owned by the Sharmas, gets no tag.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, it should still get a tag: 123-SHARMA."
+   },
+   {
+    "prompt": "\n  With your correction: A pet whose name was entered as the number 123 and whose owner is Sharma does get a tag: the number is read as the text \"123\", so the tag comes to 123-SHARMA (10 characters, within the 12-character limit), not blank.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 10 of 25. Rex entered with stray spaces around the name, owned by the Sharmas, still gets a clean tag reading REX-SHARMA.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 11 of 25. A pet weighing exactly 10 kg counts as medium, not small; the small group stops just below 10 kg.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 12 of 25. A pet weighing exactly 25 kg counts as large, not medium.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, 25 kg is still medium. Large starts above 25."
+   },
+   {
+    "prompt": "\n  With your correction: A pet weighing exactly 25 kg is not counted as large: it is classed as medium, because medium covers anything over 6 kg up to and including 25 kg, and large starts only above 25 kg.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 13 of 25. A pet weighing exactly 45 kg counts as giant, not large.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, 45 kg is still large. Giant starts above 45."
+   },
+   {
+    "prompt": "\n  With your correction: A pet weighing exactly 45 kg is not giant, because giant starts only above 45 kg, so the pet is classed as large.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 14 of 25. A pet recorded at minus 1 kg gets no size category (blank), while one at 0 kg is called small.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No: 1 kg or less, including minus 1 and 0, is 'micro', never blank or small."
+   },
+   {
+    "prompt": "\n  With your correction: A pet recorded at minus 1 kg is classed as micro, not left blank, because a negative weight is not NULL and anything of 1 kg or less is micro. A pet at 0 kg is also micro, not small, because small starts above 1 kg: both pets get the size 'micro'.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 15 of 25. A pet recorded at 300 kg, which is surely a typing mistake, is simply called giant with no warning.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 16 of 25. A dog vaccinated on 31 January 2026 with a one-month interval is next due on 28 February 2026, the last day of the shorter month.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, it should spill into March: 3 March 2026, not 28 February."
+   },
+   {
+    "prompt": "\n  With your correction: A dog vaccinated on 31 January 2026 with a one-month interval has no 31 February, so the due date spills over past the end of February (28 days) by 3 days and lands on 3 March 2026, not 28 February.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 17 of 25. A cat vaccinated on 29 February 2024 with a yearly interval is next due on 28 February 2025, a day earlier than a strict anniversary.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, it should spill into March: 1 March 2025, not 28 February."
+   },
+   {
+    "prompt": "\n  With your correction: A cat vaccinated on 29 February 2024 with a 12-month interval has no 29 February in 2025, so the extra day rolls over into March: the next vaccination is due on 1 March 2025, not 28 February 2025.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 18 of 25. A vaccination given on 15 March 2026 with a zero-month interval is due again the very same day, 15 March 2026.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, a zero interval should count as 12 months, so it's due 15 March 2027."
+   },
+   {
+    "prompt": "\n  With your correction: A vaccination given on 15 March 2026 with a zero-month interval is not due again the same day, because a zero interval is treated as 12 months: the next due date is 15 March 2027.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 19 of 25. A vaccination on 15 March 2026 with an interval of one and a half months gets no due date; only whole months are accepted.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, the 1.5 should drop to 1 month, so it's due 15 April 2026."
+   },
+   {
+    "prompt": "\n  With your correction: A vaccination given on 15 March 2026 with an interval of one and a half months is not rejected, because the part after the decimal point is dropped and 1.5 is used as 1 month: the next vaccination is due on 15 April 2026.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 20 of 25. A vaccination logged on the impossible date 30 February 2026 gets no due date, rather than being rolled into March.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, an impossible date counts as 1970-01-01, so it should still give a due date."
+   },
+   {
+    "prompt": "\n  With your correction: A vaccination logged on the impossible date 30 February 2026 does get a due date, because the software treats that date as 1 January 1970 and counts the interval forward from there: with a 12-month interval the due date is 1 January 1971, and it is not blank and not rolled into March.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 21 of 25. A one-minute visit at 100 an hour is charged 1.67, so there is no minimum fee and short visits are billed by the minute.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, a one-minute visit is billed as one 15-minute block (25), and the minimum fee of 30 applies, so it should be 30."
+   },
+   {
+    "prompt": "\n  With your correction: A one-minute visit at 100 an hour is rounded up to one 15-minute block, which comes to 25, but the 30 minimum fee applies, so the visit is charged 30.0 and not 1.67.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 22 of 25. A 20-minute visit at 50 an hour costs 16.67, rounded to the nearest cent.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, 20 minutes is two 15-minute blocks, which comes to 25, so the 30 minimum applies and it should be 30."
+   },
+   {
+    "prompt": "\n  With your correction: A 20-minute visit at 50 an hour is billed as 2 fifteen-minute blocks, not by the minute, so it comes to 25 (2 \u00d7 50 \u00f7 4), which is below the 30 minimum: the visit fee is 30.0, not 16.67.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 23 of 25. A 5-minute visit at half a unit an hour comes to 0.04, so tiny fees round down to a few cents.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No: minutes above 0 are billed in 15-minute blocks and the minimum fee of 30 applies, so it should be 30."
+   },
+   {
+    "prompt": "\n  With your correction: A 5-minute visit at half a unit an hour is one 15-minute block, which calculates to only 0.125, but because the visit is longer than 0 minutes the 30 minimum applies, so the fee is 30.0 and not 0.04, and tiny fees are never rounded down to a few cents.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 24 of 25. A visit logged as minus 30 minutes at 100 an hour gets no fee (blank), not a refund or a zero.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "No, minutes of 0 or less should give a fee of 0, not blank."
+   },
+   {
+    "prompt": "\n  With your correction: A visit logged as minus 30 minutes at 100 an hour is charged a fee of 0.0: because the minutes are negative, the fee is a real zero, not blank and not a negative refund.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 25 of 25. A 10-hour visit at 100 an hour is charged 1000 with no daily cap.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   }
+  ],
+  "transcript": "Hive: Now 25 quick checks on what the build does in real cases. Press Enter if a result is right, or say what should happen instead.\n\nCase 1 of 25. A patient entered with a weight of minus 5 kg at 10 mg per kg gets no dose at all: the dose comes back blank rather than an error or zero.\n  Right? (Enter = yes, or say what should happen) > No: a negative weight should be treated as 0, so the dose should be 0.\n\n  With your correction: A patient entered with a weight of minus 5 kg at 10 mg per kg gets a dose of 0 mg: the negative weight is treated as 0, so the dose is 0 (not blank, as the case suggests), because only NULL, non-numeric text or 'inf' inputs give a blank dose.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 2 of 25. A 3.333 kg kitten on 7.77 mg per kg is rounded to two decimals, so the dose comes to 25.9 mg.\n  Right? (Enter = yes, or say what should happen) > No, the dose should be a whole number of mg, rounded up, so 26 mg.\n\n  With your correction: A 3.333 kg kitten on 7.77 mg per kg works out to 25.89741 mg, and the dose is not rounded to two decimals (25.9 is wrong), because a dose that is not a whole number is always rounded up to the next whole mg, so the kitten's dose comes to 26 mg, which is well under the 500 mg cap.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 3 of 25. A patient typed in as 500 kg (probably a slip for 50) at 10 mg per kg is accepted with no upper limit: the dose comes to 5000 mg.\n  Right? (Enter = yes, or say what should happen) > Policy caps the dose at 500 mg, so it should come back as 500, not 5000.\n\n  With your correction: A patient entered as 500 kg (probably a slip for 50) at 10 mg per kg works out to 5000 mg, but the dose is capped at 500 mg, so the dose comes to 500 mg, not 5000.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 4 of 25. A 10 kg dog prescribed 0 mg per kg gets a dose of 0 mg, a normal-looking answer rather than a warning.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 5 of 25. A patient whose weight was never recorded, at 10 mg per kg, gets a blank dose instead of zero.\n  Right? (Enter = yes, or say what should happen) > No, a missing weight should count as 0, so the dose should be 0.\n\n  With your correction: A patient whose weight was never recorded (missing) is prescribed 10 mg per kg: the missing weight counts as 0 kg, so the dose comes out as 0 mg, shown as zero rather than blank.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 6 of 25. Rex, owned by the Sharma family, gets a tag reading REX-SHARMA: the full name and full surname in capitals, nothing shortened.\n  Right? (Enter = yes, or say what should happen) > No: the tag should be REX-SHARMA cut to 12 characters, which is \"REX-SHARMA\" (10 characters), so that's fine, but Rex should be capitalised as shown. Actually, yes, that's right.\n\nYes, that's right\n\n  With your correction: Rex, owned by the Sharma family, gets a pet tag: both the name and surname are non-empty text made only of ASCII letters, so nothing is dropped or trimmed, and the tag is the full name and full surname in capitals joined by a hyphen, REX-SHARMA.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 7 of 25. Bella, owned by Ms de la Cruz, gets a tag reading BELLA-DE LA CRUZ, so a multi-word surname makes a long tag with spaces in it.\n  Right? (Enter = yes, or say what should happen) > No, spaces get dropped and the tag is cut to 12 characters, so it should be BELLA-DELACR.\n\n  With your correction: Bella, owned by Ms de la Cruz, gets the tag BELLA-DELACR, not BELLA-DE LA CRUZ: the spaces inside the surname are dropped so it becomes DELACRUZ, the full tag BELLA-DELACRUZ is 14 characters, and that is cut to the first 12, so the tag is BELLA-DELACR.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 8 of 25. A pet with no name entered, owned by the Sharmas, gets no tag at all (blank), not a tag with just the surname.\n  Right? (Enter = yes, or say what should happen) > No, it should get a tag: a missing name becomes STRAY, so STRAY-SHARMA.\n\n  With your correction: A pet with no name entered, owned by the Sharmas, still gets a tag: the missing name becomes STRAY, so the tag is STRAY-SHARMA (12 characters, so nothing is cut), and it is not blank.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 9 of 25. A pet whose name was entered as the number 123, owned by the Sharmas, gets no tag.\n  Right? (Enter = yes, or say what should happen) > No, it should still get a tag: 123-SHARMA.\n\n  With your correction: A pet whose name was entered as the number 123 and whose owner is Sharma does get a tag: the number is read as the text \"123\", so the tag comes to 123-SHARMA (10 characters, within the 12-character limit), not blank.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 10 of 25. Rex entered with stray spaces around the name, owned by the Sharmas, still gets a clean tag reading REX-SHARMA.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 11 of 25. A pet weighing exactly 10 kg counts as medium, not small; the small group stops just below 10 kg.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 12 of 25. A pet weighing exactly 25 kg counts as large, not medium.\n  Right? (Enter = yes, or say what should happen) > No, 25 kg is still medium. Large starts above 25.\n\n  With your correction: A pet weighing exactly 25 kg is not counted as large: it is classed as medium, because medium covers anything over 6 kg up to and including 25 kg, and large starts only above 25 kg.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 13 of 25. A pet weighing exactly 45 kg counts as giant, not large.\n  Right? (Enter = yes, or say what should happen) > No, 45 kg is still large. Giant starts above 45.\n\n  With your correction: A pet weighing exactly 45 kg is not giant, because giant starts only above 45 kg, so the pet is classed as large.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 14 of 25. A pet recorded at minus 1 kg gets no size category (blank), while one at 0 kg is called small.\n  Right? (Enter = yes, or say what should happen) > No: 1 kg or less, including minus 1 and 0, is 'micro', never blank or small.\n\n  With your correction: A pet recorded at minus 1 kg is classed as micro, not left blank, because a negative weight is not NULL and anything of 1 kg or less is micro. A pet at 0 kg is also micro, not small, because small starts above 1 kg: both pets get the size 'micro'.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 15 of 25. A pet recorded at 300 kg, which is surely a typing mistake, is simply called giant with no warning.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 16 of 25. A dog vaccinated on 31 January 2026 with a one-month interval is next due on 28 February 2026, the last day of the shorter month.\n  Right? (Enter = yes, or say what should happen) > No, it should spill into March: 3 March 2026, not 28 February.\n\n  With your correction: A dog vaccinated on 31 January 2026 with a one-month interval has no 31 February, so the due date spills over past the end of February (28 days) by 3 days and lands on 3 March 2026, not 28 February.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 17 of 25. A cat vaccinated on 29 February 2024 with a yearly interval is next due on 28 February 2025, a day earlier than a strict anniversary.\n  Right? (Enter = yes, or say what should happen) > No, it should spill into March: 1 March 2025, not 28 February.\n\n  With your correction: A cat vaccinated on 29 February 2024 with a 12-month interval has no 29 February in 2025, so the extra day rolls over into March: the next vaccination is due on 1 March 2025, not 28 February 2025.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 18 of 25. A vaccination given on 15 March 2026 with a zero-month interval is due again the very same day, 15 March 2026.\n  Right? (Enter = yes, or say what should happen) > No, a zero interval should count as 12 months, so it's due 15 March 2027.\n\n  With your correction: A vaccination given on 15 March 2026 with a zero-month interval is not due again the same day, because a zero interval is treated as 12 months: the next due date is 15 March 2027.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 19 of 25. A vaccination on 15 March 2026 with an interval of one and a half months gets no due date; only whole months are accepted.\n  Right? (Enter = yes, or say what should happen) > No, the 1.5 should drop to 1 month, so it's due 15 April 2026.\n\n  With your correction: A vaccination given on 15 March 2026 with an interval of one and a half months is not rejected, because the part after the decimal point is dropped and 1.5 is used as 1 month: the next vaccination is due on 15 April 2026.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 20 of 25. A vaccination logged on the impossible date 30 February 2026 gets no due date, rather than being rolled into March.\n  Right? (Enter = yes, or say what should happen) > No, an impossible date counts as 1970-01-01, so it should still give a due date.\n\n  With your correction: A vaccination logged on the impossible date 30 February 2026 does get a due date, because the software treats that date as 1 January 1970 and counts the interval forward from there: with a 12-month interval the due date is 1 January 1971, and it is not blank and not rolled into March.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 21 of 25. A one-minute visit at 100 an hour is charged 1.67, so there is no minimum fee and short visits are billed by the minute.\n  Right? (Enter = yes, or say what should happen) > No, a one-minute visit is billed as one 15-minute block (25), and the minimum fee of 30 applies, so it should be 30.\n\n  With your correction: A one-minute visit at 100 an hour is rounded up to one 15-minute block, which comes to 25, but the 30 minimum fee applies, so the visit is charged 30.0 and not 1.67.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 22 of 25. A 20-minute visit at 50 an hour costs 16.67, rounded to the nearest cent.\n  Right? (Enter = yes, or say what should happen) > No, 20 minutes is two 15-minute blocks, which comes to 25, so the 30 minimum applies and it should be 30.\n\n  With your correction: A 20-minute visit at 50 an hour is billed as 2 fifteen-minute blocks, not by the minute, so it comes to 25 (2 \u00d7 50 \u00f7 4), which is below the 30 minimum: the visit fee is 30.0, not 16.67.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 23 of 25. A 5-minute visit at half a unit an hour comes to 0.04, so tiny fees round down to a few cents.\n  Right? (Enter = yes, or say what should happen) > No: minutes above 0 are billed in 15-minute blocks and the minimum fee of 30 applies, so it should be 30.\n\n  With your correction: A 5-minute visit at half a unit an hour is one 15-minute block, which calculates to only 0.125, but because the visit is longer than 0 minutes the 30 minimum applies, so the fee is 30.0 and not 0.04, and tiny fees are never rounded down to a few cents.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 24 of 25. A visit logged as minus 30 minutes at 100 an hour gets no fee (blank), not a refund or a zero.\n  Right? (Enter = yes, or say what should happen) > No, minutes of 0 or less should give a fee of 0, not blank.\n\n  With your correction: A visit logged as minus 30 minutes at 100 an hour is charged a fee of 0.0: because the minutes are negative, the fee is a real zero, not blank and not a negative refund.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 25 of 25. A 10-hour visit at 100 an hour is charged 1000 with no daily cap.\n  Right? (Enter = yes, or say what should happen) > \n"
+ },
+ "labels": [
+  {
+   "function": "dose_mg",
+   "decision": 0,
+   "label": "wrong",
+   "D": "wrong",
+   "FINAL": "wrong",
+   "R": "right",
+   "note": "D: NULL/unreadable->NULL; FINAL says NULL->0 but also unreadable text/inf->NULL (conflict); R general rule treats missing/non-finite as 0"
+  },
+  {
+   "function": "dose_mg",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D rounds to 2dp; FINAL/R round up to whole mg"
+  },
+  {
+   "function": "dose_mg",
+   "decision": 2,
+   "label": "right",
+   "D": "absent",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D has no cap"
+  },
+  {
+   "function": "visit_fee",
+   "decision": 0,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D rounds to nearest 2dp; FINAL/R round up to cent"
+  },
+  {
+   "function": "visit_fee",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D gives NULL; FINAL/R treat missing as 0 (min 30 for missing rate)"
+  },
+  {
+   "function": "visit_fee",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D says no rounding up of minutes"
+  },
+  {
+   "function": "visit_fee",
+   "decision": 3,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D says no minimum"
+  },
+  {
+   "function": "size_class",
+   "decision": 0,
+   "label": "wrong",
+   "D": "wrong",
+   "FINAL": "wrong",
+   "R": "right",
+   "note": "D/FINAL give NULL for missing; policy gives micro"
+  },
+  {
+   "function": "size_class",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D puts thresholds in upper tier (and wrong thresholds); FINAL/R lower tier"
+  },
+  {
+   "function": "size_class",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D says <=1 is small; no micro"
+  },
+  {
+   "function": "vaccine_next_due",
+   "decision": 0,
+   "label": "wrong",
+   "D": "wrong",
+   "FINAL": "wrong",
+   "R": "right",
+   "note": "D NULL; FINAL NULL for missing date/interval (invalid date ->1970 only)"
+  },
+  {
+   "function": "vaccine_next_due",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D clamps; FINAL/R spill"
+  },
+  {
+   "function": "vaccine_next_due",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D: 0 means same date, negative NULL"
+  },
+  {
+   "function": "pet_tag",
+   "decision": 0,
+   "label": "right",
+   "D": "absent",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D has no 12-char cut"
+  },
+  {
+   "function": "pet_tag",
+   "decision": 1,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D keeps inner spaces/hyphens/accents"
+  },
+  {
+   "function": "pet_tag",
+   "decision": 2,
+   "label": "right",
+   "D": "wrong",
+   "FINAL": "right",
+   "R": "right",
+   "note": "D gives NULL for blank"
+  }
+ ],
+ "hidden_tests": 92,
+ "hidden_total": 125,
+ "minutes": 13.3
+}
