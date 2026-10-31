@@ -2,7 +2,7 @@
 
 **A team of AI builders you direct by talking. It asks in plain words, never breaks what already works, and hands back a tested branch.**
 
-You describe a feature. Before building, Hive lists the business decisions the code will have to take and asks you about each one, in plain words, in the terminal or on your phone (tap, type, or send a voice note). Then it puts several coding agents (the *builders*: Claude Code, Codex, or a mix) to work on copies of your repository. They coordinate only through git, and a guard lets in nothing that breaks a passing test. How many builders, and whether they leave each other notes, is set by Hive's **swarm law**, fitted on its own experiments. At the end Hive writes what the code now does as plain rules (the *code sheet*); you mark what's off, and a fix round makes it so. The result arrives as a new branch. Your own branches are never touched.
+You describe a feature. Before building, Hive lists the business decisions the code will have to take and asks you about each one, in plain words, in the terminal or on your phone (tap, type, or send a voice note). Then it puts several coding agents (the *builders*: Claude Code, Codex, or a mix) to work on copies of your repository. Before building each part, they ask you about every business decision your description leaves open, one short question at a time; they share your answers, so nobody asks twice. They coordinate only through git, and a guard lets in nothing that breaks a passing test. How many builders, and whether they leave each other notes, is set by Hive's **swarm law**, fitted on its own experiments. If they had nothing to ask you, Hive writes what the code now does as plain rules (the *code sheet*) and shows you concrete cases; you mark what's off, and a fix round makes it so. Away overnight? The builders write their questions down instead, and you answer the list in the morning. The result arrives as a new branch. Your own branches are never touched.
 
 From your phone, Hive is your **Jarvis**: it knows what every builder is doing, answers in context, and takes direction any time ("who's doing what?", "also add a monthly total", "stop w2", "use 2 Claude and 2 Codex"). When you ask for something the evidence says is a mistake, such as more builders than the law recommends, it says so once, plainly, and then it's your call.
 
@@ -83,10 +83,10 @@ You can also message it any time, in English, Hindi-English or with typos:
 | You type | What happens |
 | --- | --- |
 | `hive` | One conversation from an idea to a tested branch |
-| `hive start --overnight` | Builds without asking anything; you review the next morning |
+| `hive start --overnight` | Builds while you're away; the builders write down their questions for your morning |
 | `hive start --agent codex` | Builders run on another coding agent (`claude`, `codex`, `gemini`; `antigravity` needs a headless command the Antigravity IDE does not have, so use `gemini` for Google's models); `--agent claude,codex` mixes them, each builder taking the next agent in turn (Gate 47: mixed swarms matched single-agent ones, with no breaks of main, at about half the Claude bill) |
 | `hive start --workers N` | Your choice of team size; Hive says what the law would pick if it differs |
-| `hive morning [--phone]` | Check an overnight build's decisions; Hive fixes what you correct |
+| `hive morning [--phone]` | Answer the overnight build's questions; Hive builds your answers in and updates the branch |
 | `hive listen` | Stay on Telegram as your Jarvis: start, steer and stop builds and builders, rules, status, cloud |
 | `hive rules` | Your standing rulings for this project (`hive rules forget 3` drops one) |
 | `hive name "Sunny Shop"` | What Hive calls this project: your startup's name (guessed from package.json or the README until you set it) |
