@@ -1,0 +1,15 @@
+{
+ "name": "g68a",
+ "predictions": "gates/gate68/prompts/PREDICTIONS.md",
+ "rulegiver_brief": "gates/gate68/prompts/rulegiver_brief.md",
+ "require_decisions": true,
+ "prompt": "gates/gate68/prompts/prompt_builder.md",
+ "ask_texts": "runs/g68a/ask_texts.md",
+ "visible_seed": 68100,
+ "hidden_seed": 68200000,
+ "baseline": "SQ",
+ "stage1": ["CQ"],
+ "pre_launch": ["python3 gates/gate68/referee/review68.py pre {run} {oracle}"],
+ "after_baseline": ["python3 gates/gate68/referee/review68.py after {run} {oracle} {base}"],
+ "arms": ["SQ:3:none", "CQ:1:none", "SQH:3:none"]
+}
