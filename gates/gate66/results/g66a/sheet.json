@@ -1,0 +1,1599 @@
+{
+ "R": [
+  "Whenever mask_card receives NULL, it returns NULL.",
+  "Whenever mask_card receives a value, it first converts it to text and removes every character that is not a digit 0-9 (spaces, dashes, letters).",
+  "Whenever the digits left in mask_card contain more than 4 digits, it replaces every digit except the last 4 with '*' and keeps the total digit count.",
+  "Whenever the digits left in mask_card number 4 or fewer, it returns those digits unmasked; if none are left it returns empty text.",
+  "Whenever mask_card receives a number rather than text, it treats it as its decimal text.",
+  "Whenever rating_band receives NULL or a value that cannot be read as a number, it returns NULL; numeric text is accepted as a number.",
+  "Whenever rating_band gets a score above 4.5 it returns 'A'; above 3.5 up to 4.5 it returns 'B'; above 2.5 up to 3.5 it returns 'C'; otherwise 'D'.",
+  "Whenever rating_band gets a score exactly on a boundary (4.5, 3.5, 2.5), it returns the lower band.",
+  "Whenever rating_band gets a score outside 0-5, it does not reject it: scores above 4.5 give 'A' and scores at or below 2.5 (including negatives) give 'D'.",
+  "Whenever discount_price receives NULL or a non-numeric value for either argument, it returns NULL.",
+  "Whenever discount_price gets a percentage above 50, it uses 50 instead.",
+  "Whenever discount_price gets a negative percentage, it does not clamp it; the price is increased accordingly.",
+  "Whenever discount_price gets a fractional percentage, it uses it exactly (for example 12.5 is a valid percentage).",
+  "Whenever discount_price computes a price with a fractional cent, it rounds up to the next whole cent (toward positive infinity).",
+  "Whenever discount_price gets a price of zero, it returns 0; a negative price is not rejected and is computed the same way, with the same round-up toward positive infinity.",
+  "Whenever discount_price gets a percentage of 0, it returns the price unchanged.",
+  "Whenever biz_days receives NULL, a non-text value, or text that is not a valid ISO date in YYYY-MM-DD form (including impossible dates like Feb 30), it returns NULL; surrounding whitespace is ignored.",
+  "Whenever biz_days gets an end date on or before the start date, it returns 0.",
+  "Whenever biz_days counts days, it counts the start date but not the end date (the range is start inclusive, end exclusive).",
+  "Whenever biz_days counts days, only Monday to Friday count as working days; Saturday and Sunday never do.",
+  "Whenever biz_days counts days, January 1 and December 25 of any year are not working days when they fall on a weekday and inside the counted range (on or after start, before end).",
+  "Whenever biz_days is given a range spanning several years, it removes the January 1 and December 25 weekday holidays of every year in the range; no other holidays exist.",
+  "Whenever slugify receives NULL, it returns NULL.",
+  "Whenever slugify receives a non-text value, it converts it to text first.",
+  "Whenever slugify processes text, it lowercases it.",
+  "Whenever slugify meets a non-ASCII character (accented letters, symbols), it drops the character entirely, without transliterating it and without turning it into a hyphen.",
+  "Whenever slugify meets any run of characters other than a-z and 0-9 (spaces, punctuation, underscores, repeated hyphens), it replaces the whole run with one hyphen.",
+  "Whenever slugify has a result with leading or trailing hyphens, it removes them.",
+  "Whenever slugify has a result longer than 40 characters, it cuts it to the first 40 characters and then removes any trailing hyphen left by the cut.",
+  "Whenever slugify receives empty text or text with no a-z or 0-9 characters, it returns empty text, not NULL.",
+  "Whenever ship_cost receives NULL or a non-numeric weight or zone, it returns NULL.",
+  "Whenever ship_cost gets a weight above 30000 g, it returns NULL; exactly 30000 g is allowed.",
+  "Whenever ship_cost gets a weight of zero or less (and the weight is not above 30000 and the zone is valid input), it returns 0 whatever the zone.",
+  "Whenever ship_cost gets a zone, it truncates a fractional zone toward zero to a whole number.",
+  "Whenever ship_cost gets a zone below 1 or above 4 (zero, negative or large), it prices it as zone 4.",
+  "Whenever ship_cost computes the base charge, it is 400 cents for zone 1, 550 for zone 2, 700 for zone 3 and 850 for zone 4, and it covers the first 500 g.",
+  "Whenever ship_cost gets a weight above 500 g, it adds 100 cents for every started 500 g beyond the first 500 g (501 g costs one extra step, 1000 g costs one, 1001 g costs two).",
+  "Whenever check_digit receives NULL, it returns NULL.",
+  "Whenever check_digit receives a value, it converts it to text and ignores every character that is not a digit 0-9 (including minus signs and letters).",
+  "Whenever check_digit has more than 12 digits, it uses only the last 12 digits.",
+  "Whenever check_digit has no digits at all (empty text or no digit characters), it returns 0.",
+  "Whenever check_digit computes, it weights digits from the rightmost digit leftwards alternately 3, 1, 3, 1, ..., sums the weighted digits, and returns the amount needed to reach the next multiple of 10 (0 if already a multiple).",
+  "Whenever loyalty_points receives a NULL or non-numeric spend, it returns NULL; a NULL or unrecognized tier does not make it NULL.",
+  "Whenever loyalty_points computes points, it counts only whole dollars of spend by rounding down (floor) to a multiple of 100 cents and ignoring the leftover cents.",
+  "Whenever loyalty_points gets a negative spend, it floors toward negative infinity (so -150 cents is -2 dollars) and does not clamp to zero, so the result can be negative.",
+  "Whenever loyalty_points gets tier exactly 'basic' it multiplies dollars by 1, 'gold' by 2, and 'platinum' by 3.",
+  "Whenever loyalty_points gets a tier that is NULL, not text, differently cased (like 'Gold'), or unknown, it uses the basic multiplier of 1.",
+  "Whenever loyalty_points computes more than 5000 points after the tier multiplier, it returns 5000; the cap applies to the result, not the spend.",
+  "Whenever format_money receives a NULL amount or a NULL currency, it returns NULL.",
+  "Whenever format_money gets a non-integer amount, it rounds it to a whole number of minor units first (halves round to the even number).",
+  "Whenever format_money gets an amount of 0, it returns the single character '-' whatever the currency.",
+  "Whenever format_money formats a currency, it trims spaces and uppercases the code, so 'usd' behaves as 'USD'.",
+  "Whenever format_money gets USD, EUR or GBP, it prefixes the amount with $, \u20ac or \u00a3 with no space.",
+  "Whenever format_money gets any other currency code, it prefixes the uppercased code followed by one space.",
+  "Whenever format_money formats an amount below 100,000,000 minor units in absolute value, it shows major units with comma thousands separators and exactly 2 decimals.",
+  "Whenever format_money gets an absolute amount of 100,000,000 minor units (1,000,000.00) or more, it shows millions with 1 decimal and an 'M' suffix, truncating, not rounding, the extra digits.",
+  "Whenever format_money gets a negative amount, it wraps the whole formatted text, prefix included, in parentheses and shows no minus sign; this applies to the millions form too.",
+  "Whenever order_avg groups values, it ignores NULL, text (even numeric text) and boolean values.",
+  "Whenever order_avg meets a value of zero or less, it excludes it from the average, counting neither in the sum nor in the number of values.",
+  "Whenever order_avg meets a value above 1,000,000, it counts it as 1,000,000.",
+  "Whenever order_avg has fewer than 3 qualifying values (after exclusions), including an empty group, it returns NULL.",
+  "Whenever order_avg computes the mean of the qualifying capped values, it rounds to a whole number with halves rounded up."
+ ],
+ "D": [
+  "Whenever biz_days is given two valid dates, it counts the Monday-to-Friday days from the start date up to but not including the end date, so Monday 2 Nov to Monday 9 Nov gives 5.",
+  "Whenever biz_days is given the same start and end date, it returns 0.",
+  "Whenever the biz_days start date is after the end date, it counts the working days between them the same way but returns the count as a negative number.",
+  "Whenever biz_days spans only a Saturday and/or Sunday (for example Saturday to Monday), it returns 0, because weekends are never counted.",
+  "Whenever biz_days is used, it treats every Monday-to-Friday day as a working day and ignores public holidays.",
+  "Whenever a biz_days date has extra text after its first 10 characters (a time such as '2026-11-02 10:00' or even junk such as '2026-11-02xyz'), it uses only the first 10 characters as the date and ignores the rest.",
+  "Whenever a biz_days date has spaces before or after it, the spaces are ignored and the date is used normally.",
+  "Whenever either biz_days date is NULL, empty, shorter than 10 characters, a number, or not an ISO year-month-day date (for example '2026/11/02', '20261102', '2026-1-2' or the impossible '2026-02-30'), biz_days returns NULL.",
+  "Whenever check_digit is given a code made only of digits, it returns the single GS1-style check digit: the digits are weighted 3, 1, 3, 1... starting from the rightmost digit, summed, and the digit that brings the sum up to the next multiple of 10 is returned (0 if already a multiple), so '629104150021' gives 3.",
+  "Whenever check_digit is given a code with leading zeros, they are accepted and do not change the result, so '007' and '7' both give 9; a code of '0' gives 0.",
+  "Whenever check_digit is given a whole number rather than text, it treats it as the same digits as text (629104150021 gives 3), and a decimal number that is a whole value such as 12.0 is treated as 12.",
+  "Whenever check_digit is given a number with a fractional part (such as 12.5) or text with a decimal point (such as '1.5'), it returns NULL.",
+  "Whenever check_digit is given NULL, empty text, a negative number or text starting with '-' or '+', text containing letters, spaces (even leading or trailing) or separators such as dashes, or non-ASCII digits, it returns NULL.",
+  "Whenever check_digit is given a very long digit string, it still uses every digit with no length limit.",
+  "Whenever discount_price is given a price in cents and a percentage off, it returns the price multiplied by (100 minus the percentage) divided by 100, as a whole number of cents, so 1000 at 10% gives 900.",
+  "Whenever the discounted price falls exactly halfway between two cents, discount_price rounds it away from zero (half up for positive prices), so 999 at 50% gives 500 and 1 at 50% gives 1.",
+  "Whenever the percentage given to discount_price is below 0, it is treated as 0 and the price is returned unchanged (rounded to a whole cent).",
+  "Whenever the percentage given to discount_price is above 100, it is treated as 100 and the result is 0.",
+  "Whenever the percentage given to discount_price has decimals (such as 12.5 or 33.33), they are used exactly and the result is rounded to the nearest cent, so 1000 at 12.5% gives 875.",
+  "Whenever the price given to discount_price is negative, the same calculation is applied and a negative result is returned, with halves rounded away from zero (-5 at 50% gives -3); a price of 0 gives 0.",
+  "Whenever the price given to discount_price has a fraction of a cent, the discounted result is rounded to the nearest whole cent, halves going up, so 1000.5 at 0% gives 1001.",
+  "Whenever discount_price is given a price or percentage as numeric text (such as '1000', ' 10 ' or '1e1'), it reads it as a number and calculates normally.",
+  "Whenever the price or the percentage given to discount_price is NULL, empty text, non-numeric text, or 'nan'/'inf', it returns NULL.",
+  "Whenever format_money is given an amount in minor units and a currency of USD, GBP, EUR, INR, CAD, AUD or CNY, it divides by 100 and shows two decimals with comma thousands separators after the symbol: $, \u00a3, \u20ac, \u20b9, CA$, A$ and CN\u00a5 respectively, so 123456789 USD gives '$1,234,567.89'.",
+  "Whenever format_money is given CHF, it shows 'CHF ' with a space and then the amount with two decimals, such as 'CHF 19.99'.",
+  "Whenever format_money is given JPY, it shows the amount as whole yen with no decimals and no division by 100, with thousands separators, such as 1234567 giving '\u00a51,234,567'.",
+  "Whenever format_money is given KRW, VND, CLP or ISK, it shows the amount with no decimals and thousands separators, prefixed by the currency code and a space, such as 'KRW 1,999'.",
+  "Whenever format_money is given any other currency code (such as XYZ or BHD), it shows the code, a space, and the amount with two decimals, such as 'XYZ 19.99'.",
+  "Whenever format_money is given a currency in lower or mixed case or with spaces around it (such as ' usd '), it ignores the case and spaces and treats it as the upper-case code.",
+  "Whenever format_money is given empty or blank currency text, it shows a single space followed by the two-decimal amount, such as ' 19.99'; a currency written as a symbol or word fragment is shown as typed, upper-cased, such as 'US 19.99'.",
+  "Whenever format_money is given a negative amount, it puts a minus sign before the currency symbol, such as '-$0.05' or '-$1,234.56'.",
+  "Whenever format_money is given an amount of less than one unit, it still shows a leading zero and two decimals, so 5 gives '$0.05' and 0 gives '$0.00'.",
+  "Whenever format_money is given an amount with a fraction of a minor unit (such as 1999.5), it first rounds to a whole minor unit with halves away from zero (1999.5 gives '$20.00', -1999.5 gives '-$20.00'); a tiny negative that rounds to zero shows with no minus sign ('$0.00').",
+  "Whenever format_money is given an amount as numeric text (such as '1999'), it treats it as that number.",
+  "Whenever the amount given to format_money is NULL, empty text or non-numeric text, or the currency is NULL, it returns NULL.",
+  "Whenever loyalty_points is given a spend in cents and a tier, it returns whole points earned per dollar spent: basic 1, silver 1.5, gold 2 and platinum 3, so 10000 cents gives 100, 150, 200 and 300 points respectively.",
+  "Whenever loyalty_points calculates a fraction of a point, it rounds down and never up, so 1999 cents at basic gives 19 and 199 cents at silver gives 2, and 99 cents at basic gives 0.",
+  "Whenever the loyalty_points tier is written in any letter case or with spaces around it (such as 'GOLD' or ' Gold '), it is recognised as that tier.",
+  "Whenever the loyalty_points tier is not one of the four known tiers (including empty text or a number), it is treated as basic and earns 1 point per dollar.",
+  "Whenever the spend given to loyalty_points is zero or negative, it returns 0 points.",
+  "Whenever the spend given to loyalty_points is numeric text (such as '10000') it is read as a number, and a spend with a fraction of a cent is used as is before rounding down.",
+  "Whenever the spend or the tier given to loyalty_points is NULL, or the spend is empty or non-numeric text, it returns NULL.",
+  "Whenever mask_card is given a card number, it replaces every digit with an asterisk except the last 4 digits, so '4111111111111111' gives '************1111'.",
+  "Whenever a card number given to mask_card contains spaces, dashes or any other non-digit characters, those characters are kept in place and only digits are masked, so '4111-1111-1111-1111' gives '****-****-****-1111' and '3782 822463 10005' gives '**** ****** *0005'.",
+  "Whenever mask_card counts the last 4 digits, it counts only digits, so letters or separators after them do not count: '4111-1111-1111-111x' gives '****-****-***1-111x'.",
+  "Whenever the card text given to mask_card has 4 or fewer digits (or no digits, such as 'abcd'), nothing is masked and it is returned unchanged.",
+  "Whenever mask_card is given spaces before or after the card number, the spaces are kept as they are.",
+  "Whenever mask_card is given a number instead of text, it treats it as text of its digits; it returns an empty string for empty text and NULL for NULL.",
+  "Whenever mask_card is given non-ASCII digits (such as Arabic-Indic digits), it counts and masks them as digits like any other.",
+  "Whenever rating_band is given an average score of 4.5 or more, it returns 'A'; from 3 up to but not including 4.5, 'B'; from 2 up to but not including 3, 'C'; and below 2, 'D'.",
+  "Whenever rating_band is given a score exactly on a boundary, it falls in the higher band, so 4.5 gives 'A', 3 gives 'B' and 2 gives 'C', while 4.49 gives 'B', 2.99 gives 'C' and 1.99 gives 'D'.",
+  "Whenever rating_band is given a score above 5 (such as 7) it returns 'A', and a score below 0 (such as -1) returns 'D', since out-of-range values are not rejected.",
+  "Whenever rating_band is given a score as numeric text (such as '4.7' or ' 4.7 '), it reads it as a number; the value true counts as 1 and gives 'D'.",
+  "Whenever the score given to rating_band is NULL, empty text, non-numeric text, or 'nan'/'inf', it returns NULL.",
+  "Whenever ship_cost is given a weight in grams and a zone, it returns 250 cents plus 150 cents per zone number as the base charge, so zone 1 costs 400, zone 2 costs 550 and zone 3 costs 700.",
+  "Whenever a parcel given to ship_cost weighs 500 g or less (including 0 g), no weight surcharge is added.",
+  "Whenever a parcel given to ship_cost weighs more than 500 g, 100 cents is added for each started 500 g above the first 500 g, so 501 g and 1000 g cost 100 extra, 1001 g costs 200 extra, and 1500 g costs 200 extra.",
+  "Whenever the weight given to ship_cost has a fraction of a gram above 500 (such as 500.5 or 1000.5), the partial gram starts a new 500 g step, so 500.5 g adds 100 and 1000.5 g adds 200.",
+  "Whenever the zone given to ship_cost is a whole number of 1 or more, it is accepted with no upper limit (zone 100 costs 15250 for a light parcel), and a whole-number decimal such as 2.0 or text such as '3' or ' 2 ' is accepted too.",
+  "Whenever the zone given to ship_cost is 0, negative, a fraction such as 1.5, empty, or non-numeric text such as 'A', ship_cost returns NULL.",
+  "Whenever the weight given to ship_cost is negative, empty or non-numeric text, ship_cost returns NULL; numeric text such as '100' is accepted as a weight.",
+  "Whenever the weight or the zone given to ship_cost is NULL, it returns NULL.",
+  "Whenever slugify is given a title, it turns it into lower case and replaces each run of one or more characters other than the letters a-z and digits 0-9 (spaces, punctuation, underscores, slashes, symbols) with a single dash, so 'Hello, World!' gives 'hello-world'.",
+  "Whenever a title given to slugify starts or ends with spaces, punctuation or dashes, no leading or trailing dash is left in the result.",
+  "Whenever a title given to slugify contains accented letters, the accent is removed and the base letter kept, so 'Caf\u00e9 Cr\u00e8me' gives 'cafe-creme' and '\u00d1and\u00fa' gives 'nandu'.",
+  "Whenever a title given to slugify contains letters that do not break down into a plain letter plus accent (such as \u00df, \u00d8, \u0152 or Japanese characters), those letters are dropped and treated as separators, so 'Stra\u00dfe' gives 'stra-e', '\u0152uvre' gives 'uvre' and '\u00d8' gives an empty slug.",
+  "Whenever a title given to slugify contains compatibility forms such as ligatures, Roman-numeral characters or full-width letters, they are converted to plain letters, so '\ufb01ne' gives 'fine', '\u216b' gives 'xii' and '\uff21\uff22\uff23' gives 'abc'.",
+  "Whenever a title given to slugify contains digits, apostrophes or dots, digits are kept and apostrophes and dots become dashes, so 'v2.0 Release' gives 'v2-0-release' and 'it's' gives 'it-s'.",
+  "Whenever a title given to slugify has no letters or digits at all (empty text, '!!!', or only non-Latin characters), it returns empty text rather than NULL.",
+  "Whenever slugify is given NULL it returns NULL, and when given a number it treats it as text (123 gives '123').",
+  "Whenever order_avg is given a group of order values, it returns their average as a whole number of cents, rounded to the nearest cent with halves rounded away from zero, so 100 and 201 give 151 and -3 and -4 give -4.",
+  "Whenever some order values given to order_avg are NULL, they are left out of both the total and the count, so 10, NULL and 20 average to 15.",
+  "Whenever order_avg is given values that are empty text, non-numeric text or 'nan', those orders are ignored like NULLs, while numeric text such as '150' or ' 100 ' counts as that number.",
+  "Whenever order_avg has no usable values (no orders, all NULL, or all non-numeric), it returns NULL rather than 0.",
+  "Whenever order_avg is used with GROUP BY, it gives one average per group, and a zero value counts as a real order (0 and 0 and 1 average to 0)."
+ ],
+ "SL": [
+  "Whenever biz_days is given two valid dates, it counts the Monday-to-Friday days from the start date up to but not including the end date, so Monday 2 Nov to Monday 9 Nov gives 5.",
+  "Whenever biz_days is given the same start and end date, it returns 0.",
+  "Whenever the biz_days start date is after the end date, it counts the working days between them the same way but returns the count as a negative number.",
+  "Whenever biz_days spans only a Saturday and/or Sunday (for example Saturday to Monday), it returns 0, because weekends are never counted.",
+  "Whenever biz_days is used, it treats every Monday-to-Friday day as a working day, except that January 1 and December 25 are not working days when they fall on a weekday. No other holidays are excluded.",
+  "Whenever a biz_days date has extra text after its first 10 characters (a time such as '2026-11-02 10:00' or even junk such as '2026-11-02xyz'), it uses only the first 10 characters as the date and ignores the rest.",
+  "Whenever a biz_days date has spaces before or after it, the spaces are ignored and the date is used normally.",
+  "Whenever either biz_days date is NULL, empty, shorter than 10 characters, a number, or not an ISO year-month-day date (for example '2026/11/02', '20261102', '2026-1-2' or the impossible '2026-02-30'), biz_days returns NULL.",
+  "Whenever check_digit is given a code made only of digits, it returns the single GS1-style check digit: the digits are weighted 3, 1, 3, 1... starting from the rightmost digit, summed, and the digit that brings the sum up to the next multiple of 10 is returned (0 if already a multiple), so '629104150021' gives 3.",
+  "Whenever check_digit is given a code with leading zeros, they are accepted and do not change the result, so '007' and '7' both give 9; a code of '0' gives 0.",
+  "Whenever check_digit is given a whole number rather than text, it treats it as the same digits as text (629104150021 gives 3), and a decimal number that is a whole value such as 12.0 is treated as 12.",
+  "Whenever check_digit is given a number with a fractional part (such as 12.5) or text with a decimal point (such as '1.5'), it returns NULL.",
+  "Whenever check_digit is given NULL, empty text, a negative number or text starting with '-' or '+', text containing letters, spaces (even leading or trailing) or separators such as dashes, or non-ASCII digits, it returns NULL.",
+  "Whenever check_digit is given a very long digit string, it still uses every digit with no length limit.",
+  "Whenever discount_price is given a price in cents and a percentage off, it returns the price multiplied by (100 minus the percentage) divided by 100, as a whole number of cents, so 1000 at 10% gives 900.",
+  "Whenever the discounted price falls exactly halfway between two cents, discount_price rounds it up to the next cent, toward positive infinity, so 999 at 50% gives 500 and 1 at 50% gives 1.",
+  "Whenever the percentage given to discount_price is below 0, it is not clamped to 0: the negative percentage raises the price, and the result is rounded to a whole cent.",
+  "Whenever the percentage given to discount_price is above 100, it is treated as 100 and the result is 0. Correction from the owner, which overrides anything above that it contradicts: Cap it at 50 percent, not 100.",
+  "Whenever the percentage given to discount_price has decimals (such as 12.5 or 33.33), they are used exactly and the result is rounded to the nearest cent, so 1000 at 12.5% gives 875.",
+  "Whenever the price given to discount_price is negative, the same calculation is applied and a negative result is returned, with halves rounded away from zero (-5 at 50% gives -3); a price of 0 gives 0.",
+  "Whenever the price given to discount_price has a fraction of a cent, the discounted result is rounded to the nearest whole cent, halves going up, so 1000.5 at 0% gives 1001.",
+  "Whenever discount_price is given a price or percentage as numeric text (such as '1000', ' 10 ' or '1e1'), it reads it as a number and calculates normally.",
+  "Whenever the price or the percentage given to discount_price is NULL, empty text, non-numeric text, or 'nan'/'inf', it returns NULL.",
+  "Whenever format_money is given an amount in minor units and a currency of USD, GBP, EUR, INR, CAD, AUD or CNY, it divides by 100 and shows two decimals with comma thousands separators after the symbol: $, \u00a3, \u20ac, \u20b9, CA$, A$ and CN\u00a5 respectively, so 123456789 USD gives '$1,234,567.89'.",
+  "Whenever format_money is given CHF, it shows 'CHF ' with a space and then the amount with two decimals, such as 'CHF 19.99'.",
+  "Whenever format_money is given JPY, it shows the amount as whole yen with no decimals and no division by 100, with thousands separators, such as 1234567 giving '\u00a51,234,567'.",
+  "Whenever format_money is given KRW, VND, CLP or ISK, it shows the amount with no decimals and thousands separators, prefixed by the currency code and a space, such as 'KRW 1,999'.",
+  "Whenever format_money is given any other currency code (such as XYZ or BHD), it shows the code, a space, and the amount with two decimals, such as 'XYZ 19.99'.",
+  "Whenever format_money is given a currency in lower or mixed case or with spaces around it (such as ' usd '), it ignores the case and spaces and treats it as the upper-case code.",
+  "Whenever format_money is given empty or blank currency text, it shows a single space followed by the two-decimal amount, such as ' 19.99'; a currency written as a symbol or word fragment is shown as typed, upper-cased, such as 'US 19.99'.",
+  "Whenever format_money is given a negative amount, it wraps the amount in parentheses with no minus sign, such as '($0.05)' or '($1,234.56)'. The same applies to the millions form.",
+  "Whenever format_money is given an amount of less than one unit, it still shows a leading zero and two decimals, so 5 gives '$0.05' and 0 gives '$0.00'.",
+  "Whenever format_money is given an amount with a fraction of a minor unit (such as 1999.5), it first rounds to a whole minor unit with halves away from zero (1999.5 gives '$20.00', -1999.5 gives '-$20.00'); a tiny negative that rounds to zero shows with no minus sign ('$0.00').",
+  "Whenever format_money is given an amount as numeric text (such as '1999'), it treats it as that number.",
+  "Whenever the amount given to format_money is NULL, empty text or non-numeric text, or the currency is NULL, it returns NULL.",
+  "Whenever loyalty_points is given a spend in cents and a tier, it returns whole points earned per dollar spent: basic 1, silver 1.5, gold 2 and platinum 3, so 10000 cents gives 100, 150, 200 and 300 points respectively.",
+  "Whenever loyalty_points calculates a fraction of a point, it rounds down and never up, so 1999 cents at basic gives 19 and 199 cents at silver gives 2, and 99 cents at basic gives 0.",
+  "Whenever the loyalty_points tier is written in any letter case or with spaces around it (such as 'GOLD' or ' Gold '), it is recognised as that tier.",
+  "Whenever the loyalty_points tier is not one of the four known tiers (including empty text or a number), it is treated as basic and earns 1 point per dollar.",
+  "Whenever the spend given to loyalty_points is zero or negative, it returns 0 points.",
+  "Whenever the spend given to loyalty_points is numeric text (such as '10000') it is read as a number, and a spend with a fraction of a cent is used as is before rounding down.",
+  "Whenever the spend or the tier given to loyalty_points is NULL, or the spend is empty or non-numeric text, it returns NULL.",
+  "Whenever mask_card is given a card number, it replaces every digit with an asterisk except the last 4 digits, so '4111111111111111' gives '************1111'.",
+  "Whenever a card number given to mask_card contains spaces, dashes or any other non-digit characters, those characters are kept in place and only digits are masked, so '4111-1111-1111-1111' gives '****-****-****-1111' and '3782 822463 10005' gives '**** ****** *0005'.",
+  "Whenever mask_card counts the last 4 digits, it counts only digits, so letters or separators after them do not count: '4111-1111-1111-111x' gives '****-****-***1-111x'.",
+  "Whenever the card text given to mask_card has 4 or fewer digits (or no digits, such as 'abcd'), nothing is masked and it is returned unchanged.",
+  "Whenever mask_card is given spaces before or after the card number, the spaces are kept as they are.",
+  "Whenever mask_card is given a number instead of text, it treats it as text of its digits; it returns an empty string for empty text and NULL for NULL.",
+  "Whenever mask_card is given non-ASCII digits (such as Arabic-Indic digits), it counts and masks them as digits like any other.",
+  "Whenever rating_band is given an average score above 4.5, it returns 'A'; above 3.5 up to and including 4.5, 'B'; above 2.5 up to and including 3.5, 'C'; and anything else, 'D'. A score exactly on 4.5, 3.5 or 2.5 gets the lower band.",
+  "Whenever rating_band is given a score exactly on a boundary, it falls in the higher band, so 4.5 gives 'A', 3 gives 'B' and 2 gives 'C', while 4.49 gives 'B', 2.99 gives 'C' and 1.99 gives 'D'.",
+  "Whenever rating_band is given a score above 5 (such as 7) it returns 'A', and a score below 0 (such as -1) returns 'D', since out-of-range values are not rejected.",
+  "Whenever rating_band is given a score as numeric text (such as '4.7' or ' 4.7 '), it reads it as a number; the value true counts as 1 and gives 'D'.",
+  "Whenever the score given to rating_band is NULL, empty text, non-numeric text, or 'nan'/'inf', it returns NULL.",
+  "Whenever ship_cost is given a weight in grams and a zone, it returns 250 cents plus 150 cents per zone number as the base charge, so zone 1 costs 400, zone 2 costs 550 and zone 3 costs 700.",
+  "Whenever a parcel given to ship_cost weighs 500 g or less (including 0 g), no weight surcharge is added.",
+  "Whenever a parcel given to ship_cost weighs more than 500 g, 100 cents is added for each started 500 g above the first 500 g, so 501 g and 1000 g cost 100 extra, 1001 g costs 200 extra, and 1500 g costs 200 extra.",
+  "Whenever the weight given to ship_cost has a fraction of a gram above 500 (such as 500.5 or 1000.5), the partial gram starts a new 500 g step, so 500.5 g adds 100 and 1000.5 g adds 200.",
+  "Whenever the zone given to ship_cost is a number, text such as '3' or ' 2 ' is accepted too, as is a whole-number decimal such as 2.0. A fractional zone is first cut down to a whole number. After that, any zone above 4 is priced as zone 4, and any zone below 1 is also priced as zone 4. Zones 1 to 4 are priced as themselves.",
+  "Whenever the zone given to ship_cost is 0, negative, a fraction such as 1.5, empty, or non-numeric text such as 'A', ship_cost returns NULL.",
+  "Whenever the weight given to ship_cost is negative, empty or non-numeric text, ship_cost returns NULL; numeric text such as '100' is accepted as a weight.",
+  "Whenever the weight or the zone given to ship_cost is NULL, it returns NULL.",
+  "Whenever slugify is given a title, it turns it into lower case and replaces each run of one or more characters other than the letters a-z and digits 0-9 (spaces, punctuation, underscores, slashes, symbols) with a single dash, so 'Hello, World!' gives 'hello-world'.",
+  "Whenever a title given to slugify starts or ends with spaces, punctuation or dashes, no leading or trailing dash is left in the result.",
+  "Whenever a title given to slugify contains accented letters, the accent is removed and the base letter kept, so 'Caf\u00e9 Cr\u00e8me' gives 'cafe-creme' and '\u00d1and\u00fa' gives 'nandu'.",
+  "Whenever a title given to slugify contains letters that do not break down into a plain letter plus accent (such as \u00df, \u00d8, \u0152 or Japanese characters), those letters are dropped and treated as separators, so 'Stra\u00dfe' gives 'stra-e', '\u0152uvre' gives 'uvre' and '\u00d8' gives an empty slug.",
+  "Whenever a title given to slugify contains compatibility forms such as ligatures, Roman-numeral characters or full-width letters, they are converted to plain letters, so '\ufb01ne' gives 'fine', '\u216b' gives 'xii' and '\uff21\uff22\uff23' gives 'abc'.",
+  "Whenever a title given to slugify contains digits, apostrophes or dots, digits are kept and apostrophes and dots become dashes, so 'v2.0 Release' gives 'v2-0-release' and 'it's' gives 'it-s'.",
+  "Whenever a title given to slugify has no letters or digits at all (empty text, '!!!', or only non-Latin characters), it returns empty text rather than NULL.",
+  "Whenever slugify is given NULL it returns NULL, and when given a number it treats it as text (123 gives '123').",
+  "Whenever order_avg is given a group of order values, it returns their average as a whole number of cents, rounded to the nearest cent with halves rounded away from zero, so 100 and 201 give 151 and -3 and -4 give -4.",
+  "Whenever some order values given to order_avg are NULL, they are left out of both the total and the count, so 10, NULL and 20 average to 15.",
+  "Whenever order_avg is given values that are empty text, non-numeric text or 'nan', those orders are ignored like NULLs, while numeric text such as '150' or ' 100 ' counts as that number.",
+  "Whenever order_avg has no usable values (no orders, all NULL, or all non-numeric), it returns NULL rather than 0.",
+  "Whenever order_avg is used with GROUP BY, it gives one average per group. Zero or negative values are left out of the average, and fewer than 3 valid values gives NULL."
+ ],
+ "HV": [
+  "Whenever biz_days is given two valid dates, it counts the Monday-to-Friday days from the start date up to but not including the end date, so Monday 2 Nov to Monday 9 Nov gives 5.",
+  "Whenever biz_days is given the same start and end date, it returns 0.",
+  "Whenever the biz_days start date is after the end date, it returns NULL (no answer), because backwards dates give no answer and never a negative number, a 0 or an error.",
+  "Whenever biz_days spans only a Saturday and/or Sunday (for example Saturday to Monday), it returns 0, because weekends are never counted.",
+  "Whenever biz_days is used, it treats every Monday-to-Friday day as a working day, except that January 1 and December 25 are not working days when they fall on a weekday. No other holidays are excluded.",
+  "Whenever a biz_days date has extra text after its first 10 characters (a time such as '2026-11-02 10:00' or even junk such as '2026-11-02xyz'), it uses only the first 10 characters as the date and ignores the rest.",
+  "Whenever a biz_days date has spaces before or after it, the spaces are ignored and the date is used normally.",
+  "Whenever either biz_days date is NULL, empty, shorter than 10 characters, a number, or not an ISO year-month-day date (for example '2026/11/02', '20261102', '2026-1-2' or the impossible '2026-02-30'), biz_days returns NULL.",
+  "Whenever check_digit is given a code made only of digits, it returns the single GS1-style check digit: the digits are weighted 3, 1, 3, 1... starting from the rightmost digit, summed, and the digit that brings the sum up to the next multiple of 10 is returned (0 if already a multiple), so '629104150021' gives 3.",
+  "Whenever check_digit is given a code with leading zeros, they are accepted and do not change the result, so '007' and '7' both give 9; a code of '0' gives 0.",
+  "Whenever check_digit is given a whole number rather than text, it treats it as the same digits as text (629104150021 gives 3), and a decimal number that is a whole value such as 12.0 is treated as 12.",
+  "Whenever check_digit is given a number with a fractional part (such as 12.5) or text with a decimal point (such as '1.5'), it returns NULL.",
+  "Whenever check_digit is given NULL, a negative number or text starting with '-' or '+', text containing spaces (even leading or trailing) or separators such as dashes, or non-ASCII digits, it returns NULL. Empty text is the exception: it returns the check digit 0, because no digits are left to sum and 0 is already a multiple of 10. Letters in text are not a reason for NULL: they are ignored, and the check digit is worked out from the remaining digits exactly as for a code made only of digits (weights, summing and rounding as in rule 9), so '12A4' gives the check digit for '124', which is 3, and 'A007' gives the same as '007'. If text has letters but no digits at all (such as 'ABC'), it still returns NULL, as it did before. The other cases in this rule still return NULL even when letters are also present, for example '-12A4', ' 12A4', '12-A4', '1.5A' and text with non-ASCII digits.",
+  "Whenever check_digit is given a very long digit string, it still uses every digit with no length limit.",
+  "Whenever discount_price is given a price in cents and a percentage off, it returns the price multiplied by (100 minus the percentage) divided by 100, as a whole number of cents, so 1000 at 10% gives 900.",
+  "Whenever the discounted price falls exactly halfway between two cents, discount_price rounds it up to the next cent, toward positive infinity, so 999 at 50% gives 500 and 1 at 50% gives 1.",
+  "Whenever the percentage given to discount_price is below 0, it is not clamped to 0 and not treated as no discount: the negative percentage is applied as a markup, so the price is multiplied by (100 minus the percentage) divided by 100, which is more than the price. The result is rounded to a whole cent as in the other rules. A 1000-cent item at -20% therefore comes out at 1200.",
+  "Whenever the percentage given to discount_price is above 100, it is capped at 50 percent instead, so the discount applied is 50 percent. The price is multiplied by 50 divided by 100, and the result is rounded as in the other rules. A 1000-cent item at 150% therefore comes out at 500.",
+  "Whenever the percentage given to discount_price has decimals (such as 12.5 or 33.33), they are used exactly and the result is rounded to the nearest cent, so 1000 at 12.5% gives 875.",
+  "Whenever the price given to discount_price is negative, the same calculation is applied and a negative result is returned, with halves rounded away from zero (-5 at 50% gives -3); a price of 0 gives 0.",
+  "Whenever the price given to discount_price has a fraction of a cent, the discounted result is rounded to the nearest whole cent, halves going up, so 1000.5 at 0% gives 1001.",
+  "Whenever discount_price is given a price or percentage as numeric text (such as '1000', ' 10 ' or '1e1'), it reads it as a number and calculates normally.",
+  "Whenever the price or the percentage given to discount_price is NULL, empty text, non-numeric text, or 'nan'/'inf', it returns NULL.",
+  "Whenever format_money is given an amount in minor units and a currency of USD, GBP, EUR, INR, CAD, AUD or CNY, it divides by 100 and shows two decimals with comma thousands separators after the symbol: $, \u00a3, \u20ac, \u20b9, CA$, A$ and CN\u00a5 respectively, so 123456789 USD gives '$1,234,567.89'.",
+  "Whenever format_money is given CHF, it shows 'CHF ' with a space and then the amount with two decimals, such as 'CHF 19.99'.",
+  "Whenever format_money is given JPY, it treats it like any other regular currency: it divides the amount by 100 and shows the code 'JPY', a space, and then the amount with two decimals and comma thousands separators, so 1234567 gives 'JPY 12,345.67'.",
+  "Whenever format_money is given KRW, VND, CLP or ISK, it shows the amount with no decimals and thousands separators, prefixed by the currency code and a space, such as 'KRW 1,999'.",
+  "Whenever format_money is given any other currency code (such as XYZ or BHD), it shows the code, a space, and the amount with two decimals, such as 'XYZ 19.99'.",
+  "Whenever format_money is given a currency in lower or mixed case or with spaces around it (such as ' usd '), it ignores the case and spaces and treats it as the upper-case code.",
+  "Whenever format_money is given empty or blank currency text, it shows a single space followed by the two-decimal amount, such as ' 19.99'; a currency written as a symbol or word fragment is shown as typed, upper-cased, such as 'US 19.99'.",
+  "Whenever format_money is given a negative amount, it wraps the amount in parentheses with no minus sign, such as '($0.05)' or '($1,234.56)'. The same applies to the millions form.",
+  "Whenever format_money is given an amount of less than one unit, it still shows a leading zero and two decimals, so 5 gives '$0.05' and 0 gives '$0.00'.",
+  "Whenever format_money is given an amount with a fraction of a minor unit (such as 1999.5 or 1050.5), it first rounds to a whole minor unit. Anything not exactly halfway rounds to the nearest whole unit. Exactly halfway rounds to the nearest even whole minor unit (banker's rounding), whether the amount is positive or negative. So 1050.5 gives '$10.50', 1051.5 gives '$10.52', 1999.5 gives '$20.00', 2000.5 gives '$20.00', and -1999.5 gives '($20.00)', in parentheses with no minus sign as for any negative amount. A tiny negative that rounds to zero shows as zero with no minus sign and no parentheses ('$0.00').",
+  "Whenever format_money is given an amount as numeric text (such as '1999'), it treats it as that number.",
+  "Whenever the amount given to format_money is NULL, empty text or non-numeric text, or the currency is NULL, it returns NULL.",
+  "Whenever loyalty_points is given a spend in cents and a tier, it returns whole points earned per whole dollar spent: only whole dollars count (any part of a dollar is dropped first), and that number of dollars is then multiplied by the tier rate: basic 1, silver 1.5, gold 2 and platinum 3, so 10000 cents gives 100, 150, 200 and 300 points respectively.",
+  "Whenever loyalty_points works out the points, it first drops any part of a dollar from the spend (only whole dollars count), then multiplies by the tier rate, and if that leaves a fraction of a point it rounds down and never up. So 1999 cents at basic gives 19, 199 cents at silver gives 1 (1 whole dollar x 1.5 = 1.5, rounded down), 300 cents at silver gives 4 (4.5 rounded down), 99 cents at basic gives 0 and 99 cents at platinum gives 0. For a refund (a negative spend) the part of a dollar is dropped from the size of the refund in the same way, so the points taken back are never more than the matching purchase would earn: -1999 cents at basic gives -19, and -99 cents at basic gives 0.",
+  "Whenever the loyalty_points tier is written in any letter case or with spaces around it (such as 'GOLD' or ' Gold '), it is recognised as that tier.",
+  "Whenever the loyalty_points tier is not one of the four known tiers (including empty text or a number), it is treated as basic and earns 1 point per dollar.",
+  "Whenever the spend given to loyalty_points is zero, it returns 0 points. Whenever the spend is negative (a refund), it returns the points the same amount would have earned as a purchase, as a negative number, using the same whole-dollars-first rule, tier rates and rounding down, so a gold member's refund of -5000 cents returns -100 points, a silver member's refund of -10000 cents returns -150, a basic member's refund of -99 cents returns 0 and a platinum member's refund of -99 cents returns 0.",
+  "Whenever the spend given to loyalty_points is numeric text (such as '10000') it is read as a number, and a spend with a fraction of a cent is used as is before rounding down.",
+  "Whenever the spend given to loyalty_points is NULL, or the spend is empty or non-numeric text, it returns NULL. Whenever the tier is NULL (no tier recorded), this does not make the result NULL: the tier is treated as basic and earns 1 point per dollar, the same as any other unknown tier, so a spend of 10000 cents with no tier returns 100 points.",
+  "Whenever mask_card is given a card number, it replaces every digit with an asterisk except the last 4 digits, so '4111111111111111' gives '************1111'.",
+  "Whenever a card number given to mask_card contains dashes or spaces between its characters, those dashes and spaces are removed from the result, and only digits are masked, so '4111-1111-1111-1111' gives '************1111' and '3782 822463 10005' gives '***********0005'. Any other non-digit characters (such as letters) are kept in place. Spaces before or after the whole card number are not removed (see rule 47).",
+  "Whenever mask_card counts the last 4 digits, it counts only digits, so letters or separators after them do not count: '4111-1111-1111-111x' gives '***********1111x' (the dashes are removed, the letter x is kept).",
+  "Whenever the card text given to mask_card has 4 or fewer digits, nothing is masked and it is returned unchanged, with one exception: if the card text contains only letters (no digits and no other characters, such as 'abcd'), the result is an empty string instead. Card text with no digits that also has other characters, such as separators, spaces or symbols, is still returned unchanged.",
+  "Whenever mask_card is given spaces before or after the card number, the spaces are kept as they are.",
+  "Whenever mask_card is given a number instead of text, it treats it as text of its digits; it returns an empty string for empty text and NULL for NULL.",
+  "Whenever mask_card is given non-ASCII digits (such as Arabic-Indic digits), it counts and masks them as digits like any other.",
+  "Whenever rating_band is given an average score above 4.5, it returns 'A'; above 3.5 up to and including 4.5, 'B'; above 2.5 up to and including 3.5, 'C'; and anything else, 'D'. A score exactly on 4.5, 3.5 or 2.5 gets the lower band.",
+  "Whenever rating_band is given a score exactly on a boundary, it falls in the higher band, so 4.5 gives 'A', 3 gives 'B' and 2 gives 'C', while 4.49 gives 'B', 2.99 gives 'C' and 1.99 gives 'D'.",
+  "Whenever rating_band is given a score above 5 (such as 7) it returns 'A', and a score below 0 (such as -1) returns 'D', since out-of-range values are not rejected.",
+  "Whenever rating_band is given a score as numeric text (such as '4.7' or ' 4.7 '), it reads it as a number; the value true counts as 1 and gives 'D'.",
+  "Whenever the score given to rating_band is NULL, empty text, non-numeric text, or 'nan'/'inf', it returns NULL.",
+  "Whenever ship_cost is given a weight in grams above 0 and a zone, it returns 250 cents plus 150 cents per priced zone number as the base charge, so zone 1 costs 400, zone 2 costs 550, zone 3 costs 700 and zone 4 costs 850. The priced zone is the zone after the zone rules are applied: any zone above 4 (such as 5, 9 or 100) is priced as zone 4, so there is no zone above 4 and the base charge never goes above 850 cents. A 100 g parcel to zone 9 therefore costs 850 cents. A parcel weighing exactly 0 g has no base charge: see rule 56.",
+  "Whenever a parcel given to ship_cost weighs 500 g or less (including 0 g), no weight surcharge is added. A parcel weighing exactly 0 g costs 0 cents in total, with no base charge and no surcharge, in every valid zone (so a 0 g parcel to zone 1, 2, 3, 4 or 9 costs 0). A 0 g parcel with an invalid zone or a NULL zone still returns NULL as the zone rules say. Any weight above 0 g, however small (such as 0.5 g), still pays the full base charge.",
+  "Whenever a parcel given to ship_cost weighs more than 500 g, 100 cents is added for each started 500 g above the first 500 g, so 501 g and 1000 g cost 100 extra, 1001 g costs 200 extra, and 1500 g costs 200 extra.",
+  "Whenever the weight given to ship_cost has a fraction of a gram above 500 (such as 500.5 or 1000.5), the partial gram starts a new 500 g step, so 500.5 g adds 100 and 1000.5 g adds 200.",
+  "Whenever the zone given to ship_cost is a number, text such as '3' or ' 2 ' is accepted too, as is a whole-number decimal such as 2.0. A fractional zone is first cut down to a whole number. After that, any zone above 4 is priced as zone 4, and a zone of 0 (including '0' and 0.0) is also priced as zone 4. Zones 1 to 4 are priced as themselves.",
+  "Whenever the zone given to ship_cost is negative, a fraction such as 1.5, empty, or non-numeric text such as 'A', ship_cost returns NULL. A zone of 0 is not one of these cases: it is priced as zone 4.",
+  "Whenever the weight given to ship_cost is negative, empty or non-numeric text, ship_cost returns NULL; numeric text such as '100' is accepted as a weight.",
+  "Whenever the weight or the zone given to ship_cost is NULL, it returns NULL.",
+  "Whenever slugify is given a title, it turns it into lower case and replaces each run of one or more characters other than the letters a-z and digits 0-9 (spaces, punctuation, underscores, slashes, symbols) with a single dash, so 'Hello, World!' gives 'hello-world'.",
+  "Whenever a title given to slugify starts or ends with spaces, punctuation or dashes, no leading or trailing dash is left in the result.",
+  "Whenever a title given to slugify contains accented letters (letters that break down into a plain letter plus an accent), the whole accented letter is dropped, not turned into its plain letter, and no dash is left in its place, so 'Caf\u00e9 Cr\u00e8me' gives 'caf-crme' and '\u00d1and\u00fa' gives 'and', and ' Caf\u00e9 Cr\u00e8me -- 50% Off ' gives 'caf-crme-50-off'.",
+  "Whenever a title given to slugify contains letters that do not break down into a plain letter plus accent (such as \u00df, \u00c6, \u00d8, \u0152 or Japanese characters), those letters are dropped entirely, not turned into plain letters, and no dash is left in their place, so 'Stra\u00dfe' gives 'strae', '\u0152uvre' gives 'uvre', '\u00d8' gives an empty slug and 'Stra\u00dfe \u00df \u00c6 \u00f8' gives 'strae'.",
+  "Whenever a title given to slugify contains compatibility forms such as ligatures, Roman-numeral characters or full-width letters, they are converted to plain letters, so '\ufb01ne' gives 'fine', '\u216b' gives 'xii' and '\uff21\uff22\uff23' gives 'abc'.",
+  "Whenever a title given to slugify contains digits, apostrophes or dots, digits are kept and apostrophes and dots become dashes, so 'v2.0 Release' gives 'v2-0-release' and 'it's' gives 'it-s'.",
+  "Whenever a title given to slugify has no letters or digits at all (empty text, '!!!', or only non-Latin characters), it returns empty text rather than NULL.",
+  "Whenever slugify is given NULL it returns NULL, and when given a number it treats it as text (123 gives '123').",
+  "Whenever order_avg is given a group of order values, it averages only the values greater than zero, so zero-value orders and negative values such as refunds are left out of both the total and the count. It returns the average as a whole number of cents, rounded to the nearest cent with halves rounded away from zero, so 100, 100, 100 and 102 give 101. If fewer than 3 valid values remain, the rule on no usable values applies.",
+  "Whenever some order values given to order_avg are NULL, they are left out of both the total and the count, so 10, NULL and 20 average to 15.",
+  "Whenever order_avg is given values that are empty text, non-numeric text or 'nan', those orders are ignored like NULLs, while numeric text such as '150' or ' 100 ' counts as that number.",
+  "Whenever order_avg has no usable values (no orders, all NULL, all non-numeric, or all zero or negative), or fewer than 3 valid values remain after ignoring NULLs, non-numeric values, zeros and negatives, it returns NULL rather than 0. So orders of 0, 0, 5 and -100 give NULL.",
+  "Whenever order_avg is used with GROUP BY, it gives one average per group. Each group is treated on its own by the same rules as any other set of values: zero or negative values are left out of the average, and fewer than 3 valid values gives NULL.",
+  "An order placed Thursday 24 December and due Monday 28 December counts 2 working days, so Christmas Day on Friday 25 December is treated as a normal working day. The owner says: Christmas Day isn't a working day, so it should count 1 working day, not 2.",
+  "Orders of 1 and 2 rupees average 2 rupees, because 1.5 rounds up. The owner says: With only 2 orders there should be no average. It should come back empty."
+ ],
+ "spots": [
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2026-11-02','2026-11-06')",
+   "got": 4,
+   "say": "Delivery booked Monday 2 November and due Friday 6 November counts as 4 working days, because the due day itself is not counted."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2026-12-24','2026-12-28')",
+   "got": 2,
+   "say": "An order placed Thursday 24 December and due Monday 28 December counts 2 working days, so Christmas Day on Friday 25 December is treated as a normal working day."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2026-11-09','2026-11-02')",
+   "got": -5,
+   "say": "Dates given backwards, from Monday 9 November to Monday 2 November, come back as minus 5 working days instead of an error."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2026-13-45','2026-11-02')",
+   "got": null,
+   "say": "A mistyped start date of month 13, day 45 gives no answer at all, with no warning."
+  },
+  {
+   "function": "check_digit",
+   "call": "SELECT check_digit('629104150021')",
+   "got": 3,
+   "say": "Product code 629104150021 gets a check digit of 3 to append."
+  },
+  {
+   "function": "check_digit",
+   "call": "SELECT check_digit('0012')",
+   "got": 3,
+   "say": "Code 0012 with leading zeros gets a check digit of 3, the same as code 12, so the zeros make no difference."
+  },
+  {
+   "function": "check_digit",
+   "call": "SELECT check_digit('12A4')",
+   "got": null,
+   "say": "A product code with a letter in it, 12A4, gets no check digit instead of an error."
+  },
+  {
+   "function": "check_digit",
+   "call": "SELECT check_digit('')",
+   "got": null,
+   "say": "A blank product code gets no check digit."
+  },
+  {
+   "function": "discount_price",
+   "call": "SELECT discount_price(995,50)",
+   "got": 498,
+   "say": "A 9.95-dollar item with 50 percent off comes to 498 cents, so the half cent rounds up in the customer's disfavour."
+  },
+  {
+   "function": "discount_price",
+   "call": "SELECT discount_price(1000,150)",
+   "got": 0,
+   "say": "A 10-dollar item with a mistyped 150 percent discount comes out free at 0 cents."
+  },
+  {
+   "function": "discount_price",
+   "call": "SELECT discount_price(1000,-20)",
+   "got": 1000,
+   "say": "A 10-dollar item with a mistyped minus 20 percent discount stays at 1000 cents, so it is not marked up."
+  },
+  {
+   "function": "discount_price",
+   "call": "SELECT discount_price(-1000,10)",
+   "got": -900,
+   "say": "A refund of minus 10 dollars with 10 percent off comes to minus 900 cents, with no check that prices are positive."
+  },
+  {
+   "function": "discount_price",
+   "call": "SELECT discount_price(1000,'abc')",
+   "got": null,
+   "say": "A 10-dollar item with the discount typed as the word abc gives no price at all."
+  },
+  {
+   "function": "format_money",
+   "call": "SELECT format_money(-5,'USD')",
+   "got": "-$0.05",
+   "say": "A 5-cent credit in dollars is shown as -$0.05."
+  },
+  {
+   "function": "format_money",
+   "call": "SELECT format_money(1000,'KWD')",
+   "got": "KWD 10.00",
+   "say": "An invoice of 1000 minor units in Kuwaiti dinars shows as KWD 10.00, with no special symbol or three-decimal handling for that currency."
+  },
+  {
+   "function": "format_money",
+   "call": "SELECT format_money(1234567,'JPY')",
+   "got": "\u00a51,234,567",
+   "say": "An invoice of 1,234,567 in yen is shown as \u00a51,234,567 with no decimals, not divided by 100."
+  },
+  {
+   "function": "format_money",
+   "call": "SELECT format_money(1000,'')",
+   "got": " 10.00",
+   "say": "An invoice with a blank currency shows as ' 10.00', a bare amount with a leading space and no currency."
+  },
+  {
+   "function": "format_money",
+   "call": "SELECT format_money(1050.5,'USD')",
+   "got": "$10.51",
+   "say": "An amount of 1050.5 cents is shown as $10.51, rounding the half cent up."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(9999,'basic')",
+   "got": 99,
+   "say": "Meera spends 99.99 dollars as a basic member and earns 99 points, because the last 99 cents earn nothing."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(10000,'diamond')",
+   "got": 100,
+   "say": "A customer in a tier the programme does not list, diamond, spends 100 dollars and earns 100 points, the same as a basic member."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(-5000,'gold')",
+   "got": 0,
+   "say": "A gold member's 50-dollar refund earns 0 points, so points already given are not taken back."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(99,'platinum')",
+   "got": 2,
+   "say": "A platinum member spending 0.99 dollars earns 2 points, since the fractions are dropped after the tier multiplier."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(10000,NULL)",
+   "got": null,
+   "say": "A customer with no tier recorded spends 100 dollars and earns no answer at all, rather than basic points."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('4111-1111-1111-1111')",
+   "got": "****-****-****-1111",
+   "say": "A card written with dashes shows as ****-****-****-1111, keeping the dashes and the last four digits."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('123')",
+   "got": "123",
+   "say": "A card number of only 3 digits is shown in full as 123, with nothing hidden."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('abcd')",
+   "got": "abcd",
+   "say": "A card entry that is just letters, abcd, is shown unchanged, with nothing masked."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('')",
+   "got": "",
+   "say": "A blank card number comes back blank."
+  },
+  {
+   "function": "rating_band",
+   "call": "SELECT rating_band(4.49)",
+   "got": "B",
+   "say": "A product averaging 4.49 stars lands in band B, just under the 4.5 needed for an A."
+  },
+  {
+   "function": "rating_band",
+   "call": "SELECT rating_band(7)",
+   "got": "A",
+   "say": "A product with an impossible average of 7 stars still gets band A, with no warning that the score is out of range."
+  },
+  {
+   "function": "rating_band",
+   "call": "SELECT rating_band(-1)",
+   "got": "D",
+   "say": "A product with an impossible average of minus 1 star gets band D."
+  },
+  {
+   "function": "rating_band",
+   "call": "SELECT rating_band('')",
+   "got": null,
+   "say": "A product with a blank average score gets no band, rather than a D."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(500,1)",
+   "got": 400,
+   "say": "A 500-gram parcel to zone 1 costs 400 cents, with no weight surcharge at exactly 500 grams."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(501,1)",
+   "got": 500,
+   "say": "A 501-gram parcel to zone 1 costs 500 cents, so one extra gram adds a full 100-cent step."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(100,0)",
+   "got": null,
+   "say": "A parcel sent to zone 0 gets no price at all, because zones start at 1."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(100,9)",
+   "got": 1600,
+   "say": "A 100-gram parcel to zone 9 costs 1600 cents, and the engine accepts any zone number with no upper limit."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(0,1)",
+   "got": 400,
+   "say": "A parcel weighing 0 grams to zone 1 is still charged the full 400 cents."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('  Caf\u00e9 Cr\u00e8me -- 50% Off  ')",
+   "got": "cafe-creme-50-off",
+   "say": "The title ' Caf\u00e9 Cr\u00e8me -- 50% Off ' becomes the web address cafe-creme-50-off, losing the accents and the percent sign."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('\u65e5\u672c\u8a9e Tea')",
+   "got": "tea",
+   "say": "A product titled in Japanese followed by Tea becomes just tea, dropping the Japanese characters."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('Stra\u00dfe \u00df \u00c6 \u00f8')",
+   "got": "stra-e",
+   "say": "The title Stra\u00dfe \u00df \u00c6 \u00f8 becomes stra-e, because the letters \u00df, \u00c6 and \u00f8 are dropped instead of converted."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('!!!')",
+   "got": "",
+   "say": "A title made only of punctuation becomes an empty address."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('Rock & Roll')",
+   "got": "rock-roll",
+   "say": "The title Rock & Roll becomes rock-roll, so the ampersand is lost and it is not spelt as 'and'."
+  },
+  {
+   "function": "order_avg",
+   "call": "SELECT order_avg(v) FROM o",
+   "got": 101,
+   "say": "Orders of 100 and 101 rupees plus one order with no value average out to 101 rupees, because the blank order is left out and 100.5 rounds up."
+  },
+  {
+   "function": "order_avg",
+   "call": "SELECT order_avg(v) FROM e",
+   "got": null,
+   "say": "With no orders at all the average order value comes back empty, not zero."
+  },
+  {
+   "function": "order_avg",
+   "call": "SELECT order_avg(v) FROM r",
+   "got": 150,
+   "say": "Orders of 100 and 200 rupees plus one order typed as the word abc average 150 rupees, because the bad entry is silently left out."
+  },
+  {
+   "function": "order_avg",
+   "call": "SELECT order_avg(v) FROM p",
+   "got": -24,
+   "say": "Orders of 0, 0, 5 and a refund of minus 100 average minus 24, because zero-value orders and refunds are counted in the average."
+  },
+  {
+   "function": "order_avg",
+   "call": "SELECT order_avg(v) FROM q",
+   "got": 2,
+   "say": "Orders of 1 and 2 rupees average 2 rupees, because 1.5 rounds up."
+  }
+ ],
+ "shown": [
+  {
+   "function": "check_digit",
+   "call": "SELECT check_digit('629104150021')",
+   "got": 3,
+   "say": "Product code 629104150021 gets a check digit of 3 to append."
+  },
+  {
+   "function": "check_digit",
+   "call": "SELECT check_digit('0012')",
+   "got": 3,
+   "say": "Code 0012 with leading zeros gets a check digit of 3, the same as code 12, so the zeros make no difference."
+  },
+  {
+   "function": "check_digit",
+   "call": "SELECT check_digit('12A4')",
+   "got": null,
+   "say": "A product code with a letter in it, 12A4, gets no check digit instead of an error."
+  },
+  {
+   "function": "check_digit",
+   "call": "SELECT check_digit('')",
+   "got": null,
+   "say": "A blank product code gets no check digit."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(9999,'basic')",
+   "got": 99,
+   "say": "Meera spends 99.99 dollars as a basic member and earns 99 points, because the last 99 cents earn nothing."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(10000,'diamond')",
+   "got": 100,
+   "say": "A customer in a tier the programme does not list, diamond, spends 100 dollars and earns 100 points, the same as a basic member."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(-5000,'gold')",
+   "got": 0,
+   "say": "A gold member's 50-dollar refund earns 0 points, so points already given are not taken back."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(99,'platinum')",
+   "got": 2,
+   "say": "A platinum member spending 0.99 dollars earns 2 points, since the fractions are dropped after the tier multiplier."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(10000,NULL)",
+   "got": null,
+   "say": "A customer with no tier recorded spends 100 dollars and earns no answer at all, rather than basic points."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('4111-1111-1111-1111')",
+   "got": "****-****-****-1111",
+   "say": "A card written with dashes shows as ****-****-****-1111, keeping the dashes and the last four digits."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('123')",
+   "got": "123",
+   "say": "A card number of only 3 digits is shown in full as 123, with nothing hidden."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('abcd')",
+   "got": "abcd",
+   "say": "A card entry that is just letters, abcd, is shown unchanged, with nothing masked."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('')",
+   "got": "",
+   "say": "A blank card number comes back blank."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('  Caf\u00e9 Cr\u00e8me -- 50% Off  ')",
+   "got": "cafe-creme-50-off",
+   "say": "The title ' Caf\u00e9 Cr\u00e8me -- 50% Off ' becomes the web address cafe-creme-50-off, losing the accents and the percent sign."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('\u65e5\u672c\u8a9e Tea')",
+   "got": "tea",
+   "say": "A product titled in Japanese followed by Tea becomes just tea, dropping the Japanese characters."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('Stra\u00dfe \u00df \u00c6 \u00f8')",
+   "got": "stra-e",
+   "say": "The title Stra\u00dfe \u00df \u00c6 \u00f8 becomes stra-e, because the letters \u00df, \u00c6 and \u00f8 are dropped instead of converted."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('!!!')",
+   "got": "",
+   "say": "A title made only of punctuation becomes an empty address."
+  },
+  {
+   "function": "slugify",
+   "call": "SELECT slugify('Rock & Roll')",
+   "got": "rock-roll",
+   "say": "The title Rock & Roll becomes rock-roll, so the ampersand is lost and it is not spelt as 'and'."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2026-11-02','2026-11-06')",
+   "got": 4,
+   "say": "Delivery booked Monday 2 November and due Friday 6 November counts as 4 working days, because the due day itself is not counted."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2026-12-24','2026-12-28')",
+   "got": 2,
+   "say": "An order placed Thursday 24 December and due Monday 28 December counts 2 working days, so Christmas Day on Friday 25 December is treated as a normal working day."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2026-11-09','2026-11-02')",
+   "got": -5,
+   "say": "Dates given backwards, from Monday 9 November to Monday 2 November, come back as minus 5 working days instead of an error."
+  },
+  {
+   "function": "biz_days",
+   "call": "SELECT biz_days('2026-13-45','2026-11-02')",
+   "got": null,
+   "say": "A mistyped start date of month 13, day 45 gives no answer at all, with no warning."
+  },
+  {
+   "function": "discount_price",
+   "call": "SELECT discount_price(995,50)",
+   "got": 498,
+   "say": "A 9.95-dollar item with 50 percent off comes to 498 cents, so the half cent rounds up in the customer's disfavour."
+  },
+  {
+   "function": "discount_price",
+   "call": "SELECT discount_price(1000,150)",
+   "got": 0,
+   "say": "A 10-dollar item with a mistyped 150 percent discount comes out free at 0 cents."
+  },
+  {
+   "function": "discount_price",
+   "call": "SELECT discount_price(1000,-20)",
+   "got": 1000,
+   "say": "A 10-dollar item with a mistyped minus 20 percent discount stays at 1000 cents, so it is not marked up."
+  },
+  {
+   "function": "discount_price",
+   "call": "SELECT discount_price(-1000,10)",
+   "got": -900,
+   "say": "A refund of minus 10 dollars with 10 percent off comes to minus 900 cents, with no check that prices are positive."
+  },
+  {
+   "function": "discount_price",
+   "call": "SELECT discount_price(1000,'abc')",
+   "got": null,
+   "say": "A 10-dollar item with the discount typed as the word abc gives no price at all."
+  },
+  {
+   "function": "format_money",
+   "call": "SELECT format_money(-5,'USD')",
+   "got": "-$0.05",
+   "say": "A 5-cent credit in dollars is shown as -$0.05."
+  },
+  {
+   "function": "format_money",
+   "call": "SELECT format_money(1000,'KWD')",
+   "got": "KWD 10.00",
+   "say": "An invoice of 1000 minor units in Kuwaiti dinars shows as KWD 10.00, with no special symbol or three-decimal handling for that currency."
+  },
+  {
+   "function": "format_money",
+   "call": "SELECT format_money(1234567,'JPY')",
+   "got": "\u00a51,234,567",
+   "say": "An invoice of 1,234,567 in yen is shown as \u00a51,234,567 with no decimals, not divided by 100."
+  },
+  {
+   "function": "format_money",
+   "call": "SELECT format_money(1000,'')",
+   "got": " 10.00",
+   "say": "An invoice with a blank currency shows as ' 10.00', a bare amount with a leading space and no currency."
+  },
+  {
+   "function": "format_money",
+   "call": "SELECT format_money(1050.5,'USD')",
+   "got": "$10.51",
+   "say": "An amount of 1050.5 cents is shown as $10.51, rounding the half cent up."
+  },
+  {
+   "function": "rating_band",
+   "call": "SELECT rating_band(4.49)",
+   "got": "B",
+   "say": "A product averaging 4.49 stars lands in band B, just under the 4.5 needed for an A."
+  },
+  {
+   "function": "rating_band",
+   "call": "SELECT rating_band(7)",
+   "got": "A",
+   "say": "A product with an impossible average of 7 stars still gets band A, with no warning that the score is out of range."
+  },
+  {
+   "function": "rating_band",
+   "call": "SELECT rating_band(-1)",
+   "got": "D",
+   "say": "A product with an impossible average of minus 1 star gets band D."
+  },
+  {
+   "function": "rating_band",
+   "call": "SELECT rating_band('')",
+   "got": null,
+   "say": "A product with a blank average score gets no band, rather than a D."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(500,1)",
+   "got": 400,
+   "say": "A 500-gram parcel to zone 1 costs 400 cents, with no weight surcharge at exactly 500 grams."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(501,1)",
+   "got": 500,
+   "say": "A 501-gram parcel to zone 1 costs 500 cents, so one extra gram adds a full 100-cent step."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(100,0)",
+   "got": null,
+   "say": "A parcel sent to zone 0 gets no price at all, because zones start at 1."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(100,9)",
+   "got": 1600,
+   "say": "A 100-gram parcel to zone 9 costs 1600 cents, and the engine accepts any zone number with no upper limit."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(0,1)",
+   "got": 400,
+   "say": "A parcel weighing 0 grams to zone 1 is still charged the full 400 cents."
+  },
+  {
+   "function": "order_avg",
+   "call": "SELECT order_avg(v) FROM o",
+   "got": 101,
+   "say": "Orders of 100 and 101 rupees plus one order with no value average out to 101 rupees, because the blank order is left out and 100.5 rounds up."
+  },
+  {
+   "function": "order_avg",
+   "call": "SELECT order_avg(v) FROM e",
+   "got": null,
+   "say": "With no orders at all the average order value comes back empty, not zero."
+  },
+  {
+   "function": "order_avg",
+   "call": "SELECT order_avg(v) FROM r",
+   "got": 150,
+   "say": "Orders of 100 and 200 rupees plus one order typed as the word abc average 150 rupees, because the bad entry is silently left out."
+  },
+  {
+   "function": "order_avg",
+   "call": "SELECT order_avg(v) FROM p",
+   "got": -24,
+   "say": "Orders of 0, 0, 5 and a refund of minus 100 average minus 24, because zero-value orders and refunds are counted in the average."
+  },
+  {
+   "function": "order_avg",
+   "call": "SELECT order_avg(v) FROM q",
+   "got": 2,
+   "say": "Orders of 1 and 2 rupees average 2 rupees, because 1.5 rounds up."
+  }
+ ],
+ "fixes": [
+  {
+   "shown": "A product code with a letter in it, 12A4, gets no check digit instead of an error.",
+   "said": "Letters should just be ignored, so 12A4 gets the check digit for 124, which is 3.",
+   "function": "check_digit",
+   "rounds": 1,
+   "now": "The product code 12A4 gets the check digit 3 rather than no check digit or an error, because the letter A is ignored and the check digit is worked out from the digits 124 (4\u00d73 + 2\u00d71 + 1\u00d73 = 17, and 3 brings that up to 20).",
+   "confirmed": true
+  },
+  {
+   "shown": "A blank product code gets no check digit.",
+   "said": "A blank code should get a check digit of 0, not none.",
+   "function": "check_digit",
+   "rounds": 1,
+   "now": "A product code that is blank, meaning empty text with no characters, does get a check digit: there are no digits left to sum, 0 is already a multiple of 10, so the check digit comes to 0 (only a code of spaces would get none).",
+   "confirmed": true
+  },
+  {
+   "shown": "A gold member's 50-dollar refund earns 0 points, so points already given are not taken back.",
+   "said": "A refund should take points back: a gold member's 50-dollar refund should be -100 points, not 0.",
+   "function": "loyalty_points",
+   "rounds": 1,
+   "now": "A gold member's 50-dollar refund (-5000 cents) does not earn 0 points: the software takes back 100 points, the 2 points per dollar that the same purchase would have earned, so the points already given are taken back.",
+   "confirmed": true
+  },
+  {
+   "shown": "A platinum member spending 0.99 dollars earns 2 points, since the fractions are dropped after the tier multiplier.",
+   "said": "Platinum spending 0.99 dollars should earn 0 points, because only whole dollars count before the multiplier.",
+   "function": "loyalty_points",
+   "rounds": 1,
+   "now": "A platinum member spending 0.99 dollars (99 cents) earns no points: the part of a dollar is dropped before the platinum rate of 3 is applied, so 0 whole dollars times 3 comes to 0 points, not 2.",
+   "confirmed": true
+  },
+  {
+   "shown": "A customer with no tier recorded spends 100 dollars and earns no answer at all, rather than basic points.",
+   "said": "A customer with no tier should earn basic points, so 100 points, not no answer.",
+   "function": "loyalty_points",
+   "rounds": 1,
+   "now": "A customer with no tier recorded spends 100 dollars (10000 cents): the software does not return an empty answer, because a missing tier is treated as basic, so the customer earns 100 points.",
+   "confirmed": true
+  },
+  {
+   "shown": "A card written with dashes shows as ****-****-****-1111, keeping the dashes and the last four digits.",
+   "said": "Dashes should be removed, so it shows ************1111 with only the last four digits visible.",
+   "function": "mask_card",
+   "rounds": 1,
+   "now": "A card number written with dashes, such as 4111-1111-1111-1111, does not come out as ****-****-****-1111: the dashes are removed, every digit except the last four is masked, and the shown result is ************1111.",
+   "confirmed": true
+  },
+  {
+   "shown": "A card entry that is just letters, abcd, is shown unchanged, with nothing masked.",
+   "said": "A card entry with only letters should come out empty, not shown as abcd.",
+   "function": "mask_card",
+   "rounds": 1,
+   "now": "The card entry 'abcd', which is only letters, is not shown unchanged: it has no digits and no other characters, so the card masking returns an empty string, and nothing is shown.",
+   "confirmed": true
+  },
+  {
+   "shown": "The title ' Caf\u00e9 Cr\u00e8me -- 50% Off ' becomes the web address cafe-creme-50-off, losing the accents and the percent sign.",
+   "said": "Accents should just be dropped, not turned into plain letters, so it should be caf-crme-50-off.",
+   "function": "slugify",
+   "rounds": 1,
+   "now": "The title ' Caf\u00e9 Cr\u00e8me -- 50% Off ' becomes the web address caf-crme-50-off, not cafe-creme-50-off: the accented letters \u00e9 and \u00e8 are dropped whole rather than turned into plain e, the percent sign and the double dash each collapse into a single dash, and no dash is left at either end.",
+   "confirmed": true
+  },
+  {
+   "shown": "The title Stra\u00dfe \u00df \u00c6 \u00f8 becomes stra-e, because the letters \u00df, \u00c6 and \u00f8 are dropped instead of converted.",
+   "said": "The \u00df is just dropped, with no hyphen, so it should be strae.",
+   "function": "slugify",
+   "rounds": 1,
+   "now": "The title \"Stra\u00dfe \u00df \u00c6 \u00f8\" becomes the slug \"strae\", not \"stra-e\": the letters \u00df, \u00c6 and \u00f8 are dropped completely and leave no dash in their place, and the spaces left at the end are trimmed away.",
+   "confirmed": true
+  },
+  {
+   "shown": "An order placed Thursday 24 December and due Monday 28 December counts 2 working days, so Christmas Day on Friday 25 December is treated as a normal working day.",
+   "said": "Christmas Day isn't a working day, so it should count 1 working day, not 2.",
+   "function": "biz_days",
+   "rounds": 1,
+   "now": "An order placed Thursday 24 December and due Monday 28 December counts only 1 working day, not 2: Thursday 24 December counts, the weekend doesn't, and Friday 25 December is Christmas Day, a weekday that is not a working day, so the count comes to 1.",
+   "confirmed": true
+  },
+  {
+   "shown": "Dates given backwards, from Monday 9 November to Monday 2 November, come back as minus 5 working days instead of an error.",
+   "said": "Backwards dates should give 0 working days, not minus 5.",
+   "function": "biz_days",
+   "rounds": 1,
+   "now": "When the dates are given backwards, from Monday 9 November to Monday 2 November, the working-day count comes back as 0, not minus 5 and not an error, because a start date after the end date always gives 0 working days.",
+   "confirmed": true
+  },
+  {
+   "shown": "A mistyped start date of month 13, day 45 gives no answer at all, with no warning.",
+   "said": "Backwards or invalid dates should give no answer (NULL), so that's right.\n\nActually: \"Yes, that's right\"",
+   "function": "biz_days",
+   "rounds": 1,
+   "now": "When a business-day count is requested with a start date of month 13, day 45 (not a real calendar date), the software cannot read it as a valid year-month-day date, so it returns no answer (NULL) instead of a number of working days, and it raises no error or warning.",
+   "confirmed": true
+  },
+  {
+   "shown": "A 10-dollar item with a mistyped 150 percent discount comes out free at 0 cents.",
+   "said": "A 150 percent discount should be capped at 50 percent, so the 10-dollar item should cost 500 cents, not 0.",
+   "function": "discount_price",
+   "rounds": 1,
+   "now": "A 10-dollar (1000-cent) item is mistyped with a 150 percent discount: because any percentage above 100 is capped at a 50 percent discount, the price comes out at 500 cents, or 5 dollars, not free at 0 cents.",
+   "confirmed": true
+  },
+  {
+   "shown": "A 10-dollar item with a mistyped minus 20 percent discount stays at 1000 cents, so it is not marked up.",
+   "said": "Case 25: a minus 20 percent discount should raise the price, so the 10-dollar item should cost 1200 cents, not 1000.",
+   "function": "discount_price",
+   "rounds": 1,
+   "now": "A 10-dollar item (1000 cents) is given a mistyped discount of minus 20 percent: it is not left at 1000 cents, because the negative percentage is treated as a markup, so the price is raised by 20 percent and comes out at 1200 cents, or 12 dollars.",
+   "confirmed": true
+  },
+  {
+   "shown": "A 5-cent credit in dollars is shown as -$0.05.",
+   "said": "It should show as ($0.05), in parentheses with no minus sign.",
+   "function": "format_money",
+   "rounds": 1,
+   "now": "A 5-cent credit in dollars (an amount of -5 minor units in USD) is not shown as -$0.05: the software divides by 100, wraps the amount in parentheses with no minus sign, and displays it as '($0.05)'.",
+   "confirmed": true
+  },
+  {
+   "shown": "An invoice of 1,234,567 in yen is shown as \u00a51,234,567 with no decimals, not divided by 100.",
+   "said": "Yen should show as JPY 12,345.67: it's just a regular currency, so the code goes first, it's divided by 100, and it has 2 decimals.",
+   "function": "format_money",
+   "rounds": 1,
+   "now": "Following the rules, the 1,234,567 yen invoice is treated like any regular currency, so the amount is divided by 100 and shown with the code JPY, a space and two decimals, which comes to 'JPY 12,345.67', not '\u00a51,234,567'.",
+   "confirmed": true
+  },
+  {
+   "shown": "An amount of 1050.5 cents is shown as $10.51, rounding the half cent up.",
+   "said": "It should round to the even number, so $10.50, not $10.51.",
+   "function": "format_money",
+   "rounds": 1,
+   "now": "An amount of 1050.5 cents in USD is exactly half a cent over 1,050, so it rounds to the nearest even whole cent, 1,050, and is shown as $10.50, not $10.51, because the half cent rounds down.",
+   "confirmed": true
+  },
+  {
+   "shown": "A parcel sent to zone 0 gets no price at all, because zones start at 1.",
+   "said": "A parcel to zone 0 should be priced as zone 4, so it does get a price.",
+   "function": "ship_cost",
+   "rounds": 1,
+   "now": "A parcel sent to zone 0 does get a price, not an empty result: zone 0 is priced as zone 4, so with no weight surcharge a parcel of 500 g or less costs 850 cents (250 plus 150 times 4), and a heavier parcel costs 100 cents more for each started 500 g above the first 500 g.",
+   "confirmed": true
+  },
+  {
+   "shown": "A 100-gram parcel to zone 9 costs 1600 cents, and the engine accepts any zone number with no upper limit.",
+   "said": "Zone 9 should be priced as zone 4, so 850 cents, not 1600.",
+   "function": "ship_cost",
+   "rounds": 1,
+   "now": "A 100 g parcel to zone 9 costs 850 cents, not 1600, because the rules price any zone above 4 as zone 4 (250 + 150\u00d74 = 850) and add no weight surcharge at 100 g, so the shipping charge is 850 cents.",
+   "confirmed": true
+  },
+  {
+   "shown": "A parcel weighing 0 grams to zone 1 is still charged the full 400 cents.",
+   "said": "A 0-gram parcel should cost 0, not 400.",
+   "function": "ship_cost",
+   "rounds": 1,
+   "now": "A parcel weighing 0 grams to zone 1 is not charged the 400 cents: a parcel of exactly 0 g has no base charge and no weight surcharge, so the shipping cost comes to 0 cents.",
+   "confirmed": true
+  },
+  {
+   "shown": "Orders of 0, 0, 5 and a refund of minus 100 average minus 24, because zero-value orders and refunds are counted in the average.",
+   "said": "Zero and refund orders shouldn't count, so there's no average: it should come back empty.",
+   "function": "order_avg",
+   "rounds": 1,
+   "now": "Orders of 0, 0, 5 and a refund of minus 100 do not average minus 24: the zero-value orders and the refund are left out, only the 5 order is valid, and with fewer than 3 valid orders left, the average comes back as NULL (no average).",
+   "confirmed": true
+  },
+  {
+   "shown": "Orders of 1 and 2 rupees average 2 rupees, because 1.5 rounds up.",
+   "said": "With only 2 orders there should be no average. It should come back empty.",
+   "function": "order_avg",
+   "rounds": 1,
+   "now": "Orders of 1 and 2 rupees give no average at all: only 2 valid orders remain, which is fewer than the 3 required, so order_avg returns NULL instead of 2 rupees.",
+   "confirmed": true
+  }
+ ],
+ "list_review": {
+  "replies": 10,
+  "cost": 0.838,
+  "log": [
+   {
+    "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+    "typed": "5, 16, 17, 18, 31, 50, 59, 75"
+   },
+   {
+    "prompt": "  Rule 5: Whenever biz_days is used, it treats every Monday-to-Friday day as a working day and ignores public holidays.\n  What should it be? > ",
+    "typed": "January 1 and December 25 aren't working days when they fall on a weekday. No other holidays."
+   },
+   {
+    "prompt": "  Rule 16: Whenever the discounted price falls exactly halfway between two cents, discount_price rounds it away from zero (half up for positive prices), so 999 at 50% gives 500 and 1 at 50% gives 1.\n  What should it be? > ",
+    "typed": "Round halves up to the next cent, toward positive infinity."
+   },
+   {
+    "prompt": "  Rule 17: Whenever the percentage given to discount_price is below 0, it is treated as 0 and the price is returned unchanged (rounded to a whole cent).\n  What should it be? > ",
+    "typed": "Don't clamp it: a negative percentage should raise the price."
+   },
+   {
+    "prompt": "  Rule 18: Whenever the percentage given to discount_price is above 100, it is treated as 100 and the result is 0.\n  What should it be? > ",
+    "typed": "Cap it at 50 percent, not 100."
+   },
+   {
+    "prompt": "  Rule 31: Whenever format_money is given a negative amount, it puts a minus sign before the currency symbol, such as '-$0.05' or '-$1,234.56'.\n  What should it be? > ",
+    "typed": "Wrap negatives in parentheses with no minus sign, like ($1,234.56). Same for the millions form."
+   },
+   {
+    "prompt": "  Rule 50: Whenever rating_band is given an average score of 4.5 or more, it returns 'A'; from 3 up to but not including 4.5, 'B'; from 2 up to but not including 3, 'C'; and below 2, 'D'.\n  What should it be? > ",
+    "typed": "Above 4.5 is A, above 3.5 up to 4.5 is B, above 2.5 up to 3.5 is C, and anything else is D. A score exactly on 4.5, 3.5 or 2.5 gets the lower band."
+   },
+   {
+    "prompt": "  Rule 59: Whenever the zone given to ship_cost is a whole number of 1 or more, it is accepted with no upper limit (zone 100 costs 15250 for a light parcel), and a whole-number decimal such as 2.0 or text such as '3' or ' 2 ' is accepted too.\n  What should it be? > ",
+    "typed": "Zones above 4 are priced as zone 4, not unlimited. Fractional zones are cut down to a whole number first, and a zone below 1 is also priced as zone 4."
+   },
+   {
+    "prompt": "  Rule 75: Whenever order_avg is used with GROUP BY, it gives one average per group, and a zero value counts as a real order (0 and 0 and 1 average to 0).\n  What should it be? > ",
+    "typed": "Zero or negative values are left out of the average, and fewer than 3 valid values gives NULL."
+   },
+   {
+    "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+    "typed": ""
+   }
+  ],
+  "transcript": "\nWhat the built code does now, as rules (each one is what the product will do. Mark any that is not your policy):\n  1. Whenever biz_days is given two valid dates, it counts the Monday-to-Friday days from the start date up to but not including the end date, so Monday 2 Nov to Monday 9 Nov gives 5.\n  2. Whenever biz_days is given the same start and end date, it returns 0.\n  3. Whenever the biz_days start date is after the end date, it counts the working days between them the same way but returns the count as a negative number.\n  4. Whenever biz_days spans only a Saturday and/or Sunday (for example Saturday to Monday), it returns 0, because weekends are never counted.\n  5. Whenever biz_days is used, it treats every Monday-to-Friday day as a working day and ignores public holidays.\n  6. Whenever a biz_days date has extra text after its first 10 characters (a time such as '2026-11-02 10:00' or even junk such as '2026-11-02xyz'), it uses only the first 10 characters as the date and ignores the rest.\n  7. Whenever a biz_days date has spaces before or after it, the spaces are ignored and the date is used normally.\n  8. Whenever either biz_days date is NULL, empty, shorter than 10 characters, a number, or not an ISO year-month-day date (for example '2026/11/02', '20261102', '2026-1-2' or the impossible '2026-02-30'), biz_days returns NULL.\n  9. Whenever check_digit is given a code made only of digits, it returns the single GS1-style check digit: the digits are weighted 3, 1, 3, 1... starting from the rightmost digit, summed, and the digit that brings the sum up to the next multiple of 10 is returned (0 if already a multiple), so '629104150021' gives 3.\n  10. Whenever check_digit is given a code with leading zeros, they are accepted and do not change the result, so '007' and '7' both give 9; a code of '0' gives 0.\n  11. Whenever check_digit is given a whole number rather than text, it treats it as the same digits as text (629104150021 gives 3), and a decimal number that is a whole value such as 12.0 is treated as 12.\n  12. Whenever check_digit is given a number with a fractional part (such as 12.5) or text with a decimal point (such as '1.5'), it returns NULL.\n  13. Whenever check_digit is given NULL, empty text, a negative number or text starting with '-' or '+', text containing letters, spaces (even leading or trailing) or separators such as dashes, or non-ASCII digits, it returns NULL.\n  14. Whenever check_digit is given a very long digit string, it still uses every digit with no length limit.\n  15. Whenever discount_price is given a price in cents and a percentage off, it returns the price multiplied by (100 minus the percentage) divided by 100, as a whole number of cents, so 1000 at 10% gives 900.\n  16. Whenever the discounted price falls exactly halfway between two cents, discount_price rounds it away from zero (half up for positive prices), so 999 at 50% gives 500 and 1 at 50% gives 1.\n  17. Whenever the percentage given to discount_price is below 0, it is treated as 0 and the price is returned unchanged (rounded to a whole cent).\n  18. Whenever the percentage given to discount_price is above 100, it is treated as 100 and the result is 0.\n  19. Whenever the percentage given to discount_price has decimals (such as 12.5 or 33.33), they are used exactly and the result is rounded to the nearest cent, so 1000 at 12.5% gives 875.\n  20. Whenever the price given to discount_price is negative, the same calculation is applied and a negative result is returned, with halves rounded away from zero (-5 at 50% gives -3); a price of 0 gives 0.\n  21. Whenever the price given to discount_price has a fraction of a cent, the discounted result is rounded to the nearest whole cent, halves going up, so 1000.5 at 0% gives 1001.\n  22. Whenever discount_price is given a price or percentage as numeric text (such as '1000', ' 10 ' or '1e1'), it reads it as a number and calculates normally.\n  23. Whenever the price or the percentage given to discount_price is NULL, empty text, non-numeric text, or 'nan'/'inf', it returns NULL.\n  24. Whenever format_money is given an amount in minor units and a currency of USD, GBP, EUR, INR, CAD, AUD or CNY, it divides by 100 and shows two decimals with comma thousands separators after the symbol: $, \u00a3, \u20ac, \u20b9, CA$, A$ and CN\u00a5 respectively, so 123456789 USD gives '$1,234,567.89'.\n  25. Whenever format_money is given CHF, it shows 'CHF ' with a space and then the amount with two decimals, such as 'CHF 19.99'.\n  26. Whenever format_money is given JPY, it shows the amount as whole yen with no decimals and no division by 100, with thousands separators, such as 1234567 giving '\u00a51,234,567'.\n  27. Whenever format_money is given KRW, VND, CLP or ISK, it shows the amount with no decimals and thousands separators, prefixed by the currency code and a space, such as 'KRW 1,999'.\n  28. Whenever format_money is given any other currency code (such as XYZ or BHD), it shows the code, a space, and the amount with two decimals, such as 'XYZ 19.99'.\n  29. Whenever format_money is given a currency in lower or mixed case or with spaces around it (such as ' usd '), it ignores the case and spaces and treats it as the upper-case code.\n  30. Whenever format_money is given empty or blank currency text, it shows a single space followed by the two-decimal amount, such as ' 19.99'; a currency written as a symbol or word fragment is shown as typed, upper-cased, such as 'US 19.99'.\n  31. Whenever format_money is given a negative amount, it puts a minus sign before the currency symbol, such as '-$0.05' or '-$1,234.56'.\n  32. Whenever format_money is given an amount of less than one unit, it still shows a leading zero and two decimals, so 5 gives '$0.05' and 0 gives '$0.00'.\n  33. Whenever format_money is given an amount with a fraction of a minor unit (such as 1999.5), it first rounds to a whole minor unit with halves away from zero (1999.5 gives '$20.00', -1999.5 gives '-$20.00'); a tiny negative that rounds to zero shows with no minus sign ('$0.00').\n  34. Whenever format_money is given an amount as numeric text (such as '1999'), it treats it as that number.\n  35. Whenever the amount given to format_money is NULL, empty text or non-numeric text, or the currency is NULL, it returns NULL.\n  36. Whenever loyalty_points is given a spend in cents and a tier, it returns whole points earned per dollar spent: basic 1, silver 1.5, gold 2 and platinum 3, so 10000 cents gives 100, 150, 200 and 300 points respectively.\n  37. Whenever loyalty_points calculates a fraction of a point, it rounds down and never up, so 1999 cents at basic gives 19 and 199 cents at silver gives 2, and 99 cents at basic gives 0.\n  38. Whenever the loyalty_points tier is written in any letter case or with spaces around it (such as 'GOLD' or ' Gold '), it is recognised as that tier.\n  39. Whenever the loyalty_points tier is not one of the four known tiers (including empty text or a number), it is treated as basic and earns 1 point per dollar.\n  40. Whenever the spend given to loyalty_points is zero or negative, it returns 0 points.\n  41. Whenever the spend given to loyalty_points is numeric text (such as '10000') it is read as a number, and a spend with a fraction of a cent is used as is before rounding down.\n  42. Whenever the spend or the tier given to loyalty_points is NULL, or the spend is empty or non-numeric text, it returns NULL.\n  43. Whenever mask_card is given a card number, it replaces every digit with an asterisk except the last 4 digits, so '4111111111111111' gives '************1111'.\n  44. Whenever a card number given to mask_card contains spaces, dashes or any other non-digit characters, those characters are kept in place and only digits are masked, so '4111-1111-1111-1111' gives '****-****-****-1111' and '3782 822463 10005' gives '**** ****** *0005'.\n  45. Whenever mask_card counts the last 4 digits, it counts only digits, so letters or separators after them do not count: '4111-1111-1111-111x' gives '****-****-***1-111x'.\n  46. Whenever the card text given to mask_card has 4 or fewer digits (or no digits, such as 'abcd'), nothing is masked and it is returned unchanged.\n  47. Whenever mask_card is given spaces before or after the card number, the spaces are kept as they are.\n  48. Whenever mask_card is given a number instead of text, it treats it as text of its digits; it returns an empty string for empty text and NULL for NULL.\n  49. Whenever mask_card is given non-ASCII digits (such as Arabic-Indic digits), it counts and masks them as digits like any other.\n  50. Whenever rating_band is given an average score of 4.5 or more, it returns 'A'; from 3 up to but not including 4.5, 'B'; from 2 up to but not including 3, 'C'; and below 2, 'D'.\n  51. Whenever rating_band is given a score exactly on a boundary, it falls in the higher band, so 4.5 gives 'A', 3 gives 'B' and 2 gives 'C', while 4.49 gives 'B', 2.99 gives 'C' and 1.99 gives 'D'.\n  52. Whenever rating_band is given a score above 5 (such as 7) it returns 'A', and a score below 0 (such as -1) returns 'D', since out-of-range values are not rejected.\n  53. Whenever rating_band is given a score as numeric text (such as '4.7' or ' 4.7 '), it reads it as a number; the value true counts as 1 and gives 'D'.\n  54. Whenever the score given to rating_band is NULL, empty text, non-numeric text, or 'nan'/'inf', it returns NULL.\n  55. Whenever ship_cost is given a weight in grams and a zone, it returns 250 cents plus 150 cents per zone number as the base charge, so zone 1 costs 400, zone 2 costs 550 and zone 3 costs 700.\n  56. Whenever a parcel given to ship_cost weighs 500 g or less (including 0 g), no weight surcharge is added.\n  57. Whenever a parcel given to ship_cost weighs more than 500 g, 100 cents is added for each started 500 g above the first 500 g, so 501 g and 1000 g cost 100 extra, 1001 g costs 200 extra, and 1500 g costs 200 extra.\n  58. Whenever the weight given to ship_cost has a fraction of a gram above 500 (such as 500.5 or 1000.5), the partial gram starts a new 500 g step, so 500.5 g adds 100 and 1000.5 g adds 200.\n  59. Whenever the zone given to ship_cost is a whole number of 1 or more, it is accepted with no upper limit (zone 100 costs 15250 for a light parcel), and a whole-number decimal such as 2.0 or text such as '3' or ' 2 ' is accepted too.\n  60. Whenever the zone given to ship_cost is 0, negative, a fraction such as 1.5, empty, or non-numeric text such as 'A', ship_cost returns NULL.\n  61. Whenever the weight given to ship_cost is negative, empty or non-numeric text, ship_cost returns NULL; numeric text such as '100' is accepted as a weight.\n  62. Whenever the weight or the zone given to ship_cost is NULL, it returns NULL.\n  63. Whenever slugify is given a title, it turns it into lower case and replaces each run of one or more characters other than the letters a-z and digits 0-9 (spaces, punctuation, underscores, slashes, symbols) with a single dash, so 'Hello, World!' gives 'hello-world'.\n  64. Whenever a title given to slugify starts or ends with spaces, punctuation or dashes, no leading or trailing dash is left in the result.\n  65. Whenever a title given to slugify contains accented letters, the accent is removed and the base letter kept, so 'Caf\u00e9 Cr\u00e8me' gives 'cafe-creme' and '\u00d1and\u00fa' gives 'nandu'.\n  66. Whenever a title given to slugify contains letters that do not break down into a plain letter plus accent (such as \u00df, \u00d8, \u0152 or Japanese characters), those letters are dropped and treated as separators, so 'Stra\u00dfe' gives 'stra-e', '\u0152uvre' gives 'uvre' and '\u00d8' gives an empty slug.\n  67. Whenever a title given to slugify contains compatibility forms such as ligatures, Roman-numeral characters or full-width letters, they are converted to plain letters, so '\ufb01ne' gives 'fine', '\u216b' gives 'xii' and '\uff21\uff22\uff23' gives 'abc'.\n  68. Whenever a title given to slugify contains digits, apostrophes or dots, digits are kept and apostrophes and dots become dashes, so 'v2.0 Release' gives 'v2-0-release' and 'it's' gives 'it-s'.\n  69. Whenever a title given to slugify has no letters or digits at all (empty text, '!!!', or only non-Latin characters), it returns empty text rather than NULL.\n  70. Whenever slugify is given NULL it returns NULL, and when given a number it treats it as text (123 gives '123').\n  71. Whenever order_avg is given a group of order values, it returns their average as a whole number of cents, rounded to the nearest cent with halves rounded away from zero, so 100 and 201 give 151 and -3 and -4 give -4.\n  72. Whenever some order values given to order_avg are NULL, they are left out of both the total and the count, so 10, NULL and 20 average to 15.\n  73. Whenever order_avg is given values that are empty text, non-numeric text or 'nan', those orders are ignored like NULLs, while numeric text such as '150' or ' 100 ' counts as that number.\n  74. Whenever order_avg has no usable values (no orders, all NULL, or all non-numeric), it returns NULL rather than 0.\n  75. Whenever order_avg is used with GROUP BY, it gives one average per group, and a zero value counts as a real order (0 and 0 and 1 average to 0).\n  Numbers of any that are wrong (Enter = all correct) > 5, 16, 17, 18, 31, 50, 59, 75\n  Rule 5: Whenever biz_days is used, it treats every Monday-to-Friday day as a working day and ignores public holidays.\n  What should it be? > January 1 and December 25 aren't working days when they fall on a weekday. No other holidays.\n  Rule 16: Whenever the discounted price falls exactly halfway between two cents, discount_price rounds it away from zero (half up for positive prices), so 999 at 50% gives 500 and 1 at 50% gives 1.\n  What should it be? > Round halves up to the next cent, toward positive infinity.\n  Rule 17: Whenever the percentage given to discount_price is below 0, it is treated as 0 and the price is returned unchanged (rounded to a whole cent).\n  What should it be? > Don't clamp it: a negative percentage should raise the price.\n  Rule 18: Whenever the percentage given to discount_price is above 100, it is treated as 100 and the result is 0.\n  What should it be? > Cap it at 50 percent, not 100.\n  Rule 31: Whenever format_money is given a negative amount, it puts a minus sign before the currency symbol, such as '-$0.05' or '-$1,234.56'.\n  What should it be? > Wrap negatives in parentheses with no minus sign, like ($1,234.56). Same for the millions form.\n  Rule 50: Whenever rating_band is given an average score of 4.5 or more, it returns 'A'; from 3 up to but not including 4.5, 'B'; from 2 up to but not including 3, 'C'; and below 2, 'D'.\n  What should it be? > Above 4.5 is A, above 3.5 up to 4.5 is B, above 2.5 up to 3.5 is C, and anything else is D. A score exactly on 4.5, 3.5 or 2.5 gets the lower band.\n  Rule 59: Whenever the zone given to ship_cost is a whole number of 1 or more, it is accepted with no upper limit (zone 100 costs 15250 for a light parcel), and a whole-number decimal such as 2.0 or text such as '3' or ' 2 ' is accepted too.\n  What should it be? > Zones above 4 are priced as zone 4, not unlimited. Fractional zones are cut down to a whole number first, and a zone below 1 is also priced as zone 4.\n  Rule 75: Whenever order_avg is used with GROUP BY, it gives one average per group, and a zero value counts as a real order (0 and 0 and 1 average to 0).\n  What should it be? > Zero or negative values are left out of the average, and fewer than 3 valid values gives NULL.\n  Anything the builders should know that is not on this list? (Enter = nothing) > \n",
+  "minutes": 1.2
+ },
+ "spot_review": {
+  "replies": 68,
+  "cost": 5.055,
+  "log": [
+   {
+    "prompt": "\nCase 1 of 46. Product code 629104150021 gets a check digit of 3 to append.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 2 of 46. Code 0012 with leading zeros gets a check digit of 3, the same as code 12, so the zeros make no difference.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 3 of 46. A product code with a letter in it, 12A4, gets no check digit instead of an error.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Letters should just be ignored, so 12A4 gets the check digit for 124, which is 3."
+   },
+   {
+    "prompt": "\n  With your correction: The product code 12A4 gets the check digit 3 rather than no check digit or an error, because the letter A is ignored and the check digit is worked out from the digits 124 (4\u00d73 + 2\u00d71 + 1\u00d73 = 17, and 3 brings that up to 20).\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 4 of 46. A blank product code gets no check digit.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "A blank code should get a check digit of 0, not none."
+   },
+   {
+    "prompt": "\n  With your correction: A product code that is blank, meaning empty text with no characters, does get a check digit: there are no digits left to sum, 0 is already a multiple of 10, so the check digit comes to 0 (only a code of spaces would get none).\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 5 of 46. Meera spends 99.99 dollars as a basic member and earns 99 points, because the last 99 cents earn nothing.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 6 of 46. A customer in a tier the programme does not list, diamond, spends 100 dollars and earns 100 points, the same as a basic member.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 7 of 46. A gold member's 50-dollar refund earns 0 points, so points already given are not taken back.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "A refund should take points back: a gold member's 50-dollar refund should be -100 points, not 0."
+   },
+   {
+    "prompt": "\n  With your correction: A gold member's 50-dollar refund (-5000 cents) does not earn 0 points: the software takes back 100 points, the 2 points per dollar that the same purchase would have earned, so the points already given are taken back.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 8 of 46. A platinum member spending 0.99 dollars earns 2 points, since the fractions are dropped after the tier multiplier.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Platinum spending 0.99 dollars should earn 0 points, because only whole dollars count before the multiplier."
+   },
+   {
+    "prompt": "\n  With your correction: A platinum member spending 0.99 dollars (99 cents) earns no points: the part of a dollar is dropped before the platinum rate of 3 is applied, so 0 whole dollars times 3 comes to 0 points, not 2.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 9 of 46. A customer with no tier recorded spends 100 dollars and earns no answer at all, rather than basic points.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "A customer with no tier should earn basic points, so 100 points, not no answer."
+   },
+   {
+    "prompt": "\n  With your correction: A customer with no tier recorded spends 100 dollars (10000 cents): the software does not return an empty answer, because a missing tier is treated as basic, so the customer earns 100 points.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 10 of 46. A card written with dashes shows as ****-****-****-1111, keeping the dashes and the last four digits.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Dashes should be removed, so it shows ************1111 with only the last four digits visible."
+   },
+   {
+    "prompt": "\n  With your correction: A card number written with dashes, such as 4111-1111-1111-1111, does not come out as ****-****-****-1111: the dashes are removed, every digit except the last four is masked, and the shown result is ************1111.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 11 of 46. A card number of only 3 digits is shown in full as 123, with nothing hidden.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 12 of 46. A card entry that is just letters, abcd, is shown unchanged, with nothing masked.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "A card entry with only letters should come out empty, not shown as abcd."
+   },
+   {
+    "prompt": "\n  With your correction: The card entry 'abcd', which is only letters, is not shown unchanged: it has no digits and no other characters, so the card masking returns an empty string, and nothing is shown.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 13 of 46. A blank card number comes back blank.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 14 of 46. The title ' Caf\u00e9 Cr\u00e8me -- 50% Off ' becomes the web address cafe-creme-50-off, losing the accents and the percent sign.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Accents should just be dropped, not turned into plain letters, so it should be caf-crme-50-off."
+   },
+   {
+    "prompt": "\n  With your correction: The title ' Caf\u00e9 Cr\u00e8me -- 50% Off ' becomes the web address caf-crme-50-off, not cafe-creme-50-off: the accented letters \u00e9 and \u00e8 are dropped whole rather than turned into plain e, the percent sign and the double dash each collapse into a single dash, and no dash is left at either end.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 15 of 46. A product titled in Japanese followed by Tea becomes just tea, dropping the Japanese characters.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 16 of 46. The title Stra\u00dfe \u00df \u00c6 \u00f8 becomes stra-e, because the letters \u00df, \u00c6 and \u00f8 are dropped instead of converted.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "The \u00df is just dropped, with no hyphen, so it should be strae."
+   },
+   {
+    "prompt": "\n  With your correction: The title \"Stra\u00dfe \u00df \u00c6 \u00f8\" becomes the slug \"strae\", not \"stra-e\": the letters \u00df, \u00c6 and \u00f8 are dropped completely and leave no dash in their place, and the spaces left at the end are trimmed away.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 17 of 46. A title made only of punctuation becomes an empty address.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 18 of 46. The title Rock & Roll becomes rock-roll, so the ampersand is lost and it is not spelt as 'and'.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 19 of 46. Delivery booked Monday 2 November and due Friday 6 November counts as 4 working days, because the due day itself is not counted.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 20 of 46. An order placed Thursday 24 December and due Monday 28 December counts 2 working days, so Christmas Day on Friday 25 December is treated as a normal working day.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Christmas Day isn't a working day, so it should count 1 working day, not 2."
+   },
+   {
+    "prompt": "\n  With your correction: An order placed Thursday 24 December and due Monday 28 December counts only 1 working day, not 2: Thursday 24 December counts, the weekend doesn't, and Friday 25 December is Christmas Day, a weekday that is not a working day, so the count comes to 1.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 21 of 46. Dates given backwards, from Monday 9 November to Monday 2 November, come back as minus 5 working days instead of an error.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Backwards dates should give 0 working days, not minus 5."
+   },
+   {
+    "prompt": "\n  With your correction: When the dates are given backwards, from Monday 9 November to Monday 2 November, the working-day count comes back as 0, not minus 5 and not an error, because a start date after the end date always gives 0 working days.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 22 of 46. A mistyped start date of month 13, day 45 gives no answer at all, with no warning.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Backwards or invalid dates should give no answer (NULL), so that's right.\n\nActually: \"Yes, that's right\""
+   },
+   {
+    "prompt": "\n  With your correction: When a business-day count is requested with a start date of month 13, day 45 (not a real calendar date), the software cannot read it as a valid year-month-day date, so it returns no answer (NULL) instead of a number of working days, and it raises no error or warning.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 23 of 46. A 9.95-dollar item with 50 percent off comes to 498 cents, so the half cent rounds up in the customer's disfavour.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 24 of 46. A 10-dollar item with a mistyped 150 percent discount comes out free at 0 cents.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "A 150 percent discount should be capped at 50 percent, so the 10-dollar item should cost 500 cents, not 0."
+   },
+   {
+    "prompt": "\n  With your correction: A 10-dollar (1000-cent) item is mistyped with a 150 percent discount: because any percentage above 100 is capped at a 50 percent discount, the price comes out at 500 cents, or 5 dollars, not free at 0 cents.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 25 of 46. A 10-dollar item with a mistyped minus 20 percent discount stays at 1000 cents, so it is not marked up.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Case 25: a minus 20 percent discount should raise the price, so the 10-dollar item should cost 1200 cents, not 1000."
+   },
+   {
+    "prompt": "\n  With your correction: A 10-dollar item (1000 cents) is given a mistyped discount of minus 20 percent: it is not left at 1000 cents, because the negative percentage is treated as a markup, so the price is raised by 20 percent and comes out at 1200 cents, or 12 dollars.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 26 of 46. A refund of minus 10 dollars with 10 percent off comes to minus 900 cents, with no check that prices are positive.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 27 of 46. A 10-dollar item with the discount typed as the word abc gives no price at all.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 28 of 46. A 5-cent credit in dollars is shown as -$0.05.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should show as ($0.05), in parentheses with no minus sign."
+   },
+   {
+    "prompt": "\n  With your correction: A 5-cent credit in dollars (an amount of -5 minor units in USD) is not shown as -$0.05: the software divides by 100, wraps the amount in parentheses with no minus sign, and displays it as '($0.05)'.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 29 of 46. An invoice of 1000 minor units in Kuwaiti dinars shows as KWD 10.00, with no special symbol or three-decimal handling for that currency.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 30 of 46. An invoice of 1,234,567 in yen is shown as \u00a51,234,567 with no decimals, not divided by 100.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Yen should show as JPY 12,345.67: it's just a regular currency, so the code goes first, it's divided by 100, and it has 2 decimals."
+   },
+   {
+    "prompt": "\n  With your correction: Following the rules, the 1,234,567 yen invoice is treated like any regular currency, so the amount is divided by 100 and shown with the code JPY, a space and two decimals, which comes to 'JPY 12,345.67', not '\u00a51,234,567'.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 31 of 46. An invoice with a blank currency shows as ' 10.00', a bare amount with a leading space and no currency.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 32 of 46. An amount of 1050.5 cents is shown as $10.51, rounding the half cent up.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should round to the even number, so $10.50, not $10.51."
+   },
+   {
+    "prompt": "\n  With your correction: An amount of 1050.5 cents in USD is exactly half a cent over 1,050, so it rounds to the nearest even whole cent, 1,050, and is shown as $10.50, not $10.51, because the half cent rounds down.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 33 of 46. A product averaging 4.49 stars lands in band B, just under the 4.5 needed for an A.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 34 of 46. A product with an impossible average of 7 stars still gets band A, with no warning that the score is out of range.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 35 of 46. A product with an impossible average of minus 1 star gets band D.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 36 of 46. A product with a blank average score gets no band, rather than a D.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 37 of 46. A 500-gram parcel to zone 1 costs 400 cents, with no weight surcharge at exactly 500 grams.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 38 of 46. A 501-gram parcel to zone 1 costs 500 cents, so one extra gram adds a full 100-cent step.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 39 of 46. A parcel sent to zone 0 gets no price at all, because zones start at 1.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "A parcel to zone 0 should be priced as zone 4, so it does get a price."
+   },
+   {
+    "prompt": "\n  With your correction: A parcel sent to zone 0 does get a price, not an empty result: zone 0 is priced as zone 4, so with no weight surcharge a parcel of 500 g or less costs 850 cents (250 plus 150 times 4), and a heavier parcel costs 100 cents more for each started 500 g above the first 500 g.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 40 of 46. A 100-gram parcel to zone 9 costs 1600 cents, and the engine accepts any zone number with no upper limit.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Zone 9 should be priced as zone 4, so 850 cents, not 1600."
+   },
+   {
+    "prompt": "\n  With your correction: A 100 g parcel to zone 9 costs 850 cents, not 1600, because the rules price any zone above 4 as zone 4 (250 + 150\u00d74 = 850) and add no weight surcharge at 100 g, so the shipping charge is 850 cents.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 41 of 46. A parcel weighing 0 grams to zone 1 is still charged the full 400 cents.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "A 0-gram parcel should cost 0, not 400."
+   },
+   {
+    "prompt": "\n  With your correction: A parcel weighing 0 grams to zone 1 is not charged the 400 cents: a parcel of exactly 0 g has no base charge and no weight surcharge, so the shipping cost comes to 0 cents.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 42 of 46. Orders of 100 and 101 rupees plus one order with no value average out to 101 rupees, because the blank order is left out and 100.5 rounds up.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 43 of 46. With no orders at all the average order value comes back empty, not zero.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 44 of 46. Orders of 100 and 200 rupees plus one order typed as the word abc average 150 rupees, because the bad entry is silently left out.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 45 of 46. Orders of 0, 0, 5 and a refund of minus 100 average minus 24, because zero-value orders and refunds are counted in the average.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Zero and refund orders shouldn't count, so there's no average: it should come back empty."
+   },
+   {
+    "prompt": "\n  With your correction: Orders of 0, 0, 5 and a refund of minus 100 do not average minus 24: the zero-value orders and the refund are left out, only the 5 order is valid, and with fewer than 3 valid orders left, the average comes back as NULL (no average).\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 46 of 46. Orders of 1 and 2 rupees average 2 rupees, because 1.5 rounds up.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "With only 2 orders there should be no average. It should come back empty."
+   },
+   {
+    "prompt": "\n  With your correction: Orders of 1 and 2 rupees give no average at all: only 2 valid orders remain, which is fewer than the 3 required, so order_avg returns NULL instead of 2 rupees.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   }
+  ],
+  "transcript": "Hive: Now 46 quick checks on what the build does in real cases. Press Enter if a result is right, or say what should happen instead.\n\nCase 1 of 46. Product code 629104150021 gets a check digit of 3 to append.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 2 of 46. Code 0012 with leading zeros gets a check digit of 3, the same as code 12, so the zeros make no difference.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 3 of 46. A product code with a letter in it, 12A4, gets no check digit instead of an error.\n  Right? (Enter = yes, or say what should happen) > Letters should just be ignored, so 12A4 gets the check digit for 124, which is 3.\n\n  With your correction: The product code 12A4 gets the check digit 3 rather than no check digit or an error, because the letter A is ignored and the check digit is worked out from the digits 124 (4\u00d73 + 2\u00d71 + 1\u00d73 = 17, and 3 brings that up to 20).\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 4 of 46. A blank product code gets no check digit.\n  Right? (Enter = yes, or say what should happen) > A blank code should get a check digit of 0, not none.\n\n  With your correction: A product code that is blank, meaning empty text with no characters, does get a check digit: there are no digits left to sum, 0 is already a multiple of 10, so the check digit comes to 0 (only a code of spaces would get none).\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 5 of 46. Meera spends 99.99 dollars as a basic member and earns 99 points, because the last 99 cents earn nothing.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 6 of 46. A customer in a tier the programme does not list, diamond, spends 100 dollars and earns 100 points, the same as a basic member.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 7 of 46. A gold member's 50-dollar refund earns 0 points, so points already given are not taken back.\n  Right? (Enter = yes, or say what should happen) > A refund should take points back: a gold member's 50-dollar refund should be -100 points, not 0.\n\n  With your correction: A gold member's 50-dollar refund (-5000 cents) does not earn 0 points: the software takes back 100 points, the 2 points per dollar that the same purchase would have earned, so the points already given are taken back.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 8 of 46. A platinum member spending 0.99 dollars earns 2 points, since the fractions are dropped after the tier multiplier.\n  Right? (Enter = yes, or say what should happen) > Platinum spending 0.99 dollars should earn 0 points, because only whole dollars count before the multiplier.\n\n  With your correction: A platinum member spending 0.99 dollars (99 cents) earns no points: the part of a dollar is dropped before the platinum rate of 3 is applied, so 0 whole dollars times 3 comes to 0 points, not 2.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 9 of 46. A customer with no tier recorded spends 100 dollars and earns no answer at all, rather than basic points.\n  Right? (Enter = yes, or say what should happen) > A customer with no tier should earn basic points, so 100 points, not no answer.\n\n  With your correction: A customer with no tier recorded spends 100 dollars (10000 cents): the software does not return an empty answer, because a missing tier is treated as basic, so the customer earns 100 points.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 10 of 46. A card written with dashes shows as ****-****-****-1111, keeping the dashes and the last four digits.\n  Right? (Enter = yes, or say what should happen) > Dashes should be removed, so it shows ************1111 with only the last four digits visible.\n\n  With your correction: A card number written with dashes, such as 4111-1111-1111-1111, does not come out as ****-****-****-1111: the dashes are removed, every digit except the last four is masked, and the shown result is ************1111.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 11 of 46. A card number of only 3 digits is shown in full as 123, with nothing hidden.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 12 of 46. A card entry that is just letters, abcd, is shown unchanged, with nothing masked.\n  Right? (Enter = yes, or say what should happen) > A card entry with only letters should come out empty, not shown as abcd.\n\n  With your correction: The card entry 'abcd', which is only letters, is not shown unchanged: it has no digits and no other characters, so the card masking returns an empty string, and nothing is shown.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 13 of 46. A blank card number comes back blank.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 14 of 46. The title ' Caf\u00e9 Cr\u00e8me -- 50% Off ' becomes the web address cafe-creme-50-off, losing the accents and the percent sign.\n  Right? (Enter = yes, or say what should happen) > Accents should just be dropped, not turned into plain letters, so it should be caf-crme-50-off.\n\n  With your correction: The title ' Caf\u00e9 Cr\u00e8me -- 50% Off ' becomes the web address caf-crme-50-off, not cafe-creme-50-off: the accented letters \u00e9 and \u00e8 are dropped whole rather than turned into plain e, the percent sign and the double dash each collapse into a single dash, and no dash is left at either end.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 15 of 46. A product titled in Japanese followed by Tea becomes just tea, dropping the Japanese characters.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 16 of 46. The title Stra\u00dfe \u00df \u00c6 \u00f8 becomes stra-e, because the letters \u00df, \u00c6 and \u00f8 are dropped instead of converted.\n  Right? (Enter = yes, or say what should happen) > The \u00df is just dropped, with no hyphen, so it should be strae.\n\n  With your correction: The title \"Stra\u00dfe \u00df \u00c6 \u00f8\" becomes the slug \"strae\", not \"stra-e\": the letters \u00df, \u00c6 and \u00f8 are dropped completely and leave no dash in their place, and the spaces left at the end are trimmed away.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 17 of 46. A title made only of punctuation becomes an empty address.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 18 of 46. The title Rock & Roll becomes rock-roll, so the ampersand is lost and it is not spelt as 'and'.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 19 of 46. Delivery booked Monday 2 November and due Friday 6 November counts as 4 working days, because the due day itself is not counted.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 20 of 46. An order placed Thursday 24 December and due Monday 28 December counts 2 working days, so Christmas Day on Friday 25 December is treated as a normal working day.\n  Right? (Enter = yes, or say what should happen) > Christmas Day isn't a working day, so it should count 1 working day, not 2.\n\n  With your correction: An order placed Thursday 24 December and due Monday 28 December counts only 1 working day, not 2: Thursday 24 December counts, the weekend doesn't, and Friday 25 December is Christmas Day, a weekday that is not a working day, so the count comes to 1.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 21 of 46. Dates given backwards, from Monday 9 November to Monday 2 November, come back as minus 5 working days instead of an error.\n  Right? (Enter = yes, or say what should happen) > Backwards dates should give 0 working days, not minus 5.\n\n  With your correction: When the dates are given backwards, from Monday 9 November to Monday 2 November, the working-day count comes back as 0, not minus 5 and not an error, because a start date after the end date always gives 0 working days.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 22 of 46. A mistyped start date of month 13, day 45 gives no answer at all, with no warning.\n  Right? (Enter = yes, or say what should happen) > Backwards or invalid dates should give no answer (NULL), so that's right.\n\nActually: \"Yes, that's right\"\n\n  With your correction: When a business-day count is requested with a start date of month 13, day 45 (not a real calendar date), the software cannot read it as a valid year-month-day date, so it returns no answer (NULL) instead of a number of working days, and it raises no error or warning.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 23 of 46. A 9.95-dollar item with 50 percent off comes to 498 cents, so the half cent rounds up in the customer's disfavour.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 24 of 46. A 10-dollar item with a mistyped 150 percent discount comes out free at 0 cents.\n  Right? (Enter = yes, or say what should happen) > A 150 percent discount should be capped at 50 percent, so the 10-dollar item should cost 500 cents, not 0.\n\n  With your correction: A 10-dollar (1000-cent) item is mistyped with a 150 percent discount: because any percentage above 100 is capped at a 50 percent discount, the price comes out at 500 cents, or 5 dollars, not free at 0 cents.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 25 of 46. A 10-dollar item with a mistyped minus 20 percent discount stays at 1000 cents, so it is not marked up.\n  Right? (Enter = yes, or say what should happen) > Case 25: a minus 20 percent discount should raise the price, so the 10-dollar item should cost 1200 cents, not 1000.\n\n  With your correction: A 10-dollar item (1000 cents) is given a mistyped discount of minus 20 percent: it is not left at 1000 cents, because the negative percentage is treated as a markup, so the price is raised by 20 percent and comes out at 1200 cents, or 12 dollars.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 26 of 46. A refund of minus 10 dollars with 10 percent off comes to minus 900 cents, with no check that prices are positive.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 27 of 46. A 10-dollar item with the discount typed as the word abc gives no price at all.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 28 of 46. A 5-cent credit in dollars is shown as -$0.05.\n  Right? (Enter = yes, or say what should happen) > It should show as ($0.05), in parentheses with no minus sign.\n\n  With your correction: A 5-cent credit in dollars (an amount of -5 minor units in USD) is not shown as -$0.05: the software divides by 100, wraps the amount in parentheses with no minus sign, and displays it as '($0.05)'.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 29 of 46. An invoice of 1000 minor units in Kuwaiti dinars shows as KWD 10.00, with no special symbol or three-decimal handling for that currency.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 30 of 46. An invoice of 1,234,567 in yen is shown as \u00a51,234,567 with no decimals, not divided by 100.\n  Right? (Enter = yes, or say what should happen) > Yen should show as JPY 12,345.67: it's just a regular currency, so the code goes first, it's divided by 100, and it has 2 decimals.\n\n  With your correction: Following the rules, the 1,234,567 yen invoice is treated like any regular currency, so the amount is divided by 100 and shown with the code JPY, a space and two decimals, which comes to 'JPY 12,345.67', not '\u00a51,234,567'.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 31 of 46. An invoice with a blank currency shows as ' 10.00', a bare amount with a leading space and no currency.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 32 of 46. An amount of 1050.5 cents is shown as $10.51, rounding the half cent up.\n  Right? (Enter = yes, or say what should happen) > It should round to the even number, so $10.50, not $10.51.\n\n  With your correction: An amount of 1050.5 cents in USD is exactly half a cent over 1,050, so it rounds to the nearest even whole cent, 1,050, and is shown as $10.50, not $10.51, because the half cent rounds down.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 33 of 46. A product averaging 4.49 stars lands in band B, just under the 4.5 needed for an A.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 34 of 46. A product with an impossible average of 7 stars still gets band A, with no warning that the score is out of range.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 35 of 46. A product with an impossible average of minus 1 star gets band D.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 36 of 46. A product with a blank average score gets no band, rather than a D.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 37 of 46. A 500-gram parcel to zone 1 costs 400 cents, with no weight surcharge at exactly 500 grams.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 38 of 46. A 501-gram parcel to zone 1 costs 500 cents, so one extra gram adds a full 100-cent step.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 39 of 46. A parcel sent to zone 0 gets no price at all, because zones start at 1.\n  Right? (Enter = yes, or say what should happen) > A parcel to zone 0 should be priced as zone 4, so it does get a price.\n\n  With your correction: A parcel sent to zone 0 does get a price, not an empty result: zone 0 is priced as zone 4, so with no weight surcharge a parcel of 500 g or less costs 850 cents (250 plus 150 times 4), and a heavier parcel costs 100 cents more for each started 500 g above the first 500 g.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 40 of 46. A 100-gram parcel to zone 9 costs 1600 cents, and the engine accepts any zone number with no upper limit.\n  Right? (Enter = yes, or say what should happen) > Zone 9 should be priced as zone 4, so 850 cents, not 1600.\n\n  With your correction: A 100 g parcel to zone 9 costs 850 cents, not 1600, because the rules price any zone above 4 as zone 4 (250 + 150\u00d74 = 850) and add no weight surcharge at 100 g, so the shipping charge is 850 cents.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 41 of 46. A parcel weighing 0 grams to zone 1 is still charged the full 400 cents.\n  Right? (Enter = yes, or say what should happen) > A 0-gram parcel should cost 0, not 400.\n\n  With your correction: A parcel weighing 0 grams to zone 1 is not charged the 400 cents: a parcel of exactly 0 g has no base charge and no weight surcharge, so the shipping cost comes to 0 cents.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 42 of 46. Orders of 100 and 101 rupees plus one order with no value average out to 101 rupees, because the blank order is left out and 100.5 rounds up.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 43 of 46. With no orders at all the average order value comes back empty, not zero.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 44 of 46. Orders of 100 and 200 rupees plus one order typed as the word abc average 150 rupees, because the bad entry is silently left out.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 45 of 46. Orders of 0, 0, 5 and a refund of minus 100 average minus 24, because zero-value orders and refunds are counted in the average.\n  Right? (Enter = yes, or say what should happen) > Zero and refund orders shouldn't count, so there's no average: it should come back empty.\n\n  With your correction: Orders of 0, 0, 5 and a refund of minus 100 do not average minus 24: the zero-value orders and the refund are left out, only the 5 order is valid, and with fewer than 3 valid orders left, the average comes back as NULL (no average).\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 46 of 46. Orders of 1 and 2 rupees average 2 rupees, because 1.5 rounds up.\n  Right? (Enter = yes, or say what should happen) > With only 2 orders there should be no average. It should come back empty.\n\n  With your correction: Orders of 1 and 2 rupees give no average at all: only 2 valid orders remain, which is fewer than the 3 required, so order_avg returns NULL instead of 2 rupees.\n  Right now? (Enter = yes, or say what should happen) > \n"
+ },
+ "minutes": {
+  "list": 1.2,
+  "spots": 9.7
+ },
+ "cost_usd": {
+  "documenter": 0.1394097,
+  "describer": 0.2836358,
+  "spotter": 0.2085472,
+  "judge": 0.3352199,
+  "owner_SL": 0.838,
+  "owner_HV_spots": 5.055
+ },
+ "labels": [
+  {
+   "function": "mask_card",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "partial",
+   "R": "right",
+   "note": "Oracle strips all non-digits. D/SL keep separators in place (wrong). HV removes spaces/dashes but keeps letters and edge spaces and says abcd gives empty (partial). R 1 right."
+  },
+  {
+   "function": "rating_band",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "wrong",
+   "R": "right",
+   "note": "Oracle: strict thresholds 4.5/3.5/2.5, boundary lower. D uses 4.5/3/2 higher band. SL/HV rule 49 correct but rule 50 says boundary goes to higher band: conflict."
+  },
+  {
+   "function": "discount_price",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "partial",
+   "HV": "partial",
+   "R": "right",
+   "note": "Cap at 50. D caps at 100. SL/HV apply the 50 cap only for pct above 100; 50<pct<=100 uses the plain formula. R 10 right."
+  },
+  {
+   "function": "discount_price",
+   "decision": 1,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "wrong",
+   "R": "right",
+   "note": "Oracle rounds up (ceil). D/SL/HV say nearest, halves up/away; SL/HV rule 15 half-up conflicts with 18/20. R 13 right."
+  },
+  {
+   "function": "biz_days",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "wrong",
+   "R": "right",
+   "note": "Reversed range returns 0. D/SL say negative, HV says NULL. R 17 right."
+  },
+  {
+   "function": "biz_days",
+   "decision": 1,
+   "D": "wrong",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "D ignores holidays. SL/HV rule 4 states Jan 1 and Dec 25 weekdays excluded; HV 75 correction agrees. R 20/21 right."
+  },
+  {
+   "function": "slugify",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "wrong",
+   "R": "right",
+   "note": "Oracle drops non-ASCII. D/SL transliterate (NFKD) and give stra-e. HV 64/65 drop correctly but HV 66 still converts compatibility forms (fine, XII, full-width): conflict. R 25 right."
+  },
+  {
+   "function": "slugify",
+   "decision": 1,
+   "D": "absent",
+   "SL": "absent",
+   "HV": "absent",
+   "R": "right",
+   "note": "Truncation to 40 chars never mentioned except in R 28."
+  },
+  {
+   "function": "ship_cost",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "partial",
+   "R": "right",
+   "note": "Zone outside 1-4 priced as 4. D: no upper limit, zone 0 NULL. SL: rule 58 right but 59 still NULLs 0/negative. HV: 0 and >4 right, negative zone NULL and fractional zone NULL wrong (partial). R 34 right."
+  },
+  {
+   "function": "ship_cost",
+   "decision": 1,
+   "D": "absent",
+   "SL": "absent",
+   "HV": "absent",
+   "R": "right",
+   "note": "Weight over 30000 g returning NULL is not stated in D/SL/HV. R 31 right."
+  },
+  {
+   "function": "ship_cost",
+   "decision": 2,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "partial",
+   "R": "right",
+   "note": "D/SL: 0 g pays base charge, negative weight NULL. HV: 0 g costs 0 (right) but negative weight NULL (wrong). R 32 right."
+  },
+  {
+   "function": "check_digit",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "partial",
+   "R": "right",
+   "note": "Oracle ignores all non-digits. D/SL return NULL for letters/separators. HV ignores letters but still NULLs spaces, dashes, signs and non-ASCII digits. R 38 right."
+  },
+  {
+   "function": "check_digit",
+   "decision": 1,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "wrong",
+   "R": "right",
+   "note": "Last 12 digits only. D/SL/HV rule 13 says every digit, no limit. R 39 right."
+  },
+  {
+   "function": "check_digit",
+   "decision": 2,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "partial",
+   "R": "right",
+   "note": "No digits returns 0. D/SL: empty NULL. HV: empty gives 0 but letters-only (ABC) NULL. R 40 right."
+  },
+  {
+   "function": "loyalty_points",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "partial",
+   "R": "right",
+   "note": "Cents dropped. D/SL multiply the fractional dollars (199c gold gives 3). HV right for positive spend, but refunds drop cents toward zero (-99 gives 0) where the oracle floors (-1). R 43/44 right."
+  },
+  {
+   "function": "loyalty_points",
+   "decision": 1,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "wrong",
+   "R": "right",
+   "note": "Oracle: only exact lowercase basic/gold/platinum; others basic. D/SL/HV recognise case-insensitively and add silver 1.5; D/SL make NULL tier NULL (HV fixes only that). R 45/46 right."
+  },
+  {
+   "function": "loyalty_points",
+   "decision": 2,
+   "D": "absent",
+   "SL": "absent",
+   "HV": "absent",
+   "R": "right",
+   "note": "5000 cap never stated in D/SL/HV. R 47 right."
+  },
+  {
+   "function": "format_money",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "right",
+   "R": "right",
+   "note": "Parentheses for negatives. D uses minus sign. SL rule 30 right but rule 32 example -$20.00 conflicts. HV fixes 32 to ($20.00). R 56 right."
+  },
+  {
+   "function": "format_money",
+   "decision": 1,
+   "D": "partial",
+   "SL": "partial",
+   "HV": "partial",
+   "R": "right",
+   "note": "Oracle: only USD/EUR/GBP have symbols, everything else gets CODE plus space. Sheets get XYZ/BHD/CHF right but give INR/CAD/AUD/CNY symbols and JPY/KRW no-decimals (HV fixes JPY only). R 53 right."
+  },
+  {
+   "function": "format_money",
+   "decision": 2,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "wrong",
+   "R": "right",
+   "note": "Zero shows a dash. D/SL/HV rule 31 says 0 gives $0.00. R 50 right."
+  },
+  {
+   "function": "format_money",
+   "decision": 3,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "wrong",
+   "R": "right",
+   "note": "Oracle abbreviates >=1,000,000.00 as $1.2M. All three sheets say 123456789 USD gives $1,234,567.89. R 55 right."
+  },
+  {
+   "function": "order_avg",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "right",
+   "R": "right",
+   "note": "Exclude <=0. D counts zero and negatives. SL rule 74 right but 70 averages -3 and -4 to -4: conflict. HV 70/74 right. R 58 right."
+  },
+  {
+   "function": "order_avg",
+   "decision": 1,
+   "D": "absent",
+   "SL": "absent",
+   "HV": "absent",
+   "R": "right",
+   "note": "1,000,000 cap not stated in D/SL/HV. R 59 right."
+  },
+  {
+   "function": "order_avg",
+   "decision": 2,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Half up equals half away from zero on the positive values that qualify. All sheets right on covered cases."
+  },
+  {
+   "function": "order_avg",
+   "decision": 3,
+   "D": "partial",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Fewer than 3 gives NULL. D only gives NULL for no usable values. SL 74 and HV 73/74 state it. R 60 right."
+  }
+ ]
+}

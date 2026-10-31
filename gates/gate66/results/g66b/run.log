@@ -1,0 +1,123 @@
+[00:16:28] predictions registered on origin/main: gates/gate66/prompts/PREDICTIONS.md
+[00:16:28] rule-giver writing private rules (headless Claude Code)...
+[00:18:40] rules checked: 10 functions, 128 calls, deterministic
+[00:18:40] declared decisions per function: 1:2, 2:3, 3:3, 4:2
+[00:18:41] starting repo and hidden suite built
+[00:18:41] pre-launch: python3 gates/gate66/referee/review66.py pre {run} {oracle}
+[00:18:41] wind tunnel: documenter writing the owner's policy in prose...
+[00:19:13] wind tunnel: R: 60 rules; ask text for N0 written
+[00:19:15] wind tunnel: owner on call for CC and CQ
+[00:19:15] stage 1: N0, CC, CQ
+N0: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g66b/upN0.git
+CC: 1 workers, tools/ask.py port None, repo /home/claude/hive/runs/g66b/upCC.git
+CQ: 1 workers, tools/ask.py port None, repo /home/claude/hive/runs/g66b/upCQ.git
+next: python3 lab/launch.py --run g66b
+[00:19:16] launching workers...
+launched CC-w1 
+launched CQ-w1 
+launched N0-w1 
+launched N0-w2 
+launched N0-w3 
+N0-w1 finished: exit 0, 0.9 min, tokens 431984, cost 0.21676550000000003
+N0-w3 finished: exit 0, 1.0 min, tokens 480115, cost 0.2252634
+N0-w2 finished: exit 0, 1.9 min, tokens 415316, cost 0.1894934
+CQ-w1 finished: exit 0, 2.1 min, tokens 1038547, cost 0.3611118000000001
+CC-w1 finished: exit 0, 2.4 min, tokens 947746, cost 0.39496000000000003
+wrote /home/claude/hive/runs/g66b/agents.csv
+[00:21:40] after N0: python3 gates/gate66/referee/review66.py after {run} {oracle} {base}
+[00:23:44] wind tunnel: SL owner #1: '6, 15, 23, 24, 25, 33, 41, 56, 57, 63, 64. Fees cap at 25% after a 3-day grace, '
+[00:23:47] wind tunnel: SL owner #2: 'Clamp it to 1 or 5 first, then calculate (average 7 gives 5, average -2 gives 1)'
+[00:23:57] wind tunnel: SL owner #3: 'Cap the fee at 25% of the amount, with no fee for the first 3 days.'
+[00:24:05] wind tunnel: SL owner #4: "Mask it fully with * ('a@x.com' gives '*@x.com')."
+[00:24:13] wind tunnel: SL owner #5: 'Return NULL.'
+[00:24:19] wind tunnel: SL owner #6: 'Return NULL.'
+[00:24:26] wind tunnel: SL owner #7: 'Return 0.0.'
+[00:24:32] wind tunnel: SL owner #8: 'Bill it as zone C.'
+[00:24:39] wind tunnel: SL owner #9: 'Return 0 when the end is on or before the start.'
+[00:24:46] wind tunnel: SL owner #10: "Don't count Jan 1 and Dec 25 when they fall on a weekday; no other holidays."
+[00:24:51] wind tunnel: SL owner #11: 'Return 0.0 instead of NULL.'
+[00:24:59] wind tunnel: SL owner #12: 'Exclude negatives, keep zero. Also exclude anything above 10000.'
+[00:25:06] wind tunnel: SL owner #13: ''
+[00:25:14] wind tunnel: SL owner #14: 'Treat negative votes as 0, so the rating is 3.5.'
+[00:25:21] wind tunnel: SL owner #15: ''
+[00:25:28] wind tunnel: SL owner #16: ''
+[00:25:34] wind tunnel: SL owner #17: ''
+[00:25:37] wind tunnel: HV case #1: ''
+[00:25:40] wind tunnel: HV case #2: 'It should be AMD, since only the first 3 words count.'
+[00:25:54] wind tunnel: HV case #3: 'It should return nothing (NULL), not blank text.'
+[00:26:09] wind tunnel: HV case #4: ''
+[00:26:12] wind tunnel: HV case #5: 'Case 5 matches my policy, so nothing jumps out at me.\n\nENTER'
+[00:26:25] wind tunnel: HV case #6: ''
+[00:26:30] wind tunnel: HV case #7: ''
+[00:26:33] wind tunnel: HV case #8: ''
+[00:26:37] wind tunnel: HV case #9: ''
+[00:26:40] wind tunnel: HV case #10: ''
+[00:26:45] wind tunnel: HV case #11: ''
+[00:26:49] wind tunnel: HV case #12: ''
+[00:26:54] wind tunnel: HV case #13: ''
+[00:26:57] wind tunnel: HV case #14: ''
+[00:27:01] wind tunnel: HV case #15: ''
+[00:27:05] wind tunnel: HV case #16: ''
+[00:27:10] wind tunnel: HV case #17: ''
+[00:27:15] wind tunnel: HV case #18: 'It should show 3.5 stars, because negative votes count as zero.'
+[00:27:34] wind tunnel: HV case #19: 'It should be 4.25, because the 9 gets clamped to 5 first.'
+[00:27:55] wind tunnel: HV case #20: ''
+[00:27:58] wind tunnel: HV case #21: 'It should be 1,550 rupees (0.5% per day × 31 days). The cap is 25% of the invoic'
+[00:28:18] wind tunnel: HV case #22: "That's wrong. 30 days late is 15%, which is 1,500, but the cap is 25% (2,500), s"
+[00:28:37] wind tunnel: HV case #23: ''
+[00:28:41] wind tunnel: HV case #24: ''
+[00:28:45] wind tunnel: HV case #25: 'It should be 0, because the first 3 days are a grace period and the fee starts o'
+[00:29:12] wind tunnel: HV case #26: 'It should be masked as *@x.com. A 1–2 character name part gets fully hidden.'
+[00:29:27] wind tunnel: HV case #27: 'It should be **@x.com. A name part of 1 or 2 characters is fully hidden.'
+[00:29:45] wind tunnel: HV case #28: ''
+[00:29:48] wind tunnel: HV case #29: "It should be blank (NULL). With no @ it isn't an address, so nothing gets masked"
+[00:30:03] wind tunnel: HV case #30: "It should be blank (NULL). Two @ signs means it isn't a valid address, so nothin"
+[00:30:17] wind tunnel: HV case #31: ''
+[00:30:21] wind tunnel: HV case #32: ''
+[00:30:24] wind tunnel: HV case #33: ''
+[00:30:27] wind tunnel: HV case #34: 'It should be 0.0, not blank. A period of 0 days returns 0.0.'
+[00:30:47] wind tunnel: HV case #35: ''
+[00:30:49] wind tunnel: HV case #36: 'It should be blank (NULL). A weight of 0 or less gets no price.'
+[00:31:07] wind tunnel: HV case #37: ''
+[00:31:11] wind tunnel: HV case #38: 'It should be billed as zone C, so 16.06, not blank.'
+[00:31:27] wind tunnel: HV case #39: ''
+[00:31:31] wind tunnel: HV case #40: 'It should be 1,219.90. Anything over 30 kg gets the flat 15 surcharge.'
+[00:31:50] wind tunnel: HV case #41: ''
+[00:31:54] wind tunnel: HV case #42: 'It should be 0, not minus 5. A reversed range never goes negative.'
+[00:32:12] wind tunnel: HV case #43: "It should be 5. Christmas and New Year's Day are weekday holidays, so they don't"
+[00:32:33] wind tunnel: HV case #44: ''
+[00:32:37] wind tunnel: HV case #45: ''
+[00:32:42] wind tunnel: HV case #46: ''
+[00:32:45] wind tunnel: HV case #47: ''
+[00:32:49] wind tunnel: HV case #48: 'It should show 0.0, not blank. No orders gives an average of 0.0.'
+[00:33:03] wind tunnel: HV case #49: ''
+[00:33:06] wind tunnel: HV case #50: 'It should show 0.0, not blank. No valid orders gives an average of 0.0.'
+[00:33:20] wind tunnel: D 66 rules; SL 17 replies; HV 50 cases, 20 corrected
+[00:34:17] wind tunnel: ask text for HV written
+[00:34:17] stage 2: HV
+HV: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g66b/upHV.git
+next: python3 lab/launch.py --run g66b
+[00:34:18] launching workers...
+launched HV-w1 
+launched HV-w2 
+launched HV-w3 
+HV-w2 finished: exit 0, 0.8 min, tokens 507569, cost 0.20703739999999998
+HV-w3 finished: exit 0, 1.5 min, tokens 989199, cost 0.33782909999999994
+HV-w1 finished: exit 0, 1.7 min, tokens 700729, cost 0.34184600000000004
+wrote /home/claude/hive/runs/g66b/agents.csv
+[00:36:02] scoring every arm call by call...
+# g66b: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 34.4% | 22.4%–45.6% |
+| CC | 80.4% | 66.0%–94.4% |
+| CQ | 92.8% | 81.6%–100.0% |
+| HV | 71.2% | 62.0%–81.2% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| CC-N0 | +46.0 | +35.2 to +58.0 |
+| CQ-N0 | +58.4 | +44.4 to +73.2 |
+| HV-N0 | +36.8 | +21.6 to +52.0 |
+[00:36:06] done. Next: write the gate RESULTS.md from runs/g66b/summary.md, update BRAIN.md and lab/QUEUE.md, push.

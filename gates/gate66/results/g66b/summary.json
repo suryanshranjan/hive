@@ -1,0 +1,61 @@
+{
+ "name": "g66b",
+ "arms": {
+  "N0": {
+   "hidden_pass": 0.344,
+   "ci95_by_function": [
+    0.224,
+    0.456
+   ],
+   "tests": 250
+  },
+  "CC": {
+   "hidden_pass": 0.804,
+   "ci95_by_function": [
+    0.66,
+    0.944
+   ],
+   "tests": 250
+  },
+  "CQ": {
+   "hidden_pass": 0.928,
+   "ci95_by_function": [
+    0.816,
+    1.0
+   ],
+   "tests": 250
+  },
+  "HV": {
+   "hidden_pass": 0.712,
+   "ci95_by_function": [
+    0.62,
+    0.812
+   ],
+   "tests": 250
+  }
+ },
+ "diffs": {
+  "CC-N0": {
+   "points": 46.0,
+   "ci95": [
+    35.2,
+    58.0
+   ]
+  },
+  "CQ-N0": {
+   "points": 58.4,
+   "ci95": [
+    44.4,
+    73.2
+   ]
+  },
+  "HV-N0": {
+   "points": 36.8,
+   "ci95": [
+    21.6,
+    52.0
+   ]
+  }
+ },
+ "allowance": {}
+}

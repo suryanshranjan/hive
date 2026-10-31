@@ -1,0 +1,1640 @@
+{
+ "R": [
+  "Whenever any function receives an argument that is NULL, text where a number is expected, a boolean, NaN or infinity, treat that argument as missing; each function's own rules below say what it then returns (NULL unless stated).",
+  "Whenever late_fee gets a missing amount or missing days_late, return NULL.",
+  "Whenever late_fee gets an amount that is zero or negative, return 0.0.",
+  "Whenever late_fee gets days_late of 3 or fewer (including zero and negative), return 0.0; the grace period is 3 days and the fee starts on day 4.",
+  "Whenever late_fee charges a fee, the base fee is amount x 0.5% x days_late, and days_late may be fractional.",
+  "Whenever the base fee in late_fee exceeds 25% of the amount, cap it at 25% of the amount.",
+  "Whenever late_fee has computed a fee, round it to cents with half-up rounding before applying the minimum.",
+  "Whenever the rounded late_fee is below 2.50, charge 2.50 instead; this minimum applies after the 25% cap, so it can exceed 25% of a very small amount.",
+  "Whenever late_fee returns, it returns a decimal number (0.0 for no fee).",
+  "Whenever ship_cost gets a missing or non-numeric weight, or a zone that is not text (including NULL), return NULL.",
+  "Whenever ship_cost gets a weight that is zero or negative, return NULL.",
+  "Whenever ship_cost prices a parcel, round the weight up to the next whole kg (0.5 kg bills as 1 kg, 30.5 kg as 31 kg).",
+  "Whenever ship_cost prices a parcel, the base price is 4.90 plus 1.20 per billed kg.",
+  "Whenever ship_cost applies a zone, multiply the base price by 1.0 for A, 1.5 for B and 2.2 for C.",
+  "Whenever ship_cost gets a zone, ignore leading and trailing whitespace and letter case, so ' b ' means B.",
+  "Whenever ship_cost gets a zone that is not A, B or C after trimming (including empty text), bill it as zone C.",
+  "Whenever the billed weight in ship_cost is more than 30 kg (after rounding up), add a flat 15 surcharge after the zone multiplier, so the surcharge is not multiplied; exactly 30 kg has no surcharge.",
+  "Whenever ship_cost computes a price, round it to cents with half-up rounding.",
+  "Whenever bayes_rating gets a missing or non-numeric avg or votes, return NULL.",
+  "Whenever bayes_rating computes a rating, it pulls the average toward a prior of 3.5 worth 10 votes: (votes x avg + 10 x 3.5) / (votes + 10).",
+  "Whenever bayes_rating gets an avg outside 1 to 5, clamp it to 1 or 5 before computing.",
+  "Whenever bayes_rating gets negative votes, treat them as 0; with 0 votes the result is 3.5.",
+  "Whenever bayes_rating returns, round the result to 2 decimals with half-up rounding; votes may be fractional.",
+  "Whenever sku_check gets NULL, a boolean, a float, or any type other than text or whole number, return NULL.",
+  "Whenever sku_check gets a negative whole number, return NULL; a non-negative whole number is treated as its decimal digits.",
+  "Whenever sku_check gets text, remove all spaces and dashes before anything else; no other character is stripped.",
+  "Whenever sku_check's code, after removing spaces and dashes, is empty or contains anything other than the ASCII digits 0-9, return NULL.",
+  "Whenever sku_check's code has more than 12 digits after cleaning, return NULL; exactly 12 is allowed and leading zeros count as digits and are kept.",
+  "Whenever sku_check computes the check digit, use Luhn: starting from the rightmost digit of the cleaned code, double every other digit (subtracting 9 if the double exceeds 9), sum all digits, and the check digit is (10 - sum mod 10) mod 10.",
+  "Whenever sku_check returns a code, return it as text consisting of the cleaned digits followed by the check digit.",
+  "Whenever workdays_between gets a start or end that is not text in strict YYYY-MM-DD form (4-2-2 digits) or is not a real calendar date, return NULL.",
+  "Whenever workdays_between gets dates with leading or trailing whitespace around a valid date, ignore that whitespace.",
+  "Whenever workdays_between gets an end on or before the start, return 0 (reversed ranges do not go negative); this applies only when both dates are valid.",
+  "Whenever workdays_between counts days, count Monday to Friday days from start up to but not including end, so start is counted and end is not.",
+  "Whenever workdays_between counts days, exclude January 1 and December 25 of every year when they fall on a weekday inside the range; they are not shifted when they fall on a weekend, and no other holidays exist.",
+  "Whenever mask_email gets a non-text value or text that does not contain exactly one @, return NULL.",
+  "Whenever mask_email gets text with exactly one @ but an empty name part or an empty domain, return NULL.",
+  "Whenever mask_email gets a name part of 1 or 2 characters, replace every character of it with *.",
+  "Whenever mask_email gets a name part of 3 or more characters, keep its first and last character and replace each middle character with *, preserving the length.",
+  "Whenever mask_email returns, keep the @ and the domain exactly as given, with no trimming or case change.",
+  "Whenever pro_rata gets a missing or non-numeric amount, days_used or days_in_period, return NULL, even if days_in_period is not positive.",
+  "Whenever pro_rata gets days_in_period of zero or negative, return 0.0.",
+  "Whenever pro_rata gets days_used outside 0 to days_in_period, clamp it into that range (negative becomes 0, more than the period becomes the full period).",
+  "Whenever pro_rata computes the share, it is amount x days_used / days_in_period, and days may be fractional.",
+  "Whenever pro_rata rounds, round toward zero to whole cents (truncate, never round up), also for negative amounts, which are allowed and give a negative share.",
+  "Whenever time_slot gets a missing or non-numeric minutes, return NULL.",
+  "Whenever time_slot gets minutes of zero or negative, return 0.",
+  "Whenever time_slot gets positive minutes, round up to the next multiple of 15 (the grid), including fractional minutes; an exact multiple stays unchanged.",
+  "Whenever time_slot would return more than 480, return 480 (the cap).",
+  "Whenever time_slot returns, it returns a whole number.",
+  "Whenever initials gets a value that is not text, return NULL.",
+  "Whenever initials gets text that is empty or only whitespace, return NULL.",
+  "Whenever initials splits a name, split on whitespace runs, ignoring leading, trailing and repeated whitespace.",
+  "Whenever initials builds its result, take the first character of each word and uppercase it, so hyphens and apostrophes do not start a new word and a word's first character is used even if it is not a letter.",
+  "Whenever initials gets more than 3 words, use only the first 3 words and ignore the rest.",
+  "Whenever clean_avg gets a row whose value is NULL or not a number, skip that row.",
+  "Whenever clean_avg gets a negative value, exclude it from the average.",
+  "Whenever clean_avg gets a value above 10000, exclude it; exactly 10000 is included, and zero is included.",
+  "Whenever clean_avg has no qualifying values (no rows, all NULL, or all excluded), return 0.0 rather than NULL.",
+  "Whenever clean_avg averages, divide the sum of qualifying values by their count and round to 2 decimals with half-up rounding."
+ ],
+ "D": [
+  "bayes_rating: Whenever a product has an average and a vote count, the rating is (votes \u00d7 average + 35) / (votes + 10), i.e. the average is blended with a prior of 10 imaginary votes at 3.5 stars, and the result is rounded to 2 decimals (halves round up). Example: average 4.5 with 100 votes gives 4.41.",
+  "bayes_rating: Whenever the vote count is 0, the rating is 3.5 whatever the average is; with very many votes it approaches the average.",
+  "bayes_rating: Whenever the vote count is negative, the rating is NULL.",
+  "bayes_rating: Whenever the average or the vote count is NULL, empty text, or text that is not a number, the rating is NULL.",
+  "bayes_rating: Whenever the average or votes are numbers written as text (e.g. '4.5' and '20'), they are read as numbers and the rating is calculated normally.",
+  "bayes_rating: Whenever the average is outside 0\u20135 (e.g. 7 or -2), it is not limited or rejected; the calculation just proceeds (average 7 with 5 votes gives 4.67, average -2 with 5 votes gives 1.67).",
+  "bayes_rating: Whenever the vote count is not a whole number (e.g. 2.5), it is used as is in the formula (4.5 average, 2.5 votes gives 3.7).",
+  "initials: Whenever a full name is given, the result is the first character of each word, in uppercase, joined together with no dots or spaces (e.g. 'ann marie lee' gives 'AML').",
+  "initials: Whenever words are separated by extra spaces, tabs or other whitespace, or the name has leading/trailing spaces, these are ignored and each word still counts once ('  john  smith ' gives 'JS').",
+  "initials: Whenever a name contains a hyphen or apostrophe, it is not a word separator, so 'jean-paul sartre' gives 'JS' and \"o'brien\" gives 'O'.",
+  "initials: Whenever a name starts with an accented letter, the accented letter is uppercased and used ('\u00e1nna \u00e9lan' gives '\u00c1\u00c9').",
+  "initials: Whenever the name is NULL, the result is NULL; whenever it is empty or only spaces, the result is empty text.",
+  "initials: Whenever the name is a number or a word starting with a digit, the first digit is used as its initial (123 gives '1', '1 2' gives '12'); there is no check that words are letters.",
+  "late_fee: Whenever an invoice is overdue, the fee is 0.5% of the amount for each day late, rounded to 2 decimals (halves round up). Example: 1000 that is 10 days late gives 50.00.",
+  "late_fee: Whenever the days late reach 30 or more, the fee stops growing and stays at 15% of the amount (1000 gives 150.00 at 30 days and also at 31 days or more).",
+  "late_fee: Whenever days late is 0 or negative, the fee is 0.0 (no penalty), even if the amount is large.",
+  "late_fee: Whenever the amount is 0 or negative, the fee is 0.0 (no negative fees are produced).",
+  "late_fee: Whenever days late is a fraction, it is used as is (100 at 0.5 days gives 0.25); small fees round to 0.0 (0.5 amount, 1 day gives 0.0).",
+  "late_fee: Whenever the amount or the days late is NULL, empty text, or text that is not a number, the fee is NULL; numbers written as text (e.g. '3') are read as numbers.",
+  "late_fee: Whenever the amount or days late is NULL or non-numeric, the result is NULL even if the other value is zero or negative (the NULL check comes before the zero check).",
+  "mask_email: Whenever an email has a name part of 3 or more characters, the first and last characters of the name are kept, everything between is replaced by asterisks (one per character), and the '@' and domain are left unchanged ('john.smith@example.com' gives 'j********h@example.com').",
+  "mask_email: Whenever the name part has exactly 2 characters, the first is kept and the second becomes '*' ('ab@x.com' gives 'a*@x.com').",
+  "mask_email: Whenever the name part has exactly 1 character, it is shown unchanged ('a@x.com' stays 'a@x.com').",
+  "mask_email: Whenever the name part is empty ('@x.com') or the whole text is empty, the text is returned unchanged.",
+  "mask_email: Whenever the text contains no '@', the whole text is treated as the name part and masked the same way ('noatsign' gives 'n******n').",
+  "mask_email: Whenever the text contains several '@' signs, only the last one separates name and domain, so everything before it is masked ('a@b@c.com' gives 'a*b@c.com').",
+  "mask_email: Whenever the email has upper-case letters, they are kept as typed; the domain's case is also untouched.",
+  "mask_email: Whenever the email has leading spaces or other characters, they count as part of the name (' bob@x.com' gives ' **b@x.com'); a number passed in is treated as text and masked the same way (12345 gives '1***5').",
+  "mask_email: Whenever the email is NULL, the result is NULL.",
+  "pro_rata: Whenever a service is used for some days of a period, the charge is amount \u00d7 days used / days in period, rounded to 2 decimals (halves round up). Example: 300, 10 of 30 days gives 100.00; 100, 1 of 3 gives 33.33; 1, 1 of 8 gives 0.13.",
+  "pro_rata: Whenever days used exceeds the days in the period, it is treated as the full period, so the whole amount is charged (300, 40 of 30 gives 300.00).",
+  "pro_rata: Whenever days used is negative, it is treated as 0 and the result is 0.0.",
+  "pro_rata: Whenever the days in the period is 0 or negative, the result is NULL.",
+  "pro_rata: Whenever any of the three values is NULL, empty text, or text that is not a number, the result is NULL; numbers written as text ('300','10','30') are read as numbers.",
+  "pro_rata: Whenever the amount is negative, the share is negative too (-300, 10 of 30 gives -100.0); amount 0 gives 0.0.",
+  "pro_rata: Whenever days used is a fraction, it is used as is (300, 10.5 of 30 gives 105.0).",
+  "ship_cost: Whenever a parcel has a weight and a zone, the cost is (4.90 + 1.20 \u00d7 weight in kg) multiplied by 1.0 for zone A, 1.5 for zone B and 2.2 for zone C, rounded to 2 decimals (halves round up). Examples: 2 kg to A is 7.30, to B 10.95, to C 16.06.",
+  "ship_cost: Whenever the weight is 0 (or tiny such as 0.001), the cost is the base charge: 4.9 for zone A.",
+  "ship_cost: Whenever the weight is negative, the cost is NULL; there is no maximum weight (1000 kg to C costs 2650.78).",
+  "ship_cost: Whenever the zone is lower case or has spaces around it ('b', ' c '), it is accepted as the same zone.",
+  "ship_cost: Whenever the zone is anything other than A, B or C (e.g. 'D', empty text, 'AB', a number such as 1), the cost is NULL.",
+  "ship_cost: Whenever the weight or zone is NULL, or the weight is empty or non-numeric text, the cost is NULL; a weight written as text ('2.5') is read as a number.",
+  "sku_check: Whenever a code made only of digits is given, the result is the same code with one Luhn (mod-10) check digit appended ('7992739871' gives '79927398713').",
+  "sku_check: Whenever the code is given as a number rather than text, it is treated as its digits (79927398713 gives '799273987138'), and the result is always text.",
+  "sku_check: Whenever the code has leading zeros, they are kept ('007' gives '0075', '0' gives '00').",
+  "sku_check: Whenever the code has spaces at the start or end, they are removed first (' 1234 ' gives '12344'); spaces inside the code ('12 34') make the result NULL.",
+  "sku_check: Whenever the code is NULL, empty, contains any letter or symbol (minus or plus sign, decimal point), or contains non-ASCII digits, the result is NULL.",
+  "sku_check: Whenever the code is a decimal number such as 12.0 or 1.5 (not text), the result is NULL.",
+  "time_slot: Whenever a duration in minutes is given, it is rounded up to the next multiple of 15 minutes (1 gives 15, 15 stays 15, 16 gives 30, 46 gives 60), and exact multiples are unchanged.",
+  "time_slot: Whenever the duration is 0 or negative, the result is 0.",
+  "time_slot: Whenever the duration is fractional, it is rounded up too (0.1 gives 15, 14.5 gives 15, 15.01 gives 30).",
+  "time_slot: Whenever the duration is NULL, empty text, or text that is not a number, the result is NULL; a number written as text ('30') is read as a number.",
+  "workdays_between: Whenever two ISO dates (YYYY-MM-DD) are given, the result is the number of Monday\u2013Friday days from the start date up to but not including the end date. Example: 2024-01-01 (Monday) to 2024-01-08 gives 5, to 2024-01-05 gives 4.",
+  "workdays_between: Whenever the end date itself is a working day, it is not counted, and the start date is counted if it is a working day (2024-01-05 Friday to 2024-01-06 gives 1; 2024-01-06 to 2024-01-08 gives 0).",
+  "workdays_between: Whenever the start and end are the same day, or both fall on a weekend, the result is 0.",
+  "workdays_between: Whenever the start date is after the end date, the result is the negative of the count for the reversed pair (2024-01-05 to 2024-01-01 gives -4, 2024-01-08 to 2024-01-01 gives -5).",
+  "workdays_between: Whenever public holidays fall in the range, they are counted as working days; only Saturdays and Sundays are excluded.",
+  "workdays_between: Whenever a date is NULL, empty, not exactly 10 characters, not in YYYY-MM-DD form (e.g. '2024-1-1', '2024/01/01', '20240101', a date with a time), not a real calendar date (2024-02-30) or a number, the result is NULL.",
+  "workdays_between: Whenever a date has spaces around it (' 2024-01-01 '), the spaces are ignored and the date is accepted.",
+  "clean_avg: Whenever it is applied to a set of rows, the result is the plain average of the values that are numbers, ignoring the others; example 10, 20, NULL, 35 gives 21.67.",
+  "clean_avg: Whenever a row is NULL, empty text, text that is not a number ('n/a'), or binary data, it is skipped and does not count in the number of rows divided by.",
+  "clean_avg: Whenever a value is a number written as text ('20', ' 4 ', '1e2'), it is read as a number and included.",
+  "clean_avg: Whenever there are no rows, or no row holds a usable number, the result is NULL.",
+  "clean_avg: Whenever values are zero or negative, they are included like any other number (1 and -1 give 0.0).",
+  "clean_avg: Whenever the result is calculated, it is not rounded (e.g. 2.1666666666666665); it is returned as a decimal number, and with groups each group gets its own average.",
+  "clean_avg: Whenever a text value reads as 'inf' or 'nan', it is treated as a number and makes the average infinite or not-a-number."
+ ],
+ "SL": [
+  "bayes_rating: Whenever a product has an average and a vote count, the rating is (votes \u00d7 average + 35) / (votes + 10), i.e. the average is blended with a prior of 10 imaginary votes at 3.5 stars, and the result is rounded to 2 decimals (halves round up). Example: average 4.5 with 100 votes gives 4.41.",
+  "bayes_rating: Whenever the vote count is 0, the rating is 3.5 whatever the average is; with very many votes it approaches the average.",
+  "bayes_rating: Whenever the vote count is negative, treat it as 0, and the rating is 3.5.",
+  "bayes_rating: Whenever the average or the vote count is NULL, empty text, or text that is not a number, the rating is NULL.",
+  "bayes_rating: Whenever the average or votes are numbers written as text (e.g. '4.5' and '20'), they are read as numbers and the rating is calculated normally.",
+  "bayes_rating: Whenever the average is outside 0\u20135 (e.g. 7 or -2), it is first clamped to the nearest limit, 5 if it is above 5 or 1 if it is below 1, and then the calculation proceeds with the clamped average (average 7 is treated as 5, average -2 is treated as 1).",
+  "bayes_rating: Whenever the vote count is not a whole number (e.g. 2.5), it is used as is in the formula (4.5 average, 2.5 votes gives 3.7).",
+  "initials: Whenever a full name is given, the result is the first character of each word, in uppercase, joined together with no dots or spaces (e.g. 'ann marie lee' gives 'AML').",
+  "initials: Whenever words are separated by extra spaces, tabs or other whitespace, or the name has leading/trailing spaces, these are ignored and each word still counts once ('  john  smith ' gives 'JS').",
+  "initials: Whenever a name contains a hyphen or apostrophe, it is not a word separator, so 'jean-paul sartre' gives 'JS' and \"o'brien\" gives 'O'.",
+  "initials: Whenever a name starts with an accented letter, the accented letter is uppercased and used ('\u00e1nna \u00e9lan' gives '\u00c1\u00c9').",
+  "initials: Whenever the name is NULL, the result is NULL; whenever it is empty or only spaces, the result is empty text.",
+  "initials: Whenever the name is a number or a word starting with a digit, the first digit is used as its initial (123 gives '1', '1 2' gives '12'); there is no check that words are letters.",
+  "late_fee: Whenever an invoice is overdue, the fee is 0.5% of the amount for each day late, rounded to 2 decimals (halves round up). Example: 1000 that is 10 days late gives 50.00.",
+  "late_fee: For the first 3 days late (days late 1, 2 and 3) there is no fee. Whenever the days late reach 30 or more, the fee stops growing and stays at 25% of the amount (1000 gives 250.00 at 30 days and also at 31 days or more).",
+  "late_fee: Whenever days late is 0 or negative, the fee is 0.0 (no penalty), even if the amount is large.",
+  "late_fee: Whenever the amount is 0 or negative, the fee is 0.0 (no negative fees are produced).",
+  "late_fee: Whenever days late is a fraction, it is used as is (100 at 0.5 days gives 0.25); small fees round to 0.0 (0.5 amount, 1 day gives 0.0).",
+  "late_fee: Whenever the amount or the days late is NULL, empty text, or text that is not a number, the fee is NULL; numbers written as text (e.g. '3') are read as numbers.",
+  "late_fee: Whenever the amount or days late is NULL or non-numeric, the result is NULL even if the other value is zero or negative (the NULL check comes before the zero check).",
+  "mask_email: Whenever an email has a name part of 3 or more characters, the first and last characters of the name are kept, everything between is replaced by asterisks (one per character), and the '@' and domain are left unchanged ('john.smith@example.com' gives 'j********h@example.com').",
+  "mask_email: Whenever the name part has exactly 2 characters, the first is kept and the second becomes '*' ('ab@x.com' gives 'a*@x.com').",
+  "mask_email: Whenever the name part has exactly 1 character, it is fully masked with * ('a@x.com' gives '*@x.com').",
+  "mask_email: Whenever the name part is empty ('@x.com') or the whole text is empty, the result is NULL.",
+  "mask_email: Whenever the text contains no '@', return NULL.",
+  "mask_email: Whenever the text contains several '@' signs, only the last one separates name and domain, so everything before it is masked ('a@b@c.com' gives 'a*b@c.com').",
+  "mask_email: Whenever the email has upper-case letters, they are kept as typed; the domain's case is also untouched.",
+  "mask_email: Whenever the email has leading spaces or other characters, they count as part of the name (' bob@x.com' gives ' **b@x.com'); a number passed in is treated as text and masked the same way (12345 gives '1***5').",
+  "mask_email: Whenever the email is NULL, the result is NULL.",
+  "pro_rata: Whenever a service is used for some days of a period, the charge is amount \u00d7 days used / days in period, rounded to 2 decimals (halves round up). Example: 300, 10 of 30 days gives 100.00; 100, 1 of 3 gives 33.33; 1, 1 of 8 gives 0.13.",
+  "pro_rata: Whenever days used exceeds the days in the period, it is treated as the full period, so the whole amount is charged (300, 40 of 30 gives 300.00).",
+  "pro_rata: Whenever days used is negative, it is treated as 0 and the result is 0.0.",
+  "pro_rata: Whenever the days in the period is 0 or negative, the result is 0.0.",
+  "pro_rata: Whenever any of the three values is NULL, empty text, or text that is not a number, the result is NULL; numbers written as text ('300','10','30') are read as numbers.",
+  "pro_rata: Whenever the amount is negative, the share is negative too (-300, 10 of 30 gives -100.0); amount 0 gives 0.0.",
+  "pro_rata: Whenever days used is a fraction, it is used as is (300, 10.5 of 30 gives 105.0).",
+  "ship_cost: Whenever a parcel has a weight and a zone, the cost is (4.90 + 1.20 \u00d7 weight in kg) multiplied by 1.0 for zone A, 1.5 for zone B and 2.2 for zone C, rounded to 2 decimals (halves round up). Examples: 2 kg to A is 7.30, to B 10.95, to C 16.06.",
+  "ship_cost: Whenever the weight is 0 (or tiny such as 0.001), the cost is the base charge: 4.9 for zone A.",
+  "ship_cost: Whenever the weight is negative, the cost is NULL; there is no maximum weight (1000 kg to C costs 2650.78).",
+  "ship_cost: Whenever the zone is lower case or has spaces around it ('b', ' c '), it is accepted as the same zone.",
+  "ship_cost: Whenever the zone is anything other than A, B or C (e.g. 'D', empty text, 'AB', a number such as 1), the cost is billed as zone C.",
+  "ship_cost: Whenever the weight or zone is NULL, or the weight is empty or non-numeric text, the cost is NULL; a weight written as text ('2.5') is read as a number.",
+  "sku_check: Whenever a code made only of digits is given, the result is the same code with one Luhn (mod-10) check digit appended ('7992739871' gives '79927398713').",
+  "sku_check: Whenever the code is given as a number rather than text, it is treated as its digits (79927398713 gives '799273987138'), and the result is always text.",
+  "sku_check: Whenever the code has leading zeros, they are kept ('007' gives '0075', '0' gives '00').",
+  "sku_check: Whenever the code has spaces at the start or end, they are removed first (' 1234 ' gives '12344'); spaces inside the code ('12 34') make the result NULL.",
+  "sku_check: Whenever the code is NULL, empty, contains any letter or symbol (minus or plus sign, decimal point), or contains non-ASCII digits, the result is NULL.",
+  "sku_check: Whenever the code is a decimal number such as 12.0 or 1.5 (not text), the result is NULL.",
+  "time_slot: Whenever a duration in minutes is given, it is rounded up to the next multiple of 15 minutes (1 gives 15, 15 stays 15, 16 gives 30, 46 gives 60), and exact multiples are unchanged.",
+  "time_slot: Whenever the duration is 0 or negative, the result is 0.",
+  "time_slot: Whenever the duration is fractional, it is rounded up too (0.1 gives 15, 14.5 gives 15, 15.01 gives 30).",
+  "time_slot: Whenever the duration is NULL, empty text, or text that is not a number, the result is NULL; a number written as text ('30') is read as a number.",
+  "workdays_between: Whenever two ISO dates (YYYY-MM-DD) are given, the result is the number of Monday\u2013Friday days from the start date up to but not including the end date. Example: 2024-01-01 (Monday) to 2024-01-08 gives 5, to 2024-01-05 gives 4.",
+  "workdays_between: Whenever the end date itself is a working day, it is not counted, and the start date is counted if it is a working day (2024-01-05 Friday to 2024-01-06 gives 1; 2024-01-06 to 2024-01-08 gives 0).",
+  "workdays_between: Whenever the start and end are the same day, or both fall on a weekend, the result is 0.",
+  "workdays_between: Return 0 when the end date is on or before the start date.",
+  "workdays_between: Public holidays that fall in the range are counted as working days, except January 1 and December 25 when they fall on a weekday, which are not counted; no other holidays are excluded. Saturdays and Sundays are excluded.",
+  "workdays_between: Whenever a date is NULL, empty, not exactly 10 characters, not in YYYY-MM-DD form (e.g. '2024-1-1', '2024/01/01', '20240101', a date with a time), not a real calendar date (2024-02-30) or a number, the result is NULL.",
+  "workdays_between: Whenever a date has spaces around it (' 2024-01-01 '), the spaces are ignored and the date is accepted.",
+  "clean_avg: Whenever it is applied to a set of rows, the result is the plain average of the values that are numbers, ignoring the others; example 10, 20, NULL, 35 gives 21.67.",
+  "clean_avg: Whenever a row is NULL, empty text, text that is not a number ('n/a'), or binary data, it is skipped and does not count in the number of rows divided by.",
+  "clean_avg: Whenever a value is a number written as text ('20', ' 4 ', '1e2'), it is read as a number and included.",
+  "clean_avg: Whenever there are no rows, or no row holds a usable number, the result is 0.0.",
+  "clean_avg: Values that are negative are excluded. Zero is kept and included like any other number. Values above 10000 are excluded.",
+  "clean_avg: Whenever the result is calculated, it is not rounded (e.g. 2.1666666666666665); it is returned as a decimal number, and with groups each group gets its own average.",
+  "clean_avg: Whenever a text value reads as 'inf' or 'nan', it is treated as a number and makes the average infinite or not-a-number."
+ ],
+ "HV": [
+  "bayes_rating: Whenever a product has an average and a vote count, the rating is (votes \u00d7 average + 35) / (votes + 10), where the average is first clamped as rule 6 says if it is outside 0\u20135. This blends the (clamped) average with a prior of 10 imaginary votes at 3.5 stars, and the result is rounded to 2 decimals (halves round up). Example: average 4.5 with 100 votes gives 4.41. Example: average 9 with 10 votes is clamped to 5 first, giving 4.25, not 6.25.",
+  "bayes_rating: Whenever the vote count is 0, the rating is 3.5 whatever the average is; with very many votes it approaches the average.",
+  "bayes_rating: Whenever the vote count is negative (a whole number such as -3 or a fraction such as -0.5), it is treated as 0, and the rating is 3.5 whatever the average is (for example, a 4.8 average with -3 votes gives 3.5, not a blank rating or an error). This applies whenever the average and the vote count are both usable numbers; if either is NULL, empty text or text that is not a number, rule 4 still applies.",
+  "bayes_rating: Whenever the average or the vote count is NULL, empty text, or text that is not a number, the rating is NULL.",
+  "bayes_rating: Whenever the average or votes are numbers written as text (e.g. '4.5' and '20'), they are read as numbers and the rating is calculated normally.",
+  "bayes_rating: Whenever the average is outside 0\u20135 (e.g. 9, 7 or -2), it is first clamped to the nearest limit, 5 if it is above 5 or 1 if it is below 1, and then the whole calculation (rule 1, and the vote-count rules 2, 3 and 7) proceeds with the clamped average, never the original one (average 9 is treated as 5, so with 10 votes the rating is 4.25; average 7 is treated as 5; average -2 is treated as 1). The rating can therefore never be above 5 because of a mistyped average.",
+  "bayes_rating: Whenever the vote count is not a whole number (e.g. 2.5), it is used as is in the formula (4.5 average, 2.5 votes gives 3.7).",
+  "initials: Whenever a full name is given, the result is the first character of each of the first 3 words only, in uppercase, joined together with no dots or spaces (e.g. 'ann marie lee' gives 'AML'). Any words after the third are ignored, even if they are small words like 'de', so 'Ana Maria de Souza' gives 'AMD' and 'ann marie lee jones' gives 'AML'. A name with fewer than 3 words uses all of its words.",
+  "initials: Whenever words are separated by extra spaces, tabs or other whitespace, or the name has leading/trailing spaces, these are ignored and each word still counts once ('  john  smith ' gives 'JS').",
+  "initials: Whenever a name contains a hyphen or apostrophe, it is not a word separator, so 'jean-paul sartre' gives 'JS' and \"o'brien\" gives 'O'.",
+  "initials: Whenever a name starts with an accented letter, the accented letter is uppercased and used ('\u00e1nna \u00e9lan' gives '\u00c1\u00c9').",
+  "initials: Whenever the name is NULL, the result is NULL; whenever it is empty or only spaces (so it has no words), the result is also NULL, not empty text.",
+  "initials: Whenever the name is a number or a word starting with a digit, the first digit is used as its initial (123 gives '1', '1 2' gives '12'); there is no check that words are letters. Only the first 3 words count here too, so '1 2 3 4' gives '123'.",
+  "Whenever an invoice is more than 3 days late, the fee is 0.5% of the amount for each day late, rounded to 2 decimals (halves round up). The first 3 days are a grace period (see rule 16). Example: 1000 that is 10 days late gives 50.00.",
+  "For the first 3 days late there is no fee. This means any days late of 3 or less, including part days (for example 0.5, 2.5 or 3.0), gives a fee of 0.0. The fee starts only once days late is more than 3. The fee is never more than 25% of the amount. It grows by 0.5% of the amount per day until it reaches that 25% limit, which happens at 50 days late. From 50 days late onward it stays at 25% of the amount. Before that point the fee is not capped. Examples: 1000 gives 155.00 at 31 days, and 250.00 at 50 days and at any later day. 10000 at 31 days late gives 1550.00. 10000 at 2.5 days late gives 0.0.",
+  "Whenever days late is 3 or less (this includes 0 and negative, and part-days such as 2.5), the fee is 0.0 (no penalty, because the first 3 days are a grace period), even if the amount is large. Exactly 3 days late is still within the grace period.",
+  "late_fee: Whenever the amount is 0 or negative, the fee is 0.0 (no negative fees are produced).",
+  "Whenever days late is a fraction, it is used as is, and the 3-day grace period applies to it like any other number (100 at 0.5 days gives 0.0, 10000 at 2.5 days gives 0.0, and 100 at 3.5 days gives 1.75); small fees round to 0.0 (0.5 amount, 1 day gives 0.0).",
+  "late_fee: Whenever the amount or the days late is NULL, empty text, or text that is not a number, the fee is NULL; numbers written as text (e.g. '3') are read as numbers.",
+  "late_fee: Whenever the amount or days late is NULL or non-numeric, the result is NULL even if the other value is zero or negative (the NULL check comes before the zero check).",
+  "mask_email: Whenever an email has a name part of 3 or more characters, the first and last characters of the name are kept, everything between is replaced by asterisks (one per character), and the '@' and domain are left unchanged ('john.smith@example.com' gives 'j********h@example.com').",
+  "mask_email: Whenever the name part has exactly 2 characters, both are fully masked with '*', so nothing of the name is shown, not even the first or last character, and the '@' and domain are left unchanged ('ab@x.com' gives '**@x.com'). Together with the 1-character rule, a name part of 1 or 2 characters is always fully hidden.",
+  "mask_email: Whenever the name part has exactly 1 character, it is fully masked with * ('a@x.com' gives '*@x.com').",
+  "mask_email: Whenever the name part is empty ('@x.com') or the whole text is empty, the result is NULL.",
+  "mask_email: Whenever the text contains no '@', it is not an email address, so nothing is masked and the result is NULL (for example 'notanemail' gives NULL), whatever the text's length or characters.",
+  "mask_email: Whenever the text contains more than one '@' sign, it is not a valid email address, so nothing is masked and the result is NULL, whatever the text's length or characters (for example 'a@b@c.com' gives NULL, and 'john@home@x.com' gives NULL).",
+  "mask_email: Whenever the email has upper-case letters, they are kept as typed; the domain's case is also untouched.",
+  "mask_email: Whenever the email has leading spaces or other characters, they count as part of the name (' bob@x.com' gives ' **b@x.com'); a number passed in is treated as text and masked the same way (12345 gives '1***5').",
+  "mask_email: Whenever the email is NULL, the result is NULL.",
+  "pro_rata: Whenever a service is used for some days of a period, the charge is amount \u00d7 days used / days in period, rounded to 2 decimals (halves round up). Example: 300, 10 of 30 days gives 100.00; 100, 1 of 3 gives 33.33; 1, 1 of 8 gives 0.13.",
+  "pro_rata: Whenever the days in the period is above 0 and days used exceeds the days in the period, days used is treated as the full period, so the whole amount is charged (300, 40 of 30 gives 300.00). This does not apply when the period is 0 or negative, where the result is 0.0.",
+  "pro_rata: Whenever days used is negative, it is treated as 0 and the result is 0.0.",
+  "pro_rata: Whenever the days in the period is 0 or negative, the result is 0.0, whatever the amount and the days used are (300, 10 of 0 days gives 0.0). This comes before the rule that treats days used above the period as the full period. The only exception is when any of the three values is NULL, empty or not a number, which still gives NULL.",
+  "pro_rata: Whenever any of the three values is NULL, empty text, or text that is not a number, the result is NULL; numbers written as text ('300','10','30') are read as numbers.",
+  "pro_rata: Whenever the amount is negative, the share is negative too (-300, 10 of 30 gives -100.0); amount 0 gives 0.0.",
+  "pro_rata: Whenever days used is a fraction, it is used as is (300, 10.5 of 30 gives 105.0).",
+  "ship_cost: Whenever a parcel has a weight above 0 and a zone, the cost is (4.90 + 1.20 \u00d7 weight in kg) multiplied by 1.0 for zone A, 1.5 for zone B and 2.2 for zone C, then, if the weight is over 30 kg (exactly 30 kg or less gets none), a flat surcharge of 15 is added (the same 15 for every zone, not multiplied by the zone factor), and the total is rounded to 2 decimals (halves round up). Examples: 2 kg to A is 7.30, to B 10.95, to C 16.06 (no surcharge); 1000 kg to A is 1219.90.",
+  "ship_cost: Whenever the weight is 0, the cost is NULL (no price), whatever the zone. A tiny weight above 0 such as 0.001 is still priced by the normal formula, so it comes to about the base charge: 4.9 for zone A, 7.35 for zone B, 10.78 for zone C.",
+  "ship_cost: Whenever the weight is 0 or negative (less than or equal to 0), the cost is NULL; there is no maximum weight, so heavy parcels are still priced by the normal formula plus the flat 15 surcharge for weight over 30 kg (1000 kg to A costs 1219.90, 1000 kg to C costs 2665.78).",
+  "ship_cost: Whenever the zone is lower case or has spaces around it ('b', ' c '), it is accepted as the same zone.",
+  "ship_cost: Whenever the zone is anything other than A, B or C (e.g. 'D', empty text, 'AB', a number such as 1), the cost is billed as zone C.",
+  "ship_cost: Whenever the weight or zone is NULL, or the weight is empty or non-numeric text, the cost is NULL; a weight written as text ('2.5') is read as a number.",
+  "sku_check: Whenever a code made only of digits is given, the result is the same code with one Luhn (mod-10) check digit appended ('7992739871' gives '79927398713').",
+  "sku_check: Whenever the code is given as a number rather than text, it is treated as its digits (79927398713 gives '799273987138'), and the result is always text.",
+  "sku_check: Whenever the code has leading zeros, they are kept ('007' gives '0075', '0' gives '00').",
+  "sku_check: Whenever the code has spaces at the start or end, they are removed first (' 1234 ' gives '12344'); spaces inside the code ('12 34') make the result NULL.",
+  "sku_check: Whenever the code is NULL, empty, contains any letter or symbol (minus or plus sign, decimal point), or contains non-ASCII digits, the result is NULL.",
+  "sku_check: Whenever the code is a decimal number such as 12.0 or 1.5 (not text), the result is NULL.",
+  "time_slot: Whenever a duration in minutes is given, it is rounded up to the next multiple of 15 minutes (1 gives 15, 15 stays 15, 16 gives 30, 46 gives 60), and exact multiples are unchanged.",
+  "time_slot: Whenever the duration is 0 or negative, the result is 0.",
+  "time_slot: Whenever the duration is fractional, it is rounded up too (0.1 gives 15, 14.5 gives 15, 15.01 gives 30).",
+  "time_slot: Whenever the duration is NULL, empty text, or text that is not a number, the result is NULL; a number written as text ('30') is read as a number.",
+  "workdays_between: Whenever two valid ISO dates (YYYY-MM-DD) are given and the end date is after the start date, the result is the number of working days from the start date up to but not including the end date. A working day is a Monday\u2013Friday day that is not a weekday January 1 or December 25 (see rule 57). Example: 2024-01-01 (Monday) to 2024-01-08 gives 5, to 2024-01-05 gives 4. If the end date is on or before the start date, the result is 0 (see rule 56).",
+  "workdays_between: Whenever the end date itself is a working day, it is not counted, and the start date is counted if it is a working day (2024-01-05 Friday to 2024-01-06 gives 1; 2024-01-06 to 2024-01-08 gives 0).",
+  "workdays_between: Whenever the start and end are the same day, or both fall on a weekend, the result is 0.",
+  "workdays_between: Whenever the end date is on or before the start date (including a reversed range, such as 2026-11-09 to 2026-11-02), the result is 0. The result is never negative, however far apart the dates are, and the weekdays between the two dates are not counted backwards.",
+  "workdays_between: Saturdays and Sundays are never counted. January 1 (New Year's Day) and December 25 (Christmas Day) are not counted in any year when they fall on a weekday, whether they are the start date or fall inside the range (the end date is never counted anyway). Every other public holiday that falls on a weekday is still counted as an ordinary working day; no other holidays are excluded. Example: 2026-12-24 (Thursday) to 2027-01-04 gives 5, because 2026-12-25 and 2027-01-01 are not counted.",
+  "workdays_between: Whenever a date is NULL, empty, not exactly 10 characters, not in YYYY-MM-DD form (e.g. '2024-1-1', '2024/01/01', '20240101', a date with a time), not a real calendar date (2024-02-30) or a number, the result is NULL.",
+  "workdays_between: Whenever a date has spaces around it (' 2024-01-01 '), the spaces are ignored and the date is accepted.",
+  "clean_avg: Whenever it is applied to a set of rows, the result is the plain average of the values that are numbers, ignoring the others; example 10, 20, NULL, 35 gives 21.67.",
+  "clean_avg: Whenever a row is NULL, empty text, text that is not a number ('n/a'), or binary data, it is skipped and does not count in the number of rows divided by.",
+  "clean_avg: Whenever a value is a number written as text ('20', ' 4 ', '1e2'), it is read as a number and included.",
+  "clean_avg: Whenever there are no rows at all (for example, a day with no orders), or no row holds a usable number, the result is 0.0, never blank or NULL and never an error. This includes the case where every row is skipped or excluded, such as when the only entries are junk text like 'abc', 'n/a', empty text, NULL, binary data, negative values, or values above 10000. With groups, a group with no usable number also gets 0.0. It is returned as a decimal number, so it shows as 0.0.",
+  "clean_avg: Values that are negative are excluded. Zero is kept and included like any other number. Values above 10000 are excluded.",
+  "clean_avg: Whenever the result is calculated, it is not rounded (e.g. 2.1666666666666665); it is returned as a decimal number, and with groups each group gets its own average.",
+  "clean_avg: Whenever a text value reads as 'inf' or 'nan', it is treated as a number and makes the average infinite or not-a-number.",
+  "A customer with no name on file gets no badge at all (blank). The owner says: Case 5 matches my policy, so nothing jumps out at me.\n\nENTER",
+  "A 10,000-rupee invoice that is 30 days late already reaches the 1,500-rupee ceiling, so day 31 or day 90 adds nothing more. The owner says: That's wrong. 30 days late is 15%, which is 1,500, but the cap is 25% (2,500), so it keeps growing until day 50.",
+  "A 2 kg parcel sent to a zone D, which does not exist, gets no price at all (blank) rather than an error. The owner says: It should be billed as zone C, so 16.06, not blank."
+ ],
+ "spots": [
+  {
+   "function": "bayes_rating",
+   "call": "SELECT bayes_rating(5.0, 1)",
+   "got": 3.64,
+   "say": "A new product with a single 5-star vote is shown as 3.64 stars, because the first votes are pulled strongly toward a built-in 3.5 starting point."
+  },
+  {
+   "function": "bayes_rating",
+   "call": "SELECT bayes_rating(4.8, 0)",
+   "got": 3.5,
+   "say": "A product with an average of 4.8 stars but no votes at all is shown as 3.5 stars, the neutral starting rating."
+  },
+  {
+   "function": "bayes_rating",
+   "call": "SELECT bayes_rating(4.8, -3)",
+   "got": null,
+   "say": "A product listed with a 4.8 average and minus 3 votes gets no rating at all (blank) instead of an error."
+  },
+  {
+   "function": "bayes_rating",
+   "call": "SELECT bayes_rating(9, 10)",
+   "got": 6.25,
+   "say": "A mistyped 9-star average on 10 votes is not rejected: the shop shows a 6.25-star rating on a 5-star scale."
+  },
+  {
+   "function": "bayes_rating",
+   "call": "SELECT bayes_rating(5, 40)",
+   "got": 4.7,
+   "say": "A product with a perfect 5-star average from 40 votes is still shown as 4.7 stars, never reaching 5."
+  },
+  {
+   "function": "initials",
+   "call": "SELECT initials('Jean-Luc Picard')",
+   "got": "JP",
+   "say": "Jean-Luc Picard gets the badge letters JP, so the second half of his hyphenated first name is ignored."
+  },
+  {
+   "function": "initials",
+   "call": "SELECT initials('ana maria de souza')",
+   "got": "AMDS",
+   "say": "Ana Maria de Souza gets four letters, AMDS, because small words like 'de' count as a name too."
+  },
+  {
+   "function": "initials",
+   "call": "SELECT initials('')",
+   "got": "",
+   "say": "A customer with an empty name gets an empty badge (blank text), not a placeholder."
+  },
+  {
+   "function": "initials",
+   "call": "SELECT initials('  ravi   kumar ')",
+   "got": "RK",
+   "say": "Ravi Kumar typed with extra spaces around and between his names still gets the badge RK."
+  },
+  {
+   "function": "initials",
+   "call": "SELECT initials(NULL)",
+   "got": null,
+   "say": "A customer with no name on file gets no badge at all (blank)."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 31)",
+   "got": 1500.0,
+   "say": "Ravi's 10,000-rupee invoice paid 31 days late is charged a late fee of 1,500 rupees, which is the most any invoice can be charged."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 30)",
+   "got": 1500.0,
+   "say": "A 10,000-rupee invoice that is 30 days late already reaches the 1,500-rupee ceiling, so day 31 or day 90 adds nothing more."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 0)",
+   "got": 0.0,
+   "say": "A 10,000-rupee invoice that is not late at all (0 days) is charged no late fee, 0 rupees."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(-500, 10)",
+   "got": 0.0,
+   "say": "A credit note of minus 500 rupees that is 10 days overdue is charged no late fee, 0 rupees, and is not turned into a refund."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 2.5)",
+   "got": 125.0,
+   "say": "An invoice of 10,000 rupees that is 2.5 days late is charged a part-day fee of 125 rupees."
+  },
+  {
+   "function": "mask_email",
+   "call": "SELECT mask_email('a@x.com')",
+   "got": "a@x.com",
+   "say": "An address whose name part is a single letter, a@x.com, is shown in full in the report, with nothing hidden."
+  },
+  {
+   "function": "mask_email",
+   "call": "SELECT mask_email('ab@x.com')",
+   "got": "a*@x.com",
+   "say": "The two-letter address ab@x.com is shown as a*@x.com, so half of the name part stays visible."
+  },
+  {
+   "function": "mask_email",
+   "call": "SELECT mask_email('ravi@example.com')",
+   "got": "r**i@example.com",
+   "say": "Ravi's address ravi@example.com is shown as r**i@example.com, keeping the first and last letter of the name part visible."
+  },
+  {
+   "function": "mask_email",
+   "call": "SELECT mask_email('notanemail')",
+   "got": "n********l",
+   "say": "A customer who typed 'notanemail' with no @ sign has the whole text masked like a name part, shown as n********l, with no warning that it is not an address."
+  },
+  {
+   "function": "mask_email",
+   "call": "SELECT mask_email('john@home@x.com')",
+   "got": "j*******e@x.com",
+   "say": "An address with two @ signs, john@home@x.com, treats everything before the last @ as the name part and shows j*******e@x.com."
+  },
+  {
+   "function": "pro_rata",
+   "call": "SELECT pro_rata(300, 45, 30)",
+   "got": 300.0,
+   "say": "A customer on a 300-rupee monthly plan who used 45 days of a 30-day period is charged only the full 300 rupees, not 450."
+  },
+  {
+   "function": "pro_rata",
+   "call": "SELECT pro_rata(100, 1, 3)",
+   "got": 33.33,
+   "say": "A 100-rupee charge for 1 day used out of 3 comes to 33.33 rupees, rounded to the nearest paisa."
+  },
+  {
+   "function": "pro_rata",
+   "call": "SELECT pro_rata(300, -5, 30)",
+   "got": 0.0,
+   "say": "A 300-rupee monthly plan with minus 5 days used is charged 0 rupees instead of an error."
+  },
+  {
+   "function": "pro_rata",
+   "call": "SELECT pro_rata(300, 10, 0)",
+   "got": null,
+   "say": "A 300-rupee charge for 10 days used in a period of 0 days gets no amount at all (blank), so nothing is billed."
+  },
+  {
+   "function": "pro_rata",
+   "call": "SELECT pro_rata(-300, 10, 30)",
+   "got": -100.0,
+   "say": "A 300-rupee credit (minus 300) used for 10 of 30 days comes out as minus 100 rupees, so a refund is prorated the same way as a charge."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(0, 'B')",
+   "got": 7.35,
+   "say": "A parcel weighing 0 kg sent to zone B still costs 7.35, the base fee for that zone."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(2, 'c')",
+   "got": 16.06,
+   "say": "A 2 kg parcel to zone C written with a small letter 'c' is accepted and costs 16.06."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(2, 'D')",
+   "got": null,
+   "say": "A 2 kg parcel sent to a zone D, which does not exist, gets no price at all (blank) rather than an error."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(-1, 'A')",
+   "got": null,
+   "say": "A parcel with a weight of minus 1 kg to zone A gets no price at all (blank)."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(1000, 'A')",
+   "got": 1204.9,
+   "say": "A 1,000 kg shipment to zone A is priced at 1,204.90, with no weight limit or special freight rate."
+  },
+  {
+   "function": "sku_check",
+   "call": "SELECT sku_check('0012')",
+   "got": "00125",
+   "say": "Product code 0012 keeps its leading zeros and becomes 00125 with its check digit."
+  },
+  {
+   "function": "sku_check",
+   "call": "SELECT sku_check('7992739871')",
+   "got": "79927398713",
+   "say": "Product code 7992739871 becomes 79927398713 with a check digit of 3."
+  },
+  {
+   "function": "sku_check",
+   "call": "SELECT sku_check('12a')",
+   "got": null,
+   "say": "A product code typed as 12a, with a letter in it, gets no check digit (blank) instead of an error."
+  },
+  {
+   "function": "sku_check",
+   "call": "SELECT sku_check(12.0)",
+   "got": null,
+   "say": "A product code stored as the decimal number 12.0, for example after a spreadsheet import, gets no check digit (blank)."
+  },
+  {
+   "function": "sku_check",
+   "call": "SELECT sku_check(' 123 ')",
+   "got": "1230",
+   "say": "Product code 123 typed with spaces around it is accepted and comes back as 1230 with the spaces removed."
+  },
+  {
+   "function": "time_slot",
+   "call": "SELECT time_slot(16)",
+   "got": 30,
+   "say": "A 16-minute consultation with Meera is billed as 30 minutes, since any started 15-minute block counts in full."
+  },
+  {
+   "function": "time_slot",
+   "call": "SELECT time_slot(1)",
+   "got": 15,
+   "say": "A 1-minute call is billed as a full 15 minutes."
+  },
+  {
+   "function": "time_slot",
+   "call": "SELECT time_slot(0)",
+   "got": 0,
+   "say": "A booking of 0 minutes is billed 0 minutes, with no minimum charge."
+  },
+  {
+   "function": "time_slot",
+   "call": "SELECT time_slot(-20)",
+   "got": 0,
+   "say": "A booking recorded as minus 20 minutes is billed 0 minutes instead of an error."
+  },
+  {
+   "function": "time_slot",
+   "call": "SELECT time_slot(15)",
+   "got": 15,
+   "say": "A meeting of exactly 15 minutes is billed 15 minutes, with no extra block added."
+  },
+  {
+   "function": "workdays_between",
+   "call": "SELECT workdays_between('2026-11-02','2026-11-09')",
+   "got": 5,
+   "say": "From Monday 2 November to Monday 9 November 2026 there are 5 working days, counting the start day but not the end day."
+  },
+  {
+   "function": "workdays_between",
+   "call": "SELECT workdays_between('2026-11-09','2026-11-02')",
+   "got": -5,
+   "say": "With the dates the other way round, Monday 9 November to Monday 2 November 2026, the answer is minus 5 working days instead of an error."
+  },
+  {
+   "function": "workdays_between",
+   "call": "SELECT workdays_between('2026-12-24','2027-01-04')",
+   "got": 7,
+   "say": "From 24 December 2026 to 4 January 2027 there are 7 working days, because Christmas and New Year's Day are counted as ordinary working days."
+  },
+  {
+   "function": "workdays_between",
+   "call": "SELECT workdays_between('2026-11-06','2026-11-06')",
+   "got": 0,
+   "say": "A job that starts and ends on the same Friday, 6 November 2026, counts 0 working days, so a same-day job is not charged for any day."
+  },
+  {
+   "function": "workdays_between",
+   "call": "SELECT workdays_between('2026-02-30','2026-03-04')",
+   "got": null,
+   "say": "A start date of 30 February 2026, which does not exist, gives no answer (blank) instead of an error."
+  },
+  {
+   "function": "clean_avg",
+   "call": "SELECT clean_avg(a) FROM t",
+   "got": 90.0,
+   "say": "A dashboard with orders of 100, 100, 200, 50 (typed as text) and 0 rupees, plus a blank and a junk entry 'abc', shows an average order of 90 rupees, skipping the blank and junk instead of counting them as zero."
+  },
+  {
+   "function": "clean_avg",
+   "call": "SELECT clean_avg(a) FROM t WHERE a=0",
+   "got": 0.0,
+   "say": "A day with only a single 0-rupee order shows an average order of 0 rupees, so a zero order is counted as a real order."
+  },
+  {
+   "function": "clean_avg",
+   "call": "SELECT clean_avg(a) FROM e",
+   "got": null,
+   "say": "A dashboard for a day with no orders at all shows a blank average, not 0 rupees."
+  },
+  {
+   "function": "clean_avg",
+   "call": "SELECT clean_avg(DISTINCT a) FROM t",
+   "got": 90.0,
+   "say": "Asking for the average of distinct order amounts still gives 90 rupees, so the two 100-rupee orders are both counted and are not merged into one."
+  },
+  {
+   "function": "clean_avg",
+   "call": "SELECT clean_avg(a) FROM t WHERE a='abc'",
+   "got": null,
+   "say": "A dashboard where the only entry is the junk text 'abc' shows a blank average instead of an error."
+  }
+ ],
+ "shown": [
+  {
+   "function": "initials",
+   "call": "SELECT initials('Jean-Luc Picard')",
+   "got": "JP",
+   "say": "Jean-Luc Picard gets the badge letters JP, so the second half of his hyphenated first name is ignored."
+  },
+  {
+   "function": "initials",
+   "call": "SELECT initials('ana maria de souza')",
+   "got": "AMDS",
+   "say": "Ana Maria de Souza gets four letters, AMDS, because small words like 'de' count as a name too."
+  },
+  {
+   "function": "initials",
+   "call": "SELECT initials('')",
+   "got": "",
+   "say": "A customer with an empty name gets an empty badge (blank text), not a placeholder."
+  },
+  {
+   "function": "initials",
+   "call": "SELECT initials('  ravi   kumar ')",
+   "got": "RK",
+   "say": "Ravi Kumar typed with extra spaces around and between his names still gets the badge RK."
+  },
+  {
+   "function": "initials",
+   "call": "SELECT initials(NULL)",
+   "got": null,
+   "say": "A customer with no name on file gets no badge at all (blank)."
+  },
+  {
+   "function": "sku_check",
+   "call": "SELECT sku_check('0012')",
+   "got": "00125",
+   "say": "Product code 0012 keeps its leading zeros and becomes 00125 with its check digit."
+  },
+  {
+   "function": "sku_check",
+   "call": "SELECT sku_check('7992739871')",
+   "got": "79927398713",
+   "say": "Product code 7992739871 becomes 79927398713 with a check digit of 3."
+  },
+  {
+   "function": "sku_check",
+   "call": "SELECT sku_check('12a')",
+   "got": null,
+   "say": "A product code typed as 12a, with a letter in it, gets no check digit (blank) instead of an error."
+  },
+  {
+   "function": "sku_check",
+   "call": "SELECT sku_check(12.0)",
+   "got": null,
+   "say": "A product code stored as the decimal number 12.0, for example after a spreadsheet import, gets no check digit (blank)."
+  },
+  {
+   "function": "sku_check",
+   "call": "SELECT sku_check(' 123 ')",
+   "got": "1230",
+   "say": "Product code 123 typed with spaces around it is accepted and comes back as 1230 with the spaces removed."
+  },
+  {
+   "function": "time_slot",
+   "call": "SELECT time_slot(16)",
+   "got": 30,
+   "say": "A 16-minute consultation with Meera is billed as 30 minutes, since any started 15-minute block counts in full."
+  },
+  {
+   "function": "time_slot",
+   "call": "SELECT time_slot(1)",
+   "got": 15,
+   "say": "A 1-minute call is billed as a full 15 minutes."
+  },
+  {
+   "function": "time_slot",
+   "call": "SELECT time_slot(0)",
+   "got": 0,
+   "say": "A booking of 0 minutes is billed 0 minutes, with no minimum charge."
+  },
+  {
+   "function": "time_slot",
+   "call": "SELECT time_slot(-20)",
+   "got": 0,
+   "say": "A booking recorded as minus 20 minutes is billed 0 minutes instead of an error."
+  },
+  {
+   "function": "time_slot",
+   "call": "SELECT time_slot(15)",
+   "got": 15,
+   "say": "A meeting of exactly 15 minutes is billed 15 minutes, with no extra block added."
+  },
+  {
+   "function": "bayes_rating",
+   "call": "SELECT bayes_rating(5.0, 1)",
+   "got": 3.64,
+   "say": "A new product with a single 5-star vote is shown as 3.64 stars, because the first votes are pulled strongly toward a built-in 3.5 starting point."
+  },
+  {
+   "function": "bayes_rating",
+   "call": "SELECT bayes_rating(4.8, 0)",
+   "got": 3.5,
+   "say": "A product with an average of 4.8 stars but no votes at all is shown as 3.5 stars, the neutral starting rating."
+  },
+  {
+   "function": "bayes_rating",
+   "call": "SELECT bayes_rating(4.8, -3)",
+   "got": null,
+   "say": "A product listed with a 4.8 average and minus 3 votes gets no rating at all (blank) instead of an error."
+  },
+  {
+   "function": "bayes_rating",
+   "call": "SELECT bayes_rating(9, 10)",
+   "got": 6.25,
+   "say": "A mistyped 9-star average on 10 votes is not rejected: the shop shows a 6.25-star rating on a 5-star scale."
+  },
+  {
+   "function": "bayes_rating",
+   "call": "SELECT bayes_rating(5, 40)",
+   "got": 4.7,
+   "say": "A product with a perfect 5-star average from 40 votes is still shown as 4.7 stars, never reaching 5."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 31)",
+   "got": 1500.0,
+   "say": "Ravi's 10,000-rupee invoice paid 31 days late is charged a late fee of 1,500 rupees, which is the most any invoice can be charged."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 30)",
+   "got": 1500.0,
+   "say": "A 10,000-rupee invoice that is 30 days late already reaches the 1,500-rupee ceiling, so day 31 or day 90 adds nothing more."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 0)",
+   "got": 0.0,
+   "say": "A 10,000-rupee invoice that is not late at all (0 days) is charged no late fee, 0 rupees."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(-500, 10)",
+   "got": 0.0,
+   "say": "A credit note of minus 500 rupees that is 10 days overdue is charged no late fee, 0 rupees, and is not turned into a refund."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 2.5)",
+   "got": 125.0,
+   "say": "An invoice of 10,000 rupees that is 2.5 days late is charged a part-day fee of 125 rupees."
+  },
+  {
+   "function": "mask_email",
+   "call": "SELECT mask_email('a@x.com')",
+   "got": "a@x.com",
+   "say": "An address whose name part is a single letter, a@x.com, is shown in full in the report, with nothing hidden."
+  },
+  {
+   "function": "mask_email",
+   "call": "SELECT mask_email('ab@x.com')",
+   "got": "a*@x.com",
+   "say": "The two-letter address ab@x.com is shown as a*@x.com, so half of the name part stays visible."
+  },
+  {
+   "function": "mask_email",
+   "call": "SELECT mask_email('ravi@example.com')",
+   "got": "r**i@example.com",
+   "say": "Ravi's address ravi@example.com is shown as r**i@example.com, keeping the first and last letter of the name part visible."
+  },
+  {
+   "function": "mask_email",
+   "call": "SELECT mask_email('notanemail')",
+   "got": "n********l",
+   "say": "A customer who typed 'notanemail' with no @ sign has the whole text masked like a name part, shown as n********l, with no warning that it is not an address."
+  },
+  {
+   "function": "mask_email",
+   "call": "SELECT mask_email('john@home@x.com')",
+   "got": "j*******e@x.com",
+   "say": "An address with two @ signs, john@home@x.com, treats everything before the last @ as the name part and shows j*******e@x.com."
+  },
+  {
+   "function": "pro_rata",
+   "call": "SELECT pro_rata(300, 45, 30)",
+   "got": 300.0,
+   "say": "A customer on a 300-rupee monthly plan who used 45 days of a 30-day period is charged only the full 300 rupees, not 450."
+  },
+  {
+   "function": "pro_rata",
+   "call": "SELECT pro_rata(100, 1, 3)",
+   "got": 33.33,
+   "say": "A 100-rupee charge for 1 day used out of 3 comes to 33.33 rupees, rounded to the nearest paisa."
+  },
+  {
+   "function": "pro_rata",
+   "call": "SELECT pro_rata(300, -5, 30)",
+   "got": 0.0,
+   "say": "A 300-rupee monthly plan with minus 5 days used is charged 0 rupees instead of an error."
+  },
+  {
+   "function": "pro_rata",
+   "call": "SELECT pro_rata(300, 10, 0)",
+   "got": null,
+   "say": "A 300-rupee charge for 10 days used in a period of 0 days gets no amount at all (blank), so nothing is billed."
+  },
+  {
+   "function": "pro_rata",
+   "call": "SELECT pro_rata(-300, 10, 30)",
+   "got": -100.0,
+   "say": "A 300-rupee credit (minus 300) used for 10 of 30 days comes out as minus 100 rupees, so a refund is prorated the same way as a charge."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(0, 'B')",
+   "got": 7.35,
+   "say": "A parcel weighing 0 kg sent to zone B still costs 7.35, the base fee for that zone."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(2, 'c')",
+   "got": 16.06,
+   "say": "A 2 kg parcel to zone C written with a small letter 'c' is accepted and costs 16.06."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(2, 'D')",
+   "got": null,
+   "say": "A 2 kg parcel sent to a zone D, which does not exist, gets no price at all (blank) rather than an error."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(-1, 'A')",
+   "got": null,
+   "say": "A parcel with a weight of minus 1 kg to zone A gets no price at all (blank)."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(1000, 'A')",
+   "got": 1204.9,
+   "say": "A 1,000 kg shipment to zone A is priced at 1,204.90, with no weight limit or special freight rate."
+  },
+  {
+   "function": "workdays_between",
+   "call": "SELECT workdays_between('2026-11-02','2026-11-09')",
+   "got": 5,
+   "say": "From Monday 2 November to Monday 9 November 2026 there are 5 working days, counting the start day but not the end day."
+  },
+  {
+   "function": "workdays_between",
+   "call": "SELECT workdays_between('2026-11-09','2026-11-02')",
+   "got": -5,
+   "say": "With the dates the other way round, Monday 9 November to Monday 2 November 2026, the answer is minus 5 working days instead of an error."
+  },
+  {
+   "function": "workdays_between",
+   "call": "SELECT workdays_between('2026-12-24','2027-01-04')",
+   "got": 7,
+   "say": "From 24 December 2026 to 4 January 2027 there are 7 working days, because Christmas and New Year's Day are counted as ordinary working days."
+  },
+  {
+   "function": "workdays_between",
+   "call": "SELECT workdays_between('2026-11-06','2026-11-06')",
+   "got": 0,
+   "say": "A job that starts and ends on the same Friday, 6 November 2026, counts 0 working days, so a same-day job is not charged for any day."
+  },
+  {
+   "function": "workdays_between",
+   "call": "SELECT workdays_between('2026-02-30','2026-03-04')",
+   "got": null,
+   "say": "A start date of 30 February 2026, which does not exist, gives no answer (blank) instead of an error."
+  },
+  {
+   "function": "clean_avg",
+   "call": "SELECT clean_avg(a) FROM t",
+   "got": 90.0,
+   "say": "A dashboard with orders of 100, 100, 200, 50 (typed as text) and 0 rupees, plus a blank and a junk entry 'abc', shows an average order of 90 rupees, skipping the blank and junk instead of counting them as zero."
+  },
+  {
+   "function": "clean_avg",
+   "call": "SELECT clean_avg(a) FROM t WHERE a=0",
+   "got": 0.0,
+   "say": "A day with only a single 0-rupee order shows an average order of 0 rupees, so a zero order is counted as a real order."
+  },
+  {
+   "function": "clean_avg",
+   "call": "SELECT clean_avg(a) FROM e",
+   "got": null,
+   "say": "A dashboard for a day with no orders at all shows a blank average, not 0 rupees."
+  },
+  {
+   "function": "clean_avg",
+   "call": "SELECT clean_avg(DISTINCT a) FROM t",
+   "got": 90.0,
+   "say": "Asking for the average of distinct order amounts still gives 90 rupees, so the two 100-rupee orders are both counted and are not merged into one."
+  },
+  {
+   "function": "clean_avg",
+   "call": "SELECT clean_avg(a) FROM t WHERE a='abc'",
+   "got": null,
+   "say": "A dashboard where the only entry is the junk text 'abc' shows a blank average instead of an error."
+  }
+ ],
+ "fixes": [
+  {
+   "shown": "Ana Maria de Souza gets four letters, AMDS, because small words like 'de' count as a name too.",
+   "said": "It should be AMD, since only the first 3 words count.",
+   "function": "initials",
+   "rounds": 1,
+   "now": "Ana Maria de Souza's full name is turned into initials by using only the first 3 words, so the small word 'de' counts as the third word and 'Souza' is ignored: the initials come to AMD, not AMDS.",
+   "confirmed": true
+  },
+  {
+   "shown": "A customer with an empty name gets an empty badge (blank text), not a placeholder.",
+   "said": "It should return nothing (NULL), not blank text.",
+   "function": "initials",
+   "rounds": 1,
+   "now": "A customer with an empty name has no words to take initials from, so the badge comes out as NULL (no value at all), not blank text and not a placeholder.",
+   "confirmed": true
+  },
+  {
+   "shown": "A customer with no name on file gets no badge at all (blank).",
+   "said": "Case 5 matches my policy, so nothing jumps out at me.\n\nENTER",
+   "function": "initials",
+   "rounds": 1,
+   "now": "A customer with no name on file (the name is NULL) has no initials, so the result is NULL and no badge is shown, leaving the badge blank.",
+   "confirmed": true
+  },
+  {
+   "shown": "A product listed with a 4.8 average and minus 3 votes gets no rating at all (blank) instead of an error.",
+   "said": "It should show 3.5 stars, because negative votes count as zero.",
+   "function": "bayes_rating",
+   "rounds": 1,
+   "now": "A product listed with a 4.8 average and minus 3 votes is not left blank and does not cause an error: the negative vote count is treated as 0 votes, so the rating comes to 3.5.",
+   "confirmed": true
+  },
+  {
+   "shown": "A mistyped 9-star average on 10 votes is not rejected: the shop shows a 6.25-star rating on a 5-star scale.",
+   "said": "It should be 4.25, because the 9 gets clamped to 5 first.",
+   "function": "bayes_rating",
+   "rounds": 1,
+   "now": "A mistyped 9-star average on 10 votes is clamped down to 5 stars before the calculation, so the shop shows a 4.25-star rating (not 6.25): (10 votes \u00d7 5 + 35) / (10 + 10) = 4.25, which stays within the 5-star scale.",
+   "confirmed": true
+  },
+  {
+   "shown": "Ravi's 10,000-rupee invoice paid 31 days late is charged a late fee of 1,500 rupees, which is the most any invoice can be charged.",
+   "said": "It should be 1,550 rupees (0.5% per day \u00d7 31 days). The cap is 25% of the invoice, which is 2,500, so the fee isn't capped here.",
+   "function": "late_fee",
+   "rounds": 1,
+   "now": "Ravi's 10,000-rupee invoice paid 31 days late is charged a late fee of 1,550 rupees (0.5% of the amount for each of the 31 days, which is 15.5%), not 1,500, because the 25% cap of 2,500 rupees only applies from 50 days late, so no cap applies at 31 days.",
+   "confirmed": true
+  },
+  {
+   "shown": "A 10,000-rupee invoice that is 30 days late already reaches the 1,500-rupee ceiling, so day 31 or day 90 adds nothing more.",
+   "said": "That's wrong. 30 days late is 15%, which is 1,500, but the cap is 25% (2,500), so it keeps growing until day 50.",
+   "function": "late_fee",
+   "rounds": 1,
+   "now": "The 10,000-rupee invoice that is 30 days late has not reached any ceiling: its late fee is 1,500 rupees (0.5% a day for 30 days, or 15%), the fee keeps growing to 1,550 rupees on day 31, and it only stops at the 25% ceiling of 2,500 rupees from day 50 onward, so at 90 days late the fee comes to 2,500 rupees.",
+   "confirmed": true
+  },
+  {
+   "shown": "An invoice of 10,000 rupees that is 2.5 days late is charged a part-day fee of 125 rupees.",
+   "said": "It should be 0, because the first 3 days are a grace period and the fee starts on day 4.",
+   "function": "late_fee",
+   "rounds": 2,
+   "now": "Meera's 10,000-rupee invoice is 2.5 days late: because the fee is 0.5% of the amount for each day late, which makes 1.25% for 2.5 days, the late fee comes to 125.00 rupees.",
+   "confirmed": false,
+   "said_again": "No, it should be 0. The first 3 days are grace, so there's no fee at 2.5 days."
+  },
+  {
+   "shown": "An address whose name part is a single letter, a@x.com, is shown in full in the report, with nothing hidden.",
+   "said": "It should be masked as *@x.com. A 1\u20132 character name part gets fully hidden.",
+   "function": "mask_email",
+   "rounds": 1,
+   "now": "The address a@x.com, whose name part is a single letter, is masked by the rules to '*@x.com', so the report hides the letter and does not show it in full: the outcome is '*@x.com', which differs from what was shown.",
+   "confirmed": true
+  },
+  {
+   "shown": "The two-letter address ab@x.com is shown as a*@x.com, so half of the name part stays visible.",
+   "said": "It should be **@x.com. A name part of 1 or 2 characters is fully hidden.",
+   "function": "mask_email",
+   "rounds": 1,
+   "now": "The address ab@x.com has a two-letter name part, so the software hides all of it and shows **@x.com, not a*@x.com: no letter of the name is visible and only the @x.com domain stays readable.",
+   "confirmed": true
+  },
+  {
+   "shown": "A customer who typed 'notanemail' with no @ sign has the whole text masked like a name part, shown as n********l, with no warning that it is not an address.",
+   "said": "It should be blank (NULL). With no @ it isn't an address, so nothing gets masked.",
+   "function": "mask_email",
+   "rounds": 1,
+   "now": "The customer who typed 'notanemail' with no @ sign gets no masked text at all, because that is not an email address: nothing is masked and the result is NULL (empty), not 'n********l'.",
+   "confirmed": true
+  },
+  {
+   "shown": "An address with two @ signs, john@home@x.com, treats everything before the last @ as the name part and shows j*******e@x.com.",
+   "said": "It should be blank (NULL). Two @ signs means it isn't a valid address, so nothing gets masked.",
+   "function": "mask_email",
+   "rounds": 1,
+   "now": "The address john@home@x.com has two @ signs, so the software treats it as not a valid email address and masks nothing: the result is NULL, not j*******e@x.com.",
+   "confirmed": true
+  },
+  {
+   "shown": "A 300-rupee charge for 10 days used in a period of 0 days gets no amount at all (blank), so nothing is billed.",
+   "said": "It should be 0.0, not blank. A period of 0 days returns 0.0.",
+   "function": "pro_rata",
+   "rounds": 1,
+   "now": "A 300-rupee charge for 10 days used in a period of 0 days comes to 0.0 rupees, a zero amount and not a blank, because a period of 0 or fewer days always gives 0.0 when all three values are valid numbers, so nothing is billed.",
+   "confirmed": true
+  },
+  {
+   "shown": "A parcel weighing 0 kg sent to zone B still costs 7.35, the base fee for that zone.",
+   "said": "It should be blank (NULL). A weight of 0 or less gets no price.",
+   "function": "ship_cost",
+   "rounds": 1,
+   "now": "A parcel weighing 0 kg sent to zone B gets no price: the shipping cost is NULL, not the 7.35 zone B base fee, because a weight of 0 or less is never priced, whatever the zone.",
+   "confirmed": true
+  },
+  {
+   "shown": "A 2 kg parcel sent to a zone D, which does not exist, gets no price at all (blank) rather than an error.",
+   "said": "It should be billed as zone C, so 16.06, not blank.",
+   "function": "ship_cost",
+   "rounds": 1,
+   "now": "A 2 kg parcel sent to zone D, which does not exist, is not left without a price: it is billed as zone C, so the shipping cost comes to 16.06 (7.30 \u00d7 2.2), not blank and not an error.",
+   "confirmed": true
+  },
+  {
+   "shown": "A 1,000 kg shipment to zone A is priced at 1,204.90, with no weight limit or special freight rate.",
+   "said": "It should be 1,219.90. Anything over 30 kg gets the flat 15 surcharge.",
+   "function": "ship_cost",
+   "rounds": 1,
+   "now": "A 1,000 kg shipment to zone A is over the 30 kg line, so it gets the flat 15 surcharge on top of the 1,204.90 base charge (4.90 + 1.20 \u00d7 1,000, times 1.0 for zone A): the shipping cost comes to 1,219.90, not 1,204.90, because the rules have no weight limit or special freight rate that would waive the surcharge.",
+   "confirmed": true
+  },
+  {
+   "shown": "With the dates the other way round, Monday 9 November to Monday 2 November 2026, the answer is minus 5 working days instead of an error.",
+   "said": "It should be 0, not minus 5. A reversed range never goes negative.",
+   "function": "workdays_between",
+   "rounds": 1,
+   "now": "Counting working days from Monday 9 November 2026 back to Monday 2 November 2026, which is the wrong way round, gives 0 working days, not minus 5 and not an error, because when the end date is on or before the start date the result is 0 and is never negative.",
+   "confirmed": true
+  },
+  {
+   "shown": "From 24 December 2026 to 4 January 2027 there are 7 working days, because Christmas and New Year's Day are counted as ordinary working days.",
+   "said": "It should be 5. Christmas and New Year's Day are weekday holidays, so they don't count.",
+   "function": "workdays_between",
+   "rounds": 1,
+   "now": "Counting working days from 24 December 2026 to 4 January 2027, the software does not count Christmas Day (Friday 25 December) or New Year's Day (Friday 1 January) as working days, so the count is 5 rather than 7: Thursday 24 December plus Monday 28 to Thursday 31 December.",
+   "confirmed": true
+  },
+  {
+   "shown": "A dashboard for a day with no orders at all shows a blank average, not 0 rupees.",
+   "said": "It should show 0.0, not blank. No orders gives an average of 0.0.",
+   "function": "clean_avg",
+   "rounds": 1,
+   "now": "On a day with no orders at all, the dashboard's average order value comes to 0.0 rupees, not blank, because with no rows the average is defined to be 0.0, so the blank shown is wrong.",
+   "confirmed": true
+  },
+  {
+   "shown": "A dashboard where the only entry is the junk text 'abc' shows a blank average instead of an error.",
+   "said": "It should show 0.0, not blank. No valid orders gives an average of 0.0.",
+   "function": "clean_avg",
+   "rounds": 1,
+   "now": "A dashboard whose only entry is the junk text 'abc' skips that entry, so no row holds a usable number and the average comes out as 0.0, not blank, NULL or an error: the dashboard shows an average of 0.0.",
+   "confirmed": true
+  }
+ ],
+ "list_review": {
+  "replies": 17,
+  "cost": 1.381,
+  "log": [
+   {
+    "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+    "typed": "6, 15, 23, 24, 25, 33, 41, 56, 57, 63, 64. Fees cap at 25% after a 3-day grace, short emails get fully masked, and unknown zones bill as C. Reversed date ranges give 0, and holidays on 1 Jan and 25 Dec are excluded."
+   },
+   {
+    "prompt": "  Rule 6: bayes_rating: Whenever the average is outside 0\u20135 (e.g. 7 or -2), it is not limited or rejected; the calculation just proceeds (average 7 with 5 votes gives 4.67, average -2 with 5 votes gives 1.67).\n  What should it be? > ",
+    "typed": "Clamp it to 1 or 5 first, then calculate (average 7 gives 5, average -2 gives 1)."
+   },
+   {
+    "prompt": "  Rule 15: late_fee: Whenever the days late reach 30 or more, the fee stops growing and stays at 15% of the amount (1000 gives 150.00 at 30 days and also at 31 days or more).\n  What should it be? > ",
+    "typed": "Cap the fee at 25% of the amount, with no fee for the first 3 days."
+   },
+   {
+    "prompt": "  Rule 23: mask_email: Whenever the name part has exactly 1 character, it is shown unchanged ('a@x.com' stays 'a@x.com').\n  What should it be? > ",
+    "typed": "Mask it fully with * ('a@x.com' gives '*@x.com')."
+   },
+   {
+    "prompt": "  Rule 24: mask_email: Whenever the name part is empty ('@x.com') or the whole text is empty, the text is returned unchanged.\n  What should it be? > ",
+    "typed": "Return NULL."
+   },
+   {
+    "prompt": "  Rule 25: mask_email: Whenever the text contains no '@', the whole text is treated as the name part and masked the same way ('noatsign' gives 'n******n').\n  What should it be? > ",
+    "typed": "Return NULL."
+   },
+   {
+    "prompt": "  Rule 33: pro_rata: Whenever the days in the period is 0 or negative, the result is NULL.\n  What should it be? > ",
+    "typed": "Return 0.0."
+   },
+   {
+    "prompt": "  Rule 41: ship_cost: Whenever the zone is anything other than A, B or C (e.g. 'D', empty text, 'AB', a number such as 1), the cost is NULL.\n  What should it be? > ",
+    "typed": "Bill it as zone C."
+   },
+   {
+    "prompt": "  Rule 56: workdays_between: Whenever the start date is after the end date, the result is the negative of the count for the reversed pair (2024-01-05 to 2024-01-01 gives -4, 2024-01-08 to 2024-01-01 gives -5).\n  What should it be? > ",
+    "typed": "Return 0 when the end is on or before the start."
+   },
+   {
+    "prompt": "  Rule 57: workdays_between: Whenever public holidays fall in the range, they are counted as working days; only Saturdays and Sundays are excluded.\n  What should it be? > ",
+    "typed": "Don't count Jan 1 and Dec 25 when they fall on a weekday; no other holidays."
+   },
+   {
+    "prompt": "  Rule 63: clean_avg: Whenever there are no rows, or no row holds a usable number, the result is NULL.\n  What should it be? > ",
+    "typed": "Return 0.0 instead of NULL."
+   },
+   {
+    "prompt": "  Rule 64: clean_avg: Whenever values are zero or negative, they are included like any other number (1 and -1 give 0.0).\n  What should it be? > ",
+    "typed": "Exclude negatives, keep zero. Also exclude anything above 10000."
+   },
+   {
+    "prompt": "  Rule 25: mask_email: Whenever the text contains no '@', return NULL.\n  What should it be? > ",
+    "typed": ""
+   },
+   {
+    "prompt": "  Rule 3: bayes_rating: Whenever the vote count is negative, the rating is NULL.\n  What should it be? > ",
+    "typed": "Treat negative votes as 0, so the rating is 3.5."
+   },
+   {
+    "prompt": "  Rule 1: bayes_rating: Whenever a product has an average and a vote count, the rating is (votes \u00d7 average + 35) / (votes + 10), i.e. the average is blended with a prior of 10 imaginary votes at 3.5 stars, and the result is rounded to 2 decimals (halves round up). Example: average 4.5 with 100 votes gives 4.41.\n  What should it be? > ",
+    "typed": ""
+   },
+   {
+    "prompt": "  Rule 25: mask_email: Whenever the text contains no '@', return NULL.\n  What should it be? > ",
+    "typed": ""
+   },
+   {
+    "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+    "typed": ""
+   }
+  ],
+  "transcript": "\nWhat the built code does now, as rules (each one is what the product will do. Mark any that is not your policy):\n  1. bayes_rating: Whenever a product has an average and a vote count, the rating is (votes \u00d7 average + 35) / (votes + 10), i.e. the average is blended with a prior of 10 imaginary votes at 3.5 stars, and the result is rounded to 2 decimals (halves round up). Example: average 4.5 with 100 votes gives 4.41.\n  2. bayes_rating: Whenever the vote count is 0, the rating is 3.5 whatever the average is; with very many votes it approaches the average.\n  3. bayes_rating: Whenever the vote count is negative, the rating is NULL.\n  4. bayes_rating: Whenever the average or the vote count is NULL, empty text, or text that is not a number, the rating is NULL.\n  5. bayes_rating: Whenever the average or votes are numbers written as text (e.g. '4.5' and '20'), they are read as numbers and the rating is calculated normally.\n  6. bayes_rating: Whenever the average is outside 0\u20135 (e.g. 7 or -2), it is not limited or rejected; the calculation just proceeds (average 7 with 5 votes gives 4.67, average -2 with 5 votes gives 1.67).\n  7. bayes_rating: Whenever the vote count is not a whole number (e.g. 2.5), it is used as is in the formula (4.5 average, 2.5 votes gives 3.7).\n  8. initials: Whenever a full name is given, the result is the first character of each word, in uppercase, joined together with no dots or spaces (e.g. 'ann marie lee' gives 'AML').\n  9. initials: Whenever words are separated by extra spaces, tabs or other whitespace, or the name has leading/trailing spaces, these are ignored and each word still counts once ('  john  smith ' gives 'JS').\n  10. initials: Whenever a name contains a hyphen or apostrophe, it is not a word separator, so 'jean-paul sartre' gives 'JS' and \"o'brien\" gives 'O'.\n  11. initials: Whenever a name starts with an accented letter, the accented letter is uppercased and used ('\u00e1nna \u00e9lan' gives '\u00c1\u00c9').\n  12. initials: Whenever the name is NULL, the result is NULL; whenever it is empty or only spaces, the result is empty text.\n  13. initials: Whenever the name is a number or a word starting with a digit, the first digit is used as its initial (123 gives '1', '1 2' gives '12'); there is no check that words are letters.\n  14. late_fee: Whenever an invoice is overdue, the fee is 0.5% of the amount for each day late, rounded to 2 decimals (halves round up). Example: 1000 that is 10 days late gives 50.00.\n  15. late_fee: Whenever the days late reach 30 or more, the fee stops growing and stays at 15% of the amount (1000 gives 150.00 at 30 days and also at 31 days or more).\n  16. late_fee: Whenever days late is 0 or negative, the fee is 0.0 (no penalty), even if the amount is large.\n  17. late_fee: Whenever the amount is 0 or negative, the fee is 0.0 (no negative fees are produced).\n  18. late_fee: Whenever days late is a fraction, it is used as is (100 at 0.5 days gives 0.25); small fees round to 0.0 (0.5 amount, 1 day gives 0.0).\n  19. late_fee: Whenever the amount or the days late is NULL, empty text, or text that is not a number, the fee is NULL; numbers written as text (e.g. '3') are read as numbers.\n  20. late_fee: Whenever the amount or days late is NULL or non-numeric, the result is NULL even if the other value is zero or negative (the NULL check comes before the zero check).\n  21. mask_email: Whenever an email has a name part of 3 or more characters, the first and last characters of the name are kept, everything between is replaced by asterisks (one per character), and the '@' and domain are left unchanged ('john.smith@example.com' gives 'j********h@example.com').\n  22. mask_email: Whenever the name part has exactly 2 characters, the first is kept and the second becomes '*' ('ab@x.com' gives 'a*@x.com').\n  23. mask_email: Whenever the name part has exactly 1 character, it is shown unchanged ('a@x.com' stays 'a@x.com').\n  24. mask_email: Whenever the name part is empty ('@x.com') or the whole text is empty, the text is returned unchanged.\n  25. mask_email: Whenever the text contains no '@', the whole text is treated as the name part and masked the same way ('noatsign' gives 'n******n').\n  26. mask_email: Whenever the text contains several '@' signs, only the last one separates name and domain, so everything before it is masked ('a@b@c.com' gives 'a*b@c.com').\n  27. mask_email: Whenever the email has upper-case letters, they are kept as typed; the domain's case is also untouched.\n  28. mask_email: Whenever the email has leading spaces or other characters, they count as part of the name (' bob@x.com' gives ' **b@x.com'); a number passed in is treated as text and masked the same way (12345 gives '1***5').\n  29. mask_email: Whenever the email is NULL, the result is NULL.\n  30. pro_rata: Whenever a service is used for some days of a period, the charge is amount \u00d7 days used / days in period, rounded to 2 decimals (halves round up). Example: 300, 10 of 30 days gives 100.00; 100, 1 of 3 gives 33.33; 1, 1 of 8 gives 0.13.\n  31. pro_rata: Whenever days used exceeds the days in the period, it is treated as the full period, so the whole amount is charged (300, 40 of 30 gives 300.00).\n  32. pro_rata: Whenever days used is negative, it is treated as 0 and the result is 0.0.\n  33. pro_rata: Whenever the days in the period is 0 or negative, the result is NULL.\n  34. pro_rata: Whenever any of the three values is NULL, empty text, or text that is not a number, the result is NULL; numbers written as text ('300','10','30') are read as numbers.\n  35. pro_rata: Whenever the amount is negative, the share is negative too (-300, 10 of 30 gives -100.0); amount 0 gives 0.0.\n  36. pro_rata: Whenever days used is a fraction, it is used as is (300, 10.5 of 30 gives 105.0).\n  37. ship_cost: Whenever a parcel has a weight and a zone, the cost is (4.90 + 1.20 \u00d7 weight in kg) multiplied by 1.0 for zone A, 1.5 for zone B and 2.2 for zone C, rounded to 2 decimals (halves round up). Examples: 2 kg to A is 7.30, to B 10.95, to C 16.06.\n  38. ship_cost: Whenever the weight is 0 (or tiny such as 0.001), the cost is the base charge: 4.9 for zone A.\n  39. ship_cost: Whenever the weight is negative, the cost is NULL; there is no maximum weight (1000 kg to C costs 2650.78).\n  40. ship_cost: Whenever the zone is lower case or has spaces around it ('b', ' c '), it is accepted as the same zone.\n  41. ship_cost: Whenever the zone is anything other than A, B or C (e.g. 'D', empty text, 'AB', a number such as 1), the cost is NULL.\n  42. ship_cost: Whenever the weight or zone is NULL, or the weight is empty or non-numeric text, the cost is NULL; a weight written as text ('2.5') is read as a number.\n  43. sku_check: Whenever a code made only of digits is given, the result is the same code with one Luhn (mod-10) check digit appended ('7992739871' gives '79927398713').\n  44. sku_check: Whenever the code is given as a number rather than text, it is treated as its digits (79927398713 gives '799273987138'), and the result is always text.\n  45. sku_check: Whenever the code has leading zeros, they are kept ('007' gives '0075', '0' gives '00').\n  46. sku_check: Whenever the code has spaces at the start or end, they are removed first (' 1234 ' gives '12344'); spaces inside the code ('12 34') make the result NULL.\n  47. sku_check: Whenever the code is NULL, empty, contains any letter or symbol (minus or plus sign, decimal point), or contains non-ASCII digits, the result is NULL.\n  48. sku_check: Whenever the code is a decimal number such as 12.0 or 1.5 (not text), the result is NULL.\n  49. time_slot: Whenever a duration in minutes is given, it is rounded up to the next multiple of 15 minutes (1 gives 15, 15 stays 15, 16 gives 30, 46 gives 60), and exact multiples are unchanged.\n  50. time_slot: Whenever the duration is 0 or negative, the result is 0.\n  51. time_slot: Whenever the duration is fractional, it is rounded up too (0.1 gives 15, 14.5 gives 15, 15.01 gives 30).\n  52. time_slot: Whenever the duration is NULL, empty text, or text that is not a number, the result is NULL; a number written as text ('30') is read as a number.\n  53. workdays_between: Whenever two ISO dates (YYYY-MM-DD) are given, the result is the number of Monday\u2013Friday days from the start date up to but not including the end date. Example: 2024-01-01 (Monday) to 2024-01-08 gives 5, to 2024-01-05 gives 4.\n  54. workdays_between: Whenever the end date itself is a working day, it is not counted, and the start date is counted if it is a working day (2024-01-05 Friday to 2024-01-06 gives 1; 2024-01-06 to 2024-01-08 gives 0).\n  55. workdays_between: Whenever the start and end are the same day, or both fall on a weekend, the result is 0.\n  56. workdays_between: Whenever the start date is after the end date, the result is the negative of the count for the reversed pair (2024-01-05 to 2024-01-01 gives -4, 2024-01-08 to 2024-01-01 gives -5).\n  57. workdays_between: Whenever public holidays fall in the range, they are counted as working days; only Saturdays and Sundays are excluded.\n  58. workdays_between: Whenever a date is NULL, empty, not exactly 10 characters, not in YYYY-MM-DD form (e.g. '2024-1-1', '2024/01/01', '20240101', a date with a time), not a real calendar date (2024-02-30) or a number, the result is NULL.\n  59. workdays_between: Whenever a date has spaces around it (' 2024-01-01 '), the spaces are ignored and the date is accepted.\n  60. clean_avg: Whenever it is applied to a set of rows, the result is the plain average of the values that are numbers, ignoring the others; example 10, 20, NULL, 35 gives 21.67.\n  61. clean_avg: Whenever a row is NULL, empty text, text that is not a number ('n/a'), or binary data, it is skipped and does not count in the number of rows divided by.\n  62. clean_avg: Whenever a value is a number written as text ('20', ' 4 ', '1e2'), it is read as a number and included.\n  63. clean_avg: Whenever there are no rows, or no row holds a usable number, the result is NULL.\n  64. clean_avg: Whenever values are zero or negative, they are included like any other number (1 and -1 give 0.0).\n  65. clean_avg: Whenever the result is calculated, it is not rounded (e.g. 2.1666666666666665); it is returned as a decimal number, and with groups each group gets its own average.\n  66. clean_avg: Whenever a text value reads as 'inf' or 'nan', it is treated as a number and makes the average infinite or not-a-number.\n  Numbers of any that are wrong (Enter = all correct) > 6, 15, 23, 24, 25, 33, 41, 56, 57, 63, 64. Fees cap at 25% after a 3-day grace, short emails get fully masked, and unknown zones bill as C. Reversed date ranges give 0, and holidays on 1 Jan and 25 Dec are excluded.\n  Rule 6: bayes_rating: Whenever the average is outside 0\u20135 (e.g. 7 or -2), it is not limited or rejected; the calculation just proceeds (average 7 with 5 votes gives 4.67, average -2 with 5 votes gives 1.67).\n  What should it be? > Clamp it to 1 or 5 first, then calculate (average 7 gives 5, average -2 gives 1).\n  Rule 15: late_fee: Whenever the days late reach 30 or more, the fee stops growing and stays at 15% of the amount (1000 gives 150.00 at 30 days and also at 31 days or more).\n  What should it be? > Cap the fee at 25% of the amount, with no fee for the first 3 days.\n  Rule 23: mask_email: Whenever the name part has exactly 1 character, it is shown unchanged ('a@x.com' stays 'a@x.com').\n  What should it be? > Mask it fully with * ('a@x.com' gives '*@x.com').\n  Rule 24: mask_email: Whenever the name part is empty ('@x.com') or the whole text is empty, the text is returned unchanged.\n  What should it be? > Return NULL.\n  Rule 25: mask_email: Whenever the text contains no '@', the whole text is treated as the name part and masked the same way ('noatsign' gives 'n******n').\n  What should it be? > Return NULL.\n  Rule 33: pro_rata: Whenever the days in the period is 0 or negative, the result is NULL.\n  What should it be? > Return 0.0.\n  Rule 41: ship_cost: Whenever the zone is anything other than A, B or C (e.g. 'D', empty text, 'AB', a number such as 1), the cost is NULL.\n  What should it be? > Bill it as zone C.\n  Rule 56: workdays_between: Whenever the start date is after the end date, the result is the negative of the count for the reversed pair (2024-01-05 to 2024-01-01 gives -4, 2024-01-08 to 2024-01-01 gives -5).\n  What should it be? > Return 0 when the end is on or before the start.\n  Rule 57: workdays_between: Whenever public holidays fall in the range, they are counted as working days; only Saturdays and Sundays are excluded.\n  What should it be? > Don't count Jan 1 and Dec 25 when they fall on a weekday; no other holidays.\n  Rule 63: clean_avg: Whenever there are no rows, or no row holds a usable number, the result is NULL.\n  What should it be? > Return 0.0 instead of NULL.\n  Rule 64: clean_avg: Whenever values are zero or negative, they are included like any other number (1 and -1 give 0.0).\n  What should it be? > Exclude negatives, keep zero. Also exclude anything above 10000.\n  Rule 25: mask_email: Whenever the text contains no '@', return NULL.\n  What should it be? > \n  Rule 3: bayes_rating: Whenever the vote count is negative, the rating is NULL.\n  What should it be? > Treat negative votes as 0, so the rating is 3.5.\n  Rule 1: bayes_rating: Whenever a product has an average and a vote count, the rating is (votes \u00d7 average + 35) / (votes + 10), i.e. the average is blended with a prior of 10 imaginary votes at 3.5 stars, and the result is rounded to 2 decimals (halves round up). Example: average 4.5 with 100 votes gives 4.41.\n  What should it be? > \n  Rule 25: mask_email: Whenever the text contains no '@', return NULL.\n  What should it be? > \n  Anything the builders should know that is not on this list? (Enter = nothing) > \n",
+  "minutes": 2.0
+ },
+ "spot_review": {
+  "replies": 70,
+  "cost": 5.127,
+  "log": [
+   {
+    "prompt": "\nCase 1 of 50. Jean-Luc Picard gets the badge letters JP, so the second half of his hyphenated first name is ignored.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 2 of 50. Ana Maria de Souza gets four letters, AMDS, because small words like 'de' count as a name too.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be AMD, since only the first 3 words count."
+   },
+   {
+    "prompt": "\n  With your correction: Ana Maria de Souza's full name is turned into initials by using only the first 3 words, so the small word 'de' counts as the third word and 'Souza' is ignored: the initials come to AMD, not AMDS.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 3 of 50. A customer with an empty name gets an empty badge (blank text), not a placeholder.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should return nothing (NULL), not blank text."
+   },
+   {
+    "prompt": "\n  With your correction: A customer with an empty name has no words to take initials from, so the badge comes out as NULL (no value at all), not blank text and not a placeholder.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 4 of 50. Ravi Kumar typed with extra spaces around and between his names still gets the badge RK.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 5 of 50. A customer with no name on file gets no badge at all (blank).\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Case 5 matches my policy, so nothing jumps out at me.\n\nENTER"
+   },
+   {
+    "prompt": "\n  With your correction: A customer with no name on file (the name is NULL) has no initials, so the result is NULL and no badge is shown, leaving the badge blank.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 6 of 50. Product code 0012 keeps its leading zeros and becomes 00125 with its check digit.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 7 of 50. Product code 7992739871 becomes 79927398713 with a check digit of 3.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 8 of 50. A product code typed as 12a, with a letter in it, gets no check digit (blank) instead of an error.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 9 of 50. A product code stored as the decimal number 12.0, for example after a spreadsheet import, gets no check digit (blank).\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 10 of 50. Product code 123 typed with spaces around it is accepted and comes back as 1230 with the spaces removed.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 11 of 50. A 16-minute consultation with Meera is billed as 30 minutes, since any started 15-minute block counts in full.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 12 of 50. A 1-minute call is billed as a full 15 minutes.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 13 of 50. A booking of 0 minutes is billed 0 minutes, with no minimum charge.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 14 of 50. A booking recorded as minus 20 minutes is billed 0 minutes instead of an error.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 15 of 50. A meeting of exactly 15 minutes is billed 15 minutes, with no extra block added.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 16 of 50. A new product with a single 5-star vote is shown as 3.64 stars, because the first votes are pulled strongly toward a built-in 3.5 starting point.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 17 of 50. A product with an average of 4.8 stars but no votes at all is shown as 3.5 stars, the neutral starting rating.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 18 of 50. A product listed with a 4.8 average and minus 3 votes gets no rating at all (blank) instead of an error.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should show 3.5 stars, because negative votes count as zero."
+   },
+   {
+    "prompt": "\n  With your correction: A product listed with a 4.8 average and minus 3 votes is not left blank and does not cause an error: the negative vote count is treated as 0 votes, so the rating comes to 3.5.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 19 of 50. A mistyped 9-star average on 10 votes is not rejected: the shop shows a 6.25-star rating on a 5-star scale.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be 4.25, because the 9 gets clamped to 5 first."
+   },
+   {
+    "prompt": "\n  With your correction: A mistyped 9-star average on 10 votes is clamped down to 5 stars before the calculation, so the shop shows a 4.25-star rating (not 6.25): (10 votes \u00d7 5 + 35) / (10 + 10) = 4.25, which stays within the 5-star scale.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 20 of 50. A product with a perfect 5-star average from 40 votes is still shown as 4.7 stars, never reaching 5.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 21 of 50. Ravi's 10,000-rupee invoice paid 31 days late is charged a late fee of 1,500 rupees, which is the most any invoice can be charged.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be 1,550 rupees (0.5% per day \u00d7 31 days). The cap is 25% of the invoice, which is 2,500, so the fee isn't capped here."
+   },
+   {
+    "prompt": "\n  With your correction: Ravi's 10,000-rupee invoice paid 31 days late is charged a late fee of 1,550 rupees (0.5% of the amount for each of the 31 days, which is 15.5%), not 1,500, because the 25% cap of 2,500 rupees only applies from 50 days late, so no cap applies at 31 days.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 22 of 50. A 10,000-rupee invoice that is 30 days late already reaches the 1,500-rupee ceiling, so day 31 or day 90 adds nothing more.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "That's wrong. 30 days late is 15%, which is 1,500, but the cap is 25% (2,500), so it keeps growing until day 50."
+   },
+   {
+    "prompt": "\n  With your correction: The 10,000-rupee invoice that is 30 days late has not reached any ceiling: its late fee is 1,500 rupees (0.5% a day for 30 days, or 15%), the fee keeps growing to 1,550 rupees on day 31, and it only stops at the 25% ceiling of 2,500 rupees from day 50 onward, so at 90 days late the fee comes to 2,500 rupees.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 23 of 50. A 10,000-rupee invoice that is not late at all (0 days) is charged no late fee, 0 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 24 of 50. A credit note of minus 500 rupees that is 10 days overdue is charged no late fee, 0 rupees, and is not turned into a refund.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 25 of 50. An invoice of 10,000 rupees that is 2.5 days late is charged a part-day fee of 125 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be 0, because the first 3 days are a grace period and the fee starts on day 4."
+   },
+   {
+    "prompt": "\n  With your correction: Meera's 10,000-rupee invoice is 2.5 days late: because the fee is 0.5% of the amount for each day late, which makes 1.25% for 2.5 days, the late fee comes to 125.00 rupees.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": "No, it should be 0. The first 3 days are grace, so there's no fee at 2.5 days."
+   },
+   {
+    "prompt": "\nCase 26 of 50. An address whose name part is a single letter, a@x.com, is shown in full in the report, with nothing hidden.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be masked as *@x.com. A 1\u20132 character name part gets fully hidden."
+   },
+   {
+    "prompt": "\n  With your correction: The address a@x.com, whose name part is a single letter, is masked by the rules to '*@x.com', so the report hides the letter and does not show it in full: the outcome is '*@x.com', which differs from what was shown.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 27 of 50. The two-letter address ab@x.com is shown as a*@x.com, so half of the name part stays visible.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be **@x.com. A name part of 1 or 2 characters is fully hidden."
+   },
+   {
+    "prompt": "\n  With your correction: The address ab@x.com has a two-letter name part, so the software hides all of it and shows **@x.com, not a*@x.com: no letter of the name is visible and only the @x.com domain stays readable.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 28 of 50. Ravi's address ravi@example.com is shown as r**i@example.com, keeping the first and last letter of the name part visible.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 29 of 50. A customer who typed 'notanemail' with no @ sign has the whole text masked like a name part, shown as n********l, with no warning that it is not an address.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be blank (NULL). With no @ it isn't an address, so nothing gets masked."
+   },
+   {
+    "prompt": "\n  With your correction: The customer who typed 'notanemail' with no @ sign gets no masked text at all, because that is not an email address: nothing is masked and the result is NULL (empty), not 'n********l'.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 30 of 50. An address with two @ signs, john@home@x.com, treats everything before the last @ as the name part and shows j*******e@x.com.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be blank (NULL). Two @ signs means it isn't a valid address, so nothing gets masked."
+   },
+   {
+    "prompt": "\n  With your correction: The address john@home@x.com has two @ signs, so the software treats it as not a valid email address and masks nothing: the result is NULL, not j*******e@x.com.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 31 of 50. A customer on a 300-rupee monthly plan who used 45 days of a 30-day period is charged only the full 300 rupees, not 450.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 32 of 50. A 100-rupee charge for 1 day used out of 3 comes to 33.33 rupees, rounded to the nearest paisa.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 33 of 50. A 300-rupee monthly plan with minus 5 days used is charged 0 rupees instead of an error.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 34 of 50. A 300-rupee charge for 10 days used in a period of 0 days gets no amount at all (blank), so nothing is billed.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be 0.0, not blank. A period of 0 days returns 0.0."
+   },
+   {
+    "prompt": "\n  With your correction: A 300-rupee charge for 10 days used in a period of 0 days comes to 0.0 rupees, a zero amount and not a blank, because a period of 0 or fewer days always gives 0.0 when all three values are valid numbers, so nothing is billed.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 35 of 50. A 300-rupee credit (minus 300) used for 10 of 30 days comes out as minus 100 rupees, so a refund is prorated the same way as a charge.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 36 of 50. A parcel weighing 0 kg sent to zone B still costs 7.35, the base fee for that zone.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be blank (NULL). A weight of 0 or less gets no price."
+   },
+   {
+    "prompt": "\n  With your correction: A parcel weighing 0 kg sent to zone B gets no price: the shipping cost is NULL, not the 7.35 zone B base fee, because a weight of 0 or less is never priced, whatever the zone.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 37 of 50. A 2 kg parcel to zone C written with a small letter 'c' is accepted and costs 16.06.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 38 of 50. A 2 kg parcel sent to a zone D, which does not exist, gets no price at all (blank) rather than an error.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be billed as zone C, so 16.06, not blank."
+   },
+   {
+    "prompt": "\n  With your correction: A 2 kg parcel sent to zone D, which does not exist, is not left without a price: it is billed as zone C, so the shipping cost comes to 16.06 (7.30 \u00d7 2.2), not blank and not an error.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 39 of 50. A parcel with a weight of minus 1 kg to zone A gets no price at all (blank).\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 40 of 50. A 1,000 kg shipment to zone A is priced at 1,204.90, with no weight limit or special freight rate.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be 1,219.90. Anything over 30 kg gets the flat 15 surcharge."
+   },
+   {
+    "prompt": "\n  With your correction: A 1,000 kg shipment to zone A is over the 30 kg line, so it gets the flat 15 surcharge on top of the 1,204.90 base charge (4.90 + 1.20 \u00d7 1,000, times 1.0 for zone A): the shipping cost comes to 1,219.90, not 1,204.90, because the rules have no weight limit or special freight rate that would waive the surcharge.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 41 of 50. From Monday 2 November to Monday 9 November 2026 there are 5 working days, counting the start day but not the end day.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 42 of 50. With the dates the other way round, Monday 9 November to Monday 2 November 2026, the answer is minus 5 working days instead of an error.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be 0, not minus 5. A reversed range never goes negative."
+   },
+   {
+    "prompt": "\n  With your correction: Counting working days from Monday 9 November 2026 back to Monday 2 November 2026, which is the wrong way round, gives 0 working days, not minus 5 and not an error, because when the end date is on or before the start date the result is 0 and is never negative.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 43 of 50. From 24 December 2026 to 4 January 2027 there are 7 working days, because Christmas and New Year's Day are counted as ordinary working days.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should be 5. Christmas and New Year's Day are weekday holidays, so they don't count."
+   },
+   {
+    "prompt": "\n  With your correction: Counting working days from 24 December 2026 to 4 January 2027, the software does not count Christmas Day (Friday 25 December) or New Year's Day (Friday 1 January) as working days, so the count is 5 rather than 7: Thursday 24 December plus Monday 28 to Thursday 31 December.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 44 of 50. A job that starts and ends on the same Friday, 6 November 2026, counts 0 working days, so a same-day job is not charged for any day.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 45 of 50. A start date of 30 February 2026, which does not exist, gives no answer (blank) instead of an error.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 46 of 50. A dashboard with orders of 100, 100, 200, 50 (typed as text) and 0 rupees, plus a blank and a junk entry 'abc', shows an average order of 90 rupees, skipping the blank and junk instead of counting them as zero.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 47 of 50. A day with only a single 0-rupee order shows an average order of 0 rupees, so a zero order is counted as a real order.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 48 of 50. A dashboard for a day with no orders at all shows a blank average, not 0 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should show 0.0, not blank. No orders gives an average of 0.0."
+   },
+   {
+    "prompt": "\n  With your correction: On a day with no orders at all, the dashboard's average order value comes to 0.0 rupees, not blank, because with no rows the average is defined to be 0.0, so the blank shown is wrong.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 49 of 50. Asking for the average of distinct order amounts still gives 90 rupees, so the two 100-rupee orders are both counted and are not merged into one.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 50 of 50. A dashboard where the only entry is the junk text 'abc' shows a blank average instead of an error.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "It should show 0.0, not blank. No valid orders gives an average of 0.0."
+   },
+   {
+    "prompt": "\n  With your correction: A dashboard whose only entry is the junk text 'abc' skips that entry, so no row holds a usable number and the average comes out as 0.0, not blank, NULL or an error: the dashboard shows an average of 0.0.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   }
+  ],
+  "transcript": "Hive: Now 50 quick checks on what the build does in real cases. Press Enter if a result is right, or say what should happen instead.\n\nCase 1 of 50. Jean-Luc Picard gets the badge letters JP, so the second half of his hyphenated first name is ignored.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 2 of 50. Ana Maria de Souza gets four letters, AMDS, because small words like 'de' count as a name too.\n  Right? (Enter = yes, or say what should happen) > It should be AMD, since only the first 3 words count.\n\n  With your correction: Ana Maria de Souza's full name is turned into initials by using only the first 3 words, so the small word 'de' counts as the third word and 'Souza' is ignored: the initials come to AMD, not AMDS.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 3 of 50. A customer with an empty name gets an empty badge (blank text), not a placeholder.\n  Right? (Enter = yes, or say what should happen) > It should return nothing (NULL), not blank text.\n\n  With your correction: A customer with an empty name has no words to take initials from, so the badge comes out as NULL (no value at all), not blank text and not a placeholder.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 4 of 50. Ravi Kumar typed with extra spaces around and between his names still gets the badge RK.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 5 of 50. A customer with no name on file gets no badge at all (blank).\n  Right? (Enter = yes, or say what should happen) > Case 5 matches my policy, so nothing jumps out at me.\n\nENTER\n\n  With your correction: A customer with no name on file (the name is NULL) has no initials, so the result is NULL and no badge is shown, leaving the badge blank.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 6 of 50. Product code 0012 keeps its leading zeros and becomes 00125 with its check digit.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 7 of 50. Product code 7992739871 becomes 79927398713 with a check digit of 3.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 8 of 50. A product code typed as 12a, with a letter in it, gets no check digit (blank) instead of an error.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 9 of 50. A product code stored as the decimal number 12.0, for example after a spreadsheet import, gets no check digit (blank).\n  Right? (Enter = yes, or say what should happen) > \n\nCase 10 of 50. Product code 123 typed with spaces around it is accepted and comes back as 1230 with the spaces removed.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 11 of 50. A 16-minute consultation with Meera is billed as 30 minutes, since any started 15-minute block counts in full.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 12 of 50. A 1-minute call is billed as a full 15 minutes.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 13 of 50. A booking of 0 minutes is billed 0 minutes, with no minimum charge.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 14 of 50. A booking recorded as minus 20 minutes is billed 0 minutes instead of an error.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 15 of 50. A meeting of exactly 15 minutes is billed 15 minutes, with no extra block added.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 16 of 50. A new product with a single 5-star vote is shown as 3.64 stars, because the first votes are pulled strongly toward a built-in 3.5 starting point.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 17 of 50. A product with an average of 4.8 stars but no votes at all is shown as 3.5 stars, the neutral starting rating.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 18 of 50. A product listed with a 4.8 average and minus 3 votes gets no rating at all (blank) instead of an error.\n  Right? (Enter = yes, or say what should happen) > It should show 3.5 stars, because negative votes count as zero.\n\n  With your correction: A product listed with a 4.8 average and minus 3 votes is not left blank and does not cause an error: the negative vote count is treated as 0 votes, so the rating comes to 3.5.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 19 of 50. A mistyped 9-star average on 10 votes is not rejected: the shop shows a 6.25-star rating on a 5-star scale.\n  Right? (Enter = yes, or say what should happen) > It should be 4.25, because the 9 gets clamped to 5 first.\n\n  With your correction: A mistyped 9-star average on 10 votes is clamped down to 5 stars before the calculation, so the shop shows a 4.25-star rating (not 6.25): (10 votes \u00d7 5 + 35) / (10 + 10) = 4.25, which stays within the 5-star scale.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 20 of 50. A product with a perfect 5-star average from 40 votes is still shown as 4.7 stars, never reaching 5.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 21 of 50. Ravi's 10,000-rupee invoice paid 31 days late is charged a late fee of 1,500 rupees, which is the most any invoice can be charged.\n  Right? (Enter = yes, or say what should happen) > It should be 1,550 rupees (0.5% per day \u00d7 31 days). The cap is 25% of the invoice, which is 2,500, so the fee isn't capped here.\n\n  With your correction: Ravi's 10,000-rupee invoice paid 31 days late is charged a late fee of 1,550 rupees (0.5% of the amount for each of the 31 days, which is 15.5%), not 1,500, because the 25% cap of 2,500 rupees only applies from 50 days late, so no cap applies at 31 days.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 22 of 50. A 10,000-rupee invoice that is 30 days late already reaches the 1,500-rupee ceiling, so day 31 or day 90 adds nothing more.\n  Right? (Enter = yes, or say what should happen) > That's wrong. 30 days late is 15%, which is 1,500, but the cap is 25% (2,500), so it keeps growing until day 50.\n\n  With your correction: The 10,000-rupee invoice that is 30 days late has not reached any ceiling: its late fee is 1,500 rupees (0.5% a day for 30 days, or 15%), the fee keeps growing to 1,550 rupees on day 31, and it only stops at the 25% ceiling of 2,500 rupees from day 50 onward, so at 90 days late the fee comes to 2,500 rupees.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 23 of 50. A 10,000-rupee invoice that is not late at all (0 days) is charged no late fee, 0 rupees.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 24 of 50. A credit note of minus 500 rupees that is 10 days overdue is charged no late fee, 0 rupees, and is not turned into a refund.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 25 of 50. An invoice of 10,000 rupees that is 2.5 days late is charged a part-day fee of 125 rupees.\n  Right? (Enter = yes, or say what should happen) > It should be 0, because the first 3 days are a grace period and the fee starts on day 4.\n\n  With your correction: Meera's 10,000-rupee invoice is 2.5 days late: because the fee is 0.5% of the amount for each day late, which makes 1.25% for 2.5 days, the late fee comes to 125.00 rupees.\n  Right now? (Enter = yes, or say what should happen) > No, it should be 0. The first 3 days are grace, so there's no fee at 2.5 days.\n\nCase 26 of 50. An address whose name part is a single letter, a@x.com, is shown in full in the report, with nothing hidden.\n  Right? (Enter = yes, or say what should happen) > It should be masked as *@x.com. A 1\u20132 character name part gets fully hidden.\n\n  With your correction: The address a@x.com, whose name part is a single letter, is masked by the rules to '*@x.com', so the report hides the letter and does not show it in full: the outcome is '*@x.com', which differs from what was shown.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 27 of 50. The two-letter address ab@x.com is shown as a*@x.com, so half of the name part stays visible.\n  Right? (Enter = yes, or say what should happen) > It should be **@x.com. A name part of 1 or 2 characters is fully hidden.\n\n  With your correction: The address ab@x.com has a two-letter name part, so the software hides all of it and shows **@x.com, not a*@x.com: no letter of the name is visible and only the @x.com domain stays readable.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 28 of 50. Ravi's address ravi@example.com is shown as r**i@example.com, keeping the first and last letter of the name part visible.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 29 of 50. A customer who typed 'notanemail' with no @ sign has the whole text masked like a name part, shown as n********l, with no warning that it is not an address.\n  Right? (Enter = yes, or say what should happen) > It should be blank (NULL). With no @ it isn't an address, so nothing gets masked.\n\n  With your correction: The customer who typed 'notanemail' with no @ sign gets no masked text at all, because that is not an email address: nothing is masked and the result is NULL (empty), not 'n********l'.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 30 of 50. An address with two @ signs, john@home@x.com, treats everything before the last @ as the name part and shows j*******e@x.com.\n  Right? (Enter = yes, or say what should happen) > It should be blank (NULL). Two @ signs means it isn't a valid address, so nothing gets masked.\n\n  With your correction: The address john@home@x.com has two @ signs, so the software treats it as not a valid email address and masks nothing: the result is NULL, not j*******e@x.com.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 31 of 50. A customer on a 300-rupee monthly plan who used 45 days of a 30-day period is charged only the full 300 rupees, not 450.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 32 of 50. A 100-rupee charge for 1 day used out of 3 comes to 33.33 rupees, rounded to the nearest paisa.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 33 of 50. A 300-rupee monthly plan with minus 5 days used is charged 0 rupees instead of an error.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 34 of 50. A 300-rupee charge for 10 days used in a period of 0 days gets no amount at all (blank), so nothing is billed.\n  Right? (Enter = yes, or say what should happen) > It should be 0.0, not blank. A period of 0 days returns 0.0.\n\n  With your correction: A 300-rupee charge for 10 days used in a period of 0 days comes to 0.0 rupees, a zero amount and not a blank, because a period of 0 or fewer days always gives 0.0 when all three values are valid numbers, so nothing is billed.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 35 of 50. A 300-rupee credit (minus 300) used for 10 of 30 days comes out as minus 100 rupees, so a refund is prorated the same way as a charge.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 36 of 50. A parcel weighing 0 kg sent to zone B still costs 7.35, the base fee for that zone.\n  Right? (Enter = yes, or say what should happen) > It should be blank (NULL). A weight of 0 or less gets no price.\n\n  With your correction: A parcel weighing 0 kg sent to zone B gets no price: the shipping cost is NULL, not the 7.35 zone B base fee, because a weight of 0 or less is never priced, whatever the zone.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 37 of 50. A 2 kg parcel to zone C written with a small letter 'c' is accepted and costs 16.06.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 38 of 50. A 2 kg parcel sent to a zone D, which does not exist, gets no price at all (blank) rather than an error.\n  Right? (Enter = yes, or say what should happen) > It should be billed as zone C, so 16.06, not blank.\n\n  With your correction: A 2 kg parcel sent to zone D, which does not exist, is not left without a price: it is billed as zone C, so the shipping cost comes to 16.06 (7.30 \u00d7 2.2), not blank and not an error.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 39 of 50. A parcel with a weight of minus 1 kg to zone A gets no price at all (blank).\n  Right? (Enter = yes, or say what should happen) > \n\nCase 40 of 50. A 1,000 kg shipment to zone A is priced at 1,204.90, with no weight limit or special freight rate.\n  Right? (Enter = yes, or say what should happen) > It should be 1,219.90. Anything over 30 kg gets the flat 15 surcharge.\n\n  With your correction: A 1,000 kg shipment to zone A is over the 30 kg line, so it gets the flat 15 surcharge on top of the 1,204.90 base charge (4.90 + 1.20 \u00d7 1,000, times 1.0 for zone A): the shipping cost comes to 1,219.90, not 1,204.90, because the rules have no weight limit or special freight rate that would waive the surcharge.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 41 of 50. From Monday 2 November to Monday 9 November 2026 there are 5 working days, counting the start day but not the end day.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 42 of 50. With the dates the other way round, Monday 9 November to Monday 2 November 2026, the answer is minus 5 working days instead of an error.\n  Right? (Enter = yes, or say what should happen) > It should be 0, not minus 5. A reversed range never goes negative.\n\n  With your correction: Counting working days from Monday 9 November 2026 back to Monday 2 November 2026, which is the wrong way round, gives 0 working days, not minus 5 and not an error, because when the end date is on or before the start date the result is 0 and is never negative.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 43 of 50. From 24 December 2026 to 4 January 2027 there are 7 working days, because Christmas and New Year's Day are counted as ordinary working days.\n  Right? (Enter = yes, or say what should happen) > It should be 5. Christmas and New Year's Day are weekday holidays, so they don't count.\n\n  With your correction: Counting working days from 24 December 2026 to 4 January 2027, the software does not count Christmas Day (Friday 25 December) or New Year's Day (Friday 1 January) as working days, so the count is 5 rather than 7: Thursday 24 December plus Monday 28 to Thursday 31 December.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 44 of 50. A job that starts and ends on the same Friday, 6 November 2026, counts 0 working days, so a same-day job is not charged for any day.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 45 of 50. A start date of 30 February 2026, which does not exist, gives no answer (blank) instead of an error.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 46 of 50. A dashboard with orders of 100, 100, 200, 50 (typed as text) and 0 rupees, plus a blank and a junk entry 'abc', shows an average order of 90 rupees, skipping the blank and junk instead of counting them as zero.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 47 of 50. A day with only a single 0-rupee order shows an average order of 0 rupees, so a zero order is counted as a real order.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 48 of 50. A dashboard for a day with no orders at all shows a blank average, not 0 rupees.\n  Right? (Enter = yes, or say what should happen) > It should show 0.0, not blank. No orders gives an average of 0.0.\n\n  With your correction: On a day with no orders at all, the dashboard's average order value comes to 0.0 rupees, not blank, because with no rows the average is defined to be 0.0, so the blank shown is wrong.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 49 of 50. Asking for the average of distinct order amounts still gives 90 rupees, so the two 100-rupee orders are both counted and are not merged into one.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 50 of 50. A dashboard where the only entry is the junk text 'abc' shows a blank average instead of an error.\n  Right? (Enter = yes, or say what should happen) > It should show 0.0, not blank. No valid orders gives an average of 0.0.\n\n  With your correction: A dashboard whose only entry is the junk text 'abc' skips that entry, so no row holds a usable number and the average comes out as 0.0, not blank, NULL or an error: the dashboard shows an average of 0.0.\n  Right now? (Enter = yes, or say what should happen) > \n"
+ },
+ "minutes": {
+  "list": 2.0,
+  "spots": 8.7
+ },
+ "cost_usd": {
+  "documenter": 0.14094869999999998,
+  "describer": 0.2593599,
+  "spotter": 0.20017629999999997,
+  "judge": 0.2622402,
+  "owner_SL": 1.381,
+  "owner_HV_spots": 5.127
+ },
+ "labels": [
+  {
+   "function": "late_fee",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "right",
+   "R": "right",
+   "note": "D charges from day 1 (0.5 days gives 0.25); SL states grace for days 1-3 but its fraction rule still gives 0.25 at 0.5 days (conflict); HV covers fractions and exactly 3."
+  },
+  {
+   "function": "late_fee",
+   "decision": 1,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "right",
+   "R": "right",
+   "note": "D/SL cap at 15%/25% from day 30 (policy: 25% reached at day 50); HV and R correct."
+  },
+  {
+   "function": "late_fee",
+   "decision": 2,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "wrong",
+   "R": "right",
+   "note": "No sheet but R states the 2.50 floor; D/SL/HV say small fees round to 0.0, contradicting the floor (their example only works via grace)."
+  },
+  {
+   "function": "late_fee",
+   "decision": 3,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Half-up to 2 decimals stated in all."
+  },
+  {
+   "function": "ship_cost",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "wrong",
+   "R": "right",
+   "note": "D/SL/HV use the raw weight (0.001 kg -> base charge 4.9); policy bills ceil(kg)."
+  },
+  {
+   "function": "ship_cost",
+   "decision": 1,
+   "D": "wrong",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "D gives NULL for unknown zones. SL/HV/R bill C (SL/HV also say a numeric zone is billed C, whereas oracle gives NULL for non-text; not part of this decision)."
+  },
+  {
+   "function": "ship_cost",
+   "decision": 2,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "right",
+   "R": "right",
+   "note": "D/SL: no surcharge (1000 kg C = 2650.78); HV/R add flat 15 above 30 kg."
+  },
+  {
+   "function": "bayes_rating",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "D: not clamped."
+  },
+  {
+   "function": "bayes_rating",
+   "decision": 1,
+   "D": "wrong",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "D: negative votes give NULL."
+  },
+  {
+   "function": "sku_check",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "wrong",
+   "R": "right",
+   "note": "D/SL/HV make inner spaces NULL and treat minus as invalid; policy strips spaces and dashes."
+  },
+  {
+   "function": "sku_check",
+   "decision": 1,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Letters/symbols/non-ASCII digits give NULL stated in all (minus conflict belongs to decision 0)."
+  },
+  {
+   "function": "sku_check",
+   "decision": 2,
+   "D": "absent",
+   "SL": "absent",
+   "HV": "absent",
+   "R": "right",
+   "note": "Only R states the 12-digit limit."
+  },
+  {
+   "function": "workdays_between",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "D counts holidays as working days."
+  },
+  {
+   "function": "workdays_between",
+   "decision": 1,
+   "D": "wrong",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "D returns negative counts."
+  },
+  {
+   "function": "mask_email",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "right",
+   "R": "right",
+   "note": "D: 2 chars keep first, 1 char unchanged; SL: 2 chars still keep first (1 char right); HV/R fully mask."
+  },
+  {
+   "function": "mask_email",
+   "decision": 1,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "right",
+   "R": "right",
+   "note": "D masks no-@, multi-@ and returns empty unchanged; SL fixes empty/no-@ but still masks multi-@ using the last @; HV/R correct."
+  },
+  {
+   "function": "pro_rata",
+   "decision": 0,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Clamping to 0..period stated in all."
+  },
+  {
+   "function": "pro_rata",
+   "decision": 1,
+   "D": "wrong",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "D gives NULL for non-positive period."
+  },
+  {
+   "function": "pro_rata",
+   "decision": 2,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "wrong",
+   "R": "right",
+   "note": "D/SL/HV round half-up; policy truncates."
+  },
+  {
+   "function": "time_slot",
+   "decision": 0,
+   "D": "absent",
+   "SL": "absent",
+   "HV": "absent",
+   "R": "right",
+   "note": "Only R states the 480 cap."
+  },
+  {
+   "function": "initials",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "right",
+   "R": "right",
+   "note": "D/SL use all words; HV/R limit to 3."
+  },
+  {
+   "function": "clean_avg",
+   "decision": 0,
+   "D": "wrong",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "D includes negatives."
+  },
+  {
+   "function": "clean_avg",
+   "decision": 1,
+   "D": "wrong",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "D has no exclusion above 10000 (averages all numbers)."
+  },
+  {
+   "function": "clean_avg",
+   "decision": 2,
+   "D": "wrong",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "D gives NULL."
+  },
+  {
+   "function": "clean_avg",
+   "decision": 3,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "wrong",
+   "R": "right",
+   "note": "D/SL/HV say not rounded; policy rounds half-up to 2 decimals."
+  }
+ ]
+}
