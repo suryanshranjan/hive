@@ -1,0 +1,121 @@
+[01:07:11] predictions registered on origin/main: gates/gate70/prompts/PREDICTIONS.md
+[01:07:11] rule-giver writing private rules (headless Claude Code)...
+[01:09:19] rules checked: 10 functions, 132 calls, deterministic
+[01:09:19] declared decisions per function: 1:2, 2:3, 3:3, 4:2
+[01:09:20] starting repo and hidden suite built
+[01:09:20] pre-launch: python3 gates/gate70/referee/review70.py pre {run} {oracle}
+[01:09:20] wind tunnel: documenter writing the owner's policy in prose...
+[01:09:59] wind tunnel: R: 75 rules; ask text for N0 written
+[01:09:59] stage 1: N0, QN
+N0: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g70a/upN0.git
+QN: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g70a/upQN.git
+next: python3 lab/launch.py --run g70a
+[01:10:00] launching workers...
+launched N0-w1 
+launched N0-w2 
+launched N0-w3 
+launched QN-w1 
+launched QN-w2 
+launched QN-w3 
+N0-w1 finished: exit 0, 0.9 min, tokens 495730, cost 0.2133912
+N0-w2 finished: exit 0, 1.0 min, tokens 706301, cost 0.23034800000000005
+QN-w2 finished: exit 0, 1.0 min, tokens 600139, cost 0.22640240000000003
+N0-w3 finished: exit 0, 1.1 min, tokens 809955, cost 0.24618589999999996
+QN-w1 finished: exit 0, 1.1 min, tokens 768613, cost 0.24197459999999998
+QN-w3 finished: exit 0, 1.2 min, tokens 550771, cost 0.2372003
+wrote /home/claude/hive/runs/g70a/agents.csv
+[01:11:12] after N0: python3 gates/gate70/referee/review70.py after {run} {oracle} {base}
+[01:14:48] wind tunnel: morning: he answered 27 recorded questions
+[01:14:54] wind tunnel: SL owner #1: '19, 20, 44, 11, 15, 34'
+[01:14:57] wind tunnel: SL owner #2: "Grace period is 5 days or less, not 7. Past that, it's 1% of the amount per late"
+[01:15:03] wind tunnel: SL owner #3: 'Rule 20 is covered by the 1%-per-week answer. Drop the 2%/5%/9% bands.'
+[01:15:13] wind tunnel: SL owner #4: 'Base is 300 for A, 500 for B and 800 for C. Then add 100, 150 or 200 per 500 g b'
+[01:15:21] wind tunnel: SL owner #5: "Dec 25 and Jan 1 are holidays, every year, so they aren't working days. 2024-12-"
+[01:15:30] wind tunnel: SL owner #6: 'Above 100 or below 0 should be INVALID. Exactly 100 is A+, and scores are rounde'
+[01:15:39] wind tunnel: SL owner #7: "With fewer than 5 digits, every digit becomes '*'. With no digits at all, includ"
+[01:15:46] wind tunnel: SL owner #8: ''
+[01:15:49] wind tunnel: HV case #1: ''
+[01:15:52] wind tunnel: HV case #2: ''
+[01:15:57] wind tunnel: HV case #3: '1: Enter\n2: Enter\n3: It should show -1, not blank.'
+[01:16:12] wind tunnel: HV case #4: ''
+[01:16:16] wind tunnel: HV case #5: ''
+[01:16:20] wind tunnel: HV case #6: ''
+[01:16:23] wind tunnel: HV case #7: ''
+[01:16:28] wind tunnel: HV case #8: ''
+[01:16:33] wind tunnel: HV case #9: '3: Enter\n4: Enter\n5: Enter\n6: Enter\n7: Enter\n8: Enter\n9: No, points should be ta'
+[01:16:50] wind tunnel: HV case #10: 'Missing tier should count as basic, so 100 points.'
+[01:17:06] wind tunnel: HV case #11: ''
+[01:17:10] wind tunnel: HV case #12: 'Right now? 3: Enter\n9: Enter\n10: Enter\n11: Enter\n12: Enter'
+[01:17:24] wind tunnel: HV case #13: ''
+[01:17:28] wind tunnel: HV case #14: '13: Enter\n14: No, negative hours should give negative pay: -100 rupees.'
+[01:17:48] wind tunnel: HV case #15: ''
+[01:17:53] wind tunnel: HV case #16: '15: No, 200 hours should come to 7,000 rupees.\n16: Enter'
+[01:18:07] wind tunnel: HV case #17: ''
+[01:18:12] wind tunnel: HV case #18: '17: Enter\n18: Enter'
+[01:18:40] wind tunnel: HV case #19: ''
+[01:18:44] wind tunnel: HV case #20: '19: Enter\n20: Enter'
+[01:18:59] wind tunnel: HV case #21: ''
+[01:19:03] wind tunnel: HV case #22: 'No, with only two sales it should give blank, not 505.'
+[01:19:18] wind tunnel: HV case #23: ''
+[01:19:22] wind tunnel: HV case #24: '22: Enter\n23: Enter\n24: Enter'
+[01:19:35] wind tunnel: HV case #25: ''
+[01:19:39] wind tunnel: HV case #26: '25: Enter\n26: Enter'
+[01:19:54] wind tunnel: HV case #27: "No, holidays should come off: Christmas isn't a working day, so 3 working days."
+[01:20:15] wind tunnel: HV case #28: 'No, it should be 0, not -4.'
+[01:20:29] wind tunnel: HV case #29: ''
+[01:20:32] wind tunnel: HV case #30: ''
+[01:20:35] wind tunnel: HV case #31: 'No, 89.99 rounds to 90, so Rohan should get an A.'
+[01:20:52] wind tunnel: HV case #32: 'No, 150 should be INVALID, not an A.'
+[01:21:10] wind tunnel: HV case #33: 'No, -5 should be INVALID, not an F.'
+[01:21:29] wind tunnel: HV case #34: ''
+[01:21:32] wind tunnel: HV case #35: 'No, 7 days late is past the grace period, so the fee should be 5 rupees.'
+[01:21:52] wind tunnel: HV case #36: 'No, the fee should be 5 rupees. The minimum fee applies.'
+[01:22:14] wind tunnel: HV case #37: 'No, it should be 5 rupees.'
+[01:22:35] wind tunnel: HV case #38: 'No, 31 days is still 5 rupees, not 9.'
+[01:22:58] wind tunnel: HV case #39: 'No, it should be -25 rupees, the negative cap.'
+[01:23:18] wind tunnel: HV case #40: ''
+[01:23:24] wind tunnel: HV case #41: ''
+[01:23:27] wind tunnel: HV case #42: 'No, 1234 should be hidden as ****.'
+[01:23:45] wind tunnel: HV case #43: ''
+[01:23:49] wind tunnel: HV case #44: 'No, an empty card should show INVALID, not empty text.'
+[01:24:05] wind tunnel: HV case #45: 'No, it should be 5 rupees.'
+[01:24:30] wind tunnel: HV case #46: 'No, it should be 6 rupees.'
+[01:24:57] wind tunnel: HV case #47: 'No, a 0 g parcel should cost 0 rupees.'
+[01:25:18] wind tunnel: HV case #48: 'No, an unknown zone should be charged at zone C rates, not left blank.'
+[01:25:42] wind tunnel: HV case #49: ''
+[01:25:42] wind tunnel: D 65 rules; SL 8 replies; HV 49 cases, 27 corrected
+[01:27:19] wind tunnel: ask text for HV written
+[01:27:19] stage 2: HV, QA
+HV: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g70a/upHV.git
+QA: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g70a/upQA.git
+next: python3 lab/launch.py --run g70a
+[01:27:20] launching workers...
+launched HV-w1 
+launched HV-w2 
+launched HV-w3 
+launched QA-w1 
+launched QA-w2 
+launched QA-w3 
+QA-w2 finished: exit 0, 0.4 min, tokens 379280, cost 0.1552162
+QA-w1 finished: exit 0, 0.5 min, tokens 438687, cost 0.1696852
+HV-w2 finished: exit 0, 0.8 min, tokens 412015, cost 0.21144209999999997
+HV-w3 finished: exit 0, 0.9 min, tokens 474066, cost 0.23078679999999996
+QA-w3 finished: exit 0, 1.0 min, tokens 506797, cost 0.2413271
+HV-w1 finished: exit 0, 1.1 min, tokens 664695, cost 0.27935350000000003
+wrote /home/claude/hive/runs/g70a/agents.csv
+[01:28:30] scoring every arm call by call...
+# g70a: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 36.8% | 28.4%–46.0% |
+| QN | 41.2% | 32.0%–50.0% |
+| HV | 69.6% | 56.8%–82.8% |
+| QA | 88.4% | 75.2%–100.0% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| QN-N0 | +4.4 | +0.0 to +10.8 |
+| HV-N0 | +32.8 | +14.8 to +51.6 |
+| QA-N0 | +51.6 | +38.8 to +64.0 |
+[01:28:31] done. Next: write the gate RESULTS.md from runs/g70a/summary.md, update BRAIN.md and lab/QUEUE.md, push.

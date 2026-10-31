@@ -1,0 +1,32 @@
+{"t": 1793476895, "worker": "QN-w3", "question": "Working days between two dates: if the start date is after the end date, should the answer be 0, or a negative count?"}
+{"t": 1793476895, "worker": "QN-w3", "question": "Working days between two dates: if either date is missing or not a valid YYYY-MM-DD date, should the answer be blank (NULL) or an error?"}
+{"t": 1793476895, "worker": "QN-w3", "question": "Working days: should public holidays ever be excluded, or only Saturdays and Sundays?"}
+{"t": 1793476895, "worker": "QN-w3", "question": "Ticket priority: after how many hours open does a ticket move up one level (we assumed 48 hours), and can it move up more than one level (we assumed only one)?"}
+{"t": 1793476895, "worker": "QN-w3", "question": "Ticket priority: what should happen if severity is outside 1 to 4 or missing, or hours open is negative or missing? (We assumed: clamp severity into 1-4, blank if missing, negative hours count as 0.)"}
+{"t": 1793476896, "worker": "QN-w3", "question": "Median of amounts: for an even number of values, should we average the two middle values (assumed), and should blank values be ignored (assumed)? What if the group has no values \u2014 blank?"}
+{"t": 1793476896, "worker": "QN-w3", "question": "Median of amounts: how should non-numeric text values in the group be treated \u2014 ignored, counted as 0, or an error?"}
+{"t": 1793476896, "worker": "QN-w1", "question": "Parcel fee: what is the full price table? We only know 1000g to zone 2 = 8.00, 1500g to zone 2 = 9.00 and 2500g to zone 3 = 14.00. What are the weight bands and prices for each zone (1, 2, 3)?"}
+{"t": 1793476896, "worker": "QN-w1", "question": "Parcel fee: what happens for a zone other than 1, 2 or 3 (e.g. 0, 4, blank)? We return no value (NULL)."}
+{"t": 1793476896, "worker": "QN-w1", "question": "Parcel fee: what is charged for a parcel weighing 0 g, a negative weight, or blank weight? We return no value for negative/blank and the lowest band for 0."}
+{"t": 1793476896, "worker": "QN-w1", "question": "Parcel fee: is there a maximum weight we ship, or a cap on the fee, for very heavy parcels?"}
+{"t": 1793476896, "worker": "QN-w1", "question": "Parcel fee: is a weight exactly on a band edge (e.g. exactly 1000 g) charged at the lower band or the higher band?"}
+{"t": 1793476896, "worker": "QN-w1", "question": "Slug: when a title has accented letters (e.g. 'Caf\u00e9 Cr\u00e8me'), should they become plain letters (cafe-creme) or be dropped/split?"}
+{"t": 1793476896, "worker": "QN-w1", "question": "Slug: should a title that is blank or has no letters or digits (e.g. '!!!') give an empty slug or no value (NULL)? We return an empty slug; a blank/NULL title gives NULL."}
+{"t": 1793476896, "worker": "QN-w1", "question": "Slug: is there a maximum slug length, and should we cut at a whole word?"}
+{"t": 1793476896, "worker": "QN-w1", "question": "Slug: should an apostrophe split words ('don-t') as in the example, or can that change, and should '&' become 'and'? We follow the example and drop '&'."}
+{"t": 1793476902, "worker": "QN-w2", "question": "Shelf price: when a raw price already ends in 99 we keep it, otherwise we round UP to the next price ending in 99 (e.g. 1200 becomes 1299). Is rounding up always right, even for tiny prices like 50 cents (becomes 99)?"}
+{"t": 1793476902, "worker": "QN-w2", "question": "Shelf price: what should a zero or negative raw price give? My guess: 0 gives 99, negative gives blank (NULL)."}
+{"t": 1793476902, "worker": "QN-w2", "question": "Letter grades: what are the percentage cut-offs? My guess: 90% and above A, 80 B, 70 C, 60 D, below 60 F, with the boundary percentage itself earning the higher grade."}
+{"t": 1793476902, "worker": "QN-w2", "question": "Letter grades: for a score above the scale maximum, or below zero, or a scale maximum of zero or less, what do we show? My guess: above max is A, below zero is F, bad scale gives blank (NULL)."}
+{"t": 1793476902, "worker": "QN-w2", "question": "Sales tax: when the tax lands exactly halfway between two cents, do we round up? My guess: yes, half a cent rounds up (away from zero for refunds/negative prices)."}
+{"t": 1793476903, "worker": "QN-w2", "question": "Sales tax: how should a negative price (refund) or a negative rate behave? My guess: tax is computed the same way and comes out negative."}
+{"t": 1793476903, "worker": "QN-w2", "question": "Loyalty points: my guess is basic earns 1 point per whole 100 cents spent, silver 2, gold 3, with leftover cents ignored. Is that right, and is there a cap or minimum purchase?"}
+{"t": 1793476903, "worker": "QN-w2", "question": "Loyalty points: what happens with an unknown, blank or missing tier name, and is the tier name case-insensitive? My guess: ignore case and spaces; unknown or blank tier earns at the basic rate; missing spend gives blank."}
+{"t": 1793476903, "worker": "QN-w2", "question": "Loyalty points: what should a zero or negative spend (e.g. a refund) earn? My guess: zero points, never negative."}
+{"t": 1793476903, "worker": "QN-w2", "question": "Card masking: my guess is we hide all digits except the last 4, drop spaces and dashes, and show stars only. For numbers with fewer than 4 digits, do we hide everything? My guess: yes."}
+{"t": 1793476903, "worker": "QN-w2", "question": "Card masking: a blank card number gives blank text and a missing one gives NULL; letters in the number are dropped like dashes. OK?"}
+{"t": 1793476929, "worker": "QN-w2", "question": "Parcel fee: from the examples I infer a base fee of 300 cents times the zone number plus 100 cents for every started 500 grams. Is that the real rate card, and is there a minimum or maximum fee?"}
+{"t": 1793476929, "worker": "QN-w2", "question": "Parcel fee: what should a zero-gram parcel cost (my guess: just the zone base fee), and what about a negative or missing weight (my guess: blank/NULL)?"}
+{"t": 1793476929, "worker": "QN-w2", "question": "Parcel fee: for a zone other than 1, 2 or 3 (or a missing zone) do we show blank (NULL)? Is there a weight limit above which we refuse to quote?"}
+{"t": 1793476929, "worker": "QN-w2", "question": "Slugs: should accented letters be turned into plain ones (e.g. Caf\u00e9 becomes cafe) or dropped/separated? My guess: accents are stripped to the plain letter, other non-English characters act as separators."}
+{"t": 1793476929, "worker": "QN-w2", "question": "Slugs: a title with no letters or digits gives an empty slug, a missing title gives NULL, and there is no maximum slug length. OK?"}

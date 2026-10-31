@@ -1,0 +1,27 @@
+{"t": 1793475646, "worker": "QN-w2", "question": "Shift pay: overtime starts after how many hours in a week, and at what multiple of the hourly rate (we assumed after 40 hours at 1.5x)?"}
+{"t": 1793475646, "worker": "QN-w2", "question": "Shift pay: when the overtime or fractional-hour pay has a fraction of a cent, do we round to the nearest cent (half up) or round down?"}
+{"t": 1793475646, "worker": "QN-w2", "question": "Shift pay: if hours or rate is negative, should pay be 0 (our guess), blank, or an error?"}
+{"t": 1793475646, "worker": "QN-w2", "question": "Shipping: what is the charge for each zone (A, B, C and any others) and each weight band? We assumed first 500 g costs A 400 / B 600 / C 800 cents, plus 100 / 200 / 250 cents per further started 500 g."}
+{"t": 1793475646, "worker": "QN-w2", "question": "Shipping: what should happen for an unknown or blank zone (we return blank), and for zero or negative weight (we charge 0)?"}
+{"t": 1793475646, "worker": "QN-w2", "question": "Shipping: is there a maximum weight we ship, or a cap on the charge?"}
+{"t": 1793475647, "worker": "QN-w2", "question": "Card masking: how many trailing digits should stay visible (we assumed last 4)?"}
+{"t": 1793475647, "worker": "QN-w2", "question": "Card masking: if the text has 4 or fewer digits, should we mask all of them (our guess) or show it unchanged?"}
+{"t": 1793475647, "worker": "QN-w2", "question": "Card masking: should spaces and dashes be kept in place (we keep them), and what about letters or other characters in the text?"}
+{"t": 1793475648, "worker": "QN-w1", "question": "For the outlier-resistant average (robust_mean), do we always drop exactly the single highest and single lowest value, or drop a percentage (e.g. 20%) from each end? My guess: drop one from each end."}
+{"t": 1793475648, "worker": "QN-w1", "question": "For robust_mean, what should it return when there are fewer than 3 values (1 or 2)? My guess: the plain average of what is there; NULL only if there are no values."}
+{"t": 1793475648, "worker": "QN-w1", "question": "For robust_mean, should blank or non-numeric text values be ignored like empty values, or counted as zero? My guess: NULLs ignored, numeric-looking text treated as numbers."}
+{"t": 1793475648, "worker": "QN-w1", "question": "For slugify, should accented letters be converted to plain letters (caf\u00e9 -> cafe) or dropped/kept? My guess: converted to plain letters."}
+{"t": 1793475648, "worker": "QN-w1", "question": "For slugify, should there be a maximum slug length? My guess: no limit."}
+{"t": 1793475648, "worker": "QN-w1", "question": "For slugify, what should a title with no letters or digits (e.g. '!!!' or blank) return: empty text or NULL? My guess: empty text; a missing (NULL) title gives NULL."}
+{"t": 1793475648, "worker": "QN-w1", "question": "For slugify, should an ampersand be spelled out as 'and' (Tom & Jerry -> tom-and-jerry) or just treated as a separator? My guess: separator."}
+{"t": 1793475656, "worker": "QN-w3", "question": "Age in years: if someone was born on 29 February, do they turn a year older on 28 February or 1 March in non-leap years? We assumed 1 March."}
+{"t": 1793475657, "worker": "QN-w3", "question": "Age in years: if the birth date is after the as-of date, or either date is blank or not a valid date, do we return blank (our guess), 0, or a negative age?"}
+{"t": 1793475657, "worker": "QN-w3", "question": "Working days: is the end date counted? We assumed the start date counts and the end date does not (Mon 4 Mar to Mon 11 Mar = 5), and that Saturday/Sunday are the only days off."}
+{"t": 1793475657, "worker": "QN-w3", "question": "Working days: should public holidays be excluded, and if so which calendar? We assumed none."}
+{"t": 1793475657, "worker": "QN-w3", "question": "Working days: if the end date is before the start date, return a negative count (our guess), 0, or blank?"}
+{"t": 1793475657, "worker": "QN-w3", "question": "Course grades: are the cut-offs A 90, B 80, C 70, D 60 and F below 60? We assumed so, with no rounding (89.9 is a B)."}
+{"t": 1793475657, "worker": "QN-w3", "question": "Course grades: what letter for a score above 100 (we give A), a negative score (F), and a blank or non-numeric score (blank)?"}
+{"t": 1793475657, "worker": "QN-w3", "question": "Late fee: what are the fee percentages by days late? We assumed no fee up to 7 days, 2% from 8 days, 5% from 30 days, 9% from 60 days."}
+{"t": 1793475657, "worker": "QN-w3", "question": "Late fee: is there a minimum or maximum fee, and do we round fractions of a cent to nearest (our guess) or down? What about zero/negative amounts or days (we charge 0)?"}
+{"t": 1793475657, "worker": "QN-w3", "question": "Loyalty points: what is the earning rate for each tier? We assumed 1 point per dollar basic, 1.5 silver, 2 gold, 3 platinum, rounded down."}
+{"t": 1793475657, "worker": "QN-w3", "question": "Loyalty points: what should an unknown or blank tier earn (we assume basic rate), and a zero or negative purchase (we give 0)?"}

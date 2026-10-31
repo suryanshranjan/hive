@@ -38,14 +38,37 @@ def _dir(run=None):
         os.makedirs(os.path.join(d, sub), exist_ok=True)
     return d
 
+def _later(d):
+    p = os.path.join(d, 'budget.json')
+    return bool(json.load(open(p)).get('later')) if os.path.exists(p) else False
+
+def pending(run):
+    """The questions recorded for the owner that he has not answered yet."""
+    d = os.path.join(run, 'owner')
+    qs = [json.load(open(p)) for p in sorted(glob.glob(os.path.join(d, 'questions', '*.json')))]
+    return [q for q in qs if not os.path.exists(os.path.join(d, 'answers', q['id'] + '.json'))]
+
 def _budget(d):
     p = os.path.join(d, 'budget.json')
     return json.load(open(p)).get('questions') if os.path.exists(p) else None
 
-def setup(run, examples=None, questions=None, assumptions=False):
-    """Called by hive run: copy the owner's examples and set the question budget. Returns the prompt text."""
+LATER = ("\n## Questions for the owner's morning\nThe owner is away until the morning. For every business decision the goal "
+         "leaves open (cut-offs and boundaries, rounding, minimums and caps, what happens with blank, missing, negative or "
+         "oddly formatted information), record one question for him with `python3 -m hive ask \"<question>\"`: one real-life "
+         "situation in plain words, with real amounts, one decision per question. It returns at once. Build your best guess "
+         "and keep going: in the morning he answers every recorded question, and the team then changes the code to his "
+         "answers (Gate 70: his morning answers took a night build from 39% to 94% of his rules, where reviewing the "
+         "finished build reached 75%). Read `python3 -m hive answers` first and do not record a question a teammate has "
+         "already recorded.\n")
+
+def setup(run, examples=None, questions=None, assumptions=False, later=False):
+    """Called by hive run: copy the owner's examples and set the question budget. Returns the prompt text. later=True:
+    the owner is away, so questions are recorded for his morning instead of waited on (Gate 70)."""
     d = _dir(run)
     text = ''
+    if later:   # questions are recorded for his morning; assumptions are still recorded, for a build that asked nothing
+        json.dump({'questions': None, 'later': True}, open(os.path.join(d, 'budget.json'), 'w'))
+        text += LATER
     if examples:
         ex = open(examples).read().strip() if os.path.exists(examples) else examples
         open(os.path.join(d, 'examples.md'), 'w').write(ex + '\n')
@@ -54,7 +77,7 @@ def setup(run, examples=None, questions=None, assumptions=False):
                  "behind each.\n\n" + ex + '\n')
     if questions is not None:
         json.dump({'questions': questions}, open(os.path.join(d, 'budget.json'), 'w'))
-    if questions != 0:
+    if questions != 0 and not later:
         text += ("\n## Asking the owner\nThe owner is a business person, not an engineer. Ask with "
                  "`python3 -m hive ask \"<question>\"`, which blocks until they answer; first read `python3 -m hive answers` "
                  "(all answers so far). " + (f"The team has {questions} questions in all. " if questions else '') +
@@ -97,6 +120,12 @@ def ask(question, timeout_min=30):
               'A) Rs 2,000, the promised maximum  B) Rs 2,500, what they earned  C) something else (please say)\n'
               'Found: ' + ', '.join(problems)); return 5
     d = _dir(); budget = _budget(d)
+    if _later(d):   # the owner is away: record it for his morning, and let the builder carry on (Gate 70)
+        qid = f'{int(time.time() * 1000)}-{os.environ.get("HIVE_WORKER", "w")}'
+        json.dump({'id': qid, 'worker': os.environ.get('HIVE_WORKER', '?'), 'question': question, 'asked': int(time.time()),
+                   'later': True}, open(os.path.join(d, 'questions', qid + '.json'), 'w'))
+        print('Recorded for the owner\'s morning. Build your best guess for now and keep going; the team will change the code '
+              'to his answers.'); return 0
     asked = len(glob.glob(os.path.join(d, 'questions', '*.json')))
     if budget is not None and asked >= budget:
         print(f'question budget exhausted ({budget} for the whole team); decide from the goal, examples and answers'); return 3
@@ -210,6 +239,8 @@ def answers():
     for p in sorted(glob.glob(os.path.join(d, 'answers', '*.json'))):
         a = json.load(open(p)); q = json.load(open(os.path.join(d, 'questions', a['id'] + '.json')))
         rows.append(f"Q ({q['worker']}): {q['question']}\nA: {a['answer']}\n")
+    if _later(d):
+        rows += [f"Q ({q['worker']}): {q['question']}\n(recorded for the owner's morning)\n" for q in pending(os.path.dirname(d))]
     print('\n'.join(rows) if rows else 'no answers yet'); return 0
 
 def format_question(q, number, budget=None, width=72):

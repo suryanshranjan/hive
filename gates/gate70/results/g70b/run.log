@@ -1,0 +1,124 @@
+[01:28:32] predictions registered on origin/main: gates/gate70/prompts/PREDICTIONS.md
+[01:28:32] rule-giver writing private rules (headless Claude Code)...
+[01:30:26] rules checked: 10 functions, 131 calls, deterministic
+[01:30:26] declared decisions per function: 1:2, 2:3, 3:3, 4:2
+[01:30:26] starting repo and hidden suite built
+[01:30:26] pre-launch: python3 gates/gate70/referee/review70.py pre {run} {oracle}
+[01:30:26] wind tunnel: documenter writing the owner's policy in prose...
+[01:31:01] wind tunnel: R: 58 rules; ask text for N0 written
+[01:31:01] stage 1: N0, QN
+N0: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g70b/upN0.git
+QN: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g70b/upQN.git
+next: python3 lab/launch.py --run g70b
+[01:31:02] launching workers...
+launched N0-w1 
+launched N0-w2 
+launched N0-w3 
+launched QN-w1 
+launched QN-w2 
+launched QN-w3 
+N0-w2 finished: exit 0, 0.7 min, tokens 520522, cost 0.1843727
+QN-w3 finished: exit 0, 0.8 min, tokens 420861, cost 0.1841809
+N0-w3 finished: exit 0, 0.8 min, tokens 533897, cost 0.2051442
+N0-w1 finished: exit 0, 0.9 min, tokens 473747, cost 0.2029268
+QN-w1 finished: exit 0, 0.9 min, tokens 696668, cost 0.21971460000000004
+QN-w2 finished: exit 0, 1.4 min, tokens 851677, cost 0.28288660000000004
+wrote /home/claude/hive/runs/g70b/agents.csv
+[01:32:26] after N0: python3 gates/gate70/referee/review70.py after {run} {oracle} {base}
+[01:36:48] wind tunnel: morning: he answered 32 recorded questions
+[01:36:55] wind tunnel: SL owner #1: '10, 21, 23, 45, 48, 63, 85. The parcel fees and the 500 g steps are wrong, and s'
+[01:36:58] wind tunnel: SL owner #2: 'Half to even: 10.5 becomes 10 and 11.5 becomes 12. So 5 cents at 5000 bp gives 2'
+[01:37:05] wind tunnel: SL owner #3: "Above scale_max should give 'X', not A. Negative scores stay F."
+[01:37:11] wind tunnel: SL owner #4: "Rule 23: scale_max of zero or less should give 'N/A', not NULL."
+[01:37:18] wind tunnel: SL owner #5: 'Up to 250 g is a flat 300 in any zone. Above that, the base is 500, 800 or 1200 '
+[01:37:28] wind tunnel: SL owner #6: 'Weight zero or less should give a fee of 0, in any zone.'
+[01:37:34] wind tunnel: SL owner #7: 'Slugs over 40 characters should be cut to the first 40, then any trailing hyphen'
+[01:37:40] wind tunnel: SL owner #8: 'Use the lower of the two middle values, with no averaging: 1 and 2 give 1, and 2'
+[01:37:49] wind tunnel: SL owner #9: ''
+[01:37:57] wind tunnel: SL owner #10: ''
+[01:38:00] wind tunnel: HV case #1: ''
+[01:38:03] wind tunnel: HV case #2: ''
+[01:38:07] wind tunnel: HV case #3: 'No, a free sample should stay at 0.'
+[01:38:24] wind tunnel: HV case #4: 'No, a negative price should come back unchanged, so -5 cents stays -5 cents.'
+[01:38:40] wind tunnel: HV case #5: ''
+[01:38:44] wind tunnel: HV case #6: ''
+[01:38:48] wind tunnel: HV case #7: ''
+[01:38:53] wind tunnel: HV case #8: 'No, a missing tier should count as basic, so she still earns points.'
+[01:39:08] wind tunnel: HV case #9: ''
+[01:39:11] wind tunnel: HV case #10: ''
+[01:39:14] wind tunnel: HV case #11: ''
+[01:39:17] wind tunnel: HV case #12: 'No, a card with fewer than 8 digits should show INVALID, not stars.'
+[01:39:38] wind tunnel: HV case #13: ''
+[01:39:42] wind tunnel: HV case #14: 'No, a card with a stray letter should be rejected and show nothing, not be maske'
+[01:40:07] wind tunnel: HV case #15: 'No, an empty card number should show INVALID.'
+[01:40:25] wind tunnel: HV case #16: ''
+[01:40:30] wind tunnel: HV case #17: ''
+[01:40:33] wind tunnel: HV case #18: ''
+[01:40:36] wind tunnel: HV case #19: 'No, severity 5 should be treated as 4, so it gets a priority (P4), not blank.'
+[01:41:02] wind tunnel: HV case #20: 'No, a missing open time should give blank (NULL), not P3.'
+[01:41:21] wind tunnel: HV case #21: ''
+[01:41:25] wind tunnel: HV case #22: 'No, reversed dates should give 0 working days, not minus 4.'
+[01:41:39] wind tunnel: HV case #23: "No, Christmas Day isn't a working day, so 24 to 26 December should count 1."
+[01:42:00] wind tunnel: HV case #24: 'No, an impossible date like 30 February should give -1, not blank.'
+[01:42:19] wind tunnel: HV case #25: "No, a start with a time of day isn't a valid date, so it should give -1, not bla"
+[01:42:35] wind tunnel: HV case #26: ''
+[01:42:38] wind tunnel: HV case #27: 'No, a score above the scale maximum should give X, not A.'
+[01:42:50] wind tunnel: HV case #28: ''
+[01:42:53] wind tunnel: HV case #29: 'No, a top mark of 0 should give N/A, not blank.'
+[01:43:06] wind tunnel: HV case #30: ''
+[01:43:09] wind tunnel: HV case #31: 'No, anything over 250 g is charged per started 1000 g, not per 500 g. A 501 g pa'
+[01:43:34] wind tunnel: HV case #32: 'No, a 0 g parcel should cost 0.'
+[01:43:50] wind tunnel: HV case #33: 'No, an unknown zone should be charged the zone 3 rate, not blank.'
+[01:44:19] wind tunnel: HV case #34: 'No, 100 kg costs 129.00 dollars: 5.00 base, 99 extra kilos at 1.00 each, and a 2'
+[01:44:45] wind tunnel: HV case #35: 'No, a negative weight should give 0, not blank.'
+[01:45:07] wind tunnel: HV case #36: 'No, accented letters just vanish, so it should be caf-crme-tea.'
+[01:45:28] wind tunnel: HV case #37: ''
+[01:45:31] wind tunnel: HV case #38: "No, a Japanese title should give 'untitled', not an empty address."
+[01:45:48] wind tunnel: HV case #39: ''
+[01:45:51] wind tunnel: HV case #40: "No, an empty title should give 'untitled', not an empty address."
+[01:46:06] wind tunnel: HV case #41: 'No, half-to-even rounding makes 82.5 come out as 82 cents, not 83.'
+[01:46:29] wind tunnel: HV case #42: ''
+[01:46:33] wind tunnel: HV case #43: 'No, rounding half to even makes it 82 cents refunded, not 83.'
+[01:46:49] wind tunnel: HV case #44: ''
+[01:46:53] wind tunnel: HV case #45: ''
+[01:46:56] wind tunnel: HV case #46: 'No, it takes the lower of the two middle orders, no averaging, so the median is '
+[01:47:09] wind tunnel: HV case #47: 'No, it takes the lower of the two middle orders, so the median is 5, not 500,002'
+[01:47:23] wind tunnel: HV case #48: ''
+[01:47:26] wind tunnel: HV case #49: ''
+[01:47:29] wind tunnel: HV case #50: 'No, it takes the lower of the two middle payments, so the median is 100, not 100'
+[01:47:39] wind tunnel: D 91 rules; SL 10 replies; HV 50 cases, 27 corrected
+[01:49:30] wind tunnel: ask text for HV written
+[01:49:30] stage 2: HV, QA
+HV: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g70b/upHV.git
+QA: 3 workers, tools/ask.py port None, repo /home/claude/hive/runs/g70b/upQA.git
+next: python3 lab/launch.py --run g70b
+[01:49:31] launching workers...
+launched HV-w1 
+launched HV-w2 
+launched HV-w3 
+launched QA-w1 
+launched QA-w2 
+launched QA-w3 
+QA-w1 finished: exit 0, 0.7 min, tokens 445530, cost 0.1895832
+QA-w2 finished: exit 0, 0.8 min, tokens 617442, cost 0.2164707
+HV-w1 finished: exit 0, 0.9 min, tokens 534175, cost 0.2260635
+QA-w3 finished: exit 0, 0.9 min, tokens 713026, cost 0.2466775
+HV-w3 finished: exit 0, 0.9 min, tokens 365539, cost 0.2370609
+HV-w2 finished: exit 0, 1.0 min, tokens 728778, cost 0.2684853
+wrote /home/claude/hive/runs/g70b/agents.csv
+[01:50:33] scoring every arm call by call...
+# g70b: summary
+
+| Arm | Hidden pass | 95% CI by function |
+| --- | --- | --- |
+| N0 | 31.2% | 20.8%–41.2% |
+| QN | 37.6% | 26.4%–48.8% |
+| HV | 80.4% | 68.8%–91.2% |
+| QA | 100.0% | 100.0%–100.0% |
+
+| Paired difference | Points | 95% CI |
+| --- | --- | --- |
+| QN-N0 | +6.4 | +1.6 to +11.6 |
+| HV-N0 | +49.2 | +34.8 to +64.4 |
+| QA-N0 | +68.8 | +58.8 to +78.8 |
+[01:50:35] done. Next: write the gate RESULTS.md from runs/g70b/summary.md, update BRAIN.md and lab/QUEUE.md, push.
