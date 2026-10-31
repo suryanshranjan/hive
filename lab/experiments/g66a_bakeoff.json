@@ -1,0 +1,15 @@
+{
+ "name": "g66a",
+ "predictions": "gates/gate66/prompts/PREDICTIONS.md",
+ "rulegiver_brief": "gates/gate66/prompts/rulegiver_brief.md",
+ "require_decisions": true,
+ "prompt": "gates/gate66/prompts/prompt_builder.md",
+ "ask_texts": "runs/g66a/ask_texts.md",
+ "visible_seed": 66100,
+ "hidden_seed": 66200000,
+ "baseline": "N0",
+ "stage1": ["CC", "CQ"],
+ "pre_launch": ["python3 gates/gate66/referee/review66.py pre {run} {oracle}"],
+ "after_baseline": ["python3 gates/gate66/referee/review66.py after {run} {oracle} {base}"],
+ "arms": ["N0:3:none", "CC:1:none", "CQ:1:none", "HV:3:none"]
+}
