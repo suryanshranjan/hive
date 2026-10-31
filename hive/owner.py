@@ -63,8 +63,12 @@ def setup(run, examples=None, questions=None, assumptions=False):
                  "No code, function names, quoted values, brackets or status codes: `hive ask` refuses them. Ask one thing "
                  "per question, the way you would ask a busy founder in person: one friendly sentence setting the scene "
                  "(who, what, how much), then the question, then the choices, under about 70 words in all. Translate the answer back into code yourself, encode it as a test before you land, and do not "
-                 "stretch it into rules it does not state. Spread your questions: at most 2 about one area before every "
-                 "area you own has had one (a fixed number of questions fixes more when spread; Gate 11).\n")
+                 "stretch it into rules it does not state. **Ask before you build** (Gate 66): before you build an area, ask the "
+                 "owner about every business decision the goal leaves open for it (cut-offs and boundaries, rounding, minimums "
+                 "and caps, what happens with blank, missing, negative or oddly formatted information), one decision per "
+                 "question, and build to his answers. Read `python3 -m hive answers` first and never ask what a teammate has "
+                 "already asked." + (" With a fixed number of questions, spread them: at most 2 about one area before every "
+                                     "area you own has had one (Gate 11)." if questions else '') + "\n")
     if assumptions:
         text += ("\n## Recording your assumptions\nThe owner will read, after the build, every default you chose that the goal "
                  "does not state, and correct the wrong ones. Builders miss most where they feel sure (Gate 27), so record every "

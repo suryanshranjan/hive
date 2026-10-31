@@ -95,4 +95,10 @@ check "with a code sheet, it exits cleanly" $? 0
 check "the assumptions are covered by the code sheet, not reviewed one by one" \
   "$(grep -c "Rather than going through them one by one" $T/sheet.txt) $(grep -c "Assumption 1 of" $T/sheet.txt) $(grep -c "What the build does now, as rules" $T/sheet.txt)" "1 0 1"
 check "after the rules, spot checks on concrete cases of the parts his review left alone (Gate 58)"   "$(grep -c "quick check.* on what the build does in real cases" $T/sheet.txt) $(grep -q "2 of 2." $T/sheet.txt && echo shown)" "1 shown"
+# Gate 68: after builders asked him (here 3 questions), the long hand-over is skipped: his answers are built in
+git checkout -q main
+printf 'Implement creator fees and payouts.\nA\nB\nA\n' | HIVE_WORKER_CMD="sh $HIVE/tests/fake_three_asks_worker.sh" \
+  HIVE_DESCRIBE_CMD="$PY $HIVE/tests/fake_describe_sheet.py" $PY -m hive start --workers 1 --no-interview > $T/asked.txt 2>&1
+check "after builders asked him, the hand-over is skipped and his answers are said to be built in (Gate 68)" \
+  "$(grep -c 'asked you 3 questions while building' $T/asked.txt) $(grep -c 'What the build does now, as rules' $T/asked.txt)" "1 0"
 rm -rf $T; exit $fail

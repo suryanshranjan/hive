@@ -1,0 +1,187 @@
+{
+ "feature": 3,
+ "arm": "F",
+ "questions": [
+  {
+   "t": 1793475004,
+   "worker": "Q3F-w2",
+   "question": "Late fee: examples suggest 5% of the invoice at 8-10 days late, 10% at 20 days, 15% at 30 days. What are the exact day bands and percentages (e.g. 0 days = no fee; up to which day is 5%, 10%, 15%)?",
+   "answer": "Those examples are wrong, so ignore the bands. 5 days late or less is no fee. Past 5 days it's 0.5% of the invoice per day late, capped at 25% of the invoice.",
+   "cost": 0.0591227,
+   "seconds": 4.2
+  },
+  {
+   "t": 1793475008,
+   "worker": "Q3F-w3",
+   "question": "Invoice reference looks like CAT22-0099 (prefix, 2-digit year, dash, number padded to 4 digits). If the prefix is blank or missing, what should it show instead?",
+   "answer": "Use \"XXX\" as the prefix, so it'd show something like XXX22-0099.",
+   "cost": 0.0586607,
+   "seconds": 3.0
+  },
+  {
+   "t": 1793475011,
+   "worker": "Q3F-w1",
+   "question": "Payment plan: if the first due date is the 31st (or 29th-30th) and a later month is shorter, which date is the instalment due: last day of that month (e.g. Jan 31 -> Feb 28/29) or overflow into the next month (Mar 2/3)?",
+   "answer": "Overflow into the next month, same as our other month-add rules (Jan 31 + 1 month gives Mar 2 or 3). But instalment dates are first_due_date plus (installment_no \u2212 1) months from the original date, not chained from the previous instalment.",
+   "cost": 0.0593047,
+   "seconds": 4.3
+  },
+  {
+   "t": 1793475015,
+   "worker": "Q3F-w2",
+   "question": "Late fee: is there a minimum fee, or a cap (maximum fee), and should the fee be rounded to cents (up, down, nearest)?",
+   "answer": "No minimum fee, but yes, there's a cap: the fee can't exceed 25% of the invoice amount. For rounding, round money up to the next whole cent and return it as a number.",
+   "cost": 0.0589047,
+   "seconds": 6.1
+  },
+  {
+   "t": 1793475021,
+   "worker": "Q3F-w3",
+   "question": "Invoice reference: should the prefix be trimmed and upper-cased (e.g. ' vet ' -> VET)? And what about a prefix longer than 3 letters - keep it all or cut it?",
+   "answer": "Yes, trim it, keep only the letters, and upper-case it, so ' vet ' becomes VET. If there are more than 3 letters, keep just the first 3.",
+   "cost": 0.0589367,
+   "seconds": 3.1
+  },
+  {
+   "t": 1793475025,
+   "worker": "Q3F-w1",
+   "question": "Payment plan: if an instalment due date lands on a Saturday or Sunday, does it move to another day (which), or stay as is?",
+   "answer": "Stays as is. No weekday adjustment for instalment dates, so a Saturday or Sunday due date is left alone.",
+   "cost": 0.0586947,
+   "seconds": 3.9
+  },
+  {
+   "t": 1793475028,
+   "worker": "Q3F-w2",
+   "question": "Late fee: what if days late is zero, negative or blank, or the invoice amount is zero, negative, blank or not a number?",
+   "answer": "Return 0 in all those cases. Zero, negative, blank or unreadable days late means no fee, and an invoice amount of zero, negative, blank or non-numeric also means no fee.",
+   "cost": 0.058896699999999996,
+   "seconds": 3.2
+  },
+  {
+   "t": 1793475032,
+   "worker": "Q3F-w3",
+   "question": "Invoice reference: if the invoice number is bigger than 4 digits (e.g. 12345), do we print it in full, or cap it?",
+   "answer": "Print it in full. Numbers are zero-padded to at least 4 digits but never shortened, except that the whole code gets cut to 12 characters.",
+   "cost": 0.0587827,
+   "seconds": 3.5
+  },
+  {
+   "t": 1793475035,
+   "worker": "Q3F-w1",
+   "question": "Payment plan: if the instalment number is 0, negative or blank/missing, what should the result be (NULL, the first due date, or something else)?",
+   "answer": "The first due date. Anything below 1, negative, or blank counts as instalment 1.",
+   "cost": 0.0585867,
+   "seconds": 3.6
+  },
+  {
+   "t": 1793475039,
+   "worker": "Q3F-w2",
+   "question": "Insurance payout: examples suggest the insurer pays 80% of the claim after subtracting the deductible. Is that right? What if the deductible is larger than the claim, or the deductible is negative or blank?",
+   "answer": "Only partly. It's 80% of (claim minus deductible) when the claim is 1000 or less, but if the claim is over 1000 it's 50% of that amount. If the deductible is bigger than the claim, the payout is 0. A negative deductible counts as 0, and a blank one does too.",
+   "cost": 0.059340699999999996,
+   "seconds": 3.2
+  },
+  {
+   "t": 1793475042,
+   "worker": "Q3F-w3",
+   "question": "Invoice reference: if the invoice number is zero, negative, blank or missing, what should be printed for the number part? And fractional numbers like 7.9?",
+   "answer": "Zero, negative, blank or missing all print as 0000. Fractions get rounded down, so 7.9 prints as 0007.",
+   "cost": 0.0587527,
+   "seconds": 3.7
+  },
+  {
+   "t": 1793475046,
+   "worker": "Q3F-w1",
+   "question": "Payment plan: is there a maximum instalment number, and if the number is fractional like 2.5, do we cut it down to a whole number?",
+   "answer": "Yes, the max is 12. Anything above 12 counts as 12, and anything below 1 counts as 1. A fractional number like 2.5 gets cut down to 2.",
+   "cost": 0.058868699999999996,
+   "seconds": 2.8
+  },
+  {
+   "t": 1793475049,
+   "worker": "Q3F-w2",
+   "question": "Insurance payout: is there a maximum payout per claim, and should the payout be rounded to cents (up, down, nearest)?",
+   "answer": "No maximum payout per claim. Round the payout up to the next whole cent, like all our money results, and return it as a number.",
+   "cost": 0.058670700000000006,
+   "seconds": 2.8
+  },
+  {
+   "t": 1793475051,
+   "worker": "Q3F-w3",
+   "question": "Invoice reference: if the year is blank, missing or not a real year, what should the year part show? And what about years like 2005 (-> 05) or 1999?",
+   "answer": "Blank, missing or unreadable year shows '00'. Otherwise drop any fraction and use the last two digits, so 2005 gives '05' and 1999 gives '99'.",
+   "cost": 0.0589127,
+   "seconds": 2.9
+  },
+  {
+   "t": 1793475054,
+   "worker": "Q3F-w1",
+   "question": "Payment plan: if the first due date is blank, missing, not a valid date, or has a time on the end, what should the result be: NULL or 1970-01-01 or something else?",
+   "answer": "1970-01-01. Any date that's missing or not a valid YYYY-MM-DD gets treated as 1970-01-01, and spaces around it are ignored. A date with a time on the end isn't valid, so it falls back to that too.",
+   "cost": 0.0591127,
+   "seconds": 3.0
+  },
+  {
+   "t": 1793475057,
+   "worker": "Q3F-w2",
+   "question": "Insurance payout: what if the claim amount is zero, negative, blank or not a number?",
+   "answer": "Return 0. Zero, negative, blank, or non-numeric claim amounts all pay out nothing.",
+   "cost": 0.0585887,
+   "seconds": 3.3
+  },
+  {
+   "t": 1793475060,
+   "worker": "Q3F-w3",
+   "question": "Invoice reference: a prefix with fewer than 3 letters, like 'PT' - print as is (PT22-0001)? And a prefix with no letters at all (like '123') also becomes XXX?",
+   "answer": "No, pad with X to 3 letters, so 'PT' becomes 'PTX' and the code is PTX22-0001. And yes, a prefix with no letters like '123' becomes XXX.",
+   "cost": 0.0590267,
+   "seconds": 2.8
+  },
+  {
+   "t": 1793475063,
+   "worker": "Q3F-w3",
+   "question": "Invoice reference: for a negative or zero year, what should the year part show (00?)",
+   "answer": "Yes, 00. For a year of 0 or less (or NULL or unreadable), the year part shows 00. A negative year like -5 should drop its fraction downward and print its last two digits, so I'd go with 00 for all of them.",
+   "cost": 0.0589807,
+   "seconds": 4.3
+  },
+  {
+   "t": 1793475068,
+   "worker": "Q3F-w3",
+   "question": "SMS reminder looks like 'Bo in 5d'. What should it say when the appointment is today (0 days) and tomorrow (1 day)?",
+   "answer": "Today: \"Bo today\". Tomorrow: \"Bo tomorrow\".",
+   "cost": 0.0585887,
+   "seconds": 2.5
+  },
+  {
+   "t": 1793475070,
+   "worker": "Q3F-w3",
+   "question": "SMS reminder: what if days_until is negative (appointment already passed), blank or missing?",
+   "answer": "Negative means the appointment already passed, so the message ends \"overdue\". Blank or missing counts as 0, so it ends \"today\".",
+   "cost": 0.0586627,
+   "seconds": 2.8
+  },
+  {
+   "t": 1793475073,
+   "worker": "Q3F-w3",
+   "question": "SMS reminder: what if the pet name is blank or missing, and should the name be trimmed or capitalised?",
+   "answer": "Blank or missing name: just send the ending with no leading space (e.g. \"tomorrow\"). Yes, trim the name, but don't change its capitalisation. The whole message gets cut to 12 characters.",
+   "cost": 0.0589367,
+   "seconds": 2.8
+  },
+  {
+   "t": 1793475076,
+   "worker": "Q3F-w3",
+   "question": "SMS reminder: is there a length limit on the message, and should far-away appointments (e.g. 60 days) switch to weeks? Also fractional days like 2.5?",
+   "answer": "Max 12 characters, so a long name can cut the ending short. No switching to weeks, 60 days is just \"in 60d\". For 2.5 days, round down to 2, so \"in 2d\".",
+   "cost": 0.0589627,
+   "seconds": 3.6
+  }
+ ],
+ "earlier_in": 0,
+ "house_in": [],
+ "hidden_tests": 125,
+ "hidden_total": 125,
+ "minutes": 2.2
+}

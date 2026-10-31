@@ -1,0 +1,18 @@
+feature arm  questions  hidden   earlier answers in / house rules in
+1  S      14     100.0%   0 / 0
+2  C      14      88.8%   14 / 8
+2  F      19      91.2%   0 / 0
+2  M      20      91.2%   14 / 0
+3  C      20      90.4%   28 / 7
+3  F      22     100.0%   0 / 0
+3  M      19     100.0%   34 / 0
+
+features 2-3: F: 41 questions, hidden 95.6%; M: 39 questions, hidden 95.6%; C: 34 questions, hidden 89.6%
+
+predictions
+A1 C asks ≤ 0.7 × F: 34 vs 41 -> failed
+A2 M asks ≤ 0.85 × F: 39 vs 41 -> failed
+A3 hidden C ≥ F − 2: -6.0 -> failed
+A4 hidden C ≥ F + 3: -6.0 -> failed
+Ship (keep answers, distil house rules): did not fire
+Kill (nothing compounds): did not fire

@@ -1,0 +1,1408 @@
+{
+ "R": [
+  "Whenever late_fee receives a NULL or non-numeric (text, boolean) amount_cents or days_late, it must return NULL.",
+  "Whenever late_fee has days_late of 3 or fewer (including zero and negative values), it must return 0; the first three days are a grace period and a fee applies only from more than 3 days late.",
+  "Whenever late_fee charges a fee, the fee is amount_cents x days_late x 0.5% (5 per 1000), so each day late costs half a percent of the amount.",
+  "Whenever the late_fee calculation exceeds 25% of amount_cents, late_fee must return 25% of amount_cents instead, capping the fee at a quarter of the invoice.",
+  "Whenever the late_fee result is not a whole number of cents, late_fee must round it up (toward +infinity) to the next whole cent.",
+  "Whenever late_fee gets a fractional days_late greater than 3, it must charge it like any other value above 3 without rounding days first; a zero amount gives 0, and a negative amount uses the same formula without any special case.",
+  "Whenever mask_card receives NULL, it must return NULL.",
+  "Whenever mask_card receives a value, it must convert it to text and remove every character that is not a digit 0-9 (spaces, hyphens, letters) before doing anything else; a number input is treated as its digits.",
+  "Whenever mask_card finds fewer than 12 digits after cleaning (including empty text or text with no digits), it must return the text 'INVALID'.",
+  "Whenever mask_card finds 12 or more digits, it must return the first 6 digits, then one '*' for each remaining middle digit, then the last 4 digits, with no spaces or separators and no upper limit on length.",
+  "Whenever ship_cost receives a NULL or non-numeric weight_g or zone, it must return NULL, even if the weight is zero or negative.",
+  "Whenever ship_cost has a weight_g of 0 or less (and neither input is NULL), it must return 0 regardless of zone.",
+  "Whenever ship_cost prices a positive weight, it must charge a base of 300 cents plus the number of 500 g units times the zone rate, where the weight is rounded up to whole 500 g units (1 g counts as one unit).",
+  "Whenever ship_cost prices a parcel, the per-unit rate must be 100 cents for zone 1, 180 cents for zone 2 and 260 cents for zone 3.",
+  "Whenever ship_cost receives a zone that is not 1, 2 or 3 (such as 0, negative, above 3 or fractional), it must price it as zone 3; a whole-number value like 2.0 counts as zone 2.",
+  "Whenever ship_cost receives a weight_g strictly greater than 20000, it must add a flat 2000 cent heavy surcharge; exactly 20000 g gets no surcharge.",
+  "Whenever letter_grade receives a NULL or non-numeric score, it must return NULL.",
+  "Whenever letter_grade receives a score below 0 or above 100 (judged on the raw score before any rounding, so 100.4 is out of range), it must return 'X'.",
+  "Whenever letter_grade receives a fractional score in range, it must round it half up to a whole number before assigning the band.",
+  "Whenever letter_grade assigns a band after rounding, it must give 'A' for 90 or more, 'B' for 80-89, 'C' for 70-79, 'D' for 60-69 and 'F' below 60; 0 is a valid score and gives 'F'.",
+  "Whenever biz_days_add receives a NULL start_date or NULL n, it must return NULL.",
+  "Whenever biz_days_add receives an n that is non-numeric (text, boolean, NaN or infinite), it must return NULL; this check comes before date validation.",
+  "Whenever biz_days_add receives a start_date that is not text in the exact form YYYY-MM-DD, or is not a real calendar date, or the result falls outside the supported date range, it must return the text 'BAD_DATE'.",
+  "Whenever biz_days_add receives a fractional n, it must drop the fractional part (truncate toward zero) before counting.",
+  "Whenever biz_days_add receives a start_date on a Saturday or Sunday, it must first move it forward to the following Monday, before counting and even when n is 0 or negative.",
+  "Whenever biz_days_add counts business days, a business day must be Monday to Friday excluding December 25 and January 1 in every year; no other holidays exist.",
+  "Whenever biz_days_add moves by n business days, it must step one calendar day at a time, counting only business days, forward for positive n and backward for negative n.",
+  "Whenever biz_days_add has n equal to 0 and a start_date on a weekday, it must return that same date, even if that weekday is December 25 or January 1; only weekends are moved.",
+  "Whenever ticket_priority receives a NULL or non-numeric severity or hours_open, it must return NULL.",
+  "Whenever ticket_priority receives a severity that is a whole number from 1 to 4, it must start from the label P1 to P4 with the same number.",
+  "Whenever ticket_priority receives any other severity (0, negative, above 4, or fractional), it must start from P4.",
+  "Whenever ticket_priority has hours_open of 48 or more, it must escalate by one level (P4 to P3, and so on), but never above P1; below 48 hours, including negative hours, nothing changes.",
+  "Whenever pct_change receives a NULL or non-numeric old_value or new_value, it must return NULL.",
+  "Whenever pct_change has an old_value of 0, it must return 999.0 whatever new_value is (including 0 or negative).",
+  "Whenever pct_change has a non-zero old_value, it must return (new_value - old_value) / old_value x 100, dividing by the signed old_value rather than its absolute value, so a negative old_value flips the sign.",
+  "Whenever pct_change returns a computed result, it must be a decimal number rounded to 1 decimal place.",
+  "Whenever slug receives NULL, it must return NULL; any other non-text input is converted to text first.",
+  "Whenever slug builds a slug, it must lowercase the title and drop every non-ASCII character completely (no transliteration, so accented letters vanish and '\u00e9' leaves nothing).",
+  "Whenever slug sees a run of one or more characters that are not a-z or 0-9 (spaces, punctuation, underscores), it must replace the run with a single hyphen, and remove leading and trailing hyphens.",
+  "Whenever slug produces more than 30 characters, it must cut it to the first 30 and then remove any trailing hyphen left by the cut.",
+  "Whenever slug produces an empty result (empty text, only spaces or punctuation, only non-ASCII characters), it must return 'n-a'.",
+  "Whenever loyalty_points receives a NULL or non-numeric spend, it must return NULL.",
+  "Whenever loyalty_points calculates points, it must give 1 point per whole currency unit of spend at the basic rate, with a multiplier of 1.5 for silver and 2 for gold.",
+  "Whenever loyalty_points receives a tier, it must ignore case and surrounding whitespace when matching it (' GOLD ' is gold).",
+  "Whenever loyalty_points receives a NULL, non-text or unrecognised tier, it must treat it as basic and still return points rather than NULL.",
+  "Whenever loyalty_points receives a spend above 5000, it must cap the spend at 5000 before applying the tier multiplier, so gold earns at most 10000 points.",
+  "Whenever loyalty_points gets a result that is not a whole number, it must round it down (toward minus infinity); a zero spend gives 0, and a negative spend is not special-cased and gives a negative (rounded down) result.",
+  "Whenever avg_rating sees a NULL or non-numeric rating, it must skip it, counting it in neither the total nor the number of reviews.",
+  "Whenever avg_rating sees a numeric rating below 1 or above 5, it must clamp it to 1 or 5 before averaging, so it still counts as a review.",
+  "Whenever avg_rating has no usable ratings (empty group or all NULL), it must return NULL.",
+  "Whenever avg_rating returns an average, it must be the mean of the clamped ratings as a decimal number rounded to 2 decimal places."
+ ],
+ "D": [
+  "biz_days_add: Whenever a start date and a number of days n are given, the result is the ISO date (YYYY-MM-DD) reached by moving n business days forward from the start date, counting Monday to Friday only.",
+  "biz_days_add: Whenever a day is skipped, it is because it is a Saturday, a Sunday, 25 December or 1 January (these two dates are holidays in every year); no other holidays exist.",
+  "biz_days_add: Whenever n is negative, the date moves backward by that many business days, skipping weekends, 25 December and 1 January the same way (e.g. Monday 2024-03-04 minus 1 gives Friday 2024-03-01).",
+  "biz_days_add: Whenever the start date falls on a Saturday or Sunday, it is first moved forward to the following Monday before counting, for positive, zero and negative n alike (Saturday 2024-03-02 plus 1 gives Tuesday 2024-03-05; Sunday 2024-03-03 minus 1 gives Friday 2024-03-01).",
+  "biz_days_add: Whenever n is 0 and the start date is a weekday, the start date is returned unchanged; when n is 0 and the start is a weekend, the next Monday is returned.",
+  "biz_days_add: Whenever the start date is itself 25 December or 1 January on a weekday, it is not moved and is returned as is for n = 0; counting then starts from that day (2024-12-25 plus 0 gives 2024-12-25, plus 1 gives 2024-12-26).",
+  "biz_days_add: Whenever a weekend start date is moved to Monday and that Monday is 25 December or 1 January, the holiday date is returned as is for n = 0 (2028-12-23 plus 0 gives 2028-12-25).",
+  "biz_days_add: Whenever n has a fractional part, it is cut toward zero before counting (2.9 counts as 2, -2.9 as -2, 0.5 and -0.5 as 0).",
+  "biz_days_add: Whenever n is text that is wholly a number (e.g. '3', ' 3 ' with spaces, or '1e1' meaning 10), it is used as that number.",
+  "biz_days_add: Whenever the start date or n is NULL, the result is NULL.",
+  "biz_days_add: Whenever n is text that is not a number (including empty text), the result is NULL, even if the start date is also invalid.",
+  "biz_days_add: Whenever the start date is not exactly four digits, hyphen, two digits, hyphen, two digits, or is not a real calendar date, the result is the text BAD_DATE; this covers '2024-02-30', '2024-2-3', empty text, a date with a time ('2024-03-01 10:00'), a date with leading spaces, and a plain number such as 20240301 (provided n is valid).",
+  "biz_days_add: Whenever the counting would go past the supported calendar range (before year 1 or after 9999-12-31, e.g. 9999-12-30 plus 5, or a huge n like 1e30), the result is NULL.",
+  "late_fee: Whenever days_late is 3 or fewer (including 0 and negative values), the fee is 0 (a grace period).",
+  "late_fee: Whenever days_late is more than 3, the fee is 0.5% of the amount for every day late counted from day 1 (not only the days after the 3rd): 10000 cents 4 days late gives 200, 10 days late gives 500.",
+  "late_fee: Whenever the percentage would exceed 25% of the amount (50 or more days late), the fee is capped at 25% of the amount (10000 cents gives 2500 for 50, 51 or more days).",
+  "late_fee: Whenever the fee is not a whole number of cents, it is rounded up to the next whole cent (10001 cents at 4 days gives 201; 999 cents at 4 days gives 20; 1 cent at 4 days gives 1).",
+  "late_fee: Whenever days_late has a fractional part and is above 3, the fraction counts (3.5 days on 10000 cents gives 175); 3.0001 days is above the grace period and is charged (100 cents gives 2).",
+  "late_fee: Whenever amount_cents is 0, the fee is 0; whenever it is negative and days_late is over 3, the fee is negative at the same percentage, rounded up toward zero (-10000 cents at 10 days gives -500; at 100 days gives -2500); with 3 days or fewer the fee is 0.",
+  "late_fee: Whenever either input is text that is wholly a number (e.g. '10000' and '10', spaces allowed), it is treated as that number.",
+  "late_fee: Whenever either input is NULL, empty text or text that is not a number, the result is NULL.",
+  "letter_grade: Whenever the score is first rounded to the nearest whole number (halves round up), the grade is A for 90 or more, B for 80 to 89, C for 70 to 79, D for 60 to 69 and F below 60.",
+  "letter_grade: Whenever the score has a half-point at a boundary, it rounds up into the higher grade (89.5 gives A, 79.5 gives B, 69.5 gives C, 59.5 gives D), while 89.49 gives B and 59.49 gives F.",
+  "letter_grade: Whenever the score is exactly 0, between 0 and 0.5, or exactly 100, the grade is F for 0 to 59.49 and A for 100.",
+  "letter_grade: Whenever the raw score is below 0 (even -0.1 or -0.4) or above 100 (even 100.5), the result is the letter X, meaning invalid; the check uses the score before rounding.",
+  "letter_grade: Whenever the score is text that is wholly a number (e.g. '85', ' 85 ', '1e2'), it is graded as that number.",
+  "letter_grade: Whenever the score is NULL, empty text, spaces only or other non-numeric text, the result is NULL.",
+  "loyalty_points: Whenever the tier is basic, bronze, an unrecognised name, empty text, NULL or a non-text value, points are 1 per unit of spend (spend 1000 gives 1000).",
+  "loyalty_points: Whenever the tier is silver, points are 1.5 per unit of spend (1000 gives 1500); for gold, 2 per unit (1000 gives 2000).",
+  "loyalty_points: Whenever the tier is written in different letter case or with spaces around it (GOLD, ' Gold ', Silver), it is recognised as that tier; but spaces inside a name (e.g. 'sil ver') are not, giving the 1-per-unit rate.",
+  "loyalty_points: Whenever the calculated points are not a whole number, they are rounded down (999 at silver gives 1498; 10.99 at gold gives 21; 0.5 at basic gives 0; 3 at silver gives 4).",
+  "loyalty_points: Whenever spend is negative, points are negative and rounding goes down, away from zero (-0.5 at basic gives -1; -10 at gold gives -20; -1 at silver gives -2).",
+  "loyalty_points: Whenever spend is 0, points are 0.",
+  "loyalty_points: Whenever spend is text that is wholly a number (e.g. '100', ' 100.5 ', '1e2'), it is used as that number ('100' at gold gives 200; ' 100.5 ' at gold gives 201).",
+  "loyalty_points: Whenever spend is NULL, empty text or non-numeric text, the result is NULL, whatever the tier.",
+  "loyalty_points: Whenever spend is extremely large (e.g. 1e30), no upper limit is applied and the full whole-number result is returned.",
+  "mask_card: Whenever a card number has at least 12 digits, the result shows the first 6 digits, then one asterisk for every digit in between, then the last 4 digits (4111111111111111 gives 411111******1111).",
+  "mask_card: Whenever the card number contains spaces, hyphens or any other non-digit characters, those are removed first and only the digits are counted and shown (4111-1111-1111-1111 and '4111 1111 1111 1111' both give 411111******1111; letters inside are dropped too).",
+  "mask_card: Whenever the card number has 12 to any larger number of digits, there is no maximum length: 12 digits give 2 asterisks, 19 digits give 9, 25 digits give 15.",
+  "mask_card: Whenever fewer than 12 digits remain after removing non-digits (11 digits, empty text, spaces only, letters only like 'abcd'), the result is the text INVALID.",
+  "mask_card: Whenever the card number is NULL, the result is NULL.",
+  "mask_card: Whenever the card number is given as a plain number rather than text, it is treated as its digits and masked the same way.",
+  "mask_card: Whenever digits are written in non-ASCII form (e.g. full-width digits), they are not counted as digits, so such input gives INVALID.",
+  "mask_card: Whenever the card number has leading or trailing spaces, they are ignored and do not count as digits.",
+  "pct_change: Whenever both values are given and old_value is not 0, the result is (new - old) / old x 100, rounded to one decimal place (100 to 150 gives 50.0; 100 to 50 gives -50.0; 100 to 100 gives 0.0).",
+  "pct_change: Whenever old_value is 0 (including 0.0 and '0'), the result is 999.0 no matter what new_value is (0, positive or negative).",
+  "pct_change: Whenever the rounding falls exactly on a half of a tenth, it rounds up in size, away from zero (1 to 1.0005 gives 0.1; 1 to 0.9995 gives -0.1; 1 to 1.00049 gives 0.0; 1 to 1.0095 gives 1.0).",
+  "pct_change: Whenever a small decrease rounds to nothing, the result is shown as -0.0 rather than 0.0 (1 to 0.99951 gives -0.0).",
+  "pct_change: Whenever old_value is negative, the percentage is divided by the negative old value itself, so the sign is reversed from what an increase would suggest (-100 to -50 gives -50.0; -100 to 50 gives -150.0; 100 to -50 gives -150.0; -3 to -4 gives 33.3).",
+  "pct_change: Whenever either value is NULL, the result is NULL, even when old_value is 0 or new_value is 0.",
+  "pct_change: Whenever either value is empty text or non-numeric text, the result is NULL, even when old_value is 0 ('0' to 'abc' gives NULL).",
+  "pct_change: Whenever a value is text that is wholly a number (e.g. '100', ' 100 ', '1e2'), it is used as that number.",
+  "ship_cost: Whenever the weight is above 0, the charge is a base of 300 cents plus a per-block charge for each started 500 g (weight divided by 500, rounded up): 100 cents per block in zone 1, 180 in zone 2 and 260 in zone 3.",
+  "ship_cost: Whenever the weight is exactly on a 500 g multiple it counts that many blocks (500 g in zone 1 gives 400); one gram more starts a new block (501 g gives 500); even 0.5 g counts as one block.",
+  "ship_cost: Whenever the weight is above 20000 g (20000 g exactly is not above), a flat surcharge of 2000 cents is added (20000 g zone 1 gives 4300; 20001 g zone 1 gives 6400; 20001 g zone 3 gives 12960).",
+  "ship_cost: Whenever the zone is anything other than exactly 1 or 2 (0, 4, 99, negative, or fractional such as 1.5 or 2.5), the zone 3 rate of 260 per block is used.",
+  "ship_cost: Whenever the zone is written as 2.0, '2' or ' 2 ', it counts as zone 2.",
+  "ship_cost: Whenever the weight is 0 or negative, the charge is 0 (no base charge) for any valid zone, including an out-of-range zone.",
+  "ship_cost: Whenever the weight or the zone is NULL, empty text or non-numeric text, the result is NULL, even if the other input is 0 or negative.",
+  "ship_cost: Whenever the weight is text that is wholly a number (e.g. '500'), it is used as that number.",
+  "slug: Whenever a title is given, it is turned into lower case, and each run of characters that are not a-z or 0-9 (spaces, tabs, line breaks, punctuation, underscores, hyphens, ampersands, symbols) is replaced by a single hyphen ('Hello,   World!' gives hello-world; 'a_b-c' gives a-b-c; 'a--b' gives a-b).",
+  "slug: Whenever the title starts or ends with separators, no leading or trailing hyphen is kept ('  Hello World  ' gives hello-world).",
+  "slug: Whenever the title contains accented or other non-English letters or digits (\u00e9, \u00fc, \u00df, \u65e5\u672c\u8a9e, \u00b2, \u2460), those characters are deleted entirely, without leaving a separator: 'na\u00efve test' gives nave-test, 'Caf\u00e9 Ol\u00e9' gives caf-ol, 'abc\u00e9def' gives abcdef and '\u00dcn\u00ef C\u00f6d\u00e9' gives n-cd.",
+  "slug: Whenever a non-ASCII character is a symbol or punctuation rather than a letter or digit (e.g. \u00a1, \u20ac, \u2014, a non-breaking space), it acts as a separator and becomes a hyphen like other punctuation ('a\u20acb' gives a-b; '\u00a1Hola!' gives hola).",
+  "slug: Whenever the slug would be longer than 30 characters, it is cut to the first 30 characters, even in the middle of a word, and if that leaves a hyphen at the end, the hyphen is removed (so it may be 29 characters).",
+  "slug: Whenever the title is empty, spaces only, only symbols, or only deleted non-English letters (e.g. '', '   ', '!!!', '\u65e5\u672c\u8a9e', '\u00df'), the result is n-a.",
+  "slug: Whenever the title is NULL, the result is NULL.",
+  "slug: Whenever the title is a number, it is converted to text first (123 gives 123; 12.5 gives 12-5).",
+  "slug: Whenever the title contains digits, they are kept ('2024 Report' gives 2024-report).",
+  "ticket_priority: Whenever severity is 1, 2, 3 or 4 (also 1.0 or the text '2'), the base priority is P1, P2, P3 or P4 respectively.",
+  "ticket_priority: Whenever severity is any other number (0, 5, 9, negative, or fractional such as 2.5 or 3.99), the base priority is P4; fractions are not rounded.",
+  "ticket_priority: Whenever hours_open is 48 or more, the priority is raised by one level (P4 to P3, P3 to P2, P2 to P1), but never above P1; 47.9 hours is not raised and exactly 48 is.",
+  "ticket_priority: Whenever the severity is unrecognised (base P4) and the ticket has been open 48 hours or more, the result is P3 (severity 9, 0 or 2.5 at 48 hours gives P3).",
+  "ticket_priority: Whenever hours_open is negative or under 48, there is no age bump, only the base priority applies; the bump does not go higher with more hours (severity 3 at 100 hours gives P2).",
+  "ticket_priority: Whenever severity or hours_open is text that is wholly a number (e.g. '2' and '50', ' 2 ' and ' 50 ', '4.8e1'), it is used as that number.",
+  "ticket_priority: Whenever severity or hours_open is NULL, empty text or non-numeric text, the result is NULL.",
+  "avg_rating: Whenever a group of reviews is averaged, the result is the mean of the ratings, rounded to two decimals with halves rounding up (ratings 1, 1, 2 give 1.33; 4.5 and 4.4 give 4.45; 4.335 and 4.335 give 4.34).",
+  "avg_rating: Whenever a rating is below 1 (0, 0.5, negative), it counts as 1 in the average, and whenever it is above 5 it counts as 5 (ratings 0, 10 and '3' average 3.0).",
+  "avg_rating: Whenever a rating is NULL, empty text or non-numeric text, that review is skipped and does not count in the average or the number of reviews.",
+  "avg_rating: Whenever a rating is text that is wholly a number (e.g. '3', ' 4 '), it is counted as that number.",
+  "avg_rating: Whenever the group has no reviews or no usable ratings (no rows, only NULLs or non-numeric text), the result is NULL.",
+  "avg_rating: Whenever the DISTINCT form is used, each different rating value is counted once (ratings 1, 1, 2 average 1.5)."
+ ],
+ "SL": [
+  "biz_days_add: Whenever a start date and a number of days n are given, the result is the ISO date (YYYY-MM-DD) reached by moving n business days forward from the start date, counting Monday to Friday only.",
+  "biz_days_add: Whenever a day is skipped, it is because it is a Saturday, a Sunday, 25 December or 1 January (these two dates are holidays in every year); no other holidays exist.",
+  "biz_days_add: Whenever n is negative, the date moves backward by that many business days, skipping weekends, 25 December and 1 January the same way (e.g. Monday 2024-03-04 minus 1 gives Friday 2024-03-01).",
+  "biz_days_add: Whenever the start date falls on a Saturday or Sunday, it is first moved forward to the following Monday before counting, for positive, zero and negative n alike (Saturday 2024-03-02 plus 1 gives Tuesday 2024-03-05; Sunday 2024-03-03 minus 1 gives Friday 2024-03-01).",
+  "biz_days_add: Whenever n is 0 and the start date is a weekday, the start date is returned unchanged; when n is 0 and the start is a weekend, the next Monday is returned.",
+  "biz_days_add: Whenever the start date is itself 25 December or 1 January on a weekday, it is not moved and is returned as is for n = 0; counting then starts from that day (2024-12-25 plus 0 gives 2024-12-25, plus 1 gives 2024-12-26).",
+  "biz_days_add: Whenever a weekend start date is moved to Monday and that Monday is 25 December or 1 January, the holiday date is returned as is for n = 0 (2028-12-23 plus 0 gives 2028-12-25).",
+  "biz_days_add: Whenever n has a fractional part, it is cut toward zero before counting (2.9 counts as 2, -2.9 as -2, 0.5 and -0.5 as 0).",
+  "biz_days_add: Whenever n is text that is wholly a number (e.g. '3', ' 3 ' with spaces, or '1e1' meaning 10), it is used as that number.",
+  "biz_days_add: Whenever the start date or n is NULL, the result is NULL.",
+  "biz_days_add: Whenever n is text that is not a number (including empty text), the result is NULL, even if the start date is also invalid.",
+  "biz_days_add: Whenever the start date is not exactly four digits, hyphen, two digits, hyphen, two digits, or is not a real calendar date, the result is the text BAD_DATE; this covers '2024-02-30', '2024-2-3', empty text, a date with a time ('2024-03-01 10:00'), a date with leading spaces, and a plain number such as 20240301 (provided n is valid).",
+  "biz_days_add: Whenever the counting would go past the supported calendar range (before year 1 or after 9999-12-31, e.g. 9999-12-30 plus 5, or a huge n like 1e30), the result is the text BAD_DATE.",
+  "late_fee: Whenever days_late is 3 or fewer (including 0 and negative values), the fee is 0 (a grace period).",
+  "late_fee: Whenever days_late is more than 3, the fee is 0.5% of the amount for every day late counted from day 1 (not only the days after the 3rd): 10000 cents 4 days late gives 200, 10 days late gives 500.",
+  "late_fee: Whenever the percentage would exceed 25% of the amount (50 or more days late), the fee is capped at 25% of the amount (10000 cents gives 2500 for 50, 51 or more days).",
+  "late_fee: Whenever the fee is not a whole number of cents, it is rounded up to the next whole cent (10001 cents at 4 days gives 201; 999 cents at 4 days gives 20; 1 cent at 4 days gives 1).",
+  "late_fee: Whenever days_late has a fractional part and is above 3, the fraction counts (3.5 days on 10000 cents gives 175); 3.0001 days is above the grace period and is charged (100 cents gives 2).",
+  "late_fee: Whenever amount_cents is 0, the fee is 0; whenever it is negative and days_late is over 3, the fee is negative at the same percentage, rounded up toward zero (-10000 cents at 10 days gives -500; at 100 days gives -2500); with 3 days or fewer the fee is 0.",
+  "late_fee: Whenever either input is text that is wholly a number (e.g. '10000' and '10', spaces allowed), it is treated as that number.",
+  "late_fee: Whenever either input is NULL, empty text or text that is not a number, the result is NULL.",
+  "letter_grade: Whenever the score is first rounded to the nearest whole number (halves round up), the grade is A for 90 or more, B for 80 to 89, C for 70 to 79, D for 60 to 69 and F below 60.",
+  "letter_grade: Whenever the score has a half-point at a boundary, it rounds up into the higher grade (89.5 gives A, 79.5 gives B, 69.5 gives C, 59.5 gives D), while 89.49 gives B and 59.49 gives F.",
+  "letter_grade: Whenever the score is exactly 0, between 0 and 0.5, or exactly 100, the grade is F for 0 to 59.49 and A for 100.",
+  "letter_grade: Whenever the raw score is below 0 (even -0.1 or -0.4) or above 100 (even 100.5), the result is the letter X, meaning invalid; the check uses the score before rounding.",
+  "letter_grade: Whenever the score is text that is wholly a number (e.g. '85', ' 85 ', '1e2'), it is graded as that number.",
+  "letter_grade: Whenever the score is NULL, empty text, spaces only or other non-numeric text, the result is NULL.",
+  "loyalty_points: Whenever the tier is basic, bronze, an unrecognised name, empty text, NULL or a non-text value, points are 1 per unit of spend (spend 1000 gives 1000).",
+  "loyalty_points: Whenever the tier is silver, points are 1.5 per unit of spend (1000 gives 1500); for gold, 2 per unit (1000 gives 2000).",
+  "loyalty_points: Whenever the tier is written in different letter case or with spaces around it (GOLD, ' Gold ', Silver), it is recognised as that tier; but spaces inside a name (e.g. 'sil ver') are not, giving the 1-per-unit rate.",
+  "loyalty_points: Whenever the calculated points are not a whole number, they are rounded down (999 at silver gives 1498; 10.99 at gold gives 21; 0.5 at basic gives 0; 3 at silver gives 4).",
+  "loyalty_points: Whenever spend is negative, points are negative and rounding goes down, away from zero (-0.5 at basic gives -1; -10 at gold gives -20; -1 at silver gives -2).",
+  "loyalty_points: Whenever spend is 0, points are 0.",
+  "loyalty_points: Whenever spend is text that is wholly a number (e.g. '100', ' 100.5 ', '1e2'), it is used as that number ('100' at gold gives 200; ' 100.5 ' at gold gives 201).",
+  "loyalty_points: Whenever spend is NULL, empty text or non-numeric text, the result is NULL, whatever the tier.",
+  "loyalty_points: Spend is capped at 5000 before the tier multiplier is applied, so gold earns at most 10000 points. Whenever spend is extremely large (e.g. 1e30), the spend is capped at 5000 and the full whole-number result is returned.",
+  "mask_card: Whenever a card number has at least 12 digits, the result shows the first 6 digits, then one asterisk for every digit in between, then the last 4 digits (4111111111111111 gives 411111******1111).",
+  "mask_card: Whenever the card number contains spaces, hyphens or any other non-digit characters, those are removed first and only the digits are counted and shown (4111-1111-1111-1111 and '4111 1111 1111 1111' both give 411111******1111; letters inside are dropped too).",
+  "mask_card: Whenever the card number has 12 to any larger number of digits, there is no maximum length: 12 digits give 2 asterisks, 19 digits give 9, 25 digits give 15.",
+  "mask_card: Whenever fewer than 12 digits remain after removing non-digits (11 digits, empty text, spaces only, letters only like 'abcd'), the result is the text INVALID.",
+  "mask_card: Whenever the card number is NULL, the result is NULL.",
+  "mask_card: Whenever the card number is given as a plain number rather than text, it is treated as its digits and masked the same way.",
+  "mask_card: Whenever digits are written in non-ASCII form (e.g. full-width digits), they are not counted as digits, so such input gives INVALID.",
+  "mask_card: Whenever the card number has leading or trailing spaces, they are ignored and do not count as digits.",
+  "pct_change: Whenever both values are given and old_value is not 0, the result is (new - old) / old x 100, rounded to one decimal place (100 to 150 gives 50.0; 100 to 50 gives -50.0; 100 to 100 gives 0.0).",
+  "pct_change: Whenever old_value is 0 (including 0.0 and '0'), the result is 999.0 no matter what new_value is (0, positive or negative).",
+  "pct_change: Whenever the rounding falls exactly on a half of a tenth, it rounds up in size, away from zero (1 to 1.0005 gives 0.1; 1 to 0.9995 gives -0.1; 1 to 1.00049 gives 0.0; 1 to 1.0095 gives 1.0).",
+  "pct_change: Whenever a small decrease rounds to nothing, the result is shown as -0.0 rather than 0.0 (1 to 0.99951 gives -0.0).",
+  "pct_change: Whenever old_value is negative, the percentage is divided by the negative old value itself, so the sign is reversed from what an increase would suggest (-100 to -50 gives -50.0; -100 to 50 gives -150.0; 100 to -50 gives -150.0; -3 to -4 gives 33.3).",
+  "pct_change: Whenever either value is NULL, the result is NULL, even when old_value is 0 or new_value is 0.",
+  "pct_change: Whenever either value is empty text or non-numeric text, the result is NULL, even when old_value is 0 ('0' to 'abc' gives NULL).",
+  "pct_change: Whenever a value is text that is wholly a number (e.g. '100', ' 100 ', '1e2'), it is used as that number.",
+  "ship_cost: Whenever the weight is above 0, the charge is a base of 300 cents plus a per-block charge for each started 500 g (weight divided by 500, rounded up): 100 cents per block in zone 1, 180 in zone 2 and 260 in zone 3.",
+  "ship_cost: Whenever the weight is exactly on a 500 g multiple it counts that many blocks (500 g in zone 1 gives 400); one gram more starts a new block (501 g gives 500); even 0.5 g counts as one block.",
+  "ship_cost: Whenever the weight is above 20000 g (20000 g exactly is not above), a flat surcharge of 2000 cents is added (20000 g zone 1 gives 4300; 20001 g zone 1 gives 6400; 20001 g zone 3 gives 12960).",
+  "ship_cost: Whenever the zone is anything other than exactly 1 or 2 (0, 4, 99, negative, or fractional such as 1.5 or 2.5), the zone 3 rate of 260 per block is used.",
+  "ship_cost: Whenever the zone is written as 2.0, '2' or ' 2 ', it counts as zone 2.",
+  "ship_cost: Whenever the weight is 0 or negative, the charge is 0 (no base charge) for any valid zone, including an out-of-range zone.",
+  "ship_cost: Whenever the weight or the zone is NULL, empty text or non-numeric text, the result is NULL, even if the other input is 0 or negative.",
+  "ship_cost: Whenever the weight is text that is wholly a number (e.g. '500'), it is used as that number.",
+  "slug: Whenever a title is given, it is turned into lower case, and each run of characters that are not a-z or 0-9 (spaces, tabs, line breaks, punctuation, underscores, hyphens, ampersands, symbols) is replaced by a single hyphen ('Hello,   World!' gives hello-world; 'a_b-c' gives a-b-c; 'a--b' gives a-b).",
+  "slug: Whenever the title starts or ends with separators, no leading or trailing hyphen is kept ('  Hello World  ' gives hello-world).",
+  "slug: Whenever the title contains accented or other non-English letters or digits (\u00e9, \u00fc, \u00df, \u65e5\u672c\u8a9e, \u00b2, \u2460), those characters are deleted entirely, without leaving a separator: 'na\u00efve test' gives nave-test, 'Caf\u00e9 Ol\u00e9' gives caf-ol, 'abc\u00e9def' gives abcdef and '\u00dcn\u00ef C\u00f6d\u00e9' gives n-cd.",
+  "slug: Whenever a non-ASCII character is a symbol or punctuation rather than a letter or digit (e.g. \u00a1, \u20ac, \u2014, a non-breaking space), it acts as a separator and becomes a hyphen like other punctuation ('a\u20acb' gives a-b; '\u00a1Hola!' gives hola).",
+  "slug: Whenever the slug would be longer than 30 characters, it is cut to the first 30 characters, even in the middle of a word, and if that leaves a hyphen at the end, the hyphen is removed (so it may be 29 characters).",
+  "slug: Whenever the title is empty, spaces only, only symbols, or only deleted non-English letters (e.g. '', '   ', '!!!', '\u65e5\u672c\u8a9e', '\u00df'), the result is n-a.",
+  "slug: Whenever the title is NULL, the result is NULL.",
+  "slug: Whenever the title is a number, it is converted to text first (123 gives 123; 12.5 gives 12-5).",
+  "slug: Whenever the title contains digits, they are kept ('2024 Report' gives 2024-report).",
+  "ticket_priority: Whenever severity is 1, 2, 3 or 4 (also 1.0 or the text '2'), the base priority is P1, P2, P3 or P4 respectively.",
+  "ticket_priority: Whenever severity is any other number (0, 5, 9, negative, or fractional such as 2.5 or 3.99), the base priority is P4; fractions are not rounded.",
+  "ticket_priority: Whenever hours_open is 48 or more, the priority is raised by one level (P4 to P3, P3 to P2, P2 to P1), but never above P1; 47.9 hours is not raised and exactly 48 is.",
+  "ticket_priority: Whenever the severity is unrecognised (base P4) and the ticket has been open 48 hours or more, the result is P3 (severity 9, 0 or 2.5 at 48 hours gives P3).",
+  "ticket_priority: Whenever hours_open is negative or under 48, there is no age bump, only the base priority applies; the bump does not go higher with more hours (severity 3 at 100 hours gives P2).",
+  "ticket_priority: Whenever severity or hours_open is text that is wholly a number (e.g. '2' and '50', ' 2 ' and ' 50 ', '4.8e1'), it is used as that number.",
+  "ticket_priority: Whenever severity or hours_open is NULL, empty text or non-numeric text, the result is NULL.",
+  "avg_rating: Whenever a group of reviews is averaged, the result is the mean of the ratings, rounded to two decimals with halves rounding up (ratings 1, 1, 2 give 1.33; 4.5 and 4.4 give 4.45; 4.335 and 4.335 give 4.34).",
+  "avg_rating: Whenever a rating is below 1 (0, 0.5, negative), it counts as 1 in the average, and whenever it is above 5 it counts as 5 (ratings 0, 10 and '3' average 3.0).",
+  "avg_rating: Whenever a rating is NULL, empty text or non-numeric text, that review is skipped and does not count in the average or the number of reviews.",
+  "avg_rating: Whenever a rating is text that is wholly a number (e.g. '3', ' 4 '), it is counted as that number.",
+  "avg_rating: Whenever the group has no reviews or no usable ratings (no rows, only NULLs or non-numeric text), the result is NULL.",
+  "avg_rating: Whenever the DISTINCT form is used, each different rating value is counted once (ratings 1, 1, 2 average 1.5)."
+ ],
+ "HV": [
+  "biz_days_add: Whenever a start date and a number of days n are given, the result is the ISO date (YYYY-MM-DD) reached by moving n business days forward from the start date, counting Monday to Friday only.",
+  "biz_days_add: Whenever a day is skipped, it is because it is a Saturday, a Sunday, 25 December or 1 January (these two dates are holidays in every year); no other holidays exist.",
+  "biz_days_add: Whenever n is negative, the date moves backward by that many business days, skipping weekends, 25 December and 1 January the same way (e.g. Monday 2024-03-04 minus 1 gives Friday 2024-03-01).",
+  "biz_days_add: Whenever the start date falls on a Saturday or Sunday, it is first moved forward to the following Monday before counting, for positive, zero and negative n alike (Saturday 2024-03-02 plus 1 gives Tuesday 2024-03-05; Sunday 2024-03-03 minus 1 gives Friday 2024-03-01).",
+  "biz_days_add: Whenever n is 0 and the start date is a weekday, the start date is returned unchanged; when n is 0 and the start is a weekend, the next Monday is returned.",
+  "biz_days_add: Whenever the start date is itself 25 December or 1 January on a weekday, it is not moved and is returned as is for n = 0; counting then starts from that day (2024-12-25 plus 0 gives 2024-12-25, plus 1 gives 2024-12-26).",
+  "biz_days_add: Whenever a weekend start date is moved to Monday and that Monday is 25 December or 1 January, the holiday date is returned as is for n = 0 (2028-12-23 plus 0 gives 2028-12-25).",
+  "biz_days_add: Whenever n has a fractional part, it is cut toward zero before counting (2.9 counts as 2, -2.9 as -2, 0.5 and -0.5 as 0).",
+  "biz_days_add: Whenever n is text that is wholly a number (e.g. '3', ' 3 ' with spaces, or '1e1' meaning 10), it is used as that number.",
+  "biz_days_add: Whenever the start date or n is NULL, the result is NULL.",
+  "biz_days_add: Whenever n is text that is not a number (including empty text), the result is NULL, even if the start date is also invalid.",
+  "biz_days_add: Whenever the start date is not exactly four digits, hyphen, two digits, hyphen, two digits, or is not a real calendar date, the result is the text BAD_DATE; this covers '2024-02-30', '2024-2-3', empty text, a date with a time ('2024-03-01 10:00'), a date with leading spaces, and a plain number such as 20240301 (provided n is valid).",
+  "biz_days_add: Whenever the counting would go past the supported calendar range (before year 1 or after 9999-12-31, e.g. 9999-12-30 plus 5, or a huge n like 1e30), the result is the text BAD_DATE.",
+  "late_fee: Whenever days_late is 3 or fewer (including 0 and negative values), the fee is 0 (a grace period).",
+  "late_fee: Whenever days_late is more than 3, the fee is 0.5% of the amount for every day late counted from day 1 (not only the days after the 3rd): 10000 cents 4 days late gives 200, 10 days late gives 500.",
+  "late_fee: Whenever the percentage would exceed 25% of the amount (50 or more days late), the fee is capped at 25% of the amount (10000 cents gives 2500 for 50, 51 or more days).",
+  "late_fee: Whenever the fee is not a whole number of cents, it is rounded up to the next whole cent (10001 cents at 4 days gives 201; 999 cents at 4 days gives 20; 1 cent at 4 days gives 1).",
+  "late_fee: Whenever days_late has a fractional part and is above 3, the fraction counts (3.5 days on 10000 cents gives 175); 3.0001 days is above the grace period and is charged (100 cents gives 2).",
+  "late_fee: Whenever amount_cents is 0, the fee is 0; whenever it is negative and days_late is over 3, the fee is negative at the same percentage, rounded up toward zero (-10000 cents at 10 days gives -500; at 100 days gives -2500); with 3 days or fewer the fee is 0.",
+  "late_fee: Whenever either input is text that is wholly a number (e.g. '10000' and '10', spaces allowed), it is treated as that number.",
+  "late_fee: Whenever either input is NULL, empty text or text that is not a number, the result is NULL.",
+  "letter_grade: Whenever the score is first rounded to the nearest whole number (halves round up), the grade is A for 90 or more, B for 80 to 89, C for 70 to 79, D for 60 to 69 and F below 60.",
+  "letter_grade: Whenever the score has a half-point at a boundary, it rounds up into the higher grade (89.5 gives A, 79.5 gives B, 69.5 gives C, 59.5 gives D), while 89.49 gives B and 59.49 gives F.",
+  "letter_grade: Whenever the score is exactly 0, between 0 and 0.5, or exactly 100, the grade is F for 0 to 59.49 and A for 100.",
+  "letter_grade: Whenever the raw score is below 0 (even -0.1 or -0.4) or above 100 (even 100.5), the result is the letter X, meaning invalid; the check uses the score before rounding.",
+  "letter_grade: Whenever the score is text that is wholly a number (e.g. '85', ' 85 ', '1e2'), it is graded as that number.",
+  "letter_grade: Whenever the score is NULL, empty text, spaces only or other non-numeric text, the result is NULL.",
+  "loyalty_points: Whenever the tier is basic, bronze, an unrecognised name, empty text, NULL or a non-text value, points are 1 per unit of spend (spend 1000 gives 1000).",
+  "loyalty_points: Whenever the tier is silver, points are 1.5 per unit of spend (1000 gives 1500); for gold, 2 per unit (1000 gives 2000).",
+  "loyalty_points: Whenever the tier is written in different letter case or with spaces around it (GOLD, ' Gold ', Silver), it is recognised as that tier; but spaces inside a name (e.g. 'sil ver') are not, giving the 1-per-unit rate.",
+  "loyalty_points: Whenever the calculated points are not a whole number, they are rounded down (999 at silver gives 1498; 10.99 at gold gives 21; 0.5 at basic gives 0; 3 at silver gives 4).",
+  "loyalty_points: Whenever spend is negative, points are negative and rounding goes down, away from zero (-0.5 at basic gives -1; -10 at gold gives -20; -1 at silver gives -2).",
+  "loyalty_points: Whenever spend is 0, points are 0.",
+  "loyalty_points: Whenever spend is text that is wholly a number (e.g. '100', ' 100.5 ', '1e2'), it is used as that number ('100' at gold gives 200; ' 100.5 ' at gold gives 201).",
+  "loyalty_points: Whenever spend is NULL, empty text or non-numeric text, the result is NULL, whatever the tier.",
+  "loyalty_points: Spend is capped at 5000 before the tier multiplier is applied, so gold earns at most 10000 points. Whenever spend is extremely large (e.g. 1e30), the spend is capped at 5000 and the full whole-number result is returned.",
+  "mask_card: Whenever a card number has at least 12 digits, the result shows the first 6 digits, then one asterisk for every digit in between, then the last 4 digits (4111111111111111 gives 411111******1111).",
+  "mask_card: Whenever the card number contains spaces, hyphens or any other non-digit characters, those are removed first and only the digits are counted and shown (4111-1111-1111-1111 and '4111 1111 1111 1111' both give 411111******1111; letters inside are dropped too).",
+  "mask_card: Whenever the card number has 12 to any larger number of digits, there is no maximum length: 12 digits give 2 asterisks, 19 digits give 9, 25 digits give 15.",
+  "mask_card: Whenever fewer than 12 digits remain after removing non-digits (11 digits, empty text, spaces only, letters only like 'abcd'), the result is the text INVALID.",
+  "mask_card: Whenever the card number is NULL, the result is NULL.",
+  "mask_card: Whenever the card number is given as a plain number rather than text, it is treated as its digits and masked the same way.",
+  "mask_card: Whenever digits are written in non-ASCII form (e.g. full-width digits), they are not counted as digits, so such input gives INVALID.",
+  "mask_card: Whenever the card number has leading or trailing spaces, they are ignored and do not count as digits.",
+  "pct_change: Whenever both values are given and old_value is not 0, the result is (new - old) / old x 100, rounded to one decimal place (100 to 150 gives 50.0; 100 to 50 gives -50.0; 100 to 100 gives 0.0).",
+  "pct_change: Whenever old_value is 0 (including 0.0 and '0'), the result is 999.0 no matter what new_value is (0, positive or negative).",
+  "pct_change: Whenever the rounding falls exactly on a half of a tenth, it rounds up in size, away from zero (1 to 1.0005 gives 0.1; 1 to 0.9995 gives -0.1; 1 to 1.00049 gives 0.0; 1 to 1.0095 gives 1.0).",
+  "pct_change: Whenever a small decrease rounds to nothing, the result is shown as -0.0 rather than 0.0 (1 to 0.99951 gives -0.0).",
+  "pct_change: Whenever old_value is negative, the percentage is divided by the negative old value itself, so the sign is reversed from what an increase would suggest (-100 to -50 gives -50.0; -100 to 50 gives -150.0; 100 to -50 gives -150.0; -3 to -4 gives 33.3).",
+  "pct_change: Whenever either value is NULL, the result is NULL, even when old_value is 0 or new_value is 0.",
+  "pct_change: Whenever either value is empty text or non-numeric text, the result is NULL, even when old_value is 0 ('0' to 'abc' gives NULL).",
+  "pct_change: Whenever a value is text that is wholly a number (e.g. '100', ' 100 ', '1e2'), it is used as that number.",
+  "ship_cost: Whenever the weight is above 0, the charge is a base of 300 cents plus a per-block charge for each started 500 g (weight divided by 500, rounded up): 100 cents per block in zone 1, 180 in zone 2 and 260 in zone 3.",
+  "ship_cost: Whenever the weight is exactly on a 500 g multiple it counts that many blocks (500 g in zone 1 gives 400); one gram more starts a new block (501 g gives 500); even 0.5 g counts as one block.",
+  "ship_cost: Whenever the weight is above 20000 g (20000 g exactly is not above), a flat surcharge of 2000 cents is added (20000 g zone 1 gives 4300; 20001 g zone 1 gives 6400; 20001 g zone 3 gives 12960).",
+  "ship_cost: Whenever the zone is anything other than exactly 1 or 2 (0, 4, 99, negative, or fractional such as 1.5 or 2.5), the zone 3 rate of 260 per block is used.",
+  "ship_cost: Whenever the zone is written as 2.0, '2' or ' 2 ', it counts as zone 2.",
+  "ship_cost: Whenever the weight is 0 or negative, the charge is 0 (no base charge) for any valid zone, including an out-of-range zone.",
+  "ship_cost: Whenever the weight or the zone is NULL, empty text or non-numeric text, the result is NULL, even if the other input is 0 or negative.",
+  "ship_cost: Whenever the weight is text that is wholly a number (e.g. '500'), it is used as that number.",
+  "slug: Whenever a title is given, it is turned into lower case, and each run of characters that are not a-z or 0-9 (spaces, tabs, line breaks, punctuation, underscores, hyphens, ampersands, symbols) is replaced by a single hyphen ('Hello,   World!' gives hello-world; 'a_b-c' gives a-b-c; 'a--b' gives a-b).",
+  "slug: Whenever the title starts or ends with separators, no leading or trailing hyphen is kept ('  Hello World  ' gives hello-world).",
+  "slug: Whenever the title contains accented or other non-English letters or digits (\u00e9, \u00fc, \u00df, \u65e5\u672c\u8a9e, \u00b2, \u2460), those characters are deleted entirely, without leaving a separator: 'na\u00efve test' gives nave-test, 'Caf\u00e9 Ol\u00e9' gives caf-ol, 'abc\u00e9def' gives abcdef and '\u00dcn\u00ef C\u00f6d\u00e9' gives n-cd.",
+  "slug: Whenever a non-ASCII character is a symbol or punctuation rather than a letter or digit (e.g. \u00a1, \u20ac, \u2014, a non-breaking space), it acts as a separator and becomes a hyphen like other punctuation ('a\u20acb' gives a-b; '\u00a1Hola!' gives hola).",
+  "slug: Whenever the slug would be longer than 30 characters, it is cut to the first 30 characters, even in the middle of a word, and if that leaves a hyphen at the end, the hyphen is removed (so it may be 29 characters).",
+  "slug: Whenever the title is empty, spaces only, only symbols, or only deleted non-English letters (e.g. '', '   ', '!!!', '\u65e5\u672c\u8a9e', '\u00df'), the result is n-a.",
+  "slug: Whenever the title is NULL, the result is NULL.",
+  "slug: Whenever the title is a number, it is converted to text first (123 gives 123; 12.5 gives 12-5).",
+  "slug: Whenever the title contains digits, they are kept ('2024 Report' gives 2024-report).",
+  "ticket_priority: Whenever severity is 1, 2, 3 or 4 (also 1.0 or the text '2'), the base priority is P1, P2, P3 or P4 respectively.",
+  "ticket_priority: Whenever severity is any other number (0, 5, 9, negative, or fractional such as 2.5 or 3.99), the base priority is P4; fractions are not rounded.",
+  "ticket_priority: Whenever hours_open is 48 or more, the priority is raised by one level (P4 to P3, P3 to P2, P2 to P1), but never above P1; 47.9 hours is not raised and exactly 48 is.",
+  "ticket_priority: Whenever the severity is unrecognised (base P4) and the ticket has been open 48 hours or more, the result is P3 (severity 9, 0 or 2.5 at 48 hours gives P3).",
+  "ticket_priority: Whenever hours_open is negative or under 48, there is no age bump, only the base priority applies; the bump does not go higher with more hours (severity 3 at 100 hours gives P2).",
+  "ticket_priority: Whenever severity or hours_open is text that is wholly a number (e.g. '2' and '50', ' 2 ' and ' 50 ', '4.8e1'), it is used as that number.",
+  "ticket_priority: Whenever severity or hours_open is NULL, empty text or non-numeric text, the result is NULL.",
+  "avg_rating: Whenever a group of reviews is averaged, the result is the mean of the ratings, rounded to two decimals with halves rounding up (ratings 1, 1, 2 give 1.33; 4.5 and 4.4 give 4.45; 4.335 and 4.335 give 4.34).",
+  "avg_rating: Whenever a rating is below 1 (0, 0.5, negative), it counts as 1 in the average, and whenever it is above 5 it counts as 5 (ratings 0 and 10 average 3.0).",
+  "avg_rating: Whenever a rating is NULL or any text (empty text, non-numeric text, or a number written as text such as '3' or ' 4 '), that review is skipped and does not count in the average or the number of reviews. Only ratings stored as actual numbers are counted (abc, 4 and the text '3' average 4.0).",
+  "avg_rating: Whenever a rating is text that is wholly a number (e.g. '3', ' 4 '), it is not converted to a number and is not counted: that review is skipped like any other text.",
+  "avg_rating: Whenever the group has no reviews or no usable ratings (no rows, or only NULLs and text of any kind), the result is NULL.",
+  "avg_rating: Whenever the DISTINCT form is used, each different rating value is counted once (ratings 1, 1, 2 average 1.5).",
+  "A parcel recorded with 0 grams to zone 1 ships for free, with no base charge. The owner says: Yes, that's right. Everything looks fine."
+ ],
+ "spots": [
+  {
+   "function": "biz_days_add",
+   "call": "SELECT biz_days_add('2026-12-24', 1)",
+   "got": "2026-12-28",
+   "say": "Meera's order is promised one business day after Thursday 24 December 2026: Christmas Day, Saturday and Sunday are skipped, so delivery is set for Monday 28 December 2026."
+  },
+  {
+   "function": "biz_days_add",
+   "call": "SELECT biz_days_add('2026-10-31', 0)",
+   "got": "2026-11-02",
+   "say": "Dev's order is placed on Saturday 31 October 2026 with zero business days to add: the date still moves forward to Monday 2 November 2026."
+  },
+  {
+   "function": "biz_days_add",
+   "call": "SELECT biz_days_add('2026-12-31', 1)",
+   "got": "2027-01-04",
+   "say": "A support request logged on 31 December 2026 with a one-business-day deadline is due on Monday 4 January 2027, because New Year's Day and the weekend are skipped."
+  },
+  {
+   "function": "biz_days_add",
+   "call": "SELECT biz_days_add('2026-11-02', 2.9)",
+   "got": "2026-11-04",
+   "say": "Asha asks for 2.9 business days from Monday 2 November 2026: the fraction is dropped and the date comes back as Wednesday 4 November 2026."
+  },
+  {
+   "function": "biz_days_add",
+   "call": "SELECT biz_days_add('2026-02-30', 1)",
+   "got": "BAD_DATE",
+   "say": "Someone types 30 February 2026 as an order date: no error is raised and the date column shows the text BAD_DATE instead."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 3)",
+   "got": 0,
+   "say": "Ravi's 100-rupee invoice is paid 3 days late: no late fee is charged, but one more day makes it 2 rupees."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 31)",
+   "got": 1550,
+   "say": "Ravi's 100-rupee invoice is paid 31 days late: the late fee comes to 15.50 rupees, which is half a percent of the invoice for each day late."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 100)",
+   "got": 2500,
+   "say": "Ravi's 100-rupee invoice is paid 100 days late: the fee stops growing at 25% and comes to 25 rupees."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(1, 4)",
+   "got": 1,
+   "say": "A 1-cent invoice that is 4 days late is charged a fee of 1 cent, because any fraction of a cent is rounded up."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(-10000, 10)",
+   "got": -500,
+   "say": "A 100-rupee credit note that is 10 days past due gets a late fee of minus 5 rupees, so the customer is paid money instead of charged."
+  },
+  {
+   "function": "letter_grade",
+   "call": "SELECT letter_grade(89.5)",
+   "got": "A",
+   "say": "Priya scores 89.5 on her exam: the score is rounded up to 90 and she gets an A, while 89.4 would stay a B."
+  },
+  {
+   "function": "letter_grade",
+   "call": "SELECT letter_grade(100.4)",
+   "got": "X",
+   "say": "Tom's score is entered as 100.4, just over the maximum: he gets an X instead of an A."
+  },
+  {
+   "function": "letter_grade",
+   "call": "SELECT letter_grade(-1)",
+   "got": "X",
+   "say": "A score mistyped as minus 1 for Lena comes back as an X rather than an F or an error."
+  },
+  {
+   "function": "letter_grade",
+   "call": "SELECT letter_grade(59.5)",
+   "got": "D",
+   "say": "Sam scores 59.5: it is rounded up to 60 and he passes with a D instead of failing."
+  },
+  {
+   "function": "letter_grade",
+   "call": "SELECT letter_grade(NULL)",
+   "got": null,
+   "say": "Noor missed the exam and has no score recorded: her grade is left blank, not an F."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(1000, 'gold')",
+   "got": 2000,
+   "say": "Anil, a gold member, spends 1,000 and earns 2,000 points, twice the 1,000 a regular customer earns."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(1000, 'platinum')",
+   "got": 1000,
+   "say": "Zoya is a platinum member, a tier the program does not list: she earns only the basic 1,000 points on a 1,000 purchase."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(999, 'silver')",
+   "got": 1498,
+   "say": "Kiran, a silver member, spends 999 and earns 1,498 points: the half point is dropped, not rounded up."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(-1000, 'gold')",
+   "got": -2000,
+   "say": "Anil, a gold member, returns a 1,000 purchase entered as a negative spend: he loses 2,000 points."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(1000, NULL)",
+   "got": 1000,
+   "say": "Mei's purchase of 1,000 has no member tier recorded: she is given the basic rate and earns 1,000 points."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('4111111111111111')",
+   "got": "411111******1111",
+   "say": "Ravi's 16-digit card prints on the receipt as the first six digits, six stars and the last four, so the first six digits are still visible."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('41111111111')",
+   "got": "INVALID",
+   "say": "A card number with only 11 digits typed in is shown as the word INVALID on the receipt."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('4111-1111-1111-1111-1234567')",
+   "got": "411111*************4567",
+   "say": "A 23-digit string typed by mistake is not rejected: it prints with 13 stars between the first six and last four digits."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('378282246310005')",
+   "got": "378282*****0005",
+   "say": "An American Express card with 15 digits prints with five stars in the middle and the first six digits still showing."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('')",
+   "got": "INVALID",
+   "say": "An empty card field prints INVALID, while a missing card prints as blank."
+  },
+  {
+   "function": "pct_change",
+   "call": "SELECT pct_change(0, 50)",
+   "got": 999.0,
+   "say": "Last month the shop had 0 sign-ups and this month 50: the dashboard shows an increase of 999%."
+  },
+  {
+   "function": "pct_change",
+   "call": "SELECT pct_change(3, 4)",
+   "got": 33.3,
+   "say": "Sales go from 3 to 4 units: the dashboard shows a rise of 33.3%, rounded to one decimal."
+  },
+  {
+   "function": "pct_change",
+   "call": "SELECT pct_change(-100, -50)",
+   "got": -50.0,
+   "say": "A loss shrinks from minus 100 to minus 50, which is an improvement, yet the dashboard shows minus 50%."
+  },
+  {
+   "function": "pct_change",
+   "call": "SELECT pct_change(0, 0)",
+   "got": 999.0,
+   "say": "A product sells 0 units both months: the dashboard still shows a rise of 999%."
+  },
+  {
+   "function": "pct_change",
+   "call": "SELECT pct_change('', 5)",
+   "got": null,
+   "say": "A month with an empty revenue figure compared with 5 shows a blank change on the dashboard."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(500, 1)",
+   "got": 400,
+   "say": "A 500-gram parcel to zone 1 costs 4.00: a 3.00 base charge plus 1.00 for the first 500 grams."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(501, 1)",
+   "got": 500,
+   "say": "A 501-gram parcel to zone 1 costs 5.00, 1.00 more than at 500 grams, because every started 500 grams is charged in full."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(20001, 1)",
+   "got": 6400,
+   "say": "A parcel of 20,001 grams to zone 1 costs 64.00, which is 21.00 more than at exactly 20,000 grams because of a 20.00 heavy parcel surcharge."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(1000, 4)",
+   "got": 820,
+   "say": "A 1,000-gram parcel to zone 4, which does not exist, is not rejected: it is charged the zone 3 price of 8.20."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(0, 1)",
+   "got": 0,
+   "say": "A parcel recorded with 0 grams to zone 1 ships for free, with no base charge."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(1000, 1.5)",
+   "got": 820,
+   "say": "A parcel to zone 1.5, a mistyped zone, is charged the most expensive zone 3 rate of 8.20 for 1,000 grams."
+  },
+  {
+   "function": "slug",
+   "call": "SELECT slug('Caf\u00e9 M\u00fcnch\u00ebn Menu')",
+   "got": "caf-mnchn-menu",
+   "say": "The page titled Caf\u00e9 M\u00fcnch\u00ebn Menu gets the web address caf-mnchn-menu, because accented letters are dropped instead of being turned into plain ones."
+  },
+  {
+   "function": "slug",
+   "call": "SELECT slug('A very long title about our quarterly results and plans')",
+   "got": "a-very-long-title-about-our-qu",
+   "say": "A long page title is cut off at 30 characters, so the address ends in the half word our-qu."
+  },
+  {
+   "function": "slug",
+   "call": "SELECT slug('\u65e5\u672c\u8a9e')",
+   "got": "n-a",
+   "say": "A page titled in Japanese gets the web address n-a, so every Japanese page would share the same address."
+  },
+  {
+   "function": "slug",
+   "call": "SELECT slug('')",
+   "got": "n-a",
+   "say": "A page with an empty title gets the address n-a."
+  },
+  {
+   "function": "slug",
+   "call": "SELECT slug('Tom''s Cafe')",
+   "got": "tom-s-cafe",
+   "say": "The page Tom's Cafe gets the address tom-s-cafe, with the apostrophe turned into a hyphen."
+  },
+  {
+   "function": "ticket_priority",
+   "call": "SELECT ticket_priority(2, 48)",
+   "got": "P1",
+   "say": "Meera's severity 2 ticket has been open 48 hours: it is raised to the top priority, P1, while at 47 hours it is still P2."
+  },
+  {
+   "function": "ticket_priority",
+   "call": "SELECT ticket_priority(2, 500)",
+   "got": "P1",
+   "say": "A severity 2 ticket left open for 500 hours is still only P1, so there is no higher level than P1 however long it waits."
+  },
+  {
+   "function": "ticket_priority",
+   "call": "SELECT ticket_priority(5, 0)",
+   "got": "P4",
+   "say": "A ticket with severity 5, which is not on the 1 to 4 scale, is given the lowest priority, P4."
+  },
+  {
+   "function": "ticket_priority",
+   "call": "SELECT ticket_priority(0, 0)",
+   "got": "P4",
+   "say": "A ticket with severity 0 is labelled the lowest priority, P4, which is likely the opposite of what the sender meant."
+  },
+  {
+   "function": "ticket_priority",
+   "call": "SELECT ticket_priority(NULL, 10)",
+   "got": null,
+   "say": "A ticket with no severity filled in, open for 10 hours, has no priority label at all."
+  },
+  {
+   "function": "avg_rating",
+   "call": "SELECT avg_rating(x) FROM r  -- ratings 5, 4, NULL, 0, 9",
+   "got": 3.75,
+   "say": "Five reviews come in: 5 stars, 4 stars, one left blank, one scored 0 and one scored 9: the 0 counts as 1 star and the 9 as 5 stars, and the average comes to 3.75."
+  },
+  {
+   "function": "avg_rating",
+   "call": "SELECT avg_rating(x) FROM r  -- ratings 5, 4, 4",
+   "got": 4.33,
+   "say": "Three reviews of 5, 4 and 4 stars give an average of 4.33, rounded to two decimals."
+  },
+  {
+   "function": "avg_rating",
+   "call": "SELECT avg_rating(x) FROM r  -- no reviews",
+   "got": null,
+   "say": "A product with no reviews yet shows a blank average, not 0 stars."
+  },
+  {
+   "function": "avg_rating",
+   "call": "SELECT avg_rating(x) FROM r  -- ratings 'abc', 4, '3'",
+   "got": 3.5,
+   "say": "Reviews with the text abc, 4 stars and the text 3 are averaged: abc is skipped and the text 3 is counted, giving 3.5."
+  }
+ ],
+ "shown": [
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 3)",
+   "got": 0,
+   "say": "Ravi's 100-rupee invoice is paid 3 days late: no late fee is charged, but one more day makes it 2 rupees."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 31)",
+   "got": 1550,
+   "say": "Ravi's 100-rupee invoice is paid 31 days late: the late fee comes to 15.50 rupees, which is half a percent of the invoice for each day late."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(10000, 100)",
+   "got": 2500,
+   "say": "Ravi's 100-rupee invoice is paid 100 days late: the fee stops growing at 25% and comes to 25 rupees."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(1, 4)",
+   "got": 1,
+   "say": "A 1-cent invoice that is 4 days late is charged a fee of 1 cent, because any fraction of a cent is rounded up."
+  },
+  {
+   "function": "late_fee",
+   "call": "SELECT late_fee(-10000, 10)",
+   "got": -500,
+   "say": "A 100-rupee credit note that is 10 days past due gets a late fee of minus 5 rupees, so the customer is paid money instead of charged."
+  },
+  {
+   "function": "letter_grade",
+   "call": "SELECT letter_grade(89.5)",
+   "got": "A",
+   "say": "Priya scores 89.5 on her exam: the score is rounded up to 90 and she gets an A, while 89.4 would stay a B."
+  },
+  {
+   "function": "letter_grade",
+   "call": "SELECT letter_grade(100.4)",
+   "got": "X",
+   "say": "Tom's score is entered as 100.4, just over the maximum: he gets an X instead of an A."
+  },
+  {
+   "function": "letter_grade",
+   "call": "SELECT letter_grade(-1)",
+   "got": "X",
+   "say": "A score mistyped as minus 1 for Lena comes back as an X rather than an F or an error."
+  },
+  {
+   "function": "letter_grade",
+   "call": "SELECT letter_grade(59.5)",
+   "got": "D",
+   "say": "Sam scores 59.5: it is rounded up to 60 and he passes with a D instead of failing."
+  },
+  {
+   "function": "letter_grade",
+   "call": "SELECT letter_grade(NULL)",
+   "got": null,
+   "say": "Noor missed the exam and has no score recorded: her grade is left blank, not an F."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('4111111111111111')",
+   "got": "411111******1111",
+   "say": "Ravi's 16-digit card prints on the receipt as the first six digits, six stars and the last four, so the first six digits are still visible."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('41111111111')",
+   "got": "INVALID",
+   "say": "A card number with only 11 digits typed in is shown as the word INVALID on the receipt."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('4111-1111-1111-1111-1234567')",
+   "got": "411111*************4567",
+   "say": "A 23-digit string typed by mistake is not rejected: it prints with 13 stars between the first six and last four digits."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('378282246310005')",
+   "got": "378282*****0005",
+   "say": "An American Express card with 15 digits prints with five stars in the middle and the first six digits still showing."
+  },
+  {
+   "function": "mask_card",
+   "call": "SELECT mask_card('')",
+   "got": "INVALID",
+   "say": "An empty card field prints INVALID, while a missing card prints as blank."
+  },
+  {
+   "function": "pct_change",
+   "call": "SELECT pct_change(0, 50)",
+   "got": 999.0,
+   "say": "Last month the shop had 0 sign-ups and this month 50: the dashboard shows an increase of 999%."
+  },
+  {
+   "function": "pct_change",
+   "call": "SELECT pct_change(3, 4)",
+   "got": 33.3,
+   "say": "Sales go from 3 to 4 units: the dashboard shows a rise of 33.3%, rounded to one decimal."
+  },
+  {
+   "function": "pct_change",
+   "call": "SELECT pct_change(-100, -50)",
+   "got": -50.0,
+   "say": "A loss shrinks from minus 100 to minus 50, which is an improvement, yet the dashboard shows minus 50%."
+  },
+  {
+   "function": "pct_change",
+   "call": "SELECT pct_change(0, 0)",
+   "got": 999.0,
+   "say": "A product sells 0 units both months: the dashboard still shows a rise of 999%."
+  },
+  {
+   "function": "pct_change",
+   "call": "SELECT pct_change('', 5)",
+   "got": null,
+   "say": "A month with an empty revenue figure compared with 5 shows a blank change on the dashboard."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(500, 1)",
+   "got": 400,
+   "say": "A 500-gram parcel to zone 1 costs 4.00: a 3.00 base charge plus 1.00 for the first 500 grams."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(501, 1)",
+   "got": 500,
+   "say": "A 501-gram parcel to zone 1 costs 5.00, 1.00 more than at 500 grams, because every started 500 grams is charged in full."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(20001, 1)",
+   "got": 6400,
+   "say": "A parcel of 20,001 grams to zone 1 costs 64.00, which is 21.00 more than at exactly 20,000 grams because of a 20.00 heavy parcel surcharge."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(1000, 4)",
+   "got": 820,
+   "say": "A 1,000-gram parcel to zone 4, which does not exist, is not rejected: it is charged the zone 3 price of 8.20."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(0, 1)",
+   "got": 0,
+   "say": "A parcel recorded with 0 grams to zone 1 ships for free, with no base charge."
+  },
+  {
+   "function": "ship_cost",
+   "call": "SELECT ship_cost(1000, 1.5)",
+   "got": 820,
+   "say": "A parcel to zone 1.5, a mistyped zone, is charged the most expensive zone 3 rate of 8.20 for 1,000 grams."
+  },
+  {
+   "function": "slug",
+   "call": "SELECT slug('Caf\u00e9 M\u00fcnch\u00ebn Menu')",
+   "got": "caf-mnchn-menu",
+   "say": "The page titled Caf\u00e9 M\u00fcnch\u00ebn Menu gets the web address caf-mnchn-menu, because accented letters are dropped instead of being turned into plain ones."
+  },
+  {
+   "function": "slug",
+   "call": "SELECT slug('A very long title about our quarterly results and plans')",
+   "got": "a-very-long-title-about-our-qu",
+   "say": "A long page title is cut off at 30 characters, so the address ends in the half word our-qu."
+  },
+  {
+   "function": "slug",
+   "call": "SELECT slug('\u65e5\u672c\u8a9e')",
+   "got": "n-a",
+   "say": "A page titled in Japanese gets the web address n-a, so every Japanese page would share the same address."
+  },
+  {
+   "function": "slug",
+   "call": "SELECT slug('')",
+   "got": "n-a",
+   "say": "A page with an empty title gets the address n-a."
+  },
+  {
+   "function": "slug",
+   "call": "SELECT slug('Tom''s Cafe')",
+   "got": "tom-s-cafe",
+   "say": "The page Tom's Cafe gets the address tom-s-cafe, with the apostrophe turned into a hyphen."
+  },
+  {
+   "function": "ticket_priority",
+   "call": "SELECT ticket_priority(2, 48)",
+   "got": "P1",
+   "say": "Meera's severity 2 ticket has been open 48 hours: it is raised to the top priority, P1, while at 47 hours it is still P2."
+  },
+  {
+   "function": "ticket_priority",
+   "call": "SELECT ticket_priority(2, 500)",
+   "got": "P1",
+   "say": "A severity 2 ticket left open for 500 hours is still only P1, so there is no higher level than P1 however long it waits."
+  },
+  {
+   "function": "ticket_priority",
+   "call": "SELECT ticket_priority(5, 0)",
+   "got": "P4",
+   "say": "A ticket with severity 5, which is not on the 1 to 4 scale, is given the lowest priority, P4."
+  },
+  {
+   "function": "ticket_priority",
+   "call": "SELECT ticket_priority(0, 0)",
+   "got": "P4",
+   "say": "A ticket with severity 0 is labelled the lowest priority, P4, which is likely the opposite of what the sender meant."
+  },
+  {
+   "function": "ticket_priority",
+   "call": "SELECT ticket_priority(NULL, 10)",
+   "got": null,
+   "say": "A ticket with no severity filled in, open for 10 hours, has no priority label at all."
+  },
+  {
+   "function": "avg_rating",
+   "call": "SELECT avg_rating(x) FROM r  -- ratings 5, 4, NULL, 0, 9",
+   "got": 3.75,
+   "say": "Five reviews come in: 5 stars, 4 stars, one left blank, one scored 0 and one scored 9: the 0 counts as 1 star and the 9 as 5 stars, and the average comes to 3.75."
+  },
+  {
+   "function": "avg_rating",
+   "call": "SELECT avg_rating(x) FROM r  -- ratings 5, 4, 4",
+   "got": 4.33,
+   "say": "Three reviews of 5, 4 and 4 stars give an average of 4.33, rounded to two decimals."
+  },
+  {
+   "function": "avg_rating",
+   "call": "SELECT avg_rating(x) FROM r  -- no reviews",
+   "got": null,
+   "say": "A product with no reviews yet shows a blank average, not 0 stars."
+  },
+  {
+   "function": "avg_rating",
+   "call": "SELECT avg_rating(x) FROM r  -- ratings 'abc', 4, '3'",
+   "got": 3.5,
+   "say": "Reviews with the text abc, 4 stars and the text 3 are averaged: abc is skipped and the text 3 is counted, giving 3.5."
+  },
+  {
+   "function": "biz_days_add",
+   "call": "SELECT biz_days_add('2026-12-24', 1)",
+   "got": "2026-12-28",
+   "say": "Meera's order is promised one business day after Thursday 24 December 2026: Christmas Day, Saturday and Sunday are skipped, so delivery is set for Monday 28 December 2026."
+  },
+  {
+   "function": "biz_days_add",
+   "call": "SELECT biz_days_add('2026-10-31', 0)",
+   "got": "2026-11-02",
+   "say": "Dev's order is placed on Saturday 31 October 2026 with zero business days to add: the date still moves forward to Monday 2 November 2026."
+  },
+  {
+   "function": "biz_days_add",
+   "call": "SELECT biz_days_add('2026-12-31', 1)",
+   "got": "2027-01-04",
+   "say": "A support request logged on 31 December 2026 with a one-business-day deadline is due on Monday 4 January 2027, because New Year's Day and the weekend are skipped."
+  },
+  {
+   "function": "biz_days_add",
+   "call": "SELECT biz_days_add('2026-11-02', 2.9)",
+   "got": "2026-11-04",
+   "say": "Asha asks for 2.9 business days from Monday 2 November 2026: the fraction is dropped and the date comes back as Wednesday 4 November 2026."
+  },
+  {
+   "function": "biz_days_add",
+   "call": "SELECT biz_days_add('2026-02-30', 1)",
+   "got": "BAD_DATE",
+   "say": "Someone types 30 February 2026 as an order date: no error is raised and the date column shows the text BAD_DATE instead."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(1000, 'gold')",
+   "got": 2000,
+   "say": "Anil, a gold member, spends 1,000 and earns 2,000 points, twice the 1,000 a regular customer earns."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(1000, 'platinum')",
+   "got": 1000,
+   "say": "Zoya is a platinum member, a tier the program does not list: she earns only the basic 1,000 points on a 1,000 purchase."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(999, 'silver')",
+   "got": 1498,
+   "say": "Kiran, a silver member, spends 999 and earns 1,498 points: the half point is dropped, not rounded up."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(-1000, 'gold')",
+   "got": -2000,
+   "say": "Anil, a gold member, returns a 1,000 purchase entered as a negative spend: he loses 2,000 points."
+  },
+  {
+   "function": "loyalty_points",
+   "call": "SELECT loyalty_points(1000, NULL)",
+   "got": 1000,
+   "say": "Mei's purchase of 1,000 has no member tier recorded: she is given the basic rate and earns 1,000 points."
+  }
+ ],
+ "fixes": [
+  {
+   "shown": "A parcel recorded with 0 grams to zone 1 ships for free, with no base charge.",
+   "said": "Yes, that's right. Everything looks fine.",
+   "function": "ship_cost",
+   "rounds": 1,
+   "now": "A parcel recorded at 0 grams going to zone 1 is shipped for free: because its weight is 0 (not above 0), no base charge and no per-block charge apply, and the shipping cost comes to 0 cents.",
+   "confirmed": true
+  },
+  {
+   "shown": "Reviews with the text abc, 4 stars and the text 3 are averaged: abc is skipped and the text 3 is counted, giving 3.5.",
+   "said": "Text \"3\" shouldn't be counted, so the average is 4.0.",
+   "function": "avg_rating",
+   "rounds": 1,
+   "now": "Reviews with the text abc, 4 stars and the text 3 are averaged: abc is skipped, and the text 3 is also skipped because a number written as text is not counted, so only the 4-star review counts and the average comes to 4.0.",
+   "confirmed": true
+  }
+ ],
+ "list_review": {
+  "replies": 4,
+  "cost": 0.346,
+  "log": [
+   {
+    "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+    "typed": "13, 36"
+   },
+   {
+    "prompt": "  Rule 13: biz_days_add: Whenever the counting would go past the supported calendar range (before year 1 or after 9999-12-31, e.g. 9999-12-30 plus 5, or a huge n like 1e30), the result is NULL.\n  What should it be? > ",
+    "typed": "It should return the text BAD_DATE, not NULL."
+   },
+   {
+    "prompt": "  Rule 36: loyalty_points: Whenever spend is extremely large (e.g. 1e30), no upper limit is applied and the full whole-number result is returned.\n  What should it be? > ",
+    "typed": "It should cap the spend at 5000 before the tier multiplier, so gold earns at most 10000 points."
+   },
+   {
+    "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+    "typed": ""
+   }
+  ],
+  "transcript": "\nWhat the built code does now, as rules (each one is what the product will do. Mark any that is not your policy):\n  1. biz_days_add: Whenever a start date and a number of days n are given, the result is the ISO date (YYYY-MM-DD) reached by moving n business days forward from the start date, counting Monday to Friday only.\n  2. biz_days_add: Whenever a day is skipped, it is because it is a Saturday, a Sunday, 25 December or 1 January (these two dates are holidays in every year); no other holidays exist.\n  3. biz_days_add: Whenever n is negative, the date moves backward by that many business days, skipping weekends, 25 December and 1 January the same way (e.g. Monday 2024-03-04 minus 1 gives Friday 2024-03-01).\n  4. biz_days_add: Whenever the start date falls on a Saturday or Sunday, it is first moved forward to the following Monday before counting, for positive, zero and negative n alike (Saturday 2024-03-02 plus 1 gives Tuesday 2024-03-05; Sunday 2024-03-03 minus 1 gives Friday 2024-03-01).\n  5. biz_days_add: Whenever n is 0 and the start date is a weekday, the start date is returned unchanged; when n is 0 and the start is a weekend, the next Monday is returned.\n  6. biz_days_add: Whenever the start date is itself 25 December or 1 January on a weekday, it is not moved and is returned as is for n = 0; counting then starts from that day (2024-12-25 plus 0 gives 2024-12-25, plus 1 gives 2024-12-26).\n  7. biz_days_add: Whenever a weekend start date is moved to Monday and that Monday is 25 December or 1 January, the holiday date is returned as is for n = 0 (2028-12-23 plus 0 gives 2028-12-25).\n  8. biz_days_add: Whenever n has a fractional part, it is cut toward zero before counting (2.9 counts as 2, -2.9 as -2, 0.5 and -0.5 as 0).\n  9. biz_days_add: Whenever n is text that is wholly a number (e.g. '3', ' 3 ' with spaces, or '1e1' meaning 10), it is used as that number.\n  10. biz_days_add: Whenever the start date or n is NULL, the result is NULL.\n  11. biz_days_add: Whenever n is text that is not a number (including empty text), the result is NULL, even if the start date is also invalid.\n  12. biz_days_add: Whenever the start date is not exactly four digits, hyphen, two digits, hyphen, two digits, or is not a real calendar date, the result is the text BAD_DATE; this covers '2024-02-30', '2024-2-3', empty text, a date with a time ('2024-03-01 10:00'), a date with leading spaces, and a plain number such as 20240301 (provided n is valid).\n  13. biz_days_add: Whenever the counting would go past the supported calendar range (before year 1 or after 9999-12-31, e.g. 9999-12-30 plus 5, or a huge n like 1e30), the result is NULL.\n  14. late_fee: Whenever days_late is 3 or fewer (including 0 and negative values), the fee is 0 (a grace period).\n  15. late_fee: Whenever days_late is more than 3, the fee is 0.5% of the amount for every day late counted from day 1 (not only the days after the 3rd): 10000 cents 4 days late gives 200, 10 days late gives 500.\n  16. late_fee: Whenever the percentage would exceed 25% of the amount (50 or more days late), the fee is capped at 25% of the amount (10000 cents gives 2500 for 50, 51 or more days).\n  17. late_fee: Whenever the fee is not a whole number of cents, it is rounded up to the next whole cent (10001 cents at 4 days gives 201; 999 cents at 4 days gives 20; 1 cent at 4 days gives 1).\n  18. late_fee: Whenever days_late has a fractional part and is above 3, the fraction counts (3.5 days on 10000 cents gives 175); 3.0001 days is above the grace period and is charged (100 cents gives 2).\n  19. late_fee: Whenever amount_cents is 0, the fee is 0; whenever it is negative and days_late is over 3, the fee is negative at the same percentage, rounded up toward zero (-10000 cents at 10 days gives -500; at 100 days gives -2500); with 3 days or fewer the fee is 0.\n  20. late_fee: Whenever either input is text that is wholly a number (e.g. '10000' and '10', spaces allowed), it is treated as that number.\n  21. late_fee: Whenever either input is NULL, empty text or text that is not a number, the result is NULL.\n  22. letter_grade: Whenever the score is first rounded to the nearest whole number (halves round up), the grade is A for 90 or more, B for 80 to 89, C for 70 to 79, D for 60 to 69 and F below 60.\n  23. letter_grade: Whenever the score has a half-point at a boundary, it rounds up into the higher grade (89.5 gives A, 79.5 gives B, 69.5 gives C, 59.5 gives D), while 89.49 gives B and 59.49 gives F.\n  24. letter_grade: Whenever the score is exactly 0, between 0 and 0.5, or exactly 100, the grade is F for 0 to 59.49 and A for 100.\n  25. letter_grade: Whenever the raw score is below 0 (even -0.1 or -0.4) or above 100 (even 100.5), the result is the letter X, meaning invalid; the check uses the score before rounding.\n  26. letter_grade: Whenever the score is text that is wholly a number (e.g. '85', ' 85 ', '1e2'), it is graded as that number.\n  27. letter_grade: Whenever the score is NULL, empty text, spaces only or other non-numeric text, the result is NULL.\n  28. loyalty_points: Whenever the tier is basic, bronze, an unrecognised name, empty text, NULL or a non-text value, points are 1 per unit of spend (spend 1000 gives 1000).\n  29. loyalty_points: Whenever the tier is silver, points are 1.5 per unit of spend (1000 gives 1500); for gold, 2 per unit (1000 gives 2000).\n  30. loyalty_points: Whenever the tier is written in different letter case or with spaces around it (GOLD, ' Gold ', Silver), it is recognised as that tier; but spaces inside a name (e.g. 'sil ver') are not, giving the 1-per-unit rate.\n  31. loyalty_points: Whenever the calculated points are not a whole number, they are rounded down (999 at silver gives 1498; 10.99 at gold gives 21; 0.5 at basic gives 0; 3 at silver gives 4).\n  32. loyalty_points: Whenever spend is negative, points are negative and rounding goes down, away from zero (-0.5 at basic gives -1; -10 at gold gives -20; -1 at silver gives -2).\n  33. loyalty_points: Whenever spend is 0, points are 0.\n  34. loyalty_points: Whenever spend is text that is wholly a number (e.g. '100', ' 100.5 ', '1e2'), it is used as that number ('100' at gold gives 200; ' 100.5 ' at gold gives 201).\n  35. loyalty_points: Whenever spend is NULL, empty text or non-numeric text, the result is NULL, whatever the tier.\n  36. loyalty_points: Whenever spend is extremely large (e.g. 1e30), no upper limit is applied and the full whole-number result is returned.\n  37. mask_card: Whenever a card number has at least 12 digits, the result shows the first 6 digits, then one asterisk for every digit in between, then the last 4 digits (4111111111111111 gives 411111******1111).\n  38. mask_card: Whenever the card number contains spaces, hyphens or any other non-digit characters, those are removed first and only the digits are counted and shown (4111-1111-1111-1111 and '4111 1111 1111 1111' both give 411111******1111; letters inside are dropped too).\n  39. mask_card: Whenever the card number has 12 to any larger number of digits, there is no maximum length: 12 digits give 2 asterisks, 19 digits give 9, 25 digits give 15.\n  40. mask_card: Whenever fewer than 12 digits remain after removing non-digits (11 digits, empty text, spaces only, letters only like 'abcd'), the result is the text INVALID.\n  41. mask_card: Whenever the card number is NULL, the result is NULL.\n  42. mask_card: Whenever the card number is given as a plain number rather than text, it is treated as its digits and masked the same way.\n  43. mask_card: Whenever digits are written in non-ASCII form (e.g. full-width digits), they are not counted as digits, so such input gives INVALID.\n  44. mask_card: Whenever the card number has leading or trailing spaces, they are ignored and do not count as digits.\n  45. pct_change: Whenever both values are given and old_value is not 0, the result is (new - old) / old x 100, rounded to one decimal place (100 to 150 gives 50.0; 100 to 50 gives -50.0; 100 to 100 gives 0.0).\n  46. pct_change: Whenever old_value is 0 (including 0.0 and '0'), the result is 999.0 no matter what new_value is (0, positive or negative).\n  47. pct_change: Whenever the rounding falls exactly on a half of a tenth, it rounds up in size, away from zero (1 to 1.0005 gives 0.1; 1 to 0.9995 gives -0.1; 1 to 1.00049 gives 0.0; 1 to 1.0095 gives 1.0).\n  48. pct_change: Whenever a small decrease rounds to nothing, the result is shown as -0.0 rather than 0.0 (1 to 0.99951 gives -0.0).\n  49. pct_change: Whenever old_value is negative, the percentage is divided by the negative old value itself, so the sign is reversed from what an increase would suggest (-100 to -50 gives -50.0; -100 to 50 gives -150.0; 100 to -50 gives -150.0; -3 to -4 gives 33.3).\n  50. pct_change: Whenever either value is NULL, the result is NULL, even when old_value is 0 or new_value is 0.\n  51. pct_change: Whenever either value is empty text or non-numeric text, the result is NULL, even when old_value is 0 ('0' to 'abc' gives NULL).\n  52. pct_change: Whenever a value is text that is wholly a number (e.g. '100', ' 100 ', '1e2'), it is used as that number.\n  53. ship_cost: Whenever the weight is above 0, the charge is a base of 300 cents plus a per-block charge for each started 500 g (weight divided by 500, rounded up): 100 cents per block in zone 1, 180 in zone 2 and 260 in zone 3.\n  54. ship_cost: Whenever the weight is exactly on a 500 g multiple it counts that many blocks (500 g in zone 1 gives 400); one gram more starts a new block (501 g gives 500); even 0.5 g counts as one block.\n  55. ship_cost: Whenever the weight is above 20000 g (20000 g exactly is not above), a flat surcharge of 2000 cents is added (20000 g zone 1 gives 4300; 20001 g zone 1 gives 6400; 20001 g zone 3 gives 12960).\n  56. ship_cost: Whenever the zone is anything other than exactly 1 or 2 (0, 4, 99, negative, or fractional such as 1.5 or 2.5), the zone 3 rate of 260 per block is used.\n  57. ship_cost: Whenever the zone is written as 2.0, '2' or ' 2 ', it counts as zone 2.\n  58. ship_cost: Whenever the weight is 0 or negative, the charge is 0 (no base charge) for any valid zone, including an out-of-range zone.\n  59. ship_cost: Whenever the weight or the zone is NULL, empty text or non-numeric text, the result is NULL, even if the other input is 0 or negative.\n  60. ship_cost: Whenever the weight is text that is wholly a number (e.g. '500'), it is used as that number.\n  61. slug: Whenever a title is given, it is turned into lower case, and each run of characters that are not a-z or 0-9 (spaces, tabs, line breaks, punctuation, underscores, hyphens, ampersands, symbols) is replaced by a single hyphen ('Hello,   World!' gives hello-world; 'a_b-c' gives a-b-c; 'a--b' gives a-b).\n  62. slug: Whenever the title starts or ends with separators, no leading or trailing hyphen is kept ('  Hello World  ' gives hello-world).\n  63. slug: Whenever the title contains accented or other non-English letters or digits (\u00e9, \u00fc, \u00df, \u65e5\u672c\u8a9e, \u00b2, \u2460), those characters are deleted entirely, without leaving a separator: 'na\u00efve test' gives nave-test, 'Caf\u00e9 Ol\u00e9' gives caf-ol, 'abc\u00e9def' gives abcdef and '\u00dcn\u00ef C\u00f6d\u00e9' gives n-cd.\n  64. slug: Whenever a non-ASCII character is a symbol or punctuation rather than a letter or digit (e.g. \u00a1, \u20ac, \u2014, a non-breaking space), it acts as a separator and becomes a hyphen like other punctuation ('a\u20acb' gives a-b; '\u00a1Hola!' gives hola).\n  65. slug: Whenever the slug would be longer than 30 characters, it is cut to the first 30 characters, even in the middle of a word, and if that leaves a hyphen at the end, the hyphen is removed (so it may be 29 characters).\n  66. slug: Whenever the title is empty, spaces only, only symbols, or only deleted non-English letters (e.g. '', '   ', '!!!', '\u65e5\u672c\u8a9e', '\u00df'), the result is n-a.\n  67. slug: Whenever the title is NULL, the result is NULL.\n  68. slug: Whenever the title is a number, it is converted to text first (123 gives 123; 12.5 gives 12-5).\n  69. slug: Whenever the title contains digits, they are kept ('2024 Report' gives 2024-report).\n  70. ticket_priority: Whenever severity is 1, 2, 3 or 4 (also 1.0 or the text '2'), the base priority is P1, P2, P3 or P4 respectively.\n  71. ticket_priority: Whenever severity is any other number (0, 5, 9, negative, or fractional such as 2.5 or 3.99), the base priority is P4; fractions are not rounded.\n  72. ticket_priority: Whenever hours_open is 48 or more, the priority is raised by one level (P4 to P3, P3 to P2, P2 to P1), but never above P1; 47.9 hours is not raised and exactly 48 is.\n  73. ticket_priority: Whenever the severity is unrecognised (base P4) and the ticket has been open 48 hours or more, the result is P3 (severity 9, 0 or 2.5 at 48 hours gives P3).\n  74. ticket_priority: Whenever hours_open is negative or under 48, there is no age bump, only the base priority applies; the bump does not go higher with more hours (severity 3 at 100 hours gives P2).\n  75. ticket_priority: Whenever severity or hours_open is text that is wholly a number (e.g. '2' and '50', ' 2 ' and ' 50 ', '4.8e1'), it is used as that number.\n  76. ticket_priority: Whenever severity or hours_open is NULL, empty text or non-numeric text, the result is NULL.\n  77. avg_rating: Whenever a group of reviews is averaged, the result is the mean of the ratings, rounded to two decimals with halves rounding up (ratings 1, 1, 2 give 1.33; 4.5 and 4.4 give 4.45; 4.335 and 4.335 give 4.34).\n  78. avg_rating: Whenever a rating is below 1 (0, 0.5, negative), it counts as 1 in the average, and whenever it is above 5 it counts as 5 (ratings 0, 10 and '3' average 3.0).\n  79. avg_rating: Whenever a rating is NULL, empty text or non-numeric text, that review is skipped and does not count in the average or the number of reviews.\n  80. avg_rating: Whenever a rating is text that is wholly a number (e.g. '3', ' 4 '), it is counted as that number.\n  81. avg_rating: Whenever the group has no reviews or no usable ratings (no rows, only NULLs or non-numeric text), the result is NULL.\n  82. avg_rating: Whenever the DISTINCT form is used, each different rating value is counted once (ratings 1, 1, 2 average 1.5).\n  Numbers of any that are wrong (Enter = all correct) > 13, 36\n  Rule 13: biz_days_add: Whenever the counting would go past the supported calendar range (before year 1 or after 9999-12-31, e.g. 9999-12-30 plus 5, or a huge n like 1e30), the result is NULL.\n  What should it be? > It should return the text BAD_DATE, not NULL.\n  Rule 36: loyalty_points: Whenever spend is extremely large (e.g. 1e30), no upper limit is applied and the full whole-number result is returned.\n  What should it be? > It should cap the spend at 5000 before the tier multiplier, so gold earns at most 10000 points.\n  Anything the builders should know that is not on this list? (Enter = nothing) > \n",
+  "minutes": 0.4
+ },
+ "spot_review": {
+  "replies": 52,
+  "cost": 3.7,
+  "log": [
+   {
+    "prompt": "\nCase 1 of 50. Ravi's 100-rupee invoice is paid 3 days late: no late fee is charged, but one more day makes it 2 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 2 of 50. Ravi's 100-rupee invoice is paid 31 days late: the late fee comes to 15.50 rupees, which is half a percent of the invoice for each day late.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 3 of 50. Ravi's 100-rupee invoice is paid 100 days late: the fee stops growing at 25% and comes to 25 rupees.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 4 of 50. A 1-cent invoice that is 4 days late is charged a fee of 1 cent, because any fraction of a cent is rounded up.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 5 of 50. A 100-rupee credit note that is 10 days past due gets a late fee of minus 5 rupees, so the customer is paid money instead of charged.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 6 of 50. Priya scores 89.5 on her exam: the score is rounded up to 90 and she gets an A, while 89.4 would stay a B.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 7 of 50. Tom's score is entered as 100.4, just over the maximum: he gets an X instead of an A.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 8 of 50. A score mistyped as minus 1 for Lena comes back as an X rather than an F or an error.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 9 of 50. Sam scores 59.5: it is rounded up to 60 and he passes with a D instead of failing.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 10 of 50. Noor missed the exam and has no score recorded: her grade is left blank, not an F.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 11 of 50. Ravi's 16-digit card prints on the receipt as the first six digits, six stars and the last four, so the first six digits are still visible.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 12 of 50. A card number with only 11 digits typed in is shown as the word INVALID on the receipt.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 13 of 50. A 23-digit string typed by mistake is not rejected: it prints with 13 stars between the first six and last four digits.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 14 of 50. An American Express card with 15 digits prints with five stars in the middle and the first six digits still showing.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 15 of 50. An empty card field prints INVALID, while a missing card prints as blank.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 16 of 50. Last month the shop had 0 sign-ups and this month 50: the dashboard shows an increase of 999%.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 17 of 50. Sales go from 3 to 4 units: the dashboard shows a rise of 33.3%, rounded to one decimal.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 18 of 50. A loss shrinks from minus 100 to minus 50, which is an improvement, yet the dashboard shows minus 50%.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 19 of 50. A product sells 0 units both months: the dashboard still shows a rise of 999%.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 20 of 50. A month with an empty revenue figure compared with 5 shows a blank change on the dashboard.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 21 of 50. A 500-gram parcel to zone 1 costs 4.00: a 3.00 base charge plus 1.00 for the first 500 grams.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 22 of 50. A 501-gram parcel to zone 1 costs 5.00, 1.00 more than at 500 grams, because every started 500 grams is charged in full.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 23 of 50. A parcel of 20,001 grams to zone 1 costs 64.00, which is 21.00 more than at exactly 20,000 grams because of a 20.00 heavy parcel surcharge.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 24 of 50. A 1,000-gram parcel to zone 4, which does not exist, is not rejected: it is charged the zone 3 price of 8.20.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 25 of 50. A parcel recorded with 0 grams to zone 1 ships for free, with no base charge.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Yes, that's right. Everything looks fine."
+   },
+   {
+    "prompt": "\n  With your correction: A parcel recorded at 0 grams going to zone 1 is shipped for free: because its weight is 0 (not above 0), no base charge and no per-block charge apply, and the shipping cost comes to 0 cents.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 26 of 50. A parcel to zone 1.5, a mistyped zone, is charged the most expensive zone 3 rate of 8.20 for 1,000 grams.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 27 of 50. The page titled Caf\u00e9 M\u00fcnch\u00ebn Menu gets the web address caf-mnchn-menu, because accented letters are dropped instead of being turned into plain ones.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 28 of 50. A long page title is cut off at 30 characters, so the address ends in the half word our-qu.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 29 of 50. A page titled in Japanese gets the web address n-a, so every Japanese page would share the same address.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 30 of 50. A page with an empty title gets the address n-a.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 31 of 50. The page Tom's Cafe gets the address tom-s-cafe, with the apostrophe turned into a hyphen.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 32 of 50. Meera's severity 2 ticket has been open 48 hours: it is raised to the top priority, P1, while at 47 hours it is still P2.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 33 of 50. A severity 2 ticket left open for 500 hours is still only P1, so there is no higher level than P1 however long it waits.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 34 of 50. A ticket with severity 5, which is not on the 1 to 4 scale, is given the lowest priority, P4.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 35 of 50. A ticket with severity 0 is labelled the lowest priority, P4, which is likely the opposite of what the sender meant.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 36 of 50. A ticket with no severity filled in, open for 10 hours, has no priority label at all.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 37 of 50. Five reviews come in: 5 stars, 4 stars, one left blank, one scored 0 and one scored 9: the 0 counts as 1 star and the 9 as 5 stars, and the average comes to 3.75.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 38 of 50. Three reviews of 5, 4 and 4 stars give an average of 4.33, rounded to two decimals.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 39 of 50. A product with no reviews yet shows a blank average, not 0 stars.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 40 of 50. Reviews with the text abc, 4 stars and the text 3 are averaged: abc is skipped and the text 3 is counted, giving 3.5.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": "Text \"3\" shouldn't be counted, so the average is 4.0."
+   },
+   {
+    "prompt": "\n  With your correction: Reviews with the text abc, 4 stars and the text 3 are averaged: abc is skipped, and the text 3 is also skipped because a number written as text is not counted, so only the 4-star review counts and the average comes to 4.0.\n  Right now? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 41 of 50. Meera's order is promised one business day after Thursday 24 December 2026: Christmas Day, Saturday and Sunday are skipped, so delivery is set for Monday 28 December 2026.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 42 of 50. Dev's order is placed on Saturday 31 October 2026 with zero business days to add: the date still moves forward to Monday 2 November 2026.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 43 of 50. A support request logged on 31 December 2026 with a one-business-day deadline is due on Monday 4 January 2027, because New Year's Day and the weekend are skipped.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 44 of 50. Asha asks for 2.9 business days from Monday 2 November 2026: the fraction is dropped and the date comes back as Wednesday 4 November 2026.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 45 of 50. Someone types 30 February 2026 as an order date: no error is raised and the date column shows the text BAD_DATE instead.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 46 of 50. Anil, a gold member, spends 1,000 and earns 2,000 points, twice the 1,000 a regular customer earns.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 47 of 50. Zoya is a platinum member, a tier the program does not list: she earns only the basic 1,000 points on a 1,000 purchase.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 48 of 50. Kiran, a silver member, spends 999 and earns 1,498 points: the half point is dropped, not rounded up.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 49 of 50. Anil, a gold member, returns a 1,000 purchase entered as a negative spend: he loses 2,000 points.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   },
+   {
+    "prompt": "\nCase 50 of 50. Mei's purchase of 1,000 has no member tier recorded: she is given the basic rate and earns 1,000 points.\n  Right? (Enter = yes, or say what should happen) > ",
+    "typed": ""
+   }
+  ],
+  "transcript": "Hive: Now 50 quick checks on what the build does in real cases. Press Enter if a result is right, or say what should happen instead.\n\nCase 1 of 50. Ravi's 100-rupee invoice is paid 3 days late: no late fee is charged, but one more day makes it 2 rupees.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 2 of 50. Ravi's 100-rupee invoice is paid 31 days late: the late fee comes to 15.50 rupees, which is half a percent of the invoice for each day late.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 3 of 50. Ravi's 100-rupee invoice is paid 100 days late: the fee stops growing at 25% and comes to 25 rupees.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 4 of 50. A 1-cent invoice that is 4 days late is charged a fee of 1 cent, because any fraction of a cent is rounded up.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 5 of 50. A 100-rupee credit note that is 10 days past due gets a late fee of minus 5 rupees, so the customer is paid money instead of charged.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 6 of 50. Priya scores 89.5 on her exam: the score is rounded up to 90 and she gets an A, while 89.4 would stay a B.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 7 of 50. Tom's score is entered as 100.4, just over the maximum: he gets an X instead of an A.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 8 of 50. A score mistyped as minus 1 for Lena comes back as an X rather than an F or an error.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 9 of 50. Sam scores 59.5: it is rounded up to 60 and he passes with a D instead of failing.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 10 of 50. Noor missed the exam and has no score recorded: her grade is left blank, not an F.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 11 of 50. Ravi's 16-digit card prints on the receipt as the first six digits, six stars and the last four, so the first six digits are still visible.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 12 of 50. A card number with only 11 digits typed in is shown as the word INVALID on the receipt.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 13 of 50. A 23-digit string typed by mistake is not rejected: it prints with 13 stars between the first six and last four digits.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 14 of 50. An American Express card with 15 digits prints with five stars in the middle and the first six digits still showing.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 15 of 50. An empty card field prints INVALID, while a missing card prints as blank.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 16 of 50. Last month the shop had 0 sign-ups and this month 50: the dashboard shows an increase of 999%.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 17 of 50. Sales go from 3 to 4 units: the dashboard shows a rise of 33.3%, rounded to one decimal.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 18 of 50. A loss shrinks from minus 100 to minus 50, which is an improvement, yet the dashboard shows minus 50%.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 19 of 50. A product sells 0 units both months: the dashboard still shows a rise of 999%.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 20 of 50. A month with an empty revenue figure compared with 5 shows a blank change on the dashboard.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 21 of 50. A 500-gram parcel to zone 1 costs 4.00: a 3.00 base charge plus 1.00 for the first 500 grams.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 22 of 50. A 501-gram parcel to zone 1 costs 5.00, 1.00 more than at 500 grams, because every started 500 grams is charged in full.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 23 of 50. A parcel of 20,001 grams to zone 1 costs 64.00, which is 21.00 more than at exactly 20,000 grams because of a 20.00 heavy parcel surcharge.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 24 of 50. A 1,000-gram parcel to zone 4, which does not exist, is not rejected: it is charged the zone 3 price of 8.20.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 25 of 50. A parcel recorded with 0 grams to zone 1 ships for free, with no base charge.\n  Right? (Enter = yes, or say what should happen) > Yes, that's right. Everything looks fine.\n\n  With your correction: A parcel recorded at 0 grams going to zone 1 is shipped for free: because its weight is 0 (not above 0), no base charge and no per-block charge apply, and the shipping cost comes to 0 cents.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 26 of 50. A parcel to zone 1.5, a mistyped zone, is charged the most expensive zone 3 rate of 8.20 for 1,000 grams.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 27 of 50. The page titled Caf\u00e9 M\u00fcnch\u00ebn Menu gets the web address caf-mnchn-menu, because accented letters are dropped instead of being turned into plain ones.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 28 of 50. A long page title is cut off at 30 characters, so the address ends in the half word our-qu.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 29 of 50. A page titled in Japanese gets the web address n-a, so every Japanese page would share the same address.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 30 of 50. A page with an empty title gets the address n-a.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 31 of 50. The page Tom's Cafe gets the address tom-s-cafe, with the apostrophe turned into a hyphen.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 32 of 50. Meera's severity 2 ticket has been open 48 hours: it is raised to the top priority, P1, while at 47 hours it is still P2.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 33 of 50. A severity 2 ticket left open for 500 hours is still only P1, so there is no higher level than P1 however long it waits.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 34 of 50. A ticket with severity 5, which is not on the 1 to 4 scale, is given the lowest priority, P4.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 35 of 50. A ticket with severity 0 is labelled the lowest priority, P4, which is likely the opposite of what the sender meant.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 36 of 50. A ticket with no severity filled in, open for 10 hours, has no priority label at all.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 37 of 50. Five reviews come in: 5 stars, 4 stars, one left blank, one scored 0 and one scored 9: the 0 counts as 1 star and the 9 as 5 stars, and the average comes to 3.75.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 38 of 50. Three reviews of 5, 4 and 4 stars give an average of 4.33, rounded to two decimals.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 39 of 50. A product with no reviews yet shows a blank average, not 0 stars.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 40 of 50. Reviews with the text abc, 4 stars and the text 3 are averaged: abc is skipped and the text 3 is counted, giving 3.5.\n  Right? (Enter = yes, or say what should happen) > Text \"3\" shouldn't be counted, so the average is 4.0.\n\n  With your correction: Reviews with the text abc, 4 stars and the text 3 are averaged: abc is skipped, and the text 3 is also skipped because a number written as text is not counted, so only the 4-star review counts and the average comes to 4.0.\n  Right now? (Enter = yes, or say what should happen) > \n\nCase 41 of 50. Meera's order is promised one business day after Thursday 24 December 2026: Christmas Day, Saturday and Sunday are skipped, so delivery is set for Monday 28 December 2026.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 42 of 50. Dev's order is placed on Saturday 31 October 2026 with zero business days to add: the date still moves forward to Monday 2 November 2026.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 43 of 50. A support request logged on 31 December 2026 with a one-business-day deadline is due on Monday 4 January 2027, because New Year's Day and the weekend are skipped.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 44 of 50. Asha asks for 2.9 business days from Monday 2 November 2026: the fraction is dropped and the date comes back as Wednesday 4 November 2026.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 45 of 50. Someone types 30 February 2026 as an order date: no error is raised and the date column shows the text BAD_DATE instead.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 46 of 50. Anil, a gold member, spends 1,000 and earns 2,000 points, twice the 1,000 a regular customer earns.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 47 of 50. Zoya is a platinum member, a tier the program does not list: she earns only the basic 1,000 points on a 1,000 purchase.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 48 of 50. Kiran, a silver member, spends 999 and earns 1,498 points: the half point is dropped, not rounded up.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 49 of 50. Anil, a gold member, returns a 1,000 purchase entered as a negative spend: he loses 2,000 points.\n  Right? (Enter = yes, or say what should happen) > \n\nCase 50 of 50. Mei's purchase of 1,000 has no member tier recorded: she is given the basic rate and earns 1,000 points.\n  Right? (Enter = yes, or say what should happen) > \n"
+ },
+ "minutes": {
+  "list": 0.4,
+  "spots": 4.8
+ },
+ "cost_usd": {
+  "documenter": 0.1479646,
+  "describer": 0.40352,
+  "spotter": 0.22962459999999998,
+  "judge": 0.26969800000000005,
+  "owner_SL": 0.346,
+  "owner_HV_spots": 3.7
+ },
+ "labels": [
+  {
+   "function": "late_fee",
+   "decision": 0,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "3-day grace period (days<=3 costs nothing)"
+  },
+  {
+   "function": "late_fee",
+   "decision": 1,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "fee capped at 25% of amount"
+  },
+  {
+   "function": "late_fee",
+   "decision": 2,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "fee rounded up to whole cents"
+  },
+  {
+   "function": "mask_card",
+   "decision": 0,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "non-digit separators stripped first | Stated right in all sheets. Minor: D/SL/HV rule 42 and R 7 say non-ASCII (full-width) digits are not digits, but oracle's \\D is Unicode-aware and keeps them; outside the separator decision."
+  },
+  {
+   "function": "mask_card",
+   "decision": 1,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "fewer than 12 digits -> INVALID"
+  },
+  {
+   "function": "ship_cost",
+   "decision": 0,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "weight rounded up to 500g units"
+  },
+  {
+   "function": "ship_cost",
+   "decision": 1,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "unknown zone priced as zone 3"
+  },
+  {
+   "function": "ship_cost",
+   "decision": 2,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "over 20000g adds 2000 surcharge"
+  },
+  {
+   "function": "ship_cost",
+   "decision": 3,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "weight <= 0 costs 0"
+  },
+  {
+   "function": "letter_grade",
+   "decision": 0,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "fractional scores rounded half up before banding"
+  },
+  {
+   "function": "letter_grade",
+   "decision": 1,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "score outside 0-100 -> X"
+  },
+  {
+   "function": "biz_days_add",
+   "decision": 0,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "weekend start rolls forward to Monday before counting"
+  },
+  {
+   "function": "biz_days_add",
+   "decision": 1,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "Dec 25 and Jan 1 are skipped as holidays"
+  },
+  {
+   "function": "biz_days_add",
+   "decision": 2,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "invalid date -> BAD_DATE | Invalid start date -> BAD_DATE right in all sheets. Side issue: D rule 12 says out-of-range result is NULL (oracle: BAD_DATE); SL/HV/R fix that."
+  },
+  {
+   "function": "ticket_priority",
+   "decision": 0,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "48h or more open escalates one level (not above P1)"
+  },
+  {
+   "function": "ticket_priority",
+   "decision": 1,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "invalid severity treated as P4"
+  },
+  {
+   "function": "pct_change",
+   "decision": 0,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "old value 0 -> 999.0"
+  },
+  {
+   "function": "slug",
+   "decision": 0,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "truncated to 30 chars, trailing hyphen trimmed"
+  },
+  {
+   "function": "slug",
+   "decision": 1,
+   "D": "wrong",
+   "SL": "wrong",
+   "HV": "wrong",
+   "R": "right",
+   "note": "non-ASCII characters dropped (not transliterated) | Oracle drops every non-ASCII char (ord<128 filter). Sheets D/SL/HV rule 63 says non-ASCII symbols (\u20ac, \u00a1, nbsp) become hyphens ('a\u20acb'->a-b), contradicting rule 62 and policy (oracle gives 'ab'). R 37 correct."
+  },
+  {
+   "function": "slug",
+   "decision": 2,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "empty result -> 'n-a'"
+  },
+  {
+   "function": "loyalty_points",
+   "decision": 0,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "points rounded down"
+  },
+  {
+   "function": "loyalty_points",
+   "decision": 1,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "unknown or NULL tier earns as basic"
+  },
+  {
+   "function": "loyalty_points",
+   "decision": 2,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "tier case-insensitive and trimmed"
+  },
+  {
+   "function": "loyalty_points",
+   "decision": 3,
+   "D": "wrong",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "spend capped at 5000 | D rule 35 says no upper limit; oracle caps spend at 5000. SL/HV/R state the cap correctly."
+  },
+  {
+   "function": "avg_rating",
+   "decision": 0,
+   "D": "right",
+   "SL": "right",
+   "HV": "right",
+   "R": "right",
+   "note": "out-of-range ratings clamped to 1..5 | Clamp to 1..5 stated right in all sheets. Side issue: D/SL count numeric text, HV/R skip it (oracle skips text)."
+  }
+ ]
+}

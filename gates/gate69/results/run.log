@@ -1,0 +1,16 @@
+[00:56:20] predictions registered on origin/main: gates/gate69/prompts/PREDICTIONS.md
+[00:57:44] 1S: 14 questions, hidden 125/125, 1.2 min
+[00:57:57] after feature 1: 14 answers; house rules: ['Across the business: a blank (NULL) number is treated as 0, and zero and negative numbers are treated the same way as blank. Weight, minutes, rate, mg-per-kg and interval are all handled like this, and the case is handled by a fixed rule, not an error.', 'Across the business: when a calculated amount has to be rounded, it is always rounded up to the next whole unit, never down and never half-up. Money goes up to the next whole cent, time goes up to the next 15-minute block, and doses go up to the next whole mg, so 7.5 becomes 8 and 61 minutes becomes 5 blocks.', "Across the business: band and category cut-offs are inclusive at the top. A value exactly on a boundary belongs to the lower band (for example, 25 kg is medium and 10 kg is medium). Bands read as 'up to X' or 'over X'.", 'Across the business: a minimum applies only when there is something to charge for, meaning an amount above 0. Zero or negative amounts get 0 and no minimum.', "Across the business: codes and names built from text are written in uppercase using only plain ASCII letters and digits. Spaces, punctuation and accented letters are dropped, not converted, so 'José' becomes 'JOS' and 'Müller' becomes 'MLLER'.", 'Across the business: a text part that has nothing left after cleaning (blank, NULL, or only punctuation) counts as blank and gets the standard stand-in value, not an empty gap.', 'Across the business: dates must be a clean YYYY-MM-DD. Spaces around the date are ignored. A blank date, a wrong format, or a date with extra text or a time counts as 1970-01-01.', 'Across the business: when adding months to a date lands on a day that does not exist in that month, the date rolls over into the next month (31 Jan + 1 month is 3 Mar, or 2 Mar in a leap year). It does not snap back to the last day of the month.']
+10 visible tests in /home/claude/hive/runs/g69/seed_f2_C/tests/visible
+10 visible tests in /home/claude/hive/runs/g69/seed_f2_F/tests/visible
+10 visible tests in /home/claude/hive/runs/g69/seed_f2_M/tests/visible
+[00:59:32] 2C: 14 questions, hidden 111/125, 1.6 min
+10 visible tests in /home/claude/hive/runs/g69/seed_f3_C/tests/visible
+[00:59:49] 2F: 19 questions, hidden 114/125, 1.9 min
+10 visible tests in /home/claude/hive/runs/g69/seed_f3_F/tests/visible
+[01:00:00] 2M: 20 questions, hidden 114/125, 2.1 min
+10 visible tests in /home/claude/hive/runs/g69/seed_f3_M/tests/visible
+[01:01:49] 3M: 19 questions, hidden 125/125, 1.8 min
+[01:01:59] 3F: 22 questions, hidden 125/125, 2.2 min
+[01:02:13] 3C: 20 questions, hidden 113/125, 2.4 min
+[01:02:29] done: python3 gates/gate69/referee/analyze.py runs/g69

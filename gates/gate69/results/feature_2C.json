@@ -1,0 +1,132 @@
+{
+ "feature": 2,
+ "arm": "C",
+ "questions": [
+  {
+   "t": 1793474891,
+   "worker": "Q2C-w1",
+   "question": "Adoption anniversary: if the pet was adopted on 29 Feb and the anniversary year is not a leap year, which date should it show: 28 Feb or 1 March?",
+   "answer": "1 March.",
+   "cost": 0.0584007,
+   "seconds": 2.7
+  },
+  {
+   "t": 1793474895,
+   "worker": "Q2C-w2",
+   "question": "Loyalty tiers: what are the exact visits AND/OR total-spent cut-offs for bronze, silver, gold and platinum? Is a client's tier set by visits alone, spend alone, either one (whichever is higher), or both needed? Is a client exactly on a cut-off included in the higher tier?",
+   "answer": "Both together, as a score: 10 points per visit (max 30 visits counted) plus 1 point per whole 10 spent. Bronze is 100 or less, silver is 101\u2013300, gold is 301\u2013600, and platinum is over 600. Exactly on a cut-off stays in the lower tier, so 100 is bronze and 300 is silver.",
+   "cost": 0.059646700000000004,
+   "seconds": 3.4
+  },
+  {
+   "t": 1793474899,
+   "worker": "Q2C-w1",
+   "question": "Adoption anniversary: if the adoption date is blank, missing or not a real date (e.g. 2023-02-30), what should we show?",
+   "answer": "Treat a blank, missing or invalid date like 2023-02-30 as 1970-01-01, then calculate from that. With 0 years it just returns 1970-01-01.",
+   "cost": 0.0600127,
+   "seconds": 3.5
+  },
+  {
+   "t": 1793474902,
+   "worker": "Q2C-w1",
+   "question": "Adoption anniversary: if the number of years is blank, zero or negative, what should we show?",
+   "answer": "Blank or unreadable years, or zero, show the adoption date itself. Negative years (after rounding) show nothing, so return NULL.",
+   "cost": 0.0586927,
+   "seconds": 3.0
+  },
+  {
+   "t": 1793474905,
+   "worker": "Q2C-w2",
+   "question": "Loyalty tier: if visits or total spent is blank/missing, negative, or not a number, how should it be counted (e.g. as zero)? And are part-visits like 2.5 rounded down to whole visits?",
+   "answer": "Yes, count blank, missing, or non-numeric visits as 0. Negatives also count as 0, and visits cap at 30. Part-visits round down, so 2.5 counts as 2. For total spent, blank, non-numeric, or negative counts as 0, and the fraction is dropped per whole 10.",
+   "cost": 0.0594087,
+   "seconds": 3.0
+  },
+  {
+   "t": 1793474908,
+   "worker": "Q2C-w1",
+   "question": "Adoption anniversary: if the number of years is fractional (e.g. 2.5), what do we do?",
+   "answer": "Round to the nearest whole year, with halves rounding up, so 2.5 becomes 3.",
+   "cost": 0.0585787,
+   "seconds": 3.5
+  },
+  {
+   "t": 1793474912,
+   "worker": "Q2C-w2",
+   "question": "Boarding cost: is the total simply days times daily rate, or are there discounts for long stays, a minimum charge, or a cap?",
+   "answer": "Not quite. The first 7 days are full daily rate, and every day after that is 80% of the rate. There's no minimum charge and no cap. Fractional days round up, and 0 or fewer days costs nothing.",
+   "cost": 0.0589847,
+   "seconds": 3.3
+  },
+  {
+   "t": 1793474915,
+   "worker": "Q2C-w1",
+   "question": "Membership expiry: if the start is 31 Jan and we add 1 month (no 31 Feb), which date should it expire on?",
+   "answer": "It spills into March: 3 March in a normal year, 2 March in a leap year. If that day is a Sunday, move it to the Monday after.",
+   "cost": 0.059500700000000004,
+   "seconds": 3.7
+  },
+  {
+   "t": 1793474919,
+   "worker": "Q2C-w2",
+   "question": "Owner label: what should show if the first name is blank/missing, if the last name is blank/missing, or both? Also, should extra spaces be trimmed and should the case be fixed (e.g. 'eve' / 'WALKER' -> 'Walker, E.')? And a first name starting with a non-letter?",
+   "answer": "Yes, trim spaces and fix the case: 'eve' / 'WALKER' gives 'Walker, E.'. If the first name is blank or missing, show just the surname, e.g. 'Walker'. If the last name is blank or missing, use 'Unknown', so 'Unknown, E.'. If both are blank, show 'Unknown'. A first name starting with a non-letter just uses that first character upper-cased, so '7up' gives 'Walker, 7.'. Results are cut to 12 characters.",
+   "cost": 0.0601987,
+   "seconds": 4.0
+  },
+  {
+   "t": 1793474923,
+   "worker": "Q2C-w1",
+   "question": "Membership expiry: if the start date is blank, missing or not a real date, what should we show?",
+   "answer": "Treat it as 1970-01-01 and calculate from there, so the expiry would be that date plus the months. If that lands on a Sunday, it moves to the following Monday.",
+   "cost": 0.0587987,
+   "seconds": 4.0
+  },
+  {
+   "t": 1793474927,
+   "worker": "Q2C-w2",
+   "question": "Boarding cost: if the daily rate is blank, missing, non-numeric, zero or negative, what is the total (0?). And is the final price rounded to the cent, and which way?",
+   "answer": "Yes, the total is 0. A blank, missing, non-numeric or zero rate counts as 0, and a negative rate is also treated as 0. The final price is rounded up to the next whole cent, never down, and returned as a number.",
+   "cost": 0.0597547,
+   "seconds": 3.4
+  },
+  {
+   "t": 1793474930,
+   "worker": "Q2C-w1",
+   "question": "Membership expiry: if the number of months is blank, zero or negative, what should we show?",
+   "answer": "Treat it as 0 months, so the expiry is just the start date. If that date falls on a Sunday, push it to the following Monday.",
+   "cost": 0.0586647,
+   "seconds": 3.8
+  },
+  {
+   "t": 1793474934,
+   "worker": "Q2C-w2",
+   "question": "Owner label: for a multi-word or hyphenated surname like 'de la cruz' or 'smith-jones', should each word/part be capitalised ('De La Cruz', 'Smith-Jones') or only the first letter ('De la cruz')? Does the 12-character cut apply to the whole label?",
+   "answer": "Only the first letter: 'De la cruz', 'Smith-jones'. Yes, the 12-character cut applies to the whole label.",
+   "cost": 0.0589687,
+   "seconds": 2.7
+  },
+  {
+   "t": 1793474937,
+   "worker": "Q2C-w1",
+   "question": "Membership expiry: if months is fractional (e.g. 1.5), what do we do?",
+   "answer": "Drop the fraction toward zero, so 1.5 months counts as 1 month.",
+   "cost": 0.0585187,
+   "seconds": 4.0
+  }
+ ],
+ "earlier_in": 14,
+ "house_in": [
+  "Across the business: a blank (NULL) number is treated as 0, and zero and negative numbers are treated the same way as blank. Weight, minutes, rate, mg-per-kg and interval are all handled like this, and the case is handled by a fixed rule, not an error.",
+  "Across the business: when a calculated amount has to be rounded, it is always rounded up to the next whole unit, never down and never half-up. Money goes up to the next whole cent, time goes up to the next 15-minute block, and doses go up to the next whole mg, so 7.5 becomes 8 and 61 minutes becomes 5 blocks.",
+  "Across the business: band and category cut-offs are inclusive at the top. A value exactly on a boundary belongs to the lower band (for example, 25 kg is medium and 10 kg is medium). Bands read as 'up to X' or 'over X'.",
+  "Across the business: a minimum applies only when there is something to charge for, meaning an amount above 0. Zero or negative amounts get 0 and no minimum.",
+  "Across the business: codes and names built from text are written in uppercase using only plain ASCII letters and digits. Spaces, punctuation and accented letters are dropped, not converted, so 'Jos\u00e9' becomes 'JOS' and 'M\u00fcller' becomes 'MLLER'.",
+  "Across the business: a text part that has nothing left after cleaning (blank, NULL, or only punctuation) counts as blank and gets the standard stand-in value, not an empty gap.",
+  "Across the business: dates must be a clean YYYY-MM-DD. Spaces around the date are ignored. A blank date, a wrong format, or a date with extra text or a time counts as 1970-01-01.",
+  "Across the business: when adding months to a date lands on a day that does not exist in that month, the date rolls over into the next month (31 Jan + 1 month is 3 Mar, or 2 Mar in a leap year). It does not snap back to the last day of the month."
+ ],
+ "hidden_tests": 111,
+ "hidden_total": 125,
+ "minutes": 1.6
+}

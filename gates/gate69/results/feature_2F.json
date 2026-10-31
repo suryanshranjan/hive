@@ -1,0 +1,163 @@
+{
+ "feature": 2,
+ "arm": "F",
+ "questions": [
+  {
+   "t": 1793474892,
+   "worker": "Q2F-w2",
+   "question": "Boarding cost: is there a discount for long stays (e.g. after some number of days), and if so what percent from which day?",
+   "answer": "Yes. The first 7 days are full rate, and from day 8 on each day is 20% off (charged at 80% of the daily rate).",
+   "cost": 0.0587147,
+   "seconds": 4.2
+  },
+  {
+   "t": 1793474896,
+   "worker": "Q2F-w2",
+   "question": "Boarding cost: what should the price be when days is 0, negative, or blank/missing?",
+   "answer": "It should be 0. If days is 0, negative, or blank/missing, there's no charge, whatever the rate.",
+   "cost": 0.058598700000000004,
+   "seconds": 3.4
+  },
+  {
+   "t": 1793474900,
+   "worker": "Q2F-w3",
+   "question": "Owner label is 'Last, F.' on appointment sheets. If the first name is blank or missing, what should the label show (e.g. just 'Walker', or 'Walker, ?')?",
+   "answer": "Just 'Walker', with no comma and no initial.",
+   "cost": 0.0585467,
+   "seconds": 3.0
+  },
+  {
+   "t": 1793474903,
+   "worker": "Q2F-w1",
+   "question": "When a pet was adopted on Feb 29 and the anniversary year is not a leap year, which date is the anniversary: Feb 28 or Mar 1?",
+   "answer": "Mar 1.",
+   "cost": 0.0584007,
+   "seconds": 3.4
+  },
+  {
+   "t": 1793474906,
+   "worker": "Q2F-w2",
+   "question": "Boarding cost: what if the daily rate is zero, negative or missing? And should the total be rounded to cents?",
+   "answer": "Zero, negative or missing rate all count as 0, so the boarding cost is 0. Yes, round the total up to the next whole cent and return it as a number.",
+   "cost": 0.0587807,
+   "seconds": 2.8
+  },
+  {
+   "t": 1793474909,
+   "worker": "Q2F-w3",
+   "question": "If the last name is blank or missing, what should the owner label show?",
+   "answer": "It should show \"Unknown\" as the surname. If there's a first name, it prints \"Unknown, J.\" (with their initial), and if the first name is blank too, it's just \"Unknown\".",
+   "cost": 0.0587827,
+   "seconds": 3.1
+  },
+  {
+   "t": 1793474912,
+   "worker": "Q2F-w1",
+   "question": "For a membership starting Jan 31 with 1 month, which expiry date: Feb 28 (last day of the month) or Mar 2/3 (overflow)?",
+   "answer": "Overflow. Jan 31 plus 1 month spills into March (Mar 3 in 2026, Mar 2 in a leap year). If that lands on a Sunday, it moves to the Monday after.",
+   "cost": 0.0590047,
+   "seconds": 2.9
+  },
+  {
+   "t": 1793474915,
+   "worker": "Q2F-w2",
+   "question": "Loyalty tier: what are the tiers and the minimum visits AND/OR total spent needed for each (bronze, silver, gold, platinum)? Does a client need both visits and spend, or either one?",
+   "answer": "Both count, not either one: score = 10 per visit (max 30 visits counted) + 1 per whole 10 spent. Bronze is a score of 100 or less, silver is 101\u2013300, gold is 301\u2013600, and platinum is over 600. There are no separate minimums for visits or spend.",
+   "cost": 0.0593267,
+   "seconds": 3.3
+  },
+  {
+   "t": 1793474918,
+   "worker": "Q2F-w3",
+   "question": "Names with extra spaces or odd case, like '  eve ' and 'walker' \u2014 should we trim spaces and fix capitalisation (Walker, E.) or keep them as typed?",
+   "answer": "Trim the spaces and fix the capitalisation: surname with just the first letter capital, then \", \" and the first name's initial with a full stop. So '  eve ' and 'walker' gives \"Walker, E.\"",
+   "cost": 0.0590387,
+   "seconds": 3.1
+  },
+  {
+   "t": 1793474921,
+   "worker": "Q2F-w1",
+   "question": "If the adoption date or membership start date is blank, missing or not a valid date, what should the result be: blank (NULL) or something else?",
+   "answer": "Not NULL. An invalid or missing date is treated as 1970-01-01, so the result is calculated from that date. For membership expiry, that means 1970-01-01 plus the months, with the Sunday-to-Monday move still applied.",
+   "cost": 0.0590607,
+   "seconds": 3.6
+  },
+  {
+   "t": 1793474925,
+   "worker": "Q2F-w3",
+   "question": "For double-barrelled or multi-word last names ('van der Berg', 'Smith-Jones'), and first names starting with a non-letter or accented letter ('\u00c9lodie'), any special handling for the label?",
+   "answer": "No special handling. Just apply the rules as written: 'van der Berg' becomes 'Van der berg' and 'Smith-Jones' becomes 'Smith-jones'. The initial is the first character upper-cased, so '\u00c9lodie' gives '\u00c9.' and a non-letter stays as is. Then cut to 12 characters.",
+   "cost": 0.0606767,
+   "seconds": 4.6
+  },
+  {
+   "t": 1793474930,
+   "worker": "Q2F-w2",
+   "question": "Loyalty tier: if visits or total spent is blank/missing, negative, or not a number, what should count for it \u2014 zero?",
+   "answer": "Yes, zero for both. Blank, missing, non-numeric and negative values all count as 0. Visits are also rounded down and capped at 30.",
+   "cost": 0.0587627,
+   "seconds": 3.7
+  },
+  {
+   "t": 1793474933,
+   "worker": "Q2F-w1",
+   "question": "If the number of years (anniversary) is zero, negative or missing, what should the anniversary date be?",
+   "answer": "Zero or missing years: return the adoption date itself. Negative years: return NULL.",
+   "cost": 0.0585307,
+   "seconds": 3.4
+  },
+  {
+   "t": 1793474937,
+   "worker": "Q2F-w3",
+   "question": "You said cut to 12 characters: is that the whole finished label (e.g. 'Smith-jones, ' cut to 12 chars total, possibly losing the initial), or only the surname part?",
+   "answer": "The whole finished label. Build it fully, then cut to 12 characters total, even if that drops the initial.",
+   "cost": 0.0587107,
+   "seconds": 3.8
+  },
+  {
+   "t": 1793474941,
+   "worker": "Q2F-w2",
+   "question": "Loyalty tier: if visits is fractional (e.g. 2.5) do we count whole visits only? And spend of 19.99 counts as 1 whole ten (rounded down)?",
+   "answer": "Yes to both. Fractional visits get rounded down to whole visits, so 2.5 counts as 2. Spend of 19.99 counts as 1 whole ten, with the fraction dropped.",
+   "cost": 0.059016700000000005,
+   "seconds": 3.5
+  },
+  {
+   "t": 1793474944,
+   "worker": "Q2F-w1",
+   "question": "If the number of months for a membership is zero, negative or missing, what should the expiry be? And are part-months (e.g. 1.5) cut down to whole months?",
+   "answer": "Zero, negative or missing months all count as 0, so the expiry is just the start date (unless that date is a Sunday, then it moves to the following Monday). Yes, part-months are cut down toward zero, so 1.5 becomes 1, and the cap is 60 months.",
+   "cost": 0.0592067,
+   "seconds": 3.2
+  },
+  {
+   "t": 1793474952,
+   "worker": "Q2F-w1",
+   "question": "Does the Sunday-to-Monday move also apply to the adoption anniversary date?",
+   "answer": "No. The adoption anniversary has no weekday adjustment, so a Sunday stays a Sunday. That move is only for membership expiry.",
+   "cost": 0.0586987,
+   "seconds": 3.5
+  },
+  {
+   "t": 1793474955,
+   "worker": "Q2F-w1",
+   "question": "For the adoption anniversary: is there a maximum number of years, and are part-years (e.g. 2.5) cut down to whole years? Also, if the adoption date is blank/invalid, is it treated as 1970-01-01 like membership?",
+   "answer": "No maximum on years. Part-years round to the nearest whole year, with halves rounding up, so 2.5 becomes 3. A blank or invalid adoption date is treated as 1970-01-01, same as membership.",
+   "cost": 0.0591347,
+   "seconds": 3.6
+  },
+  {
+   "t": 1793474959,
+   "worker": "Q2F-w1",
+   "question": "Membership: if months is above the 60 cap, do we use 60? And if the date has extra spaces or a time on the end (e.g. '2024-02-12 10:30'), do we just use the date part?",
+   "answer": "Yes, cap months at 60. Surrounding spaces are ignored, but a date with a time on the end isn't in the exact YYYY-MM-DD form, so treat it as 1970-01-01.",
+   "cost": 0.0590387,
+   "seconds": 3.9
+  }
+ ],
+ "earlier_in": 0,
+ "house_in": [],
+ "hidden_tests": 114,
+ "hidden_total": 125,
+ "minutes": 1.9
+}
