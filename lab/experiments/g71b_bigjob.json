@@ -1,0 +1,14 @@
+{
+ "name": "g71b",
+ "predictions": "gates/gate71/prompts/PREDICTIONS.md",
+ "rulegiver_brief": "gates/gate71/prompts/rulegiver_brief.md",
+ "require_decisions": true,
+ "prompt": "gates/gate71/prompts/prompt_builder.md",
+ "ask_texts": "runs/g71b/ask_texts.md",
+ "visible_seed": 71300,
+ "hidden_seed": 71400000,
+ "baseline": "S7",
+ "pre_launch": ["python3 gates/gate71/referee/review71.py pre {run} {oracle}"],
+ "after_baseline": ["true"],
+ "arms": ["S7:7:none", "A1:1:none"]
+}
