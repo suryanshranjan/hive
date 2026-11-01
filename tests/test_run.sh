@@ -54,6 +54,9 @@ if [ -x "${HIVE_GRAPHIFY:-/home/claude/gvenv/bin/graphify}" ]; then
   cd $T/project && HIVE_GRAPHIFY=${HIVE_GRAPHIFY:-/home/claude/gvenv/bin/graphify} HIVE_MAP_LABEL=0 $PY -c "from hive import swarm; swarm.prepare('$TW/project', '$TW/runmap', 2, 'Implement creator fees.', 40, None, 0, code_map=True)"
   check "the map is in every clone, named in the prompt, and kept out of git" \
     "$(ls $T/runmap/work/w1/graphify-out/GRAPH_REPORT.md $T/runmap/work/w2/graphify-out/GRAPH_REPORT.md | wc -l) $(grep -c 'A map of this codebase' $T/runmap/prompts/w2.md) $(git -C $T/runmap/work/w1 status --porcelain | grep -c graphify)" "2 1 0"
+  cd $T/project && HIVE_GRAPHIFY=${HIVE_GRAPHIFY:-/home/claude/gvenv/bin/graphify} HIVE_MAP_LABEL=0 $PY -c "from hive import swarm; swarm.prepare('$TW/project', '$TW/runguide', 2, 'Implement creator fees.', 40, None, 0, code_map=True, map_guide=True)"
+  check "a guided map adds graphify's rule and hook to each clone, kept out of git (Gate 79, under test)" \
+    "$(ls $T/runguide/work/w1/CLAUDE.local.md $T/runguide/work/w1/.claude/settings.local.json | wc -l) $(grep -c 'hook-guard' $T/runguide/work/w1/.claude/settings.local.json) $(git -C $T/runguide/work/w1 status --porcelain | wc -l)" "2 2 0"
   check "without code_map there is no map" "$(grep -c 'A map of this codebase' $T/runsolo/prompts/w1.md)" 0
 fi
 rm -rf $T; exit $fail

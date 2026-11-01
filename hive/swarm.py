@@ -173,7 +173,8 @@ def split_roles(workers, questions):
         return workers >= SPLIT_FROM and split_overnight()
     return workers >= SPLIT_FROM and questions not in (0, None)
 
-def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None, assumptions=False, code_map=None):
+def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None, assumptions=False, code_map=None,
+            map_guide=None):
     """Create <run>/up.git, one clone per worker in <run>/work, and one prompt per worker in <run>/prompts."""
     repo = os.path.abspath(repo); run = os.path.abspath(run)
     cfg = config.load(repo)
@@ -210,7 +211,7 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
                 .replace('{TEST_CMD}', cfg['test_cmd']).replace('{AREAS}', _areas_text(cfg)).replace('{OWNER}', owner_text)
                 .replace('{MINUTES}', str(minutes)).replace('{NOTES}', notes_text))
         if built:   # Gate 78: one map of the code, built once, in every clone
-            codemap.install(built, work); text = text.replace(owner_text, codemap.text() + owner_text) if owner_text else text + codemap.text()
+            codemap.install(built, work, map_guide); text = text.replace(owner_text, codemap.text() + owner_text) if owner_text else text + codemap.text()
         if split:   # Gate 74: one builder owns the owner's decisions, the rest build everything else
             biz = f'w{workers}'
             brole, rrole = (BUSINESS_ROLE_LATER, BUILDER_ROLE_LATER) if questions == 'later' else (BUSINESS_ROLE, BUILDER_ROLE)
@@ -228,6 +229,7 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
         raise SystemExit(' '.join(f"{a} isn't installed here. {AGENT_HELP.get(a, '')}".strip() for a in missing))
     env =dict(os.environ, PYTHONPATH=HIVE_ROOT + os.pathsep + os.environ.get('PYTHONPATH', ''),
                HIVE_GUARD_CACHE=os.path.join(run, 'guard_cache'), HIVE_RUN=run)
+    env = codemap.path_env(run, env)   # Gate 78-79: graphify on the builders' PATH when there is a map
     queue = sorted(f[:-3] for f in os.listdir(os.path.join(run, 'prompts')) if f.endswith('.md'))
     meta = json.load(open(os.path.join(run, 'run.json'))); meta['started'] = int(time.time())
     json.dump(meta, open(os.path.join(run, 'run.json'), 'w'), indent=1)

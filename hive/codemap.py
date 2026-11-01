@@ -5,7 +5,7 @@ computer, no model, under a minute; its groups are then named by one cheap model
 builder's clone. Each builder can then ask the map where
 things are and what calls what, instead of each reading the same files to find its way.
 Off unless the swarm is prepared with code_map=True (or HIVE_CODE_MAP=1)."""
-import os, shutil, subprocess
+import json, os, shutil, subprocess
 
 OUT = 'graphify-out'
 
@@ -36,13 +36,49 @@ def build(src, into):
     rep = os.path.join(into, OUT, 'GRAPH_REPORT.md')
     return rep if os.path.exists(rep) else None
 
-def install(built, work):
-    """Copy a built map into a builder's clone, kept out of git."""
-    shutil.copytree(os.path.join(built, OUT), os.path.join(work, OUT), dirs_exist_ok=True)
+def guided():
+    """Gate 79 (under test): also steer the builder to the map, as graphify does for Claude Code (a CLAUDE.local.md rule,
+    and a hook that reminds it of the map before each search or file read). Off unless HIVE_MAP_GUIDE=1."""
+    return os.environ.get('HIVE_MAP_GUIDE') == '1'
+
+def _exclude(work, *names):
     ex = os.path.join(work, '.git', 'info', 'exclude'); os.makedirs(os.path.dirname(ex), exist_ok=True)
     lines = open(ex).read().splitlines() if os.path.exists(ex) else []
-    if OUT + '/' not in lines:
-        open(ex, 'a').write(OUT + '/\n')
+    with open(ex, 'a') as f:
+        for n in names:
+            if n not in lines:
+                f.write(n + '\n')
+
+RULE = """## graphify (a map of this codebase)
+
+This clone has a knowledge graph of its code at graphify-out/graph.json.
+- Run `{g} query "<question>"` before your first grep, search or source-file read for a question about the code. Read raw
+  files only for lines the graph or an earlier read already located.
+- Use `{g} explain "<name>"` for one function or class (what it calls, what calls it) and `{g} path "<A>" "<B>"` for how
+  two things connect; `{g} affected "<name>"` before you change something others use.
+- After modifying code, or after you pull, run `{g} update .` (seconds, no cost).
+"""
+
+def install(built, work, guide=None):
+    """Copy a built map into a builder's clone, kept out of git; with guide, also graphify's rule and search hook."""
+    shutil.copytree(os.path.join(built, OUT), os.path.join(work, OUT), dirs_exist_ok=True)
+    _exclude(work, OUT + '/')
+    if guide if guide is not None else guided():
+        g = tool() or 'graphify'
+        open(os.path.join(work, 'CLAUDE.local.md'), 'a').write(RULE.format(g=g))
+        os.makedirs(os.path.join(work, '.claude'), exist_ok=True)
+        hooks = {'hooks': {'PreToolUse': [
+            {'matcher': 'Bash|Grep', 'hooks': [{'type': 'command', 'command': f'{g} hook-guard search', 'timeout': 10}]},
+            {'matcher': 'Read|Glob', 'hooks': [{'type': 'command', 'command': f'{g} hook-guard read', 'timeout': 10}]}]}}
+        json.dump(hooks, open(os.path.join(work, '.claude', 'settings.local.json'), 'w'), indent=1)
+        _exclude(work, 'CLAUDE.local.md', '.claude/settings.local.json')
+
+def path_env(run, env):
+    """Put graphify on the builders' PATH when their clones have a map (the hook's reminders name it bare)."""
+    g = tool()
+    if g and os.path.isdir(os.path.join(run, 'map')):
+        env = dict(env, PATH=os.path.dirname(g) + os.pathsep + env.get('PATH', ''))
+    return env
 
 def text():
     g = tool() or 'graphify'

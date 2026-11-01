@@ -66,7 +66,7 @@ def tool_use(work):
                     cmd = (b.get('input') or {}).get('command', '')
                     if 'graphify' in cmd: c['graphify'] += 1
                     if re.search(r'\b(grep|rg|find|ls|cat|sed|head|tail)\b', cmd): c['search_bash'] += 1
-                if re.search(r'pip (install|download)[^"]*sqlglot|site-packages/sqlglot|private/g78|scratchpad|g78_seed|sqlglot-30', inp):
+                if re.search(r'pip (install|download)[^"]*sqlglot|site-packages/sqlglot|private/g7[89]|g7[89]_seed|sqlglot-30|_orig_link', inp):
                     c['outside'].append(inp[:200])
     return c
 
