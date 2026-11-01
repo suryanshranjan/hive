@@ -2,7 +2,7 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 2 2026 IST, after Gate 86)
+## Where we left off (Nov 2 2026 IST, after Gate 88)
 
 - **Gate 66 done (the user, travelling: "test something that makes Hive the best tool"):** one Claude Code agent that asks the owner beat Hive's hand-over by 21-30 hidden points (CQ 93.0, CC 84.6, HV 63.4, N0 34.8%) at 1/13 of his reading. Wind tunnel, synthetic owner who answers from his policy.
 - **Gate 67 done:** the hand-over's memory does not compound (neither rule fired).
@@ -26,7 +26,10 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 - **New phase: closing the founder's gaps** (`docs/gap_plan.md`): reliability (pass^k), owner load under 10 minutes, Hive's own spend, real codebases (Ambig-SWE), owner drift, the real founder, MAST failure labels.
 - **Gate 85 done (baseline):** pass^1 0.80, pass^5 no; median 55 owner prompts; Hive's own spend 4.8-8.6x builders' (interview interpretation 45%, reply reading 19%, spot checks 22%).
 - **Gate 86 done (claim did not fire):** real Django issues: one builder 8/10 full, 7/10 summary; hive start 8/10 at 15x the cost; the business interview invents a shop on technical goals.
-- **Running:** Gate 87 (Hive's own reading on Haiku), then Gate 88 (at most 6 spot checks), both against Gate 85.
+- **Gate 87 done:** Haiku for Hive's own reading: spend 0.11x, pass^1 same, median hidden 25; found the placeholder fault (split x derived areas).
+- **Gate 88 done (claim fired):** at most 6 spot checks: prompts 34 vs 55, pass^1 1.00; ships after Gates 89-90 (3 of 5 reviews were skipped, so partly luck).
+- **Running:** Gate 90 (placeholder fix, 5 flights vs Gate 85), then Gate 89 (no interview on technical goals, 10 Django issues). `dev90` (with `dev89`) is merged to main.
+- **Then:** ship `HIVE_SPOT_MAX=6` by default; register Gate 91 (Haiku on the fixed flow vs Gate 90).
 - **Next:** skip the interview when a goal has no business decisions (Gate 86); Gap 4 again on issues whose summaries lose what a builder cannot infer (Ambig-SWE's missing-information annotations); a check for state that outlives a call (Gate 85) on a real codebase (where 'business parts' are a judgement); low priority, a short interview before an overnight build (at most ~2 of 27 to gain); the split on a real codebase (where 'business parts' are a judgement); with the founder, Gate 45 day 2 with builders asking him live (his pace and whether his answers hold).
 - **Earlier plan, superseded by Gate 73:** Gate 72 again with the repeated-question fix (does the swarm then match one agent's business correctness and keep its speed?). **With the founder:** Gate 45 day 2, builders asking him live; measure his answer time and whether his answers hold.
 - **For Gate 45 day 2 with the founder:** test builders asking him live (his answers drift; does asking still win?).
