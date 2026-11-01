@@ -652,6 +652,28 @@ json.dump({'pid': os.getppid(), 'at': time.time()}, open(telegram.BUSY, 'w'))
 check('another live process talking: the listener steps aside', telegram.busy_elsewhere(), True)
 json.dump({'pid': os.getppid(), 'at': time.time() - 600}, open(telegram.BUSY, 'w'))
 check('a stale claim is ignored', telegram.busy_elsewhere(), False)
+# Gate 72: five builders asked the owner the same question at once; one answer now serves every copy
+from hive import owner as _ow
+_dd = tempfile.mkdtemp(); _od = os.path.join(_dd, 'owner')
+for sub in ('questions', 'answers'):
+    os.makedirs(os.path.join(_od, sub))
+for k, qtext in enumerate(['What label for ages under 10?', 'What label for ages under 10?', 'Is there a late fee cap?']):
+    json.dump({'id': f'{k}-w{k}', 'worker': f'w{k}', 'question': qtext, 'asked': int(time.time())},
+              open(os.path.join(_od, 'questions', f'{k}-w{k}.json'), 'w'))
+_save = explain.ask_json
+def _same(prompt):
+    import re as _re
+    earlier = dict(_re.findall(r'^(\d+)\. (.+)$', prompt.split('New question:')[0], _re.M))
+    new = prompt.split('New question: ')[1].split('\n')[0].strip()
+    return {'same': next((int(n) for n, q in earlier.items() if q.strip() == new), None)}
+explain.ask_json = _same
+held = _ow.settle_duplicates(_od)
+check('a teammate\'s same question is held back, a different one is not', sorted(held), ['1-w1'])
+json.dump({'id': '0-w0', 'answer': "'Under 10'", 'answered': int(time.time())}, open(os.path.join(_od, 'answers', '0-w0.json'), 'w'))
+held = _ow.settle_duplicates(_od)
+check('once he answers, the copy gets the same answer and nothing is held',
+      (held, json.load(open(os.path.join(_od, 'answers', '1-w1.json')))['answer']), (set(), "'Under 10'"))
+explain.ask_json = _save
 json.dump({'pid': os.getpid(), 'at': time.time()}, open(telegram.BUSY, 'w'))
 check("its own claim doesn't block it", telegram.busy_elsewhere(), False)
 sys.exit(fail)

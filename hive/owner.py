@@ -61,6 +61,50 @@ LATER = ("\n## Questions for the owner's morning\nThe owner is away until the mo
          "finished build reached 75%). Read `python3 -m hive answers` first and do not record a question a teammate has "
          "already recorded.\n")
 
+SAME = """Builders are asking a busy business owner questions, one decision each. Earlier questions, numbered:
+{earlier}
+
+New question: {new}
+
+Does one earlier question ask about the same decision, so that its answer would settle the new question completely? If
+the new question asks anything more, or about a different case, it does not. Reply with JSON only: {{"same": <number or null>}}"""
+
+def settle_duplicates(d):
+    """Gate 72: builders starting together asked the owner the same question five times over. A question that asks the
+    same decision as an earlier one is not put to him: it gets the earlier one's answer, now or when he gives it. Returns
+    the ids of such questions still waiting for that answer (not to be shown). Best effort: if no model answers, every
+    question is shown."""
+    from . import explain
+    p = os.path.join(d, 'duplicates.json')
+    marks = json.load(open(p)) if os.path.exists(p) else {}
+    qs = [json.load(open(f)) for f in sorted(glob.glob(os.path.join(d, 'questions', '*.json')))]
+    answered = lambda i: os.path.exists(os.path.join(d, 'answers', i + '.json'))
+    changed = False
+    for k, q in enumerate(qs):
+        if q['id'] in marks or answered(q['id']):
+            continue
+        earlier = [x for x in qs[:k] if not marks.get(x['id'])]
+        same = None
+        if earlier:
+            got = explain.ask_json(SAME.format(earlier='\n'.join(f"{n}. {x['question']}" for n, x in enumerate(earlier, 1)),
+                                               new=q['question']))
+            n = got.get('same') if isinstance(got, dict) else None
+            same = earlier[n - 1]['id'] if isinstance(n, int) and 1 <= n <= len(earlier) else None
+        marks[q['id']] = same; changed = True
+    if changed:
+        json.dump(marks, open(p, 'w'), indent=1)
+    waiting = set()
+    for qid, eid in marks.items():
+        if not eid or answered(qid):
+            continue
+        if answered(eid):
+            a = json.load(open(os.path.join(d, 'answers', eid + '.json')))
+            json.dump({'id': qid, 'answer': a['answer'], 'answered': int(time.time()), 'seconds': 0, 'same_as': eid},
+                      open(os.path.join(d, 'answers', qid + '.json'), 'w'))
+        else:
+            waiting.add(qid)
+    return waiting
+
 def setup(run, examples=None, questions=None, assumptions=False, later=False):
     """Called by hive run: copy the owner's examples and set the question budget. Returns the prompt text. later=True:
     the owner is away, so questions are recorded for his morning instead of waited on (Gate 70)."""
@@ -288,9 +332,10 @@ def serve(run, poll=2, until=None, tick=None, greet=True):
                                          for p in glob.glob(os.path.join(d, 'questions', '*.json'))):
                 return 0
             budget = _budget(d)
+            hold = settle_duplicates(d) if not closed else set()   # a teammate's same question: his one answer serves both
             for i, p in enumerate(sorted(glob.glob(os.path.join(d, 'questions', '*.json'))), 1):
                 q = json.load(open(p))
-                if q['id'] in seen or os.path.exists(os.path.join(d, 'answers', q['id'] + '.json')):
+                if q['id'] in seen or q['id'] in hold or os.path.exists(os.path.join(d, 'answers', q['id'] + '.json')):
                     continue
                 seen.add(q['id'])
                 if closed:   # no one can answer here: the builder decides rather than waiting half an hour

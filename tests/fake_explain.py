@@ -2,6 +2,12 @@
 ranks them by their position, and marks the last one as something an owner cannot judge."""
 import json, re, sys
 prompt = sys.stdin.read()
+if 'would settle the new question completely' in prompt:   # duplicate questions: the same text is the same decision
+    earlier = dict(re.findall(r'^(\d+)\. (.+)$', prompt.split('New question:')[0], re.M))
+    new = prompt.split('New question: ')[1].split('\n')[0].strip()
+    same = next((int(n) for n, q in earlier.items() if q.strip() == new), None)
+    print(json.dumps({'result': json.dumps({'same': same})}))
+    sys.exit(0)
 if 'How many independent parts does it have' in prompt:   # the law's estimate of parallel work: fees and payouts
     print(json.dumps({'result': json.dumps({'parts': ['fees', 'payouts']})}))
     sys.exit(0)

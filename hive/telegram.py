@@ -231,9 +231,11 @@ def bridge_questions(run, ch, until, poll=2, tick=None):
     while True:
         if tick:
             tick()
+        from . import owner as _owner
+        hold = _owner.settle_duplicates(d)   # Gate 72: a teammate's same question gets his one answer, not a second ping
         open_qs = unanswered()
         for q in open_qs:
-            if q['id'] not in sent:
+            if q['id'] not in sent and q['id'] not in hold:
                 who = ch.name()
                 sent[q['id']] = ch.send(f"❓ <b>{esc(who[:1].upper() + who[1:]) + ', a' if who else 'A'} quick one from the builders</b>\n\n"
                                         f"{esc(q['question'])}\n\n<i>A tap is enough, or tell me in your own words. 🎙 Voice notes work too.</i>",
