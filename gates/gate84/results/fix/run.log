@@ -1,0 +1,32 @@
+[22:50:25] predictions registered on origin/main: gates/gate84/prompts/PREDICTIONS.md
+
+[22:50] The build changed 1 thing your goal fixed: refund (line 68 returns a dict with `amount`, `method`, `card`, `store_credit`; the goal states exactly `amount`, `method` (extra: card, store_credit)). Sending a builder to put it back.
+  [22:50] Builder w1 picked up: fix.
+  [22:51] Builder w1 landed: refund returns exactly amount and method; split moved to refund_breakdown
+  [22:51] Builder w1 landed: refund() returns exactly {amount, method}; card/store_credit split kept in new...
+  [22:51] Builder w1 landed: hive: leave build output and dependencies out of the shared branch
+  [22:51] Builder w1 landed: pytest.ini: pin rootdir so junit test ids are stable
+{
+ "before": {
+  "passed": 14,
+  "failed": 13,
+  "errors": 0,
+  "line": "13 failed, 14 passed in 1.82s"
+ },
+ "problems": [
+  {
+   "name": "refund",
+   "file": "shop/refunds.py",
+   "problem": "line 68 returns a dict with `amount`, `method`, `card`, `store_credit`; the goal states exactly `amount`, `method` (extra: card, store_credit)"
+  }
+ ],
+ "fix_ran": true,
+ "after": {
+  "passed": 26,
+  "failed": 1,
+  "errors": 0,
+  "line": "1 failed, 26 passed in 0.04s"
+ },
+ "problems_after": [],
+ "cost": 0.686407
+}

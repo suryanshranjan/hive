@@ -1,0 +1,9 @@
+fix: before 13 failed, 14 passed in 1.82s; problems [{'name': 'refund', 'file': 'shop/refunds.py', 'problem': 'line 68 returns a dict with `amount`, `method`, `card`, `store_credit`; the goal states exactly `amount`, `method` (extra: card, store_credit)'}]; fix ran True; after 1 failed, 26 passed in 0.04s; problems after []
+g84_live1: rc 0, 12.2 min, after 27 passed in 0.03s, owner prompts 61, review skipped False, check ran False, found None, fix round False, problems left []
+g84_live2: rc 0, 9.6 min, after 1 failed, 26 passed in 0.08s, owner prompts 42, review skipped True, check ran True, found [], fix round False, problems left []
+
+predictions
+I1 Gate 83's build: found, fixed, 0 left, >= 24 -> held
+I3 flights: no crash, one branch, >= 24 each -> held
+I4 flights: 0 interface problems delivered -> held
+I5 flights: check ran where the review was skipped; fix ran if needed -> held
