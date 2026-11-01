@@ -49,4 +49,11 @@ check "overnight: no split unless HIVE_SPLIT_OVERNIGHT=1 (Gate 77: no gain, off)
 cd $T/project && HIVE_SPLIT_OVERNIGHT=1 $PY -c "from hive import swarm; swarm.prepare('$TW/project', '$TW/runnight2', 3, 'Implement creator fees.', 40, None, 'later')"
 check "overnight split: w3 records systematically, w1 records nothing" \
   "$(grep -c 'record his questions systematically' $T/runnight2/prompts/w3.md) $(grep -c 'Do not record questions yourself' $T/runnight2/prompts/w1.md) $(grep -c 'hive ask' $T/runnight2/prompts/w1.md)" "1 1 0"
+# Gate 78 (under test): with graphify installed, one map of the code is built and copied into every clone, out of git
+if [ -x "${HIVE_GRAPHIFY:-/home/claude/gvenv/bin/graphify}" ]; then
+  cd $T/project && HIVE_GRAPHIFY=${HIVE_GRAPHIFY:-/home/claude/gvenv/bin/graphify} HIVE_MAP_LABEL=0 $PY -c "from hive import swarm; swarm.prepare('$TW/project', '$TW/runmap', 2, 'Implement creator fees.', 40, None, 0, code_map=True)"
+  check "the map is in every clone, named in the prompt, and kept out of git" \
+    "$(ls $T/runmap/work/w1/graphify-out/GRAPH_REPORT.md $T/runmap/work/w2/graphify-out/GRAPH_REPORT.md | wc -l) $(grep -c 'A map of this codebase' $T/runmap/prompts/w2.md) $(git -C $T/runmap/work/w1 status --porcelain | grep -c graphify)" "2 1 0"
+  check "without code_map there is no map" "$(grep -c 'A map of this codebase' $T/runsolo/prompts/w1.md)" 0
+fi
 rm -rf $T; exit $fail

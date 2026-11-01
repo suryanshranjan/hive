@@ -8,7 +8,7 @@ Workers run $HIVE_WORKER_CMD (default: headless Claude Code) inside their clone 
 shell commands, so run swarms in a container or a throwaway VM."""
 import csv, json, os, shutil, subprocess, sys, time
 
-from . import argv, PY, config, law, owner
+from . import argv, PY, codemap, config, law, owner
 from .guard import sh
 
 DEFAULT_CMD = 'claude -p --output-format json --permission-mode acceptEdits --allowedTools Bash Read Edit Write Glob Grep'
@@ -173,7 +173,7 @@ def split_roles(workers, questions):
         return workers >= SPLIT_FROM and split_overnight()
     return workers >= SPLIT_FROM and questions not in (0, None)
 
-def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None, assumptions=False):
+def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None, assumptions=False, code_map=None):
     """Create <run>/up.git, one clone per worker in <run>/work, and one prompt per worker in <run>/prompts."""
     repo = os.path.abspath(repo); run = os.path.abspath(run)
     cfg = config.load(repo)
@@ -194,6 +194,9 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
                   "One line, only when it matters.\n") if notes_on else ""
     goal_text = open(goal, encoding='utf-8').read().strip() if os.path.exists(goal) else goal
     split = split_roles(workers, questions)
+    if code_map is None:
+        code_map = codemap.wanted()
+    built = os.path.join(run, 'map') if code_map and codemap.build(repo, os.path.join(run, 'map')) else None   # Gate 78
     for k in range(1, workers + 1):
         me = f'w{k}'; work = os.path.join(run, 'work', me)
         sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', up, work)
@@ -206,6 +209,8 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
                 .replace('{LOG}', os.path.join(run, 'logs', f'{me}.log')).replace('{GOAL}', goal_text)
                 .replace('{TEST_CMD}', cfg['test_cmd']).replace('{AREAS}', _areas_text(cfg)).replace('{OWNER}', owner_text)
                 .replace('{MINUTES}', str(minutes)).replace('{NOTES}', notes_text))
+        if built:   # Gate 78: one map of the code, built once, in every clone
+            codemap.install(built, work); text = text.replace(owner_text, codemap.text() + owner_text) if owner_text else text + codemap.text()
         if split:   # Gate 74: one builder owns the owner's decisions, the rest build everything else
             biz = f'w{workers}'
             brole, rrole = (BUSINESS_ROLE_LATER, BUILDER_ROLE_LATER) if questions == 'later' else (BUSINESS_ROLE, BUILDER_ROLE)
