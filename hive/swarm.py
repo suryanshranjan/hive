@@ -161,7 +161,8 @@ BUILDER_ROLE_LATER = ("\n## Your role: build the rest\nOne teammate, `{biz}`, ow
                       "decisions, leave a clear placeholder and let `{biz}` fill it.\n")
 
 def split_overnight():
-    """Gate 77 (under test): split the night builders too. Off unless HIVE_SPLIT_OVERNIGHT=1."""
+    """Gate 77: split the night builders too. Tested: 25.7 vs 25.0 of 27 after the morning, 1.28x the morning questions;
+    no gain worth it, so off unless HIVE_SPLIT_OVERNIGHT=1."""
     return os.environ.get('HIVE_SPLIT_OVERNIGHT') == '1'
 
 def split_roles(workers, questions):

@@ -1,0 +1,107 @@
+[
+ {
+  "id": "1793535138751-w3",
+  "worker": "w3",
+  "question": "In the daily sales summary, an order has items worth Rs 1000, a 10% discount code and Rs 50 shipping, so the customer pays Rs 950. Should revenue count Rs 950 (shipping included), or Rs 900 (shipping left out)?",
+  "asked": 1793535138,
+  "later": true
+ },
+ {
+  "id": "1793535138840-w3",
+  "worker": "w3",
+  "question": "Two orders today bring in Rs 100 and Rs 135, so the average is Rs 117.50. Should the summary show Rs 117, Rs 118 (round half up), or round to the nearest rupee some other way?",
+  "asked": 1793535138,
+  "later": true
+ },
+ {
+  "id": "1793535138926-w3",
+  "worker": "w3",
+  "question": "On a day with no orders at all, should the summary show 0 orders, Rs 0 revenue and Rs 0 average, or something else?",
+  "asked": 1793535138,
+  "later": true
+ },
+ {
+  "id": "1793535139006-w3",
+  "worker": "w3",
+  "question": "An order that was refunded or is a final-sale order is in today's list. Should it still count in the orders, revenue and average of the summary, or be left out / reduced by the refund?",
+  "asked": 1793535139,
+  "later": true
+ },
+ {
+  "id": "1793535139099-w3",
+  "worker": "w3",
+  "question": "An order in today's list has no items at all, or only Rs 0 items (e.g. a free gift, Rs 0 shipping). Should it count as an order in the count and pull the average down?",
+  "asked": 1793535139,
+  "later": true
+ },
+ {
+  "id": "1793535141446-w1",
+  "worker": "w1",
+  "question": "A customer asks for a refund 31 days after delivery (30 days after is still ok in my build): what is the last day a refund is allowed?",
+  "asked": 1793535141,
+  "later": true
+ },
+ {
+  "id": "1793535141555-w1",
+  "worker": "w1",
+  "question": "A customer returns a final-sale item worth 500 rupees that arrived damaged: do they get a refund?",
+  "asked": 1793535141,
+  "later": true
+ },
+ {
+  "id": "1793535144160-w2",
+  "worker": "w2",
+  "question": "A customer orders Rs 1,250 of items and pays Rs 50 shipping. How many points do they earn, and how many rupees make one point (I assumed 1 point per full Rs 100 of items, so 12)?",
+  "asked": 1793535144,
+  "later": true
+ },
+ {
+  "id": "1793535144252-w2",
+  "worker": "w2",
+  "question": "A customer's order is Rs 1,000 of items with a 10% discount code, so they pay Rs 900 for items. Do points count the Rs 1,000 or the Rs 900 (I assumed Rs 900, so 9 points)?",
+  "asked": 1793535144,
+  "later": true
+ },
+ {
+  "id": "1793535144339-w2",
+  "worker": "w2",
+  "question": "A customer pays an order entirely with store credit. Do they still earn points (I assumed yes)?",
+  "asked": 1793535144,
+  "later": true
+ },
+ {
+  "id": "1793535144421-w2",
+  "worker": "w2",
+  "question": "A customer later refunds an order that earned 12 points. Do those points get taken back (I did not build this)?",
+  "asked": 1793535144,
+  "later": true
+ },
+ {
+  "id": "1793535152280-w1",
+  "worker": "w1",
+  "question": "A customer paid Rs 650 (Rs 600 items, Rs 50 shipping) and says they changed their mind 10 days after delivery. What do they get back? A) Rs 600, shipping not refunded B) Rs 650, everything C) something else (please say)",
+  "asked": 1793535152,
+  "later": true
+ },
+ {
+  "id": "1793535152363-w1",
+  "worker": "w1",
+  "question": "A customer wants a refund 31 days after delivery. What is the last day a refund is allowed? A) 30 days B) 14 days C) 7 days D) something else (please say)",
+  "asked": 1793535152,
+  "later": true
+ },
+ {
+  "id": "1793535152462-w1",
+  "worker": "w1",
+  "question": "A customer returns a final-sale item of Rs 500 that arrived damaged. A) refund in full B) no refund, final sale is final C) something else",
+  "asked": 1793535152,
+  "later": true
+ },
+ {
+  "id": "1793535152552-w1",
+  "worker": "w1",
+  "question": "A customer paid by card but changed their mind. Where does the money go? A) back to the card B) store credit C) something else",
+  "asked": 1793535152,
+  "later": true
+ }
+]

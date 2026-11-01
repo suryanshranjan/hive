@@ -1,0 +1,135 @@
+[
+ {
+  "id": "1793534904261-w3",
+  "worker": "w3",
+  "question": "A customer paid with store credit and wants a refund of Rs 500. Does it go back as store credit (I assumed yes), and do card orders ever get store credit instead, e.g. late changed-mind returns?",
+  "asked": 1793534904,
+  "later": true
+ },
+ {
+  "id": "1793534904509-w3",
+  "worker": "w3",
+  "question": "The delivery-day count is -2 (not delivered yet) or blank. Do we refund (I assumed negative counts as day 0, and blank/missing gives Rs 0)?",
+  "asked": 1793534904,
+  "later": true
+ },
+ {
+  "id": "1793534904594-w3",
+  "worker": "w3",
+  "question": "An order has Rs 0 total or no items and someone asks for a refund. Do we return Rs 0 with the original method (I assumed yes)?",
+  "asked": 1793534904,
+  "later": true
+ },
+ {
+  "id": "1793534904675-w3",
+  "worker": "w3",
+  "question": "A customer spends Rs 1,250 on an order (Rs 1,000 items after discount + Rs 250 shipping). How many loyalty points do they earn per rupee (I assumed 1 point per Rs 10 spent on items, after discount, excluding shipping)?",
+  "asked": 1793534904,
+  "later": true
+ },
+ {
+  "id": "1793534904762-w3",
+  "worker": "w3",
+  "question": "Rs 1,259 of items earns how many points: do we round down to 125 or to nearest (I assumed round down, whole points only)?",
+  "asked": 1793534904,
+  "later": true
+ },
+ {
+  "id": "1793534904850-w3",
+  "worker": "w3",
+  "question": "Is there a minimum spend before points are earned, or bonus tiers (e.g. double points above Rs 5,000)? I assumed no minimum and no tiers.",
+  "asked": 1793534904,
+  "later": true
+ },
+ {
+  "id": "1793534904937-w3",
+  "worker": "w3",
+  "question": "A customer pays an order with store credit worth Rs 2,000. Do they still earn points (I assumed yes, same as card)?",
+  "asked": 1793534904,
+  "later": true
+ },
+ {
+  "id": "1793534905020-w3",
+  "worker": "w3",
+  "question": "An order was fully refunded or is empty or has a negative total. Points earned (I assumed 0, never negative)?",
+  "asked": 1793534905,
+  "later": true
+ },
+ {
+  "id": "1793534905115-w3",
+  "worker": "w3",
+  "question": "Daily sales summary: is revenue the sum of order totals including shipping and after discounts (I assumed yes), and are refunded/cancelled orders left out?",
+  "asked": 1793534905,
+  "later": true
+ },
+ {
+  "id": "1793534905203-w3",
+  "worker": "w3",
+  "question": "Summary average for 3 orders totalling Rs 1,000: that's Rs 333.33. Round down, up, or nearest rupee (I assumed nearest, halves up)?",
+  "asked": 1793534905,
+  "later": true
+ },
+ {
+  "id": "1793534905287-w3",
+  "worker": "w3",
+  "question": "On a day with no orders, should the summary show orders 0, revenue 0, average 0 (I assumed yes, average 0 rather than blank)?",
+  "asked": 1793534905,
+  "later": true
+ },
+ {
+  "id": "1793534916487-w3",
+  "worker": "w3",
+  "question": "A customer paid Rs 1,000 by card and returns the order 10 days after delivery because they changed their mind. What is the last day after delivery a change-of-mind return is accepted? A) 30 days (my guess) B) 7 days C) something else (please say)",
+  "asked": 1793534916,
+  "later": true
+ },
+ {
+  "id": "1793534916572-w3",
+  "worker": "w3",
+  "question": "An order has Rs 1,000 of items plus Rs 100 shipping and is returned on day 5 because the customer changed their mind. What do they get back? A) Rs 1,000, items only (my guess) B) Rs 1,100, shipping too",
+  "asked": 1793534916,
+  "later": true
+ },
+ {
+  "id": "1793534916658-w3",
+  "worker": "w3",
+  "question": "A customer says an item arrived damaged, 45 days after delivery. A) Refund in full including shipping, up to 90 days (my guess) B) Refund items only C) No refund after 30 days",
+  "asked": 1793534916,
+  "later": true
+ },
+ {
+  "id": "1793534916751-w3",
+  "worker": "w3",
+  "question": "An order of Rs 800 marked as final sale is returned on day 3 because the customer changed their mind. A) Refund Rs 0 (my guess); if it arrived damaged it is still refunded in full B) Refund Rs 0 even if damaged C) Refund anyway",
+  "asked": 1793534916,
+  "later": true
+ },
+ {
+  "id": "1793534916873-w3",
+  "worker": "w3",
+  "question": "A customer's refund works out to Rs 333.50, for example after a 5% discount code on odd prices. A) Round down to Rs 333 (my guess) B) Round up to Rs 334 C) Nearest rupee",
+  "asked": 1793534916,
+  "later": true
+ },
+ {
+  "id": "1793534920861-w3",
+  "worker": "w3",
+  "question": "A customer returns an order and writes their reason in capital letters with a trailing space, or leaves it blank, or writes something else like wrong colour. A) Ignore capitals and spaces when spotting damaged, and treat blank or any other reason as change of mind (my guess) B) Blank reason gets no refund C) something else (please say)",
+  "asked": 1793534920,
+  "later": true
+ },
+ {
+  "id": "1793534920959-w3",
+  "worker": "w3",
+  "question": "An order is not delivered yet, so the customer is at minus 2 days since delivery, or the days are left blank, and they ask for a refund. A) Treat minus 2 as day 0 and refund; blank gets Rs 0 (my guess) B) Refund Rs 0 for both C) something else (please say)",
+  "asked": 1793534920,
+  "later": true
+ },
+ {
+  "id": "1793534921048-w3",
+  "worker": "w3",
+  "question": "A customer who paid with store credit asks for a refund of Rs 500. A) It goes back as store credit; card payments go back to the card (my guess) B) Everything returns to the card or as store credit regardless of how it was paid C) something else",
+  "asked": 1793534921,
+  "later": true
+ }
+]

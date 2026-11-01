@@ -45,7 +45,7 @@ check "the last builder owns the owner's decisions and asks him; the others buil
 $PY -c "from hive import swarm; swarm.prepare('$TW/project', '$TW/runsolo', 2, 'Implement creator fees.', 40, None, 30)"
 check "with 2 builders nobody is split" "$(grep -c 'Your role' $T/runsolo/prompts/w1.md $T/runsolo/prompts/w2.md | grep -c ':0')" 2
 cd $T/project && $PY -c "from hive import swarm; swarm.prepare('$TW/project', '$TW/runnight', 3, 'Implement creator fees.', 40, None, 'later')"
-check "overnight: no split unless HIVE_SPLIT_OVERNIGHT=1 (Gate 77, under test)" "$(grep -c 'Your role' $T/runnight/prompts/w3.md)" 0
+check "overnight: no split unless HIVE_SPLIT_OVERNIGHT=1 (Gate 77: no gain, off)" "$(grep -c 'Your role' $T/runnight/prompts/w3.md)" 0
 cd $T/project && HIVE_SPLIT_OVERNIGHT=1 $PY -c "from hive import swarm; swarm.prepare('$TW/project', '$TW/runnight2', 3, 'Implement creator fees.', 40, None, 'later')"
 check "overnight split: w3 records systematically, w1 records nothing" \
   "$(grep -c 'record his questions systematically' $T/runnight2/prompts/w3.md) $(grep -c 'Do not record questions yourself' $T/runnight2/prompts/w1.md) $(grep -c 'hive ask' $T/runnight2/prompts/w1.md)" "1 1 0"

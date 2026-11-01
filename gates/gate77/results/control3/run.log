@@ -1,0 +1,136 @@
+[17:49:55] predictions registered on origin/main: gates/gate77/prompts/PREDICTIONS.md
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: pytest. 2 tests, all passing.
+
+I'll put 3 builders on it (the job has 3 parts that can be built at the same time): about 1.9× the speed of one builder, for about 1.8× the cost. They work on copies, so your branches stay exactly as they are.
+You're away, so they won't ask you anything: they'll decide, and write down every business assumption for you to check when you're back.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+
+[17:49] Starting.
+  [17:50] Builder w1 picked up: w1.
+  [17:50] Builder w1 landed: Add refunds, loyalty, report
+  [17:50] Builder w1 landed: refunds (7d change of mind, 30d damaged, final sale 0), points 1 per Rs100 items after...
+  [17:50] Builder w1 landed: hive: leave build output and dependencies out of the shared branch
+
+[17:50] All 3 builders are done.
+
+Let me check the result.
+  6 tests, all passing. All 2 that passed before still pass.
+
+Done in 1 minute, about $0.29. Your result is on branch hive/add-three-things-to-1101-1749.
+  See what changed:  git diff main...hive/add-three-things-to-1101-1749
+  Take it:           git merge hive/add-three-things-to-1101-1749
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/add-three-things-to-1101-1749.)
+
+They wrote down 5 questions only you can answer. When you're back, type `hive morning`: answer them, and I'll change the build to your answers and update the branch.
+
+--- the next morning: the owner types hive morning ---
+
+Welcome back. While you were away, the builders worked on: Add three things to the shop. (1) Refunds: `refund(order, days_since_delivery, reason)` in `shop/refunds.py`, returning 
+They wrote down 5 questions only you can answer. Pick a letter, or answer in your own words, and press Enter.
+
+========================================================================
+ Question 1  -  from builder w1  -  asked 0:24 ago
+========================================================================
+
+  A customer paid Rs 720 for items plus Rs 50 shipping and returns the
+  order 8 days after delivery because they changed their mind. How
+  many days is the return window for a change of mind (I assumed 7),
+  and do they get anything after it?
+
+  Your answer (a letter, or say it in your own words) >   > The window is 14 days, not 7, with day 14 included. So this customer, at 8 days, gets the full Rs 720 for the items back, with no shipping. From day 15 to day 30 they'd get half, and after day 30 nothing.
+  Thanks, sent to builder w1. (1 answered so far)
+
+========================================================================
+ Question 2  -  from builder w1  -  asked 0:28 ago
+========================================================================
+
+  A customer returns a damaged Rs 770 order (Rs 50 of it shipping) 40
+  days after delivery. How long after delivery can damaged goods be
+  refunded (I assumed 30 days), and is shipping refunded?
+
+  Your answer (a letter, or say it in your own words) >   > Damaged goods get a full refund up to 90 days after delivery, not 30, so at 40 days this customer gets everything back. Shipping is refunded too for damaged goods, so the full Rs 770 goes back, the same way it was paid.
+  Thanks, sent to builder w1. (2 answered so far)
+
+========================================================================
+ Question 3  -  from builder w1  -  asked 0:32 ago
+========================================================================
+
+  A customer with an order of Rs 799 in items, after discount, earns
+  how many loyalty points? I assumed 1 point per full Rs 100 (so 7),
+  ignoring shipping, rounding down. Is that right?
+
+  Your answer (a letter, or say it in your own words) >   > Not quite. It's 1 point per full Rs 100 of items after the discount code, rounded down, so Rs 799 gives 7 points. But only if the items come to at least Rs 500 and the order was paid by card; store credit orders earn nothing. Final-sale orders earn double, and shipping never earns points.
+  Thanks, sent to builder w1. (3 answered so far)
+
+========================================================================
+ Question 4  -  from builder w1  -  asked 0:36 ago
+========================================================================
+
+  A customer who changed their mind returns an order that was paid
+  with store credit: should the refund go back as store credit (I
+  assumed it returns to the original payment method) or could it be
+  card?
+
+  Your answer (a letter, or say it in your own words) >   > Store credit orders go back as store credit, never to the card. Card orders go back to the card. It's always the way it was paid.
+  Thanks, sent to builder w1. (4 answered so far)
+
+========================================================================
+ Question 5  -  from builder w1  -  asked 0:39 ago
+========================================================================
+
+  On a day with 3 orders totalling Rs 1,000, the average is Rs 333.33.
+  Should the average be rounded to nearest (I assumed, 333) or down?
+  Also should shipping count in revenue (I assumed yes)?
+
+  Your answer (a letter, or say it in your own words) >   > Round down, not to the nearest, so 3 orders totalling Rs 1,000 gives Rs 333. And revenue only counts card orders: the totals (items after discount, plus shipping) of card orders only, since store-credit orders bring in no new money. The average is revenue divided by the number of card orders, rounded down, or 0 if there are no card orders. The "Orders" count includes every order, store-credit ones too.
+  Thanks, sent to builder w1. (5 answered so far)
+
+[17:51] Sending the builders back to build your 5 answers in.
+  [17:51] Builder w1 picked up: all.
+  [17:51] Builder w1 landed: Follow owner answers
+  [17:51] Builder w1 landed: Applied owner answers; edited existing test test_refund_changed_mind (8 days now...
+  [17:51] Builder w1 landed: hive: leave build output and dependencies out of the shared branch
+[17:51] Your answers are built in.
+
+Let me check the result.
+  9 tests, all passing. All 2 that passed before still pass.
+  I've noted 5 new rulings of yours for the next build on this project.
+
+Done in under a minute, about $0.73 in all (builders $0.53, Hive's own questions and checks $0.20). Your result is on branch hive/add-three-things-to-1101-1749.
+  See what changed:  git diff main...hive/add-three-things-to-1101-1749
+  Take it:           git merge hive/add-three-things-to-1101-1749
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/add-three-things-to-1101-1749.)
+
+Your answers are built in. 9 tests, all passing. All 2 that passed before still pass. It's ready on branch hive/add-three-things-to-1101-1749.
+{
+ "mode": "overnight",
+ "arm": "control",
+ "k": "3",
+ "rc": 0,
+ "error": null,
+ "minutes": 1.7,
+ "branches": [
+  "hive/add-three-things-to-1101-1749"
+ ],
+ "before": {},
+ "night": {
+  "passed": 16,
+  "failed": 11,
+  "errors": 0,
+  "line": "11 failed, 16 passed in 0.10s"
+ },
+ "after": {
+  "passed": 25,
+  "failed": 2,
+  "errors": 0,
+  "line": "2 failed, 25 passed in 0.05s"
+ },
+ "owner_replies": 5,
+ "owner_cost": 0.29,
+ "build_cost": 0.53
+}

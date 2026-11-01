@@ -1,0 +1,16 @@
+{'arm': 'control', 'k': '1', 'rc': 0, 'error': False, 'minutes': 3.4, 'night': 15, 'after': 26, 'questions': 16, 'askers': ['w1', 'w2', 'w3'], 'builders': 3, 'split': False, 'last': 'w3', 'fixed': True, 'build_cost': 0.87, 'owner_cost': 1.0}
+{'arm': 'control', 'k': '2', 'rc': 0, 'error': False, 'minutes': 4.5, 'night': 11, 'after': 24, 'questions': 15, 'askers': ['w1', 'w2', 'w3'], 'builders': 3, 'split': False, 'last': 'w3', 'fixed': True, 'build_cost': 0.93, 'owner_cost': 0.86}
+{'arm': 'control', 'k': '3', 'rc': 0, 'error': False, 'minutes': 1.7, 'night': 16, 'after': 25, 'questions': 5, 'askers': ['w1'], 'builders': 3, 'split': False, 'last': 'w3', 'fixed': True, 'build_cost': 0.53, 'owner_cost': 0.29}
+{'arm': 'split', 'k': '1', 'rc': 0, 'error': False, 'minutes': 4.0, 'night': 11, 'after': 26, 'questions': 19, 'askers': ['w3'], 'builders': 3, 'split': True, 'last': 'w3', 'fixed': True, 'build_cost': 0.92, 'owner_cost': 1.07}
+{'arm': 'split', 'k': '2', 'rc': 0, 'error': False, 'minutes': 3.4, 'night': 11, 'after': 26, 'questions': 17, 'askers': ['w3'], 'builders': 3, 'split': True, 'last': 'w3', 'fixed': True, 'build_cost': 0.83, 'owner_cost': 0.94}
+{'arm': 'split', 'k': '3', 'rc': 0, 'error': False, 'minutes': 2.4, 'night': 15, 'after': 25, 'questions': 10, 'askers': ['w3'], 'builders': 3, 'split': True, 'last': 'w3', 'fixed': True, 'build_cost': 0.7, 'owner_cost': 0.61}
+
+control: night 14.0, after 25.00/27, questions 12.0, 3.2 min, builders $0.78
+split:   night 12.3, after 25.67/27, questions 15.3, 3.3 min, builders $0.82
+
+predictions
+N1 split after 25.67 >= control 25.00 + 2 -> failed
+N2 split engaged, only the business builder recorded -> held
+N3 split questions 15.3 <= 1.5 x control 12.0 -> held
+N4 no crash, morning fix ran, six flights -> held
+Claim N1 and N3 -> failed

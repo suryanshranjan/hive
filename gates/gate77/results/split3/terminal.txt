@@ -1,0 +1,164 @@
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: pytest. 2 tests, all passing.
+
+I'll put 3 builders on it (the job has 3 parts that can be built at the same time): about 1.9× the speed of one builder, for about 1.8× the cost. They work on copies, so your branches stay exactly as they are.
+You're away, so they won't ask you anything: they'll decide, and write down every business assumption for you to check when you're back.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+
+[17:51] Starting.
+  [17:51] Builder w3 picked up: biz.
+  [17:51] Builder w2 picked up: machinery.
+  [17:51] Builder w2 landed: Order helpers: net_items_total, units, paid_total
+  [17:51] Builder w2 landed: Added Order.net_items_total, units, paid_total helpers; no business decisions made...
+  [17:51] Builder w2 landed: hive: leave build output and dependencies out of the shared branch
+  [17:51] Builder w1 picked up: machinery.
+  [17:51] Builder w1 landed: Machinery: money helpers and skeletons
+  [17:51] Builder w1 landed: money.py helpers; skeleton refund/points_earned/sales_summary with PLACEHOLDER(policy)...
+  [17:51] Builder w1 landed: hive: leave build output and dependencies out of the shared branch
+  [17:52] Builder w3 landed: Refunds, loyalty, report with tests
+  [17:52] Builder w3 landed: refunds 30d window, damaged incl shipping, points 1/100, summary half-up (lock biz...
+
+[17:52] All 3 builders are done.
+
+Let me check the result.
+  14 tests, all passing. All 2 that passed before still pass.
+
+Done in 1 minute, about $0.31. Your result is on branch hive/add-three-things-to-1101-1751.
+  See what changed:  git diff main...hive/add-three-things-to-1101-1751
+  Take it:           git merge hive/add-three-things-to-1101-1751
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/add-three-things-to-1101-1751.)
+
+They wrote down 10 questions only you can answer. When you're back, type `hive morning`: answer them, and I'll change the build to your answers and update the branch.
+
+--- the next morning: the owner types hive morning ---
+
+Welcome back. While you were away, the builders worked on: Add three things to the shop. (1) Refunds: `refund(order, days_since_delivery, reason)` in `shop/refunds.py`, returning 
+They wrote down 10 questions only you can answer. Pick a letter, or answer in your own words, and press Enter.
+
+========================================================================
+ Question 1  -  from builder w3  -  asked 0:44 ago
+========================================================================
+
+  A customer returns an order 31 days after delivery because they
+  changed their mind. Is the 30-day return window right, and is day 30
+  still allowed?
+
+  Your answer (a letter, or say it in your own words) >   > Yes, 30 days is right, and day 30 is still allowed. Days 1 to 14 get the full refund, days 15 to 30 get half, and after day 30 nothing, except damaged goods, which get a full refund up to 90 days.
+  Thanks, sent to builder w3. (1 answered so far)
+
+========================================================================
+ Question 2  -  from builder w3  -  asked 0:48 ago
+========================================================================
+
+  A customer returns an item that arrived damaged 45 days after
+  delivery. Do we still refund it, or does the window apply to damaged
+  items too?
+
+  Your answer (a letter, or say it in your own words) >   > Damaged goods are always refunded in full, including the shipping fee, up to 90 days after delivery. So 45 days is fine. After 90 days, nothing.
+  Thanks, sent to builder w3. (2 answered so far)
+
+========================================================================
+ Question 3  -  from builder w3  -  asked 0:52 ago
+========================================================================
+
+  An order has items Rs 1,250, Rs 100 shipping and a 10% code, and the
+  customer changed their mind. We refund Rs 1,125 (no shipping). Is
+  that right, or should shipping come back too?
+
+  Your answer (a letter, or say it in your own words) >   > Yes, Rs 1,125 is right, and shipping does not come back. That's assuming it's within 14 days of delivery. From day 15 to 30 it would be half, so Rs 562. Shipping is only refunded for damaged goods.
+  Thanks, sent to builder w3. (3 answered so far)
+
+========================================================================
+ Question 4  -  from builder w3  -  asked 0:56 ago
+========================================================================
+
+  A damaged order of Rs 1,250 items plus Rs 100 shipping with a 10%
+  code: we refund Rs 1,225 including shipping. Right?
+
+  Your answer (a letter, or say it in your own words) >   > Yes, Rs 1,225 is right: items after the 10% code are Rs 1,125, plus Rs 100 shipping, because damaged goods get shipping back too.
+  Thanks, sent to builder w3. (4 answered so far)
+
+========================================================================
+ Question 5  -  from builder w3  -  asked 0:59 ago
+========================================================================
+
+  A customer paid with store credit and asks for a refund. We return
+  store credit; should a card customer who changed mind after 20 days
+  get store credit instead of card?
+
+  Your answer (a letter, or say it in your own words) >   > No. Card orders go back to the card, and store credit orders go back as store credit. A card customer who changed their mind after 20 days gets half, back on the card.
+  Thanks, sent to builder w3. (5 answered so far)
+
+========================================================================
+ Question 6  -  from builder w3  -  asked 1:03 ago
+========================================================================
+
+  A final-sale order arrives damaged. We refund Rs 0 today. Should
+  damaged final-sale items be refunded?
+
+  Your answer (a letter, or say it in your own words) >   > Yes, refund it. Final-sale orders get no refund unless the goods arrived damaged, so a damaged final-sale order gets the full refund, including shipping, up to 90 days after delivery.
+  Thanks, sent to builder w3. (6 answered so far)
+
+========================================================================
+ Question 7  -  from builder w3  -  asked 1:06 ago
+========================================================================
+
+  A customer earns loyalty points on an order of Rs 1,250 items with
+  Rs 500 shipping. We give 12 points (1 per full Rs 100 on items after
+  discount, shipping excluded). Right? Different rate or rounding?
+
+  Your answer (a letter, or say it in your own words) >   > Rs 1,250 items with Rs 500 shipping gives 12 points, and that's right. It's one point per full Rs 100 on the items after the discount code, and shipping earns nothing. That's if the customer paid by card and the order isn't final sale. Store credit orders earn no points, and neither do orders where the items come to under Rs 500. Final-sale orders earn double.
+  Thanks, sent to builder w3. (7 answered so far)
+
+========================================================================
+ Question 8  -  from builder w3  -  asked 1:08 ago
+========================================================================
+
+  An order's average in the daily summary comes to Rs 100.50 across
+  two orders. We round to Rs 101 (half up). Is that right?
+
+  Your answer (a letter, or say it in your own words) >   > No, round down. Rs 100.50 becomes Rs 100. The average is revenue divided by the number of card orders, rounded down to whole rupees, and it's 0 if there are no card orders.
+  Thanks, sent to builder w3. (8 answered so far)
+
+========================================================================
+ Question 9  -  from builder w3  -  asked 1:12 ago
+========================================================================
+
+  A refunded or cancelled order is in the day's list: should it count
+  in the daily orders and revenue?
+
+  Your answer (a letter, or say it in your own words) >   > No. "Orders" counts every order in the list, including store-credit ones. "Revenue" is only the card orders' totals (items after discount, plus shipping), and store-credit orders bring in no new money. My policy says nothing about excluding refunded or cancelled orders, so don't treat them differently.
+  Thanks, sent to builder w3. (9 answered so far)
+
+========================================================================
+ Question 10  -  from builder w3  -  asked 1:15 ago
+========================================================================
+
+  A customer pays an order partly in store credit and partly by card?
+  Not supported today; ignore. Instead: a refund request with a blank
+  reason, e.g. nothing typed, is treated like changed mind. OK?
+
+  Your answer (a letter, or say it in your own words) >   > Yes, a blank reason can be treated like changed mind. My policy doesn't cover part-card, part-store-credit payments, so ignore that for now.
+  Thanks, sent to builder w3. (10 answered so far)
+
+[17:53] Sending the builders back to build your 10 answers in.
+  [17:53] Builder w1 picked up: all.
+  [17:53] Builder w1 landed: Apply owner answers to refunds, loyalty, report
+  [17:53] Builder w1 landed: Implemented owner answers. Edited existing tests in test_business.py: day-30...
+  [17:53] Builder w1 landed: hive: leave build output and dependencies out of the shared branch
+[17:53] Your answers are built in.
+
+Let me check the result.
+  19 tests, all passing. All 2 that passed before still pass.
+  I've noted 10 new rulings of yours for the next build on this project.
+
+Done in under a minute, about $1.15 in all (builders $0.70, Hive's own questions and checks $0.46). Your result is on branch hive/add-three-things-to-1101-1751.
+  See what changed:  git diff main...hive/add-three-things-to-1101-1751
+  Take it:           git merge hive/add-three-things-to-1101-1751
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/add-three-things-to-1101-1751.)
+
+Your answers are built in. 19 tests, all passing. All 2 that passed before still pass. It's ready on branch hive/add-three-things-to-1101-1751.

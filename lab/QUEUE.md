@@ -2,7 +2,7 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 1 2026 IST, after Gate 76)
+## Where we left off (Nov 1 2026 IST, after Gate 77)
 
 - **Gate 66 done (the user, travelling: "test something that makes Hive the best tool"):** one Claude Code agent that asks the owner beat Hive's hand-over by 21-30 hidden points (CQ 93.0, CC 84.6, HV 63.4, N0 34.8%) at 1/13 of his reading. Wind tunnel, synthetic owner who answers from his policy.
 - **Gate 67 done:** the hand-over's memory does not compound (neither rule fired).
@@ -15,7 +15,8 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 - **Gate 74 done (shipped the split):** 6 engine builders plus 1 business builder: business rules 97.8 vs one agent's 95.2%, engineering 95% in 4.9 min; to all visible tests no sooner (1.05×; by wall 0.81×). Hive now gives the owner's decisions to one builder when he is there and there are 3+ builders.
 - **Gate 75 done (claim fired):** on an engineering-heavy job the split swarm reached one agent's accuracy (90.0 vs 86.5%) in 0.45× the time (12.1 vs 27.1 min), at 1.95× the cost.
 - **Gate 76 done:** the shipped flow flies: live 27/27 (split engaged, review skipped), overnight 22/27 after `hive morning`.
-- **Next:** split the night builders too (one records the owner's questions systematically; overnight scored 22/27 against 27/27 live); the split on a real codebase (where 'business parts' are a judgement); with the founder, Gate 45 day 2 with builders asking him live (his pace and whether his answers hold).
+- **Gate 77 done (claim did not fire):** splitting the night builders scored 25.7 vs 25.0 of 27 after the morning (3 flights each), with 1.28× the morning questions. Not shipped (`HIVE_SPLIT_OVERNIGHT`, off). Gate 76's overnight 22 was a low draw.
+- **Next:** the split on a real codebase (where 'business parts' are a judgement); low priority, a short interview before an overnight build (at most ~2 of 27 to gain); the split on a real codebase (where 'business parts' are a judgement); with the founder, Gate 45 day 2 with builders asking him live (his pace and whether his answers hold).
 - **Earlier plan, superseded by Gate 73:** Gate 72 again with the repeated-question fix (does the swarm then match one agent's business correctness and keep its speed?). **With the founder:** Gate 45 day 2, builders asking him live; measure his answer time and whether his answers hold.
 - **For Gate 45 day 2 with the founder:** test builders asking him live (his answers drift; does asking still win?).
 
