@@ -38,4 +38,10 @@ check "the cost of the stopped attempt is kept" "$(grep '^w1,' $T/run2/agents.cs
 # an expired login: it says to log in again, keeps trying, and carries on once it works
 FAKE_STOP=auth HIVE_RESUME_MIN=1 HIVE_LOGIN_WAIT=1 HIVE_WORKER_CMD="sh $HIVE/tests/fake_limited_worker.sh" $PY -m hive run   --repo $T/project --run $T/run3 --workers 2 --goal "Implement creator fees and payouts." > $T/run3.out 2>&1
 check "an expired login is not the end: it says so, then carries on"   "$? $(grep -c "login has expired. Run claude and log in again" $T/run3.out) $(git -C $T/run3/up.git log --format=%s main | grep -c '^implement ')" "0 1 2"
+# Gate 74: with the owner there and 3 or more builders, one builder owns his decisions; the others build the rest
+cd $T/project && $PY -c "from hive import swarm; swarm.prepare('$TW/project', '$TW/runsplit', 3, 'Implement creator fees.', 40, None, 30)"
+check "the last builder owns the owner's decisions and asks him; the others build the rest and do not ask" \
+  "$(grep -c 'Your role: the business builder' $T/runsplit/prompts/w3.md) $(grep -c 'Your role: build the rest' $T/runsplit/prompts/w1.md) $(grep -c 'hive ask' $T/runsplit/prompts/w1.md)" "1 1 0"
+$PY -c "from hive import swarm; swarm.prepare('$TW/project', '$TW/runsolo', 2, 'Implement creator fees.', 40, None, 30)"
+check "with 2 builders nobody is split" "$(grep -c 'Your role' $T/runsolo/prompts/w1.md $T/runsolo/prompts/w2.md | grep -c ':0')" 2
 rm -rf $T; exit $fail
