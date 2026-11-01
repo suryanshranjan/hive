@@ -145,11 +145,32 @@ BUILDER_ROLE = ("\n## Your role: build the rest\nOne teammate, `{biz}`, owns eve
                 "those parts: build everything else, the machinery they stand on first, so `{biz}` can land on it. If "
                 "something you build needs one of his decisions, leave a clear placeholder and let `{biz}` fill it.\n")
 
+BUSINESS_ROLE_LATER = ("\n## Your role: the business builder\nYou alone own the parts of the goal that turn on the owner's "
+                       "business decisions (who pays what, cut-offs, tiers, rounding, labels, what happens with blank, "
+                       "missing, negative or odd information); your teammates build everything else and leave those parts "
+                       "to you. The owner is away until the morning, so **record his questions systematically**, part by "
+                       "part, before you build each one: (1) the rule itself, (2) rounding and the exact form of the result, "
+                       "(3) boundaries and cut-offs, and (4) what happens with blank, missing, negative, zero or oddly "
+                       "formatted information. Then build your best guess for each and encode it as a test, so his morning "
+                       "answer is a small change.\n")
+BUILDER_ROLE_LATER = ("\n## Your role: build the rest\nOne teammate, `{biz}`, owns every part of the goal that turns on the "
+                      "owner's business decisions (who pays what, cut-offs, tiers, rounding, labels, what happens with "
+                      "missing or odd information) and records the owner's questions about them for the morning. Do not "
+                      "record questions yourself, and do not claim or change those parts: build everything else, the "
+                      "machinery they stand on first, so `{biz}` can land on it. If something you build needs one of his "
+                      "decisions, leave a clear placeholder and let `{biz}` fill it.\n")
+
+def split_overnight():
+    """Gate 77 (under test): split the night builders too. Off unless HIVE_SPLIT_OVERNIGHT=1."""
+    return os.environ.get('HIVE_SPLIT_OVERNIGHT') == '1'
+
 def split_roles(workers, questions):
     """Gate 74: with the owner there to answer and 3 or more builders, the last builder owns his decisions and asks him
     systematically; the others build the rest. (Gates 72-73: with his decisions spread over the team, its business rules
     were 3-7 points less right than one agent's; split, 97.8 vs 95.2%, with the engineering as fast as before.)"""
-    return workers >= SPLIT_FROM and questions not in (0, None, 'later')
+    if questions == 'later':
+        return workers >= SPLIT_FROM and split_overnight()
+    return workers >= SPLIT_FROM and questions not in (0, None)
 
 def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None, assumptions=False):
     """Create <run>/up.git, one clone per worker in <run>/work, and one prompt per worker in <run>/prompts."""
@@ -186,7 +207,8 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
                 .replace('{MINUTES}', str(minutes)).replace('{NOTES}', notes_text))
         if split:   # Gate 74: one builder owns the owner's decisions, the rest build everything else
             biz = f'w{workers}'
-            text = text.replace(owner_text, (BUSINESS_ROLE + owner_text) if me == biz else BUILDER_ROLE.format(biz=biz))
+            brole, rrole = (BUSINESS_ROLE_LATER, BUILDER_ROLE_LATER) if questions == 'later' else (BUSINESS_ROLE, BUILDER_ROLE)
+            text = text.replace(owner_text, (brole + owner_text) if me == biz else rrole.format(biz=biz))
         open(os.path.join(run, 'prompts', f'{me}.md'), 'w', encoding='utf-8').write(text.replace('python3 -m hive', f'{PY} -m hive'))
     json.dump(dict(repo=repo, branch=b, workers=workers, started=None), open(os.path.join(run, 'run.json'), 'w'), indent=1)
     return run
