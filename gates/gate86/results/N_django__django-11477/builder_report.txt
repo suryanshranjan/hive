@@ -1,0 +1,5 @@
+I landed the fix. `RegexPattern.match` in `django/urls/resolvers.py` now drops named groups that didn't take part in the match (value `None`). `translate_url` no longer passes `None` kwargs to `reverse`, so it returns the correct URL when an optional group is absent. I added an `optional` route to `tests/i18n/patterns/urls/default.py` and `test_translate_url_optional_named_group` to `tests/i18n/patterns/tests.py`. The check suite passed (154 tests), and `hive land` reported 120/120 passing.
+
+- **Least sure:** unnamed groups that don't match still show up as `None` in `args`. I didn't change that, because the issue is about named groups.
+- **Not tested separately:** `RoutePattern` (the `path()` matcher) is unchanged, and the optional-group test only covers `re_path`.
+- **Hive tools:** nothing went wrong with them. I claimed a single area, `core`, and left no lock behind.

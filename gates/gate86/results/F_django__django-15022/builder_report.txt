@@ -1,0 +1,6 @@
+I landed nothing, and the issue is not fixed. I held no lock, claimed no area and left no diff.
+
+- **The change I tried:** folding all search words into one `queryset.filter(Q(*term_queries))` call. It removes the per-word JOINs, and my test confirmed it (3 JOINs for a 5-word search).
+- **Why I dropped it:** it breaks the existing `test_multiple_search_fields` case `'Mary Jonathan Duo'`, which expects 1 result. That test requires each word to match a different related row, such as two different members of one group. One shared join can't do that, so the single `filter()` returns 0.
+- **What needs your decision:** the issue's fix and the existing test contradict each other. Allowing it means either editing that test or choosing a heavier design. A heavier design could be subqueries or `pk__in` for multi-valued lookups. I didn't try one, so I haven't confirmed it would keep that test passing.
+- **Hive tools:** nothing went wrong with them.

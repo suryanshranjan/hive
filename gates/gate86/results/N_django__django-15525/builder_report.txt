@@ -1,0 +1,6 @@
+Landed `loaddata`: `build_instance()` in `django/core/serializers/base.py` now sets `_state.db` on the temporary instance. That makes a foreign key read inside `natural_key()` query the target database, not `default`.
+
+- **Test:** `NaturalKeyNonDefaultDatabaseTests` loads a fixture into `other` twice, using new `NKAuthor` and `NKBook` models added to `fixtures_regress`. It errors with the fix stashed and passes with it.
+- **Checks:** `hive land` reported 19/19 tests passing. My own run of the check-your-work suite passed (58 tests, 1 skipped).
+- **Least sure:** I put the test in `fixtures_regress` with new models, rather than reusing `Book` and `Person`, so existing fixtures stay unchanged.
+- No questions, and no problems with the hive tools.

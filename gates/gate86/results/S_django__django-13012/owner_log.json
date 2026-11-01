@@ -1,0 +1,86 @@
+[
+ {
+  "prompt": "\n1 of 5. Priya builds a sales report that adds up each branch's sales and stamps every line with a fixed label figure, say 'Region 3'. Every branch gets the same figure, so it says nothing about the branch.\n  A) The fixed figure is just printed on every line. Branch totals come out exactly as they would without it.  B) The report is refused, with a message asking her to remove the fixed figure first.  C) The report runs, but the fixed figure appears only once at the top, not on every line.\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n2 of 5. A report adds a fixed Rs 50 handling charge to each order amount, then totals orders per branch. The Rs 50 is fixed, but the order amount differs for every order.\n  A) The charge is treated as part of the order amount. Totals are built from the real order amounts, as they are today.  B) Totals are built per branch only, and the Rs 50 is added once per branch, not once per order.  C) The report is flagged for a person to check, because fixed and changing figures are mixed.\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n4 of 5. A list of orders has a fixed figure, say 'Season 3', on every line. It has no totals. Staff sort the list, or filter it to 'Season 3 only'.\n  A) Nothing changes. The figure is shown, sorted and filtered exactly as before.  B) The figure is shown, but sorting and filtering by it are switched off, since it's the same everywhere.  C) Filtering stays, but staff see a warning when they sort by a figure that never changes.\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n5 of 5. Last year you saved 40 reports that total things up, some with fixed figures stamped on the lines and some without. They all run with the new fix in place.\n  A) All 40 give exactly the same results and layout as before. Only reports that used to fail now work.  B) Reports that gave odd results before now give corrected ones, and your staff are told which ones changed.  C) Old reports keep running the old way. Only newly built reports get the fix.\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": "8"
+ },
+ {
+  "prompt": "  Rule 8: Grouped reports: sorting a grouped report by a wrapped fixed value puts that bare number into the sort instruction, which the sort treats as a column position and not as the value 3.\n  What should it be? > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "1 of 10. Four staff (Ann 1000, Bob blank, Cy 2500, Di 1001) are totalled by a fixed label of 3 wrapped as a number: you get one single line, label 3, total salary 4,501, not one line per person.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "2 of 10. Salary totals by manager: Cy and Di, who have no manager, are listed as their own group (total 3,501) and Ann and Bob under manager M show 1,000.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "3 of 10. A report of firstnames with total salary above 1,000 leaves Ann out because her exactly-1,000 is not above the cut-off, while Di at 1,001 is included.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "4 of 10. A report filtered to an employee that doesn't exist and grouped by manager returns no lines at all, whereas the plain overall total for the same filter comes back blank rather than 0.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "5 of 10. Splitting salary into thirds by manager rounds each person down first: Cy 2,500 and Di 1,001 give 833 and 333, so the no-manager group shows 1,166 instead of 1,167, and Ann's 1,000 gives 333.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "6 of 10. Bob has no salary recorded: the overall total (4,501) skips him and the average comes to 1,500 across the 3 people with a salary, not across all 4.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Bob has no salary recorded, so the overall total of 4,501 skips him and the average is 1,500 across the 3 people with a salary, not all 4.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "7 of 10. Manager M's team has Ann at 1,000 and Bob with no salary: the report shows total 1,000, average 1,000 and a salary count of 1 against a headcount of 2, with no warning that Bob is missing.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Manager M's team, with Ann at 1,000 and Bob's salary unknown, shows total 1,000 and average 1,000, noting 'average of 1 of 2 people; Bob has no salary recorded'.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "8 of 10. Grouping staff by double their salary puts Bob in a group of his own with a blank value, listed as 1 person, next to Ann 2,000, Di 2,002 and Cy 5,000.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Grouping staff by double their salary puts Ann 2,000, Di 2,002 and Cy 5,000 in groups, while Bob, with no salary recorded, is not grouped and is listed separately as '1 person not grouped: Bob has no salary recorded'.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "9 of 10. Labelling staff by manager name with 'none' as the fallback gives Ann and Bob under 'M' (2 people) and Cy and Di under 'none' (2 people).\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "10 of 10. A wrapped label that is left empty (no value) still produces a report: the single line has a blank label and Bob's missing salary is ignored, giving a total of 4,501.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ }
+]

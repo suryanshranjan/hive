@@ -1,0 +1,6 @@
+I landed the fix in the `proxyonly` area. `hive land` reported 18/18 tests passing.
+
+- **Fix:** in `django/db/models/sql/query.py` (about line 751), the loop that walks related models now uses `cur_model._meta.concrete_model._meta`. This is the change the issue suggested.
+- **Test:** I added `ProxyRelatedOnlyTests` to `tests/proxy_models/tests.py`. It runs `Issue.objects.select_related("assignee").only("assignee__status")`, where `assignee` points at a proxy model. It errors without the fix and passes with it. The full `proxy_models.tests` run gave 30 tests, OK.
+- **Least sure about:** I only changed this one line. I did not check whether other places that walk relations have the same proxy problem.
+- **Questions and surprises:** none. The hive tools worked as described.

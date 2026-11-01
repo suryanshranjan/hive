@@ -1,0 +1,4 @@
+I landed one regression test, `test_suppressed_context_in_middle_of_chain`, in `tests/view_tests/tests/test_debug.py`. I changed no source code.
+- **Source already fixed:** `explicit_or_implicit_cause` in `django/views/debug.py` already checks `__suppress_context__`, and the existing `test_suppressed_context` passes. I couldn't find the bug the issue describes, so the new test is the only change. It covers a suppressed context in the middle of a chain, in both the text and HTML reports.
+- **Least sure:** I'm not sure whether the issue expects a change I didn't find. I only checked `django/views/debug.py` and its templates for other uses of `__context__`.
+- **Checks:** `view_tests.tests.test_debug` passes, and `hive land` reported 43/43 tests passing. I had no questions and ran into no problems with the hive tools.

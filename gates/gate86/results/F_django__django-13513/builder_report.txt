@@ -1,0 +1,6 @@
+I landed the `debugview` area on `main`. `hive land` reported 43/43 tests passing, and `view_tests.tests.test_debug` ran 89 tests OK before I landed.
+
+- **What was already there:** `explicit_or_implicit_cause` in the base code already honored `__suppress_context__`, so `raise ... from None` was already handled.
+- **The bug I found and fixed:** `get_traceback_frames` stopped early when a chained exception had `__traceback__ = None`. With `raise ValueError from RuntimeError('no tb')`, the report showed no frames at all. I restructured the frame loop so it moves on to the next exception in the chain. I added `test_innermost_exception_without_traceback`, and the existing `test_suppressed_context` still passes.
+- **Least sure about:** whether the issue meant this bug or only the `__suppress_context__` handling, which needed no change.
+- **Hive tools:** `hive claim` and `hive land` both refuse to run on a dirty tree, so I committed before claiming. No questions asked.

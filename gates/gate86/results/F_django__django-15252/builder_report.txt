@@ -1,0 +1,6 @@
+I landed the `recorder` area. `MigrationRecorder` now asks `router.allow_migrate` before touching `django_migrations`, and `hive land` passed 14/14 tests.
+
+- **Fix (`django/db/migrations/recorder.py`):** `ensure_schema`, `record_applied` and `record_unapplied` do nothing on a connection where the router forbids the table. `applied_migrations` returns `{}` there.
+- **Test:** I added `RecorderRouterTests` in `tests/migrations/test_executor.py`. It checks that nothing is created or recorded under a deny-all router, and that the table is created again once the router allows it. The 35 tests in `backends.base.test_creation` and `migrations.test_executor` pass.
+- **Least sure about:** `applied_migrations` returns `{}` on a forbidden connection even if the table already exists there, a case I didn't test. I passed `model_name` as a hint to `allow_migrate`.
+- **Questions and problems:** none, and the hive tools worked normally.

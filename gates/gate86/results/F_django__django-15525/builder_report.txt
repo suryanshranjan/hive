@@ -1,0 +1,6 @@
+I landed the fix in the `core` area. The 58 tests in the check command pass, and the new test fails without the fix.
+
+- **Fix:** in `django/core/serializers/base.py`, `build_instance` now sets `_state.db` to the target database before it calls `natural_key()`. The author lookup then goes to the right database instead of defaulting to `default`.
+- **Tests:** I added `NaturalKeyAuthor` and `NaturalKeyBook` models and a test, `NaturalKeyNonDefaultDatabaseTests`, in `tests/fixtures_regress`. The test loads the issue's data into the `other` database. I called `serializers.deserialize` directly rather than `loaddata`.
+- **Least sure:** the test saves each object while iterating over the deserializer, as `loaddata` does. Wrapping the deserializer in `list()` first still fails, since the author isn't saved yet when the book is built. I took that to be expected, not part of this issue.
+- **Questions and tool problems:** none.

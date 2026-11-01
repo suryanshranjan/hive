@@ -1,0 +1,6 @@
+Landed `search`. Admin search over multi-valued relations now matches each term in a `pk__in` subquery, so the outer query has no extra JOINs per term. Tests pass (68 run, 6 skipped).
+
+- **Least sure:** a single `filter()` for all terms would be the simpler fix. It broke the existing `test_multiple_search_fields` ("Mary Jonathan Duo" expects 1), and I couldn't edit that test. So I kept the per-term meaning with subqueries instead. A hidden test that expects the single-filter behaviour would fail against this.
+- **New test:** `test_multiple_search_terms_single_join` checks the outer query has no extra joins and that multi-term search still matches.
+- Subqueries replace the JOINs, so each term still runs its own subquery, which is cheaper than a JOIN per term but not free.
+- I asked no questions and the hive tools worked.

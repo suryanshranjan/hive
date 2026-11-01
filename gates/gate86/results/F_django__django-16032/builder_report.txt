@@ -1,0 +1,6 @@
+I landed the fix as area `fix`: `hive land` reported 77/77 tests passing. My own run of `annotations.tests`, `lookup`, `queries` and `expressions` also passed.
+
+- **Fix:** `In.get_prep_lookup` in `django/db/models/lookups.py` now clears the subquery's selected columns and selects only the pk. It does this when the subquery has no explicit `values()` and no `extra()` select. Previously annotate-then-alias left the default columns plus the annotation in the subquery, which caused "sub-select returns 10 columns".
+- **Tests:** I added the issue's test and a second annotate-only variant to `NonAggregateAnnotationTestCase` in `tests/annotations/tests.py`. I first put them in `AliasTests`, which doesn't have the fixture data they need, so I moved them.
+- **Least sure:** the condition `default_cols and not extra_select_mask`. It is broader than the alias case, so it also changes `annotate()`-only subqueries. Those were silently wrong before, comparing against the wrong column. I haven't checked `.extra(select=...)` subqueries.
+- **Not done:** no questions asked, and no problems with the hive tools.

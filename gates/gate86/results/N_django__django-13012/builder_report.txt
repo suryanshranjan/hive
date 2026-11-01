@@ -1,0 +1,6 @@
+I landed the `wrapper` area, which covers the whole fix. `hive land` reported 133/133 passing.
+
+- **Fix:** `ExpressionWrapper` now has a `get_group_by_cols` that delegates to the wrapped expression, in `django/db/models/expressions.py`. A wrapped constant therefore no longer ends up in GROUP BY.
+- **Test:** I added `test_group_by_excludes_wrapped_constant` in `tests/expressions/tests.py`.
+- **Least sure about:** the test only checks the SQL on SQLite, since the original error was a Postgres syntax error. It asserts that GROUP BY is absent and that the aggregate result is correct.
+- **Tool and process notes:** I made no questions and hit no problems with the hive tools. My first `hive claim` was refused because I hadn't committed my working tree yet. It worked once I had.

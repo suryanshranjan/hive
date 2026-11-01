@@ -1,0 +1,7 @@
+I landed the `real_apps` fix. `hive land` reported 44/44 tests passing.
+
+- **Change:** `ProjectState.__init__()` in `django/db/migrations/state.py` now asserts `real_apps` is a set when it isn't `None`. `None` still gives an empty set. The old code converted non-sets with `set()`.
+- **Test:** I added `test_real_apps_non_set` in `tests/migrations/test_state.py`. It checks that passing a list raises `AssertionError`. A direct run of `migrations.test_state` showed 65 tests OK.
+- **Callers:** I read the callers in `executor.py`, `loader.py` and `graph.py` and they pass `unmigrated_apps`, which is already a set. I didn't run the rest of the suite.
+- **Least sure:** I used a plain `assert`, as the issue suggests. A non-set argument is now an `AssertionError` instead of being converted.
+- **Hive tools:** `python3 -m hive areas` printed nothing. My first `claim` failed with "working tree not clean", so I committed and claimed again.

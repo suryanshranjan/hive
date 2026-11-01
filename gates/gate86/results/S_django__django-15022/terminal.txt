@@ -1,0 +1,133 @@
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: the command in your hive settings. 34 tests, all passing.
+
+One choice before I start, asked only once: 2 builders would finish about 1.6× sooner than one, for about 1.6× the cost. Should I build fast or cheap, from now on? (Enter = fast)
+  > 
+  Got it: fast, from now on. (`hive pace fast` or `hive pace cheap` changes it.)
+
+I'll put 2 builders on it (the job has 2 parts that can be built at the same time): about 1.6× the speed of one builder, for about 1.6× the cost. They work on copies, so your branches stay exactly as they are.
+If they need a decision only you can make, the question will appear right here.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+
+First, a few quick situations where your own rules matter:
+
+1 of 8. Meera types three words into the client search box: "Sharma textiles Pune". The business name has "Sharma" and "textiles", while "Pune" appears only in the office city. The list must stay quick even with thousands of clients. Which clients should she see?
+  A) Every client where each word is found somewhere (name, contact or office). This client is shown, same as today, and only the speed changes.  B) Clients where at least one of the words is found, which gives a longer, looser list.  C) Only clients where all words are found in the client's own name or details, ignoring contacts and offices.
+  Your answer (a letter, or your own words) > 
+  > A
+  (Your answer also settles 7 of the coming questions; I'll skip them.)
+  Thank you. The builders will encode your 1 rule as tests before anything lands.
+  For a job this size I'll use 1 builder (the job has about 1 decisions, about 3 per builder).
+
+[02:07] Starting.
+  [02:08] Builder w1 landed: Avoid one JOIN per search word in admin search
+  [02:08] Builder w1 picked up: search.
+  [02:08] Builder w1 landed: Per-word subqueries for multi-valued search fields; single filter call; test added...
+
+[02:08] The builder is done.
+The builder made 1 assumption your description didn't cover. Rather than going through them one by one, I'll show you everything the build does, as rules: that covers them all.
+
+Let me check the result.
+  35 tests, all passing. All 34 that passed before still pass.
+
+Done in 2 minutes, about $0.66 in all (builders $0.15, Hive's own questions and checks $0.51). Your result is on branch hive/this-repository-is-django-1102-0206.
+  See what changed:  git diff main...hive/this-repository-is-django-1102-0206
+  Take it:           git merge hive/this-repository-is-django-1102-0206
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/this-repository-is-django-1102-0206.)
+
+Here is everything the build does now, written from its code (1 more only repeat your own rules, so I left them out).
+
+What the build does now, as rules (each one is what the product will do. Mark any that is not your policy):
+  1. Client search: when staff type several words, a client is listed only if every word is found somewhere in the client's searchable details. Searching "Sharma Pune" finds Sharma Textiles, which has a show called Pune show.
+  2. Client search: the words may be found in different places, such as the client's name and the name of one of their events. "Sharma Rao" finds Sharma Textiles because Asha Rao is one of its members.
+  3. Client search: a client is left out if even one word is found nowhere. "Sharma Zzz" returns no clients, even though Sharma Textiles matches "Sharma".
+  4. Client search: the order of the words does not matter. "Textiles Sharma" finds the same client as "Sharma Textiles".
+  5. Client search: a word matches when it appears anywhere inside a detail, not only at the start. "pune" finds the event "Pune show", and "Textiles" finds "Sharma Textiles".
+  6. Client search: the same word typed twice acts like one word. "Sharma Sharma" lists both Sharma Textiles and Sharma Other.
+  7. Client search: when the words are found in several of a client's events or members, the client is still listed once. Sharma Textiles has two events matching "Pune" and appears one time.
+  8. Client search: words wrapped in double quotes are treated as one phrase. "\"Sharma Textiles\" pune" finds Sharma Textiles, and "\"pune show\" asha" does too.
+  9. Client search: single quotes also make a phrase. Typing 'Pune show' with single quotes finds Sharma Textiles.
+  10. Client search: an opening quote that is never closed is taken as part of the word. Typing "Sharma Textiles with only the first quote finds nobody, because that text with the quote mark is not found anywhere.
+  11. Client search: a detail marked as starting-with only matches words at the beginning. With that setting, "sharma" finds Sharma Other and Sharma Textiles, but "textiles" finds nobody.
+  12. Client search: a detail marked as exact only matches a word that is the whole detail. "sharma textiles" finds nobody, since it is split into two words and neither alone equals the full name.
+  13. Client search: a detail can be the client's reference number. Searching the number of Sharma Textiles finds it, and a word like "x" finds nobody.
+  14. Client search: if no details are set up for searching, typing words changes nothing and every client is listed. Typing "pune" still shows Sharma Other and Sharma Textiles.
+  15. Messy or missing details: capital letters are ignored. "sharma  PUNE" and "SHARMA   rao  " find Sharma Textiles just as lowercase words would.
+  16. Messy or missing details: extra spaces between words or around them are ignored. "sharma   PUNE" works the same as "sharma pune".
+  17. Messy or missing details: an empty search shows all clients. Leaving the box empty lists both Sharma Other and Sharma Textiles.
+  18. Messy or missing details: a word that matches nothing returns an empty list instead of an error. "Sharma Zzz" shows no clients.
+  Numbers of any that are wrong (Enter = all correct) > 
+  > 
+  Anything the builders should know that is not on this list? (Enter = nothing) > 
+  > 
+🔎 Last step, 10 quick checks on what the build does in real cases. They catch what a list of rules hides. Tap ✅ if a result is right, or tell me what should happen.
+1 of 10. Searching "Sharma Pune" finds Sharma Textiles, because one word matches the client's name and the other matches its Pune show order, while Sharma Traders (whose only order is Goa show) is left out.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+2 of 10. Sharma Textiles has two Pune orders (Pune show and Pune expo); searching "Pune" lists the client once, not twice.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+3 of 10. Searching "Sharma Goa Pune" returns nobody: every word must match somewhere, and no single client has both a Goa and a Pune order, so Sharma Traders and Sharma Textiles both drop out.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+4 of 10. Searching "sharma, pune" with a comma after the first word finds nothing, because the comma is treated as part of the word "sharma," while "sharma pune" finds Sharma Textiles.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+5 of 10. Searching "Sharma Textiles" in quotes finds only Sharma Textiles, so a quoted name is treated as one exact phrase instead of two separate words.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+6 of 10. Typing nothing, or only spaces, in the client search box shows all 6 clients with no filtering.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+7 of 10. Typing an empty pair of quotes ("") in the search box also shows all 6 clients rather than none.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+8 of 10. Typing "Sharma with an opening quote but no closing quote returns zero clients, even though Sharma Textiles and Sharma Traders exist, because the stray quote mark is searched for literally.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+9 of 10. Searching for just "%" finds only the client "100% Cotton", and just "_" finds only "Zed_Co", so these symbols are searched as ordinary characters rather than wildcards.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+10 of 10. Searching "MÜLLER" in capitals finds no client although "Müller Weber" exists, while lowercase "müller" finds it, so capital accented letters are not matched case-insensitively on the test database (SQLite).
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > I don't have that information.
+✍️ With your correction: Searching "MÜLLER" in capitals finds no client, though Müller Weber exists, since capital accented letters aren't matched case-insensitively on the test database; the owner has no information on this.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > I don't have that information.
+✅ Thank you. 1 of 10 cases changed; the builders will make it so.
+
+Let me check the result.
+  35 tests, all passing. All 34 that passed before still pass.
+
+Done in under a minute, about $1.11 in all (builders $0.23, Hive's own questions and checks $0.88). Your result is on branch hive/this-repository-is-django-1102-0206.
+  See what changed:  git diff main...hive/this-repository-is-django-1102-0206
+  Take it:           git merge hive/this-repository-is-django-1102-0206
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/this-repository-is-django-1102-0206.)
+
+Your 2 changes are in, and every test passes. It's yours.

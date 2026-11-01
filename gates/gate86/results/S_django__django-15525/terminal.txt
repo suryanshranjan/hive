@@ -1,0 +1,134 @@
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: the command in your hive settings. 18 tests, all passing.
+
+One choice before I start, asked only once: 2 builders would finish about 1.6× sooner than one, for about 1.6× the cost. Should I build fast or cheap, from now on? (Enter = fast)
+  > 
+  Got it: fast, from now on. (`hive pace fast` or `hive pace cheap` changes it.)
+
+I'll put 2 builders on it (the job has 2 parts that can be built at the same time): about 1.6× the speed of one builder, for about 1.6× the cost. They work on copies, so your branches stay exactly as they are.
+If they need a decision only you can make, the question will appear right here.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+
+First, a few quick situations where your own rules matter:
+
+1 of 5. Priya uploads a batch of orders for the Pune branch. Some orders name a customer, 'Sharma Traders', who is on Pune's customer list but not on head office's list. What should happen?
+  A) Accept the orders, checking customers against Pune's own list, the same way head office orders are checked against head office's list.  B) Refuse the orders until Sharma Traders is also on head office's list.  C) Accept the orders but mark them for a manager to review.
+  Your answer (a letter, or your own words) > 
+  > A
+  (Your answer also settles 1 of the coming question; I'll skip it.)
+
+2 of 5. An uploaded file lists an order for 'Gupta & Sons' before it lists Gupta & Sons as a customer. Head office handles this case in a set way today. What should Pune do?
+  A) Pune follows exactly the same rule as head office. If head office accepts this order of entries, so does Pune. If head office refuses it, so does Pune.  B) Pune accepts the file whatever order the entries are in.  C) Pune always refuses unless the customer is listed first.
+  Your answer (a letter, or your own words) > 
+  > A
+
+3 of 5. An uploaded customer, 'Joshi Electricals', is already on Pune's list with an old phone number, and the file brings a new one. What should happen?
+  A) Update the existing Pune entry with the new details. Don't create a duplicate, and ignore other branches' lists when matching.  B) Add a second Joshi Electricals entry at Pune with the new number.  C) Stop and ask a person which details are correct.
+  Your answer (a letter, or your own words) > 
+  > A
+
+4 of 5. A Pune upload has 500 orders, and order number 320 has a problem that stops the upload. What should happen to the first 319 that were already loaded?
+  A) Undo all of them at Pune, leave head office untouched, and show the error.  B) Keep the 319 good orders and only skip the rest.  C) Undo Pune's orders and also pause head office's uploads until it's fixed.
+  Your answer (a letter, or your own words) > 
+  > A
+
+Your rules for this feature, as the builders will follow them (each one applies to every case like it, not just the example):
+  1. Whenever an order is uploaded for a branch, the customer on the order is checked against that branch's own customer list, in the same way head office orders are checked against head office's customer list. An order naming a customer who is on that branch's list is accepted, even if the customer is not on head office's list.
+  2. Whenever an uploaded file lists an order for a customer before it lists that customer as a customer, the branch handles it by exactly the same rule head office uses. If head office accepts this order of entries, the branch accepts it. If head office refuses it, the branch refuses it.
+  3. Whenever an uploaded customer is already on the branch's own customer list, the existing entry at that branch is updated with the new details from the file. No duplicate is created, and other branches' customer lists are ignored when matching.
+  4. Whenever a branch upload stops because of a problem partway through, all the orders from that upload that were already loaded are undone at that branch, head office is left untouched, and the error is shown.
+  Numbers of any that are wrong (Enter = all correct) > 
+  > 
+  Thank you. The builders will encode your 4 rules as tests before anything lands.
+
+[02:02] Starting.
+  [02:02] Builder w1 picked up: loaddata.
+  [02:03] Builder w1 landed: Fix loaddata natural key lookup on non-default database
+  [02:03] Builder w1 landed: build_instance now sets the instance's db before computing natural_key so FK lookups...
+
+[02:03] All 2 builders are done.
+They made 1 assumption your description didn't cover. Rather than going through them one by one, I'll show you everything the build does, as rules: that covers them all.
+
+Let me check the result.
+  22 tests, all passing. All 18 that passed before still pass.
+
+Done in 2 minutes, about $0.99 in all (builders $0.30, Hive's own questions and checks $0.70). Your result is on branch hive/this-repository-is-django-1102-0200.
+  See what changed:  git diff main...hive/this-repository-is-django-1102-0200
+  Take it:           git merge hive/this-repository-is-django-1102-0200
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/this-repository-is-django-1102-0200.)
+
+Here is everything the build does now, written from its code (4 more only repeat your own rules, so I left them out).
+
+What the build does now, as rules (each one is what the product will do. Mark any that is not your policy):
+  1. Branch data upload: an upload to the branch's books never adds anything to head office's books; if the branch gets Asha's order A1, head office still shows 0 orders.
+  2. Branch data upload: if the file carries both Asha and her order, Asha is added to the branch first and her order A1 is then tied to her, giving 1 customer and 1 order.
+  3. Branch data upload: if the file contains Asha with a new city, Delhi, the branch's Asha changes from Mumbai to Delhi, while head office's Asha stays in Goa.
+  4. Branch data upload: if the same order A1 for Asha appears twice in one file, only one order A1 is kept.
+  5. Branch data upload: if an order points to a customer nobody knows, such as 'Nobody', the whole upload is cancelled, so even Asha and her good order A1 from the same file are not kept.
+  6. Messy or missing details: if an order names a customer not yet recorded, such as Asha when no Asha exists anywhere, the upload is refused with an error and nothing is saved, at head office and at the branch alike.
+  7. Messy or missing details: capital letters count when finding a customer, so an order for 'asha' is refused when only 'Asha' exists.
+  8. Messy or missing details: if an order has no customer at all, the upload is refused, because every order must belong to a customer.
+  9. Messy or missing details: if an order gives an empty customer reference instead of a name, the upload is refused with an error.
+  10. Messy or missing details: if a customer is written as plain text ' Asha ' instead of the expected name list, the upload is refused as unreadable.
+  11. Messy or missing details: if a customer is uploaded without a city, Asha is still saved, with a blank city.
+  12. Messy or missing details: a customer with a blank name and an order with a blank reference are accepted as they are; a blank-named customer is saved and its order is tied to it.
+  Numbers of any that are wrong (Enter = all correct) > 
+  > 
+  Anything the builders should know that is not on this list? (Enter = nothing) > 
+  > 
+🔎 Last step, 10 quick checks on what the build does in real cases. They catch what a list of rules hides. Tap ✅ if a result is right, or tell me what should happen.
+1 of 10. A file with the North shop and its Tea (5.50, 3 in stock) is uploaded into the branch records: both land in the branch, the main records stay empty, and Tea correctly finds North there.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+2 of 10. The same North/Tea file is uploaded a second time with Tea at 6.00 and 9 in stock: no duplicate Tea appears, the existing one is updated to 6.00 and 9.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+3 of 10. A file lists the West shop and then a Pie that belongs to a shop called Nowhere: the upload is refused and nothing from the file is kept, so even West is not added.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+4 of 10. A file lists the East shop's Cake before the East shop itself: the upload is refused, because shops must come before their products in the file, and East and Cake are not added.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+5 of 10. A file gives the shop with id 1 (North) the name Renamed: it silently replaces North, and all of North's products (Tea and the others) now show under Renamed.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+6 of 10. A shop entry with no name at all is uploaded: it is accepted and a shop with a blank name is created, with no warning.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+7 of 10. A product entry says its stock is 'many': the upload is refused with a message that the value must be a whole number, and nothing is saved.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+8 of 10. A Neg product with stock of -5 is uploaded: it is accepted and the branch now shows minus 5 in stock.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+9 of 10. A product with a price of 1234567 (above the 6-digit limit) is uploaded: the upload fails with an unhelpful 'invalid operation' error that names no product, and nothing is saved.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+10 of 10. A Tea entry names its shop as 'north' in lower case when only 'North' exists: the upload is refused because shop names must match exactly, and the error text is blank.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+✅ Thank you. Every case is as you want it.

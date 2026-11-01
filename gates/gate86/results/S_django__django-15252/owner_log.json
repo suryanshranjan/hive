@@ -1,0 +1,62 @@
+[
+ {
+  "prompt": "\n1 of 6. Your company keeps records at a main office and a branch office in Pune. Your rule says the Pune branch must not hold the 'list of updates we've made' logbook. When the system next gets set up, what should happen to that logbook at Pune?\n  A) Pune never gets the logbook. The rule is followed and nothing is created there.  B) Pune gets the logbook anyway, because the system works more smoothly with it.  C) The system stops and asks a person before deciding.\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n4 of 6. Your company has only one office and no special rules about where records go. The next update arrives. What should change for you?\n  A) Nothing changes. The logbook is kept at your one office as it is today.  B) The system asks you to confirm the logbook rule once before continuing.  C) The logbook is moved to a separate place by default.\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n5 of 6. Your rule says updates may only be applied at the main office. Someone asks the system to update the Pune branch directly. What should happen?\n  A) Nothing is changed at Pune. Only the main office is touched.  B) Pune is updated anyway because a person explicitly asked.  C) The system refuses and tells the person why.\n  Your answer (a letter, or your own words) > ",
+  "typed": "C"
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": "3. The fix should not make migrate refuse. It should skip creating the migration table on a database where the router doesn't allow it, and not record migrations there. The test runner and the app sync still call migrate on every database, so an error would break them."
+ },
+ {
+  "prompt": "  Rule 3: Whenever a rule says updates may only be applied at the main office and someone asks the system to update a branch office such as Pune directly, the system refuses the request and tells the person why.\n  What should it be? > ",
+  "typed": "Rule 3: Whenever a rule says updates may only be applied at the main office and someone asks the system to update a branch office such as Pune directly, the system does not refuse or fail. It skips creating the logbook at that office and does not record any updates there, so the request completes without error."
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": "8. Clearing history on a database that has no history table should not fail. It should do nothing, like the other recorder steps. Migrate must not error on a database where the router disallows the migration table."
+ },
+ {
+  "prompt": "1 of 7. With a rule that only the main database may be changed, the 'other' database gets no migration-history table after setup: the table is not created there (it still exists on the main database).\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "2 of 7. Running the full update on the 'other' database with that same rule creates nothing: zero tables are built there, while the main database gets all 8 account and content tables plus its history table.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "3 of 7. Asked which updates were applied on the 'other' database, the listing shows every one of the 14 account and content updates as not applied, even after the main database finished them all, with no warning that the database is deliberately skipped.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "4 of 7. Recording the same 'shop 0001' update as applied twice on the main database leaves 2 history entries for it, not 1: duplicates are accepted.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "5 of 7. Asking to wipe the history on the 'other' database, which has no history table, crashes with a 'no such table' error instead of quietly doing nothing, unlike recording or undoing an update, which silently do nothing there.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Should quietly do nothing, with no error. Migrate must not fail on a database where the router disallows the migration table."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Wiping the history on the 'other' database, which has no history table, quietly does nothing and shows no error, so nothing is changed.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "6 of 7. Undoing an update that was never recorded ('shop 9999') on the main database finishes with no error and no notice that nothing was there to undo.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "7 of 7. Recording 'shop 0001' as applied on the 'other' database, where the rule forbids changes, is silently dropped: no error, no entry, and nothing tells the owner the record was skipped.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ }
+]

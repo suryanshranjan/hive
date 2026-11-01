@@ -1,0 +1,118 @@
+[
+ {
+  "prompt": "\n1 of 5. Meera, your accounts lead, pulls a shortlist of customers who spent over \u20b95,000. Along the way the system also works out each customer's total spent and discount. She then uses the shortlist to ask 'which orders belong to these customers?' She never said which detail to use for matching. What should happen?\n  A) Match on the customer's ID alone and ignore the extra worked-out details. The check just works.  B) Stop and tell her she must say which detail to match on before it will run.  C) Match on the first extra detail the system happened to work out, such as total spent.\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n2 of 5. Ravi asks for 'phone numbers only' of customers who spent over \u20b95,000. Behind the scenes the system has also worked out total spent and a discount figure. What should his list show?\n  A) Only the phone numbers he asked for. The extra figures stay out of the list.  B) Phone numbers plus the total spent, because it was used to pick the customers.  C) Phone numbers plus every extra figure, so staff can see how each customer was picked.\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n3 of 5. Sunil asks for customer name AND phone number together, but then uses that list to check 'is this order from one of these customers?', which only works with one detail per customer. What should happen?\n  A) Stop with a clear message that one detail per customer is needed. Do not guess.  B) Quietly use the first detail (the name) and carry on.  C) Carry on with the first detail, but show a warning that the other was ignored.\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n4 of 5. The fix is for the 'is this customer among these?' check. Your team also uses other checks: 'exactly matches this one customer', 'does any order exist for this customer?' and 'combine two customer lists'. Should the fix change those too?\n  A) Fix only the 'is among these' check. Leave the others as they are, and add tests showing they still work.  B) Apply the same fix to all of these checks at once.  C) Fix only the 'is among these' check now, and bring in the others later after a separate review.\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n5 of 5. Your team has reports that already work fine, with worked-out figures and no helper figures, used in 'is among these' checks. Should the fix change anything for them?\n  A) No. Their results and behaviour stay exactly as today.  B) Update them to the new tidier behaviour, even if a few results differ slightly.  C) Keep them as is, but flag any report whose results would now differ so a manager can review.\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "1 of 15. Asking for books whose publisher is in a sub-search of publishers that have more than one book (with a hidden count and an extra helper figure attached): Pub's books A and B come back, Pub2's book C does not, with no column-count error.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "2 of 15. Asking for books whose page count (100, 200, 300) is in a sub-search of books longer than 150 pages, with no column named: the sub-search quietly hands back book ID numbers (2 and 3) instead of page counts, so no books match and the list is empty.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "3 of 15. Asking for books that are NOT in the sub-search of books over 150 pages (with a helper figure attached) leaves just book A at 100 pages.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "4 of 15. Taking only the first book of a sub-search ordered by pages, with a helper figure attached, returns book A (100 pages) alone.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "5 of 15. Using a sub-search that matches nothing (books over 999 pages) gives an empty list of books rather than an error.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "6 of 15. A hidden rating helper figure can still be used to filter: keeping books with rating 4 or higher returns book A (4.0) and book C (5.0), and excludes book B (3.0).\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "7 of 15. Trying to show or total a hidden helper figure (for example the page count helper on the three books) is refused with an error telling you to promote it to a visible figure, so no total of 600 pages is produced.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Asked to show or total the page count helper on the three books, the system refused with an error to promote it to a visible figure, so no 600-page total appeared.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "8 of 15. Ordering a sub-search by a hidden rating helper and taking the first picks book B (rating 3.0, the lowest), even though the rating never appears in the results.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "9 of 15. Giving a hidden helper figure the same name as an existing book detail such as the book's name is refused with an error saying it clashes with a book field.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A hidden helper figure named the same as a book's name was refused with a clash-with-a-book-field error, and the owner says: I don't have that information.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "The part about \"the owner says: I don't have that information\" shouldn't be in the summary. I don't have that information about helper names clashing with book fields, so I can't confirm or correct it."
+ },
+ {
+  "prompt": "10 of 15. Giving a hidden helper figure the same name as an already visible figure (z) is accepted without any warning, and all three books still come back.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Naming a hidden helper figure z, like the visible z, was accepted without warning, replaced and hid z, and all three books came back without z.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "11 of 15. Using a whole sub-search of books as the single value to match one book's ID, without limiting it to one result, is refused with an error asking for it to be cut to one result.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A search of books used as the single value to match one book's ID, with no one-result limit, is refused with an error asking to cut it to one result.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "12 of 15. Asking for books whose ID is in a sub-search that lists two details (ID and pages) is refused with an error that multi-detail lists cannot be used for matching.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "13 of 15. Using a one-book lookup inside a publisher figure when the sub-search has a visible figure and a hidden helper figure but no single detail chosen fails with a database error saying it returned 10 columns when 1 was expected.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "No, that's wrong. That is the bug from my report. With a visible figure and a hidden helper figure and no detail chosen, the sub-search should use just the ID. It should not fail with the \"returned 10 columns when 1 was expected\" error."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A one-book lookup in a publisher figure carrying a visible and a hidden helper figure, with no detail chosen, now returns just the book's ID.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "14 of 15. Matching book IDs against a list holding a blank entry and ID 1 ignores the blank and returns just book A.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Matching book IDs against a list holding a blank entry and ID 1 skips the blank and returns only book A.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "15 of 15. Matching book IDs against an empty list returns no books, and so does matching against a sub-search that is explicitly empty.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ }
+]

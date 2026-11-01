@@ -1,0 +1,114 @@
+[
+ {
+  "prompt": "\n1 of 9. A web page needs to refer to your fixed list of options, for example the membership levels Gold, Silver and Bronze, in order to show or check one of them. What should the page do?\n  A) It simply uses the list and picks out the level, e.g. Gold, with no fuss  B) The level shows as blank so the visitor never sees a half-working page  C) The page stops with an error and the team is alerted to fix it first\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n2 of 9. A page shows a customer's membership level, Gold, which is saved in your records as the short code GLD with the friendly name Gold Member. What should the page display?\n  A) The short code saved in the records, GLD  B) The friendly name, Gold Member  C) Nothing, or a 'not available' message, until staff choose what to show\n  Your answer (a letter, or your own words) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "  You're being asked what a customer should see on the page next to their membership level. In your records, Gold is stored as the short code GLD, and its friendly name is Gold Member. If you pick the first choice, customers see GLD, the short code. If you pick the second, they see Gold Member, the friendly name. If you pick the third, they see nothing or a 'not available' message until your staff decide what to show.\n  So, what should happen? (a letter, or your own words) > ",
+  "typed": "I don't have that information. The issue is only about comparing a value to an enum member in a template, like `{% if student.year_in_school == YearInSchool.FRESHMAN %}`. It doesn't say what the page should show."
+ },
+ {
+  "prompt": "\n4 of 9. A page needs to show the full list of levels, with their names and codes, for example in a sign-up dropdown. Which levels appear?\n  A) All levels appear, ready to show in the dropdown or in a list  B) Only the levels currently on offer appear  C) The full list stays hidden until a developer switches it on for that page\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) All levels appear, ready to show in the dropdown or in a list"
+ },
+ {
+  "prompt": "\n5 of 9. A page shows the details of one level: its friendly name, its saved code, and its internal name used by staff. What is shown?\n  A) All three work as normal: the friendly name, the code and the internal name  B) Friendly name and code only; the internal staff name stays hidden from pages  C) Only the friendly name; the rest is hidden from customers\n  Your answer (a letter, or your own words) > ",
+  "typed": "I don't have that information. The issue only covers comparing a value to an enum member in a template, like `{% if student.year_in_school == YearInSchool.FRESHMAN %}`. It doesn't say what is shown for the label, value and name."
+ },
+ {
+  "prompt": "\n6 of 9. Some of your other lists were set up in an older, plainer way and are not part of the standard options system. They are used on pages today. What should happen to them?\n  A) Leave them exactly as they are today, and the team can adjust any that need it  B) Change them too so every list behaves the same way  C) Review them one by one with you before anything changes\n  Your answer (a letter, or your own words) > ",
+  "typed": "I don't have that information. The issue only covers making enumeration types usable in templates, and says nothing about other lists that aren't part of the enumeration types."
+ },
+ {
+  "prompt": "\n7 of 9. Your team has already given one of its lists its own special setting on how pages treat it. The fix would normally apply a standard setting to all such lists. What happens to the team's own setting?\n  A) The team's own setting is kept, and the standard setting is only added where none exists  B) The standard setting replaces the team's, so everything is consistent  C) Stop and ask the team to choose before anything changes\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) The team's own setting is kept, and the standard setting is only added where none exists"
+ },
+ {
+  "prompt": "\n8 of 9. One of your lists has an option whose name is the same as a word the system already uses, for example a level actually called 'Label' or 'Choices'. What should happen?\n  A) It behaves as it does today, and no new special words are introduced  B) It is refused with a warning so the team renames the option  C) It is renamed automatically so there is no clash\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) It behaves as it does today, and no new special words are introduced"
+ },
+ {
+  "prompt": "\n9 of 9. Once this is fixed, how should it be recorded for your team and future builders?\n  A) Add a note in the guide on setting up option lists and a short entry in the release notes  B) Add a release note only, with nothing in the guide  C) No written record; the fix just works\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) Add a note in the guide on setting up option lists and a short entry in the release notes"
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: The owner has not said what the page should display for a Gold membership (saved as the code GLD with the friendly name Gold Member); he only said the issue concerns comparing a value to an enum member in a template, such as `{% if student.year_in_school == YearInSchool.FRESHMAN %}`, so no display behavior is specified.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: The owner has not specified what the level page shows for the friendly name, the saved code or the internal name, so no display behavior is defined for them. The only defined behavior is that a template can compare a value to an enum member, as in `{% if student.year_in_school == YearInSchool.FRESHMAN %}`.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: The change only has to make enumeration types usable in templates; the owner has not specified any behavior for older, plainer lists that are not part of the enumeration types, so those lists are outside this change's scope and nothing about them is required.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "1 of 10. A page that shows the payment-status list (Paid in full, Late, None) now displays each option's name and stored code without crashing: the invoice page shows 'Paid in full' with code 'P'.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "2 of 10. Looping over the payment-status list on a page produces one row per status, 'P=Paid in full; L=Late; N=', so a status given a blank label shows as an empty row.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "3 of 10. A priority list with Low=1 and High=2 and no wording given for High shows High's label as 'High', made up automatically from its name, so the owner never wrote that text.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "4 of 10. A page that compares an invoice's stored status 'P' to the Paid in full option says yes, so 'if status equals Paid' checks work on pages.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "5 of 10. Printing the whole status list straight onto a page, with no loop, dumps raw code text like [('P', 'Paid in full'), ...] instead of a readable list.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "6 of 10. A page asking for a priority option that doesn't exist (for example Priority.NOPE) shows nothing at all, with no error, so a typo in a page goes unnoticed.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "7 of 10. Looking up priority 3 when only Low=1 and High=2 exist is refused with the error '3 is not a valid Priority', so a stray stored value will fail rather than show a blank.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "8 of 10. A list with a 'no choice' entry labelled '(none)' offers it as an option, but asking whether 'None' is among the allowed options answers no, even though the form shows it.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information. The issue only covers comparing a value to an enum member in a template, like `{% if student.year_in_school == YearInSchool.FRESHMAN %}`. It doesn't cover a 'no choice' entry."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The list's '(none)' no-choice entry shows on the form as an option, but asking whether 'None' is an allowed option answers no.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information. The issue only covers comparing a value to an enum member in a template, like `{% if student.year_in_school == YearInSchool.FRESHMAN %}`. It doesn't cover a \"no choice\" entry or what \"None\" membership checks answer."
+ },
+ {
+  "prompt": "9 of 10. Defining two priorities that share the same stored number (Low=1 and 'Alias Low'=1) is rejected outright with a 'duplicate values' error, so the owner can't keep two names for one number.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information. The issue only covers comparing a value to an enum member in a template, like `{% if student.year_in_school == YearInSchool.FRESHMAN %}`. It doesn't say anything about two names sharing one stored number."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Defining Low=1 and 'Alias Low'=1 as two priorities sharing the same stored number is still rejected with a 'duplicate values' error, as before.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information. The issue only covers comparing a value to an enum member in a template, like `{% if student.year_in_school == YearInSchool.FRESHMAN %}`. It doesn't say anything about two names sharing one stored number."
+ },
+ {
+  "prompt": "10 of 10. A label shown for a missing item (a page asked for the label of an empty invoice) displays as blank, with no warning.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information. The issue only covers making enumeration types usable in templates, and says nothing about what a label shown for a missing item should display."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A page asking for the label of an empty invoice still shows a blank spot, with no warning.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ }
+]

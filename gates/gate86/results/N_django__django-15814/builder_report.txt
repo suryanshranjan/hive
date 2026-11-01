@@ -1,0 +1,5 @@
+Landed `proxyonly`. The fix is one line in `django/db/models/sql/query.py:751`: it now uses `cur_model._meta.concrete_model._meta`. That's the workaround the issue suggests.
+
+- **Test:** I added `ProxySelectRelatedOnlyTests`, plus a `ProxyStateRef` model that has an FK to `StateProxy`. With the fix reverted, the test fails with `ValueError: 'id' is not in list`. With the fix, `proxy_models.tests` passes (30 tests), and `hive land` reported 18/18 passing.
+- **Least sure:** I ran only `proxy_models.tests`, not the wider query or select_related suites.
+- **Surprises:** none. I asked no questions and the hive tools worked fine.

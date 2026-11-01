@@ -1,0 +1,6 @@
+I landed the `enums` area, and `hive land` reported 19/19 tests passing.
+
+- **Fix:** `ChoicesMeta.__new__` in `django/db/models/enums.py` now sets `do_not_call_in_templates = True` on each Choices class. I set it after the class is created, so it is a plain class attribute and not an enum member. A template like `{% if x == YearInSchool.FRESHMAN %}` no longer tries to call the class.
+- **Tests:** I added `test_templates` and `test_do_not_call_in_templates` to `tests/model_enums/tests.py`. The first renders a comparison and a label lookup in a template. The second checks the attribute is set and isn't listed in `__members__`.
+- **Least sure about:** putting the flag in the metaclass instead of on the `Choices` base class. The metaclass also covers classes made with the functional API. I only tested the four model enums plus the template renders.
+- **Problems:** no questions, and the hive tools gave me no trouble.

@@ -1,0 +1,74 @@
+[
+ {
+  "prompt": "\nOne choice before I start, asked only once: 2 builders would finish about 1.6\u00d7 sooner than one, for about 1.6\u00d7 the cost. Should I build fast or cheap, from now on? (Enter = fast)",
+  "typed": ""
+ },
+ {
+  "prompt": "\n1 of 5. Priya uploads a batch of orders for the Pune branch. Some orders name a customer, 'Sharma Traders', who is on Pune's customer list but not on head office's list. What should happen?\n  A) Accept the orders, checking customers against Pune's own list, the same way head office orders are checked against head office's list.  B) Refuse the orders until Sharma Traders is also on head office's list.  C) Accept the orders but mark them for a manager to review.\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n2 of 5. An uploaded file lists an order for 'Gupta & Sons' before it lists Gupta & Sons as a customer. Head office handles this case in a set way today. What should Pune do?\n  A) Pune follows exactly the same rule as head office. If head office accepts this order of entries, so does Pune. If head office refuses it, so does Pune.  B) Pune accepts the file whatever order the entries are in.  C) Pune always refuses unless the customer is listed first.\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n3 of 5. An uploaded customer, 'Joshi Electricals', is already on Pune's list with an old phone number, and the file brings a new one. What should happen?\n  A) Update the existing Pune entry with the new details. Don't create a duplicate, and ignore other branches' lists when matching.  B) Add a second Joshi Electricals entry at Pune with the new number.  C) Stop and ask a person which details are correct.\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n4 of 5. A Pune upload has 500 orders, and order number 320 has a problem that stops the upload. What should happen to the first 319 that were already loaded?\n  A) Undo all of them at Pune, leave head office untouched, and show the error.  B) Keep the 319 good orders and only skip the rest.  C) Undo Pune's orders and also pause head office's uploads until it's fixed.\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "1 of 10. A file with the North shop and its Tea (5.50, 3 in stock) is uploaded into the branch records: both land in the branch, the main records stay empty, and Tea correctly finds North there.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "2 of 10. The same North/Tea file is uploaded a second time with Tea at 6.00 and 9 in stock: no duplicate Tea appears, the existing one is updated to 6.00 and 9.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "3 of 10. A file lists the West shop and then a Pie that belongs to a shop called Nowhere: the upload is refused and nothing from the file is kept, so even West is not added.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "4 of 10. A file lists the East shop's Cake before the East shop itself: the upload is refused, because shops must come before their products in the file, and East and Cake are not added.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "5 of 10. A file gives the shop with id 1 (North) the name Renamed: it silently replaces North, and all of North's products (Tea and the others) now show under Renamed.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "6 of 10. A shop entry with no name at all is uploaded: it is accepted and a shop with a blank name is created, with no warning.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "7 of 10. A product entry says its stock is 'many': the upload is refused with a message that the value must be a whole number, and nothing is saved.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "8 of 10. A Neg product with stock of -5 is uploaded: it is accepted and the branch now shows minus 5 in stock.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "9 of 10. A product with a price of 1234567 (above the 6-digit limit) is uploaded: the upload fails with an unhelpful 'invalid operation' error that names no product, and nothing is saved.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "10 of 10. A Tea entry names its shop as 'north' in lower case when only 'North' exists: the upload is refused because shop names must match exactly, and the error text is blank.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ }
+]

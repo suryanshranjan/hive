@@ -1,0 +1,130 @@
+[
+ {
+  "prompt": "\n1 of 7. A customer clicks the 'Today's offers' link for Priya's Bakery. The link can include a city, like Pune, but this customer hasn't chosen one. What should the link do?\n  A) Go to the general offers page, with nothing about a city in the address  B) Go to a page that asks the customer to pick a city first  C) Refuse to make the link, and show our staff an error\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n2 of 7. Another customer has chosen Pune, so the 'Today's offers' link includes the city. How should Pune appear in the link?\n  A) Pune goes in exactly as it works today  B) Pune goes in tidied up (lower case, spaces replaced) so the same city never has two different links  C) Pune goes in only if it is one of the cities we serve; otherwise the customer gets the general page\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n3 of 7. The link can include an area (Koregaon Park) inside a city (Pune). A customer has given the area but no city. What should happen?\n  A) Ignore the area too, and show the general offers page  B) Refuse the link, because an area means nothing without its city  C) Keep the area and assume our main city, Pune\n  Your answer (a letter, or your own words) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\n4 of 7. The 'Track my order' link needs the order number, and a customer's message arrives without one. What should happen?\n  A) Refuse, and show a clear 'we can't find that order' message as it does today  B) Send the customer to a general 'Track an order' page where they can type the number  C) Send the customer to their latest order automatically\n  Your answer (a letter, or your own words) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "  We're asking what your website should do when a customer clicks 'Track my order' but their message didn't include an order number, so the site doesn't know which order they mean. You don't need to know any order number. This is a rule for what the site does in that situation. The first choice shows the customer a 'we can't find that order' message, which is what happens now. The second takes them to a general 'Track an order' page where they type in their number themselves. The third takes them straight to their most recent order without asking, which is quick but could show the wrong order if they have several.\n  So, what should happen? (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n5 of 7. Someone enters a city that makes no sense, like 'Pune123' or '???'. What should the link do?\n  A) Refuse to create the link, and show an error  B) Quietly drop the city and show the general offers page  C) Guess the closest real city (Pune) and use that\n  Your answer (a letter, or your own words) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\n7 of 7. A few older pages use links where the city is added without a label, so it can't be told apart from other details. What should we do about them?\n  A) Leave them exactly as they are, and fix only the labelled ones  B) Fix these older pages in the same go, even though they currently work  C) List them for you to review first, and change none until you say so\n  Your answer (a letter, or your own words) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "  Some of your pages build their links by putting the city into the address with no label. Because of that, the system can't tell the city apart from any other detail in the link. The fix we're making is about labelled details. These older pages work today, but they could be affected by the change. The first choice leaves those older pages untouched and fixes only the labelled links, so nothing that works now is changed, but the older pages stay as they are. The second choice fixes the older pages at the same time, so everything is consistent, but pages that work today get changed. The third choice gives you a list of the older pages to look over first, and nothing is changed until you say so.\n  So, what should happen? (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When a customer gives an area (such as Koregaon Park) but no city, the owner has not defined what the product should do, so there is no rule for this case and it needs a decision from him before it can be implemented or tested.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "That's not quite right. The issue doesn't say an area without a city needs a separate decision. It says a missing optional group should be left out of the URL, and not turned into the string 'None'. Arguments that are None should be discarded in reverse()."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: The owner has not specified what the link should do when someone enters a nonsensical city such as 'Pune123' or '???', so there is no defined behavior to implement or test for that case.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "That's not quite right. The issue doesn't say that a nonsense city needs its own rule. It only says that a missing optional group should be left out of the URL and not turned into the string 'None'. Arguments that are None should be discarded in reverse()."
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": "3. The issue's fix applies to positional (unlabelled) arguments too. The hints give `{% url 'my_view' obj.might_be_none %}` as an example, so reverse() should discard any None argument, named or not. Don't leave the unlabelled case as it is."
+ },
+ {
+  "prompt": "  Rule 3: Whenever an older page builds a link by adding the city without a label, so it can't be told apart from other details, leave that page exactly as it is. Fix only the links where the city is labelled.\n  What should it be? > ",
+  "typed": "Rule 3 should be: Whenever reverse() is given a None argument, whether named (kwargs) or positional (args), it discards that argument instead of turning it into the string 'None'. This applies to unlabelled arguments too, such as `{% url 'my_view' obj.might_be_none %}`, so don't leave the unlabelled case as it is."
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "1 of 14. A customer page that has an optional extra section, asked for with only Order 1 and no section, gives the short address /opt/1/ with no empty gap.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "2 of 14. The same page asked for Order 1 and the section \"x\" gives the longer address /opt/1/x/.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "3 of 14. Giving the same page its details by position instead of by name, Order 1 alone gives /pos/1/ and Order 1 plus \"x\" gives /pos/1/x/.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "4 of 14. A page with two optional sections, given Order 1 and only the third section 3, produces /two/1/3/, which is the address for the second section, so the customer would land on the wrong page and nothing warns anyone.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "5 of 14. A page that takes a whole-number id refuses -5 and the word \"abc\", and no address is produced (an error is raised).\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A page needing a whole-number id was given -5 and then \"abc\", and each was refused, so no address was built and an error was raised.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "6 of 14. A page that takes free text, given \"a b/c?d\", refuses to build an address because it contains a slash, so such names can't be linked.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The page that takes free text refused to build an address for the name \"a b/c?d\" because it contains a slash, so that name can't be linked.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "7 of 14. A free-text page given the accented name \"\u00e9\" builds /s/%C3%A9/, with the accent safely encoded.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The free-text page given the accented name \"\u00e9\" now builds the address /s/%C3%A9/, with the accent safely encoded.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "8 of 14. A free-text page given an empty name refuses to build an address, so a blank name produces an error rather than a blank link.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A free-text page given an empty name refuses to build an address and raises an error, so no blank link is produced.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "9 of 14. A page given Order 0 builds /opt/0/ normally, so zero is not treated as missing.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "10 of 14. Giving the optional section as 'nothing' (None) alongside Order 1 quietly drops it and returns /opt/1/ instead of complaining.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "11 of 14. Giving 'nothing' for the required Order number while also giving a section \"x\" fails with a no-match error and no address.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "12 of 14. Giving the optional section as an empty text \"\" with Order 1 fails with a no-match error, unlike 'nothing' which is quietly dropped.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "13 of 14. Passing an extra detail the page doesn't know about (z=3) with Order 1 fails and no address is built, rather than ignoring the extra.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "14 of 14. Giving details both by position and by name in one request is refused outright with a 'don't mix' error.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ }
+]

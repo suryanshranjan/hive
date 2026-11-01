@@ -1,0 +1,5 @@
+I landed the `recorder` area. `MigrationRecorder.ensure_schema()` in `django/db/migrations/recorder.py` now checks `router.allow_migrate` for the connection and the Migration model. If the router says no, it returns without creating the `django_migrations` table. I added `test_ensure_schema_respects_router` in `tests/migrations/test_executor.py`. The `backends.base.test_creation` and `migrations.test_executor` suites pass, and `hive land` reported 14/14.
+
+- **Least sure about:** `record_applied` and `record_unapplied` still call `ensure_schema` and then write to the table. On a connection the router forbids, that write would fail because the table doesn't exist. I left them alone to match the upstream fix, which only changed `ensure_schema`.
+- **Questions:** none.
+- **Surprises:** none, and the hive tools worked as documented.

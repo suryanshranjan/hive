@@ -1,0 +1,197 @@
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: the command in your hive settings. 17 tests, all passing.
+
+I'll put 1 builder on it (the job is one piece of work, so more builders would only wait): the cheapest way. It works on a copy, so your branches stay exactly as they are.
+If they need a decision only you can make, the question will appear right here.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+
+First, a few quick situations where your own rules matter:
+
+1 of 9. A web page needs to refer to your fixed list of options, for example the membership levels Gold, Silver and Bronze, in order to show or check one of them. What should the page do?
+  A) It simply uses the list and picks out the level, e.g. Gold, with no fuss  B) The level shows as blank so the visitor never sees a half-working page  C) The page stops with an error and the team is alerted to fix it first
+  Your answer (a letter, or your own words) > 
+  > A
+
+2 of 9. A page shows a customer's membership level, Gold, which is saved in your records as the short code GLD with the friendly name Gold Member. What should the page display?
+  A) The short code saved in the records, GLD  B) The friendly name, Gold Member  C) Nothing, or a 'not available' message, until staff choose what to show
+  Your answer (a letter, or your own words) > 
+  > I don't have that information.
+  You're being asked what a customer should see on the page next to their membership level. In your records, Gold is stored as the short code GLD, and its friendly name is Gold Member. If you pick the first choice, customers see GLD, the short code. If you pick the second, they see Gold Member, the friendly name. If you pick the third, they see nothing or a 'not available' message until your staff decide what to show.
+  So, what should happen? (a letter, or your own words) > 
+  > I don't have that information. The issue is only about comparing a value to an enum member in a template, like `{% if student.year_in_school == YearInSchool.FRESHMAN %}`. It doesn't say what the page should show.
+  (Your answer also settles 1 of the coming question; I'll skip it.)
+
+4 of 9. A page needs to show the full list of levels, with their names and codes, for example in a sign-up dropdown. Which levels appear?
+  A) All levels appear, ready to show in the dropdown or in a list  B) Only the levels currently on offer appear  C) The full list stays hidden until a developer switches it on for that page
+  Your answer (a letter, or your own words) > 
+  > A) All levels appear, ready to show in the dropdown or in a list
+
+5 of 9. A page shows the details of one level: its friendly name, its saved code, and its internal name used by staff. What is shown?
+  A) All three work as normal: the friendly name, the code and the internal name  B) Friendly name and code only; the internal staff name stays hidden from pages  C) Only the friendly name; the rest is hidden from customers
+  Your answer (a letter, or your own words) > 
+  > I don't have that information. The issue only covers comparing a value to an enum member in a template, like `{% if student.year_in_school == YearInSchool.FRESHMAN %}`. It doesn't say what is shown for the label, value and name.
+
+6 of 9. Some of your other lists were set up in an older, plainer way and are not part of the standard options system. They are used on pages today. What should happen to them?
+  A) Leave them exactly as they are today, and the team can adjust any that need it  B) Change them too so every list behaves the same way  C) Review them one by one with you before anything changes
+  Your answer (a letter, or your own words) > 
+  > I don't have that information. The issue only covers making enumeration types usable in templates, and says nothing about other lists that aren't part of the enumeration types.
+
+7 of 9. Your team has already given one of its lists its own special setting on how pages treat it. The fix would normally apply a standard setting to all such lists. What happens to the team's own setting?
+  A) The team's own setting is kept, and the standard setting is only added where none exists  B) The standard setting replaces the team's, so everything is consistent  C) Stop and ask the team to choose before anything changes
+  Your answer (a letter, or your own words) > 
+  > A) The team's own setting is kept, and the standard setting is only added where none exists
+
+8 of 9. One of your lists has an option whose name is the same as a word the system already uses, for example a level actually called 'Label' or 'Choices'. What should happen?
+  A) It behaves as it does today, and no new special words are introduced  B) It is refused with a warning so the team renames the option  C) It is renamed automatically so there is no clash
+  Your answer (a letter, or your own words) > 
+  > A) It behaves as it does today, and no new special words are introduced
+
+9 of 9. Once this is fixed, how should it be recorded for your team and future builders?
+  A) Add a note in the guide on setting up option lists and a short entry in the release notes  B) Add a release note only, with nothing in the guide  C) No written record; the fix just works
+  Your answer (a letter, or your own words) > 
+  > A) Add a note in the guide on setting up option lists and a short entry in the release notes
+
+Your rule, as I'll build it: The owner has not said what the page should display for a Gold membership (saved as the code GLD with the friendly name Gold Member); he only said the issue concerns comparing a value to an enum member in a template, such as `{% if student.year_in_school == YearInSchool.FRESHMAN %}`, so no display behavior is specified.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: The owner has not specified what the level page shows for the friendly name, the saved code or the internal name, so no display behavior is defined for them. The only defined behavior is that a template can compare a value to an enum member, as in `{% if student.year_in_school == YearInSchool.FRESHMAN %}`.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: The change only has to make enumeration types usable in templates; the owner has not specified any behavior for older, plainer lists that are not part of the enumeration types, so those lists are outside this change's scope and nothing about them is required.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rules for this feature, as the builders will follow them (each one applies to every case like it, not just the example):
+  1. Whenever a web page refers to one of the fixed lists of options (such as the membership levels Gold, Silver and Bronze) to show or check a level, the page simply uses the list and picks out the level (e.g. Gold) without any extra steps or errors. In particular, a template can compare a value to a member of the list, as in `{% if student.year_in_school == YearInSchool.FRESHMAN %}`.
+  2. Whenever a page needs the full list of levels with their names and codes (for example in a sign-up dropdown), all levels appear, ready to show in the dropdown or in a list.
+  3. Whenever a list already has its own special setting on how pages treat it, that setting is kept, and the standard setting is added only to lists that have none.
+  4. Whenever a list has an option whose name is the same as a word the system already uses (for example a level called 'Label' or 'Choices'), it behaves as it does today, and no new special words are introduced.
+  5. Once this is fixed, record it by adding a note in the guide on setting up option lists and a short entry in the release notes.
+  Numbers of any that are wrong (Enter = all correct) > 
+  > 
+  Thank you. The builders will encode your 5 rules as tests before anything lands.
+
+[02:32] Starting.
+  [02:33] Builder w1 landed: Make enumeration types usable in templates
+  [02:33] Builder w1 picked up: enums.
+  [02:33] Builder w1 landed: Set do_not_call_in_templates on enum classes unless already defined; tests, docs,...
+
+[02:33] The builder is done.
+The builder made 1 assumption your description didn't cover. Rather than going through them one by one, I'll show you everything the build does, as rules: that covers them all.
+
+Let me check the result.
+  23 tests, all passing. All 17 that passed before still pass.
+
+Done in 2 minutes, about $1.53 in all (builders $0.14, Hive's own questions and checks $1.39). Your result is on branch hive/this-repository-is-django-1102-0229.
+  See what changed:  git diff main...hive/this-repository-is-django-1102-0229
+  Take it:           git merge hive/this-repository-is-django-1102-0229
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/this-repository-is-django-1102-0229.)
+
+Here is everything the build does now, written from its code (6 more only repeat your own rules, so I left them out).
+
+What the build does now, as rules (each one is what the product will do. Mark any that is not your policy):
+  1. Choice lists on pages: asking the page to show one option, such as the Freshman year with stored value 1, prints its stored value, so the visitor sees 1.
+  2. Choice lists on pages: asking for an option's stored value, such as FR for Freshman, prints that stored value exactly.
+  3. Choice lists on pages: asking for an option's display name prints the friendly text, so Freshman shows as 'Freshman'.
+  4. Choice lists on pages: asking for an option's internal name prints it as written in the list, so the Freshman option shows as 'F'.
+  5. Choice lists on pages: an option given no friendly text gets one made from its name, with underscores turned to spaces and capitals added, so an option called SECOND_PLACE shows as 'Second Place'.
+  6. Choice lists on pages: a page can loop over all options and show each friendly name, for example 'Freshman, Sophomore, Junior'.
+  7. Choice lists on pages: a page can also show just the list of friendly names, just the stored values, or just the internal names.
+  8. Choice lists on pages: the same comparison works against the option's stored value written out, so 'a' matches both the option Alpha and its value 'a'.
+  9. Choice lists on pages: for number-based lists, a customer stored as 1 matches the Freshman option whose value is 1.
+  10. Choice lists on pages: showing the whole list itself, rather than one option, prints only a technical description of it, which is of no use to a visitor.
+  11. Choice lists on pages: asking for an option that does not exist, such as a 'Doctorate' year that was never defined, shows blank and does not break the page.
+  12. Choice lists on pages: asking for an unknown detail of a real option, such as its 'nickname', shows blank rather than an error.
+  13. Choice lists on pages: a list inheriting from another list that switched page-safe behaviour off stays switched off.
+  14. Messy or missing details: if a page asks for an option that was never defined, such as the 'Doctorate' year, the spot stays blank instead of showing an error.
+  15. Messy or missing details: capitals matter in option names, so asking for the Freshman option as 'freshman' instead of 'FRESHMAN' finds nothing and shows blank.
+  Numbers of any that are wrong (Enter = all correct) > 
+  > 
+  Anything the builders should know that is not on this list? (Enter = nothing) > 
+  > 
+🔎 Last step, 10 quick checks on what the build does in real cases. They catch what a list of rules hides. Tap ✅ if a result is right, or tell me what should happen.
+1 of 10. A page that shows the payment-status list (Paid in full, Late, None) now displays each option's name and stored code without crashing: the invoice page shows 'Paid in full' with code 'P'.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+2 of 10. Looping over the payment-status list on a page produces one row per status, 'P=Paid in full; L=Late; N=', so a status given a blank label shows as an empty row.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+3 of 10. A priority list with Low=1 and High=2 and no wording given for High shows High's label as 'High', made up automatically from its name, so the owner never wrote that text.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+4 of 10. A page that compares an invoice's stored status 'P' to the Paid in full option says yes, so 'if status equals Paid' checks work on pages.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+5 of 10. Printing the whole status list straight onto a page, with no loop, dumps raw code text like [('P', 'Paid in full'), ...] instead of a readable list.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+6 of 10. A page asking for a priority option that doesn't exist (for example Priority.NOPE) shows nothing at all, with no error, so a typo in a page goes unnoticed.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+7 of 10. Looking up priority 3 when only Low=1 and High=2 exist is refused with the error '3 is not a valid Priority', so a stray stored value will fail rather than show a blank.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+8 of 10. A list with a 'no choice' entry labelled '(none)' offers it as an option, but asking whether 'None' is among the allowed options answers no, even though the form shows it.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > I don't have that information. The issue only covers comparing a value to an enum member in a template, like `{% if student.year_in_school == YearInSchool.FRESHMAN %}`. It doesn't cover a 'no choice' entry.
+✍️ With your correction: The list's '(none)' no-choice entry shows on the form as an option, but asking whether 'None' is an allowed option answers no.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > I don't have that information. The issue only covers comparing a value to an enum member in a template, like `{% if student.year_in_school == YearInSchool.FRESHMAN %}`. It doesn't cover a "no choice" entry or what "None" membership checks answer.
+9 of 10. Defining two priorities that share the same stored number (Low=1 and 'Alias Low'=1) is rejected outright with a 'duplicate values' error, so the owner can't keep two names for one number.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > I don't have that information. The issue only covers comparing a value to an enum member in a template, like `{% if student.year_in_school == YearInSchool.FRESHMAN %}`. It doesn't say anything about two names sharing one stored number.
+✍️ With your correction: Defining Low=1 and 'Alias Low'=1 as two priorities sharing the same stored number is still rejected with a 'duplicate values' error, as before.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > I don't have that information. The issue only covers comparing a value to an enum member in a template, like `{% if student.year_in_school == YearInSchool.FRESHMAN %}`. It doesn't say anything about two names sharing one stored number.
+10 of 10. A label shown for a missing item (a page asked for the label of an empty invoice) displays as blank, with no warning.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > I don't have that information. The issue only covers making enumeration types usable in templates, and says nothing about what a label shown for a missing item should display.
+✍️ With your correction: A page asking for the label of an empty invoice still shows a blank spot, with no warning.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > 
+✅ Thank you. 3 of 10 cases changed; the builders will make them so.
+  [02:37] Builder w1 landed: Test that None membership and '(none)' entry are unchanged
+  [02:37] Builder w1 picked up: nonetest.
+  [02:38] Builder w1 landed: Added test pinning None-membership/'(none)' behaviour as unchanged; no code change...
+
+Let me check the result.
+  24 tests, all passing. All 17 that passed before still pass.
+
+Done in under a minute, about $2.28 in all (builders $0.25, Hive's own questions and checks $2.03). Your result is on branch hive/this-repository-is-django-1102-0229.
+  See what changed:  git diff main...hive/this-repository-is-django-1102-0229
+  Take it:           git merge hive/this-repository-is-django-1102-0229
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/this-repository-is-django-1102-0229.)
+
+Your 4 changes are in, and every test passes. It's yours.

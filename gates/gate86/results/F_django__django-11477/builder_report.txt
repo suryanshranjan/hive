@@ -1,0 +1,6 @@
+I landed the `translate_url()` fix. The 154 tests in the check command pass, and `hive land` reported 120/120.
+
+- **Fix:** `RegexPattern.match` in `django/urls/resolvers.py` now drops named groups whose value is `None` from the kwargs. Before, a missing optional group was passed to `reverse()` as `None`, which produced the wrong URL.
+- **Tests:** I added an `optional` URL pattern in `tests/i18n/patterns/urls/default.py`. `test_translate_url_optional_named_groups` in `tests/i18n/patterns/tests.py` checks `/en/optional/1/` and `/en/optional/1/2/` translate to `/nl/optional/1/` and `/nl/optional/1/2/`.
+- **Least sure about:** the fix changes `resolve()` kwargs for every regex pattern, not just `translate_url()`. The urlpatterns tests still pass.
+- **Questions and problems:** none, and I saw no problems with the hive tools.

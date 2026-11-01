@@ -1,0 +1,86 @@
+[
+ {
+  "prompt": "\nOne choice before I start, asked only once: 2 builders would finish about 1.6\u00d7 sooner than one, for about 1.6\u00d7 the cost. Should I build fast or cheap, from now on? (Enter = fast)",
+  "typed": ""
+ },
+ {
+  "prompt": "\n1 of 4. Priya at the front desk opens the 'Wholesale customers' list. It is a special view of the normal customer list, and each row also shows the customer's latest order. The page is set to load only a few details, such as name and phone, so it stays fast. Today this can fail with an error screen. What should happen when it is fixed?\n  A) The list opens normally, treating Wholesale customers exactly like ordinary customers, and loads only the few details asked for  B) The list opens but loads every detail of every customer, so it is slower but safer  C) The list opens, but the order details are left out of the rows\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n2 of 4. On that fast list, the screen asks only for name and phone. Sunil also needs to see a customer's credit limit, which wasn't loaded. He clicks into one customer. What should he see?\n  A) The credit limit appears straight away, fetched when he opens that customer, and the customer's ID is always there even though nobody asked for it  B) The credit limit shows as 'not loaded' until he refreshes the page  C) The credit limit shows as blank or zero unless the list was set up to include it\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "\n4 of 4. A Wholesale customer's record is opened from the list. Wholesale customers have their own sort order (largest account first) and their own label, 'Wholesale account'. What should the person see?\n  A) It is still a Wholesale account, with its own label and its own sort order, and only the behind-the-scenes lookup uses the main customer record  B) It is shown as an ordinary customer, with the normal label and the normal A-to-Z order  C) It shows the Wholesale label but follows the normal sort order\n  Your answer (a letter, or your own words) > ",
+  "typed": "A"
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "1 of 11. Asha's order A1 is looked up with only its reference and her name loaded, where she is saved under a customer-view record: it loads fine and shows A1 for Asha, with no crash.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "2 of 11. Ravi's 'Late order' issue is looked up asking only for his status: it comes back showing gold, and the same happens when his status is held back and fetched later.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "3 of 11. Order A2, which has no customer attached, is listed together with A1 asking for customer names only: A2 comes back with no customer instead of causing an error, and A1 shows Asha.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "4 of 11. An order lookup for a number that does not exist (999) says no match is found, whether or not only some details were requested.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "5 of 11. A customer list built from the customer-view record shows Asha once, and the combined customer-view record also shows her once, not twice.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "6 of 11. The customer-view list for people hides anyone named 'fred', and the alternate list hides 'wilma': with both saved, the main list shows only wilma and the alternate shows only fred.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: With both lists saved, the customer-view list for people now shows only wilma, and the alternate list shows only fred.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "7 of 11. Kerala's state record, listed through the state-view record with only the state and country names requested, shows Kerala and India correctly.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "8 of 11. Asking for order details but loading only the order reference, while also pulling in the customer, is refused: the system says the customer cannot be both skipped and included, rather than silently returning it.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "9 of 11. Saving a state called 'X' with no country attached is rejected as the country is required, so nothing is saved.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The state 'X' with no country is saved anyway, with its country left blank, because country is optional.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "10 of 11. A state saved with a blank name is accepted without complaint: the state list now shows Kerala and an empty name.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The state with a blank name was not saved, the user was told a name is needed, and the list still shows only Kerala.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "11 of 11. Asking for a detail that does not exist, such as 'nope', is refused with a message naming the allowed choice (country), so a typo is caught instead of ignored.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ }
+]

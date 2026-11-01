@@ -1,0 +1,6 @@
+I landed the fix. `ExpressionWrapper` now has a `get_group_by_cols()` that hands the call to the wrapped expression. A wrapped constant like `Value(3)` therefore no longer ends up in `GROUP BY`.
+
+- **Tests:** I added `test_empty_group_by_cols_wrapped_constant` to `tests/expressions/tests.py`. The `expressions.tests` run was OK before landing, and `hive land` reported 133/133 passing.
+- **Least sure about:** the new test checks the generated SQL by string matching (no `, 3` after `GROUP BY`). That is brittle if the SQL formatting changes.
+- **Questions:** none.
+- **Surprises:** none. The hive tools worked as described, and no `OWNER.md` was present.

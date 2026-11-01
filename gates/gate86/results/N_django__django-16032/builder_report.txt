@@ -1,0 +1,6 @@
+Landed `inalias`: `__in` subqueries now select only `pk`, so `annotate()` followed by `alias()` no longer causes "sub-select returns 10 columns". The `annotations.tests` suite passes, as do the `lookup`, `queries`, `expressions` and `basic` suites. `hive land` reported 77/77 tests passing.
+
+- **Fix:** `In.get_prep_lookup` in `django/db/models/lookups.py` now clears the select clause and adds `pk` when the right-hand side has no explicit `select` and uses default columns. Previously it cleared only when there were no annotations either.
+- **Least sure about:** the condition `not rhs.select and rhs.default_cols`. It also drops plain `annotate()` columns from `__in` subqueries (not just ones followed by `alias()`), which I think is the intended behaviour.
+- **Tests:** I added two in `tests/annotations/tests.py`, one for annotate then alias and one for annotate-only. Both failed before the change.
+- **Hive tools:** my first `claim` call with an empty area list failed with "working tree not clean". Landing worked after I committed. No questions asked.

@@ -1,0 +1,7 @@
+I landed the `state` area: `ProjectState.__init__` in `django/db/migrations/state.py` now assumes `real_apps` is a set.
+
+- **Change:** `None` becomes an empty set, and any other value is checked with `assert isinstance(real_apps, set)`.
+- **Callers:** the ones in `django/` already pass sets (`loader.unmigrated_apps`, and `make_state` passes through its own argument). The two test callers also pass sets.
+- **Tests:** I added `ProjectStateRealAppsTests` to `tests/migrations/test_state.py`. It covers the default, a set, and a non-set raising `AssertionError`. `migrations.test_state` passed, and `hive land` reported 46/46.
+- **Least sure about:** using a bare `assert`. It matches the issue's idea of a guaranteed type, but a non-set now fails instead of being converted.
+- **Open:** I asked no questions, and the hive tools gave no problems.

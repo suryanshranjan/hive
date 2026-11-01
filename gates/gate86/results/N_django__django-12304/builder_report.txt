@@ -1,0 +1,6 @@
+I landed the `enums` area. Enumeration types now work in Django templates.
+
+- **Fix:** the `ChoicesMeta` metaclass in `django/db/models/enums.py` sets `do_not_call_in_templates = True` on every Choices class. Templates no longer try to call the class without arguments.
+- **Tests:** I added one test that renders `Suit.DIAMOND.label`, `.value` and `.name` and `YearInSchool.FRESHMAN.value` in a template, and one that checks the attribute is set. `hive land` reported 19/19 `model_enums` tests passing.
+- **Least sure:** I set the attribute in the metaclass `__new__` rather than as a class attribute on `Choices`. I did not check whether it would show up as an enum member in any other case.
+- **Questions and problems:** none, and the hive tools worked as expected.
