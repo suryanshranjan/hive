@@ -697,4 +697,10 @@ _sp = [{'part': p, 'say': f'{p}{k}'} for p in ('a', 'b', 'c') for k in range(4)]
 check('at most 5 spot checks, each part shown before any part gets a second',
       [s['say'] for s in _sc.pick(_sp, ['b', 'a', 'c'], 5)], ['b0', 'a0', 'c0', 'b1', 'a1'])
 check('without a limit every spot check is kept', len(_sc.pick(_sp, ['a', 'b', 'c'], None)), 12)
+# Gate 89: a goal with no business decisions gets no interview
+from hive import interview as _iv
+_keep = explain.ask_json
+explain.ask_json = lambda prompt: {'decisions': []} if 'List the decisions' in prompt else {'situations': [{'situation': 'A shop?', 'options': ['a', 'b']}]}
+check('no business decisions: no interview questions', _iv.write_situations('Fix the ORM bug in deferred_to_data.'), [])
+explain.ask_json = _keep
 sys.exit(fail)

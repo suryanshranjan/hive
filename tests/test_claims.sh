@@ -47,5 +47,10 @@ cd $T/p && $PY -m hive claim px x "x" >/dev/null && echo "x = 1" > x.py && $PY -
 cd $T/q && git pull -q --rebase origin main && $PY -m hive claim qx x "x again" >/dev/null; check "a landed area is not claimed again" $? 1
 cd $T/q && $PY -m hive areas | grep -q "x *landed by p"; check "areas shows it as landed" $? 0
 cd $T/q && $PY -m hive claim --again qx2 x "fix a wrong case in x" >/dev/null; check "--again claims it to fix it" $? 0
+# Gate 90: the business builder may claim a landed area, and beyond an even share
+echo '{"workers": 2, "business_builder": "w2"}' > $T/run2/run.json
+cd $T/q && echo "x = 2" > x.py && $PY -m hive land qx2 "x fixed" >/dev/null; git pull -q --rebase origin main
+HIVE_WORKER=w1 $PY -m hive claim qnot x,y "x again and y" >/dev/null; check "another builder still may not" $? 1
+HIVE_WORKER=w2 $PY -m hive claim qbiz x,y "fill placeholders in x, and y" >/dev/null; check "the business builder claims a landed area and more than a share" $? 0
 unset HIVE_RUN
 rm -rf $T; exit $fail

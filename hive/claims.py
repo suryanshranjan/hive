@@ -45,6 +45,15 @@ def fair_share(n_areas):
         return max(1, n_areas)
     return max(1, math.ceil(n_areas / max(1, workers)))
 
+def business_builder():
+    """True if this builder is the run's business builder (Gate 74's split), who owns every business part (Gate 90)."""
+    import json
+    try:
+        return bool(os.environ.get('HIVE_WORKER')) and json.load(open(os.path.join(os.environ['HIVE_RUN'], 'run.json'))).get(
+            'business_builder') == os.environ['HIVE_WORKER']
+    except Exception:
+        return False
+
 def mine(name):
     """True if this clone's checkout holds lock `name`, taken by this builder."""
     path = os.path.join(LOCK_DIR, f'{name}.txt')
@@ -60,7 +69,7 @@ def claim(name, areas, desc, again=False):
     if known and wanted - known:
         print('unknown areas: ' + ', '.join(sorted(wanted - known)) + '; known: ' + ', '.join(sorted(known))); return 4
     most = fair_share(len(known))
-    if known and len(wanted) > most:   # Gate 81: one builder claimed every area and the others had nothing to build
+    if known and len(wanted) > most and not business_builder():   # Gate 81: one builder claimed every area and the others had nothing to build
         print(f'claim at most {most} area(s) at a time, so every builder has work; land them, then claim more'); return 1
     if sh('git', 'status', '--porcelain', '--untracked-files=no').stdout.strip():
         print('working tree not clean: commit or stash first'); return 3
@@ -69,7 +78,7 @@ def claim(name, areas, desc, again=False):
     held = locks()
     from .guard import landed
     done = {a: d for a, d in landed().items() if a in wanted}
-    if done and not again:   # Gate 82: an area landed and freed looked "free", and two builders rebuilt landed work
+    if done and not again and not business_builder():   # Gate 90: the business builder fills others' placeholders   # Gate 82: an area landed and freed looked "free", and two builders rebuilt landed work
         print('already landed in this build: ' + ', '.join(f"{a} (by {d['by']})" for a, d in sorted(done.items()))
               + '. Choose another area; claim it again with --again only to fix something you found wrong in it.'); return 1
     if name in held:

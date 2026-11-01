@@ -272,9 +272,15 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
         say(f"I'll remind them of your {_n(k, 'earlier ruling')} on this project, so you won't be asked those again.")
     asked = []
     if interview_first and (phone or not overnight):   # the owner is here: ask him first (Gates 30-35)
-        say("\nFirst, a few quick situations where your own rules matter" + (", on your phone." if phone else ":"))
-        asked = interview.interview(goal_text, phone, [r['text'] for r in memory.load(repo)], ask=lambda p: _ask(p, ''),
-                                    save=os.path.join(home, 'interview'))   # a stop never costs him his answers
+        past = [r['text'] for r in memory.load(repo)]
+        qs = telegram._load(os.path.join(home, 'interview') + '.questions.json').get('qs') or interview.write_situations(goal_text, past)
+        if qs:
+            say("\nFirst, a few quick situations where your own rules matter" + (", on your phone." if phone else ":"))
+            asked = interview.interview(goal_text, phone, past, ask=lambda p: _ask(p, ''), situations=qs,
+                                        save=os.path.join(home, 'interview'))   # a stop never costs him his answers
+        else:   # Gate 89: a technical goal has no business decisions to ask him about (Gate 86: it invented a shop)
+            say("\nThis goal has no business decisions for you to rule on, so I won't quiz you first. The builders will ask "
+                "if they need anything.")
         if asked:
             for r in asked:
                 memory.add(repo, r, 'interview')
