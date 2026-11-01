@@ -1,0 +1,11 @@
+All three areas have landed. I built refunds, w2 built loyalty points and w1 built the sales summary. The shared branch passes 21 of 21 tests.
+
+- **Landed:** `shop/refunds.py` with `tests/test_refunds.py` (14 tests). I did not review loyalty or the sales summary.
+- **Least sure of:**
+  - Never-arrived parcels: a final-sale order is still refunded, and the under-50 rule still applies.
+  - A half refund is worked out on the items paid after the coupon, then rounded down.
+  - Only the word "damaged" counts as damaged. Any other reason, including blank, is treated as changed mind.
+  - Negative days since delivery counts as day 0.
+- **Order model gap:** the shop's order doesn't record mixed payments or non-returnable items, so the code reads optional card-paid and store-credit-paid amounts and a per-item returnable flag. Without them it assumes card-only and returnable. The result also lists the card and store-credit parts separately, as the owner asked.
+- **Questions asked:** 3 (shipping on a change-of-mind refund, the under-50 rule on half refunds, and the mixed-payment slip). I recorded 8 business assumptions and 1 technical one.
+- **Tooling:** the first land hit a rebase conflict on committed `__pycache__` files. I resolved it by keeping the upstream copies.

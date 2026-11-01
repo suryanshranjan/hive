@@ -1,0 +1,7 @@
+Landed `loyalty_points_shop_loyalty_py`: `points_earned` in `shop/loyalty.py`, with tests in `tests/test_loyalty.py`. The suite passed 9/9 on land. The other two areas are held or landed by others, so I'm stopping with no lock left behind.
+
+- **Rule as built:** points = (items − discount) // 100, with shipping ignored. It gives 0 for store-credit orders and for items under ₹500 after the discount, and final-sale orders earn double. Returns never change points, because `points_earned` only reads the order.
+- **Least sure:** whether the ₹500 minimum is checked on the net items amount, which is how I read it, and whether a final-sale order below ₹500 should also earn nothing. I assumed it earns nothing.
+- **Questions:** none asked.
+- **Hive problem:** my first `land` hit a rebase conflict because my commit had picked up `.pyc` files, and `hive land --continue` wouldn't recover. I aborted the rebase, reset to `origin/main`, re-added only my two files and landed again.
+- **Cleanup:** `.gitignore` only covers `.hive/junit.xml`, so `__pycache__` can still be committed by accident.

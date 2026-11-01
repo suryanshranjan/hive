@@ -1,0 +1,6 @@
+Landed `points_earned` in `shop/loyalty.py`. It gives 1 point per full Rs 100 of items after the discount, and shipping earns nothing. An order with no items or under Rs 100 earns 0. I added tests in `tests/test_loyalty.py`, and 7 of 7 tests pass on landing.
+
+- **Least sure of:** whether points count items after discount or before, whether shipping earns points, and whether store-credit and final-sale orders earn points. I also don't know the rounding.
+- **Questions asked:** 5, covering rounding, shipping, discount, store credit, and points taken back on a refund.
+- **Assumptions recorded:** 5.
+- **Surprise:** `__pycache__` files were tracked in the repo, and they caused the rebase conflict. I untracked them in my commit, which deletes them from the repo. A `.gitignore` entry would stop them coming back.

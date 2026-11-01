@@ -1,0 +1,11 @@
+live: rc 0, 5.6 min, after 13 failed, 14 passed in 0.07s, owner prompts 22, builders' cost $0.51
+  areas 3, builders 3, split True, lock sizes [1, 1, 1] (share 1), landers ['w3', 'w2', 'w1'], touched {'w1': ['sales_summary'], 'w2': ['points_earned'], 'w3': ['refund']}, questions 3
+overnight: rc 0, 3.6 min, after 2 failed, 25 passed in 0.04s, owner prompts 16, builders' cost $0.9
+  areas 3, builders 3, split False, lock sizes [1, 1, 1] (share 1), landers ['w1', 'w2', 'w3'], touched {'w1': ['refund'], 'w2': ['points_earned'], 'w3': ['sales_summary']}, questions 16
+
+predictions
+Q1 live: no crash, one branch, >= 24: 14 -> failed
+Q2 no part built twice (live 0, overnight 0) -> held
+Q3 claims within an even share, and 2+ builders landed where the areas allow (live True, overnight True) -> held
+Q4 overnight: no crash, >= 22 after the morning (25), fix ran (True) -> held
+Q5 all three functions delivered (live True, overnight True) -> held

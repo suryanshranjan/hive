@@ -1,0 +1,6 @@
+I landed `sales_summary_shop_report_py`: `shop/report.py` and `tests/test_report.py`, and all 4 tests pass. Loyalty (held by w2a) and refunds (held by `refunds`) are claimed by others, so I stopped.
+
+- **What it does:** `orders` is `len(orders)`, so cancelled and refunded orders count. `revenue` is the sum of `total()` over card orders only, with no refunds subtracted.
+- **Least sure:** `average`. The owner's rules don't define it, so I left a marked placeholder for `w3`. It is revenue divided by the order count (including store-credit orders), rounded down, and 0 for an empty list.
+- **Questions asked:** none.
+- **Hive tools:** no problems.

@@ -1,0 +1,9 @@
+I built and landed the refunds area, and all 11 tests pass after the merge. Loyalty and the daily sales summary were not mine, so I didn't touch them.
+
+- **Landed:** `refund()` in `shop/refunds.py`, with tests in `tests/test_refunds.py`.
+  - A damaged item gets items plus shipping back within 30 days.
+  - A changed-mind return gets items only (shipping kept). It goes back to the original payment method up to day 7, as store credit on days 8–30, and nothing after that.
+  - Final-sale orders get nothing.
+- **Least sure of:** the 7-day and 30-day cut-offs, and treating any other or blank reason like a changed mind. I invented all three. I refund the discounted price actually paid, not the full item price.
+- **Questions asked:** 7 for the owner (day-7/day-8 cut-off, store credit versus nothing at 20 days, 31-day damage, shipping refund, discount-code refund, unknown reason, final-sale damaged). I also recorded 7 business assumptions and 1 technical one.
+- **Surprising:** `__pycache__` files are tracked in git, which caused a rebase conflict on my first `hive land`; I resolved it and it landed. The tool also rejected the wording of one question and two assumptions, so I re-recorded them.

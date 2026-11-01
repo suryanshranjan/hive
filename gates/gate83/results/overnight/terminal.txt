@@ -1,0 +1,237 @@
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: pytest. 2 tests, all passing.
+
+I'll put 3 builders on it (the job has 3 parts that can be built at the same time): about 1.9× the speed of one builder, for about 1.8× the cost. They work on copies, so your branches stay exactly as they are.
+You're away, so they won't ask you anything: they'll decide, and write down every business assumption for you to check when you're back.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+
+[22:28] Starting.
+  [22:28] Builder w1 picked up: w1.
+  [22:28] Builder w3 picked up: report.
+  [22:28] Builder w2 picked up: loyalty.
+  [22:28] Builder w3 landed: Add sales_summary
+  [22:28] Builder w3 landed: sales_summary: revenue=sum of totals incl shipping, average rounded half up, 0 for...
+  [22:28] Builder w3 landed: hive: leave build output and dependencies out of the shared branch
+  [22:28] Builder w2 landed: Add loyalty points_earned
+  [22:28] Builder w2 landed: points_earned: 1 point per full Rs100 of items after discount, excluding shipping...
+  [22:28] Builder w1 landed: Add refund()
+  [22:28] Builder w1 landed: refund(): damaged full incl shipping 30d; changed mind 7d original method, 30d credit...
+
+[22:28] All 3 builders are done.
+
+Let me check the result.
+  11 tests, all passing. All 2 that passed before still pass.
+
+Done in 1 minute, about $0.36. Your result is on branch hive/add-three-things-to-1101-2228.
+  See what changed:  git diff main...hive/add-three-things-to-1101-2228
+  Take it:           git merge hive/add-three-things-to-1101-2228
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/add-three-things-to-1101-2228.)
+
+They wrote down 16 questions only you can answer. When you're back, type `hive morning`: answer them, and I'll change the build to your answers and update the branch.
+
+--- the next morning: the owner types hive morning ---
+
+Welcome back. While you were away, the builders worked on: Add three things to the shop. (1) Refunds: `refund(order, days_since_delivery, reason)` in `shop/refunds.py`, returning 
+They wrote down 16 questions only you can answer. Pick a letter, or answer in your own words, and press Enter.
+
+========================================================================
+ Question 1  -  from builder w3  -  asked 1:14 ago
+========================================================================
+
+  A day has 2 orders totalling Rs 251 (Rs 150 and Rs 101). The average
+  per order is Rs 125.50: should the report show Rs 126 (round up), Rs
+  125 (round down), or something else?
+
+  Your answer (a letter, or say it in your own words) >   > Round down: Rs 125. Average is revenue divided by the number of card orders, rounded down to whole rupees.
+  Thanks, sent to builder w3. (1 answered so far)
+
+========================================================================
+ Question 2  -  from builder w3  -  asked 1:17 ago
+========================================================================
+
+  Should daily revenue include shipping fees? E.g. an order with Rs
+  100 of items and Rs 50 shipping: does it count as Rs 150 or Rs 100
+  revenue?
+
+  Your answer (a letter, or say it in your own words) >   > Yes, include shipping. Revenue is the totals of card orders only (items after discount, plus shipping). Store-credit orders bring in no new money, so leave them out.
+  Thanks, sent to builder w3. (2 answered so far)
+
+========================================================================
+ Question 3  -  from builder w3  -  asked 1:21 ago
+========================================================================
+
+  A day has no orders at all: should the summary show average Rs 0, or
+  no average?
+
+  Your answer (a letter, or say it in your own words) >   > Show Rs 0 when there are no card orders. Average is revenue divided by the number of card orders, rounded down, and 0 if there are none.
+  Thanks, sent to builder w3. (3 answered so far)
+
+========================================================================
+ Question 4  -  from builder w3  -  asked 1:24 ago
+========================================================================
+
+  An order was fully refunded or cancelled later the same day (e.g. Rs
+  800 order): should it still count in that day's orders and revenue?
+
+  Your answer (a letter, or say it in your own words) >   > Refunds and cancellations aren't in my sales summary rules, so keep it simple: every order in the list still counts in orders, and card orders still count in revenue. Only store-credit orders are left out of revenue.
+  Thanks, sent to builder w3. (4 answered so far)
+
+========================================================================
+ Question 5  -  from builder w2  -  asked 1:24 ago
+========================================================================
+
+  A customer's order has items worth Rs 1,250 after discount: do they
+  earn 12 points (1 per full Rs 100) or 13 (rounded)?
+
+  Your answer (a letter, or say it in your own words) >   > Round down to 12 points. One point for every full 100 rupees paid for the items after the discount code, so Rs 1,250 gives 12. This only applies to card orders where the items come to at least Rs 500, and final-sale orders earn double.
+  Thanks, sent to builder w2. (5 answered so far)
+
+========================================================================
+ Question 6  -  from builder w2  -  asked 1:28 ago
+========================================================================
+
+  A customer pays Rs 1,000 for items plus Rs 150 shipping: should the
+  shipping fee earn points too?
+
+  Your answer (a letter, or say it in your own words) >   > No, shipping earns nothing. Points are only for the items after the discount code.
+  Thanks, sent to builder w2. (6 answered so far)
+
+========================================================================
+ Question 7  -  from builder w2  -  asked 1:32 ago
+========================================================================
+
+  A customer uses a 10% code on Rs 1,000 of items: do points count the
+  Rs 900 paid or the Rs 1,000 before discount?
+
+  Your answer (a letter, or say it in your own words) >   > Points count the amount actually paid for the items, so the Rs 900 after the discount code, which gives 9 points. Remember: card orders only, at least Rs 500 in items after the discount, and final-sale orders earn double.
+  Thanks, sent to builder w2. (7 answered so far)
+
+========================================================================
+ Question 8  -  from builder w1  -  asked 1:35 ago
+========================================================================
+
+  A customer returns a Rs 800 order (Rs 50 shipping) because they
+  changed their mind 7 days after delivery: full refund, or is day 7
+  too late? And 8 days?
+
+  Your answer (a letter, or say it in your own words) >   > Within 14 days of delivery (day 14 included), a change-of-mind return gets the full amount, so day 7 is fine. Day 8 is fine too. From day 15 to day 30 it's half, and after day 30 it's nothing. The refund is worked out on the items minus the discount code, and the Rs 50 shipping is not refunded.
+  Thanks, sent to builder w1. (8 answered so far)
+
+========================================================================
+ Question 9  -  from builder w2  -  asked 1:39 ago
+========================================================================
+
+  A customer pays an order entirely with store credit: do they still
+  earn points?
+
+  Your answer (a letter, or say it in your own words) >   > No. Orders paid entirely with store credit earn no points. Points are only for card orders where the items come to at least 500 rupees after the discount, and final-sale orders earn double.
+  Thanks, sent to builder w2. (9 answered so far)
+
+========================================================================
+ Question 10  -  from builder w1  -  asked 1:43 ago
+========================================================================
+
+  A customer who changed their mind 20 days after delivery on a Rs 720
+  order: should they get store credit, or nothing?
+
+  Your answer (a letter, or say it in your own words) >   > Card orders get the refund back to the card, not store credit. Store credit orders get store credit. After 14 days it's half, so day 20 on Rs 720 of items (after the discount code) is half, Rs 360, rounded down. The shipping is not refunded.
+  Thanks, sent to builder w1. (10 answered so far)
+
+========================================================================
+ Question 11  -  from builder w2  -  asked 1:47 ago
+========================================================================
+
+  A customer's order was later refunded in full: should the points
+  earned be taken back?
+
+  Your answer (a letter, or say it in your own words) >   > Refunds and loyalty points aren't in each other's rules, so keep it simple: no, don't take the points back. Points are only decided by the points rules (card orders, items at least 500 rupees after the discount, final-sale double).
+  Thanks, sent to builder w2. (11 answered so far)
+
+========================================================================
+ Question 12  -  from builder w1  -  asked 1:51 ago
+========================================================================
+
+  A customer reports a mug damaged 31 days after delivery on a Rs 770
+  order: any refund?
+
+  Your answer (a letter, or say it in your own words) >   > Damaged goods get the full amount up to 90 days after delivery, so day 31 is fine. On Rs 770 of items (after the discount code) that's the full Rs 770, plus the shipping fee refunded too, rounded down to whole rupees.
+  Thanks, sent to builder w1. (12 answered so far)
+
+========================================================================
+ Question 13  -  from builder w1  -  asked 1:53 ago
+========================================================================
+
+  A Rs 800 order with Rs 50 shipping arrives damaged: is the Rs 50
+  shipping refunded too (I assume yes), and is it not refunded for
+  changed mind?
+
+  Your answer (a letter, or say it in your own words) >   > Yes, the Rs 50 shipping is refunded too when the goods arrive damaged, so the full Rs 800 plus the Rs 50 shipping. For a changed-mind return the shipping is never refunded. Damaged goods get the full amount up to 90 days after delivery.
+  Thanks, sent to builder w1. (13 answered so far)
+
+========================================================================
+ Question 14  -  from builder w1  -  asked 1:57 ago
+========================================================================
+
+  An order bought with a 10% discount code (Rs 800 items, Rs 720
+  paid): refund Rs 720 or Rs 800?
+
+  Your answer (a letter, or say it in your own words) >   > Refund on what the customer actually paid for the items, so Rs 720 (items after the discount code), then the usual day rules apply. Shipping is never refunded except for damaged goods.
+  Thanks, sent to builder w1. (14 answered so far)
+
+========================================================================
+ Question 15  -  from builder w1  -  asked 2:00 ago
+========================================================================
+
+  A final-sale item is damaged on arrival: still refund it?
+
+  Your answer (a letter, or say it in your own words) >   > Yes, refund it. Final-sale orders get no refund unless the goods arrived damaged, so a damaged final-sale item gets the full amount (items after the discount code) plus the shipping fee, up to 90 days after delivery.
+  Thanks, sent to builder w1. (15 answered so far)
+
+========================================================================
+ Question 16  -  from builder w1  -  asked 1:52 ago
+========================================================================
+
+  A customer returns a Rs 800 order because it is the wrong size, or
+  gives no reason at all. What should happen?
+
+    A) treat it like changed their mind
+    B) refund nothing
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   > Wrong size or no reason at all should be treated like changed their mind: full amount within 14 days of delivery, half from day 15 to 30, nothing after day 30. Shipping is not refunded, and it goes back the way it was paid.
+  Thanks, sent to builder w1. (16 answered so far)
+
+[22:30] Sending the builders back to build your 16 answers in.
+  [22:31] Builder w1 picked up: w1.
+  [22:31] Builder w1 landed: refund(): follow owner answers (14/30/90 day rules, half rounded down, original method)
+  [22:31] Builder w1 landed: Refund rules per owner; edited tests test_changed_mind_late_is_credit (now half to...
+  [22:31] Builder w1 landed: hive: leave build output and dependencies out of the shared branch
+  [22:31] Builder w1 landed: keep original test names
+  [22:31] Builder w1 landed: hive: leave build output and dependencies out of the shared branch
+  [22:31] Builder w1 picked up: w1b.
+  [22:31] Builder w3 picked up: w3a.
+  [22:31] Builder w1 landed: points_earned: card only, min 500, final sale double
+  [22:31] Builder w1 landed: Loyalty rules per owner; no existing tests changed (lock w1b released)
+  [22:31] Builder w1 landed: hive: leave build output and dependencies out of the shared branch
+  [22:31] Builder w3 landed: sales_summary: owner's rules
+  [22:31] Builder w3 landed: report per owner answers; edited test_summary_rounding: average 126 -> 125 (round...
+  [22:31] Builder w3 landed: hive: leave build output and dependencies out of the shared branch
+  [22:31] Builder w2 landed: refund(): follow owner answers
+  [22:31] Builder w2 picked up: w2.
+  [22:31] Builder w2 landed: refund per owner answers: 14d full/15-30 half/none after, any non-damaged reason incl...
+[22:31] Your answers are built in.
+
+Let me check the result.
+  24 tests, all passing. All 2 that passed before still pass.
+  I've noted 16 new rulings of yours for the next build on this project.
+
+Done in under a minute, about $1.72 in all (builders $0.90, Hive's own questions and checks $0.82). Your result is on branch hive/add-three-things-to-1101-2228.
+  See what changed:  git diff main...hive/add-three-things-to-1101-2228
+  Take it:           git merge hive/add-three-things-to-1101-2228
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/add-three-things-to-1101-2228.)
+
+Your answers are built in. 24 tests, all passing. All 2 that passed before still pass. It's ready on branch hive/add-three-things-to-1101-2228.

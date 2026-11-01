@@ -1,0 +1,7 @@
+I landed `sales_summary` in `shop/report.py`. The other two areas are held by teammates, so I'm stopping.
+
+- **Landed:** `sales_summary(orders)` returns the order count, revenue and average. Revenue is the sum of each order's final total, shipping included. The average is rounded half up, and a day with no orders gives 0 for all three. I added `tests/test_report.py`, and all 4 tests pass.
+- **Least sure about:** the average rounding, whether revenue should include shipping, and whether refunded or cancelled orders should still count.
+- **Questions asked (4):** average rounding, shipping in revenue, the average on a day with no orders, and orders refunded or cancelled later the same day.
+- **Assumptions recorded:** 3 for the owner and 1 technical. Any order passed in counts, whatever its status or payment method.
+- **Problems with the hive tools:** none. Loyalty is held by another worker and refunds by w1. I released nothing, because I hold no lock now.
