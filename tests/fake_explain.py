@@ -8,6 +8,9 @@ if 'would settle the new question completely' in prompt:   # duplicate questions
     same = next((int(n) for n, q in earlier.items() if q.strip() == new), None)
     print(json.dumps({'result': json.dumps({'same': same})}))
     sys.exit(0)
+if 'List every function it names explicitly' in prompt:   # Gate 84: the goal's stated interfaces (none here)
+    print(json.dumps({'result': json.dumps({'functions': []})}))
+    sys.exit(0)
 if 'How many independent parts does it have' in prompt:   # the law's estimate of parallel work: fees and payouts
     print(json.dumps({'result': json.dumps({'parts': ['fees', 'payouts']})}))
     sys.exit(0)

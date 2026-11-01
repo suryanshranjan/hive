@@ -5,7 +5,7 @@ and their assumptions to the owner in plain words, sends back what the owner cor
 over a branch. The owner's own branches are never changed: the result arrives as a new branch, hive/<name>."""
 import csv, glob, json, os, re, shlex, shutil, subprocess, sys, threading, time
 
-from . import PY, codesheet, docs as docs_mod, explain, interview, junit, law, memory, owner, spotcheck, swarm, telegram
+from . import PY, codesheet, contract, docs as docs_mod, explain, interview, junit, law, memory, owner, spotcheck, swarm, telegram
 from .guard import sh
 
 RUNS = os.path.join(os.path.expanduser('~'), '.hive', 'runs')
@@ -335,6 +335,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
         return rc
     answered = _answered(run1)
     if answered >= ASKED_ENOUGH:   # Gate 68: after builders asked him, the full review added +1.6 points (98.4 -> 100%)
+        _keep_contract(state, phone)   # Gate 84: with the review skipped, the goal's stated interfaces are still checked
         rc = _deliver(state)
         msg = (f"{_who(state)} asked you {_n(answered, 'question')} while building, and your answers are built in. "
                f"{state.get('check', '')} It's ready on branch hive/{name}.")
@@ -363,6 +364,36 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
 QUESTIONS_PER_BUILDER = 10   # Gate 68: 3 builders told to ask first asked 24.5 questions on a 10-function job
 ASKED_ENOUGH = 3             # answered builder questions after which the hand-over is skipped (Gate 68 saw 11-26; the
                              # threshold itself is untested)
+
+def _keep_contract(state, ch=None):
+    """Gate 84: check the build against the interfaces the goal states (names, arguments, a dict result's keys); if it
+    differs, one builder puts them back. Returns True when a fix round ran. Costs the owner nothing."""
+    if os.environ.get('HIVE_CONTRACT_CHECK') == '0':
+        return False
+    code = os.path.join(state['home'], 'contract_check')
+    if os.path.exists(code):
+        _rmtree(code)
+    sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', state['b'], os.path.join(state['final'], 'up.git'), code)
+    try:
+        problems = contract.check(state['goal'], code)
+    except Exception:
+        problems = []
+    _rmtree(code)
+    state['contract'] = problems
+    if not problems:
+        return False
+    say(f"\n[{_now()}] The build changed {_n(len(problems), 'thing')} your goal fixed: "
+        + '; '.join(f"{p['name']} ({p['problem']})" for p in problems[:3]) + ". Sending a builder to put it back.")
+    fsrc = os.path.join(state['home'], 'contract_source')
+    if os.path.exists(fsrc):
+        _rmtree(fsrc)
+    sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', state['b'], os.path.join(state['final'], 'up.git'), fsrc)
+    _link(state['repo'], fsrc, state['links'])
+    run2 = os.path.join(state['home'], 'contract_fix')
+    _phase(fsrc, run2, 1, state['goal'] + state.get('rules', '') + contract.note(problems), state['minutes'], 0, False, False, ch)
+    state.update(final=run2, cost=state['cost'] + _cost(run2))
+    json.dump(state, open(os.path.join(state['home'], 'state.json'), 'w'), indent=1)
+    return True
 
 def _answered(run):
     """How many of the builders' questions the owner answered during this build."""

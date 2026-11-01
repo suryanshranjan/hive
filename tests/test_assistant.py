@@ -676,4 +676,19 @@ check('once he answers, the copy gets the same answer and nothing is held',
 explain.ask_json = _save
 json.dump({'pid': os.getpid(), 'at': time.time()}, open(telegram.BUSY, 'w'))
 check("its own claim doesn't block it", telegram.busy_elsewhere(), False)
+# Gate 84: the goal's stated interfaces, checked against delivered code from its syntax
+from hive import contract
+_cd = tempfile.mkdtemp(); os.makedirs(os.path.join(_cd, 'shop'))
+open(os.path.join(_cd, 'shop', 'refunds.py'), 'w').write(
+    "def refund(order, days, reason):\n    if days > 30:\n        return {'amount': 0, 'method': 'card'}\n"
+    "    return {'amount': 1, 'method': 'card', 'store_credit': 0}\n")
+_if = [dict(file='shop/refunds.py', name='refund', args=['order', 'days', 'reason'], result_keys=['amount', 'method']),
+       dict(file='shop/loyalty.py', name='points_earned', args=['order'], result_keys=None)]
+_got = contract.check('', _cd, _if)
+check('a result with extra keys and a missing function are found; matching parts are not',
+      [(p['name'], 'extra: store_credit' in p['problem'] or 'not in the code' in p['problem']) for p in _got],
+      [('refund', True), ('points_earned', True)])
+open(os.path.join(_cd, 'shop', 'loyalty.py'), 'w').write("def points_earned(order):\n    return order.total // 100\n")
+open(os.path.join(_cd, 'shop', 'refunds.py'), 'w').write("def refund(order, days, reason):\n    out = {'amount': 1}\n    out['method'] = 'card'\n    return out\n")
+check('code that matches, or whose result is not a plain dict literal, is left alone', contract.check('', _cd, _if), [])
 sys.exit(fail)
