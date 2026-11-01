@@ -1,0 +1,15 @@
+== runs/g73a A1: t95 35.6, tdone inf, wall 36.5 min; visible 1359/1360; engine hidden 99.8%, business hidden 99.6%; 25 questions; $2.36
+== runs/g73a S7D: t95 14.1, tdone 23.2, wall 23.5 min; visible 1360/1360; engine hidden 99.8%, business hidden 86.8%; 20 questions; $4.42
+== runs/g73a S7Q: t95 5.7, tdone 57.0, wall 57.2 min; visible 1360/1360; engine hidden 99.8%, business hidden 88.8%; 56 questions; $6.64
+== runs/g73b S7Q: t95 7.3, tdone 70.7, wall 70.9 min; visible 1360/1360; engine hidden 99.8%, business hidden 93.2%; 74 questions; $6.76
+== runs/g73b S7D: t95 11.8, tdone 25.7, wall 27.9 min; visible 1360/1360; engine hidden 99.8%, business hidden 92.8%; 25 questions; $5.59
+== runs/g73b A1: t95 34.5, tdone 35.5, wall 38.8 min; visible 1360/1360; engine hidden 99.8%, business hidden 94.4%; 18 questions; $3.59
+
+means: A1: tdone inf min, engine 99.8%, business 97.0%, 21.5 questions, $2.98; S7D: tdone 24.5 min, engine 99.8%, business 89.8%, 22.5 questions, $5.00; S7Q: tdone 63.8 min, engine 99.8%, business 91.0%, 65.0 questions, $6.70
+
+predictions
+Y1 S7Q tdone ≤ 0.8 × A1: 0.00× -> held
+Y2 S7Q business ≥ A1 − 2: -6.0 -> failed
+Y3 S7D business ≥ A1 − 2: -7.2 -> failed
+Y4 S7D asks ≤ 1.1 × A1: 1.05× -> held
+Claim (Hive's swarm beats one agent on a mixed job: sooner and as right): did not fire

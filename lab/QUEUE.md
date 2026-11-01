@@ -2,7 +2,7 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 1 2026 IST, after Gate 72)
+## Where we left off (Nov 1 2026 IST, after Gate 73; Gate 74 running)
 
 - **Gate 66 done (the user, travelling: "test something that makes Hive the best tool"):** one Claude Code agent that asks the owner beat Hive's hand-over by 21-30 hidden points (CQ 93.0, CC 84.6, HV 63.4, N0 34.8%) at 1/13 of his reading. Wind tunnel, synthetic owner who answers from his policy.
 - **Gate 67 done:** the hand-over's memory does not compound (neither rule fired).
@@ -11,7 +11,9 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 - **Gate 70 done (ship fired, shipped):** overnight questions answered in the morning 94.2% vs morning hand-over 75.0%.
 - **Gate 71 done (claim did not fire):** with the owner at 60 s an answer, one agent and the 7-builder swarm both took 48 min; the swarm 85.4% vs 94.1% (questions lost to the 2-minute cutoff; `hive ask` fixed). g71b was rerun after the 04:10 container restart.
 - **Gate 72 done (claim did not fire, narrowly):** mixed job, owner at 60 s: the swarm reached 95% 2.4-7× sooner and finished 0.77× the time at 2.9× the cost; engine as right, business 93.8 vs 97.2%. Shipped from its first run: one answer serves a repeated question.
-- **Next (wind tunnel):** Gate 72 again with the repeated-question fix (does the swarm then match one agent's business correctness and keep its speed?). **With the founder:** Gate 45 day 2, builders asking him live; measure his answer time and whether his answers hold.
+- **Gate 73 done (claim did not fire):** the repeated-question rule kept the swarm's questions at one agent's level but its business rules stayed less right (89.8 vs 97.0%); Hive asking first flooded the owner (65 questions, 64 min).
+- **Gate 74 running:** 6 engine builders plus 1 dedicated business builder who asks systematically, against one agent with the same ask instruction.
+- **Earlier plan, superseded by Gate 73:** Gate 72 again with the repeated-question fix (does the swarm then match one agent's business correctness and keep its speed?). **With the founder:** Gate 45 day 2, builders asking him live; measure his answer time and whether his answers hold.
 - **For Gate 45 day 2 with the founder:** test builders asking him live (his answers drift; does asking still win?).
 
 ## Earlier (Oct 30 2026 IST, after Gate 65)

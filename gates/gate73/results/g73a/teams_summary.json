@@ -1,0 +1,770 @@
+{
+ "A1": {
+  "team_start": 1793501898,
+  "team_end": 1793504089,
+  "builders": 1,
+  "progress": [
+   {
+    "hash": "7c2f65ad0c7da37443c57ce317fbd7b3bd1a963c",
+    "t": 1793074251,
+    "who": "referee",
+    "subject": "Initial skeleton: lexer, parser, engine; 210 visible tests",
+    "visible": 9
+   },
+   {
+    "hash": "fac982b9d3d2bbcba0bb20ff8b9e75de06c50d95",
+    "t": 1793074846,
+    "who": "A-builder-1",
+    "subject": "Expression parser with precedence climbing; arithmetic, comparison, AND/OR/NOT, || evaluation (lock arith released)",
+    "visible": 31
+   },
+   {
+    "hash": "58502b5bc022ff290ae7bc6bb2cc02c45d8f79fe",
+    "t": 1793074866,
+    "who": "A-builder-2",
+    "subject": "ORDER BY (multi-key, ASC/DESC, SQLite type ordering, alias/position), LIMIT/OFFSET (lock order_limit released)",
+    "visible": 46
+   },
+   {
+    "hash": "43cd7099813038102340f943c553ae89cfef7fc2",
+    "t": 1793074882,
+    "who": "A-builder-6",
+    "subject": "UPDATE/DELETE statements with optional WHERE; rest of category needs BETWEEN (where) and COUNT (aggregates) (lock update",
+    "visible": 52
+   },
+   {
+    "hash": "d66efd532e0dc28da87f27f0e598c7636e37fe49",
+    "t": 1793074890,
+    "who": "A-builder-5",
+    "subject": "FROM table aliases and qualified column refs (lock basic released)",
+    "visible": 55
+   },
+   {
+    "hash": "4eefde39001318a45dc82c5b2ed5a28d77bf0be9",
+    "t": 1793074905,
+    "who": "A-builder-1",
+    "subject": "CASE expressions (simple and searched); remaining case tests need IS NULL (where) and SUM (aggregates) (lock case releas",
+    "visible": 58
+   },
+   {
+    "hash": "6004fa36782c339e2a42059c0350d43b93788bdc",
+    "t": 1793074921,
+    "who": "A-builder-2",
+    "subject": "SELECT DISTINCT / ALL: dedup output rows before ORDER BY/LIMIT (lock distinct released)",
+    "visible": 69
+   },
+   {
+    "hash": "888d758ea82acdc7234e574857753b1bc1ff65c0",
+    "t": 1793074934,
+    "who": "A-builder-5",
+    "subject": "Joins: comma/CROSS/[INNER] JOIN ... ON, LEFT [OUTER] JOIN via Connection.source_rows; remaining join tests need WHERE/GR",
+    "visible": 82
+   },
+   {
+    "hash": "dd66f00c86f9ea4eb39f93ab1e64861a474f93ad",
+    "t": 1793074952,
+    "who": "A-builder-3",
+    "subject": "WHERE clause: comparisons, AND/OR/NOT, BETWEEN, IN, IS [NOT] NULL (lock where released)",
+    "visible": 129
+   },
+   {
+    "hash": "e9019fdc87e01083e3ee3f9d255efbfc18d7f682",
+    "t": 1793074976,
+    "who": "A-builder-4",
+    "subject": "Function-call parsing ('func' node) and aggregates COUNT/SUM/TOTAL/AVG/MIN/MAX/GROUP_CONCAT with DISTINCT, whole-table a",
+    "visible": 156
+   },
+   {
+    "hash": "96f0e6ef7caa2703b5e1e092109de874755cb252",
+    "t": 1793075006,
+    "who": "A-builder-1",
+    "subject": "Subqueries: scalar (correlated via outer-env fallback), IN (SELECT ...), FROM (SELECT ...) derived tables; remaining tes",
+    "visible": 169
+   },
+   {
+    "hash": "f3d0ded1b02650adf13c9a19ea00c5988d70cc93",
+    "t": 1793075009,
+    "who": "A-builder-6",
+    "subject": "Function-call parsing ('func', NAME, args, distinct), scalar funcs (SUBSTR/UPPER/LOWER/LENGTH/IFNULL/NULLIF/COALESCE/ABS",
+    "visible": 183
+   },
+   {
+    "hash": "1b53f1083eb1b016c12b2595ced03f7b2417112a",
+    "t": 1793075048,
+    "who": "A-builder-2",
+    "subject": "GROUP BY (exprs, positions, alias fallback) and HAVING, with and without GROUP BY (lock group_by released)",
+    "visible": 210
+   },
+   {
+    "hash": "7da5a3cfeda41d7be4381b8a18b3bf0bca3cac54",
+    "t": 1793078416,
+    "who": "referee",
+    "subject": "Gate 2: 113 new feature categories (1,130 visible tests), compact --summary, tools/claim.sh",
+    "visible": 362
+   },
+   {
+    "hash": "18453385e40339e550a50d984ee71ecd4f206a49",
+    "t": 1793082269,
+    "who": "referee",
+    "subject": "Protocol v2: category claims (tools/claim.py) and guarded landing (tools/land.py)",
+    "visible": 362
+   },
+   {
+    "hash": "b68a7a26e028e20d324eeb2e6f59d55a43da89a7",
+    "t": 1793501896,
+    "who": "referee",
+    "subject": "Business functions: spec and examples",
+    "visible": 9
+   },
+   {
+    "hash": "cf31b3b17024e6866766a2ac68b6e894ca8305de",
+    "t": 1793503508,
+    "who": "A1-w1",
+    "subject": "10 business functions to owner policy, function-call parsing, simple aggregates (lock bizfn released)",
+    "visible": 29
+   },
+   {
+    "hash": "a6287bba333e0d879d125c90532e626366173c97",
+    "t": 1793503669,
+    "who": "A1-w1",
+    "subject": "SQL core: lexer, parser, evaluator, joins, compound, CTE, DML basics, scalar funcs (lock core released)",
+    "visible": 746
+   },
+   {
+    "hash": "9ed4b89f403c874a9d911c2bb9f5f2c7cc30f449",
+    "t": 1793503726,
+    "who": "A1-w1",
+    "subject": "window functions, agg FILTER and ORDER BY (lock windows released)",
+    "visible": 876
+   },
+   {
+    "hash": "3b5eef88501b753fe93350b03820901d382866b0",
+    "t": 1793503771,
+    "who": "A1-w1",
+    "subject": "scalar funcs, row values, IS TRUE, percentile/median aggs (lock misc1 released)",
+    "visible": 1014
+   },
+   {
+    "hash": "10c1f7fda340dd23aa36b62cc626d90a6c5a871e",
+    "t": 1793503857,
+    "who": "A1-w1",
+    "subject": "DDL/DML, upsert, returning, views, txn, recursive CTE, USING (lock dml released)",
+    "visible": 1130
+   },
+   {
+    "hash": "90b89ca1f33da3c82ba3459ae82dccc3027b6dc9",
+    "t": 1793503946,
+    "who": "A1-w1",
+    "subject": "date/time functions (lock dates released)",
+    "visible": 1219
+   },
+   {
+    "hash": "80c438c9561f24817861fbce3c687eabf7ab6c38",
+    "t": 1793504037,
+    "who": "A1-w1",
+    "subject": "JSON functions (lock json released)",
+    "visible": 1339
+   },
+   {
+    "hash": "45decf3e340671279dde233d2c7a0d09ab068bfb",
+    "t": 1793504057,
+    "who": "A1-w1",
+    "subject": "printf/format (lock printf released)",
+    "visible": 1359
+   }
+  ],
+  "visible_pass": 1359,
+  "visible_total": 1360,
+  "engine_hidden_pass": 2255,
+  "engine_hidden_total": 2260
+ },
+ "S7D": {
+  "team_start": 1793504089,
+  "team_end": 1793505498,
+  "builders": 7,
+  "progress": [
+   {
+    "hash": "7c2f65ad0c7da37443c57ce317fbd7b3bd1a963c",
+    "t": 1793074251,
+    "who": "referee",
+    "subject": "Initial skeleton: lexer, parser, engine; 210 visible tests",
+    "visible": 9
+   },
+   {
+    "hash": "fac982b9d3d2bbcba0bb20ff8b9e75de06c50d95",
+    "t": 1793074846,
+    "who": "A-builder-1",
+    "subject": "Expression parser with precedence climbing; arithmetic, comparison, AND/OR/NOT, || evaluation (lock arith released)",
+    "visible": 31
+   },
+   {
+    "hash": "58502b5bc022ff290ae7bc6bb2cc02c45d8f79fe",
+    "t": 1793074866,
+    "who": "A-builder-2",
+    "subject": "ORDER BY (multi-key, ASC/DESC, SQLite type ordering, alias/position), LIMIT/OFFSET (lock order_limit released)",
+    "visible": 46
+   },
+   {
+    "hash": "43cd7099813038102340f943c553ae89cfef7fc2",
+    "t": 1793074882,
+    "who": "A-builder-6",
+    "subject": "UPDATE/DELETE statements with optional WHERE; rest of category needs BETWEEN (where) and COUNT (aggregates) (lock update",
+    "visible": 52
+   },
+   {
+    "hash": "d66efd532e0dc28da87f27f0e598c7636e37fe49",
+    "t": 1793074890,
+    "who": "A-builder-5",
+    "subject": "FROM table aliases and qualified column refs (lock basic released)",
+    "visible": 55
+   },
+   {
+    "hash": "4eefde39001318a45dc82c5b2ed5a28d77bf0be9",
+    "t": 1793074905,
+    "who": "A-builder-1",
+    "subject": "CASE expressions (simple and searched); remaining case tests need IS NULL (where) and SUM (aggregates) (lock case releas",
+    "visible": 58
+   },
+   {
+    "hash": "6004fa36782c339e2a42059c0350d43b93788bdc",
+    "t": 1793074921,
+    "who": "A-builder-2",
+    "subject": "SELECT DISTINCT / ALL: dedup output rows before ORDER BY/LIMIT (lock distinct released)",
+    "visible": 69
+   },
+   {
+    "hash": "888d758ea82acdc7234e574857753b1bc1ff65c0",
+    "t": 1793074934,
+    "who": "A-builder-5",
+    "subject": "Joins: comma/CROSS/[INNER] JOIN ... ON, LEFT [OUTER] JOIN via Connection.source_rows; remaining join tests need WHERE/GR",
+    "visible": 82
+   },
+   {
+    "hash": "dd66f00c86f9ea4eb39f93ab1e64861a474f93ad",
+    "t": 1793074952,
+    "who": "A-builder-3",
+    "subject": "WHERE clause: comparisons, AND/OR/NOT, BETWEEN, IN, IS [NOT] NULL (lock where released)",
+    "visible": 129
+   },
+   {
+    "hash": "e9019fdc87e01083e3ee3f9d255efbfc18d7f682",
+    "t": 1793074976,
+    "who": "A-builder-4",
+    "subject": "Function-call parsing ('func' node) and aggregates COUNT/SUM/TOTAL/AVG/MIN/MAX/GROUP_CONCAT with DISTINCT, whole-table a",
+    "visible": 156
+   },
+   {
+    "hash": "96f0e6ef7caa2703b5e1e092109de874755cb252",
+    "t": 1793075006,
+    "who": "A-builder-1",
+    "subject": "Subqueries: scalar (correlated via outer-env fallback), IN (SELECT ...), FROM (SELECT ...) derived tables; remaining tes",
+    "visible": 169
+   },
+   {
+    "hash": "f3d0ded1b02650adf13c9a19ea00c5988d70cc93",
+    "t": 1793075009,
+    "who": "A-builder-6",
+    "subject": "Function-call parsing ('func', NAME, args, distinct), scalar funcs (SUBSTR/UPPER/LOWER/LENGTH/IFNULL/NULLIF/COALESCE/ABS",
+    "visible": 183
+   },
+   {
+    "hash": "1b53f1083eb1b016c12b2595ced03f7b2417112a",
+    "t": 1793075048,
+    "who": "A-builder-2",
+    "subject": "GROUP BY (exprs, positions, alias fallback) and HAVING, with and without GROUP BY (lock group_by released)",
+    "visible": 210
+   },
+   {
+    "hash": "7da5a3cfeda41d7be4381b8a18b3bf0bca3cac54",
+    "t": 1793078416,
+    "who": "referee",
+    "subject": "Gate 2: 113 new feature categories (1,130 visible tests), compact --summary, tools/claim.sh",
+    "visible": 362
+   },
+   {
+    "hash": "18453385e40339e550a50d984ee71ecd4f206a49",
+    "t": 1793082269,
+    "who": "referee",
+    "subject": "Protocol v2: category claims (tools/claim.py) and guarded landing (tools/land.py)",
+    "visible": 362
+   },
+   {
+    "hash": "b68a7a26e028e20d324eeb2e6f59d55a43da89a7",
+    "t": 1793501896,
+    "who": "referee",
+    "subject": "Business functions: spec and examples",
+    "visible": 9
+   },
+   {
+    "hash": "9d892d9ef7dd31bf9fe49317bf3c83c4b72fdd23",
+    "t": 1793504267,
+    "who": "S7D-w5",
+    "subject": "expression parser/evaluator with SQLite arithmetic, WHERE/ORDER BY, math scalar funcs (lock core_expr released)",
+    "visible": 101
+   },
+   {
+    "hash": "0ffc9bf2c0c14d9427ccff12c78bcfe5591b228f",
+    "t": 1793504301,
+    "who": "S7D-w5",
+    "subject": "math scalar functions, TRUE/FALSE, IS predicates (lock math_funcs released)",
+    "visible": 161
+   },
+   {
+    "hash": "37aba793b3e8c1a61222e24e6d9e200d98a9b0f2",
+    "t": 1793504320,
+    "who": "S7D-w5",
+    "subject": "string/misc scalar functions (lock str_funcs released)",
+    "visible": 254
+   },
+   {
+    "hash": "c8001f0f59c71e6844c5632660e697b93c340ff2",
+    "t": 1793504369,
+    "who": "S7D-w5",
+    "subject": "lexer (blobs, hex, comments, quoted idents), CASE, CAST, bitwise, LIKE/GLOB, hex/char/quote funcs (lock lex_ops released",
+    "visible": 396
+   },
+   {
+    "hash": "93face94cad35296cb66b7d78bf728d051da5195",
+    "t": 1793504441,
+    "who": "S7D-w5",
+    "subject": "aggregation engine, GROUP BY/HAVING, DISTINCT, LIMIT, BETWEEN/IN, subqueries, NULLS ordering, COALESCE (lock agg_core re",
+    "visible": 593
+   },
+   {
+    "hash": "a6ae86a9cfd3fd2125d93fd387cbf269ae2837f7",
+    "t": 1793504495,
+    "who": "S7D-w5",
+    "subject": "joins, FROM subqueries, EXISTS, row values, IS DISTINCT FROM (lock joins released)",
+    "visible": 695
+   },
+   {
+    "hash": "1835956a1d0f671e61fb057cef29a7e1e42e303c",
+    "t": 1793504643,
+    "who": "S7D-w5",
+    "subject": "DDL/DML: create/alter/drop, insert/update/delete with constraints, upsert, returning, transactions, views, VALUES (lock ",
+    "visible": 910
+   },
+   {
+    "hash": "3363625072f880d9aa6ee71a7c447a0b83635858",
+    "t": 1793504648,
+    "who": "S7D-w5",
+    "subject": "ALTER TABLE RENAME (done in dml) (lock dml2 released)",
+    "visible": 910
+   },
+   {
+    "hash": "4028bc92f7292f83e997d1902f6b0725011f5915",
+    "t": 1793504709,
+    "who": "S7D-w5",
+    "subject": "compound selects, CTEs incl. recursive, COLLATE NOCASE (lock compound released)",
+    "visible": 1000
+   },
+   {
+    "hash": "1a211fd77f0845c351d9688611a2d4aafdd6a236",
+    "t": 1793504770,
+    "who": "S7D-w5",
+    "subject": "window functions: ranking, offsets, frames, named windows (lock windows released)",
+    "visible": 1110
+   },
+   {
+    "hash": "27620e84d5f7977f0c14298298aebbad76567982",
+    "t": 1793504865,
+    "who": "S7D-w5",
+    "subject": "date/time functions, strftime, timediff, printf/format (lock dates released)",
+    "visible": 1220
+   },
+   {
+    "hash": "073c97774616fbbb10a148e067000733e8cc9583",
+    "t": 1793504936,
+    "who": "S7D-w5",
+    "subject": "JSON functions, arrow operators, JSON aggregates (lock json released)",
+    "visible": 1340
+   },
+   {
+    "hash": "c782b2ed680276e899f892b956b3d9352b7937f9",
+    "t": 1793504955,
+    "who": "S7D-w7",
+    "subject": "TIDY_MEAN aggregate per owner policy (lock biz_tidy released)",
+    "visible": 1342
+   },
+   {
+    "hash": "d25e485bd5c52fb549c59f95ad58c08077855655",
+    "t": 1793505035,
+    "who": "S7D-w3",
+    "subject": "mask_card and short_code modules (owner-decided policy) (lock biz_card released)",
+    "visible": 1342
+   },
+   {
+    "hash": "1ddd7ee079aa8c3acfdae600ca1e4720a8f5156b",
+    "t": 1793505050,
+    "who": "S7D-w3",
+    "subject": "register mask_card, short_code (lock biz_card_reg released)",
+    "visible": 1346
+   },
+   {
+    "hash": "1554255cf3a5d198af5258f68b3c09c070be440d",
+    "t": 1793505167,
+    "who": "S7D-w6",
+    "subject": "slugify business function (lock biz_slug released)",
+    "visible": 1348
+   },
+   {
+    "hash": "28ba4843d6a1180e0fda2f809ca6c51c2f1d23a0",
+    "t": 1793505175,
+    "who": "S7D-w6",
+    "subject": "release slugify lock",
+    "visible": 1348
+   },
+   {
+    "hash": "da83c68ff726b828598f0a6f36c4a4fd1bd22dbb",
+    "t": 1793505210,
+    "who": "S7D-w4",
+    "subject": "late_fee and pct_change per owner policy (lock biz_money released)",
+    "visible": 1352
+   },
+   {
+    "hash": "f2935ffd669e3dc38511e1218cc52f115f9c1314",
+    "t": 1793505290,
+    "who": "S7D-w1",
+    "subject": "BIZ_DAYS_AFTER per owner policy (lock biz_days released)",
+    "visible": 1354
+   },
+   {
+    "hash": "1c7c6dc5568461bd4b39a5a9c398f9e3549fb5ee",
+    "t": 1793505482,
+    "who": "S7D-w2",
+    "subject": "quarter_label, ship_cost, star_label per owner answers (lock biz_qss released)",
+    "visible": 1360
+   }
+  ],
+  "visible_pass": 1360,
+  "visible_total": 1360,
+  "engine_hidden_pass": 2256,
+  "engine_hidden_total": 2260
+ },
+ "S7Q": {
+  "team_start": 1793505499,
+  "team_end": 1793508929,
+  "builders": 7,
+  "progress": [
+   {
+    "hash": "7c2f65ad0c7da37443c57ce317fbd7b3bd1a963c",
+    "t": 1793074251,
+    "who": "referee",
+    "subject": "Initial skeleton: lexer, parser, engine; 210 visible tests",
+    "visible": 9
+   },
+   {
+    "hash": "fac982b9d3d2bbcba0bb20ff8b9e75de06c50d95",
+    "t": 1793074846,
+    "who": "A-builder-1",
+    "subject": "Expression parser with precedence climbing; arithmetic, comparison, AND/OR/NOT, || evaluation (lock arith released)",
+    "visible": 31
+   },
+   {
+    "hash": "58502b5bc022ff290ae7bc6bb2cc02c45d8f79fe",
+    "t": 1793074866,
+    "who": "A-builder-2",
+    "subject": "ORDER BY (multi-key, ASC/DESC, SQLite type ordering, alias/position), LIMIT/OFFSET (lock order_limit released)",
+    "visible": 46
+   },
+   {
+    "hash": "43cd7099813038102340f943c553ae89cfef7fc2",
+    "t": 1793074882,
+    "who": "A-builder-6",
+    "subject": "UPDATE/DELETE statements with optional WHERE; rest of category needs BETWEEN (where) and COUNT (aggregates) (lock update",
+    "visible": 52
+   },
+   {
+    "hash": "d66efd532e0dc28da87f27f0e598c7636e37fe49",
+    "t": 1793074890,
+    "who": "A-builder-5",
+    "subject": "FROM table aliases and qualified column refs (lock basic released)",
+    "visible": 55
+   },
+   {
+    "hash": "4eefde39001318a45dc82c5b2ed5a28d77bf0be9",
+    "t": 1793074905,
+    "who": "A-builder-1",
+    "subject": "CASE expressions (simple and searched); remaining case tests need IS NULL (where) and SUM (aggregates) (lock case releas",
+    "visible": 58
+   },
+   {
+    "hash": "6004fa36782c339e2a42059c0350d43b93788bdc",
+    "t": 1793074921,
+    "who": "A-builder-2",
+    "subject": "SELECT DISTINCT / ALL: dedup output rows before ORDER BY/LIMIT (lock distinct released)",
+    "visible": 69
+   },
+   {
+    "hash": "888d758ea82acdc7234e574857753b1bc1ff65c0",
+    "t": 1793074934,
+    "who": "A-builder-5",
+    "subject": "Joins: comma/CROSS/[INNER] JOIN ... ON, LEFT [OUTER] JOIN via Connection.source_rows; remaining join tests need WHERE/GR",
+    "visible": 82
+   },
+   {
+    "hash": "dd66f00c86f9ea4eb39f93ab1e64861a474f93ad",
+    "t": 1793074952,
+    "who": "A-builder-3",
+    "subject": "WHERE clause: comparisons, AND/OR/NOT, BETWEEN, IN, IS [NOT] NULL (lock where released)",
+    "visible": 129
+   },
+   {
+    "hash": "e9019fdc87e01083e3ee3f9d255efbfc18d7f682",
+    "t": 1793074976,
+    "who": "A-builder-4",
+    "subject": "Function-call parsing ('func' node) and aggregates COUNT/SUM/TOTAL/AVG/MIN/MAX/GROUP_CONCAT with DISTINCT, whole-table a",
+    "visible": 156
+   },
+   {
+    "hash": "96f0e6ef7caa2703b5e1e092109de874755cb252",
+    "t": 1793075006,
+    "who": "A-builder-1",
+    "subject": "Subqueries: scalar (correlated via outer-env fallback), IN (SELECT ...), FROM (SELECT ...) derived tables; remaining tes",
+    "visible": 169
+   },
+   {
+    "hash": "f3d0ded1b02650adf13c9a19ea00c5988d70cc93",
+    "t": 1793075009,
+    "who": "A-builder-6",
+    "subject": "Function-call parsing ('func', NAME, args, distinct), scalar funcs (SUBSTR/UPPER/LOWER/LENGTH/IFNULL/NULLIF/COALESCE/ABS",
+    "visible": 183
+   },
+   {
+    "hash": "1b53f1083eb1b016c12b2595ced03f7b2417112a",
+    "t": 1793075048,
+    "who": "A-builder-2",
+    "subject": "GROUP BY (exprs, positions, alias fallback) and HAVING, with and without GROUP BY (lock group_by released)",
+    "visible": 210
+   },
+   {
+    "hash": "7da5a3cfeda41d7be4381b8a18b3bf0bca3cac54",
+    "t": 1793078416,
+    "who": "referee",
+    "subject": "Gate 2: 113 new feature categories (1,130 visible tests), compact --summary, tools/claim.sh",
+    "visible": 362
+   },
+   {
+    "hash": "18453385e40339e550a50d984ee71ecd4f206a49",
+    "t": 1793082269,
+    "who": "referee",
+    "subject": "Protocol v2: category claims (tools/claim.py) and guarded landing (tools/land.py)",
+    "visible": 362
+   },
+   {
+    "hash": "b68a7a26e028e20d324eeb2e6f59d55a43da89a7",
+    "t": 1793501896,
+    "who": "referee",
+    "subject": "Business functions: spec and examples",
+    "visible": 9
+   },
+   {
+    "hash": "23ac9125e89f415c9461ce41a80a3fddfa0809b9",
+    "t": 1793505552,
+    "who": "S7Q-w4",
+    "subject": "expression parser/evaluator with SQLite semantics, scalar FUNCS registry (expr.py), WHERE, ORDER BY (lock exprcore relea",
+    "visible": 86
+   },
+   {
+    "hash": "9c9bcad48e49d79f4a712c0b27450ec1bf0df9de",
+    "t": 1793505585,
+    "who": "S7Q-w4",
+    "subject": "math scalar functions (mathfn.py) (lock mathfn released)",
+    "visible": 166
+   },
+   {
+    "hash": "1a76d784bdafce2b77665a507bb29a0b9d7ff163",
+    "t": 1793505601,
+    "who": "S7Q-w3",
+    "subject": "selectcore WIP",
+    "visible": 241
+   },
+   {
+    "hash": "9caabe520d478a6a521bfc14b27b8355357224cb",
+    "t": 1793505601,
+    "who": "S7Q-w3",
+    "subject": "SELECT core: DISTINCT, GROUP BY/HAVING, aggregates, ORDER BY NULLS/LIMIT/OFFSET (lock selcore released)",
+    "visible": 255
+   },
+   {
+    "hash": "f48bad8daf1c3af835eb800554369d53d4c2d510",
+    "t": 1793505630,
+    "who": "S7Q-w1",
+    "subject": "Release mathfuncs: categories already pass",
+    "visible": 255
+   },
+   {
+    "hash": "799865e680bc040a7c9f1a75b0cff5fb923d07f1",
+    "t": 1793505636,
+    "who": "S7Q-w4",
+    "subject": "string/misc scalar functions, LIKE ESCAPE, GLOB (lock strfn released)",
+    "visible": 387
+   },
+   {
+    "hash": "dc0ed912fdce1160feb2da33b0a3547b3fa23e29",
+    "t": 1793505669,
+    "who": "S7Q-w3",
+    "subject": "joins: inner/left/right/full/cross/natural/USING, aliases, t.* (lock joins released)",
+    "visible": 460
+   },
+   {
+    "hash": "6660626355d7bf268ec331d406f160c888db53c7",
+    "t": 1793505680,
+    "who": "S7Q-w4",
+    "subject": "CASE, IIF, CAST, IS TRUE/DISTINCT, bitwise, literals, comments, quoted idents (lock exprmore released)",
+    "visible": 585
+   },
+   {
+    "hash": "214b088102bb2d511ad8d711bb8bb7fbb7020b9e",
+    "t": 1793505713,
+    "who": "S7Q-w7",
+    "subject": "Release mathstr: categories already pass",
+    "visible": 585
+   },
+   {
+    "hash": "3c9648fb93be0645b4ba88c84cbb7865958f8ec8",
+    "t": 1793505720,
+    "who": "S7Q-w1",
+    "subject": "SQLite JSON functions, -> / ->> operators, json_group_array/object (lock jsonfn released)",
+    "visible": 705
+   },
+   {
+    "hash": "198305dddf9aadbc5fb8b1fa12479b4d3d70c33a",
+    "t": 1793505742,
+    "who": "S7Q-w3",
+    "subject": "subqueries (scalar/IN/EXISTS/correlated/FROM) and compound SELECT (lock subq released)",
+    "visible": 800
+   },
+   {
+    "hash": "15b6b4fa29e03da91aa9d6bcda4beae16ca9de0d",
+    "t": 1793505779,
+    "who": "S7Q-w2",
+    "subject": "date/time functions: date,time,datetime,julianday,unixepoch,strftime,timediff (lock datefn released)",
+    "visible": 890
+   },
+   {
+    "hash": "e58a9f48a94091d6447f1eda57c324b2988e348b",
+    "t": 1793505782,
+    "who": "S7Q-w7",
+    "subject": "window functions: OVER, named windows, frames, ranking, lag/lead, ntile (lock windows released)",
+    "visible": 1000
+   },
+   {
+    "hash": "e4f02ca0fa3ce8656a96de4b056653c2de629527",
+    "t": 1793505787,
+    "who": "S7Q-w1",
+    "subject": "WITH/WITH RECURSIVE, views, VALUES statement via Tables overlay (lock ctes released)",
+    "visible": 1060
+   },
+   {
+    "hash": "6f3ffe3bc0e138615181acfb4c08b8ff94982f03",
+    "t": 1793505801,
+    "who": "S7Q-w4",
+    "subject": "DDL/DML: CREATE TABLE constraints/defaults/IPK, INSERT variants, UPDATE, DELETE, DROP, CREATE/DROP INDEX (lock dml relea",
+    "visible": 1165
+   },
+   {
+    "hash": "e54ae938187ddae9e8efd34122d9f47c23804903",
+    "t": 1793505801,
+    "who": "S7Q-w4",
+    "subject": "fix DROP dispatch: only DROP VIEW goes to view handler",
+    "visible": 1175
+   },
+   {
+    "hash": "7a62203197a95716849cb715c4a497692dcf59b4",
+    "t": 1793505832,
+    "who": "S7Q-w7",
+    "subject": "ALTER TABLE (add/rename/drop column, rename), CTAS, BEGIN/COMMIT/ROLLBACK via text hooks (lock ddlx released)",
+    "visible": 1205
+   },
+   {
+    "hash": "9cd983990655f1ad219de6f44a2496b549444e4e",
+    "t": 1793505836,
+    "who": "S7Q-w2",
+    "subject": "printf/format (printffn.py), COLLATE NOCASE/RTRIM/BINARY (lock printfmt released)",
+    "visible": 1235
+   },
+   {
+    "hash": "5a0b8454cfbdebb13e4a511153298e6aa55338c2",
+    "t": 1793505843,
+    "who": "S7Q-w3",
+    "subject": "aggregate FILTER/ORDER BY, string_agg, median/percentile, row values, alias in HAVING (lock aggx released)",
+    "visible": 1300
+   },
+   {
+    "hash": "ff743e67b23badd28511726d00dad688778f0853",
+    "t": 1793505857,
+    "who": "S7Q-w7",
+    "subject": "ALTER TABLE keeps DML meta in sync (lock altfix released)",
+    "visible": 1310
+   },
+   {
+    "hash": "60e0aa8387093dac09286b1df763d99c810185ee",
+    "t": 1793505865,
+    "who": "S7Q-w1",
+    "subject": "RETURNING, UPDATE FROM, ON CONFLICT upsert (lock dml2 released)",
+    "visible": 1340
+   },
+   {
+    "hash": "110998743900ade8498cc3a60017342a3f7ebdcc",
+    "t": 1793506017,
+    "who": "S7Q-w5",
+    "subject": "wip",
+    "visible": 1340
+   },
+   {
+    "hash": "e955b55a6457ce747df82f13131ba097d56ead4b",
+    "t": 1793506419,
+    "who": "S7Q-w5",
+    "subject": "wip2",
+    "visible": 1340
+   },
+   {
+    "hash": "51dde6d18ab6d1d2e4073f91cbfeab3b5b4275db",
+    "t": 1793506435,
+    "who": "S7Q-w5",
+    "subject": "biz_days_after and late_fee per owner answers (minisql/biz.py) (lock biz_a released)",
+    "visible": 1344
+   },
+   {
+    "hash": "c931d782eb0c3c569224533cf8fb741481b044c3",
+    "t": 1793506555,
+    "who": "S7Q-w5",
+    "subject": "mask_card",
+    "visible": 1346
+   },
+   {
+    "hash": "7178fa05c0a9d41e7a1ef78aa2e740a44ea214bf",
+    "t": 1793506853,
+    "who": "S7Q-w5",
+    "subject": "pct_change",
+    "visible": 1348
+   },
+   {
+    "hash": "8bf1fc2e1e29bf3c2c9d37330bceafd3bc47d9d3",
+    "t": 1793507314,
+    "who": "S7Q-w5",
+    "subject": "quarter_label",
+    "visible": 1350
+   },
+   {
+    "hash": "1ca1ed1b03b081017e27260f8b6c5dd54f6565a7",
+    "t": 1793507314,
+    "who": "S7Q-w5",
+    "subject": "mask_card, pct_change, quarter_label per owner answers (lock biz_a2 released)",
+    "visible": 1350
+   },
+   {
+    "hash": "db275bf3902733290ec353db85025b0e4c2d7e98",
+    "t": 1793508916,
+    "who": "S7Q-w6",
+    "subject": "business functions ship_cost, short_code, slugify, star_label, tidy_mean per owner answers (lock biz_b released)",
+    "visible": 1360
+   }
+  ],
+  "visible_pass": 1360,
+  "visible_total": 1360,
+  "engine_hidden_pass": 2255,
+  "engine_hidden_total": 2260
+ }
+}

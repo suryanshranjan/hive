@@ -1,0 +1,54 @@
+[10:26:37] predictions registered on origin/main: gates/gate73/prompts/PREDICTIONS.md
+[10:26:37] rule-giver writing the business policy...
+[10:28:35] rules checked: 10 functions, 138 calls, deterministic
+[10:28:35] wind tunnel: documenter writing the owner's policy in prose...
+[10:29:09] wind tunnel: R: 74 rules; ask text for N0 written
+20 visible tests in /home/claude/hive/runs/g73b/seed/tests/visible
+[10:29:09] seed: ['TOTAL          9/1360']
+S7Q: 7 workers, tools/ask.py port None, repo /home/claude/hive/runs/g73b/upS7Q.git
+next: python3 lab/launch.py --run g73b
+[10:29:12] launching S7Q alone (7 builder(s))
+launched S7Q-w1 
+launched S7Q-w2 
+launched S7Q-w3 
+launched S7Q-w4 
+launched S7Q-w5 
+launched S7Q-w6 
+launched S7Q-w7 
+[10:33:18] Hive asked first: 71 questions queued ($0.08)
+S7Q-w1 finished: exit 0, 9.8 min, tokens 4472433, cost 1.1207520000000002
+S7Q-w3 finished: exit 0, 10.2 min, tokens 8205868, cost 1.8278279000000004
+S7Q-w7 finished: exit 0, 11.6 min, tokens 5200931, cost 1.3359437000000003
+S7Q-w2 finished: exit 0, 11.8 min, tokens 2521644, cost 0.7074522000000001
+S7Q-w6 finished: exit 0, 53.7 min, tokens 2259447, cost 0.477448
+S7Q-w4 finished: exit 0, 68.4 min, tokens 2777760, cost 0.5566925999999999
+S7Q-w5 finished: exit 0, 70.9 min, tokens 3889823, cost 0.7292759000000001
+wrote /home/claude/hive/runs/g73b/agents.csv
+S7D: 7 workers, tools/ask.py port None, repo /home/claude/hive/runs/g73b/upS7D.git
+next: python3 lab/launch.py --run g73b
+[11:40:08] launching S7D alone (7 builder(s))
+launched S7D-w1 
+launched S7D-w2 
+launched S7D-w3 
+launched S7D-w4 
+launched S7D-w5 
+launched S7D-w6 
+launched S7D-w7 
+S7D-w6 finished: exit 0, 15.4 min, tokens 8342556, cost 1.9932737999999997
+S7D-w7 finished: exit 0, 15.9 min, tokens 7573542, cost 1.9435062
+S7D-w3 finished: exit 0, 24.7 min, tokens 1289570, cost 0.32100979999999996
+S7D-w4 finished: exit 0, 25.4 min, tokens 1358587, cost 0.29730169999999995
+S7D-w2 finished: exit 0, 26.3 min, tokens 1185420, cost 0.2747572999999999
+S7D-w1 finished: exit 0, 27.9 min, tokens 1848847, cost 0.4501701999999999
+S7D-w5 finished: exit 0, 27.9 min, tokens 1392820, cost 0.30786490000000005
+wrote /home/claude/hive/runs/g73b/agents.csv
+A1: 1 workers, tools/ask.py port None, repo /home/claude/hive/runs/g73b/upA1.git
+next: python3 lab/launch.py --run g73b
+[12:08:05] launching A1 alone (1 builder(s))
+launched A1-w1 
+A1-w1 finished: exit 0, 38.7 min, tokens 15294894, cost 3.5915335000000024
+wrote /home/claude/hive/runs/g73b/agents.csv
+[12:46:56] S7Q: visible 1360/1360, engine hidden 2256/2260; replaying
+[12:47:30] S7D: visible 1360/1360, engine hidden 2255/2260; replaying
+[12:47:55] A1: visible 1360/1360, engine hidden 2256/2260; replaying
+[12:48:17] done: python3 gates/gate73/referee/analyze.py runs/g73a runs/g73b
