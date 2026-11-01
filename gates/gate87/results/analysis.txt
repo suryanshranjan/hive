@@ -1,0 +1,9 @@
+Gate 85: hidden [27, 27, 27, 20, 24], prompts [59, 55, 67, 53, 33], Hive's own [4.21, 3.32, 5.48, 2.84, 2.64] (mean $3.70), builders mean $0.63, pass^1 0.80, minutes [12.2, 11.4, 15.3, 9.5, 7.4]
+Gate 87: hidden [27, 27, 21, 25, 25], prompts [93, 52, 24, 66, 24], Hive's own [0.69, 0.48, 0.13, 0.53, 0.14] (mean $0.39), builders mean $0.48, pass^1 0.80, minutes [27.3, 16.8, 9.2, 20.8, 10.2]
+
+predictions
+H1 Hive's own spend <= 0.4x Gate 85's -> held
+H2 pass^1 >= 0.8 -> held
+H3 median hidden >= 26 -> failed
+H4 median prompts <= 1.2x Gate 85's -> held
+Claim H1, H2 and H3 -> failed
