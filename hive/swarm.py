@@ -140,7 +140,10 @@ BUSINESS_ROLE = ("\n## Your role: the business builder\nYou alone own the parts 
                  "while they build. **Ask systematically**, part by part: (1) the rule itself, (2) rounding and the exact form "
                  "of the result, (3) boundaries and cut-offs, and (4) what happens with blank, missing, negative, zero or "
                  "oddly formatted information. Build each part to his answers, one or two parts at a time, and encode each "
-                 "answer as a test before you land.\n")
+                 "answer as a test before you land. Your teammates may land a business part's machinery with placeholders "
+                 "for you (Gate 90): after each sync run `grep -rn -i placeholder --include=*.py .` (outside tests), and "
+                 "fill every one to his answers before you stop. You may claim any area, including one already landed, and "
+                 "more than an even share. You are done only when no placeholder is left.\n")
 BUILDER_ROLE = ("\n## Your role: build the rest\nOne teammate, `{biz}`, owns every part of the goal that turns on the "
                 "owner's business decisions (who pays what, cut-offs, tiers, rounding, labels, what happens with missing or "
                 "odd information) and asks the owner about them. Do not ask the owner yourself, and do not claim or change "
@@ -235,7 +238,8 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
             brole, rrole = (BUSINESS_ROLE_LATER, BUILDER_ROLE_LATER) if questions == 'later' else (BUSINESS_ROLE, BUILDER_ROLE)
             text = text.replace(owner_text, (brole + owner_text) if me == biz else rrole.format(biz=biz))
         open(os.path.join(run, 'prompts', f'{me}.md'), 'w', encoding='utf-8').write(text.replace('python3 -m hive', f'{PY} -m hive'))
-    json.dump(dict(repo=repo, branch=b, workers=workers, started=None), open(os.path.join(run, 'run.json'), 'w'), indent=1)
+    json.dump(dict(repo=repo, branch=b, workers=workers, started=None, business_builder=f'w{workers}' if split else None),
+              open(os.path.join(run, 'run.json'), 'w'), indent=1)
     return run
 
 def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
