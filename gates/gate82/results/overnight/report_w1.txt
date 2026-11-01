@@ -1,0 +1,6 @@
+Landed `sales_summary` in `shop/report.py`, with tests in `tests/test_report.py`. All 11 tests pass on the shared branch.
+
+- **Behaviour:** `orders` is the order count, and `revenue` is the sum of each order's `total()`. `average` is revenue divided by orders, rounded half up. An empty list gives all zeros.
+- **Least sure of:** whether revenue should include shipping, whether the average should round half up, and whether refunded orders should still count. I assumed yes, yes and yes.
+- **Questions asked (4):** average rounding, the average when there are no orders, shipping in revenue, and whether a same-day fully refunded order counts. I also recorded 3 owner assumptions and 1 technical one.
+- **Hive problems:** the lock names `refunds` and `loyalty` were already taken, so I claimed `report` and the other two areas went to teammates. My first `land` failed with a rebase conflict because compiled `.pyc` files are tracked in git. I restored them and ran `land --continue` with `PYTHONDONTWRITEBYTECODE=1`. Teammates are likely to hit the same conflict.

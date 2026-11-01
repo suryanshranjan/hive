@@ -1,0 +1,6 @@
+Landed `points_earned`, with tests, on main. My `sales_summary` was a duplicate, so I dropped it. w2 had already landed an equivalent version, so I reset to main and removed my lock.
+
+- **Duplicate work:** the claim limit and the landing order let w2 land `sales_summary` before me.
+- **Where the other areas stand:** w3 holds the refunds lock. w2 shows as holding the loyalty lock even though my loyalty code is already on main.
+- **Least sure about:** the loyalty rule treats "after discount" as items total minus the discount, with shipping excluded. I left refunds and points-as-payment unhandled, as the owner rules say. I didn't touch `refund()`. I asked the owner nothing.
+- **Hive problem:** the duplicate-claim race above. I couldn't verify the final suite state after the reset.

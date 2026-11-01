@@ -1,0 +1,7 @@
+Landed loyalty points (`points_earned` in `shop/loyalty.py`) with tests; 4/4 tests pass.
+
+- **Rule I chose:** 1 point per full Rs 100 of item spend after the discount code. Shipping is not counted, points round down, and there is no minimum or cap.
+- **Least sure about:** whether store-credit orders earn points, and whether shipping counts. I assumed both do what I coded (store credit earns, shipping doesn't) and recorded them as assumptions.
+- **Questions asked (5):** the base amount (after discount or with shipping), rounding, store-credit orders, minimum spend or cap, and points taken back on a refund.
+- **Other areas:** refunds was already claimed by another worker, so I took loyalty. I didn't touch the report area.
+- **Problems:** none with the hive tools.

@@ -1,0 +1,11 @@
+Refunds landed: `refund()` in `shop/refunds.py`, with tests in `tests/test_refunds.py`. The full suite passes (21 tests). Loyalty and the sales report were already landed by w1 and w2, so I released my loyalty lock without changing anything.
+- **Least sure:** the order has no fields for cancelled or fully refunded. I read them from optional flags on the order. A held cancelled order returns amount 0 plus a "held for review" status.
+- **Least sure:** a refund of 0 still names the original payment method. A partial return shares the coupon proportionally, and a damaged partial return still refunds the full delivery fee.
+- **Asked the owner (5 questions):**
+  - rounding is down;
+  - "damaged" is matched ignoring capitals and spaces;
+  - a missing or negative day count is treated as day 0;
+  - the coupon share on a partial return;
+  - the final-sale double-points rounding (answered 24 for Rs 1,299, which the existing loyalty code already does).
+- **Assumptions:** I recorded six, including the day-0 handling and the order of the Rs 50 minimum check.
+- **Hive tools:** the `__pycache__` files are tracked in git, which caused a rebase conflict on landing. I resolved it by keeping the upstream versions.

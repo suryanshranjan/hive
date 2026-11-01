@@ -163,6 +163,48 @@ def show_notes(n=8):
     print('\n'.join(f'{who}: {note}' for who, note in got) if got else '(no team notes yet)')
     return 0
 
+def _run_file(f):
+    run = os.environ.get('HIVE_RUN')
+    return os.path.join(run, f) if run and os.path.isdir(run) else None
+
+def _remember_areas(name, lock):
+    """The areas a lock held, kept for this run until its landing is pushed (the lock file is gone by then)."""
+    p = _run_file('pending_areas.json')
+    if not p:
+        return
+    areas = [a.strip() for line in open(lock) if line.startswith('areas:') for a in line.split(':', 1)[1].split(',') if a.strip()]
+    try:
+        d = json.load(open(p))
+    except Exception:
+        d = {}
+    d[name] = areas; json.dump(d, open(p, 'w'))
+
+def _landed(name):
+    """Gate 82: record this run's landed areas, so `hive areas` shows them as landed, not free, and nobody rebuilds them."""
+    p, q = _run_file('pending_areas.json'), _run_file('landed.json')
+    if not p or not q:
+        return
+    try:
+        pend = json.load(open(p))
+    except Exception:
+        return
+    try:
+        done = json.load(open(q))
+    except Exception:
+        done = {}
+    me = sh('git', 'config', 'user.name').stdout.strip()
+    for a in pend.pop(name, []):
+        done[a] = {'lock': name, 'by': me}
+    json.dump(pend, open(p, 'w')); json.dump(done, open(q, 'w'), indent=1)
+
+def landed():
+    """{area: {'lock', 'by'}} landed in this run (empty outside a run)."""
+    q = _run_file('landed.json')
+    try:
+        return json.load(open(q)) if q else {}
+    except Exception:
+        return {}
+
 def land(name, message, note=None):
     """message is a commit message, or '--continue' after resolving a rebase conflict. A note (one line others should
     know: a shared helper, a changed interface, a file many touch) rides in the commit as a Team-note trailer."""
@@ -182,6 +224,7 @@ def land(name, message, note=None):
                   'name. If every area is taken, the work is someone else\'s: stop, and say so.'); return 9
     if message != '--continue':
         if os.path.exists(lock):
+            _remember_areas(name, lock)
             sh('git', 'rm', '-q', '--cached', lock); os.remove(lock)
         sh('git', 'add', '-A')
         staged = sh('git', 'diff', '--cached', '--name-only').stdout.splitlines()
@@ -241,5 +284,6 @@ def land(name, message, note=None):
         cache_put('HEAD', mine)   # stored before pushing: any later commit with the same code finds it
         if sh('git', 'push', '-q', 'origin', f'HEAD:{b}').returncode == 0:
             log(f'LAND {name} {sum(mine.values())}')
+            _landed(name)
             print(f'landed {name}: {sum(mine.values())}/{len(mine)} tests pass'); return 0
     print('push kept being rejected; run again'); return 2

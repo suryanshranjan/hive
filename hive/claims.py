@@ -53,7 +53,7 @@ def mine(name):
     me = sh('git', 'config', 'user.name').stdout.strip()
     return open(path).readline().startswith(f'{me}:')
 
-def claim(name, areas, desc):
+def claim(name, areas, desc, again=False):
     cfg = config.load(); b = branch(cfg)
     wanted = {a.strip() for a in areas.split(',') if a.strip()}
     known = set(cfg.get('areas', {}))
@@ -67,6 +67,11 @@ def claim(name, areas, desc):
     if sh('git', 'pull', '-q', '--rebase', 'origin', b).returncode:
         sh('git', 'rebase', '--abort'); return 2
     held = locks()
+    from .guard import landed
+    done = {a: d for a, d in landed().items() if a in wanted}
+    if done and not again:   # Gate 82: an area landed and freed looked "free", and two builders rebuilt landed work
+        print('already landed in this build: ' + ', '.join(f"{a} (by {d['by']})" for a, d in sorted(done.items()))
+              + '. Choose another area; claim it again with --again only to fix something you found wrong in it.'); return 1
     if name in held:
         print('lock name already used:', name); return 1
     for other, theirs in held.items():
@@ -94,6 +99,9 @@ def status():
     cfg = config.load(); b = branch(cfg)
     sh('git', 'pull', '-q', '--rebase', 'origin', b)
     holder = {a: n for n, areas in locks().items() for a in areas}
+    from .guard import landed
+    done = landed()
     for a in sorted(set(cfg.get('areas', {})) | set(holder)):
-        print(f'{a:30s} {"held by " + holder[a] if a in holder else "free"}')
+        state = ('held by ' + holder[a]) if a in holder else (f"landed by {done[a]['by']}" if a in done else 'free')
+        print(f'{a:30s} {state}')
     return 0

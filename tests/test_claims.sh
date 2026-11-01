@@ -36,4 +36,16 @@ cd $T/c && git pull -q --rebase origin main && echo "def extra(): return 1" > ex
 cd $T/c && git checkout -q -- . 2>/dev/null; rm -f extra.py
 mkdir -p $T/run && echo '{"workers": 3}' > $T/run/run.json
 cd $T/c && git pull -q --rebase origin main && HIVE_RUN=$T/run $PY -m hive claim greedy fees,payouts "two of three areas, three builders" >/dev/null; check "a claim beyond an even share refused" $? 1
+# Gate 82: within a run, an area that landed shows as landed, not free, and is not claimed again without --again
+cd $T && git init -q -b main s2 && cd s2 && git config user.email t@t && git config user.name t && echo "def test_ok(): pass" > test_ok.py
+$PY -m hive init --test-cmd "$PY -m pytest -q -p no:cacheprovider --junitxml=.hive/junit.xml" >/dev/null
+$PY -c "import json; p = '.hive/config.json'; c = json.load(open(p)); c['areas'] = {'x': [], 'y': []}; json.dump(c, open(p, 'w'))"
+printf '__pycache__/\n' >> .gitignore; git add -A && git commit -qm s2 && git clone -q --bare . $T/up2.git
+for w in p q; do git clone -q $T/up2.git $T/$w; git -C $T/$w config user.email $w@t; git -C $T/$w config user.name $w; done
+mkdir -p $T/run2 && echo '{"workers": 2}' > $T/run2/run.json; export HIVE_RUN=$T/run2
+cd $T/p && $PY -m hive claim px x "x" >/dev/null && echo "x = 1" > x.py && $PY -m hive land px "x built" >/dev/null; check "p lands area x" $? 0
+cd $T/q && git pull -q --rebase origin main && $PY -m hive claim qx x "x again" >/dev/null; check "a landed area is not claimed again" $? 1
+cd $T/q && $PY -m hive areas | grep -q "x *landed by p"; check "areas shows it as landed" $? 0
+cd $T/q && $PY -m hive claim --again qx2 x "fix a wrong case in x" >/dev/null; check "--again claims it to fix it" $? 0
+unset HIVE_RUN
 rm -rf $T; exit $fail

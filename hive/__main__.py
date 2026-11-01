@@ -155,6 +155,7 @@ def build_parser():
     ru = sub.add_parser('rules'); ru.add_argument('action', nargs='?', choices=['forget']); ru.add_argument('n', nargs='?', type=int)
     i = sub.add_parser('init'); i.add_argument('--test-cmd', required=True); i.add_argument('--junit', default='.hive/junit.xml')
     c = sub.add_parser('claim'); c.add_argument('name'); c.add_argument('areas'); c.add_argument('desc')
+    c.add_argument('--again', action='store_true', help='claim an area already landed in this build, to fix it')
     l = sub.add_parser('land'); l.add_argument('name'); l.add_argument('message', nargs='?')
     l.add_argument('--continue', dest='cont', action='store_true')   # after fixing a conflict or a blocked landing
     l.add_argument('--note', help='one line the other builders should know (a shared helper, a changed interface)')
@@ -232,7 +233,7 @@ def main(argv=None):
     if a.cmd == 'init':
         return init(a.test_cmd, a.junit)
     if a.cmd == 'claim':
-        return claims.claim(a.name, a.areas, a.desc)
+        return claims.claim(a.name, a.areas, a.desc, a.again)
     if a.cmd == 'land':
         if not a.cont and not a.message:
             ap.error('land needs a commit message, or --continue')

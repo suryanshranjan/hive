@@ -1,0 +1,9 @@
+I landed the refunds area (`shop/refunds.py` plus `tests/test_refunds.py`). The land reported 9/9 tests passing.
+
+- **Choices I'm least sure of:**
+  - **Windows:** changed-mind refunds are accepted for 7 days after delivery and damaged ones for 30.
+  - **Amounts:** changed mind returns the discounted item cost without shipping. Damaged returns the full order total.
+  - **Edge cases:** a final-sale order gets Rs 0, even if damaged. Refunds go back the way the customer paid. Any reason other than damaged, including a blank one, is treated as changed mind.
+- **Owner questions:** I recorded seven, covering each of those rules plus the blank or wrong-size reason. Two of my first attempts were rejected for quoting code values, so I reworded and recorded them. I also recorded the matching business assumptions and one technical one.
+- **Problem with the hive tools:** `__pycache__` files were already tracked on `main`, so my first land hit a rebase conflict on them. I kept the upstream copies, dropped the ones I had added, and finished the land with `--continue`.
+- **Other areas:** `hive areas` still lists all three areas as free after my land, including refunds. I didn't claim loyalty or the sales summary because that is more than my even share.

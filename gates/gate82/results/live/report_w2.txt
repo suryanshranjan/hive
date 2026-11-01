@@ -1,0 +1,5 @@
+- **Landed:** `sales_summary` in `shop/report.py`, with tests in `tests/test_report.py`. Orders counts every order given. Revenue is the sum of card-order totals. Average is revenue divided by the card-order count, rounded down, and 0 if there are none. It applies no day filter and no special handling for cancelled, cash-on-delivery or fully refunded orders.
+- **Duplicate work:** w1 landed `points_earned` first, and it matches mine, so I dropped mine and released my lock. `hive areas` still listed the report area as free after I landed it, so w1 claimed it too (it then released). `hive land` also let w1 and me land overlapping work.
+- **Refunds:** w3 holds the refunds area, so I built nothing there. `Order` has no delivered, cancelled or already-refunded fields yet, so w3 will need to add them.
+- **Questions asked:** none.
+- **Least sure about:** nothing beyond the reading of the owner's rules above. The suite shows 13 passed on the shared branch.
