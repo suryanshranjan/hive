@@ -1,0 +1,16 @@
+F1: hidden 54/61, duplicated 12 of 12, wall 4.5 min (+0.8 s prepare), cost $1.68, tokens 5,442,264, areas 0, locks 5
+A1: hidden 57/61, duplicated 0 of 12, wall 2.6 min (+6.5 s prepare), cost $1.17, tokens 3,319,729, areas 10, locks 5
+A2: hidden 56/61, duplicated 0 of 12, wall 2.7 min (+6.3 s prepare), cost $1.16, tokens 3,296,727, areas 10, locks 5
+F2: hidden 55/61, duplicated 0 of 12, wall 2.2 min (+0.6 s prepare), cost $1.17, tokens 3,305,299, areas 0, locks 3
+F3: hidden 58/61, duplicated 5 of 12, wall 2.7 min (+0.4 s prepare), cost $1.25, tokens 3,398,502, areas 0, locks 3
+A3: hidden 53/61, duplicated 0 of 12, wall 3.1 min (+6.1 s prepare), cost $1.38, tokens 4,251,760, areas 10, locks 6
+
+F: duplicated 5.67, cost $1.37, hidden 55.67, wall 3.1 min
+A: duplicated 0.00, cost $1.24, hidden 55.33, wall 2.9 min
+
+predictions
+D1 A duplicated 0.00 <= half of F 5.67 (F >= 2) -> held
+D2 A cost 1.24 <= 0.85 x F 1.37 (ratio 0.90) -> failed
+D3 A hidden 55.33 >= F 55.67 - 3 -> held
+D4 A wall 2.9 <= 1.1 x F 3.1 -> held
+Claim D1 and D2 and D3 -> failed

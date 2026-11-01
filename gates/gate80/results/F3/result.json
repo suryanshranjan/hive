@@ -1,0 +1,180 @@
+{
+ "arm": "F",
+ "k": "3",
+ "workers": 4,
+ "prep_seconds": 0.4,
+ "wall_minutes": 2.7,
+ "hidden_passed": 58,
+ "hidden_total": 61,
+ "other_failures": 0,
+ "areas": null,
+ "changers": {
+  "sqlglot/expressions/builders.py::normalize_table_name": [
+   "w1"
+  ],
+  "sqlglot/dialects/dialect.py::array_compact_sql": [
+   "w1"
+  ],
+  "sqlglot/expressions/builders.py::to_interval": [
+   "w1"
+  ],
+  "sqlglot/generators/starrocks.py::_eliminate_between_in_delete": [
+   "w3"
+  ],
+  "sqlglot/generators/sqlite.py::_generated_to_auto_increment": [
+   "w3"
+  ],
+  "sqlglot/expressions/query.py::_is_star": [
+   "w3"
+  ],
+  "sqlglot/dialects/dialect.py::no_make_interval_sql": [
+   "w1"
+  ],
+  "sqlglot/parser.py::build_var_map": [
+   "w1"
+  ],
+  "sqlglot/serde.py::load": [
+   "w1"
+  ],
+  "sqlglot/generators/spark.py::_dateadd_sql": [
+   "w3"
+  ],
+  "sqlglot/generators/bigquery.py::_pushdown_cte_column_names": [
+   "w3"
+  ],
+  "sqlglot/generators/duckdb.py::_maybe_corr_null_to_false": [
+   "w3"
+  ]
+ },
+ "rebuilt_by": {
+  "w2": [],
+  "w1": [
+   "sqlglot/dialects/dialect.py::array_compact_sql",
+   "sqlglot/dialects/dialect.py::no_make_interval_sql",
+   "sqlglot/expressions/builders.py::normalize_table_name",
+   "sqlglot/expressions/builders.py::to_interval",
+   "sqlglot/parser.py::build_var_map",
+   "sqlglot/serde.py::load"
+  ],
+  "w3": [
+   "sqlglot/expressions/query.py::_is_star",
+   "sqlglot/generators/bigquery.py::_pushdown_cte_column_names",
+   "sqlglot/generators/duckdb.py::_maybe_corr_null_to_false",
+   "sqlglot/generators/spark.py::_dateadd_sql",
+   "sqlglot/generators/sqlite.py::_generated_to_auto_increment",
+   "sqlglot/generators/starrocks.py::_eliminate_between_in_delete"
+  ],
+  "w4": [
+   "sqlglot/expressions/builders.py::normalize_table_name",
+   "sqlglot/expressions/builders.py::to_interval",
+   "sqlglot/expressions/query.py::_is_star",
+   "sqlglot/parser.py::build_var_map",
+   "sqlglot/serde.py::load"
+  ]
+ },
+ "duplicated": 5,
+ "covered": 12,
+ "locks": [
+  "Lock: gens (_dateadd_sql,_eliminate_between_in_delete,_generated_to_auto_increment,_is_star,_maybe_corr_null_to_false,_pushdown_cte_column_names)",
+  "Lock: w4core (builders,serde,varmap)",
+  "Lock: w1funcs (array_compact_sql,build_var_map,no_make_interval_sql,normalize_table_name,serde_load,to_interval)"
+ ],
+ "cost": 1.25,
+ "tokens": 3398502,
+ "builders": [
+  {
+   "worker": "w2",
+   "agent": "claude",
+   "start": "1793546608",
+   "end": "1793546628",
+   "minutes": "0.3",
+   "exit": "0",
+   "tokens": "323978",
+   "cost_usd": "0.138351",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w1",
+   "agent": "claude",
+   "start": "1793546608",
+   "end": "1793546728",
+   "minutes": "2.0",
+   "exit": "0",
+   "tokens": "948156",
+   "cost_usd": "0.376818",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w3",
+   "agent": "claude",
+   "start": "1793546608",
+   "end": "1793546748",
+   "minutes": "2.3",
+   "exit": "0",
+   "tokens": "1183033",
+   "cost_usd": "0.414785",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w4",
+   "agent": "claude",
+   "start": "1793546608",
+   "end": "1793546768",
+   "minutes": "2.7",
+   "exit": "0",
+   "tokens": "943335",
+   "cost_usd": "0.322909",
+   "api_error": "",
+   "limit_stops": "0"
+  }
+ ],
+ "tools": {
+  "w2": {
+   "Read": 0,
+   "Grep": 1,
+   "Glob": 0,
+   "Bash": 5,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 4,
+   "outside": []
+  },
+  "w1": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 14,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 12,
+   "outside": []
+  },
+  "w3": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 17,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 16,
+   "outside": []
+  },
+  "w4": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 15,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 14,
+   "outside": []
+  }
+ }
+}

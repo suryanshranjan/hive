@@ -1,0 +1,75 @@
+[20:56:27] predictions registered on origin/main: gates/gate80/prompts/PREDICTIONS.md
+launched w1
+launched w2
+launched w3
+launched w4
+w2 finished: exit 0, 1.1 min, cost 0.180915
+w4 finished: exit 0, 1.9 min, cost 0.452804
+w1 finished: exit 0, 2.4 min, cost 0.283919
+w3 finished: exit 0, 3.1 min, cost 0.458393
+result: /home/claude/hive/runs/g80_A3/up.git, branch main
+06ac400 test: fix snowflake make_interval test CLAUDE
+642a44c array_compact_sql: ArrayFilter with NOT _u IS NULL lambda. no_make_interval_sql: INTERVAL '<n unit><sep>...' for literals; mixed/non-literal falls back to summed Interval exprs (Snowflake output for non-literals is not truly valid). (lock w3 released)
+124ca33 feat: rebuild array_compact_sql and no_make_interval_sql CLAUDE
+3026aec Unlock w1b (areas already landed by others)
+bdfeeb9 Lock: w1b (duckdb_maybe_corr_null_to_false,sqlite_generated_to_auto_increment,starrocks_eliminate_between_in_delete)
+2782044 Rebuilt _is_star (SetOperation: either side; else this), build_var_map (StarMap for lone star, else key/value pairs), serde.load (index-linked rebuild); tests added (lock w1 released)
+c22c05d feat: rebuild _is_star, build_var_map, serde.load CLAUDE
+855b74b Spark: DATE_ADD(x,n) for TsOrDsAdd day/no unit else TIMESTAMPADD(unit,n,x); BigQuery: push CTE column names into projections as aliases (skip if star/count mismatch); DuckDB: return copy with null_on_zero_variance cleared, None if not flagged (lock w4a released)
+
+{
+ "arm": "A",
+ "k": "3",
+ "workers": 4,
+ "prep_seconds": 6.1,
+ "wall_minutes": 3.1,
+ "hidden_passed": 53,
+ "hidden_total": 61,
+ "other_failures": 0,
+ "areas": {
+  "normalize_table_name_and_to_interval_exp": "normalize_table_name and to_interval (expressions/builders.py)",
+  "array_compact_sql_and_no_make_interval_s": "array_compact_sql and no_make_interval_sql (dialects/dialect.py)",
+  "starrocks_eliminate_between_in_delete": "StarRocks _eliminate_between_in_delete",
+  "sqlite_generated_to_auto_increment": "SQLite _generated_to_auto_increment",
+  "is_star_expressions_query_py": "_is_star (expressions/query.py)",
+  "build_var_map_parser_py": "build_var_map (parser.py)",
+  "serde_load_serde_py": "serde load (serde.py)",
+  "spark_dateadd_sql": "Spark _dateadd_sql",
+  "bigquery_pushdown_cte_column_names": "BigQuery _pushdown_cte_column_names",
+  "duckdb_maybe_corr_null_to_false": "DuckDB _maybe_corr_null_to_false"
+ },
+ "rebuilt_by": {
+  "w2": [
+   "sqlglot/expressions/builders.py::normalize_table_name",
+   "sqlglot/expressions/builders.py::to_interval"
+  ],
+  "w4": [
+   "sqlglot/generators/bigquery.py::_pushdown_cte_column_names",
+   "sqlglot/generators/duckdb.py::_maybe_corr_null_to_false",
+   "sqlglot/generators/spark.py::_dateadd_sql"
+  ],
+  "w1": [
+   "sqlglot/expressions/query.py::_is_star",
+   "sqlglot/parser.py::build_var_map",
+   "sqlglot/serde.py::load"
+  ],
+  "w3": [
+   "sqlglot/dialects/dialect.py::array_compact_sql",
+   "sqlglot/dialects/dialect.py::no_make_interval_sql",
+   "sqlglot/generators/sqlite.py::_generated_to_auto_increment",
+   "sqlglot/generators/starrocks.py::_eliminate_between_in_delete"
+  ]
+ },
+ "duplicated": 0,
+ "covered": 12,
+ "locks": [
+  "Lock: w1b (duckdb_maybe_corr_null_to_false,sqlite_generated_to_auto_increment,starrocks_eliminate_between_in_delete)",
+  "Lock: w3 (array_compact_sql_and_no_make_interval_s)",
+  "Lock: w4a (bigquery_pushdown_cte_column_names,duckdb_maybe_corr_null_to_false,spark_dateadd_sql)",
+  "Lock: w3 (sqlite_generated_to_auto_increment,starrocks_eliminate_between_in_delete)",
+  "Lock: w2 (normalize_table_name_and_to_interval_exp)",
+  "Lock: w1 (build_var_map_parser_py,is_star_expressions_query_py,serde_load_serde_py)"
+ ],
+ "cost": 1.38,
+ "tokens": 4251760
+}

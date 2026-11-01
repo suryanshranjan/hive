@@ -1,0 +1,65 @@
+[20:53:28] predictions registered on origin/main: gates/gate80/prompts/PREDICTIONS.md
+launched w1
+launched w2
+launched w3
+launched w4
+w2 finished: exit 0, 0.3 min, cost 0.138351
+w1 finished: exit 0, 2.0 min, cost 0.376818
+w3 finished: exit 0, 2.3 min, cost 0.414785
+w4 finished: exit 0, 2.7 min, cost 0.322909
+result: /home/claude/hive/runs/g80_F3/up.git, branch main
+a6cd207 Rebuilt normalize_table_name, to_interval (via parsing INTERVAL <str>), build_var_map, serde.load (index-based tree rebuild), _is_star; tests in tests/test_w4core.py (lock w4core released)
+16f1c2e feat: rebuild normalize_table_name, to_interval, build_var_map, serde.load, _is_star
+c5755f3 Rebuilt starrocks between-in-delete, sqlite generated->autoincrement, _is_star, spark _dateadd_sql, bigquery CTE column pushdown, duckdb corr; tests in tests/test_emptied_generators.py (lock gens released)
+56eba05 feat: rebuild six emptied generator/helper functions CLAUDE
+8c81fb8 Rebuilt 6 funcs with tests in tests/test_rebuilt_w1.py (lock w1funcs released)
+8b56bc6 feat: rebuild normalize_table_name, to_interval, array_compact_sql, no_make_interval_sql, build_var_map, serde.load
+1a68bdb Lock: gens (_dateadd_sql,_eliminate_between_in_delete,_generated_to_auto_increment,_is_star,_maybe_corr_null_to_false,_pushdown_cte_column_names)
+600f929 Lock: w4core (builders,serde,varmap)
+
+{
+ "arm": "F",
+ "k": "3",
+ "workers": 4,
+ "prep_seconds": 0.4,
+ "wall_minutes": 2.7,
+ "hidden_passed": 58,
+ "hidden_total": 61,
+ "other_failures": 0,
+ "areas": null,
+ "rebuilt_by": {
+  "w2": [],
+  "w1": [
+   "sqlglot/dialects/dialect.py::array_compact_sql",
+   "sqlglot/dialects/dialect.py::no_make_interval_sql",
+   "sqlglot/expressions/builders.py::normalize_table_name",
+   "sqlglot/expressions/builders.py::to_interval",
+   "sqlglot/parser.py::build_var_map",
+   "sqlglot/serde.py::load"
+  ],
+  "w3": [
+   "sqlglot/expressions/query.py::_is_star",
+   "sqlglot/generators/bigquery.py::_pushdown_cte_column_names",
+   "sqlglot/generators/duckdb.py::_maybe_corr_null_to_false",
+   "sqlglot/generators/spark.py::_dateadd_sql",
+   "sqlglot/generators/sqlite.py::_generated_to_auto_increment",
+   "sqlglot/generators/starrocks.py::_eliminate_between_in_delete"
+  ],
+  "w4": [
+   "sqlglot/expressions/builders.py::normalize_table_name",
+   "sqlglot/expressions/builders.py::to_interval",
+   "sqlglot/expressions/query.py::_is_star",
+   "sqlglot/parser.py::build_var_map",
+   "sqlglot/serde.py::load"
+  ]
+ },
+ "duplicated": 5,
+ "covered": 12,
+ "locks": [
+  "Lock: gens (_dateadd_sql,_eliminate_between_in_delete,_generated_to_auto_increment,_is_star,_maybe_corr_null_to_false,_pushdown_cte_column_names)",
+  "Lock: w4core (builders,serde,varmap)",
+  "Lock: w1funcs (array_compact_sql,build_var_map,no_make_interval_sql,normalize_table_name,serde_load,to_interval)"
+ ],
+ "cost": 1.25,
+ "tokens": 3398502
+}

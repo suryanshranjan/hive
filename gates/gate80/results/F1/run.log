@@ -1,0 +1,75 @@
+[20:40:09] predictions registered on origin/main: gates/gate80/prompts/PREDICTIONS.md
+launched w1
+launched w2
+launched w3
+launched w4
+w2 finished: exit 0, 1.4 min, cost 0.231156
+w3 finished: exit 0, 1.7 min, cost 0.352017
+w4 finished: exit 0, 2.1 min, cost 0.401475
+w1 finished: exit 0, 4.5 min, cost 0.693528
+result: /home/claude/hive/runs/g80_F1/up.git, branch main
+3b70185 Other workers landed all 12 first; I dropped my duplicate implementations, added cross-check tests, and made sqlite _generated_to_auto_increment also drop NOT NULL. (lock w1 released)
+81471ad fix: sqlite identity->autoincrement drops NOT NULL; add cross-checking tests (CLAUDE)
+09320f3 Rebuilt serde.load (pre-order parent-index reconstruction), spark _dateadd_sql (DATE_ADD for day TsOrDsAdd, else DATEADD(unit,n,x)), bigquery CTE column pushdown into leftmost select when no stars and counts match, duckdb corr (copy with null_on_zero_variance cleared); tests in tests/test_w4_rebuilt.py (lock w4 released)
+bbb7718 feat: rebuild serde.load, spark _dateadd_sql, bigquery CTE pushdown, duckdb corr (CLAUDE)
+598b251 Rebuilt normalize_table_name, to_interval, _is_star, array_compact_sql, starrocks between elimination, sqlite identity->autoincrement; tests in tests/test_w3_rebuilt.py (lock w3a released)
+2f7f772 feat: rebuild six emptied functions
+69d872f Rebuilt no_make_interval_sql (INTERVAL 'N unit<sep>...', Kwarg unwrapped) and build_var_map (star -> StarMap, else key/value pairs into VarMap arrays); tests in tests/test_w2_rebuilt.py (lock w2 released)
+863a975 feat: rebuild no_make_interval_sql and build_var_map CLAUDE
+
+{
+ "arm": "F",
+ "k": "1",
+ "workers": 4,
+ "prep_seconds": 0.8,
+ "wall_minutes": 4.5,
+ "hidden_passed": 54,
+ "hidden_total": 61,
+ "other_failures": 0,
+ "areas": null,
+ "rebuilt_by": {
+  "w2": [
+   "sqlglot/dialects/dialect.py::no_make_interval_sql",
+   "sqlglot/parser.py::build_var_map"
+  ],
+  "w3": [
+   "sqlglot/dialects/dialect.py::array_compact_sql",
+   "sqlglot/expressions/builders.py::normalize_table_name",
+   "sqlglot/expressions/builders.py::to_interval",
+   "sqlglot/expressions/query.py::_is_star",
+   "sqlglot/generators/sqlite.py::_generated_to_auto_increment",
+   "sqlglot/generators/starrocks.py::_eliminate_between_in_delete"
+  ],
+  "w4": [
+   "sqlglot/generators/bigquery.py::_pushdown_cte_column_names",
+   "sqlglot/generators/duckdb.py::_maybe_corr_null_to_false",
+   "sqlglot/generators/spark.py::_dateadd_sql",
+   "sqlglot/serde.py::load"
+  ],
+  "w1": [
+   "sqlglot/dialects/dialect.py::array_compact_sql",
+   "sqlglot/dialects/dialect.py::no_make_interval_sql",
+   "sqlglot/expressions/builders.py::normalize_table_name",
+   "sqlglot/expressions/builders.py::to_interval",
+   "sqlglot/expressions/query.py::_is_star",
+   "sqlglot/generators/bigquery.py::_pushdown_cte_column_names",
+   "sqlglot/generators/duckdb.py::_maybe_corr_null_to_false",
+   "sqlglot/generators/spark.py::_dateadd_sql",
+   "sqlglot/generators/sqlite.py::_generated_to_auto_increment",
+   "sqlglot/generators/starrocks.py::_eliminate_between_in_delete",
+   "sqlglot/parser.py::build_var_map",
+   "sqlglot/serde.py::load"
+  ]
+ },
+ "duplicated": 12,
+ "covered": 12,
+ "locks": [
+  "Lock: w2 (make_interval,var_map)",
+  "Lock: w2 (fees)",
+  "Lock: w4 (bq_cte_names,duckdb_corr,serde_load,spark_dateadd)",
+  "Lock: w3a (array_compact,is_star,normalize_table_name,sqlite_autoinc,starrocks_delete,to_interval)",
+  "Lock: w1 (all12)"
+ ],
+ "cost": 1.68,
+ "tokens": 5442264
+}

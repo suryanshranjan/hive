@@ -190,8 +190,8 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
     sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--bare', '--branch', b, repo, up)
     sh('git', '-C', up, 'symbolic-ref', 'HEAD', f'refs/heads/{b}')
     if derive_areas is None:
-        derive_areas = os.environ.get('HIVE_DERIVE_AREAS') == '1'
-    if derive_areas and not cfg.get('areas') and workers > 1:   # Gate 80 (under test): claim the goal's parts by name
+        derive_areas = os.environ.get('HIVE_DERIVE_AREAS') != '0'
+    if derive_areas and not cfg.get('areas') and workers > 1:   # Gate 80: claim the goal's parts by name (duplicated work 5.7 -> 0 of 12)
         goal_text0 = open(goal, encoding='utf-8').read() if os.path.exists(goal) else goal
         names = law.part_names(goal_text0)
         if len(names) > 1:

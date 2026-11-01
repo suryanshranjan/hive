@@ -1,0 +1,189 @@
+{
+ "arm": "A",
+ "k": "1",
+ "workers": 4,
+ "prep_seconds": 6.5,
+ "wall_minutes": 2.6,
+ "hidden_passed": 57,
+ "hidden_total": 61,
+ "other_failures": 0,
+ "areas": {
+  "expressions_builders_py_normalize_table_": "expressions/builders.py: normalize_table_name and to_interval",
+  "dialects_dialect_py_array_compact_sql_an": "dialects/dialect.py: array_compact_sql and no_make_interval_sql",
+  "generators_starrocks_py_eliminate_betwee": "generators/starrocks.py: _eliminate_between_in_delete",
+  "generators_sqlite_py_generated_to_auto_i": "generators/sqlite.py: _generated_to_auto_increment",
+  "expressions_query_py_is_star": "expressions/query.py: _is_star",
+  "parser_py_build_var_map": "parser.py: build_var_map",
+  "serde_py_load": "serde.py: load",
+  "generators_spark_py_dateadd_sql": "generators/spark.py: _dateadd_sql",
+  "generators_bigquery_py_pushdown_cte_colu": "generators/bigquery.py: _pushdown_cte_column_names",
+  "generators_duckdb_py_maybe_corr_null_to_": "generators/duckdb.py: _maybe_corr_null_to_false"
+ },
+ "changers": {
+  "sqlglot/expressions/builders.py::normalize_table_name": [
+   "w1"
+  ],
+  "sqlglot/dialects/dialect.py::array_compact_sql": [
+   "w2"
+  ],
+  "sqlglot/expressions/builders.py::to_interval": [
+   "w1"
+  ],
+  "sqlglot/generators/starrocks.py::_eliminate_between_in_delete": [
+   "w4"
+  ],
+  "sqlglot/generators/sqlite.py::_generated_to_auto_increment": [
+   "w4"
+  ],
+  "sqlglot/expressions/query.py::_is_star": [
+   "w1"
+  ],
+  "sqlglot/dialects/dialect.py::no_make_interval_sql": [
+   "w2"
+  ],
+  "sqlglot/parser.py::build_var_map": [
+   "w1"
+  ],
+  "sqlglot/serde.py::load": [
+   "w3"
+  ],
+  "sqlglot/generators/spark.py::_dateadd_sql": [
+   "w2"
+  ],
+  "sqlglot/generators/bigquery.py::_pushdown_cte_column_names": [
+   "w2"
+  ],
+  "sqlglot/generators/duckdb.py::_maybe_corr_null_to_false": [
+   "w4"
+  ]
+ },
+ "rebuilt_by": {
+  "w3": [
+   "sqlglot/serde.py::load"
+  ],
+  "w1": [
+   "sqlglot/expressions/builders.py::normalize_table_name",
+   "sqlglot/expressions/builders.py::to_interval",
+   "sqlglot/expressions/query.py::_is_star",
+   "sqlglot/parser.py::build_var_map"
+  ],
+  "w2": [
+   "sqlglot/dialects/dialect.py::array_compact_sql",
+   "sqlglot/dialects/dialect.py::no_make_interval_sql",
+   "sqlglot/generators/bigquery.py::_pushdown_cte_column_names",
+   "sqlglot/generators/spark.py::_dateadd_sql"
+  ],
+  "w4": [
+   "sqlglot/generators/duckdb.py::_maybe_corr_null_to_false",
+   "sqlglot/generators/sqlite.py::_generated_to_auto_increment",
+   "sqlglot/generators/starrocks.py::_eliminate_between_in_delete"
+  ]
+ },
+ "duplicated": 0,
+ "covered": 12,
+ "locks": [
+  "Lock: w1b (serde_py_load)",
+  "Lock: w2a (dialects_dialect_py_array_compact_sql_an,generators_bigquery_py_pushdown_cte_colu,generators_spark_py_dateadd_sql)",
+  "Lock: w3a (serde_py_load)",
+  "Lock: w4a (generators_duckdb_py_maybe_corr_null_to_,generators_sqlite_py_generated_to_auto_i,generators_starrocks_py_eliminate_betwee)",
+  "Lock: w1 (expressions_builders_py_normalize_table_,expressions_query_py_is_star,parser_py_build_var_map)"
+ ],
+ "cost": 1.17,
+ "tokens": 3319729,
+ "builders": [
+  {
+   "worker": "w3",
+   "agent": "claude",
+   "start": "1793546105",
+   "end": "1793546187",
+   "minutes": "1.4",
+   "exit": "0",
+   "tokens": "584168",
+   "cost_usd": "0.209751",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w1",
+   "agent": "claude",
+   "start": "1793546105",
+   "end": "1793546219",
+   "minutes": "1.9",
+   "exit": "0",
+   "tokens": "1057050",
+   "cost_usd": "0.331364",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w2",
+   "agent": "claude",
+   "start": "1793546105",
+   "end": "1793546235",
+   "minutes": "2.2",
+   "exit": "0",
+   "tokens": "1149534",
+   "cost_usd": "0.398352",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w4",
+   "agent": "claude",
+   "start": "1793546105",
+   "end": "1793546257",
+   "minutes": "2.5",
+   "exit": "0",
+   "tokens": "528977",
+   "cost_usd": "0.229018",
+   "api_error": "",
+   "limit_stops": "0"
+  }
+ ],
+ "tools": {
+  "w3": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 9,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 8,
+   "outside": []
+  },
+  "w1": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 15,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 14,
+   "outside": []
+  },
+  "w2": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 16,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 15,
+   "outside": []
+  },
+  "w4": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 9,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 9,
+   "outside": []
+  }
+ }
+}

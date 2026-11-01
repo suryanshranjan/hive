@@ -1,0 +1,74 @@
+[20:44:58] predictions registered on origin/main: gates/gate80/prompts/PREDICTIONS.md
+launched w1
+launched w2
+launched w3
+launched w4
+w3 finished: exit 0, 1.4 min, cost 0.209751
+w1 finished: exit 0, 1.9 min, cost 0.331364
+w2 finished: exit 0, 2.2 min, cost 0.398352
+w4 finished: exit 0, 2.5 min, cost 0.229018
+result: /home/claude/hive/runs/g80_A1/up.git, branch main
+4661b92 sqlite generated->autoincrement, starrocks BETWEEN expansion (parenthesised under NOT), duckdb corr null_on_zero_variance flag flip (lock w4a released)
+26cac60 feat: rebuild sqlite/starrocks/duckdb helpers
+2d680ca Rebuilt spark _dateadd_sql, bigquery _pushdown_cte_column_names, array_compact_sql (filter NOT IS NULL), no_make_interval_sql (INTERVAL 'N unit<sep>...'); added tests (lock w2a released)
+3537e45 feat: rebuild spark dateadd, bigquery cte pushdown, array_compact/make_interval sql
+164685e chore: release w1b lock (serde already landed)
+a6ec30b Lock: w1b (serde_py_load)
+e640351 Rebuilt to_interval (fullmatch INTERVAL_STRING_RE, uppercase unit), normalize_table_name (to_table+normalize_identifiers, dotted parts), _is_star (SetOperation either side, else this), build_var_map (StarMap for lone star, else VarMap of arrays); added tests (lock w1 released)
+450dc04 feat: rebuild to_interval, normalize_table_name, _is_star, build_var_map CLAUDE
+
+{
+ "arm": "A",
+ "k": "1",
+ "workers": 4,
+ "prep_seconds": 6.5,
+ "wall_minutes": 2.6,
+ "hidden_passed": 57,
+ "hidden_total": 61,
+ "other_failures": 0,
+ "areas": {
+  "expressions_builders_py_normalize_table_": "expressions/builders.py: normalize_table_name and to_interval",
+  "dialects_dialect_py_array_compact_sql_an": "dialects/dialect.py: array_compact_sql and no_make_interval_sql",
+  "generators_starrocks_py_eliminate_betwee": "generators/starrocks.py: _eliminate_between_in_delete",
+  "generators_sqlite_py_generated_to_auto_i": "generators/sqlite.py: _generated_to_auto_increment",
+  "expressions_query_py_is_star": "expressions/query.py: _is_star",
+  "parser_py_build_var_map": "parser.py: build_var_map",
+  "serde_py_load": "serde.py: load",
+  "generators_spark_py_dateadd_sql": "generators/spark.py: _dateadd_sql",
+  "generators_bigquery_py_pushdown_cte_colu": "generators/bigquery.py: _pushdown_cte_column_names",
+  "generators_duckdb_py_maybe_corr_null_to_": "generators/duckdb.py: _maybe_corr_null_to_false"
+ },
+ "rebuilt_by": {
+  "w3": [
+   "sqlglot/serde.py::load"
+  ],
+  "w1": [
+   "sqlglot/expressions/builders.py::normalize_table_name",
+   "sqlglot/expressions/builders.py::to_interval",
+   "sqlglot/expressions/query.py::_is_star",
+   "sqlglot/parser.py::build_var_map"
+  ],
+  "w2": [
+   "sqlglot/dialects/dialect.py::array_compact_sql",
+   "sqlglot/dialects/dialect.py::no_make_interval_sql",
+   "sqlglot/generators/bigquery.py::_pushdown_cte_column_names",
+   "sqlglot/generators/spark.py::_dateadd_sql"
+  ],
+  "w4": [
+   "sqlglot/generators/duckdb.py::_maybe_corr_null_to_false",
+   "sqlglot/generators/sqlite.py::_generated_to_auto_increment",
+   "sqlglot/generators/starrocks.py::_eliminate_between_in_delete"
+  ]
+ },
+ "duplicated": 0,
+ "covered": 12,
+ "locks": [
+  "Lock: w1b (serde_py_load)",
+  "Lock: w2a (dialects_dialect_py_array_compact_sql_an,generators_bigquery_py_pushdown_cte_colu,generators_spark_py_dateadd_sql)",
+  "Lock: w3a (serde_py_load)",
+  "Lock: w4a (generators_duckdb_py_maybe_corr_null_to_,generators_sqlite_py_generated_to_auto_i,generators_starrocks_py_eliminate_betwee)",
+  "Lock: w1 (expressions_builders_py_normalize_table_,expressions_query_py_is_star,parser_py_build_var_map)"
+ ],
+ "cost": 1.17,
+ "tokens": 3319729
+}
