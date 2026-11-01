@@ -1,0 +1,209 @@
+{
+ "arm": "HG",
+ "k": "1",
+ "workers": 4,
+ "prep_seconds": 69.5,
+ "wall_minutes": 2.6,
+ "hidden_passed": 25,
+ "hidden_total": 25,
+ "other_failures": 0,
+ "landings": [
+  {
+   "commit": "a7df29ea",
+   "minute": 0.1,
+   "subject": "Withdraw lock w3: overlaps w2",
+   "hidden": 0,
+   "other_fail": 0
+  },
+  {
+   "commit": "f9d4e853",
+   "minute": 1.1,
+   "subject": "fix(presto): week shift for Sunday-start DATETIME_DIFF",
+   "hidden": 0,
+   "other_fail": 0
+  },
+  {
+   "commit": "32f1e27f",
+   "minute": 1.1,
+   "subject": "Presto _date_diff_sql: Sunday-start week shift was keyed on dow==8 (never true) giving -6; now dow==",
+   "hidden": 0,
+   "other_fail": 0
+  },
+  {
+   "commit": "7d9eae31",
+   "minute": 1.4,
+   "subject": "fix: keep explicit DECIMAL params in duckdb/snowflake; exasol DATE_TRUNC timestamp literal T replace",
+   "hidden": 9,
+   "other_fail": 0
+  },
+  {
+   "commit": "83c37deb",
+   "minute": 1.4,
+   "subject": "bug06: build_default_decimal_type no longer overwrites explicit params; bug07: inverted T->space rep",
+   "hidden": 9,
+   "other_fail": 0
+  },
+  {
+   "commit": "2d386d36",
+   "minute": 1.6,
+   "subject": "fix: exasol star qualify, tsql json_extract_scalar, postgres interval/last_day",
+   "hidden": 17,
+   "other_fail": 0
+  },
+  {
+   "commit": "19d08709",
+   "minute": 1.6,
+   "subject": "bug03: inverted selected_sources check; bug04: JSONExtractScalar uses ISNULL(JSON_QUERY,JSON_VALUE) ",
+   "hidden": 17,
+   "other_fail": 0
+  },
+  {
+   "commit": "3d5d516d",
+   "minute": 1.9,
+   "subject": "fix(bigquery): dotted name split masked dots without colon",
+   "hidden": 18,
+   "other_fail": 0
+  },
+  {
+   "commit": "5db72035",
+   "minute": 1.9,
+   "subject": "_split_qualified_name: colon check was != -2 (always true), so dots were masked for any dotted name;",
+   "hidden": 18,
+   "other_fail": 0
+  },
+  {
+   "commit": "9255c6c5",
+   "minute": 2.0,
+   "subject": "fix: POWER base, MySQL STR_TO_DATE args, BigQuery FORMAT_* args (CLAUDE)",
+   "hidden": 23,
+   "other_fail": 0
+  },
+  {
+   "commit": "390f59da",
+   "minute": 2.0,
+   "subject": "bug08 POW(10), bug09 mysql STR_TO_DATE arg order, bug10 FORMAT_* arg order; tests added (lock w2 rel",
+   "hidden": 23,
+   "other_fail": 0
+  },
+  {
+   "commit": "c629ccad",
+   "minute": 2.3,
+   "subject": "Release w3b (bug11 already landed by w4)",
+   "hidden": 23,
+   "other_fail": 0
+  },
+  {
+   "commit": "f73280dd",
+   "minute": 2.4,
+   "subject": "fix: snowflake GENERATE_DATE_ARRAY unnest rewrite",
+   "hidden": 25,
+   "other_fail": 0
+  },
+  {
+   "commit": "a8d03964",
+   "minute": 2.4,
+   "subject": "bug01: unnest arg-count check was ==2 (now 1) and column alias index 1 (now 0) (lock w1 released)",
+   "hidden": 25,
+   "other_fail": 0
+  }
+ ],
+ "cost": 1.41,
+ "tokens": 5423301,
+ "builders": [
+  {
+   "worker": "w4",
+   "agent": "claude",
+   "start": "1793543169",
+   "end": "1793543295",
+   "minutes": "2.1",
+   "exit": "0",
+   "tokens": "1419045",
+   "cost_usd": "0.340513",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w2",
+   "agent": "claude",
+   "start": "1793543169",
+   "end": "1793543299",
+   "minutes": "2.2",
+   "exit": "0",
+   "tokens": "945929",
+   "cost_usd": "0.280016",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w3",
+   "agent": "claude",
+   "start": "1793543169",
+   "end": "1793543315",
+   "minutes": "2.4",
+   "exit": "0",
+   "tokens": "1624268",
+   "cost_usd": "0.399763",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w1",
+   "agent": "claude",
+   "start": "1793543169",
+   "end": "1793543321",
+   "minutes": "2.5",
+   "exit": "0",
+   "tokens": "1434059",
+   "cost_usd": "0.386631",
+   "api_error": "",
+   "limit_stops": "0"
+  }
+ ],
+ "tools": {
+  "w4": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 22,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 1,
+   "search_bash": 18,
+   "outside": []
+  },
+  "w2": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 14,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 1,
+   "search_bash": 13,
+   "outside": []
+  },
+  "w3": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 24,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 1,
+   "search_bash": 21,
+   "outside": []
+  },
+  "w1": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 21,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 20,
+   "outside": []
+  }
+ },
+ "map": true
+}

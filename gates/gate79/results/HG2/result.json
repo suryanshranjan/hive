@@ -1,0 +1,181 @@
+{
+ "arm": "HG",
+ "k": "2",
+ "workers": 4,
+ "prep_seconds": 44.7,
+ "wall_minutes": 3.0,
+ "hidden_passed": 24,
+ "hidden_total": 25,
+ "other_failures": 0,
+ "landings": [
+  {
+   "commit": "c88fe6bb",
+   "minute": 0.7,
+   "subject": "fix(exasol): always normalize T in DATE_TRUNC timestamp literal CLAUDE",
+   "hidden": 1,
+   "other_fail": 0
+  },
+  {
+   "commit": "c8f0d400",
+   "minute": 0.7,
+   "subject": "inverted condition in exasol _trunc_sql: always replace T with space (lock w1 released)",
+   "hidden": 1,
+   "other_fail": 0
+  },
+  {
+   "commit": "372aec35",
+   "minute": 1.0,
+   "subject": "fix: snowflake scale POWER base, mysql STR_TO_DATE arg, bigquery FORMAT_* arg order",
+   "hidden": 4,
+   "other_fail": 0
+  },
+  {
+   "commit": "90ce97af",
+   "minute": 1.0,
+   "subject": "Bug08: POW base 11->10 in bigquery generator; Bug09: mysql _str_to_date used format as this; Bug10: ",
+   "hidden": 4,
+   "other_fail": 0
+  },
+  {
+   "commit": "9b74b9d9",
+   "minute": 1.8,
+   "subject": "fix: bug02 BigQuery split name, bug03 Exasol star qualify, bug04 tsql JSON extract scalar",
+   "hidden": 8,
+   "other_fail": 0
+  },
+  {
+   "commit": "ed02d2ee",
+   "minute": 1.8,
+   "subject": "bug02: _split_qualified_name colon check was != -2 (always true) -> != -1, dropped alias var; bug03:",
+   "hidden": 8,
+   "other_fail": 0
+  },
+  {
+   "commit": "18b53d9c",
+   "minute": 2.3,
+   "subject": "fix: postgres LAST_DAY/numeric intervals, duckdb decimal params, presto week diff shift",
+   "hidden": 22,
+   "other_fail": 0
+  },
+  {
+   "commit": "015d9024",
+   "minute": 2.3,
+   "subject": "bug05: postgres dateadd literal-number interval (dead is_number&&is_string condition); bug06: build_",
+   "hidden": 22,
+   "other_fail": 0
+  },
+  {
+   "commit": "3c40bd47",
+   "minute": 2.6,
+   "subject": "fix(snowflake): unnest GENERATE_DATE_ARRAY alias column and arg count CLAUDE",
+   "hidden": 24,
+   "other_fail": 0
+  },
+  {
+   "commit": "bb86a191",
+   "minute": 2.6,
+   "subject": "fixed two off-by-one bugs in snowflake _unnest_generate_date_array path: expressions len == 1 (was 2",
+   "hidden": 24,
+   "other_fail": 0
+  }
+ ],
+ "cost": 1.63,
+ "tokens": 6382484,
+ "builders": [
+  {
+   "worker": "w4",
+   "agent": "claude",
+   "start": "1793543600",
+   "end": "1793543706",
+   "minutes": "1.8",
+   "exit": "0",
+   "tokens": "867115",
+   "cost_usd": "0.265171",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w2",
+   "agent": "claude",
+   "start": "1793543600",
+   "end": "1793543740",
+   "minutes": "2.3",
+   "exit": "0",
+   "tokens": "1501799",
+   "cost_usd": "0.413964",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w3",
+   "agent": "claude",
+   "start": "1793543600",
+   "end": "1793543758",
+   "minutes": "2.6",
+   "exit": "0",
+   "tokens": "2179902",
+   "cost_usd": "0.501877",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w1",
+   "agent": "claude",
+   "start": "1793543600",
+   "end": "1793543776",
+   "minutes": "2.9",
+   "exit": "0",
+   "tokens": "1833668",
+   "cost_usd": "0.445606",
+   "api_error": "",
+   "limit_stops": "0"
+  }
+ ],
+ "tools": {
+  "w4": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 13,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 1,
+   "search_bash": 12,
+   "outside": []
+  },
+  "w2": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 21,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 1,
+   "search_bash": 21,
+   "outside": []
+  },
+  "w3": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 31,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 31,
+   "outside": []
+  },
+  "w1": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 27,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 26,
+   "outside": []
+  }
+ },
+ "map": true
+}

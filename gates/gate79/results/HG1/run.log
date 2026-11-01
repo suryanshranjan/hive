@@ -1,0 +1,46 @@
+[19:54:59] predictions registered on origin/main: gates/gate79/prompts/PREDICTIONS.md
+launched w1
+launched w2
+launched w3
+launched w4
+w4 finished: exit 0, 2.1 min, cost 0.340513
+w2 finished: exit 0, 2.2 min, cost 0.280016
+w3 finished: exit 0, 2.4 min, cost 0.399763
+w1 finished: exit 0, 2.5 min, cost 0.386631
+result: /home/claude/hive/runs/g79_HG1/up.git, branch main
+a8d0396 bug01: unnest arg-count check was ==2 (now 1) and column alias index 1 (now 0) (lock w1 released)
+f73280d fix: snowflake GENERATE_DATE_ARRAY unnest rewrite
+c629cca Release w3b (bug11 already landed by w4)
+390f59d bug08 POW(10), bug09 mysql STR_TO_DATE arg order, bug10 FORMAT_* arg order; tests added (lock w2 released)
+9255c6c fix: POWER base, MySQL STR_TO_DATE args, BigQuery FORMAT_* args (CLAUDE)
+5db7203 _split_qualified_name: colon check was != -2 (always true), so dots were masked for any dotted name; now != -1. (lock w4 released)
+3d5d516 fix(bigquery): dotted name split masked dots without colon
+60d4c2a Lock: w1 (bug01)
+
+  landing a7df29ea at 0.1 min: hidden 0/25
+  landing f9d4e853 at 1.1 min: hidden 0/25
+  landing 32f1e27f at 1.1 min: hidden 0/25
+  landing 7d9eae31 at 1.4 min: hidden 9/25
+  landing 83c37deb at 1.4 min: hidden 9/25
+  landing 2d386d36 at 1.6 min: hidden 17/25
+  landing 19d08709 at 1.6 min: hidden 17/25
+  landing 3d5d516d at 1.9 min: hidden 18/25
+  landing 5db72035 at 1.9 min: hidden 18/25
+  landing 9255c6c5 at 2.0 min: hidden 23/25
+  landing 390f59da at 2.0 min: hidden 23/25
+  landing c629ccad at 2.3 min: hidden 23/25
+  landing f73280dd at 2.4 min: hidden 25/25
+  landing a8d03964 at 2.4 min: hidden 25/25
+{
+ "arm": "HG",
+ "k": "1",
+ "workers": 4,
+ "prep_seconds": 69.5,
+ "wall_minutes": 2.6,
+ "hidden_passed": 25,
+ "hidden_total": 25,
+ "other_failures": 0,
+ "cost": 1.41,
+ "tokens": 5423301,
+ "map": true
+}

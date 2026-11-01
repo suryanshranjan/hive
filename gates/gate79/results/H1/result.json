@@ -1,0 +1,202 @@
+{
+ "arm": "H",
+ "k": "1",
+ "workers": 4,
+ "prep_seconds": 0.8,
+ "wall_minutes": 4.9,
+ "hidden_passed": 25,
+ "hidden_total": 25,
+ "other_failures": 0,
+ "landings": [
+  {
+   "commit": "0c5c5c40",
+   "minute": 1.0,
+   "subject": "fix(exasol,tsql): qualify bare star, JSON_EXTRACT_SCALAR scalar_only CLAUDE",
+   "hidden": 3,
+   "other_fail": 0
+  },
+  {
+   "commit": "31f10b7c",
+   "minute": 1.0,
+   "subject": "bug03: inverted selected_sources check in exasol star qualification, plus use alias when table alias",
+   "hidden": 3,
+   "other_fail": 0
+  },
+  {
+   "commit": "dc3acd1a",
+   "minute": 2.2,
+   "subject": "fix: LAST_DAY/interval in postgres, decimal params in duckdb, exasol trunc literal",
+   "hidden": 17,
+   "other_fail": 0
+  },
+  {
+   "commit": "0c694d03",
+   "minute": 2.2,
+   "subject": "bug05: postgres date_add numeric literal -> INTERVAL, LAST_DAY honours YEAR/QUARTER; bug06: build_de",
+   "hidden": 17,
+   "other_fail": 0
+  },
+  {
+   "commit": "71ff7079",
+   "minute": 3.1,
+   "subject": "Release w3 lock",
+   "hidden": 17,
+   "other_fail": 0
+  },
+  {
+   "commit": "2f4e6f65",
+   "minute": 3.3,
+   "subject": "fix(bigquery): split dotted quoted names when no domain colon CLAUDE",
+   "hidden": 18,
+   "other_fail": 0
+  },
+  {
+   "commit": "fcced5a1",
+   "minute": 3.3,
+   "subject": "bug02: _split_qualified_name used colon != -2 (always true) so names without a colon were masked and",
+   "hidden": 18,
+   "other_fail": 0
+  },
+  {
+   "commit": "12855437",
+   "minute": 3.7,
+   "subject": "fix: snowflake GENERATE_DATE_ARRAY unnest rewrite",
+   "hidden": 20,
+   "other_fail": 0
+  },
+  {
+   "commit": "b6e9e4e9",
+   "minute": 3.7,
+   "subject": "bug01: unnest rewrite required 2 unnest expressions (now 1) and read the value alias from column ind",
+   "hidden": 20,
+   "other_fail": 0
+  },
+  {
+   "commit": "31a72047",
+   "minute": 4.2,
+   "subject": "fix(presto): week shift for Sunday-start DATETIME_DIFF CLAUDE",
+   "hidden": 20,
+   "other_fail": 0
+  },
+  {
+   "commit": "a33aa22d",
+   "minute": 4.2,
+   "subject": "Presto _date_diff_sql compared dow to 8 instead of 7, so Sunday-start weeks shifted -6 days instead ",
+   "hidden": 20,
+   "other_fail": 0
+  },
+  {
+   "commit": "fb4c65dc",
+   "minute": 4.5,
+   "subject": "fix: FORMAT_DATE arg order, MySQL STR_TO_DATE, BQ unix scale pow",
+   "hidden": 25,
+   "other_fail": 0
+  },
+  {
+   "commit": "e48e70d1",
+   "minute": 4.5,
+   "subject": "bug08: POW(10,scale); bug09: STR_TO_DATE uses arg0 as this; bug10: FORMAT_* builder passes format=ar",
+   "hidden": 25,
+   "other_fail": 0
+  }
+ ],
+ "cost": 1.42,
+ "tokens": 5194144,
+ "builders": [
+  {
+   "worker": "w4",
+   "agent": "claude",
+   "start": "1793542593",
+   "end": "1793542825",
+   "minutes": "3.9",
+   "exit": "0",
+   "tokens": "1318310",
+   "cost_usd": "0.363826",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w3",
+   "agent": "claude",
+   "start": "1793542593",
+   "end": "1793542847",
+   "minutes": "4.2",
+   "exit": "0",
+   "tokens": "2163270",
+   "cost_usd": "0.533982",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w2",
+   "agent": "claude",
+   "start": "1793542593",
+   "end": "1793542865",
+   "minutes": "4.5",
+   "exit": "0",
+   "tokens": "988439",
+   "cost_usd": "0.286379",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w1",
+   "agent": "claude",
+   "start": "1793542593",
+   "end": "1793542883",
+   "minutes": "4.8",
+   "exit": "0",
+   "tokens": "724125",
+   "cost_usd": "0.239671",
+   "api_error": "",
+   "limit_stops": "0"
+  }
+ ],
+ "tools": {
+  "w4": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 20,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 17,
+   "outside": []
+  },
+  "w3": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 32,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 31,
+   "outside": []
+  },
+  "w2": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 15,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 14,
+   "outside": []
+  },
+  "w1": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 12,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 11,
+   "outside": []
+  }
+ },
+ "map": false
+}

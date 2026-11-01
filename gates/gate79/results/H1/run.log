@@ -1,0 +1,45 @@
+[19:46:32] predictions registered on origin/main: gates/gate79/prompts/PREDICTIONS.md
+launched w1
+launched w2
+launched w3
+launched w4
+w4 finished: exit 0, 3.9 min, cost 0.363826
+w3 finished: exit 0, 4.2 min, cost 0.533982
+w2 finished: exit 0, 4.5 min, cost 0.286379
+w1 finished: exit 0, 4.8 min, cost 0.239671
+result: /home/claude/hive/runs/g79_H1/up.git, branch main
+e48e70d bug08: POW(10,scale); bug09: STR_TO_DATE uses arg0 as this; bug10: FORMAT_* builder passes format=arg0, value=arg1 (lock w1 released)
+fb4c65d fix: FORMAT_DATE arg order, MySQL STR_TO_DATE, BQ unix scale pow
+a33aa22 Presto _date_diff_sql compared dow to 8 instead of 7, so Sunday-start weeks shifted -6 days instead of +1; fixed, added tests (lock w2 released)
+31a7204 fix(presto): week shift for Sunday-start DATETIME_DIFF CLAUDE
+b6e9e4e bug01: unnest rewrite required 2 unnest expressions (now 1) and read the value alias from column index 1 (now 0) (lock w3 released)
+1285543 fix: snowflake GENERATE_DATE_ARRAY unnest rewrite
+fcced5a bug02: _split_qualified_name used colon != -2 (always true) so names without a colon were masked and not split; now -1 (lock w4 released)
+2f4e6f6 fix(bigquery): split dotted quoted names when no domain colon CLAUDE
+
+  landing 0c5c5c40 at 1.0 min: hidden 3/25
+  landing 31f10b7c at 1.0 min: hidden 3/25
+  landing dc3acd1a at 2.2 min: hidden 17/25
+  landing 0c694d03 at 2.2 min: hidden 17/25
+  landing 71ff7079 at 3.1 min: hidden 17/25
+  landing 2f4e6f65 at 3.3 min: hidden 18/25
+  landing fcced5a1 at 3.3 min: hidden 18/25
+  landing 12855437 at 3.7 min: hidden 20/25
+  landing b6e9e4e9 at 3.7 min: hidden 20/25
+  landing 31a72047 at 4.2 min: hidden 20/25
+  landing a33aa22d at 4.2 min: hidden 20/25
+  landing fb4c65dc at 4.5 min: hidden 25/25
+  landing e48e70d1 at 4.5 min: hidden 25/25
+{
+ "arm": "H",
+ "k": "1",
+ "workers": 4,
+ "prep_seconds": 0.8,
+ "wall_minutes": 4.9,
+ "hidden_passed": 25,
+ "hidden_total": 25,
+ "other_failures": 0,
+ "cost": 1.42,
+ "tokens": 5194144,
+ "map": false
+}

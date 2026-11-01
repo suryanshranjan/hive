@@ -1,0 +1,42 @@
+[20:16:50] predictions registered on origin/main: gates/gate79/prompts/PREDICTIONS.md
+launched w1
+launched w2
+launched w3
+launched w4
+w1 finished: exit 0, 2.8 min, cost 0.379003
+w3 finished: exit 0, 3.2 min, cost 0.38243
+w2 finished: exit 0, 3.5 min, cost 0.354477
+w4 finished: exit 0, 3.9 min, cost 0.275202
+result: /home/claude/hive/runs/g79_H3/up.git, branch main
+31c2808 Fixed colon-not-found sentinel (-2 -> -1) in _split_qualified_name so quoted dotted BigQuery names split into catalog/db/table (lock w4 released)
+2b26cf2 fix(bigquery): quoted dotted names split correctly (typo -2 vs -1 in domain-colon check) CLAUDE
+f8d7411 bug01: unnest guard len==1 (was 2) and value column index 0 (was 1) in snowflake _transform_generate_date_array (lock w2 released)
+4baebf8 fix: bug01 snowflake generate_date_array unnest (CLAUDE)
+56e4e1e bug05: postgres numeric literal date delta becomes interval string; bug06: build_default_decimal_type keeps explicit params; bug07: exasol timestamp trunc literal T->space (lock w3 released)
+6854418 fix(postgres,duckdb,exasol): numeric date delta, decimal params, timestamp literal CLAUDE
+3138a64 bug03: inverted selected_sources check + use table alias; bug04: tsql JSONExtractScalar uses JSON_VALUE only when scalar_only; bug11: presto week shift for Sunday start (dow==7) (lock w1 released)
+6cc7ea3 fix(exasol,tsql,presto): star qualification, json_extract_scalar, week diff shift
+
+  landing be371cb5 at 0.9 min: hidden 3/25
+  landing 24d441dc at 0.9 min: hidden 3/25
+  landing 6cc7ea3b at 2.0 min: hidden 6/25
+  landing 3138a64f at 2.0 min: hidden 6/25
+  landing 68544180 at 2.7 min: hidden 21/25
+  landing 56e4e1e0 at 2.7 min: hidden 21/25
+  landing 4baebf86 at 3.1 min: hidden 23/25
+  landing f8d74118 at 3.1 min: hidden 23/25
+  landing 2b26cf2a at 3.6 min: hidden 25/25
+  landing 31c28085 at 3.6 min: hidden 25/25
+{
+ "arm": "H",
+ "k": "3",
+ "workers": 4,
+ "prep_seconds": 0.3,
+ "wall_minutes": 4.0,
+ "hidden_passed": 25,
+ "hidden_total": 25,
+ "other_failures": 0,
+ "cost": 1.39,
+ "tokens": 5069451,
+ "map": false
+}

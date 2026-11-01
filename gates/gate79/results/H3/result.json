@@ -1,0 +1,181 @@
+{
+ "arm": "H",
+ "k": "3",
+ "workers": 4,
+ "prep_seconds": 0.3,
+ "wall_minutes": 4.0,
+ "hidden_passed": 25,
+ "hidden_total": 25,
+ "other_failures": 0,
+ "landings": [
+  {
+   "commit": "be371cb5",
+   "minute": 0.9,
+   "subject": "fix: bug08-10 arg index/typo fixes (CLAUDE)",
+   "hidden": 3,
+   "other_fail": 0
+  },
+  {
+   "commit": "24d441dc",
+   "minute": 0.9,
+   "subject": "bug08: POW base 11->10; bug09: mysql STR_TO_DATE this=arg0; bug10: BigQuery FORMAT_* args order (for",
+   "hidden": 3,
+   "other_fail": 0
+  },
+  {
+   "commit": "6cc7ea3b",
+   "minute": 2.0,
+   "subject": "fix(exasol,tsql,presto): star qualification, json_extract_scalar, week diff shift",
+   "hidden": 6,
+   "other_fail": 0
+  },
+  {
+   "commit": "3138a64f",
+   "minute": 2.0,
+   "subject": "bug03: inverted selected_sources check + use table alias; bug04: tsql JSONExtractScalar uses JSON_VA",
+   "hidden": 6,
+   "other_fail": 0
+  },
+  {
+   "commit": "68544180",
+   "minute": 2.7,
+   "subject": "fix(postgres,duckdb,exasol): numeric date delta, decimal params, timestamp literal CLAUDE",
+   "hidden": 21,
+   "other_fail": 0
+  },
+  {
+   "commit": "56e4e1e0",
+   "minute": 2.7,
+   "subject": "bug05: postgres numeric literal date delta becomes interval string; bug06: build_default_decimal_typ",
+   "hidden": 21,
+   "other_fail": 0
+  },
+  {
+   "commit": "4baebf86",
+   "minute": 3.1,
+   "subject": "fix: bug01 snowflake generate_date_array unnest (CLAUDE)",
+   "hidden": 23,
+   "other_fail": 0
+  },
+  {
+   "commit": "f8d74118",
+   "minute": 3.1,
+   "subject": "bug01: unnest guard len==1 (was 2) and value column index 0 (was 1) in snowflake _transform_generate",
+   "hidden": 23,
+   "other_fail": 0
+  },
+  {
+   "commit": "2b26cf2a",
+   "minute": 3.6,
+   "subject": "fix(bigquery): quoted dotted names split correctly (typo -2 vs -1 in domain-colon check) CLAUDE",
+   "hidden": 25,
+   "other_fail": 0
+  },
+  {
+   "commit": "31c28085",
+   "minute": 3.6,
+   "subject": "Fixed colon-not-found sentinel (-2 -> -1) in _split_qualified_name so quoted dotted BigQuery names s",
+   "hidden": 25,
+   "other_fail": 0
+  }
+ ],
+ "cost": 1.39,
+ "tokens": 5069451,
+ "builders": [
+  {
+   "worker": "w1",
+   "agent": "claude",
+   "start": "1793544411",
+   "end": "1793544577",
+   "minutes": "2.8",
+   "exit": "0",
+   "tokens": "1388143",
+   "cost_usd": "0.379003",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w3",
+   "agent": "claude",
+   "start": "1793544411",
+   "end": "1793544601",
+   "minutes": "3.2",
+   "exit": "0",
+   "tokens": "1419453",
+   "cost_usd": "0.38243",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w2",
+   "agent": "claude",
+   "start": "1793544411",
+   "end": "1793544623",
+   "minutes": "3.5",
+   "exit": "0",
+   "tokens": "1308488",
+   "cost_usd": "0.354477",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w4",
+   "agent": "claude",
+   "start": "1793544411",
+   "end": "1793544647",
+   "minutes": "3.9",
+   "exit": "0",
+   "tokens": "953367",
+   "cost_usd": "0.275202",
+   "api_error": "",
+   "limit_stops": "0"
+  }
+ ],
+ "tools": {
+  "w1": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 20,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 19,
+   "outside": []
+  },
+  "w3": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 22,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 20,
+   "outside": []
+  },
+  "w2": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 20,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 20,
+   "outside": []
+  },
+  "w4": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 15,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 14,
+   "outside": []
+  }
+ },
+ "map": false
+}

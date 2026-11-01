@@ -1,0 +1,44 @@
+[20:09:10] predictions registered on origin/main: gates/gate79/prompts/PREDICTIONS.md
+launched w1
+launched w2
+launched w3
+launched w4
+w4 finished: exit 0, 2.1 min, cost 0.275151
+w3 finished: exit 0, 3.5 min, cost 0.367864
+w2 finished: exit 0, 4.1 min, cost 0.390088
+w1 finished: exit 0, 4.4 min, cost 0.424037
+result: /home/claude/hive/runs/g79_H2/up.git, branch main
+ad6cdef bug01: rewrite required unnest with 2 expressions and used alias column index 1; now 1 expression and index 0 (lock w1 released)
+39660a6 fix(snowflake): unnest GENERATE_DATE_ARRAY rewrite conditions
+ac0e380 bug02: colon find sentinel -2->-1 in _split_qualified_name, alias info-schema view by its last part; bug04: tsql JSON extract uses JSON_VALUE only when scalar_only (lock w2 released)
+af09804 fix(bigquery,tsql): INFORMATION_SCHEMA quoted table split, JSON_EXTRACT_SCALAR to tsql
+86392ae release w3 lock
+0d064b5 Lock: w3 (bug08)
+d96a075 bug03: exasol star qualify (inverted selected_sources check, use alias); bug06: build_default_decimal_type keeps explicit params; bug07: exasol T->space for TIMESTAMP kind (lock w3 released)
+30ad72c fix: exasol star qualification and timestamp literal, decimal default params
+
+  landing 1f3ac396 at 0.3 min: hidden 0/25
+  landing a02c2aea at 1.0 min: hidden 3/25
+  landing a3cbfd8b at 1.0 min: hidden 3/25
+  landing db140542 at 2.1 min: hidden 6/25
+  landing ae79d93d at 2.1 min: hidden 6/25
+  landing 30ad72c3 at 2.9 min: hidden 17/25
+  landing d96a075f at 2.9 min: hidden 17/25
+  landing 86392ae0 at 3.4 min: hidden 17/25
+  landing af09804f at 3.6 min: hidden 20/25
+  landing ac0e3802 at 3.6 min: hidden 20/25
+  landing 39660a68 at 4.0 min: hidden 22/25
+  landing ad6cdef0 at 4.0 min: hidden 22/25
+{
+ "arm": "H",
+ "k": "2",
+ "workers": 4,
+ "prep_seconds": 0.5,
+ "wall_minutes": 4.4,
+ "hidden_passed": 22,
+ "hidden_total": 25,
+ "other_failures": 0,
+ "cost": 1.46,
+ "tokens": 5619700,
+ "map": false
+}

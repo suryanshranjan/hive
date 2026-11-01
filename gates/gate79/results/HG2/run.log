@@ -1,0 +1,42 @@
+[20:02:36] predictions registered on origin/main: gates/gate79/prompts/PREDICTIONS.md
+launched w1
+launched w2
+launched w3
+launched w4
+w4 finished: exit 0, 1.8 min, cost 0.265171
+w2 finished: exit 0, 2.3 min, cost 0.413964
+w3 finished: exit 0, 2.6 min, cost 0.501877
+w1 finished: exit 0, 2.9 min, cost 0.445606
+result: /home/claude/hive/runs/g79_HG2/up.git, branch main
+bb86a19 fixed two off-by-one bugs in snowflake _unnest_generate_date_array path: expressions len == 1 (was 2) and alias column index 0 (was 1) (lock w1 released)
+3c40bd4 fix(snowflake): unnest GENERATE_DATE_ARRAY alias column and arg count CLAUDE
+015d902 bug05: postgres dateadd literal-number interval (dead is_number&&is_string condition); bug06: build_default_decimal_type kept defaults only when params absent (inverted); bug11: presto week shift (8-dow)%7 (lock w3 released)
+18b53d9 fix: postgres LAST_DAY/numeric intervals, duckdb decimal params, presto week diff shift
+ed02d2e bug02: _split_qualified_name colon check was != -2 (always true) -> != -1, dropped alias var; bug03: Exasol star qualification guard inverted (not selected_sources), use alias; bug04: tsql JSON_EXTRACT_SCALAR uses ISNULL(JSON_QUERY,JSON_VALUE) unless dialect scalar_only (lock w2 released)
+9b74b9d fix: bug02 BigQuery split name, bug03 Exasol star qualify, bug04 tsql JSON extract scalar
+90ce97a Bug08: POW base 11->10 in bigquery generator; Bug09: mysql _str_to_date used format as this; Bug10: bigquery _build_format_time swapped args (also fixes FORMAT_DATETIME/TIMESTAMP) (lock w4 released)
+372aec3 fix: snowflake scale POWER base, mysql STR_TO_DATE arg, bigquery FORMAT_* arg order
+
+  landing c88fe6bb at 0.7 min: hidden 1/25
+  landing c8f0d400 at 0.7 min: hidden 1/25
+  landing 372aec35 at 1.0 min: hidden 4/25
+  landing 90ce97af at 1.0 min: hidden 4/25
+  landing 9b74b9d9 at 1.8 min: hidden 8/25
+  landing ed02d2ee at 1.8 min: hidden 8/25
+  landing 18b53d9c at 2.3 min: hidden 22/25
+  landing 015d9024 at 2.3 min: hidden 22/25
+  landing 3c40bd47 at 2.6 min: hidden 24/25
+  landing bb86a191 at 2.6 min: hidden 24/25
+{
+ "arm": "HG",
+ "k": "2",
+ "workers": 4,
+ "prep_seconds": 44.7,
+ "wall_minutes": 3.0,
+ "hidden_passed": 24,
+ "hidden_total": 25,
+ "other_failures": 0,
+ "cost": 1.63,
+ "tokens": 6382484,
+ "map": true
+}

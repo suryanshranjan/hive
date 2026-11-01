@@ -1,0 +1,195 @@
+{
+ "arm": "H",
+ "k": "2",
+ "workers": 4,
+ "prep_seconds": 0.5,
+ "wall_minutes": 4.4,
+ "hidden_passed": 22,
+ "hidden_total": 25,
+ "other_failures": 0,
+ "landings": [
+  {
+   "commit": "1f3ac396",
+   "minute": 0.3,
+   "subject": "Withdraw lock w2: overlaps w3",
+   "hidden": 0,
+   "other_fail": 0
+  },
+  {
+   "commit": "a02c2aea",
+   "minute": 1.0,
+   "subject": "fix(bigquery,mysql): FORMAT_* / STR_TO_DATE arg order, TIMESTAMP_SECONDS power base CLAUDE",
+   "hidden": 3,
+   "other_fail": 0
+  },
+  {
+   "commit": "a3cbfd8b",
+   "minute": 1.0,
+   "subject": "bug08 POW base 10; bug09 mysql STR_TO_DATE this=args[0]; bug10 BigQuery FORMAT_* (DATE/DATETIME/TIME",
+   "hidden": 3,
+   "other_fail": 0
+  },
+  {
+   "commit": "db140542",
+   "minute": 2.1,
+   "subject": "fix(postgres,presto): literal interval multiplication and Sunday week shift",
+   "hidden": 6,
+   "other_fail": 0
+  },
+  {
+   "commit": "ae79d93d",
+   "minute": 2.1,
+   "subject": "bug05: postgres date_add literal check was never true (is_number and is_string); now literal numbers",
+   "hidden": 6,
+   "other_fail": 0
+  },
+  {
+   "commit": "30ad72c3",
+   "minute": 2.9,
+   "subject": "fix: exasol star qualification and timestamp literal, decimal default params",
+   "hidden": 17,
+   "other_fail": 0
+  },
+  {
+   "commit": "d96a075f",
+   "minute": 2.9,
+   "subject": "bug03: exasol star qualify (inverted selected_sources check, use alias); bug06: build_default_decima",
+   "hidden": 17,
+   "other_fail": 0
+  },
+  {
+   "commit": "86392ae0",
+   "minute": 3.4,
+   "subject": "release w3 lock",
+   "hidden": 17,
+   "other_fail": 0
+  },
+  {
+   "commit": "af09804f",
+   "minute": 3.6,
+   "subject": "fix(bigquery,tsql): INFORMATION_SCHEMA quoted table split, JSON_EXTRACT_SCALAR to tsql",
+   "hidden": 20,
+   "other_fail": 0
+  },
+  {
+   "commit": "ac0e3802",
+   "minute": 3.6,
+   "subject": "bug02: colon find sentinel -2->-1 in _split_qualified_name, alias info-schema view by its last part;",
+   "hidden": 20,
+   "other_fail": 0
+  },
+  {
+   "commit": "39660a68",
+   "minute": 4.0,
+   "subject": "fix(snowflake): unnest GENERATE_DATE_ARRAY rewrite conditions",
+   "hidden": 22,
+   "other_fail": 0
+  },
+  {
+   "commit": "ad6cdef0",
+   "minute": 4.0,
+   "subject": "bug01: rewrite required unnest with 2 expressions and used alias column index 1; now 1 expression an",
+   "hidden": 22,
+   "other_fail": 0
+  }
+ ],
+ "cost": 1.46,
+ "tokens": 5619700,
+ "builders": [
+  {
+   "worker": "w4",
+   "agent": "claude",
+   "start": "1793543950",
+   "end": "1793544074",
+   "minutes": "2.1",
+   "exit": "0",
+   "tokens": "915431",
+   "cost_usd": "0.275151",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w3",
+   "agent": "claude",
+   "start": "1793543950",
+   "end": "1793544162",
+   "minutes": "3.5",
+   "exit": "0",
+   "tokens": "1549059",
+   "cost_usd": "0.367864",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w2",
+   "agent": "claude",
+   "start": "1793543950",
+   "end": "1793544198",
+   "minutes": "4.1",
+   "exit": "0",
+   "tokens": "1643661",
+   "cost_usd": "0.390088",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w1",
+   "agent": "claude",
+   "start": "1793543950",
+   "end": "1793544212",
+   "minutes": "4.4",
+   "exit": "0",
+   "tokens": "1511549",
+   "cost_usd": "0.424037",
+   "api_error": "",
+   "limit_stops": "0"
+  }
+ ],
+ "tools": {
+  "w4": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 14,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 13,
+   "outside": []
+  },
+  "w3": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 24,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 24,
+   "outside": []
+  },
+  "w2": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 25,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 19,
+   "outside": []
+  },
+  "w1": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 22,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 20,
+   "outside": []
+  }
+ },
+ "map": false
+}

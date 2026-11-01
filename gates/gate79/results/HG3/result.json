@@ -1,0 +1,195 @@
+{
+ "arm": "HG",
+ "k": "3",
+ "workers": 4,
+ "prep_seconds": 46.6,
+ "wall_minutes": 3.7,
+ "hidden_passed": 25,
+ "hidden_total": 25,
+ "other_failures": 0,
+ "landings": [
+  {
+   "commit": "cb609533",
+   "minute": 0.8,
+   "subject": "fix: TO_TIMESTAMP scale base, MySQL STR_TO_DATE arg, BigQuery FORMAT_* arg (CLAUDE)",
+   "hidden": 3,
+   "other_fail": 0
+  },
+  {
+   "commit": "4c2de595",
+   "minute": 0.8,
+   "subject": "bug08: POW base 11->10; bug09: MySQL STR_TO_DATE this=arg0; bug10: BigQuery FORMAT_* format=arg0 (lo",
+   "hidden": 3,
+   "other_fail": 0
+  },
+  {
+   "commit": "be4fd337",
+   "minute": 1.0,
+   "subject": "fix(bigquery): domain-scoped project split used wrong find sentinel (-2) CLAUDE",
+   "hidden": 4,
+   "other_fail": 0
+  },
+  {
+   "commit": "acc98bb7",
+   "minute": 1.1,
+   "subject": "Fixed colon sentinel in _split_qualified_name (!= -2 -> != -1), which truncated last char when no co",
+   "hidden": 4,
+   "other_fail": 0
+  },
+  {
+   "commit": "2358f6b3",
+   "minute": 1.4,
+   "subject": "fix: exasol star qualification, tsql JSON_EXTRACT_SCALAR, presto week shift",
+   "hidden": 7,
+   "other_fail": 0
+  },
+  {
+   "commit": "fa419f73",
+   "minute": 1.4,
+   "subject": "bug03: inverted selected_sources check + use table alias in exasol; bug04: tsql JSONExtractScalar us",
+   "hidden": 7,
+   "other_fail": 0
+  },
+  {
+   "commit": "f09c7ad4",
+   "minute": 1.8,
+   "subject": "release w1 lock (bug02 already fixed by w4)",
+   "hidden": 7,
+   "other_fail": 0
+  },
+  {
+   "commit": "13ac73bf",
+   "minute": 1.8,
+   "subject": "fix: Snowflake GENERATE_DATE_ARRAY unnest transform never fired (CLAUDE)",
+   "hidden": 9,
+   "other_fail": 0
+  },
+  {
+   "commit": "20fa211b",
+   "minute": 1.8,
+   "subject": "bug01: Unnest has 1 expression not 2; alias column index 0 not 1 (lock w2 released)",
+   "hidden": 9,
+   "other_fail": 0
+  },
+  {
+   "commit": "0323c8c7",
+   "minute": 3.2,
+   "subject": "fix: postgres numeric date add, duckdb decimal params, exasol trunc timestamp literal",
+   "hidden": 25,
+   "other_fail": 0
+  },
+  {
+   "commit": "ffe17f5d",
+   "minute": 3.2,
+   "subject": "bug05: postgres date add used 'is_number and is_string' (never true) -> 'or'; bug06: build_default_d",
+   "hidden": 25,
+   "other_fail": 0
+  },
+  {
+   "commit": "15cb815c",
+   "minute": 3.5,
+   "subject": "release w3 lock",
+   "hidden": 25,
+   "other_fail": 0
+  }
+ ],
+ "cost": 1.51,
+ "tokens": 5901389,
+ "builders": [
+  {
+   "worker": "w4",
+   "agent": "claude",
+   "start": "1793544863",
+   "end": "1793544945",
+   "minutes": "1.4",
+   "exit": "0",
+   "tokens": "1201358",
+   "cost_usd": "0.292445",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w1",
+   "agent": "claude",
+   "start": "1793544863",
+   "end": "1793544975",
+   "minutes": "1.9",
+   "exit": "0",
+   "tokens": "1624610",
+   "cost_usd": "0.411971",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w2",
+   "agent": "claude",
+   "start": "1793544863",
+   "end": "1793544981",
+   "minutes": "2.0",
+   "exit": "0",
+   "tokens": "1296087",
+   "cost_usd": "0.37439",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w3",
+   "agent": "claude",
+   "start": "1793544863",
+   "end": "1793545081",
+   "minutes": "3.6",
+   "exit": "0",
+   "tokens": "1779334",
+   "cost_usd": "0.428799",
+   "api_error": "",
+   "limit_stops": "0"
+  }
+ ],
+ "tools": {
+  "w4": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 19,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 16,
+   "outside": []
+  },
+  "w1": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 24,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 24,
+   "outside": []
+  },
+  "w2": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 20,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 1,
+   "search_bash": 20,
+   "outside": []
+  },
+  "w3": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 25,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 24,
+   "outside": []
+  }
+ },
+ "map": true
+}

@@ -1,0 +1,44 @@
+[20:23:36] predictions registered on origin/main: gates/gate79/prompts/PREDICTIONS.md
+launched w1
+launched w2
+launched w3
+launched w4
+w4 finished: exit 0, 1.4 min, cost 0.292445
+w1 finished: exit 0, 1.9 min, cost 0.411971
+w2 finished: exit 0, 2.0 min, cost 0.37439
+w3 finished: exit 0, 3.6 min, cost 0.428799
+result: /home/claude/hive/runs/g79_HG3/up.git, branch main
+15cb815 release w3 lock
+f711d3e Lock: w3 (bug03,bug04)
+ffe17f5 bug05: postgres date add used 'is_number and is_string' (never true) -> 'or'; bug06: build_default_decimal_type overwrote explicit params when precision default set; bug07: exasol trunc replaced T in wrong branch (lock w3 released)
+0323c8c fix: postgres numeric date add, duckdb decimal params, exasol trunc timestamp literal
+20fa211 bug01: Unnest has 1 expression not 2; alias column index 0 not 1 (lock w2 released)
+13ac73b fix: Snowflake GENERATE_DATE_ARRAY unnest transform never fired (CLAUDE)
+f09c7ad release w1 lock (bug02 already fixed by w4)
+7cfa34b Lock: w1 (bug02)
+
+  landing cb609533 at 0.8 min: hidden 3/25
+  landing 4c2de595 at 0.8 min: hidden 3/25
+  landing be4fd337 at 1.0 min: hidden 4/25
+  landing acc98bb7 at 1.1 min: hidden 4/25
+  landing 2358f6b3 at 1.4 min: hidden 7/25
+  landing fa419f73 at 1.4 min: hidden 7/25
+  landing f09c7ad4 at 1.8 min: hidden 7/25
+  landing 13ac73bf at 1.8 min: hidden 9/25
+  landing 20fa211b at 1.8 min: hidden 9/25
+  landing 0323c8c7 at 3.2 min: hidden 25/25
+  landing ffe17f5d at 3.2 min: hidden 25/25
+  landing 15cb815c at 3.5 min: hidden 25/25
+{
+ "arm": "HG",
+ "k": "3",
+ "workers": 4,
+ "prep_seconds": 46.6,
+ "wall_minutes": 3.7,
+ "hidden_passed": 25,
+ "hidden_total": 25,
+ "other_failures": 0,
+ "cost": 1.51,
+ "tokens": 5901389,
+ "map": true
+}

@@ -1,0 +1,17 @@
+H1: hidden 25/25 (other failures 0), time to accuracy 4.5 min, wall 4.9 min, prep 0.8 s, cost $1.42, tokens 5,194,144, reads+searches/builder 18.2, graphify users 0 (0 calls), landings 13, leaks 0
+HG1: hidden 25/25 (other failures 0), time to accuracy 3.2 min, wall 2.6 min, prep 69.5 s, cost $1.41, tokens 5,423,301, reads+searches/builder 18.0, graphify users 3 (3 calls), landings 14, leaks 0
+HG2: hidden 24/25 (other failures 0), time to accuracy 3.3 min, wall 3.0 min, prep 44.7 s, cost $1.63, tokens 6,382,484, reads+searches/builder 22.5, graphify users 2 (2 calls), landings 10, leaks 0
+H2: hidden 22/25 (other failures 0), time to accuracy 4.4 min, wall 4.4 min, prep 0.5 s, cost $1.46, tokens 5,619,700, reads+searches/builder 19.0, graphify users 0 (0 calls), landings 12, leaks 0
+H3: hidden 25/25 (other failures 0), time to accuracy 3.1 min, wall 4.0 min, prep 0.3 s, cost $1.39, tokens 5,069,451, reads+searches/builder 18.2, graphify users 0 (0 calls), landings 10, leaks 0
+HG3: hidden 25/25 (other failures 0), time to accuracy 4.0 min, wall 3.7 min, prep 46.6 s, cost $1.51, tokens 5,901,389, reads+searches/builder 21.0, graphify users 1 (1 calls), landings 12, leaks 0
+
+H:  hidden 24.00, time to accuracy 4.0 min, cost $1.42, reads+searches/builder 18.5
+HG: hidden 24.67, time to accuracy 3.5 min, cost $1.52, reads+searches/builder 20.5
+
+predictions
+G1 each HG run: >= 3 of 4 used graphify ([3, 2, 1]) -> failed
+G2 HG cost 1.52 <= 0.85 x H 1.42 (ratio 1.07) -> failed
+G3 HG time to accuracy 3.5 <= 0.85 x H 4.0 (ratio 0.88) -> failed
+G4 HG hidden 24.67 >= H 24.00 - 2 -> held
+G5 HG reads+searches 20.5 <= 0.8 x H 18.5 -> failed
+Claim G1 and (G2 or G3) and G4 -> failed
