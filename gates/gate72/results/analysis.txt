@@ -1,0 +1,13 @@
+== runs/g72a A1: t95 36.6, tdone 37.2, wall 37.5 min; visible 1360/1360; engine hidden 99.8%, business hidden 100.0%; 27 questions; $1.98
+== runs/g72a S7: t95 5.2, tdone 23.8, wall 23.9 min; visible 1360/1360; engine hidden 99.5%, business hidden 93.2%; 19 questions; $5.44
+== runs/g72b S7: t95 12.8, tdone 21.8, wall 22.0 min; visible 1360/1360; engine hidden 99.8%, business hidden 94.4%; 20 questions; $6.02
+== runs/g72b A1: t95 21.9, tdone 22.1, wall 24.4 min; visible 1360/1360; engine hidden 99.8%, business hidden 94.4%; 12 questions; $2.00
+
+means: A1: tdone 29.7 min, engine 99.8%, business 97.2%, 19.5 questions, $1.99; S7: tdone 22.8 min, engine 99.7%, business 93.8%, 19.5 questions, $5.73
+
+predictions
+X1 S7 tdone ≤ 0.7 × A1: 0.77× -> failed
+X2 S7 business ≥ A1 − 3: -3.4 -> failed
+X3 S7 engine ≥ A1 − 1: -0.1 -> held
+X4 S7 asks ≤ 1.5 × A1: 1.00× -> held
+Claim (the swarm beats one agent on a mixed job): did not fire
