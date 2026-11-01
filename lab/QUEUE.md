@@ -2,15 +2,15 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 1 2026 IST, after Gate 70; Gate 71 running)
+## Where we left off (Nov 1 2026 IST, after Gate 71; Gate 72 running)
 
 - **Gate 66 done (the user, travelling: "test something that makes Hive the best tool"):** one Claude Code agent that asks the owner beat Hive's hand-over by 21-30 hidden points (CQ 93.0, CC 84.6, HV 63.4, N0 34.8%) at 1/13 of his reading. Wind tunnel, synthetic owner who answers from his policy.
 - **Gate 67 done:** the hand-over's memory does not compound (neither rule fired).
 - **Gate 68 done (rule fired, shipped):** Hive's swarm asking first = one agent asking (98.4%); the hand-over after added +1.6. Builders now ask first; the hand-over is skipped after a build whose builders asked 3+ questions.
 - **Gate 69 done:** memory of answers and house rules did not compound with asking builders.
 - **Gate 70 done (ship fired, shipped):** overnight questions answered in the morning 94.2% vs morning hand-over 75.0%.
-- **Gate 71 running:** a 20-function job, owner at a person's pace (60 s an answer): one asking agent vs 7 asking Hive builders (the user: "a swarm of agents can beat an agent"). First run (g71a): one agent 97.6% hidden in 27.7 min with 25 questions; the swarm 85.0% in 47.9 min with 47. Found: with a shared slow owner, builders' questions hit the 2-minute command cutoff and their answers were lost; `hive ask` now waits at most 90 s and leaves the question queued (shipped). The container restarted at 04:10 mid-g71b; g71b reruns from scratch (same harness as g71a).
-- **Gate 72 queued (after g71b):** a mixed job (engine from a skeleton plus 10 business functions), owner at 60 s an answer, one agent vs 7 builders, with the fixed (queued, 90 s) ask tool.
+- **Gate 71 done (claim did not fire):** with the owner at 60 s an answer, one agent and the 7-builder swarm both took 48 min; the swarm 85.4% vs 94.1% (questions lost to the 2-minute cutoff; `hive ask` fixed). g71b was rerun after the 04:10 container restart.
+- **Gate 72 running:** a mixed job (engine from a skeleton plus 10 business functions), owner at 60 s an answer, one agent vs 7 builders, with the fixed (queued, 90 s) ask tool.
 - **For Gate 45 day 2 with the founder:** test builders asking him live (his answers drift; does asking still win?).
 
 ## Earlier (Oct 30 2026 IST, after Gate 65)

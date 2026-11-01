@@ -1,0 +1,11 @@
+== runs/g71a: A1: hidden 97.6%, 27.7 min, 25 questions, owner busy 0.90, $0.51; S7: hidden 85.0%, 47.9 min, 47 questions, owner busy 0.98, $2.38
+== runs/g71b: A1: hidden 90.6%, 68.6 min, 65 questions, owner busy 0.95, $1.19; S7: hidden 85.8%, 48.0 min, 52 questions, owner busy 1.08, $1.57
+
+means: A1: hidden 94.1%, 48.1 min, 45.0 questions, busy 0.92, $0.85; S7: hidden 85.4%, 47.9 min, 49.5 questions, busy 1.03, $1.98
+
+predictions
+T1 S7 ≤ 0.67 × A1's minutes: 1.00× -> failed
+T2 S7 hidden ≥ A1 − 3: -8.7 -> failed
+T3 S7 asks ≤ 1.5 × A1: 1.10× -> held
+T4 S7's owner busy share ≥ 0.6: 1.03 -> held
+Claim (the swarm keeps its speed with a busy owner): did not fire
