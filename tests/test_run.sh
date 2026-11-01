@@ -59,4 +59,14 @@ if [ -x "${HIVE_GRAPHIFY:-/home/claude/gvenv/bin/graphify}" ]; then
     "$(ls $T/runguide/work/w1/CLAUDE.local.md $T/runguide/work/w1/.claude/settings.local.json | wc -l) $(grep -c 'hook-guard' $T/runguide/work/w1/.claude/settings.local.json) $(git -C $T/runguide/work/w1 status --porcelain | wc -l)" "2 2 0"
   check "without code_map there is no map" "$(grep -c 'A map of this codebase' $T/runsolo/prompts/w1.md)" 0
 fi
+# Gate 80 (under test): with no areas configured, the goal's parts become the areas (here a fake part namer)
+git clone -q $T/project $T/noareas && cd $T/noareas && $PY -c "
+import json; p = '.hive/config.json'; c = json.load(open(p)); c['areas'] = {}; json.dump(c, open(p, 'w'))" && git -c user.name=t -c user.email=t@t commit -qam 'no areas' && $PY -c "
+from hive import law, swarm
+law.part_names = lambda g: ['Creator fees', 'Payouts']
+swarm.prepare('$TW/noareas', '$TW/runareas', 2, 'Implement creator fees and payouts.', 40, None, 0, derive_areas=True)
+swarm.prepare('$TW/project', '$TW/runkeep', 2, 'Implement creator fees and payouts.', 40, None, 0, derive_areas=True)"
+check "configured areas are kept" "$(grep -c 'creator_fees' $T/runkeep/prompts/w1.md)" 0
+check "areas named from the goal's parts are on the shared branch and in the prompt" \
+  "$(git -C $T/runareas/work/w1 show HEAD:.hive/config.json | grep -c 'creator_fees') $(grep -c 'the goal.s part \"Payouts\"' $T/runareas/prompts/w2.md)" "2 1"
 rm -rf $T; exit $fail

@@ -128,7 +128,9 @@ def _areas_text(cfg):
     areas = cfg.get('areas', {})
     if not areas:
         return 'No areas are configured: claim short names for the parts of the goal you build (for example `fees`, `payouts`).'
-    return '\n'.join(f'- `{a}`: tests matching {", ".join(f"`{g}`" for g in globs)}' for a, globs in sorted(areas.items()))
+    named = cfg.get('area_parts', {})   # Gate 80: areas named from the goal's parts, with no tests of their own yet
+    return '\n'.join(f'- `{a}`: ' + (f'tests matching {", ".join(f"`{g}`" for g in globs)}' if globs else
+                      f'the goal\'s part "{named.get(a, a)}"') for a, globs in sorted(areas.items()))
 
 SPLIT_FROM = 3   # Gate 74: from this many builders, with the owner there to answer, one builder owns his decisions
 
@@ -174,7 +176,7 @@ def split_roles(workers, questions):
     return workers >= SPLIT_FROM and questions not in (0, None)
 
 def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None, assumptions=False, code_map=None,
-            map_guide=None):
+            map_guide=None, derive_areas=None):
     """Create <run>/up.git, one clone per worker in <run>/work, and one prompt per worker in <run>/prompts."""
     repo = os.path.abspath(repo); run = os.path.abspath(run)
     cfg = config.load(repo)
@@ -187,6 +189,21 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
     up = os.path.join(run, 'up.git')
     sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--bare', '--branch', b, repo, up)
     sh('git', '-C', up, 'symbolic-ref', 'HEAD', f'refs/heads/{b}')
+    if derive_areas is None:
+        derive_areas = os.environ.get('HIVE_DERIVE_AREAS') == '1'
+    if derive_areas and not cfg.get('areas') and workers > 1:   # Gate 80 (under test): claim the goal's parts by name
+        goal_text0 = open(goal, encoding='utf-8').read() if os.path.exists(goal) else goal
+        names = law.part_names(goal_text0)
+        if len(names) > 1:
+            keys = law.area_names(names)
+            tmp = os.path.join(run, 'areas_tmp'); sh('git', 'clone', '-q', up, tmp)
+            path = os.path.join(tmp, '.hive', 'config.json'); c = json.load(open(path))
+            c['areas'] = {k: [] for k in keys}; c['area_parts'] = dict(zip(keys, names))
+            json.dump(c, open(path, 'w'), indent=1)
+            sh('git', '-C', tmp, '-c', 'user.name=hive', '-c', 'user.email=hive@local', 'commit', '-q', '-am',
+               "hive: the goal's parts, as areas to claim")
+            sh('git', '-C', tmp, 'push', '-q', 'origin', f'HEAD:{b}'); shutil.rmtree(tmp, ignore_errors=True)
+            cfg['areas'] = c['areas']; cfg['area_parts'] = c['area_parts']
     template = open(os.path.join(HIVE_ROOT, 'hive', 'templates', 'worker.md'), encoding='utf-8').read()
     notes_on, _ = law.notes(workers)   # Gates 43-44: silence is enough below about 10 builders
     notes_text = ("\n## Team notes\nThis swarm is large enough that builders may change the same code. At each sync, "

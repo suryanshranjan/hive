@@ -18,7 +18,7 @@
   so a small job does not pay for many builders.
 - Intent (I/b) is not limited by builder count; the interview sets it.
 Status: the terms are measured; using their minimum to pick N is a model, not yet a held-out prediction."""
-import math, os
+import re, math, os
 
 KAPPA, D = 0.049, 0.27
 TAU_MIN, RUNS_PER_LANDING = 5.0, 2.0
@@ -65,13 +65,27 @@ How many independent parts does it have: pieces different builders could build a
 same function or file? A single function or a single small module is one part, however many rules it follows. Name
 each part in a few words. Reply with JSON only: {{"parts": ["...", "..."]}}"""
 
+def part_names(goal):
+    """The goal's independent parts, each named in a few words ([] if no model answers)."""
+    from . import explain
+    got = explain.ask_json(PARTS.format(goal=(goal or '').strip()[:4000])) or {}
+    return [x.strip() for x in got.get('parts', []) if isinstance(x, str) and x.strip()]
+
 def parts(goal):
     """How many builders the work itself can use at once (Gate 52: one function got 8, then 4 builders, and one did it
     all). None if no model answers."""
-    from . import explain
-    got = explain.ask_json(PARTS.format(goal=(goal or '').strip()[:4000])) or {}
-    p = [x for x in got.get('parts', []) if isinstance(x, str) and x.strip()]
-    return len(p) or None
+    return len(part_names(goal)) or None
+
+def area_names(names):
+    """Short claimable names for the parts: lower case, words joined by '_', unique."""
+    out = []
+    for n in names:
+        a = re.sub(r'[^a-z0-9]+', '_', n.lower()).strip('_')[:40] or 'part'
+        k, base = 2, a
+        while a in out:
+            a = f'{base}_{k}'; k += 1
+        out.append(a)
+    return out
 
 PACES = ('fast', 'cheap')
 
