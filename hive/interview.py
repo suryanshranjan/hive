@@ -15,7 +15,9 @@ List the decisions the code for this feature must take that the business owner c
 technical choices): each one a case the product must handle, in plain words, with the outcome a careful builder would
 pick if nobody told him. If the description names the cases (a table, a list of situations, an interface), cover every
 one of them. Leave out any decision the company's own documents (if included) already settle clearly; a document
-that only says "as usual" or "the standard" does not settle it. One entry per decision: when the outcome depends on a number (days late, days waited, rounds used), that
+that only says "as usual" or "the standard" does not settle it. If the goal is a technical fix or change (a bug report
+about a library's or framework's behaviour, an API to correct, an error to remove) with no rule a business owner sets, reply
+with an empty list: its right behaviour is settled by the code and the report, not by an owner (Gate 89). One entry per decision: when the outcome depends on a number (days late, days waited, rounds used), that
 is still one decision, not one per number. Reply with JSON only: {{"decisions": [{{"case": "...", "default": "..."}}]}}"""
 
 WRITE = """You are preparing a short interview with a busy, non-technical business owner before his software builders start
@@ -110,6 +112,8 @@ def write_situations(goal, rulings=None, n=12, inputs=False):
     past = ("\nRules he has already given (don't ask about these again):\n" + '\n'.join(f'- {r}' for r in rulings[-40:])
             + '\n') if rulings else ''
     ds = decisions(goal, inputs)
+    if not ds and os.environ.get('HIVE_INTERVIEW_WITHOUT_DECISIONS') != '1':
+        return []   # Gate 89: no business decisions, no interview (Gate 86: with none, it invented a shop for a Django bug)
     if ds:   # cover every decision the code takes, up to MAX_QUESTIONS: ranking cut 2 of the owner's 9 surprises (Gate 37 pilot)
         n = min(max(n, len(ds)), MAX_WITH_INPUTS if inputs else MAX_QUESTIONS)
     plan = FROM_DECISIONS.format(listing='\n'.join(f"- {d['case']} (builders' outcome: {d.get('default') or 'unsure'})"
