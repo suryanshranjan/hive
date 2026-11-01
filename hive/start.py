@@ -618,6 +618,7 @@ def handover(state, ch=None, poll=20, rounds=3, sheet=None):
             spots = spotcheck.find(state['sheet_source'], state.get('goal', ''), order)
             rank = {p: k for k, p in enumerate(order)}
             spots.sort(key=lambda s: rank.get(s.get('part'), len(order)))
+            spots = spotcheck.pick(spots, order)   # Gate 88 (under test): a handful, every part first
             done, state['spot_checks'] = spotcheck.review(done, spots, ch, None if ch else (lambda p: _ask(p, '')), poll,
                                                           code=state['sheet_source'], goal=state.get('goal', ''))
             shutil.rmtree(state.pop('sheet_source'), ignore_errors=True)

@@ -78,6 +78,26 @@ def order(before, after):
     same = [p for p in parts if mine(before, p) == mine(after, p)]
     return same + [p for p in parts if p not in same]
 
+def pick(spots, parts, most=None):
+    """Gate 88 (under test): at most `most` spot checks, taken round-robin across the parts in their order (each part's
+    most important first), so every part is still shown (Gate 63) while the owner sees a handful, not 12-32 (Gate 85).
+    most=None (or HIVE_SPOT_MAX unset) keeps them all."""
+    if most is None:
+        try:
+            most = int(os.environ['HIVE_SPOT_MAX'])
+        except (KeyError, ValueError):
+            return spots
+    by = {}
+    for s in spots:
+        by.setdefault(s.get('part'), []).append(s)
+    keys = [p for p in parts if p in by] + [p for p in by if p not in parts]
+    out = []
+    while len(out) < most and any(by[k] for k in keys):
+        for k in keys:
+            if by[k] and len(out) < most:
+                out.append(by[k].pop(0))
+    return out
+
 def find(code_dir, goal, parts, timeout=1500):
     """Spot checks for these parts, from running the built code in a throwaway copy ([] if none could be made)."""
     if not parts or os.environ.get('HIVE_SPOTS') == '0':
