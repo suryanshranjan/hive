@@ -1,0 +1,15 @@
+g85_live1: success True, hidden 27/27, prompts 59, words typed 1347, 12.2 min, builders $0.88, Hive's own $4.21 (4.8x)
+g85_live2: success True, hidden 27/27, prompts 55, words typed 1151, 11.4 min, builders $0.56, Hive's own $3.32 (5.9x)
+g85_live3: success True, hidden 27/27, prompts 67, words typed 2405, 15.3 min, builders $0.64, Hive's own $5.48 (8.6x)
+g85_live4: success False, hidden 20/27, prompts 53, words typed 690, 9.5 min, builders $0.55, Hive's own $2.84 (5.2x)
+g85_live5: success True, hidden 24/27, prompts 33, words typed 834, 7.4 min, builders $0.52, Hive's own $2.64 (5.1x)
+
+Hive's own spend by step, all flights: telegram.understand $3.45 (19%), interview.settled_by $3.31 (18%), interview._amend $2.51 (14%), interview._rule $2.41 (13%), spotcheck.apply_one $2.14 (12%), spotcheck.recheck $1.46 (8%), codesheet.describe $0.51 (3%), interview.write_situations $0.45 (2%), spotcheck.find $0.45 (2%), interview.rule_sheet $0.42 (2%), law.part_names $0.34 (2%), codesheet.split_known $0.33 (2%), interview._dedupe $0.29 (2%), owner.settle_duplicates $0.25 (1%), interview.decisions $0.12 (1%), contract.stated $0.05 (0%)
+
+pass^1 0.80, pass^5 False, median prompts 55, median hidden 27
+
+predictions
+B1 pass^1 >= 0.8 (0.80) -> held
+B2 pass^5 (False) -> failed
+B3 median prompts > 30 (55) -> held
+B4 Hive's own >= 4x builders' in every flight -> held

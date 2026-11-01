@@ -1,0 +1,292 @@
+[01:02:19] predictions registered on origin/main: gates/gate85/prompts/PREDICTIONS.md
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: pytest. 2 tests, all passing.
+
+One choice before I start, asked only once: 3 builders would finish about 1.9× sooner than one, for about 1.8× the cost. Should I build fast or cheap, from now on? (Enter = fast)
+  > 
+  Got it: fast, from now on. (`hive pace fast` or `hive pace cheap` changes it.)
+
+I'll put 3 builders on it (the job has 3 parts that can be built at the same time): about 1.9× the speed of one builder, for about 1.8× the cost. They work on copies, so your branches stay exactly as they are.
+If they need a decision only you can make, the question will appear right here.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+
+First, a few quick situations where your own rules matter:
+
+1 of 15. Priya bought a kurta for ₹2,000 and asks for a refund 10 days after it arrived, because she changed her mind. What do you do?
+  A) Refuse: change-of-mind refunds are only allowed up to 7 days after delivery  B) Allow it: change-of-mind refunds are accepted up to 14 days after delivery  C) Allow it: accepted up to 30 days after delivery, same as damaged items
+  Your answer (a letter, or your own words) > 
+  > B
+
+2 of 15. Arjun received a phone with a cracked screen and reports it 40 days after delivery. What do you do?
+  A) Refuse: damage must be reported within 30 days of delivery  B) Accept it, up to 60 days after delivery, with a photo as proof  C) Always accept it, however many days have passed
+  Your answer (a letter, or your own words) > 
+  > Damaged goods are always fully refunded up to 90 days after delivery, so I'd accept it at 40 days, and the shipping fee gets refunded too. None of the options is exactly right, because I don't need a photo.
+
+3 of 15. Meena changed her mind about a ₹1,500 order 2 days after delivery. How should her money come back?
+  A) To her card, because she asked within 3 days  B) As store credit only, whatever the number of days  C) Her choice: card with a 10% handling charge deducted, or full store credit
+  Your answer (a letter, or your own words) > 
+  > Refunds go back the way the order was paid: card orders to the card, store credit orders as store credit. Meena's order is a card order, so it goes back to her card, with no handling charge. None of the options is exactly right.
+
+4 of 15. Rahul's order was ₹1,200 for the item plus ₹100 delivery, and he changed his mind. How much do you refund?
+  A) ₹1,200 only; the delivery charge is never returned  B) ₹1,300; delivery is always returned, whatever the reason  C) ₹1,200, but ₹1,300 if the mistake was ours (damaged or wrong item)
+  Your answer (a letter, or your own words) > 
+  > The shipping fee is never refunded for a change of mind, so Rahul gets ₹1,200 back (with no discount code involved). It is only refunded when the goods arrive damaged, so C is close, but I'd say: ₹1,200 for change of mind, and ₹1,300 only if the goods were damaged.
+
+5 of 15. Sunita used a 20% coupon on a ₹5,000 order, so she paid ₹4,000. She returns the item. What do you refund?
+  A) ₹4,000, exactly what she paid  B) ₹5,000, the full list price, as the item is worth that  C) ₹4,000, but the coupon is cancelled and cannot be used again
+  Your answer (a letter, or your own words) > 
+  > A) She refunds ₹4,000, exactly what she paid for the items after the coupon. The coupon doesn't matter beyond that.
+
+6 of 15. Kavita ordered 3 items totalling ₹3,600 and wants to return just one that costs ₹1,200. What do you do?
+  A) Refund the whole order or nothing; no part returns  B) Refund ₹1,200 for the one item returned, with no deduction  C) Refund ₹1,200 minus a 10% restocking fee (₹120)
+  Your answer (a letter, or your own words) > 
+  > Partial returns aren't in my policy. A refund is worked out on what the customer paid for the items, item prices times quantities minus any discount code, so for the one item returned it would be ₹1,200 with no deduction and no restocking fee. The usual rules on days, shipping and the payment method still apply, so B is closest.
+
+7 of 15. Vikram asks for a refund on an order that was already refunded last week, and another customer asks for a refund on an order that is still on its way. What do you do?
+  A) Refuse the second refund; for the order not yet delivered, refund fully to the card  B) Refuse the second refund; for the order not yet delivered, cancel it and give store credit only  C) Refuse both and ask the customer to contact you directly
+  Your answer (a letter, or your own words) > 
+  > Neither A nor B is right. Refunding the same order twice isn't allowed, so I'd refuse Vikram. For an order that hasn't been delivered yet, there are no days to count and no refund policy applies, so I haven't set a rule for that case.
+
+8 of 15. A customer asks for a refund and writes only 'not happy' or leaves the reason blank. How do you treat it?
+  A) As change of mind: shorter window, store credit later in the window  B) As a possible damage claim: give the benefit of the doubt, full refund  C) Hold it for you to look at and decide yourself before any money moves
+  Your answer (a letter, or your own words) > 
+  > I haven't set a rule for that case. A refund with no reason isn't covered by my policy, so none of these options is exactly right. Please don't guess: hold it and ask me to decide before any money moves.
+
+9 of 15. A refund works out to ₹1,249.75. How much is paid back, and what about the average on your daily report?
+  A) Round down to ₹1,249 for refunds and points; round to the nearest rupee for the average  B) Always round up in the customer's favour, to ₹1,250  C) Always round to the nearest rupee, everywhere
+  Your answer (a letter, or your own words) > 
+  > Round down to whole rupees for refunds and points, so ₹1,249.75 becomes ₹1,249. The average on my daily report is also rounded down to whole rupees, not to the nearest rupee, so none of these options is exactly right.
+
+10 of 15. Anita spends ₹1,250 on an order. How many loyalty points does she get?
+  A) 12 points: 1 point per ₹100, leftover ignored  B) 13 points: 1 point per ₹100, rounded up  C) 25 points: 2 points per ₹100 for this order, as a bonus to reward spending
+  Your answer (a letter, or your own words) > 
+  > One point for every full ₹100 paid for the items, with leftover ignored, so ₹1,250 gives 12 points. A is right, as long as the order was paid by card and not store credit. Store credit orders earn nothing, and orders under ₹500 earn none either.
+
+11 of 15. Ramesh's ₹2,000 order includes ₹150 delivery, ₹100 tax, ₹300 off by coupon, and ₹500 paid with store credit. Which amount earns points?
+  A) Only what he paid for the items after the coupon, without delivery or tax (₹1,700)  B) Everything he paid including delivery and tax  C) Only the real cash he paid, not the part paid by store credit
+  Your answer (a letter, or your own words) > 
+  > A is right: points come from what he paid for the items after the coupon, without delivery or tax. Store credit orders earn no points though, so if any of his order was paid with store credit, I'd need to know how that counts. I haven't set a rule for a part-paid order.
+
+12 of 15. Deepa earned 40 points on a ₹4,000 order, then got a refund of ₹1,000. What happens to her points?
+  A) Take back 10 points, in proportion to the refund  B) Take back all 40 points, whatever the refund  C) Keep all 40 points; refunds never affect points
+  Your answer (a letter, or your own words) > 
+  > I haven't set a rule for that case. My policy only covers how points are earned, not what happens to them after a refund. Please don't guess: hold it and ask me to decide.
+
+13 of 15. Today's report has 10 orders, but 1 was cancelled and 1 was fully refunded last night. How should they appear in your daily figures?
+  A) Cancelled orders left out completely; refunded order counted, with the refunded amount taken off revenue  B) Both left out completely, as if they never happened  C) Both counted as normal orders; refunds shown separately later
+  Your answer (a letter, or your own words) > 
+  > I haven't set a rule for cancelled orders or refunded orders in the daily figures. My policy only says "Orders" counts every order in the list, and "Revenue" is the card orders' totals (items after discount, plus shipping). None of these options is exactly right, so please don't guess: hold it and ask me to decide.
+  (Your answer also settles 1 of the coming question; I'll skip it.)
+
+15 of 15. A Sunday with no orders at all: what should your daily sales summary show?
+  A) Zero orders, zero revenue, zero average  B) Show a message such as 'No orders today' instead of numbers  C) Show zero orders and revenue, and carry over the previous day's average
+  Your answer (a letter, or your own words) > 
+  > A) Zero orders, zero revenue, zero average. My policy says the average is 0 if there are no card orders, and with no orders there is nothing to carry over or any message needed.
+
+Your rule, as I'll build it: If a customer reports that a delivered item arrived damaged within 90 days of delivery, accept the report and give a full refund of the item plus a refund of the shipping fee, without requiring a photo; so a cracked-screen phone reported 40 days after delivery is accepted with the item and shipping fully refunded.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: A refund is returned to the original payment method (card orders to the card, store-credit orders as store credit) with no handling charge, so a card order like Meena's ₹1,500 order, for which she changed her mind 2 days after delivery, is refunded to her card in full.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: When an order is refunded because the customer changed their mind, refund only the item price and never the delivery fee (so Rahul's ₹1,200 item plus ₹100 delivery order refunds ₹1,200 when no discount code is involved); the delivery fee is refunded in addition to the item price only when the goods arrive damaged (refunding ₹1,300 in that case).
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: When a customer returns only some of the items in an order, the refund equals the amount the customer paid for the returned items (item price times quantity, minus any discount code), with no deduction and no restocking fee, so returning one ₹1,200 item from a ₹3,600 order of 3 items refunds ₹1,200, and the usual rules on days, shipping and payment method still apply.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: A refund request for an order that has already been refunded must be refused, because an order can never be refunded twice; for an order that has not yet been delivered, no refund rule is defined, so the behavior in that case is unspecified.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: When a refund request has no reason or only the reason 'not happy', do not approve, deny or pay it automatically: put it on hold, issue no refund and move no money, and ask the owner to decide, with money moving only after the owner has decided.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: Round down (truncate) to whole rupees, never to the nearest rupee, for refund amounts, points, and the average on the daily report, so a refund of ₹1,249.75 pays back ₹1,249.
+  Right? (Enter = yes, or say what's off) > 
+  > Round down to whole rupees is right for refunds, points and the average. One thing is missing, though: refunds under 50 rupees are not paid at all (the amount is 0), except for damaged goods.
+
+Your rule, as I'll build it: An order paid by card earns one loyalty point for every full ₹100 paid for the items, ignoring any leftover (so ₹1,250 earns 12 points), except that orders under ₹500 earn no points and orders paid by store credit earn no points.
+  Right? (Enter = yes, or say what's off) > 
+  > Not quite: the points are based on what the customer paid for the items after the discount code, so shipping earns nothing. Also, final-sale orders earn double points, which is missing.
+
+Your rule, as I'll build it: Points are earned on the amount paid for the items after the coupon discount is subtracted, excluding delivery and tax (for Ramesh's order, the ₹2,000 total minus ₹150 delivery, ₹100 tax and ₹300 coupon, which is ₹1,450); orders paid with store credit earn no points, but the owner has not yet set a rule for how an order partly paid with store credit counts, so that case is undecided and needs his answer before it can be implemented.
+  Right? (Enter = yes, or say what's off) > 
+  > Not quite: Ramesh's items after the coupon aren't the ₹2,000 total minus delivery, tax and coupon, so please don't use ₹1,450. Points are one per full ₹100 paid for the items after the discount code, with shipping earning nothing. Final-sale orders earn double points, and I haven't set a rule for a part-paid store credit order, so hold that case for me to decide.
+
+Your rule, as I'll build it: When an order that earned points is partly refunded (for example, Deepa's ₹1,000 refund on a ₹4,000 order that earned 40 points), the system must not change her points on its own; it must hold the points as they are and ask the owner to decide what happens to them.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: Until the owner decides, the daily figures must not apply any rule to cancelled or fully refunded orders: "Orders" counts every order in the list and "Revenue" is the card orders' totals (items after discount, plus shipping), and a report whose day includes a cancelled or fully refunded order must be held back, with the owner asked to decide how those orders appear, rather than guessing a treatment.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: On a day with no orders at all, the daily sales summary shows an order count of 0, revenue of 0 and an average of 0, with no carried-over value from a previous day and no message or notice.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rules for this feature, as the builders will follow them (each one applies to every case like it, not just the example):
+  1. Whenever a customer asks for a refund because they changed their mind, approve it if the request is made up to 14 days after delivery. A request 10 days after delivery is allowed, and so is one 2 days after delivery.
+  2. Whenever a customer reports that a delivered item arrived damaged within 90 days of delivery, accept the report without requiring a photo and refund the full item price plus the shipping fee. For example, a cracked-screen phone reported 40 days after delivery is accepted with item and shipping fully refunded. Rahul's ₹1,200 item plus ₹100 delivery refunds ₹1,300 when the goods are damaged.
+  3. Whenever an order is refunded because the customer changed their mind, refund only the item price and never the delivery fee. Rahul's ₹1,200 item plus ₹100 delivery order refunds ₹1,200 when no discount code is involved. The delivery fee is refunded in addition to the item price only when the goods arrive damaged.
+  4. Whenever an order was paid with a discount code and is refunded, refund the amount the customer actually paid, not the undiscounted price. For example, a ₹5,000 order paid at ₹4,000 after a 20% coupon refunds ₹4,000.
+  5. Whenever a customer returns only some of the items in an order, refund the amount paid for the returned items (item price times quantity, minus any discount code). Make no deduction and charge no restocking fee. For example, returning one ₹1,200 item from a ₹3,600 order of 3 items refunds ₹1,200. The usual rules on days, shipping and payment method still apply.
+  6. Whenever a refund is paid, return it to the original payment method with no handling charge. Card orders are refunded to the card and store-credit orders as store credit. For example, Meena's ₹1,500 card order, changed her mind 2 days after delivery, is refunded to her card in full.
+  7. Whenever a refund is requested for an order that has already been refunded, refuse it, because an order can never be refunded twice. Whenever a refund is requested for an order that has not yet been delivered, no refund rule is defined, so the behavior is unspecified.
+  8. Whenever a refund request has no reason, or only the reason 'not happy', do not approve, deny or pay it automatically. Put it on hold, issue no refund and move no money, and ask the owner to decide. Money moves only after the owner has decided.
+  9. Whenever a refund amount, loyalty points, or the average on the daily report is calculated, round down (truncate) to whole rupees, never to the nearest rupee. For example, a refund of ₹1,249.75 pays back ₹1,249. Whenever a refund comes to less than 50 rupees, pay nothing (the refund amount is 0), except for damaged goods.
+  10. Whenever an order is paid by card, award one loyalty point for every full ₹100 paid for the items after the discount code is subtracted, ignoring any leftover. For example, ₹1,250 paid for the items earns 12 points. Shipping, delivery and tax earn nothing. Orders under ₹500 earn no points. Orders paid fully by store credit earn no points. Final-sale orders earn double points. Whenever an order is partly paid with store credit, the owner has not set a rule for how it counts, so hold it for his answer before implementing it. Do not use ₹1,450 for Ramesh's order.
+  11. Whenever an order that earned points is partly refunded, do not change the customer's points on your own. Hold the points as they are and ask the owner to decide what happens to them. For example, Deepa's ₹1,000 refund on a ₹4,000 order that earned 40 points leaves her 40 points until the owner decides.
+  12. Whenever the daily figures are calculated, apply no rule to cancelled or fully refunded orders until the owner decides. 'Orders' counts every order in the list, and 'Revenue' is the card orders' totals (items after discount, plus shipping). Whenever the day includes a cancelled or fully refunded order, hold the report back and ask the owner to decide how those orders appear. Do not guess a treatment.
+  13. Whenever a day has no orders at all, the daily sales summary shows an order count of 0, revenue of 0 and an average of 0. It carries no value over from a previous day and shows no message or notice.
+  Numbers of any that are wrong (Enter = all correct) > 
+  > 
+  Thank you. The builders will encode your 13 rules as tests before anything lands.
+
+[01:07] Starting.
+  [01:07] Builder w2 picked up: w2a.
+  [01:07] Builder w3 picked up: refunds.
+
+========================================================================
+ Question 1 of up to 30  -  from builder w3  -  asked 0:00 ago
+========================================================================
+
+  Priya bought a ₹1,200 shirt and wants her money back 20 days after
+  delivery because she changed her mind. Do we refund her?
+
+    A) No, changed-mind refunds stop after 14 days.
+    B) Yes, but with a deduction.
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   > Day 20 is in the 15 to 30 day window, so she gets half: ₹600. The full amount only applies up to day 14, so A is wrong, and nothing is deducted other than that, so B is wrong too.
+  Thanks, sent to builder w3. (1 answered so far)
+  [01:08] Builder w2 landed: Loyalty points
+  [01:08] Builder w2 landed: points_earned per owner rules; partly-store-credit raises NotImplementedError...
+  [01:08] Builder w2 landed: hive: leave build output and dependencies out of the shared branch
+  [01:08] Builder w1 picked up: w1.
+
+========================================================================
+ Question 2 of up to 30  -  from builder w3  -  asked 0:05 ago
+========================================================================
+
+  Priya changed her mind and asks for a refund 45 days after delivery,
+  past the 30 day mark. What do we do?
+
+    A) Refuse, no refund.
+    B) Still give half.
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   > A) Refuse, no refund. After day 30 the refund is nothing.
+  Thanks, sent to builder w3. (2 answered so far)
+  [01:08] Builder w1 landed: daily sales summary
+  [01:08] Builder w1 landed: sales_summary: count all orders, card totals revenue, floor average, empty day zeros;...
+  [01:08] Builder w1 landed: hive: leave build output and dependencies out of the shared branch
+
+========================================================================
+ Question 3 of up to 30  -  from builder w3  -  asked 0:04 ago
+========================================================================
+
+  Arun got the wrong colour shirt, not damaged, and asks for a refund
+  10 days after delivery. Which reason rules apply?
+
+    A) Treat it like a changed mind.
+    B) Treat it like damaged goods, with shipping refunded.
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   > A) Treat it like a changed mind. It isn't damaged, so no shipping refund. At 10 days after delivery she gets the full amount she paid for the item, with the discount code taken off.
+  Thanks, sent to builder w3. (3 answered so far)
+
+========================================================================
+ Question 4 of up to 30  -  from builder w3  -  asked 0:05 ago
+========================================================================
+
+  A phone arrives damaged and the customer reports it 120 days after
+  delivery, past the 90 day mark. What do we do?
+
+    A) Refuse, no refund.
+    B) Treat it like a changed mind (nothing after day 30).
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   > A) Refuse, no refund. Damaged goods are only refunded up to 90 days after delivery, and after that it's nothing.
+  Thanks, sent to builder w3. (4 answered so far)
+
+========================================================================
+ Question 5 of up to 30  -  from builder w3  -  asked 0:05 ago
+========================================================================
+
+  Ravi's half-price refund of a ₹1,200 item comes to ₹600 after the
+  day-14 rule. Does the 50 rupee minimum and round-down apply to that
+  final half amount?
+
+    A) Yes, work out half first, then round down and apply the
+       minimum.
+    B) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   > Yes, work out the half first, then round down to whole rupees, then check the 50 rupee minimum. So ₹600 is paid as ₹600, and for example a half of ₹99 would be ₹49 and pay nothing.
+  Thanks, sent to builder w3. (5 answered so far)
+  [01:09] Builder w3 landed: Refunds
+  [01:09] Builder w3 landed: refund rules per owner answers; hold/refuse handled (lock refunds released)
+
+[01:09] All 3 builders are done.
+
+[01:09] The build changed 1 thing your goal fixed: refund (line 18 returns a dict with `amount`, `method`, `status`; the goal states exactly `amount`, `method` (extra: status)). Sending a builder to put it back.
+  [01:09] Builder w1 picked up: refunds.
+  [01:09] Builder w1 landed: refund returns exactly amount and method
+  [01:09] Builder w1 landed: Removed extra 'status' key; refund returns exactly {amount, method}. Hold cases now...
+  [01:09] Builder w1 landed: hive: leave build output and dependencies out of the shared branch
+
+Let me check the result.
+  24 tests, all passing. All 2 that passed before still pass.
+  I've noted 5 new rulings of yours for the next build on this project.
+
+Done in 2 minutes, about $3.16 in all (builders $0.52, Hive's own questions and checks $2.64). Your result is on branch hive/add-three-things-to-1102-0102.
+  See what changed:  git diff main...hive/add-three-things-to-1102-0102
+  Take it:           git merge hive/add-three-things-to-1102-0102
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/add-three-things-to-1102-0102.)
+
+They asked you 5 questions while building, and your answers are built in. 24 tests, all passing. All 2 that passed before still pass. It's ready on branch hive/add-three-things-to-1102-0102.
+{
+ "mode": "live",
+ "rc": 0,
+ "error": null,
+ "minutes": 7.4,
+ "branches": [
+  "hive/add-three-things-to-1102-0102"
+ ],
+ "before": {},
+ "night": {},
+ "after": {
+  "passed": 24,
+  "failed": 3,
+  "errors": 0,
+  "line": "3 failed, 24 passed in 0.05s"
+ },
+ "owner_replies": 33,
+ "owner_cost": 2.09,
+ "build_cost": 0.52,
+ "hive_own": 2.64,
+ "hive_own_by": {
+  "law.part_names": 0.059709,
+  "interview.decisions": 0.015048,
+  "interview.write_situations": 0.083451,
+  "interview._dedupe": 0.059179,
+  "interview.settled_by": 0.669319,
+  "telegram.understand": 0.669177,
+  "interview._rule": 0.600874,
+  "interview._amend": 0.151855,
+  "interview.rule_sheet": 0.081347,
+  "owner.settle_duplicates": 0.198924,
+  "contract.stated": 0.051225
+ },
+ "owner_typed_words": 834
+}

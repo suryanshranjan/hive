@@ -2,7 +2,7 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 1 2026 IST, after Gate 84)
+## Where we left off (Nov 2 2026 IST, after Gate 85)
 
 - **Gate 66 done (the user, travelling: "test something that makes Hive the best tool"):** one Claude Code agent that asks the owner beat Hive's hand-over by 21-30 hidden points (CQ 93.0, CC 84.6, HV 63.4, N0 34.8%) at 1/13 of his reading. Wind tunnel, synthetic owner who answers from his policy.
 - **Gate 67 done:** the hand-over's memory does not compound (neither rule fired).
@@ -24,7 +24,9 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 - **Gate 83 done:** derived-area claims fly cleanly (Gates 80-83 close that loop). Live scored 14/27: the business builder changed `refund()`'s result shape after an owner answer, and the review was skipped after 3 questions.
 - **Gate 84 done (on by default):** when the review is skipped, Hive checks the goal's stated interfaces; it repaired Gate 83's build (14 -> 26/27) and raised no false alarm in two flights.
 - **New phase: closing the founder's gaps** (`docs/gap_plan.md`): reliability (pass^k), owner load under 10 minutes, Hive's own spend, real codebases (Ambig-SWE), owner drift, the real founder, MAST failure labels.
-- **Next:** Gate 85, the baseline: 5 live flights as shipped (registered); then Gap 2 (owner load) and Gap 3 (Hive's own spend) against it on a real codebase (where 'business parts' are a judgement); low priority, a short interview before an overnight build (at most ~2 of 27 to gain); the split on a real codebase (where 'business parts' are a judgement); with the founder, Gate 45 day 2 with builders asking him live (his pace and whether his answers hold).
+- **Gate 85 done (baseline):** pass^1 0.80, pass^5 no; median 55 owner prompts; Hive's own spend 4.8-8.6x builders' (interview interpretation 45%, reply reading 19%, spot checks 22%).
+- **Running:** Gate 86 (real Django issues, Ambig-SWE protocol): arms F and N done, arm S (hive start) running.
+- **Next:** Gap 3 (a small model for Hive's reading steps), Gap 2 (5 highest-stakes spot checks, not 20-30), both against Gate 85; a check for state that outlives a call on a real codebase (where 'business parts' are a judgement); low priority, a short interview before an overnight build (at most ~2 of 27 to gain); the split on a real codebase (where 'business parts' are a judgement); with the founder, Gate 45 day 2 with builders asking him live (his pace and whether his answers hold).
 - **Earlier plan, superseded by Gate 73:** Gate 72 again with the repeated-question fix (does the swarm then match one agent's business correctness and keep its speed?). **With the founder:** Gate 45 day 2, builders asking him live; measure his answer time and whether his answers hold.
 - **For Gate 45 day 2 with the founder:** test builders asking him live (his answers drift; does asking still win?).
 
