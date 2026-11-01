@@ -1,0 +1,11 @@
+live: rc 0, error False, 14.1 min, branches ['hive/add-three-things-to-1101-2122'], after 2 failed, 25 passed in 0.04s, owner prompts 71, builders' cost $0.47
+  {'areas': {'refunds_shop_refunds_py_refund_function': 'Refunds (shop/refunds.py refund function)', 'loyalty_points_shop_loyalty_py_points_ea': 'Loyalty points (shop/loyalty.py points_earned function)', 'daily_sales_summary_shop_report_py_sales': 'Daily sales summary (shop/report.py sales_summary function)'}, 'builders': 2, 'business_role': False, 'touched': {'w1': ['points_earned', 'refund', 'sales_summary'], 'w2': ['points_earned', 'refund', 'sales_summary']}, 'duplicated': 3, 'commits_by': {'w2': 2, 'w1': 2, 'hive': 2, 'owner': 1}, 'questions': 0, 'fixed': False}
+overnight: rc 0, error False, 4.2 min, night 10 failed, 17 passed in 0.09s, after the morning 2 failed, 25 passed in 0.04s, owner prompts 10
+  {'areas': {'refund_calculation_shop_refunds_py': 'Refund calculation (shop/refunds.py)', 'loyalty_points_calculation_shop_loyalty_': 'Loyalty points calculation (shop/loyalty.py)', 'daily_sales_summary_report_shop_report_p': 'Daily sales summary report (shop/report.py)'}, 'builders': 3, 'business_role': False, 'touched': {'w1': [], 'w2': ['points_earned', 'refund', 'sales_summary'], 'w3': []}, 'duplicated': 0, 'commits_by': {'w2': 3, 'hive': 2, 'owner': 1}, 'questions': 10, 'fixed': True}
+
+predictions
+R1 live: no crash, one branch, >= 24: 25 -> held
+R2 live: areas derived (3) and split engaged (False) -> failed
+R3 live: no part built by 2+ builders (3) -> failed
+R4 live: <= 45 owner prompts (71) -> failed
+R5 overnight: no crash, >= 22 after the morning (25), fix ran (True) -> held

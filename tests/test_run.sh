@@ -67,6 +67,11 @@ law.part_names = lambda g: ['Creator fees', 'Payouts']
 swarm.prepare('$TW/noareas', '$TW/runareas', 2, 'Implement creator fees and payouts.', 40, None, 0, derive_areas=True)
 swarm.prepare('$TW/project', '$TW/runkeep', 2, 'Implement creator fees and payouts.', 40, None, 0, derive_areas=True)"
 check "configured areas are kept" "$(grep -c 'creator_fees' $T/runkeep/prompts/w1.md)" 0
+cd $T && git clone -q $T/runareas/up.git $T/later && cd $T/later && $PY -c "
+from hive import law, swarm
+law.part_names = lambda g: ['Refund rules', 'Invoices']
+swarm.prepare('$TW/later', '$TW/runlater', 2, 'Add refunds and invoices.', 40, None, 0, derive_areas=True)"
+check "a later build names its own areas, not the earlier goal's" "$(grep -c 'refund_rules' $T/runlater/prompts/w1.md) $(grep -c 'creator_fees' $T/runlater/prompts/w1.md)" "1 0"
 check "areas named from the goal's parts are on the shared branch and in the prompt" \
   "$(git -C $T/runareas/work/w1 show HEAD:.hive/config.json | grep -c 'creator_fees') $(grep -c 'the goal.s part \"Payouts\"' $T/runareas/prompts/w2.md)" "2 1"
 rm -rf $T; exit $fail

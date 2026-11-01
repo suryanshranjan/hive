@@ -1,0 +1,13 @@
+I landed all three areas in one change: `refund`, `points_earned` and `sales_summary`. The suite passed 5/5 at landing, with the new tests in `tests/test_new.py`.
+
+- **Least sure of (refund rules, all guesses):**
+  - Changed-mind returns qualify up to 7 days after delivery, and the refund excludes shipping.
+  - Damaged items qualify up to 30 days, with a full refund including shipping.
+  - Final-sale orders get nothing unless the item is damaged.
+  - Any reason other than damaged is treated as changed mind.
+- **Other guesses:**
+  - Loyalty is 1 point per full Rs 100 of items after discount, rounded down.
+  - The daily revenue figure is the sum of order totals including shipping, and the average rounds down. Refunds are not subtracted.
+- **Questions asked:** 10 in total, covering the cut-off days, shipping in refunds, final-sale damage, refund method, odd reasons, and loyalty rounding and discount. Two more cover how the average rounds and whether refunds count in revenue. One question was rejected by the tool for quoted code values, so I rephrased it and it was recorded.
+- **Assumptions:** 8 are recorded for the owner. Three were rejected for quoted code values and I re-recorded them without quotes.
+- **Problems:** `hive ask` and `hive assume` reject quoted words, so some entries needed rewording. Compiled `.pyc` files under `shop/__pycache__` are untracked and I did not commit them.

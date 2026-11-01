@@ -1,0 +1,5 @@
+Landed. All three areas (refunds, loyalty points, sales summary) are on `main`, and 17 of 17 tests pass.
+- w1 had already landed the same three modules, so I kept their source files. They matched my own code. What I added is `tests/test_features.py`, covering every owner rule, boundary and the example amounts.
+- I recorded 7 assumptions. The least certain are: "damaged" in any capitals or with spaces counts as damaged; a negative day count is treated like day 0; and any payment type other than card earns no points and adds nothing to revenue.
+- I asked the owner no questions. The goal and rules covered the cases, so I recorded defaults instead.
+- Two surprises: the conflict at landing came from w1 landing the same code first, and `.pyc` files had been committed to the repo. I removed the ones I had added.

@@ -4,7 +4,8 @@ A claim is a lock file current_tasks/<short_name>.txt pushed to the shared branc
 .hive/config.json "areas" (name -> list of test-file globs); when none are configured, any name is accepted.
 No two locks may share an area. If two workers claim overlapping areas at the same moment, the lock that reached the
 shared branch first wins and the other is withdrawn automatically.
-Exit codes: 0 claimed; 1 taken (choose other areas); 2 sync problem, retry; 3 commit or stash first; 4 unknown area."""
+Exit codes: 0 claimed; 1 taken, or more than an even share of the areas (choose again); 2 sync problem, retry; 3 commit or
+stash first; 4 unknown area."""
 import glob, os, time
 
 from . import config
@@ -35,12 +36,32 @@ def _push(b):
             return False
     return False
 
+def fair_share(n_areas):
+    """The most areas one claim may hold: an even share of the areas among this run's builders (Gate 81)."""
+    import json, math
+    try:
+        workers = int(json.load(open(os.path.join(os.environ['HIVE_RUN'], 'run.json')))['workers'])
+    except Exception:
+        return max(1, n_areas)
+    return max(1, math.ceil(n_areas / max(1, workers)))
+
+def mine(name):
+    """True if this clone's checkout holds lock `name`, taken by this builder."""
+    path = os.path.join(LOCK_DIR, f'{name}.txt')
+    if not os.path.exists(path):
+        return False
+    me = sh('git', 'config', 'user.name').stdout.strip()
+    return open(path).readline().startswith(f'{me}:')
+
 def claim(name, areas, desc):
     cfg = config.load(); b = branch(cfg)
     wanted = {a.strip() for a in areas.split(',') if a.strip()}
     known = set(cfg.get('areas', {}))
     if known and wanted - known:
         print('unknown areas: ' + ', '.join(sorted(wanted - known)) + '; known: ' + ', '.join(sorted(known))); return 4
+    most = fair_share(len(known))
+    if known and len(wanted) > most:   # Gate 81: one builder claimed every area and the others had nothing to build
+        print(f'claim at most {most} area(s) at a time, so every builder has work; land them, then claim more'); return 1
     if sh('git', 'status', '--porcelain', '--untracked-files=no').stdout.strip():
         print('working tree not clean: commit or stash first'); return 3
     if sh('git', 'pull', '-q', '--rebase', 'origin', b).returncode:

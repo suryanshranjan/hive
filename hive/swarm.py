@@ -191,7 +191,8 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
     sh('git', '-C', up, 'symbolic-ref', 'HEAD', f'refs/heads/{b}')
     if derive_areas is None:
         derive_areas = os.environ.get('HIVE_DERIVE_AREAS') != '0'
-    if derive_areas and not cfg.get('areas') and workers > 1:   # Gate 80: claim the goal's parts by name (duplicated work 5.7 -> 0 of 12)
+    configured = cfg.get('areas') and not cfg.get('area_parts')   # areas an earlier build derived are that goal's, not this one's
+    if derive_areas and not configured and workers > 1:   # Gate 80: claim the goal's parts by name (duplicated work 5.7 -> 0 of 12)
         goal_text0 = open(goal, encoding='utf-8').read() if os.path.exists(goal) else goal
         names = law.part_names(goal_text0)
         if len(names) > 1:

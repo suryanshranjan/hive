@@ -31,4 +31,9 @@ cd $T/a && $PY -m hive areas | grep -q "payouts *held by pb"; check "areas shows
 # landing releases the lock: a finishes fees and lands; b can then claim fees
 cd $T/a && echo "def fee(x): return x // 10  # rule: 10%" > fees.py && $PY -m hive land fa "fee rule comment" >/dev/null; check "landing succeeds" $? 0
 cd $T/b && $PY -m hive claim fb2 fees "fees after release" >/dev/null; check "area free again after landing" $? 0
+# Gate 81: a builder with no lock of that name cannot land; one claim holds at most an even share of the areas
+cd $T/c && git pull -q --rebase origin main && echo "def extra(): return 1" > extra.py && $PY -m hive land nolock "built without a claim" >/dev/null; check "landing without a lock refused" $? 9
+cd $T/c && git checkout -q -- . 2>/dev/null; rm -f extra.py
+mkdir -p $T/run && echo '{"workers": 3}' > $T/run/run.json
+cd $T/c && git pull -q --rebase origin main && HIVE_RUN=$T/run $PY -m hive claim greedy fees,payouts "two of three areas, three builders" >/dev/null; check "a claim beyond an even share refused" $? 1
 rm -rf $T; exit $fail

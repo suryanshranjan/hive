@@ -10,7 +10,8 @@ Runner-agnostic version of gates/gate23/tools/land.py (Gates 3, 21-23). In order
 Main's results are cached by code content (Gate 23: lock commits change no code, so they reuse the landing's run).
 Before committing it refuses secrets (.env files other than templates, private keys, credential files; projects can
 add patterns with "never_commit") and leaves build artifacts and dependency folders out of the commit.
-Exit codes: 0 landed; 2 push kept failing; 5 rebase conflict; 6 duplicate definitions; 7 regressions; 8 forbidden files."""
+Exit codes: 0 landed; 2 push kept failing; 5 rebase conflict; 6 duplicate definitions; 7 regressions; 8 forbidden files;
+9 no lock of that name held by this builder (when areas are configured; Gate 81)."""
 import ast, fnmatch, hashlib, io, json, os, re, subprocess, sys, tarfile, tempfile, time
 
 from . import config, junit, law
@@ -173,6 +174,12 @@ def land(name, message, note=None):
         body = sh('git', 'log', '-1', '--format=%B').stdout.rstrip()
         sh('git', 'commit', '-q', '--amend', '-m', f'{body}\n\n{NOTE} {note}')
     lock = os.path.join(LOCK_DIR, f'{name}.txt')
+    if message != '--continue' and cfg.get('areas'):   # Gate 81: a builder whose claim was refused built and landed anyway
+        from .claims import mine
+        if not mine(name):
+            log(f'BLOCKED_NOLOCK {name}')
+            print(f'Refused: you hold no lock named {name}. Claim free areas first (hive claim), then land under that '
+                  'name. If every area is taken, the work is someone else\'s: stop, and say so.'); return 9
     if message != '--continue':
         if os.path.exists(lock):
             sh('git', 'rm', '-q', '--cached', lock); os.remove(lock)
