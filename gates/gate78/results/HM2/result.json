@@ -1,0 +1,181 @@
+{
+ "arm": "HM",
+ "k": "2",
+ "workers": 4,
+ "prep_seconds": 45.8,
+ "wall_minutes": 3.9,
+ "hidden_passed": 57,
+ "hidden_total": 61,
+ "other_failures": 0,
+ "landings": [
+  {
+   "commit": "4d080f42",
+   "minute": 0.2,
+   "subject": "release w4 all",
+   "hidden": 0,
+   "other_fail": 0
+  },
+  {
+   "commit": "b7a6d5b8",
+   "minute": 1.3,
+   "subject": "feat: rebuild var_map, serde.load, _is_star, to_interval, normalize_table_name, sqlite/starrocks hel",
+   "hidden": 35,
+   "other_fail": 0
+  },
+  {
+   "commit": "7529a5fb",
+   "minute": 1.3,
+   "subject": "Rebuilt 7 functions with tests; starrocks wraps BETWEEN replacement in parens under NOT (lock w3 rel",
+   "hidden": 35,
+   "other_fail": 0
+  },
+  {
+   "commit": "0c7e8e28",
+   "minute": 1.8,
+   "subject": "feat: rebuild make_interval, spark dateadd, bigquery cte pushdown, duckdb corr",
+   "hidden": 48,
+   "other_fail": 0
+  },
+  {
+   "commit": "674a8ae4",
+   "minute": 1.8,
+   "subject": "Rebuilt no_make_interval_sql, spark _dateadd_sql, bigquery _pushdown_cte_column_names, duckdb _maybe",
+   "hidden": 48,
+   "other_fail": 0
+  },
+  {
+   "commit": "8766dfbf",
+   "minute": 2.6,
+   "subject": "feat: rebuild builders, array_compact, make_interval, is_star, starrocks/sqlite helpers",
+   "hidden": 48,
+   "other_fail": 0
+  },
+  {
+   "commit": "8f6c4d86",
+   "minute": 2.6,
+   "subject": "rebuilt 7 functions; formats guessed from callers: duckdb compact -> LIST_FILTER(x, _u -> NOT _u IS ",
+   "hidden": 48,
+   "other_fail": 0
+  },
+  {
+   "commit": "eb65f1f1",
+   "minute": 2.8,
+   "subject": "fix: _is_star for Subquery/SetOperation (Star undefined), array_compact, make_interval",
+   "hidden": 55,
+   "other_fail": 0
+  },
+  {
+   "commit": "2077c9f6",
+   "minute": 3.3,
+   "subject": "fix: restore array_compact_sql",
+   "hidden": 57,
+   "other_fail": 0
+  },
+  {
+   "commit": "9e2c0ab8",
+   "minute": 3.3,
+   "subject": "restored array_compact_sql lost in my merge (lock w1b released)",
+   "hidden": 57,
+   "other_fail": 0
+  }
+ ],
+ "cost": 1.34,
+ "tokens": 4005018,
+ "builders": [
+  {
+   "worker": "w2",
+   "agent": "claude",
+   "start": "1793539975",
+   "end": "1793539999",
+   "minutes": "0.4",
+   "exit": "0",
+   "tokens": "160242",
+   "cost_usd": "0.108454",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w3",
+   "agent": "claude",
+   "start": "1793539975",
+   "end": "1793540089",
+   "minutes": "1.9",
+   "exit": "0",
+   "tokens": "870293",
+   "cost_usd": "0.313403",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w4",
+   "agent": "claude",
+   "start": "1793539975",
+   "end": "1793540105",
+   "minutes": "2.2",
+   "exit": "0",
+   "tokens": "1314596",
+   "cost_usd": "0.422517",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w1",
+   "agent": "claude",
+   "start": "1793539975",
+   "end": "1793540205",
+   "minutes": "3.8",
+   "exit": "0",
+   "tokens": "1659887",
+   "cost_usd": "0.498082",
+   "api_error": "",
+   "limit_stops": "0"
+  }
+ ],
+ "tools": {
+  "w2": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 2,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 2,
+   "outside": []
+  },
+  "w3": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 13,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 13,
+   "outside": []
+  },
+  "w4": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 19,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 18,
+   "outside": []
+  },
+  "w1": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 22,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 22,
+   "outside": []
+  }
+ },
+ "map": true
+}

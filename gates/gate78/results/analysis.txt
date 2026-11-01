@@ -1,0 +1,15 @@
+H1: hidden 53/61 (other failures 0), time to accuracy 2.9 min, wall 2.9 min, cost $1.51, tokens 4,515,411, reads+searches/builder 15.2, graphify users 0 (0 calls), landings 9, prep 0.7 s, leaks 0
+HM1: hidden 58/61 (other failures 0), time to accuracy 1.9 min, wall 2.3 min, cost $1.08, tokens 3,224,805, reads+searches/builder 11.5, graphify users 0 (0 calls), landings 8, prep 47.0 s, leaks 0
+HM2: hidden 57/61 (other failures 0), time to accuracy 2.8 min, wall 3.9 min, cost $1.34, tokens 4,005,018, reads+searches/builder 13.8, graphify users 0 (0 calls), landings 10, prep 45.8 s, leaks 0
+H2: hidden 53/61 (other failures 0), time to accuracy 3.0 min, wall 3.0 min, cost $1.63, tokens 5,302,820, reads+searches/builder 17.5, graphify users 0 (0 calls), landings 8, prep 0.6 s, leaks 1
+
+H:  hidden 53.0, time to accuracy 3.0 min, cost $1.57, reads+searches/builder 16.4
+HM: hidden 57.5, time to accuracy 2.3 min, cost $1.21, reads+searches/builder 12.6
+
+predictions
+M1 each HM run: >= 3 of 4 used graphify ([0, 0]) -> failed
+M2 HM cost 1.21 <= 0.85 x H 1.57 (ratio 0.77) -> held
+M3 HM time to accuracy 2.3 <= 0.85 x H 3.0 (ratio 0.80) -> held
+M4 HM hidden 57.5 >= H 53.0 - 3 -> held
+M5 HM reads+searches 12.6 <= 0.8 x H 16.4 (ratio 0.77) -> held
+Claim (M2 or M3) and M4 -> held

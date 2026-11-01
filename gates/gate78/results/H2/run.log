@@ -1,0 +1,40 @@
+[19:12:02] predictions registered on origin/main: gates/gate78/prompts/PREDICTIONS.md
+launched w1
+launched w2
+launched w3
+launched w4
+w4 finished: exit 0, 1.7 min, cost 0.326739
+w1 finished: exit 0, 2.0 min, cost 0.312498
+w2 finished: exit 0, 2.2 min, cost 0.398437
+w3 finished: exit 0, 2.9 min, cost 0.588848
+result: /home/claude/hive/runs/g78_H2/up.git, branch main
+321bce9 Only added tests (tests/test_w3_functions.py) for generator functions; other workers landed the implementations first, so I discarded my duplicate versions (lock w3a released)
+b6587ce test: add cross-dialect tests for rebuilt generator functions
+d98ff49 spark _dateadd_sql (DATE_ADD for day, else DATEADD(unit,n,x)), bigquery CTE column pushdown (skips stars/mismatched counts), duckdb corr flag clearing (lock gens released)
+7f7ed71 feat: rebuild spark dateadd, bigquery cte column pushdown, duckdb corr null handling
+778e300 Rebuilt normalize_table_name, to_interval, _is_star, build_var_map, serde.load, array_compact_sql (DuckDB LIST_FILTER NOT _u IS NULL); added tests/test_w1_rebuilt.py (lock w1 released)
+0d0e72b feat: rebuild six emptied helpers (CLAUDE)
+b9ff96a Rebuilt no_make_interval_sql (INTERVAL '<n unit><sep>...'), starrocks BETWEEN->comparisons in DELETE (parenthesised under NOT), sqlite GENERATED AS IDENTITY->AUTOINCREMENT placed after PRIMARY KEY (lock w4 released)
+68997a0 feat: rebuild no_make_interval_sql, starrocks between delete, sqlite autoincrement
+
+  landing 68997a05 at 1.0 min: hidden 11/61
+  landing b9ff96af at 1.0 min: hidden 11/61
+  landing 0d0e72b0 at 1.6 min: hidden 42/61
+  landing 778e3000 at 1.6 min: hidden 42/61
+  landing 7f7ed71e at 1.9 min: hidden 53/61
+  landing d98ff49e at 1.9 min: hidden 53/61
+  landing b6587ce9 at 2.6 min: hidden 53/61
+  landing 321bce9b at 2.6 min: hidden 53/61
+{
+ "arm": "H",
+ "k": "2",
+ "workers": 4,
+ "prep_seconds": 0.6,
+ "wall_minutes": 3.0,
+ "hidden_passed": 53,
+ "hidden_total": 61,
+ "other_failures": 0,
+ "cost": 1.63,
+ "tokens": 5302820,
+ "map": false
+}

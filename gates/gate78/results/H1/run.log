@@ -1,0 +1,41 @@
+[18:40:31] predictions registered on origin/main: gates/gate78/prompts/PREDICTIONS.md
+launched w1
+launched w2
+launched w3
+launched w4
+w1 finished: exit 0, 1.3 min, cost 0.188803
+w2 finished: exit 0, 1.9 min, cost 0.348867
+w3 finished: exit 0, 2.5 min, cost 0.44907
+w4 finished: exit 0, 2.8 min, cost 0.521118
+result: /home/claude/hive/runs/g78_H1/up.git, branch main
+df9bb48 Rebuilt _pushdown_cte_column_names, spark _dateadd_sql, duckdb _maybe_corr_null_to_false, starrocks _eliminate_between_in_delete, sqlite _generated_to_auto_increment; tests in tests/test_w4gen.py (lock w4a released)
+20a6a48 feat: rebuild bigquery/spark/duckdb/starrocks/sqlite generator helpers CLAUDE
+f940577 test: adjust to_interval tests (CLAUDE)
+d368f65 Rebuilt normalize_table_name, to_interval, _is_star, build_var_map, serde.load, array_compact_sql (ArrayFilter x IS NOT NULL lambda), no_make_interval_sql (INTERVAL '1 year, 2 month'; sep param); tests in tests/test_w3_rebuilt.py (lock w3 released)
+baf944c feat: rebuild 7 emptied functions (CLAUDE)
+a507886 Rebuilt 7 functions (builders, query, parser, serde, dialect helpers) modelled on callers; added tests/test_w2core.py (lock w2core released)
+ba5ac2e feat: rebuild normalize_table_name, to_interval, _is_star, build_var_map, serde.load, array_compact_sql, no_make_interval_sql CLAUDE
+d92b852 Rebuilt array_compact_sql (ArrayFilter with _u IS NOT NULL lambda) and no_make_interval_sql (INTERVAL '<v> <unit><sep>...') with tests (lock dialect released)
+
+  landing 7120af78 at 0.8 min: hidden 0/61
+  landing d92b852d at 0.8 min: hidden 0/61
+  landing ba5ac2ea at 1.4 min: hidden 31/61
+  landing a5078860 at 1.4 min: hidden 31/61
+  landing baf944cc at 1.9 min: hidden 31/61
+  landing d368f658 at 1.9 min: hidden 31/61
+  landing f9405776 at 2.2 min: hidden 31/61
+  landing 20a6a485 at 2.5 min: hidden 53/61
+  landing df9bb483 at 2.5 min: hidden 53/61
+{
+ "arm": "H",
+ "k": "1",
+ "workers": 4,
+ "prep_seconds": 0.7,
+ "wall_minutes": 2.9,
+ "hidden_passed": 53,
+ "hidden_total": 61,
+ "other_failures": 0,
+ "cost": 1.51,
+ "tokens": 4515411,
+ "map": false
+}

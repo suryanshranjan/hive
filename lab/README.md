@@ -27,6 +27,7 @@ The session reads `CLAUDE.md`, `BRAIN.md` and `lab/QUEUE.md`, runs the top ready
 | `make_swarm.py` | One bare repo per team, one clone per worker, one rendered prompt per worker |
 | `launch.py` | Runs each worker as a separate headless `claude -p` process, waits, and records minutes, tokens and cost |
 | `templates/prompt_builder.md` | The builder prompt used since Gate 3 |
+| `graphify_lab.py` | One map of the lab and the product, made with graphify (`pip install graphifyy`): Hive's code from its syntax, plus a node per gate with its result, and edges read from the repo: gate → earlier gate it builds on, gate → product file it shipped in, function → gate it cites. Then `graphify explain "Gate 74" --graph runs/lab_map/graphify-out/graph.json` answers "what did it find, what did it build on, where is it in the code"; `graphify affected "Gate 70" --relation justified_by --depth 1 --graph …` lists the code resting on a gate. Rebuilt in seconds, never committed |
 | `experiments/*.json` | One config per experiment. A `"stratified"` block (see `g11_spread_vs_blocks.json`) runs the baseline arm first, pairs functions by its edge errors, and sets each arm's questions per pair (`hi`/`lo`) |
 
 ## A scale run (no product owner)

@@ -1,0 +1,167 @@
+{
+ "arm": "HM",
+ "k": "1",
+ "workers": 4,
+ "prep_seconds": 47.0,
+ "wall_minutes": 2.3,
+ "hidden_passed": 58,
+ "hidden_total": 61,
+ "other_failures": 0,
+ "landings": [
+  {
+   "commit": "08cb6877",
+   "minute": 0.2,
+   "subject": "release lock",
+   "hidden": 0,
+   "other_fail": 0
+  },
+  {
+   "commit": "d9f22e50",
+   "minute": 0.7,
+   "subject": "feat: rebuild no_make_interval_sql",
+   "hidden": 0,
+   "other_fail": 0
+  },
+  {
+   "commit": "ab60c1e6",
+   "minute": 0.7,
+   "subject": "no_make_interval_sql: INTERVAL 'N unit ...' joined by sep, handles Kwarg; test in test_postgres (loc",
+   "hidden": 0,
+   "other_fail": 0
+  },
+  {
+   "commit": "a4d7194b",
+   "minute": 1.2,
+   "subject": "feat: rebuild six emptied functions CLAUDE",
+   "hidden": 28,
+   "other_fail": 0
+  },
+  {
+   "commit": "9ba6b78e",
+   "minute": 1.2,
+   "subject": "Rebuilt normalize_table_name, to_interval, _is_star, array_compact_sql, starrocks BETWEEN eliminatio",
+   "hidden": 28,
+   "other_fail": 0
+  },
+  {
+   "commit": "3825711f",
+   "minute": 1.6,
+   "subject": "fix: no_make_interval_sql uses arg key as unit",
+   "hidden": 29,
+   "other_fail": 0
+  },
+  {
+   "commit": "f927d7b6",
+   "minute": 1.9,
+   "subject": "feat: rebuild _is_star, build_var_map, serde.load, spark dateadd, bq cte pushdown, duckdb corr",
+   "hidden": 58,
+   "other_fail": 0
+  },
+  {
+   "commit": "0c8eb162",
+   "minute": 1.9,
+   "subject": "Rebuilt the six functions from callers/semantics; added tests/test_second6.py (lock second6 released",
+   "hidden": 58,
+   "other_fail": 0
+  }
+ ],
+ "cost": 1.08,
+ "tokens": 3224805,
+ "builders": [
+  {
+   "worker": "w2",
+   "agent": "claude",
+   "start": "1793539285",
+   "end": "1793539299",
+   "minutes": "0.2",
+   "exit": "0",
+   "tokens": "220395",
+   "cost_usd": "0.12719",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w4",
+   "agent": "claude",
+   "start": "1793539285",
+   "end": "1793539375",
+   "minutes": "1.5",
+   "exit": "0",
+   "tokens": "869239",
+   "cost_usd": "0.312153",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w1",
+   "agent": "claude",
+   "start": "1793539285",
+   "end": "1793539405",
+   "minutes": "2.0",
+   "exit": "0",
+   "tokens": "916122",
+   "cost_usd": "0.251704",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w3",
+   "agent": "claude",
+   "start": "1793539285",
+   "end": "1793539421",
+   "minutes": "2.3",
+   "exit": "0",
+   "tokens": "1219049",
+   "cost_usd": "0.389649",
+   "api_error": "",
+   "limit_stops": "0"
+  }
+ ],
+ "tools": {
+  "w2": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 3,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 3,
+   "outside": []
+  },
+  "w4": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 13,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 13,
+   "outside": []
+  },
+  "w1": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 15,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 14,
+   "outside": []
+  },
+  "w3": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 18,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 16,
+   "outside": []
+  }
+ },
+ "map": true
+}

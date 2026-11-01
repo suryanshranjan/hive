@@ -1,0 +1,42 @@
+[19:02:09] predictions registered on origin/main: gates/gate78/prompts/PREDICTIONS.md
+launched w1
+launched w2
+launched w3
+launched w4
+w2 finished: exit 0, 0.4 min, cost 0.108454
+w3 finished: exit 0, 1.9 min, cost 0.313403
+w4 finished: exit 0, 2.2 min, cost 0.422517
+w1 finished: exit 0, 3.8 min, cost 0.498082
+result: /home/claude/hive/runs/g78_HM2/up.git, branch main
+9e2c0ab restored array_compact_sql lost in my merge (lock w1b released)
+0873e6b Lock: w1b (array_compact2)
+2077c9f fix: restore array_compact_sql
+eb65f1f fix: _is_star for Subquery/SetOperation (Star undefined), array_compact, make_interval
+8f6c4d8 rebuilt 7 functions; formats guessed from callers: duckdb compact -> LIST_FILTER(x, _u -> NOT _u IS NULL), make_interval 'N unit' joined by sep (lock w1a released)
+8766dfb feat: rebuild builders, array_compact, make_interval, is_star, starrocks/sqlite helpers
+674a8ae Rebuilt no_make_interval_sql, spark _dateadd_sql, bigquery _pushdown_cte_column_names, duckdb _maybe_corr_null_to_false; tests in tests/test_dialectgen_w4.py. array_compact_sql left to w1a. (lock w4 released)
+0c7e8e2 feat: rebuild make_interval, spark dateadd, bigquery cte pushdown, duckdb corr
+
+  landing 4d080f42 at 0.2 min: hidden 0/61
+  landing b7a6d5b8 at 1.3 min: hidden 35/61
+  landing 7529a5fb at 1.3 min: hidden 35/61
+  landing 0c7e8e28 at 1.8 min: hidden 48/61
+  landing 674a8ae4 at 1.8 min: hidden 48/61
+  landing 8766dfbf at 2.6 min: hidden 48/61
+  landing 8f6c4d86 at 2.6 min: hidden 48/61
+  landing eb65f1f1 at 2.8 min: hidden 55/61
+  landing 2077c9f6 at 3.3 min: hidden 57/61
+  landing 9e2c0ab8 at 3.3 min: hidden 57/61
+{
+ "arm": "HM",
+ "k": "2",
+ "workers": 4,
+ "prep_seconds": 45.8,
+ "wall_minutes": 3.9,
+ "hidden_passed": 57,
+ "hidden_total": 61,
+ "other_failures": 0,
+ "cost": 1.34,
+ "tokens": 4005018,
+ "map": true
+}

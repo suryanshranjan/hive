@@ -48,7 +48,7 @@ def hidden_score(code_dir, hidden):
         shutil.rmtree(t, ignore_errors=True)
 
 def transcripts(work):
-    d = os.path.expanduser('~/.claude/projects/' + re.sub(r'[/.]', '-', work))
+    d = os.path.expanduser('~/.claude/projects/' + re.sub(r'[^A-Za-z0-9]', '-', work))   # every other character is '-' (first written as [/.], fixed after the runs)
     return sorted(glob.glob(os.path.join(d, '*.jsonl')))
 
 def tool_use(work):
@@ -72,7 +72,11 @@ def tool_use(work):
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('arm', choices=['H', 'HM']); ap.add_argument('k'); ap.add_argument('--skip-prereg-check', action='store_true')
-    a = ap.parse_args()
+    ap.add_argument('--tools-only', action='store_true'); a = ap.parse_args()
+    if a.tools_only:   # recount the builders' tool calls into an existing result (the transcript path was wrong at first)
+        run = os.path.join(ROOT, 'runs', f'g78_{a.arm}{a.k}'); rp = os.path.join(run, 'result.json'); out = json.load(open(rp))
+        out['tools'] = {w: tool_use(os.path.join(run, 'work', w)) for w in out['tools']}
+        json.dump(out, open(rp, 'w'), indent=1); return
     if not a.skip_prereg_check:
         import run_gate; run_gate.prereg_check('gates/gate78/prompts/PREDICTIONS.md')
     from hive import swarm

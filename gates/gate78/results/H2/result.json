@@ -1,0 +1,169 @@
+{
+ "arm": "H",
+ "k": "2",
+ "workers": 4,
+ "prep_seconds": 0.6,
+ "wall_minutes": 3.0,
+ "hidden_passed": 53,
+ "hidden_total": 61,
+ "other_failures": 0,
+ "landings": [
+  {
+   "commit": "68997a05",
+   "minute": 1.0,
+   "subject": "feat: rebuild no_make_interval_sql, starrocks between delete, sqlite autoincrement",
+   "hidden": 11,
+   "other_fail": 0
+  },
+  {
+   "commit": "b9ff96af",
+   "minute": 1.0,
+   "subject": "Rebuilt no_make_interval_sql (INTERVAL '<n unit><sep>...'), starrocks BETWEEN->comparisons in DELETE",
+   "hidden": 11,
+   "other_fail": 0
+  },
+  {
+   "commit": "0d0e72b0",
+   "minute": 1.6,
+   "subject": "feat: rebuild six emptied helpers (CLAUDE)",
+   "hidden": 42,
+   "other_fail": 0
+  },
+  {
+   "commit": "778e3000",
+   "minute": 1.6,
+   "subject": "Rebuilt normalize_table_name, to_interval, _is_star, build_var_map, serde.load, array_compact_sql (D",
+   "hidden": 42,
+   "other_fail": 0
+  },
+  {
+   "commit": "7f7ed71e",
+   "minute": 1.9,
+   "subject": "feat: rebuild spark dateadd, bigquery cte column pushdown, duckdb corr null handling",
+   "hidden": 53,
+   "other_fail": 0
+  },
+  {
+   "commit": "d98ff49e",
+   "minute": 1.9,
+   "subject": "spark _dateadd_sql (DATE_ADD for day, else DATEADD(unit,n,x)), bigquery CTE column pushdown (skips s",
+   "hidden": 53,
+   "other_fail": 0
+  },
+  {
+   "commit": "b6587ce9",
+   "minute": 2.6,
+   "subject": "test: add cross-dialect tests for rebuilt generator functions",
+   "hidden": 53,
+   "other_fail": 0
+  },
+  {
+   "commit": "321bce9b",
+   "minute": 2.6,
+   "subject": "Only added tests (tests/test_w3_functions.py) for generator functions; other workers landed the impl",
+   "hidden": 53,
+   "other_fail": 0
+  }
+ ],
+ "cost": 1.63,
+ "tokens": 5302820,
+ "builders": [
+  {
+   "worker": "w4",
+   "agent": "claude",
+   "start": "1793540523",
+   "end": "1793540627",
+   "minutes": "1.7",
+   "exit": "0",
+   "tokens": "986126",
+   "cost_usd": "0.326739",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w1",
+   "agent": "claude",
+   "start": "1793540523",
+   "end": "1793540641",
+   "minutes": "2.0",
+   "exit": "0",
+   "tokens": "806891",
+   "cost_usd": "0.312498",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w2",
+   "agent": "claude",
+   "start": "1793540523",
+   "end": "1793540657",
+   "minutes": "2.2",
+   "exit": "0",
+   "tokens": "1332932",
+   "cost_usd": "0.398437",
+   "api_error": "",
+   "limit_stops": "0"
+  },
+  {
+   "worker": "w3",
+   "agent": "claude",
+   "start": "1793540523",
+   "end": "1793540699",
+   "minutes": "2.9",
+   "exit": "0",
+   "tokens": "2176871",
+   "cost_usd": "0.588848",
+   "api_error": "",
+   "limit_stops": "0"
+  }
+ ],
+ "tools": {
+  "w4": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 14,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 13,
+   "outside": []
+  },
+  "w1": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 12,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 10,
+   "outside": []
+  },
+  "w2": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 20,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 19,
+   "outside": []
+  },
+  "w3": {
+   "Read": 0,
+   "Grep": 0,
+   "Glob": 0,
+   "Bash": 29,
+   "Edit": 0,
+   "Write": 0,
+   "graphify": 0,
+   "search_bash": 28,
+   "outside": [
+    "{\"command\": \"export HIVE_LOG=/home/claude/hive/runs/g78_H2/logs/w3.log; cp tests/test_w3_functions.py /tmp/claude-0/-home-claude-hive-runs-g78-H2-work-w3/8c8904c7-77e6-5db5-9267-c0fd993e2759/scratchpa"
+   ]
+  }
+ },
+ "map": false
+}

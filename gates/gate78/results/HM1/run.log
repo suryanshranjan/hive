@@ -1,0 +1,40 @@
+[18:50:38] predictions registered on origin/main: gates/gate78/prompts/PREDICTIONS.md
+launched w1
+launched w2
+launched w3
+launched w4
+w2 finished: exit 0, 0.2 min, cost 0.12719
+w4 finished: exit 0, 1.5 min, cost 0.312153
+w1 finished: exit 0, 2.0 min, cost 0.251704
+w3 finished: exit 0, 2.3 min, cost 0.389649
+result: /home/claude/hive/runs/g78_HM1/up.git, branch main
+0c8eb16 Rebuilt the six functions from callers/semantics; added tests/test_second6.py (lock second6 released)
+f927d7b feat: rebuild _is_star, build_var_map, serde.load, spark dateadd, bq cte pushdown, duckdb corr
+3825711 fix: no_make_interval_sql uses arg key as unit
+9ba6b78 Rebuilt normalize_table_name, to_interval, _is_star, array_compact_sql, starrocks BETWEEN elimination (parens unless directly under WHERE), sqlite generated->autoincrement; added tests/test_w4a_builders.py (lock w4a released)
+a4d7194 feat: rebuild six emptied functions CLAUDE
+ab60c1e no_make_interval_sql: INTERVAL 'N unit ...' joined by sep, handles Kwarg; test in test_postgres (lock w1 released)
+d9f22e5 feat: rebuild no_make_interval_sql
+e43e775 Lock: w1 (no_make_interval)
+
+  landing 08cb6877 at 0.2 min: hidden 0/61
+  landing d9f22e50 at 0.7 min: hidden 0/61
+  landing ab60c1e6 at 0.7 min: hidden 0/61
+  landing a4d7194b at 1.2 min: hidden 28/61
+  landing 9ba6b78e at 1.2 min: hidden 28/61
+  landing 3825711f at 1.6 min: hidden 29/61
+  landing f927d7b6 at 1.9 min: hidden 58/61
+  landing 0c8eb162 at 1.9 min: hidden 58/61
+{
+ "arm": "HM",
+ "k": "1",
+ "workers": 4,
+ "prep_seconds": 47.0,
+ "wall_minutes": 2.3,
+ "hidden_passed": 58,
+ "hidden_total": 61,
+ "other_failures": 0,
+ "cost": 1.08,
+ "tokens": 3224805,
+ "map": true
+}
