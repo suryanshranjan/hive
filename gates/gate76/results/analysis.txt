@@ -1,0 +1,10 @@
+live: rc 0, error False, 6.0 min, branches ['hive/add-three-things-to-1101-1708'], before None, after 27 passed in 0.66s, owner prompts 26, builders' cost $0.38; roles {'builders': 3, 'business_role': True, 'rest_role': True, 'askers': ['w3'], 'last': 'w3'}
+overnight: rc 0, error False, 3.3 min, branches ['hive/add-three-things-to-1101-1721'], night 12 failed, 15 passed in 0.07s, after morning 5 failed, 22 passed in 0.05s, owner prompts 16, questions recorded 16, fix round True
+
+predictions
+F1 live: no crash, one branch -> held
+F2 live: split engaged and only w3 asked: {'builders': 3, 'business_role': True, 'rest_role': True, 'askers': ['w3'], 'last': 'w3'} -> held
+F3 live: ≥ 24 of 27 after: 27 -> held
+F4 live: ≤ 45 owner prompts: 26 -> held
+F5 overnight: no crash, ≥ 5 recorded (16), fix ran (True) -> held
+F6 overnight: ≥ 22 of 27 after the morning: 22 -> held

@@ -1,0 +1,245 @@
+[17:21:58] predictions registered on origin/main: gates/gate76/prompts/PREDICTIONS.md
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: pytest. 2 tests, all passing.
+
+I'll put 3 builders on it (the job has 3 parts that can be built at the same time): about 1.9× the speed of one builder, for about 1.8× the cost. They work on copies, so your branches stay exactly as they are.
+You're away, so they won't ask you anything: they'll decide, and write down every business assumption for you to check when you're back.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+
+[17:22] Starting.
+  [17:22] Builder w1 picked up: refunds.
+  [17:22] Builder w3 picked up: loyalty_report.
+  [17:22] Builder w3 landed: Add loyalty points and sales summary
+  [17:22] Builder w3 landed: points_earned: 1pt per full 100 rupees of discounted item total, shipping excluded;...
+  [17:22] Builder w3 landed: hive: leave build output and dependencies out of the shared branch
+  [17:22] Builder w1 landed: Add refund()
+  [17:22] Builder w1 landed: refund(): final sale 0; damaged within 30d full total incl shipping; other reasons...
+
+[17:22] All 3 builders are done.
+
+Let me check the result.
+  7 tests, all passing. All 2 that passed before still pass.
+
+Done in 1 minute, about $0.39. Your result is on branch hive/add-three-things-to-1101-1721.
+  See what changed:  git diff main...hive/add-three-things-to-1101-1721
+  Take it:           git merge hive/add-three-things-to-1101-1721
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/add-three-things-to-1101-1721.)
+
+They wrote down 16 questions only you can answer. When you're back, type `hive morning`: answer them, and I'll change the build to your answers and update the branch.
+
+--- the next morning: the owner types hive morning ---
+
+Welcome back. While you were away, the builders worked on: Add three things to the shop. (1) Refunds: `refund(order, days_since_delivery, reason)` in `shop/refunds.py`, returning 
+They wrote down 16 questions only you can answer. Pick a letter, or answer in your own words, and press Enter.
+
+========================================================================
+ Question 1  -  from builder w3  -  asked 1:14 ago
+========================================================================
+
+  A customer buys items worth 1000 rupees, uses a 10% code (so pays
+  900 for items) and pays 50 shipping. How many loyalty points do they
+  earn: is it counted on 900, 950 or 1000?
+
+  Your answer (a letter, or say it in your own words) >   > Counted on 900. Points come from the items after the discount code, and shipping earns nothing. So 900 gives 9 points.
+  Thanks, sent to builder w3. (1 answered so far)
+
+========================================================================
+ Question 2  -  from builder w3  -  asked 1:17 ago
+========================================================================
+
+  A customer's order comes to 799 rupees. With 1 point per 100 rupees,
+  do they earn 7 points (drop the leftover 99) or 8 (round up)?
+
+  Your answer (a letter, or say it in your own words) >   > 7, drop the leftover 99. Only full hundreds count, so 799 gives 7 points.
+  Thanks, sent to builder w3. (2 answered so far)
+
+========================================================================
+ Question 3  -  from builder w3  -  asked 1:20 ago
+========================================================================
+
+  A customer pays an order fully with store credit. Do they still earn
+  loyalty points on it?
+
+  Your answer (a letter, or say it in your own words) >   > No. Orders paid fully with store credit earn no points.
+  Thanks, sent to builder w3. (3 answered so far)
+
+========================================================================
+ Question 4  -  from builder w3  -  asked 1:23 ago
+========================================================================
+
+  An order that was later refunded had earned 8 points. Are those
+  points taken back?
+
+  Your answer (a letter, or say it in your own words) >   > Not covered by my policy, so I don't have a rule for it. Keep it simple: the points stay with the customer and are not taken back.
+  Thanks, sent to builder w3. (4 answered so far)
+
+========================================================================
+ Question 5  -  from builder w3  -  asked 1:27 ago
+========================================================================
+
+  Today's orders are 2 orders totalling 201 rupees. Should the average
+  be shown as 100, or 101 (rounded)?
+
+  Your answer (a letter, or say it in your own words) >   > 100, rounded down to whole rupees. The average is revenue divided by the number of card orders, with the leftover dropped, so 201 over 2 orders gives 100.
+  Thanks, sent to builder w3. (5 answered so far)
+
+========================================================================
+ Question 6  -  from builder w3  -  asked 1:29 ago
+========================================================================
+
+  Today there are no orders at all. Should the summary show an average
+  of 0 rupees?
+
+  Your answer (a letter, or say it in your own words) >   > Yes, show 0 rupees. The average is 0 when there are no card orders, and with no orders at all there are none.
+  Thanks, sent to builder w3. (6 answered so far)
+
+========================================================================
+ Question 7  -  from builder w3  -  asked 1:32 ago
+========================================================================
+
+  Does the daily revenue include the shipping fees customers paid
+  (e.g. an order of 800 with 50 shipping counts as 850), or only item
+  sales?
+
+  Your answer (a letter, or say it in your own words) >   > Revenue is the money that came in, so yes, it includes shipping: items after the discount code plus shipping, so 800 with 50 shipping counts as 850. But only card orders count, because store-credit orders bring in no new money.
+  Thanks, sent to builder w3. (7 answered so far)
+
+========================================================================
+ Question 8  -  from builder w3  -  asked 1:36 ago
+========================================================================
+
+  Should refunded orders be left out of the daily sales summary or
+  counted at full value?
+
+  Your answer (a letter, or say it in your own words) >   > Not covered by my policy, so I don't have a rule for it. Keep it simple: the summary counts every order in the list, including store-credit ones, and revenue is only the money that came in from card orders, so a refunded order is not left out and is counted as it was.
+  Thanks, sent to builder w3. (8 answered so far)
+
+========================================================================
+ Question 9  -  from builder w1  -  asked 1:37 ago
+========================================================================
+
+  A damaged order of Rs 1000 plus Rs 50 shipping: do we refund the
+  shipping too?
+
+  Your answer (a letter, or say it in your own words) >   > Yes, refund the shipping too. For damaged goods the shipping fee is refunded along with the items, so 1000 plus 50 shipping gives 1050 back (as long as it's within 90 days of delivery).
+  Thanks, sent to builder w1. (9 answered so far)
+
+========================================================================
+ Question 10  -  from builder w1  -  asked 1:40 ago
+========================================================================
+
+  An order marked final sale arrives damaged. Do we still refund it?
+
+  Your answer (a letter, or say it in your own words) >   > Yes, refund it, but only because it arrived damaged. Damaged goods are always refunded in full, including shipping, up to 90 days after delivery, even if the order was marked final sale.
+  Thanks, sent to builder w1. (10 answered so far)
+
+========================================================================
+ Question 11  -  from builder w1  -  asked 1:43 ago
+========================================================================
+
+  An order bought with a 10% code (Rs 1000 items, Rs 100 off) is
+  returned for changed mind. Do we refund Rs 900 or Rs 1000?
+
+  Your answer (a letter, or say it in your own words) >   > Refund Rs 900. The refund is worked out on what the customer actually paid for the items, which is item prices times quantities minus the discount code, so 1000 minus the 100 discount gives 900.
+  Thanks, sent to builder w1. (11 answered so far)
+
+========================================================================
+ Question 12  -  from builder w1  -  asked 1:47 ago
+========================================================================
+
+  An order paid with store credit is refunded: do we always return
+  store credit, and do card orders ever get store credit instead (e.g.
+  for changed mind)?
+
+  Your answer (a letter, or say it in your own words) >   > Store credit orders are refunded as store credit, and card orders go back to the card. My policy has no exception for card orders getting store credit, so that never happens, even for changed mind.
+  Thanks, sent to builder w1. (12 answered so far)
+
+========================================================================
+ Question 13  -  from builder w1  -  asked 1:50 ago
+========================================================================
+
+  An order of Rs 1090 after discount: how many loyalty points? 1 point
+  per Rs 100 (10 points) or per Rs 10? Is shipping counted, and do we
+  round down for Rs 1090?
+
+  Your answer (a letter, or say it in your own words) >   > Per 100 rupees, so 1090 gives 10 points. Only the items after the discount code count, shipping earns nothing, and the leftover is dropped. One more thing: orders under 500 rupees for items earn no points, and store-credit orders earn none.
+  Thanks, sent to builder w1. (13 answered so far)
+
+========================================================================
+ Question 14  -  from builder w1  -  asked 1:53 ago
+========================================================================
+
+  Do loyalty points get earned on the discounted price or on the price
+  before the discount code, and do points get taken back on a refund?
+
+  Your answer (a letter, or say it in your own words) >   > Points are earned on the discounted price: items after the discount code, so 1000 with a 10% code counts as 900. Points are not taken back on a refund, because my policy has no rule for it, so the customer keeps them.
+  Thanks, sent to builder w1. (14 answered so far)
+
+========================================================================
+ Question 15  -  from builder w1  -  asked 1:56 ago
+========================================================================
+
+  The daily summary has 3 orders totalling Rs 1000: average is Rs
+  333.33. Do we round to 333, round up, or what? And with no orders,
+  is the average 0?
+
+  Your answer (a letter, or say it in your own words) >   > Round down to whole rupees, so 333. With no orders, or no card orders, the average is 0.
+  Thanks, sent to builder w1. (15 answered so far)
+
+========================================================================
+ Question 16  -  from builder w1  -  asked 1:59 ago
+========================================================================
+
+  Does the daily revenue count shipping fees and refunded orders?
+
+  Your answer (a letter, or say it in your own words) >   > Revenue includes shipping: items after the discount code plus shipping. But only card orders count, because store-credit orders bring in no new money. Refunded orders are not covered by my policy, so keep it simple: they are counted as they were, not left out.
+  Thanks, sent to builder w1. (16 answered so far)
+
+[17:24] Sending the builders back to build your 16 answers in.
+  [17:24] Builder w1 landed: Follow owner answers
+  [17:24] Builder w1 picked up: fix1.
+  [17:24] Builder w1 landed: Applied owner answers to refund/loyalty/summary. Edited existing tests: test_summary...
+  [17:25] Builder w2 landed: Apply owner answers: refunds, loyalty, summary
+  [17:25] Builder w2 landed: Rename tests to avoid duplicates
+  [17:25] Builder w2 landed: Dedupe tests; add store-credit points test
+[17:25] Your answers are built in.
+
+Let me check the result.
+  11 tests, all passing. All 2 that passed before still pass.
+  I've noted 16 new rulings of yours for the next build on this project.
+
+Done in under a minute, about $1.56 in all (builders $0.80, Hive's own questions and checks $0.76). Your result is on branch hive/add-three-things-to-1101-1721.
+  See what changed:  git diff main...hive/add-three-things-to-1101-1721
+  Take it:           git merge hive/add-three-things-to-1101-1721
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/add-three-things-to-1101-1721.)
+
+Your answers are built in. 11 tests, all passing. All 2 that passed before still pass. It's ready on branch hive/add-three-things-to-1101-1721.
+{
+ "mode": "overnight",
+ "rc": 0,
+ "error": null,
+ "minutes": 3.3,
+ "branches": [
+  "hive/add-three-things-to-1101-1721"
+ ],
+ "before": {},
+ "night": {
+  "passed": 15,
+  "failed": 12,
+  "errors": 0,
+  "line": "12 failed, 15 passed in 0.07s"
+ },
+ "after": {
+  "passed": 22,
+  "failed": 5,
+  "errors": 0,
+  "line": "5 failed, 22 passed in 0.05s"
+ },
+ "owner_replies": 16,
+ "owner_cost": 0.98,
+ "build_cost": 0.8
+}
