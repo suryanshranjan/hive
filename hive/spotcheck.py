@@ -88,9 +88,14 @@ def find(code_dir, goal, parts, timeout=1500):
         shutil.copytree(code_dir, code, ignore=shutil.ignore_patterns('.git', 'node_modules', '__pycache__'))
         out = os.path.join(work, 'spots.json')
         try:
-            subprocess.run(argv(os.environ.get('HIVE_SPOT_CMD') or CMD), cwd=work, input=BRIEF.format(code=code, goal=goal.strip()[:6000], out=out,
+            r = subprocess.run(argv(os.environ.get('HIVE_SPOT_CMD') or CMD), cwd=work, input=BRIEF.format(code=code, goal=goal.strip()[:6000], out=out,
                                                                      parts='\n'.join(f'- {p}' for p in parts)),
-                           capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=timeout)
+                               capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=timeout)
+            try:   # Gate 85: its cost was never counted with Hive's own
+                from . import explain
+                explain.spend(json.loads(r.stdout).get('total_cost_usd'), 'spotcheck.find')
+            except Exception:
+                pass
             got = json.load(open(out, encoding='utf-8'))
         except Exception:
             return []

@@ -46,7 +46,7 @@ def describe(code_dir, goal, timeout=1800):
                                capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=timeout)
             try:   # its cost counts with Hive's own model calls (Gates 52-54: it was not reported)
                 from . import explain
-                explain.SPENT[0] += float(json.loads(p.stdout).get('total_cost_usd') or 0)
+                explain.spend(json.loads(p.stdout).get('total_cost_usd'), 'codesheet.describe')
             except Exception:
                 pass
             got = json.load(open(out, encoding='utf-8'))

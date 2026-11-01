@@ -58,6 +58,20 @@ def _json_reply(text):
     return json.loads(text[text.index('{'):text.rindex('}') + 1])
 
 SPENT = [0.0]   # dollars spent on Hive's own model calls in this process (Gates 52-54: they were not in the cost reported)
+SPENT_BY = {}   # the same, by the Hive step that made the call (Gate 85: where Hive's own spend goes)
+
+def spend(dollars, step=None):
+    """Count one of Hive's own model calls, under the step that made it (default: the calling module.function)."""
+    try:
+        d = float(dollars or 0)
+    except (TypeError, ValueError):
+        return
+    if step is None:
+        import inspect
+        step = next((f'{os.path.basename(f.filename)[:-3]}.{f.function}' for f in inspect.stack()[1:]
+                     if os.path.basename(f.filename) != 'explain.py'), 'unknown')
+    SPENT[0] += d
+    SPENT_BY[step] = round(SPENT_BY.get(step, 0.0) + d, 6)
 _CLAUDE_DOWN = [0.0]   # when Claude last failed: skip it for a while instead of waiting on it for every message
 
 def _ask_claude(prompt):
@@ -73,7 +87,7 @@ def _ask_claude(prompt):
         _CLAUDE_DOWN[0] = time.time(); raise
     if isinstance(reply, dict):
         try:
-            SPENT[0] += float(reply.get('total_cost_usd') or 0)
+            spend(reply.get('total_cost_usd'))
         except (TypeError, ValueError):
             pass
     if isinstance(reply, dict) and reply.get('is_error'):   # Claude itself failed (login, limit): skip it a while
