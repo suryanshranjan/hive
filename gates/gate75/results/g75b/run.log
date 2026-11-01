@@ -1,0 +1,34 @@
+[16:11:12] predictions registered on origin/main: gates/gate75/prompts/PREDICTIONS.md
+[16:11:12] rule-giver writing the business policy...
+[16:12:06] rules checked: 4 functions, 54 calls, deterministic
+[16:12:06] wind tunnel: documenter writing the owner's policy in prose...
+[16:12:27] wind tunnel: R: 36 rules; ask text for N0 written
+8 visible tests in /home/claude/hive/runs/g75b/seed/tests/visible
+[16:12:28] seed: ['TOTAL          9/1348']
+S7B: 7 workers, tools/ask.py port None, repo /home/claude/hive/runs/g75b/upS7B.git
+next: python3 lab/launch.py --run g75b
+[16:12:31] launching S7B alone (7 builder(s))
+launched S7B-w1 
+launched S7B-w2 
+launched S7B-w3 
+launched S7B-w4 
+launched S7B-w5 
+launched S7B-w6 
+launched S7B-w7 
+S7B-w4 finished: exit 0, 6.7 min, tokens 2713583, cost 0.7510901000000002
+S7B-w5 finished: exit 0, 7.0 min, tokens 3918533, cost 0.9543224999999997
+S7B-w1 finished: exit 0, 7.7 min, tokens 3504501, cost 0.9099828000000002
+S7B-w2 finished: exit 0, 7.8 min, tokens 3344250, cost 1.0183723
+S7B-w3 finished: exit 0, 7.9 min, tokens 2226509, cost 0.6532455
+S7B-w6 finished: exit 0, 9.0 min, tokens 1767106, cost 0.6723750000000002
+S7B-w7 finished: exit 0, 14.2 min, tokens 961179, cost 0.3011963
+wrote /home/claude/hive/runs/g75b/agents.csv
+A1: 1 workers, tools/ask.py port None, repo /home/claude/hive/runs/g75b/upA1.git
+next: python3 lab/launch.py --run g75b
+[16:26:48] launching A1 alone (1 builder(s))
+launched A1-w1 
+A1-w1 finished: exit 0, 27.1 min, tokens 6770109, cost 2.272978400000001
+wrote /home/claude/hive/runs/g75b/agents.csv
+[16:53:58] S7B: visible 1348/1348, engine hidden 2256/2260; replaying
+[16:54:28] A1: visible 1348/1348, engine hidden 2255/2260; replaying
+[16:54:42] done: python3 gates/gate75/referee/analyze.py runs/g75a runs/g75b

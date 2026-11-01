@@ -1,0 +1,12 @@
+== runs/g75a A1: T_acc 31.1 min (never reached; wall), wall 31.1; final business 82.0%, engine 99.8%; 10 questions; $3.63; business at 99% visible: [(26.833333333333332, 82.0)]
+== runs/g75a S7B: T_acc 10.1 min (never reached; wall), wall 10.1; final business 82.0%, engine 99.8%; 9 questions; $6.23; business at 99% visible: [(6.016666666666667, 0.0), (9.9, 82.0)]
+== runs/g75b S7B: T_acc 14.1 min, wall 14.3; final business 98.0%, engine 99.8%; 13 questions; $5.26; business at 99% visible: [(4.683333333333334, 0.0), (14.133333333333333, 98.0)]
+== runs/g75b A1: T_acc 23.2 min, wall 27.1; final business 91.0%, engine 99.8%; 11 questions; $2.27; business at 99% visible: [(23.166666666666668, 91.0), (23.8, 91.0)]
+
+means: A1: T_acc 27.1 min, business 86.5%, engine 99.8%, 10.5 questions, $2.95; S7B: T_acc 12.1 min, business 90.0%, engine 99.8%, 11.0 questions, $5.75
+
+predictions
+V1 S7B T_acc ≤ 0.6 × A1: 0.45× -> held
+V2 S7B business ≥ A1 − 3: +3.5 -> held
+V3 S7B engine ≥ A1 − 1: +0.0 -> held
+Claim (the split swarm reaches the same accuracy much sooner): FIRED

@@ -138,6 +138,7 @@ Every result below was predicted on GitHub before the run. Real-company results 
 | The founder's confirmed rules, a day later | Held on 2 of 11 decisions; builders followed them exactly (surprising 3/6 vs 0/6, ordinary 2/6 vs 5/6). Asking ahead only seeds the build; the review after is the main channel | Gate 38 |
 | Builders given the owner's complete rules in prose | 250/250 hidden on each of three rule sets, nothing broken; the interview delivers about half the decisions whole | Gates 39–41 |
 | **Verify, don't elicit:** the owner corrects a sheet written from the built code | 99.6% and 100% hidden, against 68.4% from the interview (+31.2 points) (synthetic owner) | Gates 42, 44 |
+| A split swarm (one builder owns the owner's decisions) against one agent, engineering-heavy job | The same accuracy or better (90.0 vs 86.5%) in 0.45× the time, at 1.95× the cost | Gates 74, 75 |
 | Builders talking on a message board | No effect: finish 1.03×, cost 1.01×; +0.0 on top of the code sheet | Gates 43, 44 |
 | A lead agent keeping a shared plan over the builders | 1.20× slower and 1.09× costlier than a flat swarm, same correctness; Hive stays flat | Gate 46 |
 | Claude and Codex builders in one swarm | Both mixed teams 1,340/1,340 and 100% hidden, no breaks of main; Codex made 52% and 73% of the landings; a Codex lead works like a Claude one | Gate 47 |

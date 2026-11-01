@@ -1,0 +1,34 @@
+[15:27:49] predictions registered on origin/main: gates/gate75/prompts/PREDICTIONS.md
+[15:27:49] rule-giver writing the business policy...
+[15:28:39] rules checked: 4 functions, 52 calls, deterministic
+[15:28:39] wind tunnel: documenter writing the owner's policy in prose...
+[15:29:02] wind tunnel: R: 35 rules; ask text for N0 written
+8 visible tests in /home/claude/hive/runs/g75a/seed/tests/visible
+[15:29:03] seed: ['TOTAL          9/1348']
+A1: 1 workers, tools/ask.py port None, repo /home/claude/hive/runs/g75a/upA1.git
+next: python3 lab/launch.py --run g75a
+[15:29:05] launching A1 alone (1 builder(s))
+launched A1-w1 
+A1-w1 finished: exit 0, 31.0 min, tokens 15150318, cost 3.6301922999999996
+wrote /home/claude/hive/runs/g75a/agents.csv
+S7B: 7 workers, tools/ask.py port None, repo /home/claude/hive/runs/g75a/upS7B.git
+next: python3 lab/launch.py --run g75a
+[16:00:11] launching S7B alone (7 builder(s))
+launched S7B-w1 
+launched S7B-w2 
+launched S7B-w3 
+launched S7B-w4 
+launched S7B-w5 
+launched S7B-w6 
+launched S7B-w7 
+S7B-w5 finished: exit 0, 7.5 min, tokens 5027167, cost 1.1472267
+S7B-w4 finished: exit 0, 7.8 min, tokens 4090974, cost 0.9701303999999997
+S7B-w2 finished: exit 0, 7.8 min, tokens 4241034, cost 0.9295167000000001
+S7B-w3 finished: exit 0, 7.9 min, tokens 2971450, cost 0.7698609
+S7B-w6 finished: exit 0, 8.5 min, tokens 4789226, cost 1.1313683
+S7B-w1 finished: exit 0, 9.3 min, tokens 3529267, cost 1.0585753999999998
+S7B-w7 finished: exit 0, 10.0 min, tokens 761627, cost 0.22413430000000004
+wrote /home/claude/hive/runs/g75a/agents.csv
+[16:10:19] A1: visible 1348/1348, engine hidden 2256/2260; replaying
+[16:10:44] S7B: visible 1348/1348, engine hidden 2256/2260; replaying
+[16:11:11] done: python3 gates/gate75/referee/analyze.py runs/g75a runs/g75b
