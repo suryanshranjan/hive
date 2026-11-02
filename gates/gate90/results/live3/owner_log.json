@@ -1,0 +1,275 @@
+[
+ {
+  "prompt": "\nOne choice before I start, asked only once: 3 builders would finish about 1.9\u00d7 sooner than one, for about 1.8\u00d7 the cost. Should I build fast or cheap, from now on? (Enter = fast)",
+  "typed": ""
+ },
+ {
+  "prompt": "\n1 of 16. Priya receives a shirt and decides on day 3 that she doesn't like it. Another customer, Arjun, asks for the same on day 10, and a third asks on day 45. Which of them can send the item back for a refund?\n  A) Only requests within 7 days are accepted (Priya yes, Arjun and the day-45 customer no)  B) Accepted up to 14 days (Priya and Arjun yes, day 45 no)  C) Accepted up to 30 days (Priya and Arjun yes, day 45 no)\n  Your answer (a letter, or your own words) > ",
+  "typed": "Priya and Arjun both can, and the day-45 customer can't. Up to day 14 it's a full refund, from day 15 to day 30 it's half, and after day 30 there's nothing. So C is closer than B, since requests are accepted up to 30 days."
+ },
+ {
+  "prompt": "\n2 of 16. Meera says the blender she received 20 days ago stopped working. She is past your normal return period. What do you do?\n  A) Full refund for damaged or defective items up to 30 days after delivery, refused after that  B) Full refund up to 90 days, refused after that  C) Full refund at any time within the warranty period, with no fixed day limit\n  Your answer (a letter, or your own words) > ",
+  "typed": "B is closest, but not exactly. Damaged or defective goods get a full refund up to 90 days after delivery, and nothing after that. So Meera's blender at day 20 gets a full refund."
+ },
+ {
+  "prompt": "\n3 of 16. Rohan returns a Rs 2,000 kurta because he changed his mind, within the allowed days. How much does he get back?\n  A) Full Rs 2,000, no deduction  B) Rs 1,800 (10% restocking fee kept)  C) Rs 1,500 (25% kept, or the cost of return pickup deducted)\n  Your answer (a letter, or your own words) > ",
+  "typed": "Rohan gets the full Rs 2,000 back, as long as he's within 14 days of delivery (A). After day 14 it drops to half, and there's no restocking fee or pickup deduction."
+ },
+ {
+  "prompt": "\n4 of 16. Sunita's Rs 2,000 order had Rs 100 shipping and Rs 100 tax on top. She returns it. What does she get back?\n  A) Goods only for change of mind (Rs 2,000), and shipping too if the item was damaged  B) Goods plus tax, but never shipping, whatever the reason  C) Everything she paid (Rs 2,200) in every case\n  Your answer (a letter, or your own words) > ",
+  "typed": "Sunita gets back the goods only, Rs 2,000, for a change of mind. Shipping is never refunded, and neither is tax, since I only refund item prices minus any discount code. If the item arrived damaged, she'd get the shipping back too. That's closest to A."
+ },
+ {
+  "prompt": "\n5 of 16. Kavita is approved for a Rs 1,500 refund. Where does the money go?\n  A) Damaged goods go back to her card, change of mind becomes store credit  B) Always back to her card  C) Always store credit, unless she insists and the item was damaged\n  Your answer (a letter, or your own words) > ",
+  "typed": "The money goes back the way it was paid: store credit orders come back as store credit, and card orders go back to the card. That's the same for damaged goods and change of mind, so none of A, B or C is exactly right."
+ },
+ {
+  "prompt": "\n7 of 16. Imran asks for a refund on an order that was already refunded last week. Another customer asks for a refund on an order that hasn't been delivered yet. A third order was a free gift worth Rs 0.\n  A) Second refund refused, undelivered order refused, free order refunds Rs 0  B) Second refund refused, undelivered orders can be cancelled and refunded in full  C) Partial second refunds allowed if the first did not cover the full amount paid\n  Your answer (a letter, or your own words) > ",
+  "typed": "Not exactly any of these. A second refund on the same order is refused. An order that hasn't been delivered yet has no delivery day, so I haven't set a rule for that case. A free Rs 0 gift refunds Rs 0."
+ },
+ {
+  "prompt": "\n9 of 16. A customer places a Rs 1,250 order. How many loyalty points does she earn?\n  A) 1 point for every full Rs 100 (12 points)  B) 1 point for every Rs 50 (25 points)  C) 1 point for every Rs 10 (125 points)\n  Your answer (a letter, or your own words) > ",
+  "typed": "A, one point for every full 100 rupees, so Rs 1,250 gives 12 points. That's only if she paid by card and the items come to Rs 500 or more after any discount. Store-credit orders earn nothing, and final-sale orders earn double."
+ },
+ {
+  "prompt": "\n10 of 16. A customer's order is Rs 2,000 for goods, Rs 100 for shipping and Rs 100 for tax, and a Rs 500 discount code was used. Which amount earns points?\n  A) Only the goods after the discount (Rs 1,500), with no shipping or tax  B) The full amount paid, including shipping and tax (Rs 1,700)  C) The goods at full price, before the discount (Rs 2,000)\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) Only the goods after the discount, Rs 1,500. Shipping and tax don't earn points, and the discount code comes off first."
+ },
+ {
+  "prompt": "\n11 of 16. Vikram earned 20 points on a Rs 2,000 order and then gets a refund for half of it (Rs 1,000). What happens to his points?\n  A) He keeps 10 and 10 are taken back in proportion to the refund; a fully refunded or cancelled order earns none  B) He keeps all 20 points until the order is fully refunded  C) All 20 points are taken back whenever any refund is made\n  Your answer (a letter, or your own words) > ",
+  "typed": "My policy doesn't say anything about taking points back after a refund, so none of these is my rule. I haven't decided that case yet."
+ },
+ {
+  "prompt": "\n13 of 16. At the end of the day your orders include one cancelled order, one that was never paid for, one that was refunded in full and one that was sent out but not yet delivered. Which of these count in your daily summary?\n  A) Cancelled and unpaid orders are left out, refunded orders count net of the refund, and orders not yet delivered still count  B) Everything counts except cancelled orders  C) Only delivered and fully paid orders count\n  Your answer (a letter, or your own words) > ",
+  "typed": "Not exactly any of these. The daily summary counts every order in the list in \"Orders\", including store-credit ones. Revenue only counts the money that came in from card orders (items after discount plus shipping). I haven't set rules for cancelled, unpaid, or not-yet-delivered orders, or for how refunds affect the summary."
+ },
+ {
+  "prompt": "\n15 of 16. Your day had 3 orders worth Rs 1,000, Rs 1,000 and Rs 1,001, and on another day you had no orders at all. What does the average show?\n  A) Rounded to the nearest rupee (Rs 1,000), and zero for a day with no orders  B) Rounded down (Rs 1,000), and 'no sales' shown instead of a number for an empty day  C) Rounded up (Rs 1,001), and zero for an empty day\n  Your answer (a letter, or your own words) > ",
+  "typed": "Rounded down, so your three orders come to Rs 1,000. For a day with no orders the average is 0, not \"no sales\". That's close to B, but my rule is 0 for an empty day. The average is also only over card orders."
+ },
+ {
+  "prompt": "\n16 of 16. Divya placed an order at 11:50 pm on Monday, India time. The server is set to a different time zone, so it records the order as Tuesday. Which day's summary does it belong to?\n  A) Monday, because the shop's own India-time day decides, and the report summarises whatever orders it is given  B) Tuesday, by the server's clock  C) The day the order was paid or confirmed, not when it was placed\n  Your answer (a letter, or your own words) > ",
+  "typed": "Monday. The shop's own India-time day decides, so Divya's 11:50 pm order belongs to Monday's summary (A). I haven't set any other rule about time zones."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A customer can return an item for a refund if they request the return within 30 days: a request made on days 1 to 14 gets a full refund, a request made on days 15 to 30 gets a half refund, and a request made after day 30 gets no refund and is not accepted (so Priya on day 3 and Arjun on day 10 both get full refunds, and the customer on day 45 gets nothing).\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. Day 14 is included in the full refund, so full refund is days 0 to 14 (a negative day count is treated as day 0), half is days 15 to 30, and nothing after day 30. Also, the refund is on what the customer paid for the items minus any discount code, and shipping is never refunded unless the goods were damaged."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: If goods are damaged or defective, give a full refund when the request is made within 90 days of delivery, even if it is past the normal return period, and give no refund after 90 days, so a defective blender reported 20 days after delivery gets a full refund.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. Damaged goods get a full refund up to 90 days after delivery, and nothing after 90 days. For damaged goods the shipping fee is refunded too, and the amount is paid even if it's under 50 rupees. Final-sale orders also get a full refund if the goods arrived damaged."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When a customer returns an item because they changed their mind, the refund is the full item price (for example, Rs 2,000 for a Rs 2,000 kurta) if the return is made within 14 days of delivery, and half the item price if it is made after day 14, with no restocking fee or pickup deduction applied at any time.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. Full refund is days 0 to 14, with day 14 included and a negative day count treated as day 0. From day 15 to day 30 it's half, and after day 30 it's nothing. The refund is on the item prices minus any discount code, and shipping is never refunded unless the goods were damaged. Also, a refund under 50 rupees isn't paid, and amounts are rounded down to whole rupees."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: On a return for change of mind, refund only the item prices minus any discount code (so Sunita's Rs 2,000 order refunds Rs 2,000, with the Rs 100 shipping and Rs 100 tax not refunded), but if the item arrived damaged, also refund the shipping.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. Tax isn't part of my rules at all. The refund is the item prices times quantities minus any discount code, so Sunita's Rs 2,000 is right only if that's what she paid for the items. Shipping is never refunded for a change of mind, and it is refunded only for damaged goods. Also, amounts are rounded down, and refunds under 50 rupees aren't paid."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: An approved refund is returned to the original payment method: an order paid with store credit is refunded as store credit, and an order paid by card is refunded to that card, regardless of whether the reason is damaged goods or change of mind.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. Store credit orders go back as store credit and card orders go back to the card, that part is right. But the refund amount is also rounded down to whole rupees, and refunds under 50 rupees aren't paid, except for damaged goods."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A second refund request on an order that has already been refunded is refused, a refund on a free Rs 0 gift order refunds Rs 0, and refunds on orders that have not yet been delivered are not covered by any rule because such an order has no delivery day and the owner has not decided that case.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. A second refund on the same order is refused, and a free Rs 0 gift order refunds Rs 0, that part is right. But a not-yet-delivered order isn't something my rules cover, so please don't invent a rule for it."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: An order earns one loyalty point for every full 100 rupees of its amount, rounded down (Rs 1,250 earns 12 points), but only if the customer paid by card and the items come to Rs 500 or more after any discount; store-credit orders earn no points, and final-sale orders earn double the points.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. One point for every full 100 rupees of the items paid for after any discount code, so shipping earns nothing. Orders paid with store credit earn no points, and orders where the items come to under 500 rupees after the discount earn none. Final-sale orders earn double points."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: The owner has not decided what happens to loyalty points when an order is partially refunded, so the policy does not specify any points adjustment for a refund: in the case where Vikram earned 20 points on a Rs 2,000 order and received a Rs 1,000 refund, no behavior is defined, and this case is an open question to be decided by the owner.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Right, I haven't decided what happens to points after a refund, so please don't invent a rule for it. Leave it open."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: The daily summary's order count includes every order in the \"Orders\" list, store-credit orders included, and its revenue equals the sum, over card orders only, of (item total after discount + shipping); how cancelled, unpaid, not-yet-delivered and refunded orders affect the summary is not specified.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. \"Orders\" counts every order in the list, store-credit ones included, and revenue is the sum over card orders only of items after discount plus shipping. Also, the average is revenue divided by the number of card orders, rounded down to whole rupees, and 0 if there are no card orders. Cancelled, unpaid, not-yet-delivered and refunded orders aren't covered by my rules, so don't invent anything for them."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: The daily average order value is computed only over card orders, as the total of those orders divided by their count and rounded down to a whole rupee (so orders of Rs 1,000, Rs 1,000 and Rs 1,001 show Rs 1,000), and a day with no card orders shows 0, not \"no sales\".\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. The average is over card orders only, and it's revenue (items after discount plus shipping) divided by the number of card orders, rounded down to whole rupees. Orders of Rs 1,000, Rs 1,000 and Rs 1,001 give Rs 1,000 only if they're all card orders. A day with no card orders shows 0, not \"no sales\"."
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "a whole rupee. If there are no card orders, it shows 0, not \"no sales\". For example, orders of Rs 1,000, Rs 1,000 and Rs 1,001 show Rs 1,000 only if they are all card orders.\n  Numbers of any that are wrong (Enter = all correct) > \n  > \n  Thank you. The builders will encode your 15 rules as tests before anything lands.\n\n[05:15] Starting.\n  [05:15] Builder w2 picked up: report.\n  [05:15] Builder w3 picked up: w3.\n  [05:15] Builder w2 landed: Add sales_summary\n  [05:15] Builder w2 landed: sales_summary per owner rules; no date filtering since it summarises given orders...\n  [05:15] Builder w2 landed: hive: leave build output and dependencies out of the shared branch\n\n========================================================================\n Question 1 of up to 30  -  from builder w3  -  asked 0:01 ago\n========================================================================\n\n  A customer asks for a refund on a Rs 1,000 order and gives a reason\n  that is blank or unclear, not clearly damaged and not clearly\n  changed mind. How should we treat it?\n\n    A) like changed mind, with the normal 14 and 30 day rules,\n    B) like damaged goods,\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > I haven't set a rule for a blank or unclear reason, so please don't invent one. Ask me for that case instead of guessing, and for anything clearly damaged use the damaged rules. If it isn't clearly damaged, I'd treat it as a normal change-of-mind return.\n",
+  "typed": "I haven't set a rule for a blank or unclear reason, so please don't invent one. Ask me for that case instead of guessing, and for anything clearly damaged use the damaged rules. If it isn't clearly damaged, I'd treat it as a normal change-of-mind return.",
+  "keyboard": true
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": "1, 2, 6, 9, 11, 12\n\n1. The discount shouldn't be rounded on its own. Work out the amount first and round down only the final refund. On the 999 rupee example, day 20 should give 449, not 450.\n2. A damaged order always gets its shipping back too, so the 100 rupees of shipping should be refunded.\n6. I haven't decided what a missing delivery day means, so don't make it a full refund. Ask me.\n9. \"Not damaged, just changed mind\" is not damaged. It should be treated as changed mind.\n11. \"Store_Credit\" is still store credit, whatever the capital letters. It should be refunded as store credit and earn no points.\n12. \"Card\" is a card order whatever the capital letters. It should count toward revenue and the average."
+ },
+ {
+  "prompt": "  Rule 1: Refunds: a discount is rounded down to a whole rupee, which favours the shop. Example: a 999 rupee order with 10% discount takes off 99 rupees (not 99.9), so 900 rupees of goods remain and a day-20 return gets 450 rupees.\n  What should it be? > ",
+  "typed": "The refund is worked out on what the customer paid: item prices times quantities, minus the discount code, with no rounding of the discount on its own. Only the final refund amount is rounded down to whole rupees, so the 999 rupee order with 10% off on day 20 gives 449 (half of 899.1 is 449.55, rounded down)."
+ },
+ {
+  "prompt": "  Rule 2: Refunds: an order whose goods are free after discount (nothing paid for the items) gets 0 rupees back, even if damaged and even if shipping was paid. Example: a 1,000 rupee order with a 100% discount and 100 rupees shipping gets 0.\n  What should it be? > ",
+  "typed": "If the goods are free after the discount, the item part of the refund is 0. If the order is damaged, the 100 rupees of shipping is refunded too, so the example gets 100 rupees back. If it isn't damaged, shipping is never refunded, so the refund is 0."
+ },
+ {
+  "prompt": "  Rule 6: Messy or missing details: if the days since delivery is missing, the refund is treated as day 0, so it is a full refund. Example: Priya's 1,000 rupee order with no delivery day recorded gets 1,000 rupees back.\n  What should it be? > ",
+  "typed": "I haven't decided what a missing delivery day means, so please don't treat it as day 0 or a full refund. Ask me about that case instead of guessing."
+ },
+ {
+  "prompt": "  Rule 9: Messy or missing details: a reason that merely contains a damage word is still treated as damaged, even if it says the opposite. Example: 'not damaged, just changed mind' is refunded as damaged, with shipping.\n  What should it be? > ",
+  "typed": "\"Not damaged, just changed mind\" is not damaged. It should be treated as changed mind: half refund on days 15 to 30, no shipping refund."
+ },
+ {
+  "prompt": "  Rule 11: Messy or missing details: payment type is read exactly as 'store_credit' in small letters; written any other way, such as 'Store_Credit', the order is treated as a card payment for refunds (refund goes to card) and as a paying order for points (1,000 rupees earns 10 points).\n  What should it be? > ",
+  "typed": "\"Store_Credit\" is still store credit, whatever the capital letters. It should be refunded as store credit and earn no points."
+ },
+ {
+  "prompt": "  Rule 12: Messy or missing details: in the sales summary, an order whose payment type is not exactly 'card' (for example 'Card') is counted as an order but adds nothing to revenue or the average. Example: a 1,000 rupee order paid as 'Card' shows 1 order, 0 revenue.\n  What should it be? > ",
+  "typed": "\"Card\" is a card order whatever the capital letters. It should count toward revenue and the average, with revenue being the item total after discount plus shipping."
+ },
+ {
+  "prompt": "  Rule 1: Refunds: the refund is worked out on what the customer paid: item prices times quantities, minus the discount code, with no rounding of the discount on its own. Only the final refund amount is rounded down to whole rupees, which favours the shop. Example: a 999 rupee order with 10% off on day 20 gives a refund of 449 rupees (half of 899.1 is 449.55, rounded down).\n  What should it be? > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Rule 2: Refunds: if the goods are free after discount (nothing paid for the items), the item part of the refund is 0. If the order is damaged, the shipping paid is refunded too. If the order is not damaged, shipping is never refunded, so the refund is 0. Example: a 1,000 rupee order with a 100% discount and 100 rupees shipping gets 100 rupees back if damaged, and 0 if not damaged.\n  What should it be? > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Rule 6: Messy or missing details: if the days since delivery is missing, do not treat it as day 0 or as a full refund. Ask the business owner what to do in that case instead of guessing.\n  What should it be? > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Rule 9: Messy or missing details: a reason that merely contains a damage word is not automatically treated as damaged. If the reason says the item is not damaged, for example 'not damaged, just changed mind', treat it as changed mind: half refund on days 15 to 30, no shipping refund.\n  What should it be? > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Rule 11: Messy or missing details: payment type is matched as 'store_credit' regardless of capital letters, so 'store_credit', 'Store_Credit' and any other capitalisation all count as store credit. An order with this payment type is refunded as store credit and earns no points. Any other payment type, or a missing one, is treated as a card payment for refunds (refund goes to card) and as a paying order for points (1,000 rupees earns 10 points).\n  What should it be? > ",
+  "typed": "The capital letters part is right. But I haven't decided what a missing payment type means, so please don't treat it as card. Ask me about that case instead of guessing."
+ },
+ {
+  "prompt": "  Rule 12: Messy or missing details: in the sales summary, an order whose payment type is 'card' in any capitalisation (for example 'Card', 'CARD' or 'card') is a card order. It counts as an order, and it counts toward revenue and the average. Its revenue is the item total after discount plus shipping. Example: a 1,000 rupee order paid as 'Card' shows 1 order and counts toward revenue and the average.\n  What should it be? > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "1 of 15. Asha's order of 499 rupees earns no points, while a 500-rupee order earns 5 points: nothing is earned below 500 rupees after discount.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right. Nothing is earned below 500 rupees after discount, and a 500-rupee order earns 5 points."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Asha's 499 rupee order earns 0 points, since it is below 500 rupees after discount.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "2 of 15. Meera buys a 1,000-rupee item marked final sale: she earns 20 points, double the 10 points a normal order would give.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right. Final-sale orders earn double points, so a 1,000-rupee final-sale order earns 20 points."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Meera's 1,000-rupee final-sale order earns her 20 points.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "3 of 15. Kiran pays a 1,000-rupee order fully with store credit: he earns 0 points.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right. Store-credit orders earn no points, so Kiran earns 0."
+ },
+ {
+  "prompt": "4 of 15. Dev's order is 450 rupees of goods plus 100 rupees shipping: shipping is not counted and the order earns 0 points, even though it totals 550.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right. Shipping isn't counted for points, so 450 rupees of goods is below 500 and earns 0 points."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Dev's 450 rupees of goods plus 100 rupees shipping earns 0 loyalty points.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right. Shipping isn't counted for points, so Dev's 450 rupees of goods is below 500 and earns 0 points."
+ },
+ {
+  "prompt": "5 of 15. Neha buys 1,000 rupees of goods with a 50% discount code: points are worked out on the 500 paid, so she earns 5 points.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right. Points are worked out on the 500 rupees paid after the discount, so she earns 5 points."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Neha's 1,000 rupees of goods with a 50% discount code come to 500 rupees paid, so she earns 5 loyalty points.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right. Neha's 500 rupees paid after the discount earns 5 points."
+ },
+ {
+  "prompt": "6 of 15. Ravi returns a 1,000-rupee order for 'changed mind' on day 14 and gets 1,000 rupees back, but on day 15 he gets only 500 rupees, and from day 31 nothing.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right. Day 14 gets the full 1,000, day 15 gets half (500), and from day 31 nothing. Day 30 still gets half."
+ },
+ {
+  "prompt": "7 of 15. Sita's 1,000-rupee order (80 rupees shipping) arrives damaged and she asks for a refund on day 60: she gets 1,080 rupees including shipping, but on day 91 she gets 0.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right. Damaged goods get the full amount plus shipping up to day 90, so day 60 gives 1,080 rupees, and day 91 gives 0."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Sita's damaged 1,000-rupee order with 80 rupees shipping gets her 1,080 rupees back on day 60, and nothing on day 91.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right. A damaged order on day 60 gets the full 1,000 plus the 80 shipping, so 1,080, and on day 91 it gets nothing."
+ },
+ {
+  "prompt": "8 of 15. Tara returns a final-sale 1,000-rupee order for 'changed mind' on day 3: she is refunded the full 1,000 rupees, so final sale does not stop refunds.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Wrong. Final sale does not stop a refund only if the goods arrived damaged. A final-sale order returned for \"changed mind\" gets no refund, so Tara gets 0."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Tara's final-sale 1,000-rupee order, returned for 'changed mind' on day 3 and not damaged, gets her 0 rupees refunded.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "9 of 15. Imran returns a 99-rupee item on day 20 for 'changed mind': half would be 49 rupees, which is under the 50-rupee minimum, so he gets 0, while on day 10 he gets the full 99 rupees.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right. Day 10 gets the full 99 rupees, and on day 20 half is 49.5, which is under 50, so he gets 0."
+ },
+ {
+  "prompt": "10 of 15. Joy paid a 1,000-rupee order with store credit and it arrived broken: the 1,000 rupees go back as store credit, not to a card.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Wrong. A damaged order always gets its shipping back too, and store credit orders go back as store credit. So Joy gets 1,000 rupees plus the shipping fee, all as store credit."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Joy's damaged 1,000-rupee order, paid with store credit, is refunded 1,000 rupees, all given back as store credit, not to a card.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Not quite. Joy's order was damaged, so the shipping fee goes back too, and all of it as store credit. She gets the 1,000 rupees plus the shipping she paid."
+ },
+ {
+  "prompt": "11 of 15. Leela writes 'not damaged, just changed mind' on day 60 for a 1,000-rupee order: any reason containing the word 'damaged' is treated as damage, so she is refunded 1,000 rupees instead of 0.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Wrong. Leela's reason says \"not damaged\", so it is changed mind, not damage. On day 60 that is past day 30, so she gets 0."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Leela's 1,000-rupee order, returned on day 60 with the reason 'not damaged, just changed mind', is treated as changed mind and refunded 0 rupees.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Wrong. Leela's reason says \"not damaged\", so it is changed mind, not damage. On day 60 that is past day 30, so she gets 0."
+ },
+ {
+  "prompt": "12 of 15. A refund is requested on a 1,000-rupee order with no delivery day and no reason given: it is treated as just delivered and 1,000 rupees go back to the card.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Wrong. I haven't decided what a missing delivery day means, so it shouldn't be a full refund. Ask me about that case instead of guessing."
+ },
+ {
+  "prompt": "\ud83d\udcac That is what the build does today in that case.\n\nSo, is that result right?\n  (Enter = right, or say what should happen) > ",
+  "typed": "That's not right. I haven't decided what a missing delivery day means, so it shouldn't be a full refund. Ask me about that case instead of guessing."
+ },
+ {
+  "prompt": "\ud83d\udcac That is what the build does today in that case.\n\nSo, is that result right?\n  (Enter = right, or say what should happen) > ",
+  "typed": "That's not right. I haven't decided what a missing delivery day means, so it shouldn't be a full refund. Ask me about that case instead of guessing."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The software does not refund the 1,000-rupee order with no delivery day and no reason; it asks the business owner what to do instead.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "13 of 15. A 1,000-rupee order is refunded with a delivery day of minus 5: the day is treated as 0 and the full 1,000 rupees are refunded, with no warning.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Wrong. A negative number of days is a mistake in the data and should be treated as day 0, so the full 1,000 rupees is refunded. But it shouldn't happen with no warning, so please tell me when it does."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A 1,000-rupee order with a delivery day of minus 5 is treated as day 0 and refunded the full 1,000 rupees, with a warning to the owner.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "14 of 15. Today's summary has a 1,000-rupee card order, a 500-rupee store-credit order and a 350-rupee card order including shipping: it shows 3 orders but revenue of only 1,350 rupees and an average of 675, because store-credit sales are left out of revenue yet counted as orders.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Wrong. Store-credit orders bring in no new money, so they shouldn't count toward revenue. Revenue is only the card orders: 1,000 plus 350 is 1,350, and the average is 1,350 divided by 2 card orders, which is 675. So 3 orders, revenue 1,350 and average 675 is correct."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Today's 1,000-rupee card order, 500-rupee store-credit order and 350-rupee card order now show 3 orders, 1,350 rupees revenue and a 675-rupee average.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right. Today's summary is 3 orders, 1,350 rupees revenue and an average of 675."
+ },
+ {
+  "prompt": "15 of 15. A day with no orders, or only a store-credit order, shows revenue 0 and average 0; an order paid by any other method such as UPI is counted as an order but adds nothing to revenue.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Wrong. Any other payment method like UPI is a card-type order for the summary only if it is paid by card, so I haven't decided how to treat UPI. Ask me about that case instead of guessing. The empty day and store-credit-only day showing revenue 0 and average 0 is right."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A day with no orders or only a store-credit order shows revenue 0 and average 0, but a UPI order isn't guessed at; the owner is asked.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ }
+]

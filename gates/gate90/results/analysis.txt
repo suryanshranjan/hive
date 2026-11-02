@@ -1,0 +1,10 @@
+Gate 85: hidden [27, 27, 27, 20, 24], prompts [59, 55, 67, 53, 33], Hive's own [4.21, 3.32, 5.48, 2.84, 2.64] (mean $3.70), builders mean $0.63, pass^1 0.80, minutes [12.2, 11.4, 15.3, 9.5, 7.4]
+Gate 90: hidden [27, 27, 27, 27, 15], prompts [33, 28, 68, 64, 74], Hive's own [2.6, 2.68, 5.16, 5.73, 5.43] (mean $4.32), builders mean $0.47, pass^1 0.80, minutes [7.8, 7.4, 15.7, 17.1, 16.6]
+placeholders left: {1: [], 2: [], 3: [], 4: [], 5: []}
+
+predictions
+J1 no placeholder left in any delivery -> held
+J2 pass^1 >= 0.8 -> held
+J3 median hidden >= 26 -> held
+J4 median prompts <= 1.2x Gate 85's -> held
+Claim J1, J2 and J3 -> held
