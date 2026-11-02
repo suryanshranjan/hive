@@ -8,7 +8,7 @@ differs. It costs the owner nothing.
 
 Only what the goal states outright is checked, and only where the code shows it plainly (a function missing, an argument
 renamed, a returned dict literal with other keys). Anything else is left alone, so the check does not cry wolf."""
-import ast, json, os
+import ast, json, os, re
 
 STATED = """A software goal follows. List every function it names explicitly, with what it states about each: the file, the
 function's name, its arguments in order (only if the goal lists them), and, if the goal states the result as a dict with
@@ -67,6 +67,9 @@ def check(goal, code_dir, interfaces=None):
     """Every way the delivered code differs from an interface the goal states: [{'name', 'file', 'problem'}]."""
     out = []
     for iface in interfaces if interfaces is not None else stated(goal):
+        if not iface.get('file') or not re.fullmatch(r'[A-Za-z_]\w*', iface['name']):
+            continue   # Gate 94: only a function the goal places in a file, named as code (a bug report's "QuerySet.alias",
+                       # "ExpressionWrapper" or "URL translation function" raised three false alarms)
         path, fn = _find(code_dir, iface)
         where = os.path.relpath(path, code_dir) if path else iface.get('file')
         if fn is None:

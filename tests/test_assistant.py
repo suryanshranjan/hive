@@ -691,6 +691,9 @@ check('a result with extra keys and a missing function are found; matching parts
 open(os.path.join(_cd, 'shop', 'loyalty.py'), 'w').write("def points_earned(order):\n    return order.total // 100\n")
 open(os.path.join(_cd, 'shop', 'refunds.py'), 'w').write("def refund(order, days, reason):\n    out = {'amount': 1}\n    out['method'] = 'card'\n    return out\n")
 check('code that matches, or whose result is not a plain dict literal, is left alone', contract.check('', _cd, _if), [])
+check('a name the goal does not place in a file, or not a code name, is not checked (Gate 94)',
+      contract.check('', _cd, [dict(file=None, name='ExpressionWrapper', args=None, result_keys=None),
+                               dict(file='shop/x.py', name='URL translation function', args=None, result_keys=None)]), [])
 # Gate 88: a handful of spot checks, round-robin across parts in their order
 from hive import spotcheck as _sc
 _sp = [{'part': p, 'say': f'{p}{k}'} for p in ('a', 'b', 'c') for k in range(4)]
