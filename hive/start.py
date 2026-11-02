@@ -5,7 +5,7 @@ and their assumptions to the owner in plain words, sends back what the owner cor
 over a branch. The owner's own branches are never changed: the result arrives as a new branch, hive/<name>."""
 import csv, glob, json, os, re, shlex, shutil, subprocess, sys, threading, time
 
-from . import PY, codesheet, contract, docs as docs_mod, explain, interview, junit, law, memory, owner, spotcheck, swarm, telegram
+from . import PY, codesheet, contract, docs as docs_mod, examples, explain, interview, junit, law, memory, owner, spotcheck, swarm, telegram
 from .guard import sh
 
 RUNS = os.path.join(os.path.expanduser('~'), '.hive', 'runs')
@@ -408,6 +408,43 @@ def _keep_contract(state, ch=None):
     json.dump(state, open(os.path.join(state['home'], 'state.json'), 'w'), indent=1)
     return True
 
+def _keep_examples(state, ch=None):
+    """Gate 103: run the owner's own examples through the functions the product uses; if any come out differently,
+    one builder makes them hold. Once per delivery. Returns True when a fix round ran. Costs the owner nothing."""
+    if os.environ.get('HIVE_EXAMPLE_CHECK') == '0' or state.get('technical'):
+        return False
+    rules = examples.rules_of(state['home'])
+    if not rules:
+        return False
+    code = os.path.join(state['home'], 'examples_check')
+    if os.path.exists(code):
+        _rmtree(code)
+    sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', state['b'], os.path.join(state['final'], 'up.git'), code)
+    _link(state['repo'], code, state['links'])
+    try:
+        got = examples.check(code, state['goal'], rules, before=os.path.join(state['home'], 'source'))
+    except Exception:
+        got = None
+    _rmtree(code)
+    state.setdefault('examples', []).append(got)
+    if not got or not got['failing']:
+        return False
+    say(f"\n[{_now()}] {_n(len(got['failing']), 'example')} of yours {'does' if len(got['failing']) == 1 else 'do'} not hold "
+        f"in the product yet: " + '; '.join(f.get('example', '')[:80] for f in got['failing'][:2]) + ". Sending a builder.")
+    fsrc = os.path.join(state['home'], 'examples_source')
+    if os.path.exists(fsrc):
+        _rmtree(fsrc)
+    sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', state['b'], os.path.join(state['final'], 'up.git'), fsrc)
+    _link(state['repo'], fsrc, state['links'])
+    n = len(glob.glob(os.path.join(state['home'], 'examples_fix*'))) + 1
+    run2 = os.path.join(state['home'], f'examples_fix{n}')
+    _phase(fsrc, run2, 1, state['goal'] + state.get('rules', '') + examples.note(got['failing']), state['minutes'], 0,
+           False, False, ch)
+    shutil.rmtree(fsrc, ignore_errors=True)
+    state.update(final=run2, cost=state['cost'] + _cost(run2))
+    json.dump(state, open(os.path.join(state['home'], 'state.json'), 'w'), indent=1)
+    return True
+
 def _answered(run):
     """How many of the builders' questions the owner answered during this build."""
     return len(glob.glob(os.path.join(run, 'owner', 'answers', '*.json')))
@@ -515,6 +552,7 @@ def _deliver(state, ch=None):
     """Check every test on the result and hand it over as the branch hive/<name> (updated in place after a fix round)."""
     _keep_contract(state, ch)   # Gate 93: the goal's stated interfaces, before every delivery (Gate 90: a review's
                                 # correction broke one, on the path Gate 84 did not check)
+    _keep_examples(state, ch)   # Gate 103 (under test): the owner's own examples, through the product's own functions
     say('\nLet me check the result.')
     result = os.path.join(state['home'], 'result')
     if os.path.exists(result):
