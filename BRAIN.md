@@ -2,7 +2,7 @@
 
 Read this first. It is the shared memory for anyone working on Hive, human or agent: what we know, how sure we are, what is being tested, and exactly how to continue. When you learn something, update this file in the same commit as the evidence.
 
-Last updated: Nov 2 2026 (IST), after Gate 89.
+Last updated: Nov 2 2026 (IST), after Gate 91.
 
 ## 1. The question
 
@@ -89,6 +89,7 @@ The deeper limit is intent, and Gates 3 to 17 have now mapped it. On rules a mod
 - **At most 6 spot checks (Gate 88, claim fired):** median prompts 34 vs 55, pass^1 1.00, median hidden 27. Caveat: 3 of 5 flights skipped the review (builders asked 3+), so the cap applied in 2; where the review ran, prompts were about 0.8x Gate 85's. Ships as the default after Gates 89-90.
 - **The business builder now fills teammates' placeholders (Gate 90, claim fired):** 0 of 5 deliveries had a placeholder left (3 of 10 before); pass^1 0.80, median hidden 27. The failure (15/27) was Gate 83's again by another path: an owner's correction in the review made a builder add a `split` key to `refund()`'s result, and the interface check runs only when the review is skipped. Next: run it before every delivery.
 - **No business decisions, no interview (Gate 89, claim did not fire):** on 10 Django issues the planner found 0 business decisions and Hive asked nothing first; on business goals it still found 14-19. But reporter prompts stayed at 21.5 (vs 23.5) and cost the same: the review after the build (a 20-rule code sheet and 9-24 spot checks about ORM internals) is the load. Kept (removes nonsense, no harm); next: no business review either for such goals.
+- **Haiku for Hive's own reading loses rule details (Gate 91, second time):** spend 0.07x ($0.32 vs $4.32 per flight), pass^1 0.80, but median hidden 25 vs 27 (as in Gate 87). The losses were in flights that skipped the review, where builders rest on Haiku's readings of the owner's answers. Not shipped; next candidate: the default model for turning answers into rules, the small one for the rest.
 - **Spot checks woke the skimmer, but the sheet did not improve (Gate 57):** shown 30 concrete outcomes one at a time, the skimming owner corrected 17 (details he passes over in a list), against 11 replies to the 81-rule list. But after one model call turned his corrections into rules, the sheet had 7 decisions right (+4 partly) against the list's 9; hidden 51.2 vs 48.8% (N0 33.2). Corrections were lost in conversion (minimum and cap made to conflict), and some decisions were never shown as a case. Post hoc, the list and the spots fixed different decisions (5 and 3; together 12 of 25). Next: a combined review, with each corrected case re-run after the fix.
 - **Open:** an assumption review (builders list the defaults they applied, the owner marks the wrong ones); all 5 Gate 27 misses trace to defaults stated in the builders' own commit messages (post hoc). Also larger features with persistence and endpoints, and more founders and companies.
 
@@ -194,6 +195,7 @@ Status tags: **established** means outside theory or our data on real agents; **
 | Gate 45, day 1 | Oct 29 | The founder reviews the paged code sheet (46 rules) on his phone | Finished; 0 rules marked, nothing added; restarted twice on Hive faults (disclosed): question filed as a correction, 40 pages; rules 19-46 reworded before he saw them |
 | Gate 48 | Oct 29 | Laya (open copy of Jev) vs Claude reading 120 owner-style messages (9 intents) | Claude 92.5%, Laya-ml 42.5%, Laya-en 45.0%, v3 tuned on a practice set 45.0%; 0.68 s with 2 threads (5.0 s untuned); 26 wrong stop/cloud calls (v1); L1, L5, A2, A4 held, L2–L4, L6, A1, A3 failed; kill fired |
 | Gate 47 | Oct 29 | Claude and Codex in one swarm (M1, M2), vs Claude only (C) and Codex only (X); Codex lead (LX) vs Claude lead (LC), deep project | 95% at 9.2 / 7.5 / 8.3 / 8.0 / 8.3 / 8.1 min; all 1,340 visible; hidden 99.8–100%; 0 breaks; Claude cost $6.72 / 10.83 / 0 / 13.31 / 12.82 / 5.74; P1–P4, P6–P8 held, P5 failed; ship fired. Registered analysis miscounted the seed's history as one break per team (disclosed, recounted) |
+| Gate 91 | Nov 2 | Haiku 5.5 for Hive's own reading, on Gate 90's fixed flow | Spend 0.07x; pass^1 0.80; median hidden 25 vs 27 (H3 failed again; losses where the review was skipped). Not shipped |
 | Gate 89 | Nov 2 | No interview when the planner finds no business decisions; 10 Django issues (Gate 86's S again), planner check on business goals | Interview gone on 10/10 Django issues, kept on business goals (14-19 decisions); resolved 7/10 (S 8); prompts 21.5 vs 23.5, cost 0.96x: the review is the load. Claim did not fire; change kept |
 | Gate 90 | Nov 2 | The business builder may claim any area and fills placeholders, vs Gate 85 | No placeholder left (0 of 5); pass^1 0.80; median hidden 27; live5 15/27 from a review correction that changed refund()'s result shape (interface check ran only on the skip path). Claim fired |
 | Gate 88 | Nov 2 | At most 6 spot checks, round-robin across parts, vs Gate 85 | Median prompts 34 vs 55, pass^1 1.00, median hidden 27; 3 of 5 reviews skipped (cap applied in 2); Hive's own spend unchanged. Claim fired; ships after Gates 89-90 |
@@ -286,6 +288,7 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 - **Failed (Gate 48):** Laya ≥ 80% (42.5%); ≤ 1 s as registered (5.0, a thread misconfiguration); hybrid with Laya answering half; no wrong stop or cloud calls (26); amendment: v3 at 55–72% (45.0%), ≤ 3 wrong stops (5).
 - **Held (Gate 47):** mixed teams reach 95% (9.2, 8.1 min), break main at most once (0, 0), each agent lands ≥ 25% (Codex 52%, 73%); mixing costs no speed (8.7 vs 9.1 allowed); hidden within 3 points (0.2); Codex lead's plan within 6 minutes (85 s); lead's agent within 20% (8.0 vs 8.3).
 - **Failed (Gate 47):** Codex builders ≥ 1.2× slower than Claude (1.11×).
+- **Held (Gate 91):** H1 (spend 0.07x), H2, H4. **Failed:** H3 (median hidden 25).
 - **Held (Gate 89):** K2 (7/10), K4, K5. **Failed:** K1 (21.5 prompts), K3 (cost 0.96x).
 - **Held (Gate 90):** J1 (no placeholders), J2 (pass^1 0.80), J3 (hidden 27), J4.
 - **Held (Gate 88):** L1 (prompts 0.62x), L2 (pass^1 1.00), L3 (hidden 27). **Failed:** L4 (spend 0.95x).

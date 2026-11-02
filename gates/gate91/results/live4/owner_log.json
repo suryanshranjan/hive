@@ -1,0 +1,136 @@
+[
+ {
+  "prompt": "\nOne choice before I start, asked only once: 3 builders would finish about 1.9\u00d7 sooner than one, for about 1.8\u00d7 the cost. Should I build fast or cheap, from now on? (Enter = fast)",
+  "typed": ""
+ },
+ {
+  "prompt": "\n1 of 15. Priya bought a kurta for \u20b91,800 that was delivered 9 days ago. It fits badly, she has changed her mind, and she asks for her money back.\n  A) Refuse: the 7-day return window has passed, so no refund, and she is told so  B) Give her store credit for the price, but no money back  C) Accept returns up to 14 days after delivery, then refuse\n  Your answer (a letter, or your own words) > ",
+  "typed": "Within 14 days of delivery she gets the full amount back, even if she just changed her mind. Day 9 is inside that, so she gets the full \u20b91,800 (minus any discount code), but not the shipping fee."
+ },
+ {
+  "prompt": "\n3 of 15. Asha paid \u20b92,400 by card for an item that was faulty when it arrived, and she asks for her money back.\n  A) Refund to her card, and use store credit only if the card refund cannot be made  B) Always give store credit, even for card payments, to keep cash in the shop  C) Refund by bank transfer or cash if she gives you her bank details\n  Your answer (a letter, or your own words) > ",
+  "typed": "A \u2014 her card gets the refund. Since the item was faulty on arrival, that's damaged goods, so she gets the full \u20b92,400 and the shipping fee back too."
+ },
+ {
+  "prompt": "\n4 of 15. Ajay received \u20b9500 store credit in March and has not used it for 14 months.\n  A) Store credit expires 12 months after it was issued  B) Store credit never expires  C) Store credit expires 6 months after it was issued\n  Your answer (a letter, or your own words) > ",
+  "typed": "Store credit never expires isn't something I've decided on. I haven't set any expiry rule for store credit, so please don't build one in. Leave store credit as it is."
+ },
+ {
+  "prompt": "\n6 of 15. Sana buys three items for \u20b93,000 and gets a \u20b9300 coupon on the whole order. She returns one item listed at \u20b91,000 before the coupon.\n  A) Refund \u20b9900, its share of what she actually paid after the coupon  B) Refund the \u20b91,000 shelf price  C) Refund only if she returns all three items together\n  Your answer (a letter, or your own words) > ",
+  "typed": "A \u2014 she gets back \u20b9900, which is what she actually paid for that item after the coupon, not the \u20b91,000 shelf price. The shipping fee isn't refunded, since it isn't damaged goods."
+ },
+ {
+  "prompt": "\n7 of 15. Neha got \u20b9600 back for a torn kurta. A week later she asks for a second refund on the same order, saying a different seam has torn.\n  A) Refuse: total refunds on an order can never be more than the amount paid  B) Allow a second refund for a new shop fault, up to the rest of what she paid  C) Refuse, and offer a replacement item instead of money\n  Your answer (a letter, or your own words) > ",
+  "typed": "I haven't set any rule about a second refund on the same order, so please don't build one in. Each refund is worked out by the rules I've already given, which means damaged goods get the full amount within 90 days of delivery."
+ },
+ {
+  "prompt": "\n8 of 15. A customer spends \u20b91,250 on one order. How many loyalty points does she get?\n  A) 1 point for every \u20b9100 spent, rounded down for each order  B) 1 point for every \u20b950 spent  C) 1 point for every \u20b9200 spent\n  Your answer (a letter, or your own words) > ",
+  "typed": "A is close, but my rule is one point for every full 100 rupees paid for the items after any discount code, so \u20b91,250 gives 12 points. Shipping earns nothing, and orders paid with store credit or with items under \u20b9500 get no points. Final-sale orders get double points."
+ },
+ {
+  "prompt": "\n10 of 15. Asha orders on Monday and the parcel arrives on Thursday. She asks why her points are not showing yet.\n  A) Points are credited when the order is delivered, on Thursday  B) Points are credited as soon as the order is placed, on Monday  C) Points are credited a week after delivery, once the return window closes\n  Your answer (a letter, or your own words) > ",
+  "typed": "I haven't set any rule about when points are credited, so please don't build one in. The only rules I have are how many points an order earns, and I don't have a timing rule."
+ },
+ {
+  "prompt": "\n11 of 15. Ajay earned 40 points on a \u20b94,000 order. He returns the whole order for a refund after spending 30 of those points on another order.\n  A) Take back all 40 points; his balance drops to zero and the shortfall is written off  B) Take back only the 10 points he has left and keep the rest  C) Freeze his account until he pays back the 30 points\n  Your answer (a letter, or your own words) > ",
+  "typed": "I haven't set any rule about taking points back when an order is returned, so please don't build one in. Points are only worked out by the rules I've already given for how many an order earns."
+ },
+ {
+  "prompt": "\n13 of 15. Yesterday's \u20b92,000 order, which was counted in yesterday's sales summary, is refunded today.\n  A) Take the refund off today's revenue, and leave yesterday's order counted as yesterday's  B) Restate yesterday's totals with the refund taken off them  C) Show the refund as a separate line that is not taken off revenue\n  Your answer (a letter, or your own words) > ",
+  "typed": "I haven't set any rule about refunds after the daily summary is already sent, so please don't build one in. The summary only follows my rules: revenue is the money that came in from card orders today, and I haven't decided how a refund should change it."
+ },
+ {
+  "prompt": "\n15 of 15. An order is placed at 11:40pm on 1 November. Which day does it count for?\n  A) The day it was placed, midnight to midnight Indian time  B) A shop day that runs until 3am, so it counts for 31 October  C) The day it was delivered\n  Your answer (a letter, or your own words) > ",
+  "typed": "I haven't set any rule about which day an order counts for, so please don't build one in. The summary just counts the orders in the list I give it."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: If a buyer asks for a refund within 14 days of delivery, they get the full purchase amount back, minus any discount code used, even if they just changed their mind, but the shipping fee is not refunded.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. Day 14 is included, so it's the full amount through day 14 (not \"within 14 days\" loosely). It's also the price times quantity minus the discount code, so it's what the customer actually paid for the items. Shipping isn't refunded, except for damaged goods, which get it back too. And from day 15 to day 30 it's half, and after day 30 nothing."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When a customer paid by card and the item was faulty on arrival, treat it as damaged goods and refund the full item price (\u20b92,400) and the shipping fee to that card.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. Damaged goods get the full amount only up to 90 days after delivery, and it's worked out as price times quantity minus any discount code, with the shipping fee refunded too. The refund goes back to the card since she paid by card."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: Do not build an expiry rule for store credit: leave store credit behaving as it does now, because the owner has not decided whether store credit never expires.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Right, no expiry rule. Leave store credit exactly as it is now."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When an item is returned from an order that had a coupon on the whole order, the refund for that item is the amount the customer actually paid for it after the coupon was applied, not its listed (shelf) price, and the shipping fee is not refunded because it is not damaged goods.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. The refund is worked out on what she paid for the items (price times quantity minus the coupon), and that part is right. But the rest isn't complete: it's the full amount within 14 days of delivery, half from day 15 to day 30, and nothing after day 30. Shipping is never refunded unless the goods are damaged, in which case it is refunded too."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: Do not build any rule for a second refund on the same order; each refund is calculated under the existing rules, so damaged goods receive the full amount within 90 days of delivery.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Right, no second-refund rule. Just apply the normal rules to each refund: full amount through day 14, half from day 15 to day 30, nothing after day 30. Damaged goods get the full amount plus shipping up to 90 days after delivery, and nothing after that."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A customer earns one loyalty point for every full \u20b9100 paid for the items after any discount code is applied, shipping earns no points, orders paid with store credit or with items under \u20b9500 get no points, and final-sale orders get double points.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. It's one point for every full 100 rupees paid for the items after the discount code, not counting shipping. Orders paid with store credit get no points, and orders where the items come to under 500 rupees after the discount get no points. Final-sale orders get double points."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: Points are awarded by how many points an order earns, and no rule about when points are credited has been set, so no timing rule should be built.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Right, no timing rule. Points are only worked out by how many an order earns: one per full 100 rupees paid for the items after the discount code, nothing for store credit orders, nothing if the items come to under 500 rupees, and double for final-sale orders."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: Points are worked out only by the rules already set for how many points an order earns, and no rule takes points back when an order is returned.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Right, no take-back rule. Points are only worked out by the rules I've already given: one per full 100 rupees paid for the items after the discount code, nothing for store credit orders, nothing if the items come to under 500 rupees, and double for final-sale orders."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: Do not build any rule for refunds that happen after the daily summary has already been sent; the summary follows only the owner's rules, under which revenue is the money that came in from card orders today, and how a refund should change that revenue has not been decided.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Right, no rule for refunds after the summary. It only works from the list of orders it's given. \"Orders\" counts every order, including store-credit ones. \"Revenue\" is the totals (items after discount, plus shipping) of card orders only. \"Average\" is revenue divided by the number of card orders, rounded down, or 0 if there are none."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: No rule is set for which day an order counts for, so the product must not build one in; the summary counts only the orders in the list it is given.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Right, no rule for which day an order counts for. The summary just counts the orders in the list it's given."
+ },
+ {
+  "prompt": "\nTwo of your answers pull different ways on one decision. Which is your policy?\nFor damaged goods, or goods faulty on arrival, when the refund is asked for from day 15 after delivery, which refund applies?\n  A) The normal schedule: half the base amount from day 15 through day 30 and nothing after day 30, plus the shipping fee (answers 1 and 4).  B) The full base amount plus the shipping fee, up to and including day 90 after delivery, and nothing after day 90 (answers 2 and 5).\n  > ",
+  "typed": "B"
+ },
+ {
+  "prompt": "\nTwo of your answers pull different ways on one decision. Which is your policy?\nAre the day limits of 14 and 30 counted to the day the buyer asks for the refund, or to the day the item is returned?\n  A) The day the buyer asks for the refund (answer 1).  B) The day the item is returned (answer 4).\n  > ",
+  "typed": "A \u2014 the day she asks for the refund. The day limits of 14 and 30 count the days since delivery, up to the day she asks."
+ },
+ {
+  "prompt": "\nTwo of your answers pull different ways on one decision. Which is your policy?\nThe revenue figure counts today's card orders, but no rule says which day an order counts for. Which applies?\n  A) Revenue counts the card orders in the list the summary is given, with no day rule (answer 10).  B) Revenue counts only card orders placed today, which needs a rule for which day an order counts for (answer 9).\n  > ",
+  "typed": "A \u2014 Revenue is just the card orders in the list the summary is given, with no day rule. Only card orders count, and revenue is items after discount plus shipping."
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": "16. Revenue isn't \"today's\" card orders. It's the totals (items after discount, plus shipping) of the card orders in the list the summary is given, with no day rule."
+ },
+ {
+  "prompt": "  Rule 16: Whenever the daily summary calculates 'Revenue', it is the total of items after discount plus shipping for today's card orders only.\n  What should it be? > ",
+  "typed": "Whenever the daily summary calculates 'Revenue', it is the total of items after discount plus shipping for the card orders in the list it is given only, with no day rule."
+ },
+ {
+  "prompt": "der counts for. Which applies? -> A \u2014 Revenue is just the card orders in the list the summary is given, with no day rule. Only card orders count, and revenue is items after discount plus shipping.\n  Numbers of any that are wrong (Enter = all correct) > \n  > 16. Revenue isn't \"today's\" card orders. It's the totals (items after discount, plus shipping) of the card orders in the list the summary is given, with no day rule.\n  Rule 16: Whenever the daily summary calculates 'Revenue', it is the total of items after discount plus shipping for today's card orders only.\n  What should it be? > \n  > Whenever the daily summary calculates 'Revenue', it is the total of items after discount plus shipping for the card orders in the list it is given only, with no day rule.\n  Thank you. The builders will encode your 21 rules as tests before anything lands.\n\n[08:33] Starting.\n  [08:33] Builder w3 picked up: w3.\n\n========================================================================\n Question 1 of up to 30  -  from builder w3  -  asked 0:02 ago\n========================================================================\n\n  A customer paid by card for a \u20b91,000 order and now asks for a refund\n  because they changed their mind, on day 10. Where should the money\n  go?\n\n    A) back to their card;\n    B) as store credit;\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A) Back to their card, since they paid by card. The money goes back the way it was paid.\n",
+  "typed": "A) Back to their card, since they paid by card. The money goes back the way it was paid.",
+  "keyboard": true
+ },
+ {
+  "prompt": "ng for the card orders in the list it is given only, with no day rule.\n  Thank you. The builders will encode your 21 rules as tests before anything lands.\n\n[08:33] Starting.\n  [08:33] Builder w3 picked up: w3.\n\n========================================================================\n Question 1 of up to 30  -  from builder w3  -  asked 0:02 ago\n========================================================================\n\n  A customer paid by card for a \u20b91,000 order and now asks for a refund\n  because they changed their mind, on day 10. Where should the money\n  go?\n\n    A) back to their card;\n    B) as store credit;\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A) Back to their card, since they paid by card. The money goes back the way it was paid.\n  Thanks, sent to builder w3. (1 answered so far)\n\n========================================================================\n Question 2 of up to 30  -  from builder w3  -  asked 0:05 ago\n========================================================================\n\n  Loyalty points: an order's items come to \u20b91,299 after the discount\n  code, plus \u20b950 shipping, paid by card. Points are one per full \u20b9100.\n  Is that 12 points, or something else?\n\n    A) 12 points (shipping not counted);\n    B) 13 points;\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A) 12 points. Shipping doesn't count, so it's the \u20b91,299 for the items, which is 12 full hundreds.\n",
+  "typed": "A) 12 points. Shipping doesn't count, so it's the \u20b91,299 for the items, which is 12 full hundreds.",
+  "keyboard": true
+ },
+ {
+  "prompt": "ing else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A) Back to their card, since they paid by card. The money goes back the way it was paid.\n  Thanks, sent to builder w3. (1 answered so far)\n\n========================================================================\n Question 2 of up to 30  -  from builder w3  -  asked 0:05 ago\n========================================================================\n\n  Loyalty points: an order's items come to \u20b91,299 after the discount\n  code, plus \u20b950 shipping, paid by card. Points are one per full \u20b9100.\n  Is that 12 points, or something else?\n\n    A) 12 points (shipping not counted);\n    B) 13 points;\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A) 12 points. Shipping doesn't count, so it's the \u20b91,299 for the items, which is 12 full hundreds.\n  Thanks, sent to builder w3. (2 answered so far)\n\n========================================================================\n Question 3 of up to 30  -  from builder w3  -  asked 0:05 ago\n========================================================================\n\n  The daily summary shows average sales per card order. Say two card\n  orders total \u20b91,001. What average should it show?\n\n    A) \u20b9500 (rounded down);\n    B) \u20b9501 (rounded up);\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A) \u20b9500, rounded down. Revenue divided by the number of card orders, rounded down to whole rupees.\n",
+  "typed": "A) \u20b9500, rounded down. Revenue divided by the number of card orders, rounded down to whole rupees.",
+  "keyboard": true
+ },
+ {
+  "prompt": "B) 13 points;\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A) 12 points. Shipping doesn't count, so it's the \u20b91,299 for the items, which is 12 full hundreds.\n  Thanks, sent to builder w3. (2 answered so far)\n\n========================================================================\n Question 3 of up to 30  -  from builder w3  -  asked 0:05 ago\n========================================================================\n\n  The daily summary shows average sales per card order. Say two card\n  orders total \u20b91,001. What average should it show?\n\n    A) \u20b9500 (rounded down);\n    B) \u20b9501 (rounded up);\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A) \u20b9500, rounded down. Revenue divided by the number of card orders, rounded down to whole rupees.\n  Thanks, sent to builder w3. (3 answered so far)\n\n========================================================================\n Question 4 of up to 30  -  from builder w3  -  asked 0:06 ago\n========================================================================\n\n  A customer paid with store credit for a \u20b91,000 order and asks for a\n  refund on day 20, having changed their mind. That's half, \u20b9500.\n  Where does it go?\n\n    A) back as store credit;\n    B) to a card;\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A) Back as store credit. The money goes back the way it was paid, and she paid with store credit.\n",
+  "typed": "A) Back as store credit. The money goes back the way it was paid, and she paid with store credit.",
+  "keyboard": true
+ },
+ {
+  "prompt": " \u20b9500 (rounded down);\n    B) \u20b9501 (rounded up);\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A) \u20b9500, rounded down. Revenue divided by the number of card orders, rounded down to whole rupees.\n  Thanks, sent to builder w3. (3 answered so far)\n\n========================================================================\n Question 4 of up to 30  -  from builder w3  -  asked 0:06 ago\n========================================================================\n\n  A customer paid with store credit for a \u20b91,000 order and asks for a\n  refund on day 20, having changed their mind. That's half, \u20b9500.\n  Where does it go?\n\n    A) back as store credit;\n    B) to a card;\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A) Back as store credit. The money goes back the way it was paid, and she paid with store credit.\n  Thanks, sent to builder w3. (4 answered so far)\n\n========================================================================\n Question 5 of up to 30  -  from builder w3  -  asked 0:05 ago\n========================================================================\n\n  A customer changed their mind on day 20 about an order whose items\n  come to \u20b9999 after discount, so half is \u20b9499.50. What do we refund?\n\n    A) \u20b9499 (round down);\n    B) \u20b9500 (round up);\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A) \u20b9499. Amounts are rounded down to whole rupees.\n",
+  "typed": "A) \u20b9499. Amounts are rounded down to whole rupees.",
+  "keyboard": true
+ },
+ {
+  "prompt": "does it go?\n\n    A) back as store credit;\n    B) to a card;\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A) Back as store credit. The money goes back the way it was paid, and she paid with store credit.\n  Thanks, sent to builder w3. (4 answered so far)\n\n========================================================================\n Question 5 of up to 30  -  from builder w3  -  asked 0:05 ago\n========================================================================\n\n  A customer changed their mind on day 20 about an order whose items\n  come to \u20b9999 after discount, so half is \u20b9499.50. What do we refund?\n\n    A) \u20b9499 (round down);\n    B) \u20b9500 (round up);\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A) \u20b9499. Amounts are rounded down to whole rupees.\n  Thanks, sent to builder w3. (5 answered so far)\n\n========================================================================\n Question 6 of up to 30  -  from builder w3  -  asked 0:06 ago\n========================================================================\n\n  A card customer reports damaged goods on day 5, worth \u20b9800 plus \u20b960\n  shipping. Where should the \u20b9860 go?\n\n    A) to their card;\n    B) as store credit;\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A) To their card. Damaged goods are refunded in full, including the shipping fee, and it goes back the way it was paid, which was card.\n",
+  "typed": "A) To their card. Damaged goods are refunded in full, including the shipping fee, and it goes back the way it was paid, which was card.",
+  "keyboard": true
+ }
+]

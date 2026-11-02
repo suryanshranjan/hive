@@ -1,0 +1,228 @@
+[
+ {
+  "prompt": "\nOne choice before I start, asked only once: 3 builders would finish about 1.9\u00d7 sooner than one, for about 1.8\u00d7 the cost. Should I build fast or cheap, from now on? (Enter = fast)",
+  "typed": ""
+ },
+ {
+  "prompt": "\n1 of 13. A customer buys a Rs 1,200 kurta that arrives on 1 March. On 12 March, 11 days after delivery, the customer asks for a refund because they changed their mind. The kurta is unworn.\n  A) Refused: changed-mind returns close 7 days after delivery  B) Accepted up to 14 days after delivery  C) Accepted up to 30 days after delivery, the same as damage claims\n  Your answer (a letter, or your own words) > ",
+  "typed": "B"
+ },
+ {
+  "prompt": "\n2 of 13. A customer's mug arrives cracked. They report it on the 45th day after delivery and send a photo of the damage.\n  A) Refused: damage claims close 30 days after delivery  B) Accepted up to 60 days after delivery, with a photo  C) Accepted at any time, as long as the photo shows the damage\n  Your answer (a letter, or your own words) > ",
+  "typed": "Damaged goods are always refunded in full, up to 90 days after delivery, so day 45 is fine. None of those options match: it's not 30 days, and 60 days isn't right either. Accepted with the full amount, including shipping, up to 90 days after delivery. After 90 days, nothing."
+ },
+ {
+  "prompt": "\n3 of 13. A customer paid for a Rs 1,500 order entirely with store credit. They now return the item within the window.\n  A) Store credit back into the same balance it came from  B) Bank transfer of the same rupees  C) Half bank transfer, half store credit\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) Store credit back into the same balance it came from."
+ },
+ {
+  "prompt": "\n5 of 13. A customer cancels an order placed on Monday and paid by card. It has not been delivered and is still in transit on Wednesday.\n  A) Full refund to the card, no return needed  B) Full refund minus a Rs 50 handling fee  C) Refused until it arrives, then the normal return rules apply\n  Your answer (a letter, or your own words) > ",
+  "typed": "My rules only cover refunds after delivery, so I don't have a rule for cancelling before delivery. Option C is closest: wait until it arrives, then the normal refund rules apply, and the shipping fee is not refunded unless the goods are damaged."
+ },
+ {
+  "prompt": "\n6 of 13. A customer ordered three shirts for Rs 2,400 in total and wants to return only one. It is unworn and inside the window.\n  A) Refused here and passed to support to handle by hand  B) That shirt's price back to the original card  C) That shirt's price back as store credit\n  Your answer (a letter, or your own words) > ",
+  "typed": "Partial returns aren't something my rules spell out, so I'd say none of those is exactly right. The refund is worked out on what was paid for that shirt (its price minus its share of the discount code), under the normal rules. It goes back the way the order was paid: to the card if paid by card, as store credit if paid by store credit."
+ },
+ {
+  "prompt": "\n8 of 13. A customer receives Rs 600 of store credit on 1 March and does not use it.\n  A) Expires 12 months after it was issued  B) Expires 6 months after it was issued  C) Never expires\n  Your answer (a letter, or your own words) > ",
+  "typed": "Store credit expiry isn't something my rules cover, so none of those is my policy. I don't have an expiry rule for store credit."
+ },
+ {
+  "prompt": "\n9 of 13. A customer pays Rs 1,000 for an order after discounts. How many loyalty points does it earn?\n  A) 1 point for every Rs 100 paid  B) 1 point for every Rs 50 paid  C) 2 points for every Rs 100 paid\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) 1 point for every Rs 100 paid. That matches my rule, but only if the items come to Rs 500 or more after the discount, and not if the order was paid with store credit."
+ },
+ {
+  "prompt": "\n11 of 13. On a day with one order of Rs 1,000 for items after discount, Rs 80 shipping and Rs 180 tax, your daily summary shows the revenue figure.\n  A) Rs 1,000: items after discount only  B) Rs 1,080: items plus shipping, no tax  C) Rs 1,260: everything the customer paid\n  Your answer (a letter, or your own words) > ",
+  "typed": "B) Rs 1,080: revenue is items after discount plus shipping, no tax, and only for card orders. Store-credit orders bring in no new money."
+ },
+ {
+  "prompt": "\n13 of 13. On Monday a customer gets a Rs 900 refund for an order placed last Friday. Which day's revenue is reduced?\n  A) Monday's revenue goes down by Rs 900, the day the refund was issued  B) Last Friday's revenue goes down by Rs 900, the day of the sale  C) Shown on its own line, not taken off any day's revenue\n  Your answer (a letter, or your own words) > ",
+  "typed": "My rules don't cover how refunds show up in the daily sales summary. The summary just counts card-order totals, so I don't have a rule for taking refunds off any day's revenue."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: Damaged goods are always accepted and refunded in full, including shipping, when reported up to 90 days after delivery; after 90 days, nothing is refunded.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. Damaged goods are refunded in full including shipping, but only if the reason is \"damaged\", and the refund is still rounded down to whole rupees. The \"under 50 rupees isn't paid\" rule doesn't apply to damaged goods. Final-sale damaged orders are also refunded in full."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: An order cancelled before delivery has no separate cancellation rule: the cancellation is handled once the order arrives, when the normal post-delivery refund rules apply, and the shipping fee is not refunded unless the goods are damaged.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. My rules only cover refunds after delivery, so there's no separate rule for cancelling before delivery. If the order was delivered, the normal rules apply, and the shipping fee is only refunded for damaged goods. The refund also goes back the way it was paid, to the card or as store credit."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: For a returned item, the refund is the price paid for that item (its price minus its share of the discount code), under the normal return rules, and it goes back to the original payment method: to the card if the order was paid by card, or as store credit if it was paid by store credit.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Mostly right, but one thing is off: the refund is worked out on the whole order's discount share only for that item, and the shipping fee is not refunded unless the goods are damaged. Also the 14-day, 30-day and 90-day rules, the Rs 50 minimum (except damaged goods), rounding down to whole rupees, and the final-sale rule all still apply to that item's amount."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: Store credit has no expiry rule, so no expiry date is applied to store credit under this policy.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Right. I have no rule for store credit expiry, so no expiry date should be applied."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A customer earns 1 loyalty point for every Rs 100 paid on an order, but only if the items on the order total Rs 500 or more after discounts and the order was not paid with store credit.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. Points are 1 for every full 100 rupees of items after the discount code, and shipping earns nothing. Orders paid with store credit earn none, and items under Rs 500 earn none. Final-sale orders earn double points."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: For each order, the daily summary revenue is items after discount plus shipping, excluding tax, and it counts only for card orders, so store-credit orders contribute zero because they bring in no new money.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. Revenue is items after discount plus shipping, and no tax. It counts only card orders. Orders counts every order, including store-credit ones. Average is revenue divided by the number of card orders, rounded down to whole rupees, or 0 if there are no card orders."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: The daily sales summary counts card-order totals, and no refund is subtracted from any day's revenue.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Right. My rules don't say how refunds show up in the daily summary. Revenue is just the card-order totals (items after discount plus shipping), so nothing is subtracted for refunds."
+ },
+ {
+  "prompt": "\nTwo of your answers pull different ways on one decision. Which is your policy?\nWhich return windows apply to a returned item: only the 14-day window after delivery, or the 14-day, 30-day and 90-day windows?\n  A) Only the 14-day window after delivery applies to returned items.  B) The 14-day, 30-day and 90-day windows all apply to returned items, as answer 5 says.\n  > ",
+  "typed": "B) The 14-day, 30-day and 90-day windows all apply to returned items. Within 14 days is the full amount, days 15 to 30 are half, and after 30 days nothing. The 90-day window is only for damaged goods."
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": "1. Changed-mind returns aren't only accepted up to 14 days. Days 1 to 14 get the full amount, days 15 to 30 get half, and after day 30 nothing."
+ },
+ {
+  "prompt": "  Rule 1: Whenever a customer asks to return a delivered item because they changed their mind, accept the return only if the request is made up to 14 days after delivery.\n  What should it be? > ",
+  "typed": "Whenever a customer asks to return a delivered item because they changed their mind, the full amount is refunded within 14 days of delivery (day 14 included), half from day 15 to day 30, and nothing after day 30. The refund is worked out on what was paid for the items, and the shipping fee is not refunded."
+ },
+ {
+  "prompt": "  Rule 14: Whenever the daily summary is calculated, do not subtract refunds from any day's revenue.\n  What should it be? > ",
+  "typed": "Whenever the daily summary is calculated, revenue is the sum of card-order totals (items after discount plus shipping, no tax), so refunds are not taken off any day's revenue. My rules don't say anything about refunds in the summary."
+ },
+ {
+  "prompt": "  Rule 1: Whenever a customer asks to return a delivered item because they changed their mind, the full amount is refunded within 14 days of delivery (day 14 included), half from day 15 to day 30, and nothing after day 30. The refund is worked out on what was paid for the items, and the shipping fee is not refunded.\n  What should it be? > ",
+  "typed": "Whenever a customer asks to return a delivered item because they changed their mind, the full amount is refunded within 14 days of delivery (day 14 included), half from day 15 to day 30, and nothing after day 30. The refund is worked out on what was paid for the items (item prices times quantities, minus the discount code), the shipping fee is not refunded, and it is rounded down to whole rupees."
+ },
+ {
+  "prompt": "  Rule 14: Whenever the daily summary is calculated, revenue is the sum of card-order totals (items after discount plus shipping, no tax), so refunds are not taken off any day's revenue.\n  What should it be? > ",
+  "typed": "Whenever the daily summary is calculated, revenue is the sum of card-order totals (items after discount plus shipping, no tax), and refunds are not taken off any day's revenue."
+ },
+ {
+  "prompt": "  Rule 15: Whenever the daily summary counts orders, count every order, including store-credit orders.\n  What should it be? > ",
+  "typed": "Whenever the daily summary counts orders, count every order in the list, including store-credit orders."
+ },
+ {
+  "prompt": "calculated, revenue is the sum of card-order totals (items after discount plus shipping, no tax), so refunds are not taken off any day's revenue.\n  What should it be? > \n  > Whenever the daily summary is calculated, revenue is the sum of card-order totals (items after discount plus shipping, no tax), and refunds are not taken off any day's revenue.\n  Rule 15: Whenever the daily summary counts orders, count every order, including store-credit orders.\n  What should it be? > \n  > Whenever the daily summary counts orders, count every order in the list, including store-credit orders.\n  Thank you. The builders will encode your 17 rules as tests before anything lands.\n\n[07:42] Starting.\n  [07:43] Builder w3 picked up: w3.\n\n========================================================================\n Question 1 of up to 30  -  from builder w3  -  asked 0:02 ago\n========================================================================\n\n  A customer returns a delivered item 10 days after delivery and gives\n  a reason that is neither changed mind nor damaged, say the colour\n  looked different or wrong size ordered. How should we treat it?\n\n    A) Same as changed mind: full refund in 14 days, half to day 30.\n    B) No refund.\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > C) Something else: my rules only cover changed mind and damaged, so I don't have a rule for other reasons like wrong colour or wrong size. I'd need to decide that separately.\n",
+  "typed": "C) Something else: my rules only cover changed mind and damaged, so I don't have a rule for other reasons like wrong colour or wrong size. I'd need to decide that separately.",
+  "keyboard": true
+ },
+ {
+  "prompt": " from builder w3  -  asked 0:02 ago\n========================================================================\n\n  A customer returns a delivered item 10 days after delivery and gives\n  a reason that is neither changed mind nor damaged, say the colour\n  looked different or wrong size ordered. How should we treat it?\n\n    A) Same as changed mind: full refund in 14 days, half to day 30.\n    B) No refund.\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > C) Something else: my rules only cover changed mind and damaged, so I don't have a rule for other reasons like wrong colour or wrong size. I'd need to decide that separately.\n  Thanks, sent to builder w3. (1 answered so far)\n\n========================================================================\n Question 2 of up to 30  -  from builder w3  -  asked 0:05 ago\n========================================================================\n\n  A customer asks for money back on an order that has not been\n  delivered yet, for example it is still on the way or was cancelled.\n  What should happen?\n\n    A) Refund nothing through these return rules; the cancellation\n       is handled separately.\n    B) Refund the full amount including shipping.\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > C) Something else: my rules only cover refunds after delivery, so I don't have a rule for orders that haven't been delivered yet. I'd need to decide that separately.\n",
+  "typed": "C) Something else: my rules only cover refunds after delivery, so I don't have a rule for orders that haven't been delivered yet. I'd need to decide that separately.",
+  "keyboard": true
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": "2, 3, 4, 10, 11"
+ },
+ {
+  "prompt": "  Rule 2: Refunds: any other reason, such as 'wrong size', gets 0 rupees. For example, Amit returning an order because of 'wrong size' on day 3 gets nothing.\n  What should it be? > ",
+  "typed": "Whenever a customer returns an item for any reason other than changed mind or damaged, such as wrong size, I don't have a rule for it yet, so please don't decide it for me. It should be flagged as something I still need to decide, not silently set to 0."
+ },
+ {
+  "prompt": "  Rule 3: Refunds: when only one item from an order is returned, the refund is that item's price times quantity, less the same discount percentage, and no shipping is refunded, even for a damaged item. For example, 2 pieces at 200 rupees with a 10% code, returned for 'changed mind' on day 5, refunds 360 rupees.\n  What should it be? > ",
+  "typed": "Whenever a single item from an order is returned under the normal return rules, I don't have a rule for returning part of an order, so please don't decide it for me. My rules only work out the refund on the whole order (item prices times quantities, minus the discount code), and the shipping fee is refunded only for damaged goods, so that part needs to be flagged for me to decide."
+ },
+ {
+  "prompt": "  Rule 4: Refunds: an order that has not been delivered (no delivery date) or a negative number of days gets 0 rupees. For example, an order not yet delivered, with 'damaged' as the reason, refunds nothing.\n  What should it be? > ",
+  "typed": "Whenever an order has not been delivered yet, I don't have a rule for it, so please don't decide it for me. It should be flagged as something I still need to decide, not silently set to 0. A negative number of days is a data mistake and should be treated as day 0."
+ },
+ {
+  "prompt": "  Rule 10: Messy or missing details: if the reason is blank or missing, the refund is 0 rupees. For example, Priya returning an order on day 3 with no reason written gets nothing.\n  What should it be? > ",
+  "typed": "Whenever the reason is blank or missing, I don't have a rule for it, so please don't decide it for me. It should be flagged as something I still need to decide, not silently set to 0."
+ },
+ {
+  "prompt": "  Rule 11: Messy or missing details: reasons with other spelling, such as 'changed-mind' or 'changed my mind', are not recognised and get 0 rupees. For example, 'changed my mind' on day 3 refunds nothing.\n  What should it be? > ",
+  "typed": "Whenever the reason is something slightly different like \"changed-mind\" or \"changed my mind\", I don't have a rule for spelling variations, so please don't decide it for me. It should be flagged as something I still need to decide, not silently set to 0."
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "1 of 19. Asha buys a 499-rupee item and earns 0 points, but a 500-rupee item earns 5 points: orders under 500 rupees (after discount) earn nothing.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "2 of 19. Meena pays 600 rupees for items with a 20% discount code, so she pays 480 and earns 0 points, while the same items at full price would earn 6.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "3 of 19. Ravi buys 1,000 rupees of goods marked final sale and earns 20 points, double the 10 points a normal order earns, so non-returnable orders get a bonus.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "4 of 19. Kiran pays a 1,000-rupee order with store credit and earns 0 points, while the same order paid by card earns 10.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "5 of 19. Dev's 999-rupee order earns 9 points, not 10, because points are rounded down per full 100 rupees; and a 400-rupee order with 200 shipping earns 0 since shipping doesn't count.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "6 of 19. Asha returns a 1,000-rupee order (10% discount code, 100 shipping) because she changed her mind: on day 14 she gets 900 rupees back, but on day 15 only 450, so the full refund stops after exactly 14 days.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "7 of 19. The same changed-mind return on day 30 gets 450 rupees and on day 31 gets 0, so the half-refund window ends after 30 days.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "8 of 19. A changed-mind return of an 80-rupee order on day 20 would be a 40-rupee half refund, but it comes out as 0 because refunds under 50 rupees are not paid; a 40-rupee order damaged on day 5 still gets its full 40 back.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "9 of 19. Ravi's 1,000-rupee order marked final sale arrives damaged on day 5: he gets the full 1,000 rupees back, because final sale only blocks changed-mind returns.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "10 of 19. A damaged order is refunded in full up to day 90 (1,000 rupees on day 90) and nothing on day 91, with no check that the damage was reported on time.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "11 of 19. Asha's 1,000-rupee order with a 10% code and 100 shipping is returned as damaged on day 5: she gets 1,000 rupees back, the discounted items plus the shipping fee.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "12 of 19. The same order returned for changed mind on day 5 gets 900 rupees back: the 100 shipping fee is kept.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "13 of 19. Kiran paid a 1,000-rupee order with store credit and it arrives damaged: the 1,000 rupees go back as store credit, not to a card.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "14 of 19. Meena returns a 999-rupee order bought with a 15% code for changed mind on day 20: the code takes off 149 rupees (rounded down), she paid 850, and gets 425 rupees back.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "15 of 19. A customer's reason is left blank or missing on a 1,000-rupee order delivered 5 days ago: the refund is 0 rupees, with no flag for a person to review.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Blank or missing reason: I don't have a rule for that, so please flag it for me to decide instead of setting it to 0."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A 1,000 rupees order with a blank reason, delivered 5 days ago, is flagged for the owner to decide.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right, that's what it should do: a blank or missing reason is flagged for me to decide, not set to 0."
+ },
+ {
+  "prompt": "16 of 19. A customer gives a reason like 'wrong size' on a 1,000-rupee order: the refund is 0 rupees, since only 'damaged' and 'changed mind' are recognised; capital letters and extra spaces are accepted.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "A 'wrong size' reason is not covered by my rules, so it shouldn't be set to 0 silently. Please flag it for me to decide. Capital letters and extra spaces being accepted for 'changed mind' and 'damaged' is fine."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A 'wrong size' return on a 1,000 rupee order is flagged for the owner to decide.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right, that's what it should do: a 'wrong size' return is flagged for me to decide, not set to 0. Capital letters and extra spaces being accepted is fine."
+ },
+ {
+  "prompt": "17 of 19. An order that hasn't been delivered yet (delivery date missing) with a damaged claim on 1,000 rupees gets a refund of 0 rupees, with no message saying why.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "A damaged order that hasn't been delivered yet isn't covered by my rules, so it shouldn't be set to 0 silently. Please flag it for me to decide."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: An undelivered 1,000-rupee order with a damaged claim is flagged for the owner to decide, with the reason stated, not refunded 0 rupees.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right, that's what it should do: an undelivered order with a damaged claim is flagged for me to decide, not set to 0."
+ },
+ {
+  "prompt": "18 of 19. In the daily summary, a 1,000-rupee card order and a 500-rupee store-credit order show 2 orders but revenue of only 1,000 rupees and an average of 1,000, so store-credit sales are counted as orders but not as revenue.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right, store-credit orders count as orders, but they bring in no new money. Revenue and average only use card orders."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A 1,000-rupee card order and a 500-rupee store-credit order show 2 orders, but revenue and average stay at 1,000 rupees.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "19 of 19. A day with no orders shows 0 orders, 0 revenue and 0 average; and a 1,000-rupee order with 100 shipping counts as 1,100 rupees of revenue, shipping included.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ }
+]
