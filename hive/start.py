@@ -270,7 +270,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     if rules:
         k = len(memory.load(repo))
         say(f"I'll remind them of your {_n(k, 'earlier ruling')} on this project, so you won't be asked those again.")
-    asked = []
+    asked = []; technical = False
     if interview_first and (phone or not overnight):   # the owner is here: ask him first (Gates 30-35)
         past = [r['text'] for r in memory.load(repo)]
         qs = telegram._load(os.path.join(home, 'interview') + '.questions.json').get('qs') or interview.write_situations(goal_text, past)
@@ -279,8 +279,9 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
             asked = interview.interview(goal_text, phone, past, ask=lambda p: _ask(p, ''), situations=qs,
                                         save=os.path.join(home, 'interview'))   # a stop never costs him his answers
         else:   # Gate 89: a technical goal has no business decisions to ask him about (Gate 86: it invented a shop)
-            say("\nThis goal has no business decisions for you to rule on, so I won't quiz you first. The builders will ask "
-                "if they need anything.")
+            technical = True
+            say("\nThis goal has no business decisions for you to rule on, so I won't quiz you first or review business rules "
+                "afterwards. The builders will ask if they need anything.")
         if asked:
             for r in asked:
                 memory.add(repo, r, 'interview')
@@ -292,7 +293,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
                     workers = n
                     say(f"  For a job this size I'll use {_n(n, 'builder')} ({why}).")
     say(f'\n[{_now()}] Starting.')
-    state = dict(repo=repo, branch=branch, name=name, home=home, test_cmd=test_cmd, links=links, goal=goal_text, t_g=t_g,
+    state = dict(repo=repo, branch=branch, name=name, home=home, test_cmd=test_cmd, links=links, goal=goal_text, t_g=t_g, technical=technical,
                  rules=rules, workers=workers, minutes=minutes, before=before, started=time.time(), overnight=overnight,
                  asked=asked, spent0=spent0)
     run1 = os.path.join(home, 'build')
@@ -340,6 +341,11 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
                 f"the branch.")
         return rc
     answered = _answered(run1)
+    if state.get('technical') and answered < ASKED_ENOUGH:   # Gate 94 (under test): no business rules to review
+        rc = _deliver(state)   # its tests and the goal's stated interfaces are still checked
+        msg = f"Done. {state.get('check', '')} It's ready on branch hive/{name}."
+        (phone.send('🎉 ' + msg) if phone else say('\n' + msg))
+        return rc
     if answered >= ASKED_ENOUGH:   # Gate 68: after builders asked him, the full review added +1.6 points (98.4 -> 100%)
         rc = _deliver(state)
         msg = (f"{_who(state)} asked you {_n(answered, 'question')} while building, and your answers are built in. "
