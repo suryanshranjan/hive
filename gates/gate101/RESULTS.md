@@ -9,8 +9,10 @@
   - All three predictions failed, two of them in the good direction.
 - **Why memory helped: it is what notices the change.**
   - In M, his day-2 answers pulled against his day-1 rulings 3–5 times per flight, and Hive asked "which holds now?". The changed rules became explicit, and the builders changed the code.
-  - In F there was nothing to compare against. The merged day-1 code already paid a point per 100 rupees, and in F1 and F3 the build left it so. In F1 the interview asked about points on returned items and orders paid with points, never the rate. The new rate (a point per 50) was never raised.
-  - All 9 points tests failed in F1 and F3; F3 also missed the 7-day refund window.
+  - In F there was no earlier ruling to compare with, so the change surfaced later or not at all. **Correction, after reading the transcripts:** the new rate was not unknown in F; it never reached the code the product runs.
+    - **F1 (20):** the code sheet showed the old rate, and the owner corrected seven points rules to a point per ₹50. One change builder got all seventeen corrections in its prompt and changed only the refund rules. Hive then said "Your changes are in, and every test passes."
+    - **F3 (17):** the owner stated the new rate in the interview. The builder wrote it in a new `shop/points.py` that nothing calls, left `shop/loyalty.points_earned` at a point per ₹100, and missed the 7-day refund window. The review was skipped.
+    - The builders' own tests passed both times. Nothing checked the owner's words against the functions the product uses (MAST FM-3.2/3.3). This is now Gate 103.
 - **What this shows:** for a change to an existing product, Hive notices a changed rule only if it remembers the old one. Without memory, nothing compares the owner's answers with what the existing code already does.
 
 | Day 2 (new policy, not announced) | Hidden (of 29) | Prompts | Contradictions settled |
@@ -31,7 +33,7 @@
 ## What it means
 
 1. **Keep the memory.** Gates 92 and 101 together: whether the owner announces the change or not, his kept rulings plus the contradiction check carry his latest word into the code. They cost him a few "which holds now?" questions.
-2. **Candidate (untested): on an existing product without memory, compare against the code.** When a goal changes parts that already exist, Hive could describe what the existing code does (the code sheet's describer already can) and treat that as earlier rulings for the contradiction check.
+2. **Check the owner's examples against the product's own functions before delivery** (Gate 103). Both F failures were verification failures, not missing knowledge.
 
 ## Files
 
