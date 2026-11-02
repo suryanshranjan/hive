@@ -8,7 +8,18 @@ and cached in <owner dir>/explained.json; if it fails, the builders' own words a
 import json, os, re, subprocess
 from . import argv
 
-CMD = os.environ.get('HIVE_EXPLAIN_CMD', 'claude -p --output-format json')
+# Gate 97: Hive's own reading calls need no tools, no coding-agent system prompt and no project files. With them, each
+# call re-cached about 11k tokens: $0.050 a call; lean, $0.005, with the same model and the same answers.
+LEAN = ("claude -p --output-format json --tools '' --system-prompt "
+        "'You read what a business owner and his builders wrote, and answer exactly in the JSON you are asked for.'")
+CMD = os.environ.get('HIVE_EXPLAIN_CMD', LEAN)
+_EMPTY = []   # an empty folder to run the reader in, so no project CLAUDE.md is loaded with every call
+
+def _quiet_dir():
+    if not _EMPTY or not os.path.isdir(_EMPTY[0]):
+        import tempfile
+        _EMPTY[:] = [tempfile.mkdtemp(prefix='hive_reader_')]
+    return _EMPTY[0]
 SHOW = 8   # at most this many go to the owner, most important first
 
 PROMPT = """You help a busy, non-technical business owner check decisions that software builders made while building a
@@ -80,7 +91,7 @@ def _ask_claude(prompt):
         raise RuntimeError('claude failed recently; using the backup')
     try:
         # UTF-8 both ways: Windows' default encoding cannot carry "₹", emoji or curly quotes, so every model call failed there
-        p = subprocess.run(argv(CMD), input=prompt, capture_output=True, text=True, encoding='utf-8',
+        p = subprocess.run(argv(CMD), input=prompt, capture_output=True, text=True, encoding='utf-8', cwd=_quiet_dir() if CMD == LEAN else None,
                            errors='replace', timeout=300, env=dict(os.environ, PYTHONIOENCODING='utf-8'))
         reply = json.loads(p.stdout)
     except Exception:
