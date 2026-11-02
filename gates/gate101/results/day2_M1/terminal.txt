@@ -1,0 +1,297 @@
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: the command in your hive settings. 22 tests, all passing.
+
+I'll put 2 builders on it (the job has 2 parts that can be built at the same time): about 1.6× the speed of one builder, for about 1.6× the cost. They work on copies, so your branches stay exactly as they are.
+If they need a decision only you can make, the question will appear right here.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+I'll remind them of your 26 earlier rulings on this project, so you won't be asked those again.
+
+First, a few quick situations where your own rules matter:
+
+1 of 19. Anita bought a ₹2,000 shirt using a 10% code and paid ₹1,800. She returns it on day 5, and the order is not final-sale and not damaged. How much should she get back?
+  A) Only what she actually paid for the shirt, ₹1,800  B) The full shirt price of ₹2,000, and the shop absorbs the discount  C) ₹1,800 back, but the 10% code is cancelled and cannot be used again
+  Your answer (a letter, or your own words) > 
+  > A
+
+2 of 19. Neha's order has a ₹1,000 item and a ₹3,000 item, with 20% off the whole basket (₹800 off). You make a one-off exception and let her send back only the ₹1,000 item. How is the ₹800 discount shared?
+  A) Shared in proportion to price, so the ₹1,000 item carries ₹200 of it and she gets ₹800  B) The whole ₹800 is taken off the returned item first, so she gets ₹200  C) The discount is ignored for the returned item and she gets the full ₹1,000
+  Your answer (a letter, or your own words) > 
+  > A) Shared in proportion to price, so the ₹1,000 item carries ₹200 of it and she gets ₹800
+
+3 of 19. Ravi's ₹1,200 order had a code that needed ₹1,000 minimum spend, and the shop gave him free delivery. You allow a part return that drops what he kept to ₹700. What happens to the discount and delivery?
+  A) Nothing is clawed back, and he gets the discounted price of the returned item only  B) The discount is cancelled and he is charged for the delivery, so his refund is smaller  C) Staff decide each time and the system just flags it
+  Your answer (a letter, or your own words) > 
+  > A, nothing is clawed back and he gets what he paid for the returned item. My rules have no clawback.
+
+4 of 19. Sunita bought a ₹1,500 kurta and got a free ₹300 dupatta in the same order. She returns the whole order on day 6. What do you refund and expect back?
+  A) Refund the ₹1,500 kurta, and the free dupatta must come back too  B) Refund the ₹1,500 and let her keep the free dupatta  C) Refund ₹1,200, which is the kurta price less the value of the dupatta she keeps
+  Your answer (a letter, or your own words) > 
+  > B, refund ₹1,500 and she keeps the free dupatta. My rules only refund what was actually paid for the items, and nothing makes her send the free item back.
+
+5 of 19. Imran paid ₹100 delivery on a ₹1,800 order. The goods are fine, and his shop-error exchange fails because the item was out of stock, so you cancel and refund the whole order on day 4. Is the ₹100 delivery returned?
+  A) No. Delivery is never refunded unless the goods arrived damaged  B) Yes. If the shop could not supply the item, delivery is refunded  C) Yes if the item was shipped wrong, and no if it simply could not be supplied
+  Your answer (a letter, or your own words) > 
+  > A. Delivery is never refunded unless the goods arrived damaged. The goods here are fine, so the ₹100 stays with the shop.
+
+6 of 19. Farah bought a clearance kurta marked final-sale for ₹900 and says the zip is broken, but your records show no damage report. She asks for her money back on day 10. What do you do?
+  A) Refund her what she paid, ₹900, if the fault is confirmed  B) Refuse, since final-sale means no refund whatever the reason  C) Offer store credit of ₹900 instead of cash
+  Your answer (a letter, or your own words) > 
+  > Refuse. Final-sale means no refund unless the goods arrived damaged, and my records show no damage report for this order, so she gets nothing, not even store credit.
+
+7 of 19. Deepak asks for a refund on day 31, one day after the 30-day limit, and says the courier delivered it late and he was travelling. Do you ever bend the cut-off?
+  A) No. The cut-off is firm and he gets nothing  B) Staff may approve store credit for such late cases  C) Staff may approve a half refund if they can show the delivery was late
+  Your answer (a letter, or your own words) > 
+  > A. No. The cut-off is firm: after day 30 the refund is nothing, and my rules have no exception for late delivery or travelling.
+
+8 of 19. Kiran paid ₹3,000 with a card that has since expired and been replaced. The card refund bounces back. How is she paid?
+  A) Retry to the same card route, and staff contact her to arrange the payment  B) Pay it as store credit instead  C) Pay by bank transfer after staff check her details
+  Your answer (a letter, or your own words) > 
+  > B. My rules say the money goes back the way it was paid, so a card order goes to the card. If the card refund bounces, I'd rather pay it as store credit than do anything manual.
+
+9 of 19. Pooja orders ₹1,000 of items with a ₹200 code and ₹100 delivery, paying by card. How many points does she earn?
+  A) 8 points, on the ₹800 she actually paid for items, with delivery excluded  B) 10 points, on the full ₹1,000 before the discount  C) 9 points, on ₹800 plus ₹100 delivery
+  Your answer (a letter, or your own words) > 
+  > A. 8 points, on the ₹800 she paid for the items, with delivery excluded.
+
+10 of 19. Sana earned 20 points on a ₹2,000 order, but Tarun returned only part of his order after you made an exception: ₹1,000 of ₹2,000 was refunded. How many of his 20 points are affected?
+  A) Nothing is taken back, because points are kept on any returned order  B) Half the points, 10, are taken back in line with the money returned  C) All of the points are taken back and he gets them again if you approve
+  Your answer (a letter, or your own words) > 
+  > A. Nothing is taken back. My rules only say how points are earned, and there is no clawback when an order is returned.
+  (Your answer also settles 2 of the coming questions; I'll skip them.)
+
+12 of 19. Lata paid ₹1,000 for an order: ₹600 by card and ₹400 using 400 of her points. She returns the whole order on day 3. What does she get back?
+  A) ₹600 to her card and 400 points back into her balance  B) ₹1,000 to her card, as cash  C) ₹1,000 as store credit
+  Your answer (a letter, or your own words) > 
+  > A. The ₹600 goes back to her card because the money goes back the way it was paid. I have no other rule on paying with points, so the 400 points go back to her balance.
+  (Your answer also settles 1 of the coming question; I'll skip it.)
+
+13 of 19. Vikram uses a ₹200 code and also a promotion that gives 50 bonus points, on a ₹2,000 card order. Can he combine these, and what are the bonus points worth later?
+  A) Yes, he can combine them, and the bonus points behave like normal points  B) No, a code and the bonus promotion cannot be used together  C) Yes, but bonus points are not earned when a code is used
+  Your answer (a letter, or your own words) > 
+  > A is closest, but my rules have nothing about bonus promotions or combining them. Points are earned on what he paid for the items after the code: ₹1,800 gives 36 points, shipping excluded, and since it's a card order over ₹500 that's all he earns by my rules.
+
+14 of 19. Geeta buys on the 1st and the order is delivered on the 5th. When do her points appear in her balance?
+  A) After the return window closes, so refunded orders rarely need points undone  B) Straight away at checkout, and are taken back if there is a refund  C) On delivery day, and are taken back if there is a refund
+  Your answer (a letter, or your own words) > 
+  > Points are only earned on delivery of the order, not at checkout. My rules only say how points are earned, with nothing about when they appear, so C is closest, and since there's no clawback, nothing is taken back on a refund.
+
+17 of 19. Manoj finds a sale a week after buying a ₹2,000 jacket that is now ₹1,500, and asks for the ₹500 difference back without returning anything. What do you do?
+  A) No refund of the difference, but staff may give a goodwill amount by hand  B) Always refund the difference within 7 days  C) Give the difference as store credit within 7 days
+  Your answer (a letter, or your own words) > 
+  > A. My rules have nothing about price-match or sale differences, so no refund of the difference; any goodwill amount would be staff's call by hand.
+
+18 of 19. Alka used a single-use ₹300 code on an order that is then fully refunded on day 8, and the code has not expired. Does she get the code back?
+  A) No, the used code is gone  B) Yes, it is reissued only if the whole order is refunded and the code has not expired  C) Yes, always, even after a part refund or expiry
+  Your answer (a letter, or your own words) > 
+  > A. My rules have nothing about reissuing codes, so the used code is gone.
+
+19 of 19. A customer says their refund or points are wrong, for example Zoya says she should have 30 points and the system shows 20. Who can change the amount?
+  A) Staff can change it by hand, with a written reason that is logged  B) Only you, the owner, can change it  C) Nobody, the system's calculation is final
+  Your answer (a letter, or your own words) > 
+  > A. My rules have nothing about staff changing amounts by hand, so nobody overrides the system's calculation; the rules decide the amount.
+
+Your rule, as I'll build it: Refuse a refund request on a final-sale item, offering neither money back nor store credit, unless the item arrived damaged; if the order has no damage report on record, treat it as not damaged and refuse, even when the customer claims a defect (such as a broken zip) on day 10.
+  Right? (Enter = yes, or say what's off) > 
+  > Yes, that's right. Final-sale means no refund unless the goods arrived damaged, and with no damage report on record she gets nothing, not even store credit.
+
+Your rule, as I'll build it: On a ₹2,000 card order, a customer can use a ₹200 code and earn points only on what he paid for the items after the code (₹1,800, so 36 points, with shipping excluded), and because it is a card order over ₹500 that is all he earns; the owner's rules say nothing about bonus promotions or combining them, so the 50-bonus-point promotion is not covered by any rule and no bonus points or later value for them are defined.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: Points are earned only when an order is delivered, not at checkout, so Geeta's points for an order bought on the 1st and delivered on the 5th are credited on the 5th and not before; and if an order is later refunded, no points are taken back.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: If a customer who has already bought an item asks for a refund of the difference because the item is now on sale at a lower price (for example, a ₹2,000 jacket now ₹1,500, a ₹500 difference) without returning anything, the system must not refund or credit the price difference, because the store's rules contain no price-match or sale-difference policy; any goodwill amount is decided and issued manually by staff, never automatically.
+  Right? (Enter = yes, or say what's off) > 
+  > The part about no refund or credit for the price difference is right. Take out the goodwill by staff part, because my rules say nothing about it and the system's calculation is final.
+
+Two of your answers pull different ways on one decision. Which is your policy?
+How many points does a customer earn on what they paid for items (after any code, delivery excluded)?
+  A) 1 point per ₹100 (8 points on ₹800, and 20 points on ₹2,000)  B) 2 points per ₹100 (36 points on ₹1,800)
+  > 
+  > B. One point for every full ₹50 paid for the items, which is 2 points per ₹100. So ₹1,800 gives 36 points, and ₹800 gives 16, not 8.
+
+Your rules for this feature, as the builders will follow them (each one applies to every case like it, not just the example):
+  1. Whenever an order or part of an order is returned (including a part return you have allowed as an exception), refund only what the customer actually paid for the returned item. That is its price minus its proportional share of any discount on the whole basket, so the share is by price and a ₹1,000 item in a ₹4,000 basket with ₹800 off carries ₹200 of the discount and refunds ₹800. Whenever a part return leaves less than a code's minimum spend, nothing is clawed back: the discount and any free delivery stay, and the customer gets only the discounted price of the returned item.
+  2. Whenever an order is returned and it included a free gift item, refund only what was paid for the goods (for example ₹1,500) and do not ask for the free gift back; the customer keeps it.
+  3. Whenever an order is refunded or cancelled, do not refund the delivery charge, unless the goods arrived damaged. This holds even when the cancellation is your own fault, such as a failed shop-error exchange.
+  4. Whenever a refund is requested after the 30-day limit, refuse it and give nothing, whatever the reason (such as late courier delivery or the customer travelling). The cut-off is never bent.
+  5. Whenever a refund to the customer's card bounces back (for example because the card has expired and been replaced), pay the amount as store credit instead.
+  6. Whenever an order was paid partly by card and partly with points and it is returned in full, refund the card portion to the card and put the points portion back into the customer's points balance (for example ₹600 to the card and 400 points back).
+  7. Whenever points are calculated for an order, base them only on what the customer paid for the items after any code, and leave delivery out. Whenever an order qualifies for a bonus-points promotion, give no bonus points, because no rule defines them.
+  8. Whenever an order is delivered, credit its points on the delivery date, not at checkout (for example, bought on the 1st and delivered on the 5th means credited on the 5th).
+  9. Whenever an order is refunded or returned, in full or in part, take back none of the points earned on it.
+  10. Whenever an order that used a single-use code is fully refunded, do not give the code back, even if it has not expired. The used code is gone.
+  11. Whenever a customer says a refund or points amount is wrong, nobody can change it. The system's calculation is final.
+  12. Whenever a refund is requested for an item that is final-sale, refuse it and offer neither money back nor store credit, unless the item arrived damaged. Treat an order with no damage report on record as not damaged and refuse, even when the customer claims a defect (such as a broken zip).
+  13. Whenever a customer who already bought an item asks for the difference because the item is now on sale at a lower price, and returns nothing, do not refund or credit the difference. There is no price-match or sale-difference policy, and the system's calculation is final.
+  14. How many points does a customer earn on what they paid for items (after any code, delivery excluded)? -> B. One point for every full ₹50 paid for the items, which is 2 points per ₹100. So ₹1,800 gives 36 points, and ₹800 gives 16, not 8.
+  Numbers of any that are wrong (Enter = all correct) > 
+  > 4. After day 30 a normal refund is nothing, but damaged goods are still refunded in full up to 90 days after delivery, so the cut-off is not the same for damaged goods.
+  Rule 4: Whenever a refund is requested after the 30-day limit, refuse it and give nothing, whatever the reason (such as late courier delivery or the customer travelling). The cut-off is never bent.
+  What should it be? > 
+  > Whenever a refund is requested after the 30-day limit, give nothing, except for damaged goods, which are refunded in full (the items plus the delivery fee) up to 90 days after delivery; after 90 days, nothing, whatever the reason.
+
+One thing: this answer pulls against an earlier ruling of yours.
+How many loyalty points does a card order earn on item prices: 1 point per full ₹100 (₹1,000 gives 10) or 1 point per full ₹50 (₹1,000 gives 20)?
+  A) 1 point per ₹100  B) 1 point per ₹50
+  Which holds now? > 
+  > B. One point for every full ₹50 paid for the items, so ₹1,000 gives 20 points.
+
+One thing: this answer pulls against an earlier ruling of yours.
+Can part of an order (one item) ever be returned and refunded on its own, or is a refund always for the whole order?
+  A) Whole order only, never a single item  B) Part returns allowed as an exception, refunded at the item's discounted price
+  Which holds now? > 
+  > B. Part returns are not in my rules; refunds are worked out on the items, quantities and discount code, and I have no rule for returning a single item on its own.
+
+One thing: this answer pulls against an earlier ruling of yours.
+Is a refund only ever for the whole order, or can a part of an order be returned and refunded?
+  A) Refund is for the whole order only  B) Part returns allowed, refunded at the item's discounted price
+  Which holds now? > 
+  > B. Part returns are allowed. The refund is worked out on the items and quantities returned, minus the discount code, with the same rules on days, damage and shipping.
+  Thank you. The builders will encode your 17 rules as tests before anything lands.
+
+[18:11] Starting.
+  [18:11] Builder w2 picked up: w2.
+  [18:11] Builder w1 picked up: w1.
+  [18:11] Builder w1 landed: daily summary: more tests
+  [18:11] Builder w1 landed: Daily summary verified against rulings; added tests (lock w1 released)
+  [18:12] Builder w2 landed: Loyalty 1pt/50, part returns, card bounce, points back
+  [18:12] Builder w2 landed: loyalty per 50 rupees, part returns with proportional discount, card bounce to store...
+
+[18:12] All 2 builders are done.
+They made 9 assumptions your description didn't cover. Rather than going through them one by one, I'll show you everything the build does, as rules: that covers them all.
+
+Let me check the result.
+  31 tests, all passing. All 22 that passed before still pass.
+
+Done in 2 minutes, about $2.93 in all (builders $0.30, Hive's own questions and checks $2.63). Your result is on branch hive/customers-keep-asking-about-1102-1804.
+  See what changed:  git diff main...hive/customers-keep-asking-about-1102-1804
+  Take it:           git merge hive/customers-keep-asking-about-1102-1804
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/customers-keep-asking-about-1102-1804.)
+
+Here is everything the build does now, written from its code (30 more only repeat your own rules, so I left them out).
+
+What the build does now, as rules (each one is what the product will do. Mark any that is not your policy):
+  1. Refunds: a discount that does not come to a whole rupee is rounded down, which leaves the refund slightly higher; a Rs 333 item with 10% off (Rs 33.30 discount) refunds Rs 300.
+  2. Refunds: a part return of damaged goods does include the full shipping fee; returning the Rs 1,000 damaged item from that order on day 5 refunds Rs 1,100.
+  3. Refunds: if Priya says she returns more units than she bought, only the units she bought are refunded; sending back 5 of a Rs 500 item bought twice refunds Rs 1,000 (less any discount).
+  4. Refunds: if the same item is listed twice in one return, the quantities are added up; two lines of 1 unit of a Rs 500 item bought twice refund Rs 1,000 (less any discount).
+  5. Refunds: an item listed in a part return that is not on the order, such as 'zz', adds nothing to the refund; a return of only 'zz' refunds Rs 0.
+  6. Refunds: a part return of an empty list of items refunds Rs 0 for a changed-mind return, but a damaged claim still refunds the shipping fee, so Rs 100.
+  7. Refunds: a damaged part return that names only items not on the order still refunds the shipping fee; a return of 'zz' with Rs 100 shipping refunds Rs 100.
+  8. Refunds: a zero or negative quantity in a part return counts as no items returned; returning -1 of a Rs 500 item refunds Rs 0 (Rs 100 shipping if damaged).
+  9. Refunds: a quantity with a fraction in a part return is cut down to the whole number; returning 1.9 of a Rs 500 item counts as 1 unit.
+  10. Refunds: any payment method other than store credit, such as UPI, is refunded as if it were a card; a Rs 2,000 UPI order refunds Rs 2,000 to the card.
+  11. Refunds: points given back are capped at the refund amount, so 5,000 points used on a Rs 1,000 order returns only 1,000 points and Rs 0 in money.
+  12. Refunds: points are given back only when the whole order is returned; returning one item of a Rs 1,000 order paid partly with 400 points refunds Rs 1,000 with no points back.
+  13. Refunds: when the refund comes to Rs 0, no loyalty points are returned either; a Rs 1,000 order that used 400 points and is returned on day 40 gives back nothing.
+  14. Refunds: for damaged goods the points given back are taken from the refund including shipping; a Rs 1,000 order with Rs 100 shipping and 400 points used, reported damaged on day 1, refunds Rs 700 and 400 points.
+  15. Refunds: a discount code of 100% or more leaves nothing to refund, so a Rs 1,000 order with 100% off refunds Rs 0.
+  16. Loyalty points: the Rs 500 limit is checked after the discount, so a Rs 550 order with 10% off earns 0 points, while Rs 555 with 10% off (Rs 500 after discount) earns 10.
+  17. Loyalty points: a discount that does not come to a whole rupee is rounded down, which leaves the amount slightly higher; Rs 555 with 10% off counts as Rs 500, not Rs 499.50.
+  18. Loyalty points: any payment method other than card, such as UPI, earns no points even though its refunds are treated like card refunds; a Rs 1,000 UPI order earns 0.
+  19. Loyalty points: the amount of loyalty points Priya spent on an order does not reduce the points earned; a Rs 1,000 card order paid with 900 points still earns 20 points.
+  20. Loyalty points: a 100% discount leaves nothing to earn on, so a Rs 1,000 order with 100% off earns 0 points.
+  21. Loyalty points: a very large order earns points normally with no cap; a Rs 1,000,000,000 card order earns 20,000,000 points.
+  22. Loyalty points: until the order has a delivery date, no credit date exists and the points are not credited.
+  23. Loyalty points: a negative discount (a surcharge) is treated as a price increase, so a Rs 1,000 order with -20% earns 24 points and refunds Rs 1,200.
+  24. Messy or missing details: if the payment method is typed as ' Store_Credit ', 'Store-Credit' or 'store credit', it is still treated as store credit for refunds.
+  25. Messy or missing details: if the payment method is typed as 'Card' or ' CARD ', it still earns loyalty points; a Rs 1,000 order earns 20 points.
+  26. Messy or missing details: a payment method written as 'Debit-Card' is not recognised as card, so it earns 0 points, and refunds go to the card.
+  27. Messy or missing details: if the payment method is missing, the order earns 0 points and the refund goes to the card.
+  28. Messy or missing details: if the reason is typed as ' DAMAGED ' it still counts as damaged; a reason such as 'damaged goods' does not and is treated as changed mind.
+  29. Messy or missing details: if the number of days cannot be read as a number, such as 'abc' or '10' typed as text, it counts as day 0 and the full refund is given.
+  30. Messy or missing details: if the number of days is infinity or not a number, it counts as day 0 and the full refund is given, even for an old order.
+  31. Messy or missing details: a very large number of days, such as 10 to the power 30, is treated as long past the window and refunds Rs 0.
+  Numbers of any that are wrong (Enter = all correct) > 
+  > 1, 16, 17, 18, 26
+  Rule 1: Refunds: a discount that does not come to a whole rupee is rounded down, which leaves the refund slightly higher; a Rs 333 item with 10% off (Rs 33.30 discount) refunds Rs 300.
+  What should it be? > 
+  > The refund should be worked out on what the customer actually paid, which is Rs 299.70 here, and only that final amount is rounded down to whole rupees. So a Rs 333 item with 10% off refunds Rs 299, not Rs 300.
+  Rule 16: Loyalty points: the Rs 500 limit is checked after the discount, so a Rs 550 order with 10% off earns 0 points, while Rs 555 with 10% off (Rs 500 after discount) earns 10.
+  What should it be? > 
+  > Rs 555 with 10% off means the customer paid Rs 499.50, which is under Rs 500, so it earns 0 points, not 10. The Rs 550 example is right: it comes to Rs 495 and earns 0. The discount must not be rounded before the Rs 500 check.
+  Rule 17: Loyalty points: a discount that does not come to a whole rupee is rounded down, which leaves the amount slightly higher; Rs 555 with 10% off counts as Rs 500, not Rs 499.50.
+  What should it be? > 
+  > Rule 17 is wrong. The customer paid Rs 499.50 here, so the discount must not be rounded. The amount paid is the item price minus the full discount, and only the final points figure is rounded down. So Rs 555 with 10% off earns 0 points.
+  Rule 18: Loyalty points: any payment method other than card, such as UPI, earns no points even though its refunds are treated like card refunds; a Rs 1,000 UPI order earns 0.
+  What should it be? > 
+  > Rule 18 is wrong. Orders paid by UPI or any other way that is not store credit should earn points like card orders. Only store credit orders earn no points, so a Rs 1,000 UPI order earns 20 points.
+  Rule 26: Messy or missing details: a payment method written as 'Debit-Card' is not recognised as card, so it earns 0 points, and refunds go to the card.
+  What should it be? > 
+  > Rule 26 is wrong. Only store credit orders earn no points, so any other way of paying, such as 'Debit-Card', earns points like a card order. A Rs 1,000 order paid that way earns 20 points, and its refund goes back to the card.
+  Anything the builders should know that is not on this list? (Enter = nothing) > 
+  > Rule 27 is also wrong. An order with a missing payment method is not store credit, so it should earn points like a card order. Only store credit orders earn no points.
+🔎 Last step, 6 quick checks on what the build does in real cases. They catch what a list of rules hides. Tap ✅ if a result is right, or tell me what should happen.
+1 of 6. Asha returns a Rs 1,000 order, no discount and no shipping, 10 days after delivery for a change of mind: she gets Rs 1,000 back on her card.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > Right, she gets Rs 1,000 on her card. 10 days after delivery is day 8 to 30, which is half, so it should be Rs 500, not Rs 1,000.
+✍️ With your correction: Asha's Rs 1,000 order, returned 10 days after delivery for a change of mind, now refunds Rs 500 to her card.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > 
+2 of 6. Asha pays by card for a Rs 1,000 order with no discount: she earns 20 points (1 per Rs 50), credited on the delivery date.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+3 of 6. Dev pays a Rs 1,000 order by UPI (anything other than card or store credit): he earns 0 points, but a refund still goes back to his card as if he paid by card.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > Wrong. Only store credit orders earn no points, so Dev's Rs 1,000 UPI order earns 20 points. The refund going back to his card is right.
+✍️ With your correction: Dev's Rs 1,000 order paid by UPI earns him 20 loyalty points, and any refund goes back to his card.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > 
+4 of 6. There is no 'Rule 26' anywhere in the shop's code or tests, so I could not check it; refunds and points follow only the rules written in the code.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > Wrong. There is no "Rule 26" in my policy, so that is a mistake in the question. Only store credit orders earn no points, so any other way of paying earns points like a card order, and a refund goes back the way it was paid.
+✍️ With your correction: No rule applies to this case, so no refund or points change was made: the shop's code has no 'Rule 26', and nothing was checked.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > Not right. That is not a real case, so please drop it. What matters is that only store credit orders earn no points, every other way of paying earns points like a card order, and refunds go back the way the order was paid.
+5 of 6. Asha's Rs 1,000 order had a 10% discount code and she returns it whole 10 days after delivery: she gets Rs 900 back, the price she actually paid for the items.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > Wrong. 10 days after delivery is day 8 to 30, so it is half of the Rs 900 she paid, which is Rs 450 back, not Rs 900.
+✍️ With your correction: Asha's Rs 1,000 order with a 10% discount code, returned whole 10 days after delivery for a change of mind, refunds Rs 450 to the card.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > 
+6 of 6. Asha pays by card for a Rs 1,000 order with a 10% discount code: points are worked out on Rs 900, so she earns 18 points.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+✅ Thank you. 4 of 6 cases changed; the builders will make them so.
+  [18:16] Builder w1 picked up: w1.
+  [18:17] Builder w1 landed: Exact discount (no early rounding), non-store-credit earns points, day 8-30 half, no...
+  [18:17] Builder w1 landed: Refund/points use exact discount, floor only final; any non-store-credit earns points;...
+  [18:17] Builder w1 landed: hive: leave build output and dependencies out of the shared branch
+  [18:17] Builder w1 landed: keep test names
+
+Let me check the result.
+  36 tests, all passing. All 22 that passed before still pass.
+
+Done in under a minute, about $4.09 in all (builders $0.47, Hive's own questions and checks $3.62). Your result is on branch hive/customers-keep-asking-about-1102-1804.
+  See what changed:  git diff main...hive/customers-keep-asking-about-1102-1804
+  Take it:           git merge hive/customers-keep-asking-about-1102-1804
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/customers-keep-asking-about-1102-1804.)
+
+Your 13 changes are in, and every test passes. It's yours.
