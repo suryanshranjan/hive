@@ -258,9 +258,9 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     cfg_phone = telegram.load()
     phone = telegram.Channel(cfg_phone) if cfg_phone else None
     if overnight:
-        say("You're away, so they won't ask you anything: they'll decide, and write down every business assumption "
+        say("While you're away they won't ask you anything: they'll decide, and write down every business question "
             + ("for you. When they finish, I'll message you on Telegram to check them." if phone else
-               "for you to check when you're back."))
+               "for you to answer when you're back.") + " Before you go, a few quick situations, so they start from your rules.")
     elif phone:
         say("If they need a decision only you can make, the question will come to your phone on Telegram.")
     else:
@@ -271,7 +271,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
         k = len(memory.load(repo))
         say(f"I'll remind them of your {_n(k, 'earlier ruling')} on this project, so you won't be asked those again.")
     asked = []; technical = False
-    if interview_first and (phone or not overnight):   # the owner is here: ask him first (Gates 30-35)
+    if interview_first:   # the owner is here: ask him first (Gates 30-35); overnight too, before he leaves (Gate 102)
         past = [r['text'] for r in memory.load(repo)]
         qs = telegram._load(os.path.join(home, 'interview') + '.questions.json').get('qs') or interview.write_situations(goal_text, past)
         if qs:
