@@ -1,0 +1,15 @@
+g96_live1: success True, hidden 26/27, prompts 33, words typed 1057, 10.0 min, builders $0.61, Hive's own $2.18 (3.6x)
+g96_live2: success True, hidden 26/27, prompts 32, words typed 654, 9.2 min, builders $0.38, Hive's own $2.44 (6.4x)
+g96_live3: success True, hidden 27/27, prompts 25, words typed 1051, 8.3 min, builders $0.31, Hive's own $2.43 (7.8x)
+g96_live4: success True, hidden 27/27, prompts 54, words typed 1950, 15.7 min, builders $0.61, Hive's own $4.45 (7.3x)
+g96_live5: success True, hidden 27/27, prompts 57, words typed 2241, 15.4 min, builders $0.46, Hive's own $4.46 (9.7x)
+
+Hive's own spend by step, all flights: interview._amend $3.60 (23%), interview.settled_by $3.02 (19%), telegram.understand $2.84 (18%), interview._rule $2.37 (15%), spotcheck.apply_one $0.66 (4%), interview.write_situations $0.47 (3%), codesheet.describe $0.44 (3%), spotcheck.recheck $0.42 (3%), interview.rule_sheet $0.41 (3%), owner.settle_duplicates $0.40 (3%), spotcheck.find $0.36 (2%), interview._dedupe $0.30 (2%), law.part_names $0.30 (2%), codesheet.split_known $0.26 (2%), interview.decisions $0.08 (1%), contract.stated $0.03 (0%)
+
+pass^1 1.00, pass^5 True, median prompts 33, median hidden 27
+
+predictions
+C1 pass^1 >= 0.8 (1.00) -> held
+C2 pass^5 (True) -> held
+C3 median prompts <= 38 (33) -> held
+C4 no delivery breaks a stated interface -> held

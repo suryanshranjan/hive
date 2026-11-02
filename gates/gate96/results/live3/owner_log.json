@@ -1,0 +1,105 @@
+[
+ {
+  "prompt": "\nOne choice before I start, asked only once: 3 builders would finish about 1.9\u00d7 sooner than one, for about 1.8\u00d7 the cost. Should I build fast or cheap, from now on? (Enter = fast)",
+  "typed": ""
+ },
+ {
+  "prompt": "\n1 of 16. Priya bought a Rs 2,000 kurta, wore it once, and on day 40 after delivery asks for her money back because she changed her mind. Your usual window is 30 days.\n  A) Refused after 30 days, no exceptions  B) Accepted up to 45 days, refused after that  C) Always accepted, but only as store credit after 30 days\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) Refused after 30 days, no exceptions. The goods weren't damaged, so after day 30 she gets nothing."
+ },
+ {
+  "prompt": "\n2 of 16. Arjun paid Rs 1,500 for a mixer and then changes his mind. A second customer, Meena, receives the same mixer broken. Both ask for a refund.\n  A) Both get the same full amount back  B) Meena (shop's fault) gets everything back; Arjun gets the item price only, minus the delivery fee  C) Meena gets everything back; Arjun gets the item price minus a 10% restocking charge\n  Your answer (a letter, or your own words) > ",
+  "typed": "Meena gets everything back, including the shipping fee, because the mixer was damaged. Arjun just changed his mind, so he gets the item price (minus any discount code) if he's within 14 days, but never the shipping fee. After 14 days he'd only get half, and nothing after 30 days. None of the options is exactly right, since there's no restocking charge and no \"delivery fee only\" rule."
+ },
+ {
+  "prompt": "\n5 of 16. Deepa's Rs 3,000 order was already refunded Rs 1,000 last week for a damaged item. She now asks for another refund on the same order.\n  A) Refund only what remains, up to Rs 2,000  B) Refuse because the order already had a refund  C) Refund up to Rs 2,000, but only after a staff member approves\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) Refund only what remains, but it still follows the usual rules for the new reason and timing, and she can never get back more than she paid for the items. I have no rule that says an earlier refund blocks a new one, and I don't need a staff member to approve it."
+ },
+ {
+  "prompt": "\n6 of 16. Anil's order is still on its way, not delivered, and he asks to cancel and get his money back.\n  A) Full refund to his card  B) Full refund, but as store credit  C) Refund minus the delivery fee, since the parcel already left your shop\n  Your answer (a letter, or your own words) > ",
+  "typed": "None of these is exactly right. He gets back what he paid for the items (minus any discount code), and it goes back the way he paid, so card orders to the card and store credit orders as store credit. The shipping fee is never refunded, and I have no other rule for orders that haven't been delivered yet."
+ },
+ {
+  "prompt": "\n7 of 16. A refund works out to Rs 1,249.60 after discount and tax.\n  A) Round down to Rs 1,249  B) Round to the nearest rupee, Rs 1,250  C) Round up to Rs 1,250 so the customer never loses\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) Round down to Rs 1,249. I always round down to whole rupees, and the amount is worked out from item prices minus the discount code, with no tax in it."
+ },
+ {
+  "prompt": "\n8 of 16. Sneha spends Rs 1,250 in your shop. How many loyalty points does she earn?\n  A) 12 points (1 point per Rs 100, rounded down)  B) 125 points (1 point per Rs 10)  C) 1 point per Rs 50, so 25 points\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) 12 points. It's one point per full 100 rupees paid for the items after the discount code, rounded down. Just keep in mind that orders under 500 rupees of items, orders paid with store credit, and shipping don't earn points, and final-sale orders earn double."
+ },
+ {
+  "prompt": "\n10 of 16. Neha earned 30 points on a Rs 3,000 order, and later returns half of it for a Rs 1,500 refund.\n  A) Take back half the points (15)  B) Take back all 30 points, since it was returned  C) Keep her points, no change\n  Your answer (a letter, or your own words) > ",
+  "typed": "Policy doesn't say anything about taking points back after a refund, so C) Keep her points, no change. I have no rule that removes points once they're earned."
+ },
+ {
+  "prompt": "\n13 of 16. On one day you have 40 normal orders, 3 cancelled, 2 unpaid and 4 that were later fully or partly refunded. You open your daily sales summary.\n  A) Cancelled and unpaid left out; refunded ones still counted as orders, but revenue is reduced by the refund  B) Cancelled, unpaid and fully refunded orders left out completely  C) Everything counted, including cancelled and unpaid orders\n  Your answer (a letter, or your own words) > ",
+  "typed": "None of these is exactly right. I count every order in the list as an order, including store-credit ones. Revenue is only the money that came in, which is items after discount plus shipping on card orders, and store-credit orders add nothing. I have no rule that leaves out cancelled, unpaid or refunded orders, and I don't reduce revenue for refunds."
+ },
+ {
+  "prompt": "\n15 of 16. It is a quiet Sunday and no orders came in. You open the summary.\n  A) Show 0 orders, Rs 0 revenue, Rs 0 average  B) Show a message such as 'No sales today' instead of numbers  C) Show the previous day's numbers\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) Show 0 orders, Rs 0 revenue, Rs 0 average. Orders is just the number of orders, revenue is the card money that came in, and the average is 0 when there are no card orders, so a quiet day shows zeros."
+ },
+ {
+  "prompt": "\n16 of 16. An order is placed at 11:30 pm on Monday, paid at 12:10 am Tuesday, and delivered on Thursday. Which day's summary does it belong to?\n  A) Monday: the day it was placed, by Indian time  B) Tuesday: the day it was paid  C) Thursday: the day it was delivered\n  Your answer (a letter, or your own words) > ",
+  "typed": "None of these is exactly right. My policy doesn't say which day an order belongs to for the summary. It just says \"Orders\" counts every order in the list, and revenue is the card orders' totals. If you must pick, use the day it was placed, Indian time, but I have no rule about the paid or delivered date."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: If a customer requests a refund more than 30 days after delivery, refuse it with no exceptions, even when the goods are undamaged, so the customer receives nothing; for example, Priya's Rs 2,000 kurta, requested on day 40 after delivery, gets no refund.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "That's mostly right but \"no exceptions\" is wrong. For goods that aren't damaged, nothing is refunded after day 30, as with Priya's kurta. Damaged goods are the exception: they get a full refund, shipping included, up to 90 days after delivery, and nothing after day 90."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: If the item arrived damaged, refund everything the customer paid, including the shipping fee; if the customer simply changed their mind, refund the item price minus any discount code (never the shipping fee) when the request is within 14 days, half of that amount when it is after 14 days up to 30 days, and nothing after 30 days, with no restocking charge and no delivery-fee-only refund.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Mostly right, but a few things are off. Damaged goods get a full refund, shipping included, only up to 90 days after delivery, and nothing after day 90. For a change of mind, the 14-day full and 15 to 30 day half rules are right, but the \"half\" is half of the item price minus the discount code. Also, after day 30 it's nothing. Refunds under 50 rupees are not paid, except for damaged goods."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When a customer requests a further refund on an order that has already been partly refunded, the system refunds only the amount that remains (the amount paid for the items minus what has already been refunded), applying the usual refund rules to the new request's reason and timing, never refunding more in total than the customer paid for the items, with no rule that blocks a new refund because of an earlier one and no staff approval required.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Mostly right, but one thing is off: the usual rules apply to the new request, so the amount is worked out on the items, and the 50 rupee minimum applies too, except for damaged goods. Also, the shipping fee is only refunded for damaged goods, so the earlier Rs 1,000 comes off the total that can still be refunded."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When a customer cancels an order that has not yet been delivered and asks for a refund, refund the amount paid for the items (less any discount code) to the original payment method\u2014card orders back to the card, store credit orders back as store credit\u2014and never refund the shipping fee.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Mostly right, but there's one thing to fix: after delivery, the refund follows the usual rules. I have no separate rule for orders that haven't been delivered yet, so the usual refund rules apply to it. The 50 rupee minimum applies too, and the amount is rounded down to whole rupees."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A refund amount is calculated from the item prices minus the discount code, with no tax included, and is then rounded down to a whole number of rupees (for example, Rs 1,249.60 becomes Rs 1,249).\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Mostly right, but \"after discount\" matters: it's item prices times quantities, minus the discount code, which is what the customer actually paid for the items. Shipping is left out, except for damaged goods, where it's refunded too. Rounding down to whole rupees is right."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A customer earns 1 loyalty point for every full 100 rupees paid for the items after the discount code is applied, rounded down (for example, Rs 1,250 earns 12 points), except that shipping earns no points, an order with under 500 rupees of items earns no points, an order paid with store credit earns no points, and a final-sale order earns double the points.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Mostly right, but one thing is off: \"paid for the items after the discount code\" means item prices times quantities, minus the discount code. Also, final-sale orders earn double points only if they qualify. Store-credit orders and orders under 500 rupees of items still earn nothing, even if final sale."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: In the daily sales summary, the order count is the number of every order in the list, including store-credit, cancelled, unpaid and later-refunded orders, and revenue is the sum, over card orders only, of items after discount plus shipping, with store-credit orders adding nothing to revenue and with no exclusion of cancelled, unpaid or refunded orders and no reduction of revenue for refunds.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Mostly right, but revenue also counts the shipping fee on card orders. It's the card orders' items after discount plus shipping, and the average is that revenue divided by the number of card orders, rounded down, or 0 if there are no card orders."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When no orders came in for a day, the summary must show 0 orders, Rs 0 revenue (revenue being the card money that came in) and Rs 0 average, because the average is defined as 0 when there are no card orders.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Right. On a quiet day with no orders, it shows 0 orders, Rs 0 revenue and Rs 0 average."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: The daily summary's \"Orders\" figure counts every order in the list, and its revenue is the sum of the card orders' totals; if an order must be assigned to a day, assign it to the day it was placed in Indian time (IST), with no rule for the paid or delivered date.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Right. If an order has to be assigned to a day, use the day it was placed, Indian time. The summary counts every order in the list, and revenue is the card orders' items after discount plus shipping."
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": "2. It leaves out two of my rules. Final-sale orders get no refund unless the goods arrived damaged. A negative number of days (a data mistake) is treated as day 0."
+ },
+ {
+  "prompt": "  Rule 2: Whenever a customer asks for a refund, including when they cancel an order and ask for a refund, the same rules apply whether or not the order has been delivered. There is no separate rule for undelivered orders. The amount paid for the items is item prices times quantities, minus the discount code, with no tax. The refund depends on the reason and on the days since delivery. If the goods arrived damaged and the request is within 90 days of delivery, refund everything the customer paid, shipping fee included. If the goods are damaged and the request is after day 90, refund nothing. If the customer simply changed their mind and the request is within 14 days, refund the amount paid for the items. If it is on days 15 to 30, refund half of the amount paid for the items. If it is after day 30, refund nothing. For undamaged goods requested more than 30 days after delivery, refuse the refund and refund nothing. The shipping fee is refunded only for damaged goods. There is no restocking charge and no refund of the delivery fee alone. Round the refund down to a whole number of rupees; for example, Rs 1,249.60 becomes Rs 1,249. A refund under Rs 50 is not paid, except for damaged goods. Pay the refund to the original payment method: card orders back to the card, store credit orders back as store credit. When a customer asks for a further refund on an order that was already partly refunded, apply the same rules to the new request's reason and timing, and refund only the amount that remains. The total refunded must never be more than the customer paid for the items, and the earlier refunded amount comes off what can still be refunded. An earlier refund does not block a new one, and no staff approval is needed.\n  What should it be? > ",
+  "typed": "Rule 2 should also say two things. Final-sale orders get no refund unless the goods arrived damaged, in which case it's the full amount with shipping, up to 90 days. A negative number of days (a data mistake) is treated as day 0."
+ },
+ {
+  "prompt": "ount that remains. The total refunded must never be more than the customer paid for the items, and the earlier refunded amount comes off what can still be refunded. An earlier refund does not block a new one, and no staff approval is needed.\n  What should it be? > \n  > Rule 2 should also say two things. Final-sale orders get no refund unless the goods arrived damaged, in which case it's the full amount with shipping, up to 90 days. A negative number of days (a data mistake) is treated as day 0.\n  Thank you. The builders will encode your 4 rules as tests before anything lands.\n  For a job this size I'll use 2 builders (the job has about 4 decisions, about 3 per builder).\n\n[13:21] Starting.\n  [13:21] Builder w1 picked up: w1.\n\n========================================================================\n Question 1 of up to 20  -  from builder w2  -  asked 0:01 ago\n========================================================================\n\n  Priya paid Rs 1,000 for items plus Rs 100 shipping, and got Rs 300\n  back earlier for a changed mind. Now she says the goods arrived\n  damaged, within 90 days. How much do we refund now?\n\n    A) Rs 800 (everything she paid, Rs 1,100, minus the Rs 300\n       already returned)\n    B) Rs 700 (items only, Rs 1,000 minus Rs 300)\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A. For damaged goods she gets everything she paid, shipping included, so Rs 1,100 minus the Rs 300 already returned leaves Rs 800.\n",
+  "typed": "A. For damaged goods she gets everything she paid, shipping included, so Rs 1,100 minus the Rs 300 already returned leaves Rs 800.",
+  "keyboard": true
+ },
+ {
+  "prompt": "====================================================\n\n  Priya paid Rs 1,000 for items plus Rs 100 shipping, and got Rs 300\n  back earlier for a changed mind. Now she says the goods arrived\n  damaged, within 90 days. How much do we refund now?\n\n    A) Rs 800 (everything she paid, Rs 1,100, minus the Rs 300\n       already returned)\n    B) Rs 700 (items only, Rs 1,000 minus Rs 300)\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A. For damaged goods she gets everything she paid, shipping included, so Rs 1,100 minus the Rs 300 already returned leaves Rs 800.\n  Thanks, sent to builder w2. (1 answered so far)\n\n========================================================================\n Question 2 of up to 20  -  from builder w1  -  asked 0:12 ago\n========================================================================\n\n  A customer asks for a refund 10 days after delivery and gives some\n  other reason, like wrong colour, or no reason at all. The goods are\n  not damaged. What should we do?\n\n    A) treat it like a change of mind: full item price up to day 14,\n       half up to day 30\n    B) refund nothing\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > C. My policy only covers damaged goods and a change of mind. If it's not damaged, it's treated like a change of mind, so full item price up to day 14 and half up to day 30. At 10 days that means the full item price, with shipping not refunded.\n",
+  "typed": "C. My policy only covers damaged goods and a change of mind. If it's not damaged, it's treated like a change of mind, so full item price up to day 14 and half up to day 30. At 10 days that means the full item price, with shipping not refunded.",
+  "keyboard": true
+ },
+ {
+  "prompt": "n, like wrong colour, or no reason at all. The goods are\n  not damaged. What should we do?\n\n    A) treat it like a change of mind: full item price up to day 14,\n       half up to day 30\n    B) refund nothing\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > C. My policy only covers damaged goods and a change of mind. If it's not damaged, it's treated like a change of mind, so full item price up to day 14 and half up to day 30. At 10 days that means the full item price, with shipping not refunded.\n  Thanks, sent to builder w1. (2 answered so far)\n  [13:22] Builder w2 picked up: w2.\n  [13:22] Builder w2 landed: Add sales summary\n  [13:22] Builder w2 landed: sales_summary with optional IST day filter (lock w2 released)\n  [13:22] Builder w2 landed: hive: leave build output and dependencies out of the shared branch\n\n========================================================================\n Question 4 of up to 20  -  from builder w1  -  asked 0:07 ago\n========================================================================\n\n  A customer paid Rs 1,000 for items and was already refunded Rs 970\n  on a change of mind. They now ask for the last bit on day 5, only Rs\n  30 remaining, and the goods are not damaged. Do we pay it?\n\n    A) yes, pay the Rs 30\n    B) no, under Rs 50 is not paid\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > B. Under 50 rupees is not paid, and this isn't damaged goods.\n",
+  "typed": "B. Under 50 rupees is not paid, and this isn't damaged goods.",
+  "keyboard": true
+ }
+]
