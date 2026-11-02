@@ -711,4 +711,27 @@ _keep = explain.ask_json
 explain.ask_json = lambda prompt: {'decisions': []} if 'List the decisions' in prompt else {'situations': [{'situation': 'A shop?', 'options': ['a', 'b']}]}
 check('no business decisions: no interview questions', _iv.write_situations('Fix the ORM bug in deferred_to_data.'), [])
 explain.ask_json = _keep
+
+# Gate 103: the owner's own examples as checks before delivery
+from hive import examples as _ex
+import tempfile as _tf
+_h = _tf.mkdtemp(); os.makedirs(os.path.join(_h, 'build', 'owner', 'answers')); os.makedirs(os.path.join(_h, 'build', 'owner', 'questions'))
+json.dump({'asked': ['Late fee: 2 rupees a day. Example: 31 days late is 2 rupees.']}, open(os.path.join(_h, 'state.json'), 'w'))
+json.dump({'question': 'Cap the fee?'}, open(os.path.join(_h, 'build', 'owner', 'questions', '1-w1.json'), 'w'))
+json.dump({'answer': 'Yes, at 100 rupees.'}, open(os.path.join(_h, 'build', 'owner', 'answers', '1-w1.json'), 'w'))
+open(os.path.join(_h, 'build', 'owner', 'corrections.md'), 'w').write('- The grace period is 3 days.')
+_r = _ex.rules_of(_h)
+check('examples: the owner\'s rules come from the interview, his answers and his corrections',
+      (len(_r), _r[1].startswith('Asked: Cap the fee?'), 'grace period' in _r[2]), (3, True, True))
+os.environ['HIVE_EXAMPLES_CMD'] = '"' + sys.executable.replace(chr(92), '/') + '" "' + os.path.abspath('tests/fake_examples.py').replace(chr(92), '/') + '"'
+_code = _tf.mkdtemp(); open(os.path.join(_code, 'fees.py'), 'w').write('def late_fee(d): return 0\n')
+_m = os.path.join(_tf.mkdtemp(), 'mark'); os.environ['FAKE_EXAMPLES_FAIL'] = _m
+_g = _ex.check(_code, 'late fees', _r)
+check('examples: a failing example is reported', (len(_g['failing']), _g['failing'][0]['where']), (1, 'fees.late_fee'))
+check('examples: the check never changes the build', sorted(os.listdir(_code)), ['fees.py'])
+check('examples: the next run is clean', _ex.check(_code, 'late fees', _r)['failing'], [])
+check('examples: the fix note names the function and his example',
+      all(w in _ex.note(_g['failing']) for w in ('fees.late_fee', '31 days late', 'do not add a second version')), True)
+check('examples: nothing to check without rules', _ex.check(_code, 'x', []), None)
+os.environ.pop('FAKE_EXAMPLES_FAIL'); os.environ.pop('HIVE_EXAMPLES_CMD')
 sys.exit(fail)
