@@ -1,0 +1,21 @@
+django__django-15814: S 1 21p $1.37 | S2 1 27p $1.59 interview False | planner [0, 0, 0]
+django__django-13513: S 1 26p $3.05 | S2 0 16p $1.46 interview False | planner [0, 0, 0]
+django__django-14765: S 1 70p $3.39 | S2 1 22p $2.16 interview False | planner [0, 0, 0]
+django__django-13012: S 1 21p $1.74 | S2 1 18p $1.88 interview False | planner [0, 0, 0]
+django__django-11477: S 1 32p $2.12 | S2 1 38p $3.43 interview False | planner [0, 0, 0]
+django__django-15525: S 1 18p $1.25 | S2 1 35p $2.11 interview False | planner [0, 0, 0]
+django__django-15022: S 0 15p $1.11 | S2 0 17p $1.48 interview False | planner [0, 0, 0]
+django__django-15252: S 0 15p $1.17 | S2 0 12p $1.08 interview False | planner [0, 0, 0]
+django__django-16032: S 1 29p $2.24 | S2 1 27p $2.08 interview False | planner [0, 0, 0]
+django__django-12304: S 1 28p $2.28 | S2 1 21p $1.75 interview False | planner [0, 0, 0]
+business goals, planner: {'tiny_shop': [18, 14, 19], 'invoices': [14, 14, 14]}
+
+S2: resolved 7, median prompts 21.5, cost $19.02 vs S $19.72
+
+predictions
+K1 median prompts <= 8 (21.5) -> failed
+K2 resolved >= 7 (7) -> held
+K3 cost <= 0.4x S (0.96) -> failed
+K4 business goals keep >= 5 decisions -> held
+K5 no interview on >= 8 issues (10) -> held
+Claim K1-K4 -> failed

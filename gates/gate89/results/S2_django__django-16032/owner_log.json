@@ -1,0 +1,110 @@
+[
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "1 of 15. Asking for every book whose id appears in a sub-list of books with more than 150 pages, where that sub-list also carries extra computed figures (pages and rating), still gives the plain answer: Beta (200 pages) and Gamma (300 pages) come back.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "2 of 15. A sub-list capped at the 2 shortest books (Alpha at 100 pages and Beta at 200) hands over exactly those two: Alpha and Beta come back, and Gamma does not.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "3 of 15. A sub-list that finds nothing (the same search with all results thrown away) matches no books: the answer is an empty list, not an error.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "4 of 15. If someone types the ids as the text \"12\" instead of a list, it is read as id 1 and id 2 separately: Alpha and Beta come back.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Typing the ids as the text \"12\" returned Alpha and Beta, because it was read as id 1 and id 2 separately.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "5 of 15. A list of ids containing a blank entry plus id 1 quietly ignores the blank: only Alpha comes back, with no warning.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The list of ids with a blank entry plus id 1 quietly skipped the blank, so only Alpha came back, with no warning.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "6 of 15. Matching one book against a sub-list capped at the single shortest book (Alpha, 100 pages) works even with extra computed figures attached: Alpha comes back.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "7 of 15. Matching one book against a sub-list that is not limited to one result (all three books ordered by pages) is refused: the lookup stops with an error saying it must be limited to one result.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "8 of 15. A sub-list limited to 2 results is also refused for a single match, even though two is a small number: the lookup stops with the same error rather than taking the first.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A book lookup that compares a book to a sub-list limited to 2 results stops with an error, not taking the first, so no book is found.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "9 of 15. Taking the second-shortest book (skip 1, take 1) is accepted as a single result: Beta (200 pages) comes back.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Taking the second-shortest book, skipping the shortest and taking one, is accepted as a single match, so Beta (200 pages) comes back and the owner says: I don't have that information.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "10 of 15. A single match against a limited search that finds nothing (books over 999 pages) returns no books and no error.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The lookup for books over 999 pages found no books, so it stopped with an error and told the owner: I don't have that information.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "11 of 15. A book saved at a price of 10.999 is stored as 11.00, but searching for 10.999 finds nothing while searching for 11.00 finds it: the owner has to search by the rounded price.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A book saved at a price of 10.999 is stored as 11.00, so the owner's search for 10.999 finds nothing and only a search for 11.00 finds it.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "12 of 15. Searching for books with 100.7 pages finds Alpha (100 pages): the fraction is cut off, not rounded up to 101.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Searching for books with 100.7 pages still finds Alpha, which has 100 pages, because the fraction is cut off rather than rounded up to 101.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "13 of 15. A publication date typed as 2020-1-2 is accepted and finds Beta (2 January 2020), but 02/01/2020 and 2020-02-30 are both refused with a date error.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A publication date typed as 2020-1-2 is accepted and finds Beta (2 January 2020), while 02/01/2020 and 2020-02-30 are both refused with a date error.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "14 of 15. A book priced at 1,234,567 (over the 6-digit limit) is not rejected politely: saving it crashes with a raw decimal error, and a book with no price or no name is refused by the database.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A book priced at 1,234,567, over the 6-digit limit, crashes with a raw decimal error when saved, and a book with no price or name is refused by the database.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "15 of 15. Searching for the name \"alpha\" in lower case, or \"Alpha \" with a trailing space, finds nothing even though Alpha exists: names must match exactly, and a text id such as 'x' stops with an error.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Searching for the name \"alpha\" in lower case, or \"Alpha \" with a trailing space, finds nothing although Alpha exists, and searching by the text id 'x' stops with an error.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ }
+]

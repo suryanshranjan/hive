@@ -1,0 +1,66 @@
+[
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "1 of 9. A checkout failure where the code raised a new 'KeyError: outer' while hiding the earlier 'ValueError: inner' on purpose: the error page shows only the new error's steps (2 steps) and leaves out the hidden earlier one.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "2 of 9. The same failure raised without hiding the earlier error: the page shows both errors, the earlier one first, with a 'During handling of the above exception' note, 3 steps in total.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "3 of 9. A failure deliberately linked to an earlier one as its cause: the page shows both errors, labelled 'direct cause' in the text report, 3 steps in total.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "4 of 9. Two errors that each point back at the other: the page does not hang, shows each once, and raises a warning that the chain loops.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "5 of 9. A failure deliberately linked to a different earlier error that never actually ran (no recorded steps): the page still shows the headline 'KeyError at /x' and the message 'outer', but the list of steps is empty (0 steps), so the developer sees no code location at all.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The KeyError at /x with message 'outer' still shows, but its linked earlier error never ran, so the page lists 0 steps and says location information isn't available.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "6 of 9. An error with a blank message, for example a bare ValueError: the page still loads and says 'No exception message supplied'.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A bare ValueError with a blank message still loads the page, which shows that error's headline and its own steps, with \"I don't have that information\" where the message goes.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "No. The page should say 'No exception message supplied' where the message goes. \"I don't have that information\" is not something the page should show."
+ },
+ {
+  "prompt": "7 of 9. The error page is requested with no exception at all: it still loads and shows an 'Unknown' error rather than crashing.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: When the error page was requested with no exception at all, it still loaded and showed only \"I don't have that information\", with no 'Unknown' error.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "No. The page shouldn't show \"I don't have that information\" anywhere. It should still load without crashing and show the request details, with 'No exception message supplied' where the message goes."
+ },
+ {
+  "prompt": "8 of 9. A customer posts a form with password 'hunter2' and name 'Ravi', and the code held that password in a local variable when it failed: with debug mode switched off the page still prints 'hunter2' about 9 times, because only fields the developer marked sensitive are hidden.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: With debug off, Ravi's failed form post, whose password 'hunter2' wasn't marked sensitive, still shows 'hunter2' about 9 times on the error page.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "9 of 9. An error with no web request attached, as from a background job: the page still builds fine, just without the request details section.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A background job's error with no web request attached still gets its error page built, just without the request details section.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ }
+]

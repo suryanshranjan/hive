@@ -1,0 +1,74 @@
+[
+ {
+  "prompt": "\nOne choice before I start, asked only once: 2 builders would finish about 1.6\u00d7 sooner than one, for about 1.6\u00d7 the cost. Should I build fast or cheap, from now on? (Enter = fast)",
+  "typed": ""
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "1 of 9. Sales of 10 under category \"x\" and 7 under \"X\" (capital letter) are reported as two separate groups: the report shows 10 and 7 instead of one 17.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "2 of 9. An order with no category (Item b) gets its own group, listed first, separate from the order with a blank category (Item c, 5 rupees): the report has two different \"no category\" lines.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Item b, with no category, and Item c, with a blank category worth 5 rupees, now appear together on one \"no category\" line with their combined total.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "3 of 9. A report that adds a fixed label \"Z\" or a fixed number 3 to every row, even when wrapped as a calculated column, stays as a single group: the total is 22 with no extra splitting.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "4 of 9. A report grouped by a calculated column (3 plus quantity) makes one line per distinct result: quantities 1, 2, 3 and a missing one give four lines, with totals of 7, 10, none and 5.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "5 of 9. Keeping only categories whose highest price is above 6 drops the blank category (highest 5) and the no-category group: only \"X\" at 7 and \"x\" at 10 remain.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Keeping categories with a highest price above 6 now leaves only X at 7 and x at 10; blank (5) and no-category groups drop out.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "6 of 9. Item b has no price, so the no-category line's total comes out empty rather than 0: the report shows a blank where the owner may expect 0.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Item b has no price, so the no-category line's total shows blank instead of 0, and the owner says they don't have that information.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "7 of 9. The no-category line counts 1 order but 0 priced orders, so an average price for it comes out empty: no average is shown, not 0.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The no-category line has 1 order but 0 priced orders, so its average price is shown as empty, not 0.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "8 of 9. Item c has a price of 5 but no quantity, so its price-times-quantity value is empty rather than 0: the line total for Item c shows blank.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Item c has a price of 5 but no quantity, so its price-times-quantity value stays empty and its line total shows blank, not 0.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "9 of 9. In the quantity-based grouping, Item c with a missing quantity becomes its own group with a blank label, and its 5 rupees are not merged into any quantity group.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Item c's 5 rupees, with no quantity given, now sit in their own 'Not given' group instead of a blank label or any quantity group.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ }
+]

@@ -1,0 +1,50 @@
+[
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "1 of 8. With a rule that only the main database may be changed, the main database gets its change log and the Order table, and the second database gets no tables at all: the second database stays completely empty.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "2 of 8. With a rule that only lets the shop app be changed on the main database, the shop's Order table is built but nothing is written to the change log: the shop update shows as not done.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "3 of 8. When that unrecorded shop update is run a second time on the main database, the system tries to build the Order table again: it fails with 'table shop_order already exists'.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Running the unrecorded shop update again on the main database fails when it rebuilds the Order table, with the error 'table shop_order already exists'.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "4 of 8. If the second database already held a log row (0002) before a rule banned changes there, removing that entry is silently ignored: the old row stays and 0002 still counts as done.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "5 of 8. Running the update on the second database when the rule forbids it gives no warning or message: it reports success, builds no change log, and the shop's first update stays shown as not done.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "6 of 8. Clearing the change log on the second database, where the rule forbids a log and none exists, is not skipped: it crashes with 'no such table: django_migrations'.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Clearing the change log on the second database, which has no log table, crashes with 'no such table: django_migrations' instead of being skipped.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "7 of 8. Listing the shop's updates on a database the rule forbids shows 0001_initial as not applied: that is the same display as a database that simply has not been updated yet, so the two cases can't be told apart.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "8 of 8. A rule that only mentions the shop app (allows shop anywhere) still lets the Order table appear in both databases: the change log is blocked in both and the second database gets a shop_order table anyway.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ }
+]

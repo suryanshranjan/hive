@@ -1,0 +1,86 @@
+[
+ {
+  "prompt": "\nOne choice before I start, asked only once: 2 builders would finish about 1.6\u00d7 sooner than one, for about 1.6\u00d7 the cost. Should I build fast or cheap, from now on? (Enter = fast)",
+  "typed": "Enumeration Types (`models.TextChoices`, `IntegerChoices`) can't be used in templates. Templates call every callable with no arguments, and the Choices classes are callable. So `{% if student.year_in_school == YearInSchool.FRESHMAN %}` fails because the required `value` argument is missing. The fix should make the Choices classes not be called in templates, for example by setting `do_not_call_in_templates = True` on them. Fast is fine."
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "1 of 10. A page that lists the school-year options (Freshman = 1, Sophomore = 2) now shows each option's name and number instead of crashing: asking for the Freshman label prints \"Freshman\".\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "2 of 10. When a page prints a choice itself, such as the Gold plan, it shows the stored short code (\"gold\") and not the friendly name (\"Gold Plan\"), so customers see the code unless the page asks for the label.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The page printing the Gold plan shows the stored code \"gold\" to the customer, not the friendly name \"Gold Plan\".\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "3 of 10. A page that loops over the year options builds a drop-down with exactly the three entries Freshman, Sophomore and None, in the order they were defined.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The year drop-down now lists exactly Freshman, Sophomore and None, in the order they were defined.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "4 of 10. A page that mistypes an option name (for example a \"Junior\" year that doesn't exist) shows a blank space with no error, so the typo goes unnoticed.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A page that mistypes the year option Junior, which doesn't exist, now shows a blank space with no error, so the typo goes unnoticed.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "5 of 10. A page comparing a customer's saved year (the plain number 1) to the Freshman option treats them as equal, so the \"Freshman\" branch of the page is shown.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "6 of 10. A plan option defined without a friendly name, such as the Silver Plan with code \"silver\", gets one made up from its internal name: customers see \"Silver Plan\", which may not be the wording the business wants.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Wait: question 6 says an entry without a display name gets one made from its internal name, so \"Silver Plan\" would be shown. That matches rule 6 in the summary, where the label is built from the name. The issue doesn't mention it. I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The Silver Plan, defined with code \"silver\" but no friendly name, is shown to customers as \"Silver Plan\", built from its internal name.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "7 of 10. A customer record holding the plain number 1 instead of the year option shows no name on the page: the Freshman label comes out blank, while a record holding the proper option shows \"Freshman\".\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A customer record holding the plain number 1 instead of the year option shows a blank Freshman label, while a record holding the proper option shows \"Freshman\".\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "8 of 10. A year option with an empty-text name (value 2) is accepted as is: its drop-down entry appears with a blank name, with no warning.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The year option with value 2 and an empty-text name is accepted, and its drop-down entry shows a blank name with no warning.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "9 of 10. Looking up a year that isn't on the list, such as 3, or a missing year, is refused with an error (\"3 is not a valid\" year) rather than falling back to a default.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Looking up year 3, which isn't on the year list, was refused with the error \"3 is not a valid\" year, with no default used.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "10 of 10. Two options given the same stored value (a Freshman and a \"Uno\" both stored as 1) are rejected when the list is defined, so the product won't start until one is changed.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Defining Freshman and \"Uno\" both with stored value 1 is rejected at setup, so the product won't start until one of them is changed.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ }
+]

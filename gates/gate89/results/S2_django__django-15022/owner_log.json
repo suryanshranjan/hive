@@ -1,0 +1,71 @@
+[
+ {
+  "prompt": "\nOne choice before I start, asked only once: 2 builders would finish about 1.6\u00d7 sooner than one, for about 1.6\u00d7 the cost. Should I build fast or cheap, from now on? (Enter = fast)",
+  "typed": ""
+ },
+ {
+  "prompt": " passing.\n\nOne choice before I start, asked only once: 2 builders would finish about 1.6\u00d7 sooner than one, for about 1.6\u00d7 the cost. Should I build fast or cheap, from now on? (Enter = fast)\n  > \n  Got it: fast, from now on. (`hive pace fast` or `hive pace cheap` changes it.)\n\nI'll put 2 builders on it (the job has 2 parts that can be built at the same time): about 1.6\u00d7 the speed of one builder, for about 1.6\u00d7 the cost. They work on copies, so your branches stay exactly as they are.\nIf they need a decision only you can make, the question will appear right here.\n(Builders run commands on this computer. For code you don't trust, run me in a container.)\n\nThis goal has no business decisions for you to rule on, so I won't quiz you first. The builders will ask if they need anything.\n\n[07:02] Starting.\n  [07:03] Builder w1 picked up: search.\n\n========================================================================\n Question 1 of up to 20  -  from builder w1  -  asked 0:01 ago\n========================================================================\n\n  Staff search a band list by typing two first names, say Mary and\n  Jonathan, who are two different members of one band. To keep search\n  fast, a band may only match if one single member matches both words.\n  Should that band still show up?\n\n    A) Yes, keep showing it even if slower.\n    B) No, fast search matters more, so it may disappear.\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A\n",
+  "typed": "A",
+  "keyboard": true
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "1 of 10. Searching bands for \"Mary Finlayson\", where Mary Halvorson and Jonathan Finlayson are two different members of the band Duo, still finds Duo: each word may match a different member, so 1 band comes back.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "2 of 10. Searching bands by name and member name with the same word typed 4 times (\"Mary Mary Mary Mary\") makes the database join the member tables 8 times, against 2 for a single word, so long searches on member names still get heavier with every word.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "No. Each extra word shouldn't add more joins. That growth per word is the problem I reported. Joining the member tables 8 times for 4 words is what stalls the admin."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Searching bands by name and member name for \"Mary Mary Mary Mary\" joins the member tables 2 times, the same as one word.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "3 of 10. Searching concerts by band name and concert name, \"Duo Tiny desk x y\" (5 words) uses just 1 table join, the same as a 1-word search, because those fields hold one value each, so the slowdown does not happen there.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "No. Searching concerts by band name and concert name is fine for the join count, but the point of my report is that the number of joins must not grow with the number of words. If those fields hold one value each, 5 words using 1 join is right, as long as it stays at 1 however many words I type. ENTER"
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Searching concerts by band name and concert name for \"Duo Tiny desk x y\" (5 words) uses just 1 table join, the same as a 1-word search.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "4 of 10. Typing \"Duo Tiny\" without quotes finds the concert Tiny desk by the band Duo (1 result), but typing the same words in quotes finds nothing (0 results), because a quoted phrase must sit inside a single field.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "5 of 10. With member search set to match only the start of a name, \"Mary\" finds both bands but \"Jane\" finds nothing, even though the member Mary Jane is in The Hype; with exact-match search, \"Mary\" also finds nothing because the full name is Mary Halvorson.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "6 of 10. Pressing search with an empty box or only spaces does not filter anything: all 2 bands are listed.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "7 of 10. Typing just a quote mark (\"), or an empty pair of quotes, is treated as matching everything, so all 2 bands come back instead of none.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "No. A lone quote mark is a literal word, as in rule 16, so it should match nothing and return 0 bands. I don't have information on the empty pair of quotes."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Typing just a quote mark (\") in the band search finds 0 bands, so no bands are shown.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "8 of 10. Typing a phrase with an opening quote but no closing one, like \"Tiny desk, finds nothing (0 results) even though a concert called Tiny desk exists.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "9 of 10. Typing the text \"abc\" or \"7.5\" into a search that also covers the age number gives no error and no results, while typing 7 finds the 7-year-old child Dan (1 result).\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "10 of 10. A child with no parent on file is still found by name (searching \"Orphan\" returns 1 result) even when parent name is also searched, and \"DAN\" in capitals finds both Dan and Danielle (2 results) because any part of a name matches.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ }
+]

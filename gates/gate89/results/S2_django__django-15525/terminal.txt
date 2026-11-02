@@ -1,0 +1,230 @@
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: the command in your hive settings. 18 tests, all passing.
+
+One choice before I start, asked only once: 2 builders would finish about 1.6× sooner than one, for about 1.6× the cost. Should I build fast or cheap, from now on? (Enter = fast)
+  > 
+  Got it: fast, from now on. (`hive pace fast` or `hive pace cheap` changes it.)
+
+I'll put 2 builders on it (the job has 2 parts that can be built at the same time): about 1.6× the speed of one builder, for about 1.6× the cost. They work on copies, so your branches stay exactly as they are.
+If they need a decision only you can make, the question will appear right here.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+
+This goal has no business decisions for you to rule on, so I won't quiz you first. The builders will ask if they need anything.
+
+[06:52] Starting.
+  [06:52] Builder w2 landed: Use target database for natural key lookup in build_instance; add tests
+  [06:52] Builder w2 picked up: w2.
+  [06:53] Builder w2 landed: build_instance sets the target db on the temp instance before natural_key();...
+  [06:53] Builder w2 picked up: w2b.
+  [06:53] Builder w2 landed: regression tests were landed with the fix (lock w2b released)
+
+[06:53] All 2 builders are done.
+
+Let me check the result.
+  21 tests, all passing. All 18 that passed before still pass.
+
+Done in 2 minutes, about $0.41 in all (builders $0.31, Hive's own questions and checks $0.11). Your result is on branch hive/this-repository-is-django-1102-0652.
+  See what changed:  git diff main...hive/this-repository-is-django-1102-0652
+  Take it:           git merge hive/this-repository-is-django-1102-0652
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/this-repository-is-django-1102-0652.)
+
+Here is everything the build does now, written from its code.
+
+What the build does now, as rules (each one is what the product will do. Mark any that is not your policy):
+  1. Importing data into a second database: when a data file lists the owner Priya and her item "lamp" linked to her by name, importing into the second database stores both there. Nothing is added to the main database.
+  2. Importing data into a second database: the item is matched to its owner by looking only in the database being imported into. Priya in the second database is found even if the main database has no Priya.
+  3. Importing data into a second database: if the owner exists only in the main database (say "Dev") and not in the target one, the import of an item for Dev fails with an error and that item is not saved.
+  4. Importing data into the main database: the same file with Priya and her lamp loads normally into the main database and adds nothing to the second one.
+  5. Re-importing the same file: loading Priya's lamp a second time into the same database does not create a duplicate; there is still one lamp for Priya.
+  6. Items with the same name: a lamp for Priya and a lamp for Ravi are treated as two different items, so both are kept after import.
+  7. Item with its own id number: an item such as "w" given id 50 and linked to Priya is saved with that id in the second database, provided Priya exists there.
+  8. Item with its own id number: importing that id-50 item into the main database fails if Priya is not in the main database, and nothing is saved for it.
+  9. Import failure: when an item cannot be linked to an owner, the whole import reports an error naming the file instead of silently skipping the item.
+  10. Messy or missing details: if the item points to an owner that does not exist anywhere, such as "zzz", the import fails with an error and the item is not saved.
+  11. Messy or missing details: capitals matter in this setup, so an item linked to owner "A" when the owner is stored as "a" is not found and the import fails.
+  12. Messy or missing details: extra spaces are not removed, so an item linked to " a " with spaces around it does not match owner "a" and the import fails.
+  13. Messy or missing details: if the item's owner is left empty, the import fails with an error and the item is not saved.
+  14. Messy or missing details: if the owner reference is an empty list with no name in it, the import fails with an error saying the owner's name is missing.
+  Numbers of any that are wrong (Enter = all correct) > 
+  > 
+  Anything the builders should know that is not on this list? (Enter = nothing) > 
+  > 
+🔎 Last step, 23 quick checks on what the build does in real cases. They catch what a list of rules hides. Tap ✅ if a result is right, or tell me what should happen.
+1 of 23. A file with owner Asha and her item Lamp is imported into the second database: both are saved there and nothing appears in the main database.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+2 of 23. Asha already exists only in the main database and the file contains just her item Lamp, imported into the second database: the import is refused because Asha is not found there, and nothing is saved.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+3 of 23. Asha already exists in the second database and the file contains only her item Lamp: the import succeeds and Lamp is attached to that Asha.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+4 of 23. Lamp with explicit id 77 for Asha is imported into the second database while the main database already has Asha's Lamp as id 1: the second database gets its own Lamp with id 77 and the main database is left untouched at id 1.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+5 of 23. A file with owner Asha and her item Lamp is imported into the main database: one owner and one Lamp are saved, exactly as in the second database.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+6 of 23. A file lists Lamp before its owner Asha is listed: the import is refused and nothing is saved, because owners must come earlier in the file than their items.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+7 of 23. The same file (Asha with her Lamp) is imported twice into the second database: the second run succeeds and there is still exactly one owner and one Lamp, no duplicates.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+8 of 23. Lamp for Asha is listed twice inside one file: the import succeeds and only one Lamp is kept.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+9 of 23. A file brings Asha's Lamp again but with a different id (9) while the shop already has it as id 7: the import is refused for a clash and Lamp stays as id 7.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > No, I don't think it should be refused. The natural key matches the existing Lamp, so the import should reuse that Lamp's id 7 and not raise a clash. Lamp stays as id 7, with no duplicate.
+✍️ With your correction: Asha's Lamp, re-imported with id 9 while the shop has it as id 7, is matched to the existing Lamp and stays id 7, with no clash and no duplicate.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > 
+10 of 23. Two different owners, Asha and Bela, each have an item called Lamp: both Lamps are saved as separate items (ids 1 and 2).
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > Right? Asha's Lamp and Bela's Lamp have different natural keys, so both are saved as separate items. Ids 1 and 2 are just an example, so it's fine if the ids differ. ENTER
+✍️ With your correction: Asha's Lamp and Bela's Lamp are both saved as separate items, ids 1 and 2.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > 
+11 of 23. Owner Asha already exists and a file brings another owner named Asha with id 50: the import is refused because owner names must be unique, and the existing Asha is kept.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+12 of 23. Owners 'Asha' and 'asha' (or 'Asha ' with a trailing space) are treated as different people: all are saved as separate owners, and an item pointing to 'asha' goes only to the exact lowercase one.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+13 of 23. Lamp for Asha arrives with id 7 into an empty shop: it is saved with id 7 rather than getting a fresh number.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > Not quite. In an empty shop Asha doesn't exist, so the import fails and Lamp isn't saved. If Asha is already there, Lamp is saved with id 7.
+✍️ With your correction: Asha's Lamp with id 7 is rejected and nothing is saved, because the empty shop has no Asha in it.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > 
+14 of 23. The shop already has Lamp as id 7 and a file brings a different item, Fan, with the same id 7 for Asha: Fan silently overwrites Lamp, so id 7 is now Fan and Lamp is gone.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+15 of 23. Asha is imported with id 50 when an Asha with another id already exists: the import fails and the existing Asha is kept.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > No, I don't think it should fail. Asha's natural key (her name) matches the existing Asha, so the import should reuse that Asha's id and not raise an error. The existing Asha is kept under her current id, with no duplicate.
+✍️ With your correction: Asha's import with id 50 succeeded without error, reusing the existing Asha's id, so the existing Asha stays and no duplicate is created.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > 
+16 of 23. A file has owner Asha plus a Lamp pointing to a non-existent owner 'Zed', imported into the second database: the whole import is refused and even Asha is not saved.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+17 of 23. The same bad file (Asha plus a Lamp for unknown owner 'Zed') imported into the main database gives the same result: nothing at all is saved.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+18 of 23. A file with Asha's Lamp with a clashing id (9 vs existing 7) is refused: the existing Asha and Lamp (id 7) stay exactly as they were.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > No, it shouldn't be refused, as with check 9. Asha's Lamp matches the existing Lamp by its natural key, so the import reuses id 7. There is no clash and no duplicate. The existing Asha and Lamp (id 7) stay as they were.
+✍️ With your correction: Asha's Lamp arriving with id 9 is accepted, not refused: it matches her existing Lamp, so id 7 is reused, no duplicate is made, and nothing changes.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > 
+19 of 23. A Lamp has no owner given at all, or the owner is empty: the import is refused and nothing is saved.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > Right. A Lamp with no owner, or an empty owner, can't be linked to anyone, so the import fails with an error and nothing is saved.
+✍️ With your correction: The import of the Lamp with no owner, or an empty owner, fails with an error and nothing is saved.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > 
+20 of 23. A Lamp's owner is written as plain text 'Asha' instead of in the expected list form: the import is refused with a message that the value must be a number.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > I don't have that information.
+✍️ With your correction: Asha's Lamp import was refused with a message that the owner value must be a number, because the owner was given as plain text.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > I don't have that information.
+21 of 23. A Lamp arrives with a blank name, or no name at all: it is accepted and saved with an empty name.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > I don't have that information.
+✍️ With your correction: A Lamp that arrived with a blank name, or no name at all, was accepted and saved with an empty name.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > I don't have that information.
+22 of 23. An owner with a blank name, and an item attached to it, is accepted: one nameless owner is saved with the item attached.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > I don't have that information.
+✍️ With your correction: An owner with a blank name and an item attached to it were accepted, and one nameless owner was saved with the item attached.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > I don't have that information.
+23 of 23. A Lamp with no name for Asha arrives when Asha already has a nameless item: the existing nameless item is simply updated and no new one is added.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+✅ Thank you. 9 of 23 cases changed; the builders will make them so.
+  [07:01] Builder w1 landed: build_instance reuses existing pk on natural key match even if pk given; tests
+  [07:01] Builder w1 picked up: w1.
+  [07:01] Builder w1 landed: build_instance always looks up natural key in target db and reuses existing pk even...
+
+Let me check the result.
+  23 tests, all passing. All 18 that passed before still pass.
+
+Done in under a minute, about $2.11 in all (builders $0.47, Hive's own questions and checks $1.64). Your result is on branch hive/this-repository-is-django-1102-0652.
+  See what changed:  git diff main...hive/this-repository-is-django-1102-0652
+  Take it:           git merge hive/this-repository-is-django-1102-0652
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/this-repository-is-django-1102-0652.)
+
+Your 12 changes are in, and every test passes. It's yours.

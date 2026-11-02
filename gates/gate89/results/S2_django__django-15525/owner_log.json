@@ -1,0 +1,142 @@
+[
+ {
+  "prompt": "\nOne choice before I start, asked only once: 2 builders would finish about 1.6\u00d7 sooner than one, for about 1.6\u00d7 the cost. Should I build fast or cheap, from now on? (Enter = fast)",
+  "typed": ""
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "1 of 23. A file with owner Asha and her item Lamp is imported into the second database: both are saved there and nothing appears in the main database.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "2 of 23. Asha already exists only in the main database and the file contains just her item Lamp, imported into the second database: the import is refused because Asha is not found there, and nothing is saved.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "3 of 23. Asha already exists in the second database and the file contains only her item Lamp: the import succeeds and Lamp is attached to that Asha.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "4 of 23. Lamp with explicit id 77 for Asha is imported into the second database while the main database already has Asha's Lamp as id 1: the second database gets its own Lamp with id 77 and the main database is left untouched at id 1.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "5 of 23. A file with owner Asha and her item Lamp is imported into the main database: one owner and one Lamp are saved, exactly as in the second database.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "6 of 23. A file lists Lamp before its owner Asha is listed: the import is refused and nothing is saved, because owners must come earlier in the file than their items.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "7 of 23. The same file (Asha with her Lamp) is imported twice into the second database: the second run succeeds and there is still exactly one owner and one Lamp, no duplicates.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "8 of 23. Lamp for Asha is listed twice inside one file: the import succeeds and only one Lamp is kept.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "9 of 23. A file brings Asha's Lamp again but with a different id (9) while the shop already has it as id 7: the import is refused for a clash and Lamp stays as id 7.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "No, I don't think it should be refused. The natural key matches the existing Lamp, so the import should reuse that Lamp's id 7 and not raise a clash. Lamp stays as id 7, with no duplicate."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Asha's Lamp, re-imported with id 9 while the shop has it as id 7, is matched to the existing Lamp and stays id 7, with no clash and no duplicate.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "10 of 23. Two different owners, Asha and Bela, each have an item called Lamp: both Lamps are saved as separate items (ids 1 and 2).\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right? Asha's Lamp and Bela's Lamp have different natural keys, so both are saved as separate items. Ids 1 and 2 are just an example, so it's fine if the ids differ. ENTER"
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Asha's Lamp and Bela's Lamp are both saved as separate items, ids 1 and 2.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "11 of 23. Owner Asha already exists and a file brings another owner named Asha with id 50: the import is refused because owner names must be unique, and the existing Asha is kept.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "12 of 23. Owners 'Asha' and 'asha' (or 'Asha ' with a trailing space) are treated as different people: all are saved as separate owners, and an item pointing to 'asha' goes only to the exact lowercase one.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "13 of 23. Lamp for Asha arrives with id 7 into an empty shop: it is saved with id 7 rather than getting a fresh number.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Not quite. In an empty shop Asha doesn't exist, so the import fails and Lamp isn't saved. If Asha is already there, Lamp is saved with id 7."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Asha's Lamp with id 7 is rejected and nothing is saved, because the empty shop has no Asha in it.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "14 of 23. The shop already has Lamp as id 7 and a file brings a different item, Fan, with the same id 7 for Asha: Fan silently overwrites Lamp, so id 7 is now Fan and Lamp is gone.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "15 of 23. Asha is imported with id 50 when an Asha with another id already exists: the import fails and the existing Asha is kept.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "No, I don't think it should fail. Asha's natural key (her name) matches the existing Asha, so the import should reuse that Asha's id and not raise an error. The existing Asha is kept under her current id, with no duplicate."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Asha's import with id 50 succeeded without error, reusing the existing Asha's id, so the existing Asha stays and no duplicate is created.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "16 of 23. A file has owner Asha plus a Lamp pointing to a non-existent owner 'Zed', imported into the second database: the whole import is refused and even Asha is not saved.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "17 of 23. The same bad file (Asha plus a Lamp for unknown owner 'Zed') imported into the main database gives the same result: nothing at all is saved.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "18 of 23. A file with Asha's Lamp with a clashing id (9 vs existing 7) is refused: the existing Asha and Lamp (id 7) stay exactly as they were.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "No, it shouldn't be refused, as with check 9. Asha's Lamp matches the existing Lamp by its natural key, so the import reuses id 7. There is no clash and no duplicate. The existing Asha and Lamp (id 7) stay as they were."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Asha's Lamp arriving with id 9 is accepted, not refused: it matches her existing Lamp, so id 7 is reused, no duplicate is made, and nothing changes.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "19 of 23. A Lamp has no owner given at all, or the owner is empty: the import is refused and nothing is saved.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right. A Lamp with no owner, or an empty owner, can't be linked to anyone, so the import fails with an error and nothing is saved."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The import of the Lamp with no owner, or an empty owner, fails with an error and nothing is saved.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "20 of 23. A Lamp's owner is written as plain text 'Asha' instead of in the expected list form: the import is refused with a message that the value must be a number.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Asha's Lamp import was refused with a message that the owner value must be a number, because the owner was given as plain text.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "21 of 23. A Lamp arrives with a blank name, or no name at all: it is accepted and saved with an empty name.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A Lamp that arrived with a blank name, or no name at all, was accepted and saved with an empty name.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "22 of 23. An owner with a blank name, and an item attached to it, is accepted: one nameless owner is saved with the item attached.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: An owner with a blank name and an item attached to it were accepted, and one nameless owner was saved with the item attached.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "23 of 23. A Lamp with no name for Asha arrives when Asha already has a nameless item: the existing nameless item is simply updated and no new one is added.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ }
+]

@@ -1,0 +1,90 @@
+[
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "1 of 10. The customer table's \"name\" column is renamed to \"full_name\" and nobody confirms it is a rename: the change plan deletes the name column and adds an empty full_name column, so every existing customer name is lost.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Not related to this issue. I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The customer table's name column was dropped and an empty full_name column added, so every existing customer name is lost.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "2 of 10. The Cust table is renamed to Client and the answer to \"is this a rename?\" is no (the automatic default): the plan creates a new Client table and deletes Cust, so all existing customer rows are dropped.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Not related to this issue. I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The Cust table renamed to Client, with the rename not confirmed, becomes a brand-new Client table and Cust is deleted, so every existing customer row is lost.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Not related to this issue. I don't have that information."
+ },
+ {
+  "prompt": "3 of 10. The Cust table is renamed to Client and at the same time gets a new optional column: it is no longer recognised as a rename even when the owner says yes, so the plan deletes Cust and creates an empty Client.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Not related to this issue. I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The Cust table renamed to Client with a new optional column is not treated as a rename, so Cust is deleted and an empty Client is created.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "4 of 10. A customer name column shrinks from 10 to 5 characters: the plan shows one plain column change with no warning, so existing 10-character names would be cut off or rejected.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Not related to this issue. I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The customer name column shrinking from 10 to 5 characters shows as one plain column change with no warning, so existing 10-character names would be cut off or rejected.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Not related to this issue. I don't have that information."
+ },
+ {
+  "prompt": "5 of 10. A customer name column is changed from text to whole numbers: the plan is a single column change with no warning that existing names like \"Ravi\" cannot be converted.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Not related to this issue. I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Changing the customer name column from text to whole numbers shows as one plain column change, with no warning that existing names like \"Ravi\" cannot be converted.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Not related to this issue. I don't have that information."
+ },
+ {
+  "prompt": "6 of 10. A required \"age\" column is added to customers with no default and nobody is there to answer questions (automated run): the process stops with exit code 3 and no change plan is produced.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Not related to this issue. I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Adding a required age column to customers with no default in an automated run stops the process with exit code 3 and produces no change plan.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Not related to this issue. I don't have that information."
+ },
+ {
+  "prompt": "7 of 10. An owner typing a starting value for the new required \"age\" column gets \"0\" accepted as is, but pressing Enter on a blank answer just asks again, and invalid text like \"import os\" is rejected with \"invalid syntax\" and asked again.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Not related to this issue. I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: When the owner enters a starting value for the new required age column, 0 is accepted, a blank answer is asked again, and 'import os' is rejected as invalid syntax and asked again.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Not related to this issue. I don't have that information."
+ },
+ {
+  "prompt": "8 of 10. Making the customer name required when some existing names are empty, in an automated run: it goes through silently with no starting value, so the change would fail on the database if any customer has no name.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Not related to this issue. I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Making the customer name required in an automated run goes through silently with no starting value, so the change fails on the database if any customer has no name.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Not related to this issue. I don't have that information."
+ },
+ {
+  "prompt": "9 of 10. Making the customer name required in an interactive run and choosing \"ignore for now\": the plan is written with no starting value, leaving any customers with no name for the owner to fix by hand.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Not related to this issue. I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Making the customer name required in an interactive run with \"ignore for now\" produced a plan with no starting value, so customers without a name are left for the owner to fix by hand.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Not related to this issue. I don't have that information."
+ },
+ {
+  "prompt": "10 of 10. A required \"age\" column added with no default and the default (non-asking) setup: the change plan is still written with no starting value and no warning, so the change fails later on a table that already has customers.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Not related to this issue. I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Adding a required age column to customers with no default still produces the change plan with no starting value and no warning, so it fails later because customers already exist.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ }
+]

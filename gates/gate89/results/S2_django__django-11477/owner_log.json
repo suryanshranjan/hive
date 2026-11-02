@@ -1,0 +1,154 @@
+[
+ {
+  "prompt": "\nOne choice before I start, asked only once: 2 builders would finish about 1.6\u00d7 sooner than one, for about 1.6\u00d7 the cost. Should I build fast or cheap, from now on? (Enter = fast)",
+  "typed": ""
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": "13"
+ },
+ {
+  "prompt": "  Rule 13: Building page links: if someone explicitly passes an empty value for an optional part, the word \"None\" is written into the address (/optional/1/None/); only addresses read from a customer's page get the clean treatment.\n  What should it be? > ",
+  "typed": "Explicitly passing None for an optional part should be ignored, not written into the address. Building /optional/1/ with an explicit None for the optional part should give /optional/1/, and never /optional/1/None/."
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": "Explicitly passing None for an optional part should be ignored, not written into the address. Building /optional/1/ with an explicit None for the optional part should give /optional/1/, and never /optional/1/None/."
+ },
+ {
+  "prompt": "1 of 18. A customer on the English page /en/pos/5/, where the second detail is optional and left out, is switched to Dutch: the link comes out as /nl/pos/5/None/, a broken page with the word None in it.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right? The link should not come out as /nl/pos/5/None/. It should be /nl/pos/5/, with the absent optional part left out and no word None in it."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A customer on the English page /en/pos/5/, with the second detail left out, who switches to Dutch is sent to /nl/pos/5/, with no None added.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "2 of 18. The same page when the optional detail is filled in (/en/pos/5/x/) is switched to Dutch: it correctly comes out as /nl/pos/5/x/.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "3 of 18. A page whose optional details are named (/en/items/5/ with the second detail missing) is switched to Dutch: it comes out clean as /nl/items/5/, so only pages with unnamed optional details break.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "The named case is right: /en/items/5/ should become /nl/items/5/ with nothing added. The issue is only about optional named groups. I don't have information on unnamed optional details."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A customer on the English page /en/items/5/, with the second detail left out, who switches to Dutch now lands on /nl/items/5/.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "4 of 18. A link with a search term and section marker (/en/prefixed/?a=1#f) is switched to Dutch: both are kept and it comes out as /nl/prefixed/?a=1#f, and a full web address keeps its site name too.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "5 of 18. A page with no matching translation in the target language (/en/users/ asked for Dutch when no Dutch wording exists) comes out as /nl/users/, with only the language prefix changed.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A customer on /en/users/ who switches to Dutch, where no Dutch wording exists, lands on /nl/users/ with only the language prefix changed.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "6 of 18. An address typed with a capital language code (/EN/prefixed/) is not recognised as English: no language is found and the page link is left as /EN/prefixed/ when switched to Dutch.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A customer who typed the address /EN/prefixed/ with a capital language code is not recognised as English, so no language is found and the page link stays /EN/prefixed/ when switched to Dutch.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "7 of 18. An address starting with /pt/ is read as Brazilian Portuguese (pt-br), because the short code is matched to the only Portuguese variant offered.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A customer visiting an address starting with /pt/ is shown the site in Brazilian Portuguese (pt-br), since that is the only Portuguese version offered.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "8 of 18. An address for a country variant such as /en-gb/ is read as plain English, while an unknown code such as /xx/ or a run-on like /nlx/ gives no language at all.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A visitor to /en-gb/ is shown plain English, while visitors to /xx/ or /nlx/ get no language at all.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "9 of 18. An address with no trailing slash after the language (/nl) is still read as Dutch, same as /nl/.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A visitor to the address /nl, with no trailing slash, is still shown the site in Dutch, just as with /nl/.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "10 of 18. A page address that matches nothing (/en/nope/) or has no closing slash (/en/prefixed) is switched to Dutch: it is returned unchanged with no error, so the customer stays on the English link.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Switching the English page /en/nope/ and the slash-less /en/prefixed to Dutch returns both unchanged with no error, so the customer stays on the English links.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "11 of 18. Asking for a language the business does not offer (xx) on /en/prefixed/ is not refused: it produces /xx/prefixed/, a link to a language that does not exist.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Asking for language xx on the English page /en/prefixed/ is accepted, not refused, and gives the link /xx/prefixed/, though that language doesn't exist.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "12 of 18. Asking for an empty or missing language on /en/prefixed/ quietly falls back to the current language and returns /en/prefixed/.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A customer on /en/prefixed/ who switches language without choosing one gets no new link, is told no language was chosen, and stays on /en/prefixed/.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "13 of 18. An empty address is switched to Dutch: it comes back empty with no error.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A customer with an empty page address who switches to Dutch gets no new link, is told no page address was given, and stays where they are.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "14 of 18. Building the items page link with item number 5 and no second detail gives /en/items/5/, and the same with the second detail set to 'nothing' gives /en/items/5/None/, a link with the word None in it.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right? Building the items page link with item number 5 and no second detail should give /en/items/5/. The second detail set to nothing (None) should also give /en/items/5/, not /en/items/5/None/. The word None should never be in the link."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The items link for item 5 with no second detail is /en/items/5/, and with second detail 'nothing' it is /en/items/5/nothing/, with no None in it.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "The correction is wrong. It changed the second case into /en/items/5/nothing/, which isn't what I said. Setting the second detail to nothing (None) should give /en/items/5/, with no None and no extra word."
+ },
+ {
+  "prompt": "15 of 18. Building the items link with the second detail left as an empty string, a value with a space ('x y'), or a non-numeric item number ('abc') is refused with a no-match error instead of a link.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Building the items link with an empty second detail, a second detail of 'x y', or an item number 'abc' is refused with a no-match error.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "16 of 18. Building a link by giving both a positional and a named detail at once is refused with an error saying not to mix them.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "I don't have that information."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Building a link with both a positional and a named detail at once is refused with an error saying not to mix them, so no link is produced.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "17 of 18. Building a link for a page name that does not exist, or giving an extra unknown detail (zz), is refused with a no-match error rather than a made-up link.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right? Building a link with a page name that doesn't exist, or with an extra unknown detail (zz), should be refused with a no-match error. I don't have more information than that."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Asking for a page name that doesn't exist, or adding the unknown detail zz, produces no link and is refused with a no-match error.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right? The link should not come out as /nl/pos/5/None/. It should be /nl/pos/5/, with the absent optional part left out and no word None in it. Whether the unnamed case is also meant to be fixed is not something I have information on beyond that."
+ },
+ {
+  "prompt": "18 of 18. The same page name builds /en/prefixed/ while the customer is in English and /nl/prefixed/ when in Dutch, so the language prefix follows the customer's current language.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right? The language prefix should follow the customer's current language, so it's /en/prefixed/ in English and /nl/prefixed/ in Dutch. I don't have more information than that."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: The prefixed page link came out as /en/prefixed/ for the English-speaking customer and /nl/prefixed/ for the Dutch-speaking one, following each customer's current language.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right? The link should not come out as /nl/pos/5/None/. It should be /nl/pos/5/, with the absent optional part left out and no word None in it."
+ }
+]
