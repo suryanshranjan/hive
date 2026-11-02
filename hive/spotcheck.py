@@ -78,15 +78,19 @@ def order(before, after):
     same = [p for p in parts if mine(before, p) == mine(after, p)]
     return same + [p for p in parts if p not in same]
 
+SPOT_MAX = 6   # Gate 88: prompts 34 vs 55, pass^1 1.00, median hidden 27
+
 def pick(spots, parts, most=None):
-    """Gate 88 (under test): at most `most` spot checks, taken round-robin across the parts in their order (each part's
+    """Gate 88: at most `most` spot checks (default 6), taken round-robin across the parts in their order (each part's
     most important first), so every part is still shown (Gate 63) while the owner sees a handful, not 12-32 (Gate 85).
-    most=None (or HIVE_SPOT_MAX unset) keeps them all."""
+    HIVE_SPOT_MAX overrides the default; 0 keeps them all."""
     if most is None:
         try:
-            most = int(os.environ['HIVE_SPOT_MAX'])
-        except (KeyError, ValueError):
+            most = int(os.environ.get('HIVE_SPOT_MAX', SPOT_MAX))
+        except ValueError:
             return spots
+    if most <= 0:   # 0: every spot check, as before Gate 88
+        return spots
     by = {}
     for s in spots:
         by.setdefault(s.get('part'), []).append(s)

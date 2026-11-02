@@ -341,7 +341,6 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
         return rc
     answered = _answered(run1)
     if answered >= ASKED_ENOUGH:   # Gate 68: after builders asked him, the full review added +1.6 points (98.4 -> 100%)
-        _keep_contract(state, phone)   # Gate 84: with the review skipped, the goal's stated interfaces are still checked
         rc = _deliver(state)
         msg = (f"{_who(state)} asked you {_n(answered, 'question')} while building, and your answers are built in. "
                f"{state.get('check', '')} It's ready on branch hive/{name}.")
@@ -381,7 +380,9 @@ def _keep_contract(state, ch=None):
         _rmtree(code)
     sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', state['b'], os.path.join(state['final'], 'up.git'), code)
     try:
-        problems = contract.check(state['goal'], code)
+        if 'interfaces' not in state:   # one model call per build reads what the goal states
+            state['interfaces'] = contract.stated(state['goal'])
+        problems = contract.check(state['goal'], code, state['interfaces'])
     except Exception:
         problems = []
     _rmtree(code)
@@ -504,8 +505,10 @@ def _confirm_as_built(state, run2, phone=None):
     json.dump(state, open(os.path.join(state['home'], 'state.json'), 'w'), indent=1)
     say(f'[{_now()}] Done.')
 
-def _deliver(state):
+def _deliver(state, ch=None):
     """Check every test on the result and hand it over as the branch hive/<name> (updated in place after a fix round)."""
+    _keep_contract(state, ch)   # Gate 93: the goal's stated interfaces, before every delivery (Gate 90: a review's
+                                # correction broke one, on the path Gate 84 did not check)
     say('\nLet me check the result.')
     result = os.path.join(state['home'], 'result')
     if os.path.exists(result):
