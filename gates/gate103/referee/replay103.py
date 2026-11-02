@@ -6,7 +6,8 @@ sys.path.insert(0, os.environ.get('HIVE_DEV', '/home/claude/hive-dev'))
 from hive import examples
 
 R = 'runs'; OUT = os.path.join(R, 'g103_replay'); os.makedirs(OUT, exist_ok=True)
-FLIGHTS = sorted(glob.glob(f'{R}/g9[5-9]_*')) + sorted(glob.glob(f'{R}/g101_day*'))
+FLIGHTS = [f for f in sorted(glob.glob(f'{R}/g9[5-9]_*')) + sorted(glob.glob(f'{R}/g101_day*'))
+           if glob.glob(f'{f}/hive_state/runs/*/state.json') and os.path.isdir(f'{f}/delivered')]
 
 def hidden(f):
     g = os.path.basename(f); gate, name = g.split('_', 1); gate = gate[1:]
