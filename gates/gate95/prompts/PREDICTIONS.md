@@ -39,3 +39,7 @@ Registered Nov 2 2026, before the flights.
 ## Limits
 
 - Five flights cannot show a reliability gain with confidence (Gate 93 was 4 of 5). This is a first look. About $25.
+
+## Added before the flights (Nov 2, after Gate 94)
+
+`dev95` also carries a narrowing of the interface check: it now checks only functions the goal places in a file, named as code. This stops Gate 94's false alarms on bug reports. On Tiny Shop's goal every stated function has a file and a code name, so the check works as before. The predictions are unchanged.
