@@ -1,0 +1,84 @@
+{
+ "flight": "g101_day2_F1",
+ "hidden": 20,
+ "of": 29,
+ "rules": 30,
+ "result": {
+  "checks": 30,
+  "failing": [
+   {
+    "rule": "Refund discount not rounded, only final refund floored",
+    "example": "\u20b9999 item with 7% code refunds \u20b9929",
+    "got": "\u20b9930 (discount rounded down to 69 first)",
+    "where": "shop.refunds.refund"
+   },
+   {
+    "rule": "1 point per full \u20b950 after discount",
+    "example": "\u20b91,000 with 10% code (\u20b9900) earns 18",
+    "got": "9 (uses \u20b9100 per point)",
+    "where": "shop.loyalty.points_earned"
+   },
+   {
+    "rule": "1 point per full \u20b950",
+    "example": "Ravi \u20b91,000 card order with \u20b9200 delivery earns 20",
+    "got": "10",
+    "where": "shop.loyalty.points_earned"
+   },
+   {
+    "rule": "1 point per full \u20b950",
+    "example": "\u20b9500 earns 10",
+    "got": "5",
+    "where": "shop.loyalty.points_earned"
+   },
+   {
+    "rule": "1 point per full \u20b950",
+    "example": "\u20b9999 earns 19",
+    "got": "9",
+    "where": "shop.loyalty.points_earned"
+   },
+   {
+    "rule": "1 point per full \u20b950",
+    "example": "\u20b91,099 earns 21",
+    "got": "10",
+    "where": "shop.loyalty.points_earned"
+   },
+   {
+    "rule": "1 point per full \u20b950 after discount",
+    "example": "\u20b91,000 with 10% earns 18",
+    "got": "9",
+    "where": "shop.loyalty.points_earned"
+   },
+   {
+    "rule": "Final-sale earns double points",
+    "example": "\u20b91,000 final-sale earns 40",
+    "got": "20",
+    "where": "shop.loyalty.points_earned"
+   },
+   {
+    "rule": "Final-sale earns double points",
+    "example": "\u20b91,000 final-sale with 10% off earns 36",
+    "got": "18",
+    "where": "shop.loyalty.points_earned"
+   },
+   {
+    "rule": "Item amount is price x quantity",
+    "example": "5 mugs at \u20b9100 earn 10 points",
+    "got": "5",
+    "where": "shop.loyalty.points_earned"
+   },
+   {
+    "rule": "No cap, 1 point per \u20b950",
+    "example": "\u20b91,00,00,000 card order earns 200,000",
+    "got": "100000",
+    "where": "shop.loyalty.points_earned"
+   },
+   {
+    "rule": "Negative discount raises points",
+    "example": "\u20b91,000 with -10% earns 22",
+    "got": "11",
+    "where": "shop.loyalty.points_earned"
+   }
+  ],
+  "cost": 0.14598329999999998
+ }
+}

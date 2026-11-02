@@ -1,0 +1,38 @@
+g101_day1        hidden 26/27  rules 26  checks 12 failing 0 $0.10
+g101_day2_F1     hidden 20/29  rules 30  checks 30 failing 12 $0.14
+g101_day2_F2     hidden 29/29  rules 17  checks 12 failing 0 $0.11
+g101_day2_F3     hidden 17/29  rules 23  checks 13 failing 5 $0.17
+g101_day2_M1     hidden 27/29  rules 30  checks 17 failing 0 $0.13
+g101_day2_M2     hidden 28/29  rules 24  checks  9 failing 0 $0.12
+g101_day2_M3     hidden 29/29  rules 23  checks 13 failing 0 $0.13
+g95_live1        hidden 27/27  rules 16  checks 12 failing 0 $0.11
+g95_live2        hidden 26/27  rules 21  checks 12 failing 1 $0.11
+g95_live3        hidden 25/27  rules 15  checks  9 failing 0 $0.10
+g95_live4        hidden 27/27  rules 14  checks  7 failing 0 $0.09
+g95_live5        hidden 27/27  rules 11  checks  4 failing 0 $0.09
+g96_live1        hidden 26/27  rules 11  checks  5 failing 0 $0.10
+g96_live2        hidden 26/27  rules 15  checks 11 failing 0 $0.12
+g96_live3        hidden 27/27  rules  8  checks  5 failing 0 $0.10
+g96_live4        hidden 27/27  rules 25  checks 14 failing 0 $0.12
+g96_live5        hidden 27/27  rules 20  checks 12 failing 0 $0.11
+g97_live1        hidden 15/27  rules 13  checks  9 failing 0 $0.11
+g97_live2        hidden 27/27  rules 14  checks  7 failing 0 $0.09
+g97_live3        hidden 27/27  rules 16  checks  3 failing 0 $0.09
+g97_live4        hidden 27/27  rules 10  checks  8 failing 0 $0.10
+g97_live5        hidden 27/27  rules 15  checks 11 failing 0 $0.10
+g98_live1        hidden 27/27  rules  8  checks 23 failing 0 $0.11
+g98_live2        hidden 27/27  rules 14  checks  9 failing 0 $0.09
+g98_live3        hidden 27/27  rules 15  checks 12 failing 0 $0.10
+g98_live4        hidden 25/27  rules 13  checks  8 failing 0 $0.09
+g98_live5        hidden 27/27  rules 10  checks  7 failing 0 $0.09
+g99_overnight1   hidden 26/27  rules 14  checks 11 failing 0 $0.11
+g99_overnight2   hidden 23/27  rules 14  checks 13 failing 0 $0.10
+g99_overnight3   hidden 25/27  rules 19  checks 16 failing 0 $0.11
+g99_overnight4   hidden 26/27  rules 15  checks 13 failing 0 $0.11
+g99_overnight5   hidden 21/27  rules 13  checks 12 failing 0 $0.10
+
+failed flights flagged 2/5; good (>= of-1) flagged 1/23; ran 32/32; mean $0.11
+R1 F1 and F3 both flagged -> held
+R2 good flights flagged <= 20% -> held (1/23)
+R3 failed flights flagged >= 3 of 5 -> failed
+R4 mean cost <= $0.40 -> held

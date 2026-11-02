@@ -1,0 +1,18 @@
+{
+ "flight": "g95_live2",
+ "hidden": 26,
+ "of": 27,
+ "rules": 21,
+ "result": {
+  "checks": 12,
+  "failing": [
+   {
+    "rule": "Fractions of a rupee are always rounded down so the customer never gets more than owed",
+    "example": "\u20b91,249.60 is refunded as \u20b91,249 (items \u20b91,562 with a 20% code)",
+    "got": "\u20b91,250 (the discount is floored to \u20b9312 first, so the refund is rounded in the customer's favour)",
+    "where": "shop.refunds.refund"
+   }
+  ],
+  "cost": 0.1111251
+ }
+}

@@ -1,0 +1,42 @@
+{
+ "flight": "g101_day2_F3",
+ "hidden": 17,
+ "of": 29,
+ "rules": 23,
+ "result": {
+  "checks": 13,
+  "failing": [
+   {
+    "rule": "Refund by days since delivery: from day 8 half",
+    "example": "Lakshmi's Rs 2,000 jacket returned on day 8 gets Rs 1,000",
+    "got": "Rs 2,000 (full refund until day 14)",
+    "where": "shop.refunds.refund"
+   },
+   {
+    "rule": "Clearance items follow the same day schedule",
+    "example": "clearance return on day 12 gets half (Rs 1,000 item -> Rs 500)",
+    "got": "Rs 1,000",
+    "where": "shop.refunds.refund"
+   },
+   {
+    "rule": "1 loyalty point per full Rs 50 paid after discounts",
+    "example": "Rs 1,000 shirt sold at Rs 700 earns 14 points",
+    "got": "7 points (base//100)",
+    "where": "shop.loyalty.points_earned"
+   },
+   {
+    "rule": "Rs 100 minimum refund (under Rs 100 gets nothing)",
+    "example": "Rs 80 item returned on day 3 gets no refund",
+    "got": "Rs 80 (minimum is Rs 50)",
+    "where": "shop.refunds.refund"
+   },
+   {
+    "rule": "Amounts are rounded down to whole rupees",
+    "example": "Rs 333 item with 10% code refunds Rs 299",
+    "got": "Rs 300",
+    "where": "shop.refunds.refund"
+   }
+  ],
+  "cost": 0.1652097
+ }
+}

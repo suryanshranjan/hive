@@ -1,0 +1,18 @@
+{
+ "flight": "g98_live2",
+ "hidden": 27,
+ "of": 27,
+ "rules": 14,
+ "result": {
+  "checks": 10,
+  "failing": [
+   {
+    "rule": "Points use whole rupees after discount (rounded down): Rs 699.50 order earns 6 points",
+    "example": "Anil's order of 1399 items with 50% code (699.50 after discount), card: 6 points",
+    "got": "7 points (discount is floored to 699, so base becomes 700 instead of rounding the amount down to 699)",
+    "where": "shop.loyalty.points_earned"
+   }
+  ],
+  "cost": 0.10204369999999999
+ }
+}
