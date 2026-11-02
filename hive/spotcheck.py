@@ -23,7 +23,9 @@ Read it and run it, but do not change anything in that folder. For each part of 
 choices the code made that the owner might not expect or might decide differently (boundaries and cut-offs, rounding,
 caps and minimums, what happens in each business situation, wrong or missing input the business would care about). For
 each part write 2 to 5 spot checks, one choice each: pick one concrete case, run the code on it (its tests or a small
-script), and write what actually comes out.
+script), and write what actually comes out. **The first check of every part is its most ordinary case** (Gate 95): a
+typical customer, a typical amount, nothing unusual, built the way the rest of the product already builds it (no field
+or option the existing code would not set), so the owner sees the plain outcome before any edge case.
 
 The parts:
 {parts}
