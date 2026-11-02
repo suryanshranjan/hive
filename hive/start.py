@@ -270,7 +270,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     if rules:
         k = len(memory.load(repo))
         say(f"I'll remind them of your {_n(k, 'earlier ruling')} on this project, so you won't be asked those again.")
-    asked = []
+    asked = []; technical = False
     if interview_first and (phone or not overnight):   # the owner is here: ask him first (Gates 30-35)
         past = [r['text'] for r in memory.load(repo)]
         qs = telegram._load(os.path.join(home, 'interview') + '.questions.json').get('qs') or interview.write_situations(goal_text, past)
@@ -279,8 +279,9 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
             asked = interview.interview(goal_text, phone, past, ask=lambda p: _ask(p, ''), situations=qs,
                                         save=os.path.join(home, 'interview'))   # a stop never costs him his answers
         else:   # Gate 89: a technical goal has no business decisions to ask him about (Gate 86: it invented a shop)
-            say("\nThis goal has no business decisions for you to rule on, so I won't quiz you first. The builders will ask "
-                "if they need anything.")
+            technical = True
+            say("\nThis goal has no business decisions for you to rule on, so I won't quiz you first or review business rules "
+                "afterwards. The builders will ask if they need anything.")
         if asked:
             for r in asked:
                 memory.add(repo, r, 'interview')
@@ -292,7 +293,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
                     workers = n
                     say(f"  For a job this size I'll use {_n(n, 'builder')} ({why}).")
     say(f'\n[{_now()}] Starting.')
-    state = dict(repo=repo, branch=branch, name=name, home=home, test_cmd=test_cmd, links=links, goal=goal_text, t_g=t_g,
+    state = dict(repo=repo, branch=branch, name=name, home=home, test_cmd=test_cmd, links=links, goal=goal_text, t_g=t_g, technical=technical,
                  rules=rules, workers=workers, minutes=minutes, before=before, started=time.time(), overnight=overnight,
                  asked=asked, spent0=spent0)
     run1 = os.path.join(home, 'build')
@@ -340,8 +341,12 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
                 f"the branch.")
         return rc
     answered = _answered(run1)
+    if state.get('technical') and answered < ASKED_ENOUGH:   # Gate 94 (under test): no business rules to review
+        rc = _deliver(state)   # its tests and the goal's stated interfaces are still checked
+        msg = f"Done. {state.get('check', '')} It's ready on branch hive/{name}."
+        (phone.send('🎉 ' + msg) if phone else say('\n' + msg))
+        return rc
     if answered >= ASKED_ENOUGH:   # Gate 68: after builders asked him, the full review added +1.6 points (98.4 -> 100%)
-        _keep_contract(state, phone)   # Gate 84: with the review skipped, the goal's stated interfaces are still checked
         rc = _deliver(state)
         msg = (f"{_who(state)} asked you {_n(answered, 'question')} while building, and your answers are built in. "
                f"{state.get('check', '')} It's ready on branch hive/{name}.")
@@ -381,7 +386,9 @@ def _keep_contract(state, ch=None):
         _rmtree(code)
     sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', state['b'], os.path.join(state['final'], 'up.git'), code)
     try:
-        problems = contract.check(state['goal'], code)
+        if 'interfaces' not in state:   # one model call per build reads what the goal states
+            state['interfaces'] = contract.stated(state['goal'])
+        problems = contract.check(state['goal'], code, state['interfaces'])
     except Exception:
         problems = []
     _rmtree(code)
@@ -504,8 +511,10 @@ def _confirm_as_built(state, run2, phone=None):
     json.dump(state, open(os.path.join(state['home'], 'state.json'), 'w'), indent=1)
     say(f'[{_now()}] Done.')
 
-def _deliver(state):
+def _deliver(state, ch=None):
     """Check every test on the result and hand it over as the branch hive/<name> (updated in place after a fix round)."""
+    _keep_contract(state, ch)   # Gate 93: the goal's stated interfaces, before every delivery (Gate 90: a review's
+                                # correction broke one, on the path Gate 84 did not check)
     say('\nLet me check the result.')
     result = os.path.join(state['home'], 'result')
     if os.path.exists(result):
