@@ -27,8 +27,9 @@ contradicts):
 
 {rules}
 
-1. Read the code and its existing tests. For each rule, find the function the product itself uses for it: the one the
-   rest of the code and the existing tests call, not a helper or a new module that nothing calls.
+1. Read the code. For each rule, find the function the product itself uses for it, in this order: a function the goal
+   names; else a function that already existed before this build{before_note}, even if the build added a new one
+   beside it (callers still use the old one); only if neither exists, the new code's own function. Never a helper.
 2. For every rule that states a concrete example (amounts, days, an outcome), write one pytest test in
    {code}/test_owner_examples.py that calls that function with the example's inputs, built the way the existing tests
    build them, and asserts the owner's outcome. Skip rules with no concrete example, and examples a later rule
@@ -68,7 +69,11 @@ def rules_of(home):
     return out
 
 
-def check(code_dir, goal, rules, timeout=1500):
+BEFORE = """ (the product as it was before this build is in {before}; the builders' new tests do not tell you which
+   function the product uses)"""
+
+
+def check(code_dir, goal, rules, before=None, timeout=1500):
     """{'checks': n, 'failing': [...], 'cost': dollars}; None if the check could not run. Never changes code_dir."""
     rules = [r.strip() for r in rules if r and r.strip()]
     if not rules or os.environ.get('HIVE_EXAMPLE_CHECK') == '0':
@@ -79,10 +84,15 @@ def check(code_dir, goal, rules, timeout=1500):
         shutil.copytree(code_dir, code, ignore=shutil.ignore_patterns('.git', 'node_modules', '__pycache__', '.hive'))
         out = os.path.join(work, 'examples.json')
         listing = '\n'.join(f'{n}. {r}' for n, r in enumerate(rules[-60:], 1))
+        before_note = ''
+        if before and os.path.isdir(before):   # Gate 103a: F3's checker tested the builder's new, unused module
+            shutil.copytree(before, os.path.join(work, 'before'),
+                            ignore=shutil.ignore_patterns('.git', 'node_modules', '__pycache__', '.hive'))
+            before_note = BEFORE.format(before=os.path.join(work, 'before'))
         cost = None
         try:
             p = subprocess.run(argv(os.environ.get('HIVE_EXAMPLES_CMD') or CMD), cwd=work,
-                               input=BRIEF.format(code=code, goal=goal.strip()[:6000], rules=listing, out=out),
+                               input=BRIEF.format(code=code, goal=goal.strip()[:6000], rules=listing, out=out, before_note=before_note),
                                capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=timeout)
             try:
                 cost = json.loads(p.stdout).get('total_cost_usd')
@@ -93,6 +103,12 @@ def check(code_dir, goal, rules, timeout=1500):
             got = json.load(open(out, encoding='utf-8'))
         except Exception:
             return None
+        keep = os.environ.get('HIVE_EXAMPLES_KEEP')   # for diagnosis: keep the tests it wrote and its report
+        if keep:
+            os.makedirs(keep, exist_ok=True)
+            for f in (os.path.join(code, 'test_owner_examples.py'), out):
+                if os.path.exists(f):
+                    shutil.copy(f, keep)
         failing = [f for f in (got.get('failing') or []) if isinstance(f, dict)]
         return {'checks': int(got.get('checks') or 0), 'failing': failing, 'cost': cost}
     finally:

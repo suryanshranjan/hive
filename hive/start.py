@@ -422,7 +422,7 @@ def _keep_examples(state, ch=None):
     sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', state['b'], os.path.join(state['final'], 'up.git'), code)
     _link(state['repo'], code, state['links'])
     try:
-        got = examples.check(code, state['goal'], rules)
+        got = examples.check(code, state['goal'], rules, before=os.path.join(state['home'], 'source'))
     except Exception:
         got = None
     _rmtree(code)
