@@ -2,7 +2,7 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 2 2026 IST, after Gate 98)
+## Where we left off (Nov 2 2026 IST, after Gate 101)
 
 - **Gate 66 done (the user, travelling: "test something that makes Hive the best tool"):** one Claude Code agent that asks the owner beat Hive's hand-over by 21-30 hidden points (CQ 93.0, CC 84.6, HV 63.4, N0 34.8%) at 1/13 of his reading. Wind tunnel, synthetic owner who answers from his policy.
 - **Gate 67 done:** the hand-over's memory does not compound (neither rule fired).
@@ -39,7 +39,11 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 - **Gate 96 done:** pass^5 held again: 10 of 10 flights over Gates 95-96.
 - **Gate 97 done (claim fired):** lean reader: Hive's own spend 0.16x, about equal to builders'; ~$0.97 a feature; interface check now follows helpers.
 - **Gate 98 done:** lean reader + helper check: 5/5 right, ~$0.94 and 4-10 min a feature, 28 prompts.
-- **Next, in order:** the interview's 12-17 prompts (Gap 2); a harder real-codebase sample (Gap 4); the founder session.
+- **Gate 99 done:** overnight path: $1.09 a feature, 14 morning prompts, pass^1 0.60 (decisions no night builder asked about). Guard snapshot leak fixed.
+- **Gate 100 done:** harder Django issues: 9/9/9 of 10, 0 prompts; public summaries no longer hurt modern builders. Gap 4 needs the founder.
+- **Gate 101 done:** silent drift: memory kept 27-29 vs cleared 20, 29, 17 of 29; the contradiction check notices the change.
+- **Gate 102 running:** the interview before an overnight build (merged `66210da`, under test); score with `python3 gates/gate102/referee/analyze.py`; revert if N1/N2 fail.
+- **Next, in order:** the interview's 12-17 prompts (Gap 2); compare new answers with the existing code's behaviour when there is no memory (Gate 101); the founder session.
 - **Next ideas:** the default model only where answers become rules (Gap 3); Gap 4 again on harder issues; the founder session (`docs/founder_session.md`).
 - **Next:** skip the interview when a goal has no business decisions (Gate 86); Gap 4 again on issues whose summaries lose what a builder cannot infer (Ambig-SWE's missing-information annotations); a check for state that outlives a call (Gate 85) on a real codebase (where 'business parts' are a judgement); low priority, a short interview before an overnight build (at most ~2 of 27 to gain); the split on a real codebase (where 'business parts' are a judgement); with the founder, Gate 45 day 2 with builders asking him live (his pace and whether his answers hold).
 - **Earlier plan, superseded by Gate 73:** Gate 72 again with the repeated-question fix (does the swarm then match one agent's business correctness and keep its speed?). **With the founder:** Gate 45 day 2, builders asking him live; measure his answer time and whether his answers hold.
