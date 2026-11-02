@@ -1,0 +1,133 @@
+#!/usr/bin/env python3
+"""Gate 102: Gate 99's five overnight flights with the interview run before the night. Gate 76 (Gate 52's driver, Gate 54's three-part goal and private policy): a flight test of hive start as shipped
+after Gates 66-75, live (the owner at the keyboard) or overnight (then `hive morning` at the keyboard).
+usage: python3 gates/gate102/referee/flight85.py live <k> [--skip-prereg-check]
+Gate 52: a flight test of the product. `hive start` end to end on a small shop project, as shipped, with a synthetic
+owner answering every terminal prompt from a private refund policy (private/g52/policy.md). The delivered branch is
+scored on hidden acceptance tests written from that policy before the run (private/g52/test_refunds_hidden.py), both as
+built (when the code sheet is written) and after the hand-over.
+usage: python3 gates/gate52/referee/flight.py [--skip-prereg-check]"""
+import os as _os
+pass   # Hive as shipped: no setting changed
+import argparse, contextlib, io, json, os, shutil, subprocess, sys, time
+
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+RUN = None; PRIV = os.path.join(ROOT, 'private', 'g54')
+GOAL = ("Add three things to the shop. (1) Refunds: `refund(order, days_since_delivery, reason)` in `shop/refunds.py`, "
+        "returning `{'amount': <whole rupees>, 'method': 'card' or 'store_credit'}`; `reason` is the customer's "
+        "reason, for example 'changed mind' or 'damaged'. (2) Loyalty points: `points_earned(order)` in "
+        "`shop/loyalty.py`, the points a customer earns for an order. (3) A daily sales summary for me: "
+        "`sales_summary(orders)` in `shop/report.py`, returning `{'orders': ..., 'revenue': ..., 'average': ...}` "
+        "in whole rupees.")
+OWNER = ['claude', '-p', '--output-format', 'json']
+BRIEF = os.path.join(ROOT, 'gates', 'gate102', 'prompts', 'owner_brief.md')
+HIDDEN = 'test_hidden.py'
+
+def sh(*a, cwd=None):
+    return subprocess.run(list(a), cwd=cwd, capture_output=True, text=True)
+
+def hidden_score(code_dir):
+    r = subprocess.run([sys.executable, '-m', 'pytest', '-q', '-p', 'no:cacheprovider', os.path.join(PRIV, HIDDEN)],
+                       cwd=code_dir, capture_output=True, text=True, env=dict(os.environ, PYTHONPATH=code_dir))
+    last = (r.stdout.strip().splitlines() or [''])[-1]
+    import re
+    p = int((re.search(r'(\d+) passed', last) or [0, 0])[1]); f = int((re.search(r'(\d+) failed', last) or [0, 0])[1])
+    e = int((re.search(r'(\d+) error', last) or [0, 0])[1])
+    return dict(passed=p, failed=f, errors=e, line=last)
+
+def main():
+    global RUN
+    ap = argparse.ArgumentParser(); ap.add_argument('mode', choices=['live', 'overnight']); ap.add_argument('k', nargs='?', default=''); ap.add_argument('--skip-prereg-check', action='store_true'); a = ap.parse_args()
+    RUN = os.path.join(ROOT, 'runs', f'g102_{a.mode}{a.k}')
+    sys.path.insert(0, os.path.join(ROOT, 'lab'))
+    if not a.skip_prereg_check:
+        import run_gate; run_gate.prereg_check('gates/gate102/prompts/PREDICTIONS.md')
+    shutil.rmtree(RUN, ignore_errors=True); os.makedirs(RUN)
+    repo = os.path.join(RUN, 'tinyshop'); shutil.copytree(os.path.join(ROOT, 'gates', 'gate52', 'demo'), repo)
+    for c in (['init', '-q', '-b', 'main'], ['add', '-A'], ['-c', 'user.name=owner', '-c', 'user.email=o@shop', 'commit', '-qm', 'Tiny Shop']):
+        sh('git', *c, cwd=repo)
+    home = os.path.expanduser('~')   # this machine's Claude login stays where it is; Hive's own state starts empty
+    if os.path.exists(os.path.join(home, '.hive')):
+        sys.exit('~/.hive exists: move it aside so the flight starts like a first-time owner')
+    sys.path.insert(0, ROOT)
+    from hive import start, codesheet
+    policy = open(os.path.join(PRIV, 'policy.md')).read()
+    brief = open(BRIEF).read().replace('{POLICY}', policy)
+    term, log, cost = io.StringIO(), [], [0.0]
+    real_stdout = sys.stdout
+    class Tee(io.TextIOBase):
+        def write(self, s):
+            term.write(s); real_stdout.write(s); real_stdout.flush(); return len(s)
+    def ask(prompt, default=''):
+        print(prompt)
+        p = subprocess.run(OWNER, input=brief.replace('{SCREEN}', term.getvalue()[-12000:]), capture_output=True, text=True, timeout=600)
+        try:
+            d = json.loads(p.stdout); reply = (d.get('result') or '').strip(); cost[0] += float(d.get('total_cost_usd') or 0)
+        except Exception:
+            reply = ''
+        typed = '' if reply.strip('`').upper() in ('ENTER', '(ENTER)', '') else reply
+        print(f'  > {typed}')
+        log.append(dict(prompt=prompt[-2000:], typed=typed))
+        json.dump(log, open(os.path.join(RUN, 'owner_log.json'), 'w'), indent=1)
+        return typed or default
+    start._ask = ask
+    class OwnerKeyboard:   # Gate 54: builders' live questions and any other prompt that reads the keyboard directly
+        def readline(self):
+            p = subprocess.run(OWNER, input=brief.replace('{SCREEN}', term.getvalue()[-12000:]), capture_output=True,
+                               text=True, timeout=600)
+            try:
+                d = json.loads(p.stdout); reply = (d.get('result') or '').strip(); cost[0] += float(d.get('total_cost_usd') or 0)
+            except Exception:
+                reply = ''
+            typed = '' if reply.strip('`').upper() in ('ENTER', '(ENTER)', '') else ' '.join(reply.split())
+            print(f'  > {typed}')
+            log.append(dict(prompt=term.getvalue()[-1500:], typed=typed, keyboard=True))
+            json.dump(log, open(os.path.join(RUN, 'owner_log.json'), 'w'), indent=1)
+            return typed + '\n'
+        def isatty(self):
+            return False
+    sys.stdin = OwnerKeyboard()
+    before = {}; night = {}
+    def hidden_score_branch(repo):
+        br = [b.strip(' *') for b in sh('git', 'branch', '--list', 'hive/*', cwd=repo).stdout.splitlines()]
+        if not br: return {}
+        wt = os.path.join(RUN, 'night'); sh('git', 'worktree', 'add', '-q', wt, br[-1], cwd=repo)
+        res = hidden_score(wt); sh('git', 'worktree', 'remove', '--force', wt, cwd=repo); return res
+    real_describe = codesheet.describe
+    def describe(code_dir, goal, timeout=1800):   # the build as delivered, scored before the hand-over changes it
+        before.update(hidden_score(code_dir)); return real_describe(code_dir, goal, timeout)
+    codesheet.describe = describe
+    t0 = time.time(); err = None
+    with contextlib.redirect_stdout(Tee()):
+        try:
+            if a.mode == 'live':
+                rc = start.start(repo, None, GOAL, 20)
+            else:
+                rc = start.start(repo, None, GOAL, 20, overnight=True)
+                night.update(hidden_score_branch(repo))
+                print('\n--- the next morning: the owner types hive morning ---')
+                rc = start.morning()
+        except BaseException as e:   # a crash is a finding
+            import traceback; err = traceback.format_exc(); rc = None
+    minutes = (time.time() - t0) / 60
+    branches = [b.strip(' *') for b in sh('git', 'branch', '--list', 'hive/*', cwd=repo).stdout.splitlines()]
+    after = {}
+    if branches:
+        wt = os.path.join(RUN, 'delivered'); sh('git', 'worktree', 'add', '-q', wt, branches[-1], cwd=repo)
+        after = hidden_score(wt)
+        sh(sys.executable, '-m', 'pytest', '-q', cwd=wt)
+    runs = os.path.join(home, '.hive', 'runs'); spent = 0.0
+    for st in __import__('glob').glob(os.path.join(runs, '*', 'state.json')):
+        try: spent += float(json.load(open(st)).get('cost') or 0)
+        except Exception: pass
+    out = dict(mode=a.mode, rc=rc, error=err, minutes=round(minutes, 1), branches=branches, before=before, night=night, after=after,
+               owner_replies=len(log), owner_cost=round(cost[0], 2), build_cost=round(spent, 2),
+               hive_own=round(__import__('hive.explain', fromlist=['x']).SPENT[0], 2), hive_own_by=__import__('hive.explain', fromlist=['x']).SPENT_BY,
+               owner_typed_words=sum(len((r.get('typed') or '').split()) for r in log))
+    json.dump(out, open(os.path.join(RUN, 'flight.json'), 'w'), indent=1)
+    shutil.move(os.path.join(home, '.hive'), os.path.join(RUN, 'hive_state'))   # Hive's state from the flight, kept
+    open(os.path.join(RUN, 'terminal.txt'), 'w').write(term.getvalue())
+    print(json.dumps(out, indent=1), file=real_stdout)
+
+if __name__ == '__main__':
+    main()
