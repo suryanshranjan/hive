@@ -1,0 +1,134 @@
+[
+ {
+  "prompt": "\nOne choice before I start, asked only once: 3 builders would finish about 1.9\u00d7 sooner than one, for about 1.8\u00d7 the cost. Should I build fast or cheap, from now on? (Enter = fast)",
+  "typed": ""
+ },
+ {
+  "prompt": "\n1 of 12. Meera received her order and asks for a refund 30 days after delivery. A different customer asks on day 31.\n  A) Refund in full up to and including day 30, nothing after that  B) Refund only up to day 7, nothing after that  C) Refund up to day 15, and a half refund from day 16 to day 30\n  Your answer (a letter, or your own words) > ",
+  "typed": "Option A is not quite right. Full refund is only up to day 14, then half from day 15 to day 30, and nothing after day 30. So Meera on day 30 gets half, and the day-31 customer gets nothing (unless the goods were damaged)."
+ },
+ {
+  "prompt": "\n3 of 12. Anita's \u20b93,000 blender arrives broken, and she reports it on day 4. She paid \u20b9200 for delivery.\n  A) Full refund to her card, delivery included  B) Full refund to her card, but delivery is not returned  C) She chooses a replacement or store credit, and no card refund\n  Your answer (a letter, or your own words) > ",
+  "typed": "A damaged item is always refunded in full, and the delivery fee is refunded too. So Anita gets the full \u20b93,200 back to her card, since day 4 is well within 90 days."
+ },
+ {
+  "prompt": "\n4 of 12. Suresh asks for a refund because the wrong item was sent. Another customer says delivery was late, and a third gives no reason at all.\n  A) Treat all of them like a change of mind: store credit only  B) Refund to the card in full, since the mistake was yours  C) Refund to the card for wrong item or late delivery, and store credit for no reason given\n  Your answer (a letter, or your own words) > ",
+  "typed": "Wrong item or late delivery gets no special treatment in my rules. Only \"damaged\" is special. Those refunds follow the normal day rules: full within 14 days, half from day 15 to 30, nothing after. The money goes back the way it was paid, card orders to the card and store credit orders as store credit, whatever the reason."
+ },
+ {
+  "prompt": "\n5 of 12. Divya bought three items in one order and wants to return just one. In another case, a customer who was already refunded asks again for the same order.\n  A) Only one full-order refund per order, no part refunds, and a second request gets \u20b90  B) Allow returning single items, with refunds until the whole order amount is used up  C) Allow part refunds, but only one return request per order\n  Your answer (a letter, or your own words) > ",
+  "typed": "A. My rules only work out a refund on the whole order (item prices times quantities, minus the discount code), so there are no part refunds. An order that was already refunded gets nothing the second time."
+ },
+ {
+  "prompt": "\n6 of 12. Farhan wants to return a clearance-sale shirt, a box of sweets that has been opened, and a name-printed mug, all within 10 days.\n  A) All of them can be returned under the same rules as everything else  B) Sale items, food and personalised items cannot be returned at all  C) Sale items can only be exchanged for store credit, and food and personalised items cannot be returned\n  Your answer (a letter, or your own words) > ",
+  "typed": "B is not right either. My rules don't treat sale items, food or personalised items specially. Those returns follow the normal day rules: within 14 days, full refund of what was paid for the items. The only exception is an order marked final-sale, which gets no refund unless it arrived damaged."
+ },
+ {
+  "prompt": "\n7 of 12. Neha places an order and pays \u20b9199 for her goods.\n  A) She earns 1 point for each full \u20b9100 spent, so 1 point  B) She earns 1 point for every \u20b910 spent, so 19 points  C) She earns 1 point for every \u20b9100 spent, rounded to the nearest, so 2 points\n  Your answer (a letter, or your own words) > ",
+  "typed": "A. One point for every full 100 rupees paid for the items, so \u20b9199 gives 1 point (as long as the items come to \u20b9500 or more after the discount, otherwise no points)."
+ },
+ {
+  "prompt": "\n8 of 12. Pooja earned 8 points on a \u20b9800 order, spent them, and then returns the order and gets a refund.\n  A) She loses all 8 points when refunded, even if she already spent them  B) She keeps the points  C) She loses only the points she hasn't spent yet\n  Your answer (a letter, or your own words) > ",
+  "typed": "Policy doesn't say anything about points after a refund, so I haven't set a rule for that. Points are worked out only from what was paid for the items at the time of the order. Nothing in my rules takes points back."
+ },
+ {
+  "prompt": "\n10 of 12. For your daily summary, you had 10 orders today. One was refunded in full and one was cancelled before delivery.\n  A) Refunded orders are left out of the numbers and cancelled ones are not counted at all  B) Count refunded orders but take the refund out of the revenue, and ignore the cancelled one  C) Count every order, and show the refunds on a separate line\n  Your answer (a letter, or your own words) > ",
+  "typed": "Policy doesn't say anything about refunded or cancelled orders in the summary. \"Orders\" counts every order in the list, including store-credit ones. \"Revenue\" is the card orders' totals (items after discount, plus shipping), and nothing is taken out for refunds."
+ },
+ {
+  "prompt": "\n11 of 12. A day passes with no orders, and you open the sales summary.\n  A) It shows 0 orders, \u20b90 revenue and \u20b90 average  B) It shows a message saying there was no sales activity today  C) It shows nothing for that day\n  Your answer (a letter, or your own words) > ",
+  "typed": "A. With no orders it shows 0 orders, \u20b90 revenue and \u20b90 average."
+ },
+ {
+  "prompt": "\n12 of 12. Four orders brought in \u20b91,000, \u20b91,000, \u20b91,000 and \u20b91,001, with \u20b9100 delivery included in each and tax included in the total paid.\n  A) Revenue is everything paid including delivery and tax, and the average is rounded to the nearest rupee  B) Revenue is goods only, without delivery or tax, and the average is rounded down  C) Revenue is goods and delivery without tax, and the average is rounded to the nearest rupee\n  Your answer (a letter, or your own words) > ",
+  "typed": "None of those is quite right. Revenue is the order totals, meaning items after the discount plus delivery, for card orders only. I don't have any rule about tax. The average is revenue divided by the number of card orders, rounded down to whole rupees, not to the nearest rupee. So here it is \u20b94,001 revenue and \u20b91,000 average."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A customer who requests a refund within 14 days of delivery gets a full refund, a customer who requests it from day 15 through day 30 after delivery gets a half refund, and a customer who requests it after day 30 gets no refund, unless the goods were damaged.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Mostly right, but it's missing the damaged rule. Damaged goods get a full refund up to 90 days after delivery, and nothing after day 90. It's not just \"unless damaged\" after day 30."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When an item arrives damaged, it is refunded in full, including the delivery fee, to the customer's card, so a damaged \u20b93,000 item with a \u20b9200 delivery fee reported on day 4 (within 90 days) is refunded \u20b93,200.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Mostly right, but the money goes back the way it was paid. Card orders go to the card and store credit orders go back as store credit. Also, damaged goods are refunded in full only up to 90 days after delivery, and after that nothing."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A refund request for a damaged item is handled specially, but a refund for any other reason, including a wrong item sent, late delivery, or no reason given, follows the same day rules based on days since the order: full refund within 14 days, half refund from day 15 to day 30, and no refund after day 30; and in every case the money is returned by the original payment method, so card orders are refunded to the card and store credit orders are refunded as store credit.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Mostly right, but \"days since the order\" is wrong: the days are counted from delivery, not from the order. Also, damaged goods are the exception: full refund up to 90 days after delivery, and nothing after that."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A refund is calculated only for a whole order, as the sum of each item's price times its quantity minus the discount code, so a request to return only some of an order's items gets no partial refund, and a request for an order that has already been refunded gets no refund.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Mostly right, but it's missing that the refund is worked out on the whole order only when nothing else applies. More importantly, it should say the refund amount is items after the discount code, with the shipping fee never included, except for damaged goods where shipping is refunded too. Also refunds under 50 rupees are paid as 0 (except damaged), and amounts are rounded down to whole rupees."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A return requested within 14 days of the order is refunded in full for the amount paid for the items, with no special treatment for sale items, opened food, or personalised items, unless the order is marked final-sale, in which case no refund is given unless the order arrived damaged.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not right: it's 14 days from delivery, not from the order. Day 14 is included, and after day 14 it's half until day 30. Also, final-sale orders get no refund unless damaged, and the refund is the items after the discount code, with shipping never included (except damaged)."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When an order is placed, award the customer 1 loyalty point for every full \u20b9100 paid for the items, provided the items total \u20b9500 or more after the discount; if the items total less than \u20b9500 after the discount, award no points (for example, \u20b9199 paid for the items gives 1 point).\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Right, that matches. One point for every full \u20b9100 paid for the items, with no points if the items come to under \u20b9500 after the discount. I'd add two more things. Orders paid with store credit earn no points, and final-sale orders earn double points."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: Points are calculated only from the amount paid for the items at the time of the order, and when an order is returned and refunded, no rule takes back or adjusts points that were already earned (including points already spent), because no such rule has been set.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Right, that matches. Points come only from what was paid for the items at the time of the order. Nothing in my rules takes points back after a refund, so a refund does not change points already earned."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: In the daily summary, \"Orders\" is the count of every order in the day's order list, including store-credit orders and orders that were refunded or cancelled, and \"Revenue\" is the sum, over card orders only, of each order's total (items after discount plus shipping), with nothing subtracted for refunds.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Mostly right, but \"Revenue\" is only the money that came in, so card orders only, and the total is items after discount plus shipping. \"Average\" is also part of it: revenue divided by the number of card orders, rounded down to whole rupees, and 0 if there are no card orders."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: Revenue is the sum of the order totals (items after the discount plus delivery) for card orders only, and the average is that revenue divided by the number of card orders, rounded down to whole rupees rather than to the nearest rupee, so orders of \u20b91,000, \u20b91,000, \u20b91,000 and \u20b91,001 give revenue \u20b94,001 and average \u20b91,000.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nTwo of your answers pull different ways on one decision. Which is your policy?\nWhen the items total less than \u20b9500 after the discount, does the customer earn loyalty points?\n  A) No. Orders whose items total under \u20b9500 after the discount earn no points.  B) Yes. Points are still 1 per full \u20b9100 paid, so \u20b9199 paid for the items gives 1 point.\n  > ",
+  "typed": "A. Under \u20b9500 for the items after the discount, no points."
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": "4. My rules don't say anything about partial returns or already-refunded orders, so please don't build that. Also, none of these cover a negative number of days after delivery, which should count as day 0."
+ },
+ {
+  "prompt": "  Rule 4: Whenever a refund request is for only some of an order's items, no partial refund is given. Whenever an order has already been refunded, no further refund is given.\n  What should it be? > ",
+  "typed": "Rule 4 should be removed. Don't build anything for partial returns or already-refunded orders, since I have no rule on that. Instead it should say: a negative number of days after delivery is a mistake in the data and counts as day 0."
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "  Anything the builders should know that is not on this list? (Enter = nothing) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "1 of 6. Asha returns a 1,000-rupee order 20 days after delivery because she changed her mind: she gets 500 rupees back, half, and 0 at 31 days.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "2 of 6. A customer says an item 'arrived broken' (not the word 'damaged') on a 1,000-rupee order, 20 days after delivery: it is treated as changed mind and refunds 500 rupees instead of 1,000.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "An item that arrived broken is damaged goods, so she should get the full 1,000 rupees back, since it's within 90 days of delivery."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: A customer's 1,000-rupee order, reported 'arrived broken' 20 days after delivery, counts as damaged and is refunded the full 1,000 rupees.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right, that's what should happen."
+ },
+ {
+  "prompt": "3 of 6. Priya buys 499 rupees of goods and earns 0 points, while a 500-rupee order earns 5 points: the 500-rupee minimum is on the spend.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": "Right, that's what should happen: 499 rupees of items earns 0 points, and 500 rupees earns 5 points."
+ },
+ {
+  "prompt": "\u270d\ufe0f With your correction: Priya's 499 rupees of goods earn 0 points, since it is under the 500-rupee minimum spend on items.\n\nRight now?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "4 of 6. Ravi's 1,000-rupee order arrives damaged 5 days after delivery and it had 100 rupees shipping: he is refunded 1,100 rupees, shipping included, even on a final-sale item.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "5 of 6. The delivery day count is missing or negative for a 1,000-rupee order returned for 'changed mind': it is treated as delivered today and the full 1,000 rupees is refunded.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "6 of 6. Neha's 600-rupee order with a 20% discount code (480 paid) earns 0 points, because points are counted after the discount and it falls below the 500 minimum.\n\nRight?\n  (Enter = right, or say what should happen) > ",
+  "typed": ""
+ }
+]

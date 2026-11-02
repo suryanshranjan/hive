@@ -14,6 +14,8 @@ We use their words instead of inventing our own, so Hive's failures can be compa
 | 81 | A builder whose claim was refused built and landed anyway | FM-2.5 Ignored other agent's input; FM-1.2 | Gate 81: `hive land` needs a lock |
 | 82 | Landed areas looked free; two builders began rebuilding them | FM-1.3 Step repetition; FM-1.5 Unaware of termination conditions | Gate 82: landed areas shown, `--again` |
 | 83 | An owner answer led a builder to change a result shape the goal had fixed; the review was skipped | FM-1.1 Disobey task specification; FM-3.2 No or incomplete verification | Gate 84: interface check when the review is skipped |
+| 90 | A review correction made a builder add a `split` key to `refund()`'s stated result; the interface check ran only on the skip path | FM-1.1 Disobey task specification; FM-3.2 | Interface check before every delivery (shipped, `767d66d`) |
+| 93 | "Only delivered orders" built as `delivered: bool = False` on Order, so every ordinary refund became 0 | FM-1.1; FM-3.2 | Open: the ordinary case first in the spot checks (to test) |
 | 85 | "Already refunded" kept as module-level state, so later calls returned 0; the 32 spot checks missed it | FM-1.1 Disobey task specification; FM-3.2 No or incomplete verification | Open |
 
 ## What the pattern says
