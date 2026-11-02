@@ -1,0 +1,223 @@
+[17:19:04] predictions registered on origin/main: gates/gate99/prompts/PREDICTIONS.md
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: pytest. 2 tests, all passing.
+
+I'll put 3 builders on it (the job has 3 parts that can be built at the same time): about 1.9× the speed of one builder, for about 1.8× the cost. They work on copies, so your branches stay exactly as they are.
+You're away, so they won't ask you anything: they'll decide, and write down every business assumption for you to check when you're back.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+
+[17:19] Starting.
+  [17:19] Builder w3 picked up: w3.
+  [17:19] Builder w2 picked up: w2.
+  [17:19] Builder w1 picked up: report.
+  [17:19] Builder w2 landed: loyalty points
+  [17:19] Builder w2 landed: loyalty: 1pt/100 rupees after discount, excl shipping, floor (lock w2 released)
+  [17:19] Builder w2 landed: hive: leave build output and dependencies out of the shared branch
+  [17:19] Builder w1 landed: sales_summary: count, sum of totals incl. shipping, average rounded half up, 0 if...
+  [17:19] Builder w3 landed: refund() with 30-day window, final-sale, damaged incl. shipping, refund to original...
+
+[17:19] All 3 builders are done.
+
+Let me check the result.
+  10 tests, all passing. All 2 that passed before still pass.
+
+Done in 1 minute, about $0.40 in all (builders $0.39, Hive's own questions and checks $0.01). Your result is on branch hive/add-three-things-to-1102-1719.
+  See what changed:  git diff main...hive/add-three-things-to-1102-1719
+  Take it:           git merge hive/add-three-things-to-1102-1719
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/add-three-things-to-1102-1719.)
+
+They wrote down 13 questions only you can answer. When you're back, type `hive morning`: answer them, and I'll change the build to your answers and update the branch.
+
+--- the next morning: the owner types hive morning ---
+
+Welcome back. While you were away, the builders worked on: Add three things to the shop. (1) Refunds: `refund(order, days_since_delivery, reason)` in `shop/refunds.py`, returning 
+They wrote down 13 questions only you can answer. Pick a letter, or answer in your own words, and press Enter.
+
+========================================================================
+ Question 1  -  from builder w2  -  asked 0:55 ago
+========================================================================
+
+  A customer's order has items worth 1,250 rupees, a 10% discount code
+  (so 1,125 after discount) and 80 rupees shipping. How many loyalty
+  points do they earn, and how many rupees equal one point?
+
+  Your answer (a letter, or say it in your own words) >   > 11 points, and 100 rupees equal one point. We count only the 1,125 rupees for the items after the discount, not the shipping.
+  Thanks, sent to builder w2. (1 answered so far)
+
+========================================================================
+ Question 3  -  from builder w1  -  asked 0:59 ago
+========================================================================
+
+  On a day with 2 orders worth Rs 100 and Rs 201 (average Rs 150.50),
+  should the average show as Rs 150 or Rs 151?
+
+  Your answer (a letter, or say it in your own words) >   > Rs 150. We round down to whole rupees, never up.
+  Thanks, sent to builder w1. (2 answered so far)
+
+========================================================================
+ Question 4  -  from builder w2  -  asked 1:03 ago
+========================================================================
+
+  A customer pays an order entirely with store credit (600 rupees). Do
+  they still earn loyalty points on it?
+
+  Your answer (a letter, or say it in your own words) >   > No. Orders paid fully with store credit earn no loyalty points.
+  Thanks, sent to builder w2. (3 answered so far)
+
+========================================================================
+ Question 5  -  from builder w2  -  asked 1:07 ago
+========================================================================
+
+  A customer's order of 700 rupees is later fully refunded. Do they
+  keep the 7 points they earned?
+
+  Your answer (a letter, or say it in your own words) >   > Our rules don't take points back after a refund, so yes, they keep the 7 points. Please don't build any points clawback.
+  Thanks, sent to builder w2. (4 answered so far)
+
+========================================================================
+ Question 6  -  from builder w1  -  asked 1:13 ago
+========================================================================
+
+  Should the day's revenue include shipping fees? E.g. an order of Rs
+  500 of items plus Rs 50 shipping: does it count as Rs 500 or Rs 550?
+
+  Your answer (a letter, or say it in your own words) >   > Revenue includes shipping: Rs 550 in your example. It's the items after the discount plus shipping, but only for card orders. Store-credit orders bring in no new money, so they don't count towards revenue.
+  Thanks, sent to builder w1. (5 answered so far)
+
+========================================================================
+ Question 7  -  from builder w1  -  asked 1:17 ago
+========================================================================
+
+  If an order was fully refunded later that day (e.g. a Rs 800 order),
+  should it still count in the day's orders and revenue?
+
+  Your answer (a letter, or say it in your own words) >   > Yes, it still counts. Refunds don't change the day's orders or revenue, so an order that was refunded later that day stays in both.
+  Thanks, sent to builder w1. (6 answered so far)
+
+========================================================================
+ Question 8  -  from builder w1  -  asked 1:22 ago
+========================================================================
+
+  On a day with no orders at all, should the summary show 0 for the
+  average, or something else?
+
+  Your answer (a letter, or say it in your own words) >   > Yes, show 0 for the average on a day with no orders. We only divide by card orders, and if there are none the average is 0.
+  Thanks, sent to builder w1. (7 answered so far)
+
+========================================================================
+ Question 9  -  from builder w3  -  asked 1:25 ago
+========================================================================
+
+  A customer returns a Rs 1000 order 31 days after delivery because it
+  changed their mind; the window I assumed is 30 days. Do we refund?
+
+  Your answer (a letter, or say it in your own words) >   > No. A refund is only given within 30 days of delivery. Day 31 is past the window, so a change-of-mind return at 31 days gets nothing (the only exception is damaged goods, which get a full refund up to 90 days).
+  Thanks, sent to builder w3. (8 answered so far)
+
+========================================================================
+ Question 10  -  from builder w3  -  asked 1:29 ago
+========================================================================
+
+  A customer asks to return a final-sale item that arrived damaged (Rs
+  800). Do we refund it?
+
+  Your answer (a letter, or say it in your own words) >   > Yes, refund it in full, including the shipping fee. Damaged goods are always refunded in full, even on a final-sale order, as long as it's within 90 days of delivery.
+  Thanks, sent to builder w3. (9 answered so far)
+
+========================================================================
+ Question 11  -  from builder w3  -  asked 1:33 ago
+========================================================================
+
+  A customer returns an undamaged Rs 1000 order (Rs 50 shipping)
+  because they changed their mind. Do we refund the Rs 50 shipping?
+
+  Your answer (a letter, or say it in your own words) >   > No. Shipping is never refunded on a change-of-mind return, so they get back only the 1,000 for the items (minus any discount code). The shipping is refunded only when the goods arrived damaged.
+  Thanks, sent to builder w3. (10 answered so far)
+
+========================================================================
+ Question 12  -  from builder w3  -  asked 1:38 ago
+========================================================================
+
+  A customer paid Rs 1000 by card and returns it because they changed
+  their mind. Should the refund go to the card or to store credit?
+
+  Your answer (a letter, or say it in your own words) >   > The refund goes back the way it was paid: a card order goes back to the card, and a store credit order goes back as store credit. It should not go to store credit just because it's a change-of-mind return.
+  Thanks, sent to builder w3. (11 answered so far)
+
+========================================================================
+ Question 13  -  from builder w3  -  asked 1:30 ago
+========================================================================
+
+  A customer asks for a refund and leaves the reason blank, or writes
+  something unusual like wrong colour on a Rs 1000 order.
+
+    A) treat it like changed mind, refund items only
+    B) treat it as a fault, refund everything including shipping
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   > Neither A nor B. Our policy is based on the reason. A blank or unusual reason such as "wrong colour" is not damaged goods, so treat it like a change of mind. Refund the items only (minus any discount code) with no shipping, by the normal 14-day and 30-day rules, and back the way it was paid.
+  Thanks, sent to builder w3. (12 answered so far)
+
+[17:21] Sending the builders back to build your 13 answers in.
+  [17:21] Builder w2 picked up: w2.
+  [17:21] Builder w2 landed: loyalty: store-credit orders earn no points
+  [17:21] Builder w2 landed: store-credit-paid orders earn 0 points; tests added (lock w2 released)
+  [17:21] Builder w2 landed: hive: leave build output and dependencies out of the shared branch
+  [17:21] Builder w1 picked up: w1.
+  [17:21] Builder w1 landed: refunds: damaged 90 days incl final sale, unusual reasons as changed mind
+  [17:21] Builder w1 landed: refunds: day 31 change-of-mind=0; damaged full incl shipping up to 90d even...
+  [17:21] Builder w1 landed: hive: leave build output and dependencies out of the shared branch
+  [17:21] Builder w1 landed: loyalty: no points for store-credit orders
+  [17:21] Builder w1 picked up: w1.
+  [17:21] Builder w1 landed: loyalty: store-credit orders earn 0; tests for owner examples; no clawback (lock w1...
+  [17:22] Builder w3 picked up: w3.
+  [17:22] Builder w3 landed: report: card-only revenue, floor average
+  [17:22] Builder w3 landed: report: orders counts all; revenue = card orders' items-after-discount+shipping;...
+[17:22] Your answers are built in.
+
+Let me check the result.
+  19 tests, all passing. All 2 that passed before still pass.
+  I've noted 13 new rulings of yours for the next build on this project.
+
+Done in under a minute, about $1.05 in all (builders $0.92, Hive's own questions and checks $0.13). Your result is on branch hive/add-three-things-to-1102-1719.
+  See what changed:  git diff main...hive/add-three-things-to-1102-1719
+  Take it:           git merge hive/add-three-things-to-1102-1719
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/add-three-things-to-1102-1719.)
+
+Your answers are built in. 19 tests, all passing. All 2 that passed before still pass. It's ready on branch hive/add-three-things-to-1102-1719.
+{
+ "mode": "overnight",
+ "rc": 0,
+ "error": null,
+ "minutes": 3.2,
+ "branches": [
+  "hive/add-three-things-to-1102-1719"
+ ],
+ "before": {},
+ "night": {
+  "passed": 17,
+  "failed": 10,
+  "errors": 0,
+  "line": "10 failed, 17 passed in 0.06s"
+ },
+ "after": {
+  "passed": 21,
+  "failed": 6,
+  "errors": 0,
+  "line": "6 failed, 21 passed in 0.06s"
+ },
+ "owner_replies": 12,
+ "owner_cost": 0.72,
+ "build_cost": 0.92,
+ "hive_own": 0.13,
+ "hive_own_by": {
+  "law.part_names": 0.021028,
+  "contract.stated": 0.006199,
+  "owner.settle_duplicates": 0.100861
+ },
+ "owner_typed_words": 352
+}
