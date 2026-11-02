@@ -1,0 +1,13 @@
+overnight1: night 27, after the morning 27/27, prompts 34, 8.3 min, builders $1.21, Hive's own $0.73, success True
+overnight2: night 27, after the morning 27/27, prompts 30, 7.4 min, builders $0.88, Hive's own $0.53, success True
+overnight3: night 27, after the morning 27/27, prompts 30, 7.3 min, builders $1.01, Hive's own $0.53, success True
+overnight4: night 26, after the morning 27/27, prompts 27, 6.3 min, builders $0.77, Hive's own $0.49, success True
+overnight5: night 27, after the morning 27/27, prompts 30, 6.8 min, builders $0.93, Hive's own $0.58, success True
+
+pass^1 1.00, pass^5 True, median after 27, median prompts 30, mean cost $1.53
+
+predictions
+N1 pass^1 >= 0.8 -> held
+N2 median after the morning >= 26 -> held
+N3 median prompts <= 35 -> held
+N4 mean cost <= $1.50 -> failed

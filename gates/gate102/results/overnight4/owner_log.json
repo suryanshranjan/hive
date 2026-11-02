@@ -1,0 +1,116 @@
+[
+ {
+  "prompt": "\n1 of 11. Priya bought a saree and received it 10 days ago. She now asks for a refund because she changed her mind. How long after delivery should a customer be able to ask for a refund?\n  A) Up to 7 days after delivery, refused after that  B) Up to 15 days after delivery, refused after that  C) Up to 30 days after delivery, refused after that\n  Your answer (a letter, or your own words) > ",
+  "typed": "Up to 14 days after delivery gets the full amount, and from day 15 to day 30 it's half. After day 30, nothing. None of the options is exactly that, but C is closest, since the cutoff is 30 days."
+ },
+ {
+  "prompt": "\n2 of 11. Arjun received a phone cover with a crack in it 20 days ago and reports it as damaged. Should a damaged item be treated differently from a changed-mind return?\n  A) Damaged items get a refund up to 30 days, changed-mind only up to 7 days  B) Same time limit for both reasons  C) Damaged items get a refund at any time, with a photo as proof\n  Your answer (a letter, or your own words) > ",
+  "typed": "Damaged items are different: they get the full amount back for up to 90 days after delivery, and after 90 days nothing. None of the options is exactly that, but C is closest, since damaged items get treated differently and are refunded at any time. No photo is needed."
+ },
+ {
+  "prompt": "\n3 of 11. Meera returns a Rs 2,000 kurta because she changed her mind. The order had Rs 100 shipping. What does she get back?\n  A) Rs 2,000: the item price only, no shipping, no fee  B) Rs 1,800: item price minus a 10% restocking fee  C) Rs 2,100: everything she paid, including shipping\n  Your answer (a letter, or your own words) > ",
+  "typed": "Rs 2,000: the item price only, no shipping. That's A, as long as she's within 14 days of delivery. After day 14 it would be half of that."
+ },
+ {
+  "prompt": "\n4 of 11. Rahul's refund is approved. Where should the money go?\n  A) Damaged: back to his card. Changed mind: store credit  B) Always back to his card  C) Always store credit, unless the item was damaged and he asks for the card\n  Your answer (a letter, or your own words) > ",
+  "typed": "The money goes back the way it was paid: card orders back to the card, and store credit orders back as store credit. None of the options is exactly that, and it doesn't depend on the reason."
+ },
+ {
+  "prompt": "\n6 of 11. Vikram paid Rs 1,500 for an order with a Rs 500 coupon, so the items were listed at Rs 2,000. He returns it. Another customer was already refunded Rs 800 of a Rs 1,000 order and asks again. What is refundable?\n  A) Only what was actually paid, never more than the order total, and no second refund on an already refunded order  B) The full listed price of the items, coupon value included  C) Actually paid amount, but allow further refunds up to the remaining balance on part-refunded orders\n  Your answer (a letter, or your own words) > ",
+  "typed": "Only what was actually paid for the items (item prices times quantities, minus the discount code), never the shipping unless damaged. None of the options is exactly that. A is closest, but I never said anything about refunds on orders already refunded."
+ },
+ {
+  "prompt": "\n7 of 11. Anita spends Rs 1,250 on items plus Rs 100 shipping and Rs 60 tax. How many loyalty points does she earn?\n  A) 12 points: 1 point per Rs 100 on items paid, excluding shipping and tax  B) 13 points: 1 point per Rs 100 on the total including shipping and tax  C) 25 points: 1 point per Rs 50 on items paid\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) 12 points. One point for every full 100 rupees paid for the items after the discount code, shipping and tax earn nothing. This only applies if the items come to at least 500 rupees and it wasn't paid with store credit."
+ },
+ {
+  "prompt": "\n8 of 11. Neha earned 20 points on a Rs 2,000 order, then got a Rs 1,000 refund. What happens to her points?\n  A) Half the points are taken back, in proportion to the refund; cancelled orders earn nothing  B) All 20 points are taken back on any refund  C) She keeps the points, unless the whole order is refunded\n  Your answer (a letter, or your own words) > ",
+  "typed": "I haven't set a rule for what happens to points when an order is refunded, so none of these is my policy. Please write it down as a question for me to answer later."
+ },
+ {
+  "prompt": "\n9 of 11. In your daily report, one order was cancelled, one was fully refunded, and one Rs 1,000 order had Rs 400 refunded. How should these count?\n  A) Cancelled and fully refunded orders left out; the part-refunded order counts as Rs 600  B) All three are left out of the count and revenue  C) All orders are counted at their original value, and refunds are shown separately\n  Your answer (a letter, or your own words) > ",
+  "typed": "Orders, revenue and average are defined for the daily summary, but I haven't set a rule for refunded or cancelled orders. Please write it down as a question for me to answer later. For now, my summary counts every order in the list, and revenue is the totals (items after discount, plus shipping) of card orders only."
+ },
+ {
+  "prompt": "\n11 of 11. Sunday had no orders at all. How should the report look, and how should the average order value be rounded on other days (for example Rs 1,250.50)?\n  A) Show 0 orders, Rs 0 revenue, Rs 0 average; round the average to the nearest rupee  B) Show 0 orders and 0 revenue, but 'no average' instead of Rs 0; round to the nearest rupee  C) Show 0 for everything on empty days; always round the average down\n  Your answer (a letter, or your own words) > ",
+  "typed": "Empty days show 0 orders, Rs 0 revenue and Rs 0 average. The average is rounded down to whole rupees, not to the nearest rupee. None of the options is exactly that, but A is closest on the empty-day part."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A customer who requests a refund within 14 days of delivery gets the full amount back, a customer who requests one from day 15 through day 30 after delivery gets half the amount back, and a request after day 30 gets no refund.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. Day 14 is included in the full amount, and the half applies from day 15 to day 30. Also, damaged goods get the full amount for up to 90 days, and the refund is worked out on what was actually paid for the items (item prices times quantities, minus the discount code), with no shipping unless damaged."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A damaged item is treated differently from a changed-mind return: if the customer reports it as damaged within 90 days after delivery, they get a full refund of the amount paid with no photo required, and if the report comes after 90 days, no refund is given.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. Damaged goods get the full amount of what was actually paid for the items (item prices times quantities, minus the discount code) plus the shipping fee, refunded up to 90 days after delivery. After 90 days, nothing. Also, a damaged refund is paid even if it's under 50 rupees, and final-sale orders are refunded if the goods arrived damaged."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When a customer returns an item because she changed her mind within 14 days of delivery, the refund is the item price only (shipping is not refunded), so Meera's Rs 2,000 kurta with Rs 100 shipping refunds Rs 2,000; if the return is made after day 14, the refund is half of the item-price refund (Rs 1,000 in this example).\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. After day 14 it's half of what was actually paid for the items (item prices times quantities, minus the discount code), not half of some other amount. Also, after day 30 nothing, and if the item is damaged it's the full amount plus the shipping fee, up to 90 days. Refunds under 50 rupees aren't paid, and the amount is rounded down to whole rupees."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: An approved refund is returned to the original payment method: card orders are refunded to the card and store credit orders are refunded as store credit, regardless of the reason for the refund.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: The refundable amount for an order is only what the customer actually paid for the items, calculated as the sum of item price times quantity minus any discount code (e.g., Rs 2,000 of items with a Rs 500 coupon gives Rs 1,500 refundable), and shipping is never refundable unless the items were damaged.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A customer earns 1 loyalty point for every full 100 rupees of the item total after the discount code is applied (excluding shipping and tax), but only if that item total is at least 500 rupees and the order was not paid with store credit; otherwise she earns 0 points.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Mostly right, but you left out final-sale orders: they earn double points. For example, a final-sale order with Rs 1,250 of items after the discount earns 24 points instead of 12."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: There is no rule yet for what happens to a customer's loyalty points when an order is refunded (for example, Neha earned 20 points on a Rs 2,000 order and then received a Rs 1,000 refund); this is an open question for the owner to answer later, and none of the options proposed is his policy.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: The daily summary counts every order in the list (including cancelled and refunded orders) as an order, and its revenue is the sum of the totals (items after discount, plus shipping) of card orders only; how refunded or cancelled orders should be treated is not yet decided and is left as an open question for the owner to answer later.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: On a day with no orders, the report shows 0 orders, Rs 0 revenue and Rs 0 average order value; on every other day, the average order value is rounded down to the whole rupee (for example, Rs 1,250.50 becomes Rs 1,250), not rounded to the nearest rupee.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nTwo of your answers pull different ways on one decision. Which is your policy?\nWhen a refund for damaged goods works out to less than Rs 50, is it paid?\n  A) Yes. A damaged refund is paid even if it is under Rs 50.  B) No. All refunds under Rs 50 are not paid, including damaged ones.\n  > ",
+  "typed": "B) No. Refunds under 50 rupees are not paid, and the only exception is damaged goods, so a damaged refund is paid even if it's under 50 rupees.\n\nCorrection: my policy says the exception is damaged goods, so the answer is A.\n\nA"
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": "9 is wrong: it should say yes, a damaged refund is paid even if it's under 50 rupees (A). Also, two rules are missing: final-sale orders get no refund unless the goods arrived damaged, and a negative number of days is treated as day 0."
+ },
+ {
+  "prompt": "  Rule 9: When a refund for damaged goods works out to less than Rs 50, is it paid? -> B) No. Refunds under 50 rupees are not paid, and the only exception is damaged goods, so a damaged refund is paid even if it's under 50 rupees.\n\nCorrection: my policy says the exception is damaged goods, so the answer is A.\n\nA\n  What should it be? > ",
+  "typed": "Yes, a damaged refund is paid even if it's under 50 rupees (A). Also add two rules: final-sale orders get no refund unless the goods arrived damaged, and a negative number of days is treated as day 0."
+ },
+ {
+  "prompt": "Done in 1 minute, about $0.92 in all (builders $0.50, Hive's own questions and checks $0.42). Your result is on branch hive/add-three-things-to-1102-1943.\n  See what changed:  git diff main...hive/add-three-things-to-1102-1943\n  Take it:           git merge hive/add-three-things-to-1102-1943\n(Everything from this build, including the questions and answers, is in /root/.hive/runs/add-three-things-to-1102-1943.)\n\nThey wrote down 8 questions only you can answer. When you're back, type `hive morning`: answer them, and I'll change the build to your answers and update the branch.\n\n--- the next morning: the owner types hive morning ---\n\nWelcome back. While you were away, the builders worked on: Add three things to the shop. (1) Refunds: `refund(order, days_since_delivery, reason)` in `shop/refunds.py`, returning \nThey wrote down 8 questions only you can answer. Pick a letter, or answer in your own words, and press Enter.\n\n========================================================================\n Question 1  -  from builder w1  -  asked 1:03 ago\n========================================================================\n\n  A customer pays Rs 1,000 for items with a 15% coupon code that\n  leaves a Rs 850 item total; discount amounts are rounded down to\n  whole rupees. Should points use that rounded amount (8 points)?\n\n  Your answer (a letter, or say it in your own words) >   > Yes, 8 points. Points are one for every full Rs 100 of the item total after the discount code, so Rs 850 gives 8.\n",
+  "typed": "Yes, 8 points. Points are one for every full Rs 100 of the item total after the discount code, so Rs 850 gives 8.",
+  "keyboard": true
+ },
+ {
+  "prompt": "pes hive morning ---\n\nWelcome back. While you were away, the builders worked on: Add three things to the shop. (1) Refunds: `refund(order, days_since_delivery, reason)` in `shop/refunds.py`, returning \nThey wrote down 8 questions only you can answer. Pick a letter, or answer in your own words, and press Enter.\n\n========================================================================\n Question 1  -  from builder w1  -  asked 1:03 ago\n========================================================================\n\n  A customer pays Rs 1,000 for items with a 15% coupon code that\n  leaves a Rs 850 item total; discount amounts are rounded down to\n  whole rupees. Should points use that rounded amount (8 points)?\n\n  Your answer (a letter, or say it in your own words) >   > Yes, 8 points. Points are one for every full Rs 100 of the item total after the discount code, so Rs 850 gives 8.\n  Thanks, sent to builder w1. (1 answered so far)\n\n========================================================================\n Question 2  -  from builder w1  -  asked 1:08 ago\n========================================================================\n\n  A final-sale order has Rs 450 of items after the discount (under the\n  Rs 500 minimum). Does it earn 0 points, or does the doubling rule\n  give it points?\n\n  Your answer (a letter, or say it in your own words) >   > Final-sale orders earn double points, but the Rs 500 minimum still applies first. With Rs 450 of items after the discount, the order earns 0 points.\n",
+  "typed": "Final-sale orders earn double points, but the Rs 500 minimum still applies first. With Rs 450 of items after the discount, the order earns 0 points.",
+  "keyboard": true
+ },
+ {
+  "prompt": "t\n  leaves a Rs 850 item total; discount amounts are rounded down to\n  whole rupees. Should points use that rounded amount (8 points)?\n\n  Your answer (a letter, or say it in your own words) >   > Yes, 8 points. Points are one for every full Rs 100 of the item total after the discount code, so Rs 850 gives 8.\n  Thanks, sent to builder w1. (1 answered so far)\n\n========================================================================\n Question 2  -  from builder w1  -  asked 1:08 ago\n========================================================================\n\n  A final-sale order has Rs 450 of items after the discount (under the\n  Rs 500 minimum). Does it earn 0 points, or does the doubling rule\n  give it points?\n\n  Your answer (a letter, or say it in your own words) >   > Final-sale orders earn double points, but the Rs 500 minimum still applies first. With Rs 450 of items after the discount, the order earns 0 points.\n  Thanks, sent to builder w1. (2 answered so far)\n\n========================================================================\n Question 3  -  from builder w3  -  asked 1:10 ago\n========================================================================\n\n  A customer returns a Rs 2,000 kurta on day 14 versus day 15 for\n  changed mind: is day 14 really still full refund, and day 30 still\n  half?\n\n  Your answer (a letter, or say it in your own words) >   > Yes, that's right. Day 14 is still the full amount, day 15 is half, and day 30 is still half. After day 30 it's nothing.\n",
+  "typed": "Yes, that's right. Day 14 is still the full amount, day 15 is half, and day 30 is still half. After day 30 it's nothing.",
+  "keyboard": true
+ },
+ {
+  "prompt": "oubling rule\n  give it points?\n\n  Your answer (a letter, or say it in your own words) >   > Final-sale orders earn double points, but the Rs 500 minimum still applies first. With Rs 450 of items after the discount, the order earns 0 points.\n  Thanks, sent to builder w1. (2 answered so far)\n\n========================================================================\n Question 3  -  from builder w3  -  asked 1:10 ago\n========================================================================\n\n  A customer returns a Rs 2,000 kurta on day 14 versus day 15 for\n  changed mind: is day 14 really still full refund, and day 30 still\n  half?\n\n  Your answer (a letter, or say it in your own words) >   > Yes, that's right. Day 14 is still the full amount, day 15 is half, and day 30 is still half. After day 30 it's nothing.\n  Thanks, sent to builder w3. (3 answered so far)\n\n========================================================================\n Question 4  -  from builder w3  -  asked 1:14 ago\n========================================================================\n\n  A changed-mind return on a Rs 99 order on day 20 would be half = Rs\n  49: do we apply the Rs 50 minimum to the half amount (no refund) or\n  to the full amount paid?\n\n  Your answer (a letter, or say it in your own words) >   > The Rs 50 minimum applies to the refund amount worked out, so on a Rs 99 order on day 20 the half is Rs 49, which is under 50, and nothing is paid. This only changes for damaged goods, which are always paid.\n",
+  "typed": "The Rs 50 minimum applies to the refund amount worked out, so on a Rs 99 order on day 20 the half is Rs 49, which is under 50, and nothing is paid. This only changes for damaged goods, which are always paid.",
+  "keyboard": true
+ },
+ {
+  "prompt": "nks, sent to builder w3. (3 answered so far)\n\n========================================================================\n Question 4  -  from builder w3  -  asked 1:14 ago\n========================================================================\n\n  A changed-mind return on a Rs 99 order on day 20 would be half = Rs\n  49: do we apply the Rs 50 minimum to the half amount (no refund) or\n  to the full amount paid?\n\n  Your answer (a letter, or say it in your own words) >   > The Rs 50 minimum applies to the refund amount worked out, so on a Rs 99 order on day 20 the half is Rs 49, which is under 50, and nothing is paid. This only changes for damaged goods, which are always paid.\n  Thanks, sent to builder w3. (4 answered so far)\n\n========================================================================\n Question 5  -  from builder w3  -  asked 1:18 ago\n========================================================================\n\n  A customer asks for a refund on a final-sale order for changed mind,\n  for a reason left blank, or for a reason we don't recognise: refuse,\n  or treat as changed mind?\n\n  Your answer (a letter, or say it in your own words) >   > Refuse it. Final-sale orders get no refund unless the goods arrived damaged, so a changed-mind return on one gets nothing. A blank or unrecognised reason is not damaged, so treat it as changed mind and use the normal day rules (full to day 14, half from day 15 to day 30, nothing after), except on final-sale orders, where it gets nothing.\n",
+  "typed": "Refuse it. Final-sale orders get no refund unless the goods arrived damaged, so a changed-mind return on one gets nothing. A blank or unrecognised reason is not damaged, so treat it as changed mind and use the normal day rules (full to day 14, half from day 15 to day 30, nothing after), except on final-sale orders, where it gets nothing.",
+  "keyboard": true
+ },
+ {
+  "prompt": "amaged goods, which are always paid.\n  Thanks, sent to builder w3. (4 answered so far)\n\n========================================================================\n Question 5  -  from builder w3  -  asked 1:18 ago\n========================================================================\n\n  A customer asks for a refund on a final-sale order for changed mind,\n  for a reason left blank, or for a reason we don't recognise: refuse,\n  or treat as changed mind?\n\n  Your answer (a letter, or say it in your own words) >   > Refuse it. Final-sale orders get no refund unless the goods arrived damaged, so a changed-mind return on one gets nothing. A blank or unrecognised reason is not damaged, so treat it as changed mind and use the normal day rules (full to day 14, half from day 15 to day 30, nothing after), except on final-sale orders, where it gets nothing.\n  Thanks, sent to builder w3. (5 answered so far)\n\n========================================================================\n Question 6  -  from builder w2  -  asked 1:22 ago\n========================================================================\n\n  On a day with 4 orders where 3 are card orders worth Rs 3,000 in\n  total and 1 is a store credit order, is the average order value Rs\n  750 (revenue divided by all 4 orders) or Rs 1,000 (divided by only\n  the 3 card orders)?\n\n  Your answer (a letter, or say it in your own words) >   > Rs 1,000. The average is revenue divided by the number of card orders only, rounded down to whole rupees.\n",
+  "typed": "Rs 1,000. The average is revenue divided by the number of card orders only, rounded down to whole rupees.",
+  "keyboard": true
+ }
+]

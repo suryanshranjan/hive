@@ -22,13 +22,13 @@ Each gap below gets a test, Wright-brothers style: measure first, change one thi
 
 | # | Gap (founder's words) | Measure | Test | Needs |
 | --- | --- | --- | --- | --- |
-| 1 | "Same quality every time" | pass^1 and pass^5: a run succeeds at ≥ 24 of 27 hidden | Gate 85 baseline 0.80; after Gates 90, 93-95: **10 of 10 flights (Gates 95-96)** | done on Tiny Shop |
+| 1 | "Same quality every time" | pass^1 and pass^5: a run succeeds at ≥ 24 of 27 hidden | Gate 85 baseline 0.80; after Gates 90, 93-95: **10 of 10 live flights (Gates 95-96)**; overnight **5 of 5 (Gate 102)** | done on Tiny Shop |
 | 2 | "Under 10 minutes of my time" (now: median 33 prompts, 8-16 min, from 55) | prompts and words typed per feature, at no loss in pass^k | Batch every question into one sitting; replace the 19-rule sheet and 20 checks with ≤ 5 highest-stakes checks; compare with Gate 85 | Gate 85 |
 | 3 | "My bill is the building" (Gate 97: 6.5x -> 1.0x; ~$0.97 a feature) | Hive's own spend ÷ builders' spend | Gate 85 shows which step spends it. Cheaper model for internal steps (untested; Gates 62–65 only tested builders), fewer calls | Gate 85 |
 | 4 | "Works on my real codebase" | resolve rate on Ambig-SWE's underspecified issues, Hive vs one agent, against the published numbers | **Gate 86:** 10 Django issues via Ambig-SWE's GitHub release and a Docker-free harness: one builder 8 full / 7 summary, hive start 8 at 15x cost; the interview misfires on technical goals. Next: issues whose summaries lose what a builder cannot infer | Gates 94, 100: Hive matches one builder (8/10; 9/10 on a harder sample), 0 prompts; public summaries no longer hurt modern builders, so intent on real code needs the founder |
 | 5 | "When I change my mind, the fix is cheap" | cost and correctness of a change after a rule flips | **Gate 92:** announced drift: memory safe (29/29). **Gate 101:** silent drift: memory 27-29 vs none 17-29; the contradiction check notices the change | done on Tiny Shop; open: an existing product with no memory |
 | 6 | Real founder | his minutes, his corrections, whether his answers hold a day later | Gate 45 day 2: one real feature in his repo, terminal flow (Telegram stays untouched) | the founder |
-| 7 | Know why it fails | MAST labels for every failed flight | Label Gates 76–85's failures with MAST's modes; fix the most common first | the flights |
+| 7 | Know why it fails | MAST labels for every failed flight | Label Gates 76–85's failures with MAST's modes; fix the most common first. Gate 101's: verification (FM-3.2/3.3) -> Gate 103's examples check | the flights |
 
 ## Rules for this phase
 
