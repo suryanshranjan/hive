@@ -12,7 +12,7 @@ Before committing it refuses secrets (.env files other than templates, private k
 add patterns with "never_commit") and leaves build artifacts and dependency folders out of the commit.
 Exit codes: 0 landed; 2 push kept failing; 5 rebase conflict; 6 duplicate definitions; 7 regressions; 8 forbidden files;
 9 no lock of that name held by this builder (when areas are configured; Gate 81)."""
-import ast, fnmatch, hashlib, io, json, os, re, subprocess, sys, tarfile, tempfile, time
+import ast, fnmatch, shutil, hashlib, io, json, os, re, subprocess, sys, tarfile, tempfile, time
 
 from . import config, junit, law
 
@@ -138,7 +138,12 @@ def main_results(cfg):
     try:
         res = json.load(open(p)); open(os.path.join(d, 'stats.log'), 'a').write('hit\n'); return res
     except Exception:
-        res = run_suite(main_snapshot(cfg), cfg); cache_put(main, res)
+        snap = main_snapshot(cfg)
+        try:
+            res = run_suite(snap, cfg)
+        finally:   # Nov 2: every landing left its snapshot behind (800 in a day, up to 71 MB each, and the disk filled)
+            shutil.rmtree(snap, ignore_errors=True)
+        cache_put(main, res)
         open(os.path.join(d, 'stats.log'), 'a').write('miss\n'); return res
 
 # ---------------------------------------------------------------- landing

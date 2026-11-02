@@ -63,4 +63,9 @@ git fetch -q origin; check "a dependency folder in the builder's own commit stay
   "$(git ls-tree -r --name-only origin/main | grep -c node_modules) $(git show origin/main:calc.py | grep -c 'def sq')" "0 1"
 git reset -q --hard origin/main && echo "TOKEN=abc" > .env && git add -f .env && git commit -qm "a secret"
 $PY -m hive land secret "secret" >/dev/null 2>&1; check "a secret in the builder's own commit is refused" $? 8
+# Nov 2: the guard's snapshot of the shared branch is removed after its suite runs
+before=$(ls -d ${TMPDIR:-/tmp}/hive-main-* 2>/dev/null | wc -l)
+cd $T/a && git reset -q --hard origin/main && git pull -q --rebase origin main && printf '\ndef triple(x):\n    return 3 * x\n' >> calc.py && touch new_marker_$$ && echo "# force a fresh run of main" >> test_calc.py && git add -A && git commit -qm "triple" && $PY -m hive land trip "add triple" >/dev/null
+after=$(ls -d ${TMPDIR:-/tmp}/hive-main-* 2>/dev/null | wc -l)
+check "no snapshot left behind" $([ $after -le $before ] && echo 0 || echo 1) 0
 rm -rf $T; exit $fail
