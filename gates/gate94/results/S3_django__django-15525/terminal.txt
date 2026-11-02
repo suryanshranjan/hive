@@ -1,0 +1,34 @@
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: the command in your hive settings. 18 tests, all passing.
+
+One choice before I start, asked only once: 2 builders would finish about 1.6× sooner than one, for about 1.6× the cost. Should I build fast or cheap, from now on? (Enter = fast)
+  > 
+  Got it: fast, from now on. (`hive pace fast` or `hive pace cheap` changes it.)
+
+I'll put 2 builders on it (the job has 2 parts that can be built at the same time): about 1.6× the speed of one builder, for about 1.6× the cost. They work on copies, so your branches stay exactly as they are.
+If they need a decision only you can make, the question will appear right here.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+
+This goal has no business decisions for you to rule on, so I won't quiz you first or review business rules afterwards. The builders will ask if they need anything.
+
+[10:09] Starting.
+  [10:10] Builder w1 picked up: fix.
+  [10:11] Builder w2 landed: Fix natural key lookup in deserializer to use target database; add regression test
+  [10:11] Builder w2 picked up: regtest.
+  [10:11] Builder w2 landed: Regression test: loaddata of FK natural-key model into non-default database (new...
+
+[10:12] All 2 builders are done.
+
+Let me check the result.
+  19 tests, all passing. All 18 that passed before still pass.
+
+Done in 2 minutes, about $0.56 in all (builders $0.41, Hive's own questions and checks $0.16). Your result is on branch hive/this-repository-is-django-1102-1009.
+  See what changed:  git diff main...hive/this-repository-is-django-1102-1009
+  Take it:           git merge hive/this-repository-is-django-1102-1009
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/this-repository-is-django-1102-1009.)
+
+Done. 19 tests, all passing. All 18 that passed before still pass. It's ready on branch hive/this-repository-is-django-1102-1009.

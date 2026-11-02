@@ -1,0 +1,31 @@
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: the command in your hive settings. 132 tests, all passing.
+
+I'll put 1 builder on it (the job is one piece of work, so more builders would only wait): the cheapest way. It works on a copy, so your branches stay exactly as they are.
+If they need a decision only you can make, the question will appear right here.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+
+This goal has no business decisions for you to rule on, so I won't quiz you first or review business rules afterwards. The builders will ask if they need anything.
+
+[10:05] Starting.
+  [10:05] Builder w1 picked up: wrapper.
+  [10:06] Builder w1 landed: Fix ExpressionWrapper constants in GROUP BY
+  [10:06] Builder w1 landed: ExpressionWrapper delegates group-by columns to wrapped expression; test added (lock...
+
+[10:06] The builder is done.
+
+[10:06] The build changed 1 thing your goal fixed: ExpressionWrapper (`ExpressionWrapper` is not in the code). Sending a builder to put it back.
+
+Let me check the result.
+  133 tests, all passing. All 132 that passed before still pass.
+
+Done in 1 minute, about $0.35 in all (builders $0.20, Hive's own questions and checks $0.15). Your result is on branch hive/this-repository-is-django-1102-1005.
+  See what changed:  git diff main...hive/this-repository-is-django-1102-1005
+  Take it:           git merge hive/this-repository-is-django-1102-1005
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/this-repository-is-django-1102-1005.)
+
+Done. 133 tests, all passing. All 132 that passed before still pass. It's ready on branch hive/this-repository-is-django-1102-1005.

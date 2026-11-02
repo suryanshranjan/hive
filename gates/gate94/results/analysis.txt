@@ -1,0 +1,18 @@
+django__django-15814: F 1 | S 1 21p | S2 1 27p | S3 1 0p $0.25 1.1 min
+django__django-13513: F 1 | S 1 26p | S2 0 16p | S3 0 0p $0.31 1.7 min
+django__django-14765: F 1 | S 1 70p | S2 1 22p | S3 1 0p $0.24 1.2 min
+django__django-13012: F 1 | S 1 21p | S2 1 18p | S3 1 0p $0.35 1.6 min
+django__django-11477: F 1 | S 1 32p | S2 1 38p | S3 1 0p $0.37 1.8 min
+django__django-15525: F 1 | S 1 18p | S2 1 35p | S3 1 1p $0.57 2.7 min
+django__django-15022: F 0 | S 0 15p | S2 0 17p | S3 1 2p $0.54 2.6 min
+django__django-15252: F 0 | S 0 15p | S2 0 12p | S3 0 0p $0.28 1.6 min
+django__django-16032: F 1 | S 1 29p | S2 1 27p | S3 1 0p $0.37 2.0 min
+django__django-12304: F 1 | S 1 28p | S2 1 21p | S3 1 1p $0.36 1.7 min
+
+resolved {'F': 8, 'S': 8, 'S2': 7, 'S3': 8}; S3 median prompts 0.0; cost F $1.34, S $19.72, S2 $19.02, S3 $3.64
+
+predictions (T4 is read from the terminals by hand: any "changed ... your goal fixed" line)
+T1 median prompts <= 3 (0.0) -> held
+T2 resolved >= 7 (8) -> held
+T3 cost <= 0.35x S2 (0.19) -> held
+Claim T1, T2 and T3 -> held

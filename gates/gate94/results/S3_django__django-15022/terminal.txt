@@ -1,0 +1,53 @@
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: the command in your hive settings. 34 tests, all passing.
+
+One choice before I start, asked only once: 2 builders would finish about 1.6× sooner than one, for about 1.6× the cost. Should I build fast or cheap, from now on? (Enter = fast)
+  > 
+  Got it: fast, from now on. (`hive pace fast` or `hive pace cheap` changes it.)
+
+I'll put 2 builders on it (the job has 2 parts that can be built at the same time): about 1.6× the speed of one builder, for about 1.6× the cost. They work on copies, so your branches stay exactly as they are.
+If they need a decision only you can make, the question will appear right here.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+
+This goal has no business decisions for you to rule on, so I won't quiz you first or review business rules afterwards. The builders will ask if they need anything.
+
+[10:12] Starting.
+  [10:13] Builder w2 picked up: w2.
+  [10:13] Builder w1 picked up: w1.
+
+========================================================================
+ Question 1 of up to 20  -  from builder w2  -  asked 0:01 ago
+========================================================================
+
+  Our staff look up bands by typing several words. A band has two
+  members, Mary and Jonathan. Staff type Mary, Jonathan and the band
+  name together. Making this search fast means both names must match
+  one single member, so this band would not appear. What should we do?
+
+    A) Fast search, accept that this band is not found.
+    B) Still find the band, even if search stays slow.
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   > A
+  Thanks, sent to builder w2. (1 answered so far)
+  [10:14] Builder w1 landed: Add regression test for multi-keyword search JOINs
+  [10:14] Builder w1 landed: Added test asserting multi-keyword search over multi-valued relations uses one JOIN...
+  [10:14] Builder w2 landed: Apply all admin search terms in one filter() call to avoid a JOIN per term
+  [10:14] Builder w2 landed: All search terms in one filter call; per owner answer A, terms over multi-valued...
+
+[10:15] All 2 builders are done.
+
+Let me check the result.
+  34 tests, all passing. All 34 that passed before still pass.
+  I've noted 1 new ruling of yours for the next build on this project.
+
+Done in 2 minutes, about $0.53 in all (builders $0.38, Hive's own questions and checks $0.16). Your result is on branch hive/this-repository-is-django-1102-1012.
+  See what changed:  git diff main...hive/this-repository-is-django-1102-1012
+  Take it:           git merge hive/this-repository-is-django-1102-1012
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/this-repository-is-django-1102-1012.)
+
+Done. 34 tests, all passing. All 34 that passed before still pass. It's ready on branch hive/this-repository-is-django-1102-1012.

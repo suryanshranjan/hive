@@ -1,0 +1,29 @@
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: the command in your hive settings. 13 tests, all passing.
+
+I'll put 1 builder on it (the job is one piece of work, so more builders would only wait): the cheapest way. It works on a copy, so your branches stay exactly as they are.
+If they need a decision only you can make, the question will appear right here.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+
+This goal has no business decisions for you to rule on, so I won't quiz you first or review business rules afterwards. The builders will ask if they need anything.
+
+[10:15] Starting.
+  [10:16] Builder w1 landed: Make MigrationRecorder respect router allow_migrate
+  [10:16] Builder w1 picked up: recorder.
+  [10:16] Builder w1 landed: Recorder skips table creation and record writes when router disallows migrate on that...
+
+[10:16] The builder is done.
+
+Let me check the result.
+  15 tests, all passing. All 13 that passed before still pass.
+
+Done in 1 minute, about $0.28 in all (builders $0.13, Hive's own questions and checks $0.15). Your result is on branch hive/this-repository-is-django-1102-1015.
+  See what changed:  git diff main...hive/this-repository-is-django-1102-1015
+  Take it:           git merge hive/this-repository-is-django-1102-1015
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/this-repository-is-django-1102-1015.)
+
+Done. 15 tests, all passing. All 13 that passed before still pass. It's ready on branch hive/this-repository-is-django-1102-1015.
