@@ -2,7 +2,7 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 2 2026 IST, after Gate 94 and 92)
+## Where we left off (Nov 2 2026 IST, after Gate 95)
 
 - **Gate 66 done (the user, travelling: "test something that makes Hive the best tool"):** one Claude Code agent that asks the owner beat Hive's hand-over by 21-30 hidden points (CQ 93.0, CC 84.6, HV 63.4, N0 34.8%) at 1/13 of his reading. Wind tunnel, synthetic owner who answers from his policy.
 - **Gate 67 done:** the hand-over's memory does not compound (neither rule fired).
@@ -35,7 +35,8 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 - **Gate 93 done (new baseline):** 33 owner prompts (55 before), pass^1 0.80, pass^5 no (an unsafe new default: `delivered=False`).
 - **Gate 94 done (claim fired):** technical goals skip interview and review: 8/10 Django issues, 0 prompts, $3.64 (was $19.72).
 - **Gate 92 done:** memory is safe under announced drift (29/29 either way); saves no prompts.
-- **Running:** Gate 95 (the ordinary case first in spot checks, vs Gate 93); `dev95` merged.
+- **Gate 95 done (claim fired):** the ordinary case first: 5 of 5 flights right, 31 prompts. One flight's difference: repeat.
+- **Next, in order:** repeat Gate 95's flights (does pass^5 hold?); Gap 3 (the default model only where answers become rules); the interview's 12-17 prompts (Gap 2); a harder real-codebase sample (Gap 4); the founder session.
 - **Next ideas:** the default model only where answers become rules (Gap 3); Gap 4 again on harder issues; the founder session (`docs/founder_session.md`).
 - **Next:** skip the interview when a goal has no business decisions (Gate 86); Gap 4 again on issues whose summaries lose what a builder cannot infer (Ambig-SWE's missing-information annotations); a check for state that outlives a call (Gate 85) on a real codebase (where 'business parts' are a judgement); low priority, a short interview before an overnight build (at most ~2 of 27 to gain); the split on a real codebase (where 'business parts' are a judgement); with the founder, Gate 45 day 2 with builders asking him live (his pace and whether his answers hold).
 - **Earlier plan, superseded by Gate 73:** Gate 72 again with the repeated-question fix (does the swarm then match one agent's business correctness and keep its speed?). **With the founder:** Gate 45 day 2, builders asking him live; measure his answer time and whether his answers hold.
