@@ -1,0 +1,93 @@
+[
+ {
+  "prompt": "\nOne choice before I start, asked only once: 3 builders would finish about 1.9\u00d7 sooner than one, for about 1.8\u00d7 the cost. Should I build fast or cheap, from now on? (Enter = fast)",
+  "typed": ""
+ },
+ {
+  "prompt": "\n1 of 13. Priya asks for a refund 9 days after her order was delivered. She says the item just wasn't what she wanted. Until when should a customer be able to ask for a refund?\n  A) Up to 7 days after delivery, refused after that  B) Up to 10 days after delivery, refused after that  C) Up to 30 days after delivery, refused after that\n  Your answer (a letter, or your own words) > ",
+  "typed": "Up to 14 days after delivery. Day 14 still gets the full amount. From day 15 to day 30 she gets half, and after day 30 nothing. None of A, B or C is right, so please don't use those."
+ },
+ {
+  "prompt": "\n2 of 13. Rahul bought a \u20b91,500 shirt with \u20b9100 shipping and returns it 3 days after delivery because he changed his mind. What does he get back?\n  A) \u20b91,500 only (no shipping) as store credit  B) \u20b91,500 only (no shipping) back to his card  C) \u20b91,600 including shipping, back to his card\n  Your answer (a letter, or your own words) > ",
+  "typed": "B) \u20b91,500 only, no shipping, back to his card. The shipping fee isn't refunded unless the goods are damaged, and the money goes back the way it was paid."
+ },
+ {
+  "prompt": "\n5 of 13. Sunita paid \u20b91,000 for an item worth \u20b91,200 using a \u20b9200 coupon. She returns it for a refund. How much does she get?\n  A) \u20b91,000, only what she actually paid  B) \u20b91,200, the full listed price  C) \u20b91,000 and the coupon is given back to her to use again\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) \u20b91,000, only what she actually paid. The refund is based on the item prices minus the discount code, and then the usual day rules apply."
+ },
+ {
+  "prompt": "\n6 of 13. Vikram already got a \u20b9500 refund on a \u20b92,000 order and now asks for a refund on the whole order again. What happens?\n  A) He gets at most the remaining \u20b91,500 he paid, never more  B) Refused, only one refund per order  C) Staff must approve any second refund\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) He should never get back more than he paid for the items, so at most the remaining \u20b91,500, and the usual day rules and amounts still apply to that."
+ },
+ {
+  "prompt": "\n7 of 13. A refund works out to \u20b9833.50 after a discount. How should it be rounded?\n  A) Nearest rupee (\u20b9834)  B) Down in the shop's favour (\u20b9833)  C) Up in the customer's favour (\u20b9834 always, even for \u20b9833.10)\n  Your answer (a letter, or your own words) > ",
+  "typed": "Down to whole rupees, so \u20b9833. Rounding is always down, even for \u20b9833.90."
+ },
+ {
+  "prompt": "\n8 of 13. Neha spends \u20b91,990 on items in an order. How many loyalty points does she earn?\n  A) 19 points (1 per \u20b9100, part-hundreds ignored)  B) 20 points (1 per \u20b9100, rounded to nearest)  C) 40 points (2 per \u20b9100) as a richer reward\n  Your answer (a letter, or your own words) > ",
+  "typed": "A) 19 points. One point for every full 100 rupees paid for the items, so \u20b91,990 gives 19. Part-hundreds are ignored, and this assumes it was a card order, since store credit orders earn nothing."
+ },
+ {
+  "prompt": "\n9 of 13. Anita earned 30 points on a \u20b93,000 order, then got a \u20b91,500 refund. What happens to her points?\n  A) Half the points are removed, in proportion to the refund  B) All 30 points removed on any refund  C) Points are kept; she already earned them\n  Your answer (a letter, or your own words) > ",
+  "typed": "C) Points are kept. I have no rule about taking points back after a refund, so please don't remove any."
+ },
+ {
+  "prompt": "\n11 of 13. At the end of the day, you have 10 paid orders, 2 cancelled, 1 unpaid (cash on delivery not yet collected), 1 fully refunded and 1 partly refunded by \u20b9300. Which count in your daily summary?\n  A) Only paid, non-cancelled orders; fully refunded excluded, partly refunded counted net of the refund  B) All orders placed, including cancelled and unpaid  C) Paid orders only, with refunds ignored (refunded orders still counted in full)\n  Your answer (a letter, or your own words) > ",
+  "typed": "Revenue is only the money that came in, which means card orders only, with the items after discount plus shipping. Store-credit orders count in the number of orders but bring in no revenue. I have no rule that excludes cancelled, unpaid or refunded orders, so none of A, B or C is right. Every order in the list counts as an order, and refunds don't change the summary."
+ },
+ {
+  "prompt": "\n13 of 13. On a day with 3 orders totalling \u20b91,000, the average per order works out to \u20b9333.33. And on a day with no orders at all, what should the report show?\n  A) Average rounded to the nearest rupee (\u20b9333); no orders shows 0 orders, \u20b90 revenue, \u20b90 average  B) Average rounded down (\u20b9333); no orders shows a 'no sales today' message instead of numbers  C) Average rounded up (\u20b9334); no orders shows 0 orders, \u20b90 revenue and 'not available' for the average\n  Your answer (a letter, or your own words) > ",
+  "typed": "Average rounded down, so \u20b9333. On a day with no orders, show 0 orders, \u20b90 revenue and \u20b90 average. Note the average is revenue divided by card orders only, and is 0 if there are no card orders."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A customer may request a refund up to and including 14 days after delivery and receives the full amount (so a request on day 9, like Priya's, gets a full refund); a request made from day 15 through day 30 after delivery receives half the amount; a request made after day 30 receives nothing.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. It's the full amount only if the order isn't final-sale, and damaged goods are different: those get the full amount up to 90 days. Otherwise the day rules are right: full through day 14, half from day 15 to day 30, nothing after day 30. Also, a negative number of days counts as day 0."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When a customer returns goods because they changed their mind (undamaged goods, e.g. Rahul returning a \u20b91,500 shirt 3 days after delivery), refund only the item price (\u20b91,500) and not the shipping fee (\u20b9100), and send the refund back to the original payment method (his card); the shipping fee is refunded only if the goods are damaged.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. The refund covers the item prices minus the discount code, not just the item price. Final-sale orders get no refund unless damaged. Damaged goods get the shipping fee back too, and they're fully refunded up to 90 days. Refunds under 50 rupees aren't paid, except for damaged goods. The rest is right: shipping isn't refunded otherwise, and store credit orders go back as store credit, card orders to the card."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When an order paid with a discount code is returned, the refund is calculated from the item prices minus the discount code amount (so Sunita, who paid \u20b91,000 for a \u20b91,200 item using a \u20b9200 coupon, is refunded \u20b91,000, only what she actually paid), and then the usual day-based return rules are applied to that amount.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. The refund is only for the items, so it's the item prices times quantities minus the discount code, with no shipping, except damaged goods get the shipping fee back too. Final-sale orders get no refund unless the goods are damaged. Day rules: full through day 14, half from day 15 to day 30, nothing after day 30; damaged goods are full up to 90 days. Refunds under 50 rupees aren't paid except for damaged goods, and amounts are rounded down to whole rupees."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A customer can never be refunded more in total than he paid for the items, so when Vikram, who already received a \u20b9500 refund on a \u20b92,000 order, requests a refund for the whole order, he can receive at most the remaining \u20b91,500, and the usual day rules and amounts still apply to that refund.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. A repeat refund is based only on the item prices times quantities minus the discount code, with no shipping unless the goods are damaged. Final-sale orders get no refund unless damaged. Day rules: full through day 14, half from day 15 to day 30, nothing after day 30; damaged goods are full up to 90 days. Refunds under 50 rupees aren't paid except for damaged goods, amounts are rounded down to whole rupees, and the money goes back the way it was paid. The cap of never more than paid for the items is fine, so the remaining \u20b91,500 is right."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: For an order paid by card, a customer earns 1 loyalty point for every full \u20b9100 paid for the items, ignoring any remaining part-hundred (so \u20b91,990 earns 19 points), and an order paid with store credit earns no points.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite. Points are one per full 100 rupees paid for the items after the discount code, so the discount comes off first and shipping earns nothing. Orders where the items come to less than 500 rupees after the discount earn no points. Final-sale orders earn double points. The rest is right: \u20b91,990 on a card order is 19 points, and store credit orders earn none."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: The daily summary counts every order in the list (paid, cancelled, unpaid and refunded, fully or partly) as an order, with no exclusions, so the 15 orders all count; revenue is only money that came in, meaning card orders only, each counted as its items after discount plus shipping; store-credit orders count toward the number of orders but add zero revenue; and refunds do not change the summary.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: The daily report's average per order is the day's revenue divided by the number of card orders only, rounded down to a whole rupee (for example, 3 orders totalling \u20b91,000 shows \u20b9333, not \u20b9333.33), and on a day with no orders, or no card orders, the average is \u20b90, with a day with no orders at all showing 0 orders, \u20b90 revenue and \u20b90 average.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nTwo of your answers pull different ways on one decision. Which is your policy?\nWhen an order is final-sale and the goods are not damaged, and the request comes from day 15 through day 30 after delivery, what refund does the customer get?\n  A) Half the amount, since the final-sale condition applies only to the full refund through day 14 (answer 3).  B) Nothing, since final-sale orders get no refund unless the goods are damaged (answers 4, 5 and 6).\n  > ",
+  "typed": "B) Nothing. Final-sale orders get no refund unless the goods arrived damaged, whatever the day."
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": " Whenever the daily report shows the average per order, it is the day's revenue divided by the number of card orders only, rounded down to a whole rupee (e.g. 3 orders totalling \u20b91,000 gives \u20b9333). If the day has no orders or no card orders, the average is \u20b90. A day with no orders at all shows 0 orders, \u20b90 revenue and \u20b90 average.\n  12. When an order is final-sale and the goods are not damaged, and the request comes from day 15 through day 30 after delivery, what refund does the customer get? -> B) Nothing. Final-sale orders get no refund unless the goods arrived damaged, whatever the day.\n  Numbers of any that are wrong (Enter = all correct) > \n  > \n  Thank you. The builders will encode your 12 rules as tests before anything lands.\n\n[15:32] Starting.\n  [15:32] Builder w3 picked up: w3.\n\n========================================================================\n Question 1 of up to 30  -  from builder w3  -  asked 0:01 ago\n========================================================================\n\n  A customer says their \u20b91,500 order arrived damaged, but asks for the\n  refund on day 100 after delivery. What should happen?\n\n    A) Treat it like any other request (normal day rules, as if not\n       damaged)\n    B) Nothing, too late\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > Damaged goods are fully refunded, including the shipping fee, up to 90 days after delivery. After 90 days, nothing, so on day 100 the customer gets no refund.\n",
+  "typed": "Damaged goods are fully refunded, including the shipping fee, up to 90 days after delivery. After 90 days, nothing, so on day 100 the customer gets no refund.",
+  "keyboard": true
+ },
+ {
+  "prompt": "===================================================\n Question 1 of up to 30  -  from builder w3  -  asked 0:01 ago\n========================================================================\n\n  A customer says their \u20b91,500 order arrived damaged, but asks for the\n  refund on day 100 after delivery. What should happen?\n\n    A) Treat it like any other request (normal day rules, as if not\n       damaged)\n    B) Nothing, too late\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > Damaged goods are fully refunded, including the shipping fee, up to 90 days after delivery. After 90 days, nothing, so on day 100 the customer gets no refund.\n  Thanks, sent to builder w3. (1 answered so far)\n\n========================================================================\n Question 2 of up to 30  -  from builder w3  -  asked 0:04 ago\n========================================================================\n\n  A customer gives no reason for a refund, or writes that the item\n  came broken or smashed, instead of saying damaged. How should we\n  treat it?\n\n    A) Only the word damaged counts as damaged; anything else,\n       including no reason, is not damaged\n    B) Words like broken, defective or smashed also count as damaged\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > Only the exact word \"damaged\" counts. If no reason is given, or it says something else like \"broken\" or \"smashed\", treat it as not damaged.\n",
+  "typed": "Only the exact word \"damaged\" counts. If no reason is given, or it says something else like \"broken\" or \"smashed\", treat it as not damaged.",
+  "keyboard": true
+ },
+ {
+  "prompt": "=======================================\n\n  A customer gives no reason for a refund, or writes that the item\n  came broken or smashed, instead of saying damaged. How should we\n  treat it?\n\n    A) Only the word damaged counts as damaged; anything else,\n       including no reason, is not damaged\n    B) Words like broken, defective or smashed also count as damaged\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > Only the exact word \"damaged\" counts. If no reason is given, or it says something else like \"broken\" or \"smashed\", treat it as not damaged.\n  Thanks, sent to builder w3. (2 answered so far)\n\n========================================================================\n Question 3 of up to 30  -  from builder w3  -  asked 0:04 ago\n========================================================================\n\n  An order of \u20b92,000 plus \u20b9100 shipping arrived damaged. The customer\n  already got \u20b9500 back earlier, and now asks again. Should this new\n  refund include the \u20b9100 shipping?\n\n    A) Yes, shipping is added on top of the remaining item amount,\n       but only once in total (not if already refunded)\n    B) Yes, add it every time they ask\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > Shipping is refunded once for damaged goods, not repeated. So on the new request the customer gets the remaining item amount, and the \u20b9100 shipping only if it wasn't already refunded with the earlier \u20b9500.\n",
+  "typed": "Shipping is refunded once for damaged goods, not repeated. So on the new request the customer gets the remaining item amount, and the \u20b9100 shipping only if it wasn't already refunded with the earlier \u20b9500.",
+  "keyboard": true
+ }
+]

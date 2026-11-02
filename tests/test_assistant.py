@@ -694,6 +694,10 @@ check('code that matches, or whose result is not a plain dict literal, is left a
 check('a name the goal does not place in a file, or not a code name, is not checked (Gate 94)',
       contract.check('', _cd, [dict(file=None, name='ExpressionWrapper', args=None, result_keys=None),
                                dict(file='shop/x.py', name='URL translation function', args=None, result_keys=None)]), [])
+open(os.path.join(_cd, 'shop', 'refunds.py'), 'w').write(
+    "def _split(order, a):\n    return {'amount': a, 'method': 'card', 'card': a}\n\ndef refund(order, days, reason):\n    return _split(order, 1)\n")
+check('a result built by a helper in the same file is checked too (Gate 97)',
+      [p['name'] for p in contract.check('', _cd, _if[:1])], ['refund'])
 # Gate 88: a handful of spot checks, round-robin across parts in their order
 from hive import spotcheck as _sc
 _sp = [{'part': p, 'say': f'{p}{k}'} for p in ('a', 'b', 'c') for k in range(4)]

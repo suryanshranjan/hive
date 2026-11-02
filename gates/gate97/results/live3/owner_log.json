@@ -1,0 +1,110 @@
+[
+ {
+  "prompt": "\nOne choice before I start, asked only once: 3 builders would finish about 1.9\u00d7 sooner than one, for about 1.8\u00d7 the cost. Should I build fast or cheap, from now on? (Enter = fast)",
+  "typed": ""
+ },
+ {
+  "prompt": "\n1 of 14. Priya bought a \u20b92,000 kurta and received it 10 days ago. She asks for a refund because it doesn't suit her. How long after delivery should a refund still be allowed?\n  A) Up to 7 days after delivery, refused after that  B) Up to 3 days after delivery, refused after that  C) Up to 15 days after delivery, refused after that\n  Your answer (a letter, or your own words) > ",
+  "typed": "None of these is right. Full refund within 14 days of delivery (day 14 included), half from day 15 to day 30, and nothing after day 30. So Priya, at 10 days, gets the full amount."
+ },
+ {
+  "prompt": "\n3 of 14. Meera receives a \u20b95,000 lamp with a cracked base and reports it within the return window. What does she get back?\n  A) Everything she paid, including shipping, back to her card  B) The price of the lamp back to her card, but not the shipping  C) Her choice of a full refund to her card or a replacement lamp\n  Your answer (a letter, or your own words) > ",
+  "typed": "Everything she paid for the lamp, including the shipping fee, goes back to her card. Damaged goods get the full amount plus shipping, up to 90 days after delivery. So A."
+ },
+ {
+  "prompt": "\n5 of 14. Sana asks for a refund because the wrong colour was sent, or the parcel came very late, or she writes her own reason that isn't on your list. What happens?\n  A) Treated like a change of mind: store credit within the window  B) Treated like damage: full refund to her card, including shipping  C) Each case needs your personal approval before any money is paid\n  Your answer (a letter, or your own words) > ",
+  "typed": "None of these. Wrong colour, late parcel or any other reason is treated like a normal refund, not damage: it follows the day rules (full within 14 days, half from day 15 to 30, nothing after), and the money goes back the way it was paid, so card orders go to the card. No personal approval is needed."
+ },
+ {
+  "prompt": "\n6 of 14. Karan paid \u20b92,500 for items, \u20b9150 for shipping, and had a \u20b9300 discount coupon. He wants a refund for a change of mind. What counts as the refundable amount?\n  A) Only the item amount he actually paid after the discount (\u20b92,200), with no shipping  B) The item price before the discount (\u20b92,500), with no shipping  C) Everything he paid, including shipping (\u20b92,350)\n  Your answer (a letter, or your own words) > ",
+  "typed": "A. Items price minus the discount code (\u20b92,200), and no shipping, since shipping is only refunded for damaged goods."
+ },
+ {
+  "prompt": "\n7 of 14. Vikram earned 50 loyalty points on a \u20b95,000 order, spent them, then returned the order for a refund. What happens to those points?\n  A) He keeps the points, nothing is taken back  B) The points for the refunded amount are taken back, and he can go negative if already spent  C) The points are taken back only if he still has them, otherwise nothing\n  Your answer (a letter, or your own words) > ",
+  "typed": "None of these is quite it. My policies don't say anything about taking loyalty points back on a refund, so I don't have a rule for it. Please don't take points back unless I tell you otherwise."
+ },
+ {
+  "prompt": "\n8 of 14. How fast should customers earn loyalty points? Take an order of \u20b91,250 for items.\n  A) 1 point per \u20b9100 spent, rounded down (12 points)  B) 1 point per \u20b950 spent, rounded down (25 points)  C) 1 point per \u20b9100 spent, rounded to the nearest point (13 points)\n  Your answer (a letter, or your own words) > ",
+  "typed": "One point for every full 100 rupees paid for the items after the discount code, rounded down. So A, 12 points. Shipping earns nothing, and orders paid with store credit or with items under 500 rupees earn none."
+ },
+ {
+  "prompt": "\n10 of 14. Ravi paid for an order \u20b91,500 in cash and \u20b9500 with loyalty points. Another customer's order was cancelled. Which of these earn points?\n  A) Only the \u20b91,500 paid in cash earns points, and cancelled orders earn none  B) The full \u20b92,000 earns points, and cancelled orders earn none  C) Points are earned only when the order is paid fully in cash, and cancelled orders earn none\n  Your answer (a letter, or your own words) > ",
+  "typed": "None of these is right. Points are earned on the items paid for after the discount code, in whole 100s. Store credit orders earn nothing, items under 500 rupees earn nothing, and final-sale orders earn double. I have no rule about paying with loyalty points, and cancelled orders aren't covered by my policy, so please ask me before assuming anything there."
+ },
+ {
+  "prompt": "\n11 of 14. Your end-of-day report has a cancelled order, an order the customer hasn't paid for yet (cash on delivery pending), and a normal paid order. Which count in the sales summary?\n  A) Only paid, non-cancelled orders  B) All orders except cancelled ones, including pending payment  C) Every order placed that day, including cancelled and unpaid\n  Your answer (a letter, or your own words) > ",
+  "typed": "None of these is right. \"Orders\" counts every order in the list, including store-credit ones. Revenue is card orders only: items after discount plus shipping. My policy doesn't cover cancelled or unpaid cash-on-delivery orders, so please ask me before assuming anything about those."
+ },
+ {
+  "prompt": "\n12 of 14. Today you took 10 orders worth \u20b950,000. This afternoon a customer from last week's order got a \u20b93,000 refund. How does the day's revenue look?\n  A) \u20b947,000: the refund is subtracted from today's revenue, and all 10 orders still count  B) \u20b950,000: refunds don't touch the day's revenue  C) \u20b947,000, and the refunded order is not counted as an order\n  Your answer (a letter, or your own words) > ",
+  "typed": "None of these is right. My policy says revenue is the money that came in from card orders only, items after discount plus shipping. It doesn't say anything about refunds, so please don't subtract them from the day's revenue, and I don't have a rule about whether a refunded order stops counting as an order."
+ },
+ {
+  "prompt": "\n14 of 14. It is a quiet Sunday and no orders came in. What should the daily summary show?\n  A) Zero orders, zero revenue, zero average  B) A message saying 'No sales today' instead of numbers  C) The previous day's figures, marked as a repeat\n  Your answer (a letter, or your own words) > ",
+  "typed": "A quiet day with no orders should show zero orders, zero revenue and zero average. So A."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A refund is allowed based on days since delivery: if the request is made within 14 days of delivery (day 14 included), the customer gets a full refund; from day 15 through day 30, the customer gets a half refund; after day 30, no refund is given.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When a customer reports a damaged item within the return window, refund the full amount paid for the item plus the shipping fee to the original card, so Meera's \u20b95,000 lamp with a cracked base returns \u20b95,000 plus the shipping fee she paid, and damaged goods qualify for this full refund plus shipping up to 90 days after delivery.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Mostly right, but two things are off. Damaged goods are refunded up to 90 days after delivery, not only within the normal return window. And the money goes back the way it was paid: card orders to the card, store credit orders as store credit."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A refund request for any reason other than damage (including wrong colour, late parcel, or any other reason the customer writes herself) is handled as a normal refund without personal approval: it is refunded in full if requested within 14 days, at half from day 15 to day 30, and not at all after day 30, and the money is returned via the original payment method (e.g., card orders go back to the card).\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Mostly right, but one thing is off. Wrong colour, late parcel or any other non-damage reason follows the normal day rules, and the final-sale and under-50-rupee rules still apply (final-sale orders get no refund, and refunds under 50 rupees are not paid). Also, shipping is not refunded for these, only for damaged goods."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: For a change-of-mind refund, the refundable amount is the items price minus the discount code amount (e.g., \u20b92,500 items \u2212 \u20b9300 coupon = \u20b92,200), and the shipping charge (e.g., \u20b9150) is not refunded, because shipping is refunded only for damaged goods.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When an order is refunded or returned, do not deduct or take back any loyalty points earned on that order, even if the customer has already spent them, until the owner says otherwise.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: An order earns floor((item total after the discount code is applied, excluding shipping) / 100) loyalty points, i.e. one point per full \u20b9100 paid for the items (for example, \u20b91,250 of items earns 12 points), except that an order paid with store credit, or an order whose items are under \u20b9500, earns no points, and shipping never earns points.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Almost right, but it's missing one rule: final-sale orders earn double points."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: Loyalty points are earned on the amount paid for items after the discount code is applied, in whole units of 100 (per \u20b9100), except that store credit orders earn no points, items priced under \u20b9500 earn no points, and final-sale orders earn double points; how orders paid partly with loyalty points and cancelled orders are treated is not defined by this rule and must be confirmed with the owner before implementing.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Almost right, but it's missing one thing: the points rule has a few more parts I already told you. Orders paid with store credit earn nothing, items under 500 rupees earn nothing, and final-sale orders earn double. Please don't make up anything about loyalty-point payments or cancelled orders; I don't have a rule for those, so ask me when it comes up."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: In the sales summary, \"Orders\" counts every order in the list (including store-credit orders), and \"Revenue\" counts only card orders, calculated as items after discount plus shipping; how cancelled orders and unpaid cash-on-delivery orders are treated is not defined by his policy, so the builder must ask him rather than assume.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Almost right. \"Revenue\" is card orders only: items after discount plus shipping. Store-credit orders count as orders but bring in no revenue. \"Average\" is revenue divided by the number of card orders, rounded down to whole rupees, and 0 if there are no card orders. Please don't assume anything about cancelled or unpaid orders; ask me if it comes up."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: The day's revenue is the sum, over card orders only, of the items' price after discount plus shipping; refunds are not subtracted from revenue.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nTwo of your answers pull different ways on one decision. Which is your policy?\nFor the 'under \u20b9500 earns no points' exception, what is compared with \u20b9500?\n  A) The order's total for items (after the discount code) is under \u20b9500, so the whole order earns no points.  B) Each item's own price is under \u20b9500, so only those items earn no points and the other items in the same order still earn points.\n  > ",
+  "typed": "A. The items total for the whole order, after the discount code, is compared with 500 rupees. If it's under 500, the whole order earns no points."
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "s already spent them, until the owner says otherwise.\n  10. Whenever an order earns loyalty points, it earns floor(item total after the discount code, excluding shipping / 100) points, which is one point per full \u20b9100 paid for items. Shipping never earns points. Orders paid with store credit earn no points. Final-sale orders earn double points.\n  11. Whenever an order is paid partly with loyalty points, or is cancelled, the builder must not assume how points are earned and must ask the owner first, because his policy does not define this.\n  12. For the 'under \u20b9500 earns no points' exception, what is compared with \u20b9500? -> A. The items total for the whole order, after the discount code, is compared with 500 rupees. If it's under 500, the whole order earns no points.\n  Numbers of any that are wrong (Enter = all correct) > \n  > \n  Thank you. The builders will encode your 12 rules as tests before anything lands.\n\n[15:21] Starting.\n  [15:22] Builder w2 picked up: w2.\n\n========================================================================\n Question 1 of up to 30  -  from builder w3  -  asked 0:02 ago\n========================================================================\n\n  A customer returns a non-damage order where the refundable amount is\n  Rs 1,101 and she asks on day 20, so she gets half. Half is Rs\n  550.50. What do we pay?\n\n    A) Rs 550 (round down)\n    B) Rs 551 (round up)\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A\n",
+  "typed": "A",
+  "keyboard": true
+ },
+ {
+  "prompt": ") Rs 550 (round down)\n    B) Rs 551 (round up)\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > A\n  Thanks, sent to builder w3. (1 answered so far)\n  [15:22] Builder w2 landed: Add sales_summary\n  [15:22] Builder w2 landed: sales_summary per owner rules; cancelled/COD left as TODO for w3 (no model fields)...\n  [15:22] Builder w2 landed: hive: leave build output and dependencies out of the shared branch\n  [15:22] Builder w1 picked up: loyalty.\n  [15:22] Builder w1 landed: Add points_earned\n  [15:22] Builder w1 landed: points_earned per owner rules; partly-paid-with-points and cancelled left unassumed...\n  [15:22] Builder w1 landed: hive: leave build output and dependencies out of the shared branch\n  [15:22] Builder w3 picked up: w3.\n\n========================================================================\n Question 2 of up to 30  -  from builder w3  -  asked 0:04 ago\n========================================================================\n\n  A customer asks for a refund on day 20 after delivery but leaves the\n  reason blank. Should we treat it as a normal non-damage refund?\n\n    A) Yes, normal refund by days\n    B) No, refuse until a reason is given\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > C) My policy doesn't cover a blank reason, so please don't assume anything. Ask me before deciding. If a reason isn't given, the day rules decide, but I don't want you to guess on this one.\n",
+  "typed": "C) My policy doesn't cover a blank reason, so please don't assume anything. Ask me before deciding. If a reason isn't given, the day rules decide, but I don't want you to guess on this one.",
+  "keyboard": true
+ },
+ {
+  "prompt": "===========================\n Question 2 of up to 30  -  from builder w3  -  asked 0:04 ago\n========================================================================\n\n  A customer asks for a refund on day 20 after delivery but leaves the\n  reason blank. Should we treat it as a normal non-damage refund?\n\n    A) Yes, normal refund by days\n    B) No, refuse until a reason is given\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > C) My policy doesn't cover a blank reason, so please don't assume anything. Ask me before deciding. If a reason isn't given, the day rules decide, but I don't want you to guess on this one.\n  Thanks, sent to builder w3. (2 answered so far)\n\n========================================================================\n Question 3 of up to 30  -  from builder w3  -  asked 0:03 ago\n========================================================================\n\n  A customer reports a damaged item on day 100 after delivery, past\n  the 90 days. What do we do?\n\n    A) Treat it like any other reason, by the 14 and 30 day rules\n       (so nothing)\n    B) Refuse outright\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > Damaged goods are refunded in full only up to 90 days after delivery, and after 90 days nothing is refunded. So on day 100 the answer is nothing. That's closest to A, but it isn't because of the 14 and 30 day rules. It's because damaged goods get nothing after 90 days.\n",
+  "typed": "Damaged goods are refunded in full only up to 90 days after delivery, and after 90 days nothing is refunded. So on day 100 the answer is nothing. That's closest to A, but it isn't because of the 14 and 30 day rules. It's because damaged goods get nothing after 90 days.",
+  "keyboard": true
+ },
+ {
+  "prompt": " far)\n\n========================================================================\n Question 3 of up to 30  -  from builder w3  -  asked 0:03 ago\n========================================================================\n\n  A customer reports a damaged item on day 100 after delivery, past\n  the 90 days. What do we do?\n\n    A) Treat it like any other reason, by the 14 and 30 day rules\n       (so nothing)\n    B) Refuse outright\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > Damaged goods are refunded in full only up to 90 days after delivery, and after 90 days nothing is refunded. So on day 100 the answer is nothing. That's closest to A, but it isn't because of the 14 and 30 day rules. It's because damaged goods get nothing after 90 days.\n  Thanks, sent to builder w3. (3 answered so far)\n\n========================================================================\n Question 4 of up to 30  -  from builder w3  -  asked 0:03 ago\n========================================================================\n\n  A customer places a Rs 1,000 order and it is cancelled before\n  delivery. In the daily sales summary, should it count as an order\n  and add revenue?\n\n    A) Counts as an order, no revenue\n    B) Not counted at all\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > C) My policy doesn't cover cancelled orders, so please don't assume anything. Ask me before deciding. I don't have a rule for this one.\n",
+  "typed": "C) My policy doesn't cover cancelled orders, so please don't assume anything. Ask me before deciding. I don't have a rule for this one.",
+  "keyboard": true
+ }
+]

@@ -33,6 +33,12 @@ def stated(goal):
                             if isinstance(f.get('result_keys'), list) and f['result_keys'] else None))
     return out
 
+def _module(path):
+    try:
+        return ast.parse(open(path, encoding='utf-8', errors='replace').read())
+    except (SyntaxError, OSError):
+        return None
+
 def _find(code_dir, iface):
     """(path, FunctionDef) for the stated function, or (None, None)."""
     paths = [os.path.join(code_dir, iface['file'])] if iface.get('file') else []
@@ -49,8 +55,10 @@ def _find(code_dir, iface):
                 return p, n
     return None, None
 
-def _returned_keys(fn):
-    """The key sets of every dict literal the function returns directly (not from nested functions)."""
+def _returned_keys(fn, module=None, depth=2):
+    """The key sets of every dict literal the function returns, directly or through a helper in the same file that it
+    returns the result of (Gate 97: `return _split(order, ...)` hid a result with extra keys), up to `depth` helpers deep."""
+    helpers = {n.name: n for n in (module.body if module else []) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
     sets = []
     def walk(node):
         for c in ast.iter_child_nodes(node):
@@ -59,6 +67,9 @@ def _returned_keys(fn):
             if isinstance(c, ast.Return) and isinstance(c.value, ast.Dict):
                 if all(isinstance(k, ast.Constant) and isinstance(k.value, str) for k in c.value.keys):
                     sets.append((c.lineno, [k.value for k in c.value.keys]))
+            elif (isinstance(c, ast.Return) and isinstance(c.value, ast.Call) and isinstance(c.value.func, ast.Name)
+                  and depth > 0 and c.value.func.id in helpers and helpers[c.value.func.id] is not fn):
+                sets.extend(_returned_keys(helpers[c.value.func.id], module, depth - 1))
             walk(c)
     walk(fn)
     return sets
@@ -82,7 +93,7 @@ def check(goal, code_dir, interfaces=None):
                                 f"states ({', '.join(iface['args'])})"))
         if iface.get('result_keys'):
             want = set(iface['result_keys'])
-            for line, keys in _returned_keys(fn):
+            for line, keys in _returned_keys(fn, _module(path)):
                 if set(keys) != want:
                     extra, missing = sorted(set(keys) - want), sorted(want - set(keys))
                     out.append(dict(name=iface['name'], file=where, problem=(
