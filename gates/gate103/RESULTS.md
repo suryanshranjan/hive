@@ -1,6 +1,6 @@
 # Gate 103 results: the owner's own examples as checks before delivery
 
-*103a and 103a2 (the wind tunnel) are done. 103b (flights) runs after Gate 102.*
+*103a and 103a2 (the wind tunnel) are done. 103b (flights): 2 of 6 flown, with dev103 merged on main under test (`62ddaed`).*
 
 **Question.** Gate 101's two failures without memory were verification failures: the owner's new rule was given, but never reached the function the product runs. Can one cheap check before delivery see this, without crying wolf on good builds? The check runs the owner's own examples through the product's own functions.
 
@@ -46,10 +46,39 @@ The change: test, in this order, a function the goal names, else one that existe
 - It sees a rule that the owner gave with an example but that did not reach the product's function.
 - It cannot see a decision nobody asked him about (Gate 99) or a changed result shape (Gate 84's check covers that).
 
+## 103b: flights (partial, Nov 2 2026, 23:30 IST)
+
+| Flight | Hidden | Prompts | Minutes | Check | Fix round |
+| --- | --- | --- | --- | --- | --- |
+| Drift F1 (Gate 101's F arm: no memory, silent drift) | **29 / 29** | 49 | 15.4 | $0.27 (2 runs) | 1 ($0.12) |
+| Drift F2 | **29 / 29** | 31 | 9.4 | $0.11 | none |
+| Drift F3, live 1–3 | not yet flown | | | | |
+
+- **What happened in F1:**
+  - The check found two of the owner's examples failing in `shop/loyalty.points_earned` (₹1,500 should earn 30 points; ₹1,299, 25).
+  - One builder fixed the function ("points_earned now 1 per Rs 50"), and the build reached 29 of 29.
+  - In Gate 101, the same arm without the check scored 20, 29 and 17.
+- **Hive's own spend here ($2.69–4.03)** uses Gate 101's driver, which keeps Gate 85's reader for comparability with Gate 101. It is not the lean reader.
+- **The registered scoring** (`referee/analyze103b.py`) is final only after all 6 flights. So far X1 holds (median 29), and X3 holds ($0.25 a flight, +2.1 min). X2 needs the live flights.
+- **To finish:**
+  1. Run the remaining flights:
+
+     ```
+     python3 gates/gate103/referee/flight103_drift.py day2 F 3
+     python3 gates/gate103/referee/flight103_live.py live 1
+     python3 gates/gate103/referee/flight103_live.py live 2
+     python3 gates/gate103/referee/flight103_live.py live 3
+     ```
+
+     Each one needs `~/.hive` absent; move it aside after each.
+  2. Run `analyze103b.py`.
+  3. If X1 and X2 hold, it ships. Otherwise revert `62ddaed`.
+
 ## Files
 
 `referee/` (`replay103.py`, `analyze103a.py`, `flight103_drift.py`, `flight103_live.py`, `analyze103b.py`).
 
 `results/`:
 - `replay_v1/` and `replay_v2/`, one JSON per build;
+- `drift_F1/` and `drift_F2/`: the terminal, prompts, scores, the check's report and the run log;
 - `analysis_103a.txt` and `analysis_103a2.txt`.

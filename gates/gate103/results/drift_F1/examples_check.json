@@ -1,0 +1,25 @@
+[
+ {
+  "checks": 10,
+  "failing": [
+   {
+    "rule": "Points: 1 point per full Rs 50 paid for items",
+    "example": "Rs 1,500 paid earns 30 points",
+    "got": "15 points (still 1 point per Rs 100)",
+    "where": "shop.loyalty.points_earned"
+   },
+   {
+    "rule": "Only full Rs 50 lots count",
+    "example": "Priya's Rs 1,299 earns 25 points",
+    "got": "12 points (1 per Rs 100)",
+    "where": "shop.loyalty.points_earned"
+   }
+  ],
+  "cost": 0.14204860000000002
+ },
+ {
+  "checks": 14,
+  "failing": [],
+  "cost": 0.1298878
+ }
+]

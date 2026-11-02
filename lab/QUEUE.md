@@ -2,7 +2,7 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 2 2026 IST, after Gates 102 and 103a)
+## Where we left off (Nov 2 2026, 23:30 IST, Gate 103b half flown)
 
 - **Gate 66 done (the user, travelling: "test something that makes Hive the best tool"):** one Claude Code agent that asks the owner beat Hive's hand-over by 21-30 hidden points (CQ 93.0, CC 84.6, HV 63.4, N0 34.8%) at 1/13 of his reading. Wind tunnel, synthetic owner who answers from his policy.
 - **Gate 67 done:** the hand-over's memory does not compound (neither rule fired).
@@ -44,8 +44,18 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 - **Gate 101 done:** silent drift: memory kept 27-29 vs cleared 20, 29, 17 of 29; the contradiction check notices the change.
 - **Gate 102 done (shipped):** the interview before an overnight build: 5 of 5 overnight flights 27/27, 30 prompts, $1.53.
 - **Gate 103a done:** the owner's-examples check, replayed on 32 builds, flags both Gate 101 verification failures and 1 of 23 good builds, $0.11.
-- **Gate 103b running** (dev103 merged as `62ddaed`, under test): 3 drift flights (Gate 101's F arm) and 3 live; runner `g103.sh` writes `runs/g103.done`; score with `python3 gates/gate103/referee/analyze103b.py`; revert the merge if X1 or X2 fails.
-- **Next, in order:** the interview's 12-17 prompts (Gap 2); compare new answers with the existing code's behaviour when there is no memory (Gate 101); the founder session.
+- **Gate 103b, 2 of 6 flights done** (dev103 merged as `62ddaed`, **under test**: the owner's-examples check runs before every delivery):
+  - Drift F1 and F2 scored 29 and 29 of 29 (Gate 101 without the check: 20, 29, 17). In F1 the check caught the old points rate, and one builder fixed it.
+  - **Next session, first thing:** fly the rest, one at a time, with `~/.hive` absent:
+    - `python3 gates/gate103/referee/flight103_drift.py day2 F 3`;
+    - `python3 gates/gate103/referee/flight103_live.py live 1`, then `live 2` and `live 3`.
+  - Then run `python3 gates/gate103/referee/analyze103b.py` and write `gates/gate103/RESULTS.md`'s 103b section.
+  - If X1 and X2 hold, it ships. Otherwise `git revert -m 1 62ddaed`.
+  - Turning it off without a revert: `HIVE_EXAMPLE_CHECK=0`.
+- **Next, in order:**
+  1. Finish Gate 103b.
+  2. Owner time (Gap 2). Gates 95–98 and 102 average about 11 interview questions plus 9 per-answer rule confirmations per feature. The synthetic owner adds detail at most confirmations, so test whether one batched confirmation at the end loses anything.
+  3. The founder session (`docs/founder_session.md`).
 - **Next ideas:** the default model only where answers become rules (Gap 3); Gap 4 again on harder issues; the founder session (`docs/founder_session.md`).
 - **Next:** skip the interview when a goal has no business decisions (Gate 86); Gap 4 again on issues whose summaries lose what a builder cannot infer (Ambig-SWE's missing-information annotations); a check for state that outlives a call (Gate 85) on a real codebase (where 'business parts' are a judgement); low priority, a short interview before an overnight build (at most ~2 of 27 to gain); the split on a real codebase (where 'business parts' are a judgement); with the founder, Gate 45 day 2 with builders asking him live (his pace and whether his answers hold).
 - **Earlier plan, superseded by Gate 73:** Gate 72 again with the repeated-question fix (does the swarm then match one agent's business correctness and keep its speed?). **With the founder:** Gate 45 day 2, builders asking him live; measure his answer time and whether his answers hold.
