@@ -2,7 +2,7 @@
 
 Read this first. It is the shared memory for anyone working on Hive, human or agent: what we know, how sure we are, what is being tested, and exactly how to continue. When you learn something, update this file in the same commit as the evidence.
 
-Last updated: Nov 2 2026 (IST), after Gate 97.
+Last updated: Nov 2 2026 (IST), after Gate 98.
 
 ## 1. The question
 
@@ -96,6 +96,7 @@ The deeper limit is intent, and Gates 3 to 17 have now mapped it. On rules a mod
 - **The ordinary case first (Gate 95, claim fired):** every part's first spot check is its most ordinary case. All 5 flights succeeded (pass^5 for the first time), median hidden 27, median 31 prompts. One flight's difference from Gate 93 (4 of 5): must repeat before relying on it.
 - **It held on repeat (Gate 96):** 5 more of 5 flights right; over Gates 95-96, 10 of 10 (the five baselines before it: 20 of 25). Median prompts 33, median hidden 27. Hive's own spend still 3.6-9.7x the builders'.
 - **Hive's own spend fixed (Gate 97, claim fired):** most of it was Claude Code's coding-agent overhead re-cached on every reading call ($0.050 a call), not the reading. A lean reader (same Sonnet 5.5, no tools, a one-line system prompt, an empty folder) costs $0.005 a call: Hive's own spend $0.49 vs $3.04 per flight (0.16x), now about equal to the builders'; a whole feature about $0.97; flights 5-8 minutes; median 24 prompts; pass^1 0.80, median hidden 27. The one failure was the interface check missing a result built by a helper (`return _split(...)`); it now follows same-file helpers (replayed on 51 builds: catches all 3 failures of this kind, no false alarm on a correct build).
+- **Confirmed together (Gate 98):** lean reader plus helper-following interface check: 5 of 5 flights right (pass^5), median hidden 27, median 28 prompts, about $0.94 and 4-10 minutes a feature. Hive's own spend 1.6x the builders' ($0.58 vs $0.36; F1's 1.5x narrowly missed).
 - **Spot checks woke the skimmer, but the sheet did not improve (Gate 57):** shown 30 concrete outcomes one at a time, the skimming owner corrected 17 (details he passes over in a list), against 11 replies to the 81-rule list. But after one model call turned his corrections into rules, the sheet had 7 decisions right (+4 partly) against the list's 9; hidden 51.2 vs 48.8% (N0 33.2). Corrections were lost in conversion (minimum and cap made to conflict), and some decisions were never shown as a case. Post hoc, the list and the spots fixed different decisions (5 and 3; together 12 of 25). Next: a combined review, with each corrected case re-run after the fix.
 - **Open:** an assumption review (builders list the defaults they applied, the owner marks the wrong ones); all 5 Gate 27 misses trace to defaults stated in the builders' own commit messages (post hoc). Also larger features with persistence and endpoints, and more founders and companies.
 
@@ -201,6 +202,7 @@ Status tags: **established** means outside theory or our data on real agents; **
 | Gate 45, day 1 | Oct 29 | The founder reviews the paged code sheet (46 rules) on his phone | Finished; 0 rules marked, nothing added; restarted twice on Hive faults (disclosed): question filed as a correction, 40 pages; rules 19-46 reworded before he saw them |
 | Gate 48 | Oct 29 | Laya (open copy of Jev) vs Claude reading 120 owner-style messages (9 intents) | Claude 92.5%, Laya-ml 42.5%, Laya-en 45.0%, v3 tuned on a practice set 45.0%; 0.68 s with 2 threads (5.0 s untuned); 26 wrong stop/cloud calls (v1); L1, L5, A2, A4 held, L2–L4, L6, A1, A3 failed; kill fired |
 | Gate 47 | Oct 29 | Claude and Codex in one swarm (M1, M2), vs Claude only (C) and Codex only (X); Codex lead (LX) vs Claude lead (LC), deep project | 95% at 9.2 / 7.5 / 8.3 / 8.0 / 8.3 / 8.1 min; all 1,340 visible; hidden 99.8–100%; 0 breaks; Claude cost $6.72 / 10.83 / 0 / 13.31 / 12.82 / 5.74; P1–P4, P6–P8 held, P5 failed; ship fired. Registered analysis miscounted the seed's history as one break per team (disclosed, recounted) |
+| Gate 98 | Nov 2 | Lean reader + helper-following interface check, confirmation | pass^5 yes, median hidden 27, 28 prompts, ~$0.94 and 4-10 min a feature; Hive's own 1.6x builders' (F1 1.5x failed narrowly) |
 | Gate 97 | Nov 2 | Lean reader for Hive's own calls (no tools, short system prompt, empty folder), vs Gates 95-96 | Hive's own spend 0.16x ($0.49 vs $3.04), about equal to builders'; total ~$0.97 per feature; 5-8 min; pass^1 0.80 (one result-shape miss through a helper; check fixed). Claim fired |
 | Gate 96 | Nov 2 | Gate 95 repeated, same code | pass^1 1.00, pass^5 yes again (10 of 10 over Gates 95-96); median prompts 33, hidden 27 |
 | Gate 95 | Nov 2 | Every part's first spot check is its most ordinary case, vs Gate 93 | pass^1 1.00, pass^5 yes (first time), median prompts 31, median hidden 27; claim fired (one flight's difference: repeat) |
@@ -300,6 +302,7 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 - **Failed (Gate 48):** Laya ≥ 80% (42.5%); ≤ 1 s as registered (5.0, a thread misconfiguration); hybrid with Laya answering half; no wrong stop or cloud calls (26); amendment: v3 at 55–72% (45.0%), ≤ 3 wrong stops (5).
 - **Held (Gate 47):** mixed teams reach 95% (9.2, 8.1 min), break main at most once (0, 0), each agent lands ≥ 25% (Codex 52%, 73%); mixing costs no speed (8.7 vs 9.1 allowed); hidden within 3 points (0.2); Codex lead's plan within 6 minutes (85 s); lead's agent within 20% (8.0 vs 8.3).
 - **Failed (Gate 47):** Codex builders ≥ 1.2× slower than Claude (1.11×).
+- **Held (Gate 98):** F2 (pass^5), F3, F4. **Failed:** F1 (own 1.6x builders').
 - **Held (Gate 97):** E1 (spend 0.16x), E2, E3, E4. **Failed:** E5 (pass^5; interface check missed a helper).
 - **Held (Gate 96):** C1-C4 (pass^5 again).
 - **Held (Gate 95):** C1 (pass^1 1.00), C2 (pass^5), C3 (31 prompts), C4.

@@ -1,0 +1,9 @@
+Gates 95-96: hidden [27, 26, 25, 27, 27, 26, 26, 27, 27, 27], prompts [51, 31, 30, 34, 30, 33, 32, 25, 54, 57], Hive's own [4.19, 2.47, 2.78, 2.73, 2.25, 2.18, 2.44, 2.43, 4.45, 4.46] (mean $3.04), builders mean $0.47, own/builders 6.5x, pass^1 1.00
+Gate 98: hidden [27, 27, 27, 25, 27], prompts [31, 28, 45, 19, 22], Hive's own [0.7, 0.56, 0.98, 0.34, 0.34] (mean $0.58), builders mean $0.36, own/builders 1.6x, pass^1 1.00
+Gate 98 spend by step: {'telegram.understand': 0.46, 'interview.settled_by': 0.41, 'interview._amend': 0.41, 'interview._rule': 0.37, 'codesheet.describe': 0.28, 'spotcheck.find': 0.21, 'interview.write_situations': 0.18, 'interview.rule_sheet': 0.14}
+
+predictions
+F1 Hive's own <= 1.5x builders' -> failed
+F2 pass^5 -> held
+F3 median hidden >= 26 -> held
+F4 median prompts <= 35 -> held

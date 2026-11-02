@@ -1,0 +1,82 @@
+[
+ {
+  "prompt": "\nOne choice before I start, asked only once: 3 builders would finish about 1.9\u00d7 sooner than one, for about 1.8\u00d7 the cost. Should I build fast or cheap, from now on? (Enter = fast)",
+  "typed": ""
+ },
+ {
+  "prompt": "\n1 of 12. Priya received her order 10 days ago and asks for a refund because she only just opened the parcel. How long after delivery can a customer still get a refund?\n  A) Up to 7 days after delivery, nothing after that  B) Up to 15 days after delivery, nothing after that  C) Up to 30 days after delivery, nothing after that\n  Your answer (a letter, or your own words) > ",
+  "typed": "None of those is right. Customers get a full refund up to 14 days after delivery, half from day 15 to day 30, and nothing after day 30. Damaged goods are different: a full refund up to 90 days."
+ },
+ {
+  "prompt": "\n2 of 12. Arjun bought a 2,000 rupee shirt with 150 rupees shipping, then says 'I changed my mind'. Another customer, Meena, got the same order but it arrived damaged. How much does each get back?\n  A) Damaged: everything including shipping (2,150). Changed mind: item price only (2,000), shipping kept  B) Both get the full amount including shipping (2,150)  C) Damaged: full amount including shipping. Changed mind: item price minus a 10% handling fee, shipping kept\n  Your answer (a letter, or your own words) > ",
+  "typed": "Changed mind: the customer gets back the item price only (after any discount code), and shipping is kept. Damaged: the full amount including shipping. So the answer is A, but only within the time limits: full refund within 14 days, half from day 15 to 30, nothing after day 30. Damaged goods get full including shipping up to 90 days."
+ },
+ {
+  "prompt": "\n3 of 12. Ravi's refund is approved. Should the money go back to his card or become credit to spend in your shop, and does it depend on the reason?\n  A) Damaged goes back to the card; changed mind becomes store credit  B) Everything goes back to the card, whatever the reason  C) Everything becomes store credit, except damaged goes to the card only if the customer asks\n  Your answer (a letter, or your own words) > ",
+  "typed": "The money goes back the way it was paid: store credit orders come back as store credit, and card orders go back to the card. It doesn't depend on the reason."
+ },
+ {
+  "prompt": "\n7 of 12. A refund works out to 833.50 rupees, and an order earns 12.9 loyalty points' worth of spend. How are halves and fractions handled?\n  A) Refund rounds to the nearest rupee (half up, 834); points round down (12)  B) Refunds always round down in your favour (833); points round down  C) Refunds round to the nearest rupee; points also round to the nearest whole point (13)\n  Your answer (a letter, or your own words) > ",
+  "typed": "Amounts are rounded down to whole rupees, so 833.50 becomes 833. Loyalty points count only full 100 rupees paid, so they also round down, so B."
+ },
+ {
+  "prompt": "\n9 of 12. Anita earned 20 points on an order, then returned it for a refund. What happens to the points?\n  A) Nothing; she keeps the points (the new feature does not take them back)  B) The 20 points are taken back when the refund is made  C) Points are taken back only for refunds, not for cancelled orders\n  Your answer (a letter, or your own words) > ",
+  "typed": "Policy doesn't say anything about taking points back on a refund, so my rule is nothing changes: A) she keeps the points."
+ },
+ {
+  "prompt": "\n10 of 12. In today's sales summary, 10 orders came in, but 2 were cancelled and 1 was refunded. What do you want to see?\n  A) Only the 7 good orders counted, cancelled and refunded left out  B) All 10 orders counted, refunds and cancellations shown as usual revenue  C) Cancelled orders left out, refunded orders counted and their refund subtracted from revenue\n  Your answer (a letter, or your own words) > ",
+  "typed": "Policy: \"Orders\" counts every order in the list, and \"Revenue\" is only the totals of card orders (items after discount plus shipping). I don't have anything about cancelled or refunded orders, so don't leave anything out or subtract refunds: count all 10 orders, and revenue is just card orders' totals. That's closest to B, but not \"refunds as usual revenue\" for store-credit orders, which bring in no money."
+ },
+ {
+  "prompt": "\n11 of 12. It's a quiet Sunday and no orders came in. What should the daily summary show for the average order value?\n  A) Orders 0, revenue 0, average 0  B) Orders 0, revenue 0, average shown as 'no orders'  C) Don't send a summary on days without orders\n  Your answer (a letter, or your own words) > ",
+  "typed": "A, but with average 0 when there are no card orders. Orders 0, revenue 0, average 0."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: A customer can get a full refund if the request is made up to 14 days after delivery, a half refund from day 15 through day 30 after delivery, and no refund after day 30; for damaged goods, a full refund is available up to 90 days after delivery.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: For a change-of-mind return, the customer is refunded the item price only (after any discount code) and the shipping fee is kept, with the refund amount depending on days since purchase: 100% of the item price within 14 days, 50% of the item price from day 15 to day 30, and nothing after day 30; for damaged goods, the customer is refunded the full amount including shipping for up to 90 days. So for the 2,000 rupee shirt with 150 rupees shipping and no discount, within 14 days Arjun (changed mind) gets 2,000 rupees and Meena (damaged) gets 2,150 rupees.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "It's counted from days since delivery, not days since purchase. Everything else is right: item price only after the discount code, shipping kept unless damaged, full within 14 days, half from day 15 to 30, nothing after day 30, and damaged goods get everything including shipping up to 90 days after delivery."
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When a refund is approved, the money is returned the same way it was paid, so an order paid with store credit is refunded as store credit and an order paid by card is refunded to that card, regardless of the reason for the refund.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: Rupee amounts, including refunds, are rounded down to the whole rupee (e.g., a refund of 833.50 becomes 833), and loyalty points are awarded only for each full 100 rupees paid, with any fractional remainder rounded down (e.g., 12.9 points' worth of spend yields 12 points).\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: In the sales summary, \"Orders\" counts every order in the list (including cancelled and refunded ones, so all 10), and \"Revenue\" is the sum of the totals (items after discount plus shipping) of card orders only, with no refunds subtracted and store-credit orders contributing nothing to revenue.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Cancelled and refunded orders are fine, but one thing is off: the summary should say all 10 orders are counted, which is right. Revenue is only card orders' totals, items after discount plus shipping, and nothing is subtracted for refunds. Store-credit orders add nothing to revenue.\n\nWait, that reads as correct to me. ENTER"
+ },
+ {
+  "prompt": "\nYour rule, as I'll build it: When there are no card orders for the day, the daily summary shows 0 orders, 0 revenue, and an average order value of 0 (not blank, not an error), and otherwise shows the average order value as calculated under option A.\n  Right? (Enter = yes, or say what's off) > ",
+  "typed": "Not quite: if there are no card orders, revenue is 0 and the average is 0, but \"Orders\" still counts every order in the list, including store-credit ones. It only shows 0 orders if there were no orders at all. Otherwise the average is revenue divided by the number of card orders, rounded down to whole rupees."
+ },
+ {
+  "prompt": "  Numbers of any that are wrong (Enter = all correct) > ",
+  "typed": ""
+ },
+ {
+  "prompt": "it orders. It shows 0 only if there were no orders at all.\n  8. Whenever a sales summary or daily summary shows \"Revenue\", add up the totals (items after discount plus shipping) of card orders only. Do not subtract refunds, and store-credit orders contribute nothing. If there are no card orders, revenue is 0.\n  9. Whenever the daily summary shows the average order value, divide revenue by the number of card orders and round down to whole rupees. If there are no card orders, show 0, not blank and not an error.\n  Numbers of any that are wrong (Enter = all correct) > \n  > \n  Thank you. The builders will encode your 9 rules as tests before anything lands.\n\n[16:25] Starting.\n  [16:25] Builder w3 picked up: biz.\n\n========================================================================\n Question 1 of up to 30  -  from builder w3  -  asked 0:01 ago\n========================================================================\n\n  A customer bought a sale item marked as final sale, with no returns,\n  and now asks for a refund because it arrived damaged, 20 days after\n  delivery. What should we do?\n\n    A) refund as for any damaged item;\n    B) refuse, final sale means no refund;\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > B \u2014 but not quite. Final-sale orders get no refund unless the goods arrived damaged, and damaged goods get the full amount including shipping up to 90 days after delivery. So at 20 days it is refunded in full, which is A.\n",
+  "typed": "B \u2014 but not quite. Final-sale orders get no refund unless the goods arrived damaged, and damaged goods get the full amount including shipping up to 90 days after delivery. So at 20 days it is refunded in full, which is A.",
+  "keyboard": true
+ },
+ {
+  "prompt": "============================================\n Question 1 of up to 30  -  from builder w3  -  asked 0:01 ago\n========================================================================\n\n  A customer bought a sale item marked as final sale, with no returns,\n  and now asks for a refund because it arrived damaged, 20 days after\n  delivery. What should we do?\n\n    A) refund as for any damaged item;\n    B) refuse, final sale means no refund;\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > B \u2014 but not quite. Final-sale orders get no refund unless the goods arrived damaged, and damaged goods get the full amount including shipping up to 90 days after delivery. So at 20 days it is refunded in full, which is A.\n  Thanks, sent to builder w3. (1 answered so far)\n\n========================================================================\n Question 2 of up to 30  -  from builder w3  -  asked 0:04 ago\n========================================================================\n\n  A customer asks for a refund for a reason that is neither changed\n  mind nor damaged, for example the wrong size was sent, 10 days after\n  delivery. What should we refund?\n\n    A) nothing;\n    B) treat it like a change of mind;\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > B. Anything that isn't damaged is treated like a change of mind. At 10 days that's the full item price after any discount code, and the shipping fee is kept.\n",
+  "typed": "B. Anything that isn't damaged is treated like a change of mind. At 10 days that's the full item price after any discount code, and the shipping fee is kept.",
+  "keyboard": true
+ },
+ {
+  "prompt": "====================================================================\n Question 2 of up to 30  -  from builder w3  -  asked 0:04 ago\n========================================================================\n\n  A customer asks for a refund for a reason that is neither changed\n  mind nor damaged, for example the wrong size was sent, 10 days after\n  delivery. What should we refund?\n\n    A) nothing;\n    B) treat it like a change of mind;\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > B. Anything that isn't damaged is treated like a change of mind. At 10 days that's the full item price after any discount code, and the shipping fee is kept.\n  Thanks, sent to builder w3. (2 answered so far)\n\n========================================================================\n Question 3 of up to 30  -  from builder w3  -  asked 0:04 ago\n========================================================================\n\n  A customer paid 1,150 rupees for an order: 1,000 rupees of goods\n  plus 150 shipping. How many loyalty points should this order earn?\n\n    A) points on the whole 1,150 paid, shipping included;\n    B) points on the 1,000 of goods only;\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > B. Points are only on the items after the discount code, so 1,000 rupees gives 10 points. Shipping earns nothing, and the order still needs the items to come to at least 500 rupees and not be paid with store credit.\n",
+  "typed": "B. Points are only on the items after the discount code, so 1,000 rupees gives 10 points. Shipping earns nothing, and the order still needs the items to come to at least 500 rupees and not be paid with store credit.",
+  "keyboard": true
+ },
+ {
+  "prompt": "nswered so far)\n\n========================================================================\n Question 3 of up to 30  -  from builder w3  -  asked 0:04 ago\n========================================================================\n\n  A customer paid 1,150 rupees for an order: 1,000 rupees of goods\n  plus 150 shipping. How many loyalty points should this order earn?\n\n    A) points on the whole 1,150 paid, shipping included;\n    B) points on the 1,000 of goods only;\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > B. Points are only on the items after the discount code, so 1,000 rupees gives 10 points. Shipping earns nothing, and the order still needs the items to come to at least 500 rupees and not be paid with store credit.\n  Thanks, sent to builder w3. (3 answered so far)\n\n========================================================================\n Question 4 of up to 30  -  from builder w3  -  asked 0:04 ago\n========================================================================\n\n  A customer says a 2,000 rupee shirt arrived damaged, but asks 100\n  days after delivery. What should we refund?\n\n    A) nothing;\n    B) treat it like a change of mind, so half the item price;\n    C) something else (please say)\n\n  Your answer (a letter, or say it in your own words) >   > C) Damaged goods get a full refund including shipping up to 90 days after delivery, and after 90 days nothing. At 100 days it's 0 rupees, even though the goods are damaged.\n",
+  "typed": "C) Damaged goods get a full refund including shipping up to 90 days after delivery, and after 90 days nothing. At 100 days it's 0 rupees, even though the goods are damaged.",
+  "keyboard": true
+ }
+]
