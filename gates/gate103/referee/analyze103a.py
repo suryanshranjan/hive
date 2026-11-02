@@ -1,6 +1,7 @@
 """Scores Gate 103a's registered predictions from runs/g103_replay/*.json."""
-import glob, json
-rs = [json.load(open(p)) for p in sorted(glob.glob('runs/g103_replay/*.json'))]
+import glob, json, sys
+D = 'runs/g103_replay2' if '--v2' in sys.argv else 'runs/g103_replay'
+rs = [json.load(open(p)) for p in sorted(glob.glob(D + '/*.json'))]
 bad = lambda r: r['hidden'] < r['of'] - 3        # a failed flight: below 24 of 27 / 26 of 29
 flag = lambda r: bool(r['result'] and r['result']['failing'])
 for r in rs:

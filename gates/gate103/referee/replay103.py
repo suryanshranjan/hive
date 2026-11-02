@@ -5,7 +5,8 @@ from concurrent.futures import ThreadPoolExecutor
 sys.path.insert(0, os.environ.get('HIVE_DEV', '/home/claude/hive-dev'))
 from hive import examples
 
-R = 'runs'; OUT = os.path.join(R, 'g103_replay'); os.makedirs(OUT, exist_ok=True)
+R = 'runs'; V2 = '--v2' in sys.argv   # 103a2: the checker also sees the product as it was before the build
+OUT = os.path.join(R, 'g103_replay2' if V2 else 'g103_replay'); os.makedirs(OUT, exist_ok=True)
 FLIGHTS = [f for f in sorted(glob.glob(f'{R}/g9[5-9]_*')) + sorted(glob.glob(f'{R}/g101_day*'))
            if glob.glob(f'{f}/hive_state/runs/*/state.json') and os.path.isdir(f'{f}/delivered')]
 
@@ -21,7 +22,7 @@ def one(f):
     home = glob.glob(f'{f}/hive_state/runs/*/state.json')[0].rsplit('/', 1)[0]
     st = json.load(open(f'{home}/state.json'))
     rules = examples.rules_of(home)
-    got = examples.check(f'{f}/delivered', st['goal'], rules)
+    got = examples.check(f'{f}/delivered', st['goal'], rules, **({'before': f'{home}/source'} if V2 else {}))
     p, t = hidden(f)
     r = dict(flight=name, hidden=p, of=t, rules=len(rules), result=got)
     json.dump(r, open(dst, 'w'), indent=1); print(name, p, t, got and (got['checks'], len(got['failing']), got['cost']), flush=True)

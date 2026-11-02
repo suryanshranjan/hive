@@ -62,3 +62,22 @@ A failure sends one builder back with those examples, then delivery.
 - One project and a synthetic owner.
 - The replay judges the check on builds made without it, so it shows whether the check sees a failure, not whether the fix round repairs it (103b tests that).
 - About $10 for 103a and $15 for 103b.
+
+## 103a2: the checker sees the product as it was before the build (registered after 103a, before its replay)
+
+- **What 103a showed:**
+  - F1 flagged (12 points examples fail), F3 not: its checker tested the builder's new, unused `shop/points.py` and a new `refund_return`, because the builder's new tests call them.
+  - 2 of 23 good flights flagged, both true deviations from the owner's rounding words that the hidden tests do not cover.
+  - Mean cost $0.11.
+- **The change:**
+  - the checker gets a copy of the product before the build (the `source` clone Hive already keeps);
+  - it tests, in this order, a function the goal names, else one that existed before, and only then a new one.
+- **Same 32 builds:** `replay103.py --v2`, `analyze103a.py --v2`.
+
+| # | Prediction | Odds |
+| --- | --- | --- |
+| R1' | F1 and F3 both flagged | 70% |
+| R2' | ≤ 20% of good flights flagged | 60% |
+| R4' | Mean cost ≤ $0.40 | 80% |
+
+**Decision rule:** R1' and R2' hold → 103b flights.
