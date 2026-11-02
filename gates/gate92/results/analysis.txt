@@ -1,0 +1,8 @@
+day 1: hidden 2 failed, 25 passed in 0.04s, prompts 27, rulings kept None
+day 2 M: hidden [29, 28, 29] of 29, prompts [53, 51, 43], minutes [15.2, 13.4, 13.6]
+day 2 F: hidden [29, 29, 29] of 29, prompts [24, 67, 45], minutes [6.9, 17.9, 11.0]
+
+predictions
+D1 F median >= 26 (29) -> held
+D2 M median <= F - 5 (29 vs 29) -> failed
+D3 M prompts < F (51 vs 45) -> failed

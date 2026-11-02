@@ -2,7 +2,7 @@
 
 Read this first. It is the shared memory for anyone working on Hive, human or agent: what we know, how sure we are, what is being tested, and exactly how to continue. When you learn something, update this file in the same commit as the evidence.
 
-Last updated: Nov 2 2026 (IST), after Gate 94.
+Last updated: Nov 2 2026 (IST), after Gate 92.
 
 ## 1. The question
 
@@ -92,6 +92,7 @@ The deeper limit is intent, and Gates 3 to 17 have now mapped it. On rules a mod
 - **Haiku for Hive's own reading loses rule details (Gate 91, second time):** spend 0.07x ($0.32 vs $4.32 per flight), pass^1 0.80, but median hidden 25 vs 27 (as in Gate 87). The losses were in flights that skipped the review, where builders rest on Haiku's readings of the owner's answers. Not shipped; next candidate: the default model for turning answers into rules, the small one for the rest.
 - **The shipped flow now (Gate 93, the new baseline):** median 33 owner prompts (55 in Gate 85), pass^1 0.80, median hidden 27, no stated interface broken. pass^5 still fails: one flight in five ships a subtle wrong default (here `delivered: bool = False` on Order, so every ordinary refund is 0). The family so far: state between calls (85), a changed result form (83, 90), an unsafe new default (93). All pass the builders' tests and the owner's review; all would show in the most ordinary case, which spot checks never lead with.
 - **On real Django issues, Hive now matches one builder at near its cost (Gate 94, claim fired):** a goal with no business decisions skips both the interview and the business review; 8 of 10 resolved (one builder, full issue: 8), median 0 reporter prompts, $3.64 for all 10 (one builder $1.34; Hive before $19.72). It resolved one issue every other arm failed. The interface check raised 3 false alarms on bug-report names; narrowed to functions the goal places in a file.
+- **Memory is safe when the owner says his rules changed (Gate 92):** with day-1 rulings kept, day-2 builds scored 29, 28, 29 of 29 on the new policy (without memory 29, 29, 29). Hive's contradiction check asked "which holds now?" 2-5 times per flight and the latest word won. Memory saved no prompts (51 vs 45). Untested: drift he does not announce.
 - **Spot checks woke the skimmer, but the sheet did not improve (Gate 57):** shown 30 concrete outcomes one at a time, the skimming owner corrected 17 (details he passes over in a list), against 11 replies to the 81-rule list. But after one model call turned his corrections into rules, the sheet had 7 decisions right (+4 partly) against the list's 9; hidden 51.2 vs 48.8% (N0 33.2). Corrections were lost in conversion (minimum and cap made to conflict), and some decisions were never shown as a case. Post hoc, the list and the spots fixed different decisions (5 and 3; together 12 of 25). Next: a combined review, with each corrected case re-run after the fix.
 - **Open:** an assumption review (builders list the defaults they applied, the owner marks the wrong ones); all 5 Gate 27 misses trace to defaults stated in the builders' own commit messages (post hoc). Also larger features with persistence and endpoints, and more founders and companies.
 
@@ -197,6 +198,7 @@ Status tags: **established** means outside theory or our data on real agents; **
 | Gate 45, day 1 | Oct 29 | The founder reviews the paged code sheet (46 rules) on his phone | Finished; 0 rules marked, nothing added; restarted twice on Hive faults (disclosed): question filed as a correction, 40 pages; rules 19-46 reworded before he saw them |
 | Gate 48 | Oct 29 | Laya (open copy of Jev) vs Claude reading 120 owner-style messages (9 intents) | Claude 92.5%, Laya-ml 42.5%, Laya-en 45.0%, v3 tuned on a practice set 45.0%; 0.68 s with 2 threads (5.0 s untuned); 26 wrong stop/cloud calls (v1); L1, L5, A2, A4 held, L2–L4, L6, A1, A3 failed; kill fired |
 | Gate 47 | Oct 29 | Claude and Codex in one swarm (M1, M2), vs Claude only (C) and Codex only (X); Codex lead (LX) vs Claude lead (LC), deep project | 95% at 9.2 / 7.5 / 8.3 / 8.0 / 8.3 / 8.1 min; all 1,340 visible; hidden 99.8–100%; 0 breaks; Claude cost $6.72 / 10.83 / 0 / 13.31 / 12.82 / 5.74; P1–P4, P6–P8 held, P5 failed; ship fired. Registered analysis miscounted the seed's history as one break per team (disclosed, recounted) |
+| Gate 92 | Nov 2 | Owner drift: day-2 rules changed (and stated); Hive's day-1 memory kept vs cleared, 3 flights each | Kept 29, 28, 29 / cleared 29, 29, 29 of 29; contradiction check settled 2-5 per flight; memory saved no prompts (51 vs 45). D2 failed (memory safe) |
 | Gate 94 | Nov 2 | Technical goals skip the interview and the business review; Gate 86's 10 Django issues | Resolved 8/10 (= one builder, full issue), median 0 prompts, $3.64 vs $19.72 before; 3 interface-check false alarms (narrowed). Claim fired |
 | Gate 93 | Nov 2 | Confirmation: 5 live flights of the shipped flow (placeholder fix, 6 spot checks, interface check before every delivery) | pass^1 0.80, pass^5 no (19/27: an owner rule built with `delivered=False` as the default); median prompts 33 (55 before); no interface broken |
 | Gate 91 | Nov 2 | Haiku 5.5 for Hive's own reading, on Gate 90's fixed flow | Spend 0.07x; pass^1 0.80; median hidden 25 vs 27 (H3 failed again; losses where the review was skipped). Not shipped |
@@ -292,6 +294,7 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 - **Failed (Gate 48):** Laya ≥ 80% (42.5%); ≤ 1 s as registered (5.0, a thread misconfiguration); hybrid with Laya answering half; no wrong stop or cloud calls (26); amendment: v3 at 55–72% (45.0%), ≤ 3 wrong stops (5).
 - **Held (Gate 47):** mixed teams reach 95% (9.2, 8.1 min), break main at most once (0, 0), each agent lands ≥ 25% (Codex 52%, 73%); mixing costs no speed (8.7 vs 9.1 allowed); hidden within 3 points (0.2); Codex lead's plan within 6 minutes (85 s); lead's agent within 20% (8.0 vs 8.3).
 - **Failed (Gate 47):** Codex builders ≥ 1.2× slower than Claude (1.11×).
+- **Held (Gate 92):** D1 (F 29). **Failed:** D2 (memory did not make drift sticky), D3 (memory saved no prompts).
 - **Held (Gate 94):** T1 (0 prompts), T2 (8/10), T3 (0.19x), T4.
 - **Held (Gate 93):** C1 (pass^1 0.80), C3 (33 prompts), C4. **Failed:** C2 (pass^5).
 - **Held (Gate 91):** H1 (spend 0.07x), H2, H4. **Failed:** H3 (median hidden 25).

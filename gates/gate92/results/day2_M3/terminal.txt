@@ -1,0 +1,299 @@
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: the command in your hive settings. 9 tests, all passing.
+
+I'll put 2 builders on it (the job has 2 parts that can be built at the same time): about 1.6× the speed of one builder, for about 1.6× the cost. They work on copies, so your branches stay exactly as they are.
+If they need a decision only you can make, the question will appear right here.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+I'll remind them of your 15 earlier rulings on this project, so you won't be asked those again.
+
+First, a few quick situations where your own rules matter:
+
+1 of 15. Sunita's parcel was delivered, but the courier never recorded the delivery date. She asks for a change-of-mind refund and says it arrived 12 days ago. The shop only has the order date, which was 25 days ago.
+  A) Count from the order date and refuse once that passes the cut-off, even if the courier did not record the delivery  B) Accept her word and treat it as delivered 12 days ago, so she gets the full refund  C) Ask the courier to confirm the date first, and hold the refund until then
+  Your answer (a letter, or your own words) > 
+  > Don't take her word. If the delivery date isn't recorded, count from the order date, which is 25 days ago. That puts her in the day 8 to 30 band, so she gets half the item amount, and a change-of-mind refund is never full after day 7 anyway.
+
+2 of 15. Farhan paid ₹1,200 by card and asks for store credit instead of money back to his card, saying he will shop again soon.
+  A) Refund to his card only, the same way he paid  B) Give store credit if he asks, for the same amount  C) Give store credit if he asks, plus a ₹100 bonus on top, so he comes back
+  Your answer (a letter, or your own words) > 
+  > Refund to his card only, the same way he paid. Card orders go back to the card, and we don't give a bonus.
+  (Your answer also settles 1 of the coming question; I'll skip it.)
+
+3 of 15. Neha bought a custom-stitched blouse (₹1,800) and a sealed gift card (₹1,000). She wants both refunded 3 days after delivery because she changed her mind.
+  A) Refuse both: custom items and gift cards are never refunded  B) Refund the gift card only if it has not been used, and refuse the custom blouse  C) Refund both, but flag them for the owner to approve first
+  Your answer (a letter, or your own words) > 
+  > None of those options matches. My rules have no exception for custom items or gift cards. If they aren't final-sale, a change-of-mind refund at day 3 is the full item amount for both, ₹2,800 minus any discount code. Shipping isn't refunded, and no owner approval is needed.
+
+4 of 15. Imran returns a ₹2,500 jacket for a change-of-mind refund 6 days after delivery. It has been worn once and the tag is cut off.
+  A) Refuse, and flag it for the owner to decide  B) Refund in full, since he is inside 14 days  C) Refund a reduced amount (for example, 70%) because it was used
+  Your answer (a letter, or your own words) > 
+  > None of those matches. My rules don't look at wear or tags, so he gets the full item amount, ₹2,500 minus any discount code, since day 6 is inside the 7 days. Shipping isn't refunded, and no owner decision is needed.
+  (Your answer also settles 1 of the coming question; I'll skip it.)
+
+5 of 15. Deepa changed her mind about a ₹900 bag and sends it back. Return courier costs ₹120.
+  A) Deepa pays the return courier, and nothing is taken off her refund  B) Deepa pays the courier and a ₹100 restocking fee is also taken off her refund  C) The shop pays the return courier for all returns
+  Your answer (a letter, or your own words) > 
+  > A. The customer pays the return courier, and nothing is taken off the refund. My rules have no restocking fee, and shipping isn't refunded, so Deepa gets the full item amount (₹900 minus any discount code) if she's within 7 days.
+
+6 of 15. Rohit ordered 3 items in one parcel, ₹300 each, with ₹90 shipping. Only 1 item arrived damaged.
+  A) Refund the damaged item plus the full ₹90 shipping  B) Refund the damaged item plus one-third of the shipping (₹30)  C) Refund the damaged item only, with no shipping
+  Your answer (a letter, or your own words) > 
+  > None of those matches exactly. Rohit gets the damaged item (₹300 minus his share of any discount code), and the shipping fee is refunded too because the goods arrived damaged. My rules don't split the shipping by item, so it's the full ₹90, which is option A.
+
+8 of 15. Vikram buys ₹5,000 orders, gets the full refund each time, and still keeps the points. He has done this 4 times this month.
+  A) He keeps the points every time, as the rule says  B) He keeps them for the first 2 refunds in a month, then the shop holds the points on later ones  C) The owner reviews the account after the 3rd refund in a month and decides
+  Your answer (a letter, or your own words) > 
+  > A. My rules have no limit on points after a refund, so he keeps them every time. No owner review needed.
+
+9 of 15. During Diwali week you run a festival sale. Priya buys ₹3,000 of items in that week.
+  A) Keep the normal 1 point per ₹100 (30 points)  B) Give double points during the festival (60 points)  C) Give extra points only on selected sale items
+  Your answer (a letter, or your own words) > 
+  > B. No festival bonus: my rule is one point for every full 50 rupees paid, not 100, so ₹3,000 gives 60 points. That's 60 only because of the normal rule, not because of the festival.
+
+11 of 15. Mohan has 400 points and asks to use them to pay for his next ₹2,000 order.
+  A) No, points can never be used as payment  B) Yes, at 1 point = ₹1, up to a limit of 20% of the item total  C) Not as payment, but the owner may give him store credit for them at their discretion
+  Your answer (a letter, or your own words) > 
+  > A) No, points can never be used as payment. My rules have no way to spend points on an order, so Mohan can't use his 400 points that way, and there's no owner discretion or store credit swap either.
+
+12 of 15. Lata earned 150 points two years ago and has not shopped since.
+  A) The points never expire  B) They expire after 12 months of no purchases  C) They expire 24 months after the day they were earned, oldest first
+  Your answer (a letter, or your own words) > 
+  > None of those matches. My rules have no expiry for points, so Lata keeps her 150 points, which is option A. The points never expire.
+
+13 of 15. Suresh bought a ₹2,000 order a month ago, and the shop's rules have changed since. He asks for a refund today.
+  A) Use the rules that applied on the day he bought  B) Use today's new rules, for everyone  C) Use whichever gives him the smaller refund
+  Your answer (a letter, or your own words) > 
+  > None of those matches exactly. My policy doesn't say which rules apply to old orders, so use today's rules for the refund, the same for everyone. Suresh gets whatever today's refund rules say, based on his delivery date.
+  (Your answer also settles 1 of the coming question; I'll skip it.)
+
+15 of 15. Amit exchanges a ₹1,000 shirt for a ₹1,500 jacket on day 10. He pays the ₹500 difference.
+  A) Treat it as a refund plus a new sale: points on the shirt are not deducted, and the jacket earns new points on ₹1,500  B) The shirt's points stay, and points are earned only on the ₹500 he pays extra  C) An exchange earns no new points, as nothing new was bought
+  Your answer (a letter, or your own words) > 
+  > None of those matches exactly. My rules say nothing about exchanges, so treat it as a refund plus a new sale. Day 10 is in the half band, so the shirt refund is half of ₹1,000. The jacket earns points at one per full ₹50 on ₹1,500, which is 30 points. Points on the shirt aren't deducted, since my rules never take points back after a refund.
+
+Your rule, as I'll build it: For a change-of-mind refund, if the delivery date is not recorded, ignore the customer's stated delivery date and count days from the order date; a request made 25 days after the order falls in the day 8 to 30 band and gets half the item amount, and a change-of-mind refund is never full after day 7.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: If an item is not marked final-sale, a change-of-mind refund requested 3 days after delivery is the full item amount for every such item, with no exception for custom-stitched items or gift cards, so Neha's blouse (₹1,800) and gift card (₹1,000) are refunded ₹2,800 minus any discount code, shipping is not refunded, and no owner approval is needed.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: For a change-of-mind return requested within 7 days of delivery (day 6 qualifies), refund the full item amount minus any discount code (₹2,500 minus the discount for the jacket), regardless of whether the item has been worn or its tag removed; do not refund shipping, and do not require an owner decision.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: If a customer returns an item within 7 days, the refund equals the full item amount (the item price minus any discount code), with no restocking fee deducted and no return courier cost deducted, and the customer pays the return courier cost and it is not refunded; for example, Deepa returns a ₹900 bag within 7 days, pays the ₹120 return courier herself, and is refunded ₹900 minus any discount code.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: When only some items in a multi-item parcel arrive damaged, refund each damaged item's price minus that item's share of any discount code, plus the full shipping fee (not split or prorated by item), because the goods arrived damaged; in Rohit's case that is ₹300 minus his share of any discount code for the 1 damaged item, plus the full ₹90 shipping.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: Award one loyalty point for every full ₹50 paid, with no extra festival bonus during the Diwali sale, so a ₹3,000 purchase earns 60 points.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: When a customer requests a refund, apply the shop's current refund rules, the same for every customer regardless of when the order was placed, and determine eligibility from the order's delivery date; so Suresh's refund for his ₹2,000 order from a month ago is decided by today's refund rules applied to that order's delivery date.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: An exchange is processed as a refund of the returned item plus a separate new sale of the new item: the returned item is refunded according to the refund band for the day of the exchange (on day 10, the half band, so a ₹1,000 shirt refunds ₹500), the new item earns loyalty points at one point per full ₹50 of its price (a ₹1,500 jacket earns 30 points), and points previously earned on the returned item are not deducted.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rules for this feature, as the builders will follow them (each one applies to every case like it, not just the example):
+  1. Whenever a customer is refunded for something they paid for by card, the refund goes back to that same card, the same way they paid. It is never given as store credit, even if the customer asks for store credit and says they will shop again soon.
+  2. Whenever a customer is refunded, they keep all loyalty points they earned on that order. This holds even for a full refund and even if it happens repeatedly (for example, four ₹5,000 orders fully refunded in one month). The same applies to an exchange: points earned earlier on the returned item are not deducted.
+  3. Whenever a customer has loyalty points and asks to use them to pay for an order, the answer is no. Points can never be used as payment.
+  4. Whenever a customer has earned loyalty points, those points never expire, however long ago they were earned or however long the customer has gone without shopping.
+  5. Whenever a customer pays for a purchase, they earn one loyalty point for every full ₹50 paid. There is no extra festival bonus, including during the Diwali sale. For example, a ₹3,000 purchase earns 60 points. The new item in an exchange is a new sale, so it earns points the same way: a ₹1,500 jacket earns 30 points.
+  6. Whenever a customer requests a refund, the shop's current refund rules apply, the same for every customer regardless of when the order was placed. Eligibility is determined from the order's delivery date, so a refund for an order from a month ago is decided by today's rules applied to that order's delivery date.
+  7. Whenever a change-of-mind refund is requested, count the days from the delivery date. If the delivery date is not recorded, ignore any delivery date the customer states and count days from the order date instead. For example, a request made 25 days after the order falls in the day 8 to 30 band.
+  8. Whenever a change-of-mind refund is requested within 7 days of delivery (day 6 qualifies) for an item not marked final-sale, refund the full item amount, which is the item price minus any discount code. This holds for every such item, with no exception for custom-stitched items or gift cards, and regardless of whether the item has been worn or its tag removed. No restocking fee is deducted. For example, Neha's blouse (₹1,800) and gift card (₹1,000) requested 3 days after delivery are refunded ₹2,800 minus any discount code, Deepa's ₹900 bag is refunded ₹900 minus any discount code, and Neha's jacket at ₹2,500 is refunded ₹2,500 minus any discount code.
+  9. Whenever a change-of-mind refund is requested on day 8 to day 30, refund half the item amount. A change-of-mind refund is never full after day 7. For example, a ₹1,000 shirt on day 10 is refunded ₹500.
+  10. Whenever a change-of-mind refund or return is approved, shipping is not refunded. The customer pays the return courier cost, it is not refunded, and it is not deducted from the refund. For example, Deepa pays her ₹120 return courier herself.
+  11. Whenever a change-of-mind refund is requested within 7 days of delivery, no owner approval or owner decision is needed.
+  12. Whenever only some items in a multi-item parcel arrive damaged, refund each damaged item's price minus that item's share of any discount code, plus the full shipping fee. The shipping fee is not split or prorated by item. For example, for Rohit's 1 damaged item, refund ₹300 minus his share of any discount code, plus the full ₹90 shipping.
+  13. Whenever a customer exchanges an item, process it as a refund of the returned item plus a separate new sale of the new item. The returned item is refunded according to the refund band for the day of the exchange (on day 10, the half band, so a ₹1,000 shirt refunds ₹500). The new item earns loyalty points at one point per full ₹50 of its price. Points previously earned on the returned item are not deducted.
+  Numbers of any that are wrong (Enter = all correct) > 
+  > 5. Points are one per full ₹50 paid for the items after the discount code, and shipping earns nothing. Orders paid with store credit earn no points, and neither do orders with items under ₹500. Final-sale orders earn double points.
+  Rule 5: Whenever a customer pays for a purchase, they earn one loyalty point for every full ₹50 paid. There is no extra festival bonus, including during the Diwali sale. For example, a ₹3,000 purchase earns 60 points. The new item in an exchange is a new sale, so it earns points the same way: a ₹1,500 jacket earns 30 points.
+  What should it be? > 
+  > Rule 5 should say: one loyalty point for every full ₹50 paid for the items after the discount code, and shipping earns nothing. Orders paid with store credit earn no points, orders where the items come to under ₹500 after the discount earn no points, and final-sale orders earn double points. The Diwali point still holds: no festival bonus, so ₹3,000 gives 60 points, and the ₹1,500 jacket gives 30.
+
+One thing: this answer pulls against an earlier ruling of yours.
+How many loyalty points should a customer earn on a paid order? One point for every full ₹100 of the item total, or one point for every full ₹50, with double points on final-sale orders?
+  A) 1 point per ₹100  B) 1 point per ₹50, double for final sale
+  Which holds now? > 
+  > B. One point per full ₹50 on the items after the discount code, double for final-sale orders. Shipping earns nothing, store-credit orders earn no points, and orders under ₹500 in items after the discount earn no points.
+
+One thing: this answer pulls against an earlier ruling of yours.
+For a change-of-mind refund asked for between day 8 and day 14 after delivery, should the customer get the full amount or half?
+  A) Full up to day 14, half from day 15  B) Full only up to day 7, half from day 8
+  Which holds now? > 
+  > B. Full only up to day 7, half from day 8.
+  Thank you. The builders will encode your 15 rules as tests before anything lands.
+
+[11:29] Starting.
+  [11:29] Builder w1 picked up: w1.
+  [11:29] Builder w2 picked up: summary.
+
+========================================================================
+ Question 1 of up to 20  -  from builder w1  -  asked 0:01 ago
+========================================================================
+
+  Priya's ₹1,200 saree arrived late (not damaged) and she asks for a
+  refund 10 days after delivery. Your new rule makes change-of-mind
+  refunds half from day 8. Should late-delivery refunds also drop to
+  half on day 8?
+
+    A) yes, half from day 8
+    B) no, late delivery stays full up to day 14 as before
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   > C. My policy has no separate rule for late delivery, so it's not a special case. A refund for a late, non-damaged item follows the normal refund rules: full amount up to day 7, half from day 8 to day 30, nothing after day 30. Priya on day 10 gets half of ₹1,200, so ₹600, minus any discount code share, with no shipping refunded.
+  Thanks, sent to builder w1. (1 answered so far)
+  [11:30] Builder w2 landed: summary: test cancelled/refunded handling
+  [11:30] Builder w2 landed: Daily summary already matched the owner's rules; added a test for...
+  [11:30] Builder w2 landed: hive: leave build output and dependencies out of the shared branch
+
+========================================================================
+ Question 2 of up to 20  -  from builder w1  -  asked 0:07 ago
+========================================================================
+
+  Asha's ₹2,000 order has no delivery date recorded, and she complains
+  the goods arrived damaged 40 days after she ordered. For change of
+  mind you count from the order date when delivery is missing. Should
+  damaged and late complaints do the same?
+
+    A) yes, count from the order date
+    B) no, check with you first
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   > C. My policy only covers damaged goods through the refund rules, and it says nothing about counting from the order date for damaged or late complaints. For damaged goods I count 90 days from delivery, and since the delivery date is missing here, counting from the order date is the sensible fallback, so Asha's complaint at 40 days is within the 90 days and gets the full ₹2,000, shipping included, minus any discount code. Late complaints that aren't damaged just follow the normal refund rules.
+  Thanks, sent to builder w1. (2 answered so far)
+  [11:30] Builder w1 landed: New refund bands (7/30), points per 50 with final-sale double, exchange, partial...
+  [11:30] Builder w1 landed: Refund bands day7/30 for mind and late; points per Rs50, double final sale; exchange;...
+
+[11:30] All 2 builders are done.
+They made 8 assumptions your description didn't cover. Rather than going through them one by one, I'll show you everything the build does, as rules: that covers them all.
+
+Let me check the result.
+  11 tests, all passing. All 9 that passed before still pass.
+  I've noted 2 new rulings of yours for the next build on this project.
+
+Done in 2 minutes, about $2.54 in all (builders $0.34, Hive's own questions and checks $2.20). Your result is on branch hive/some-of-my-shop-1102-1123.
+  See what changed:  git diff main...hive/some-of-my-shop-1102-1123
+  Take it:           git merge hive/some-of-my-shop-1102-1123
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/some-of-my-shop-1102-1123.)
+
+Here is everything the build does now, written from its code (37 more only repeat your own rules, so I left them out).
+
+What the build does now, as rules (each one is what the product will do. Mark any that is not your policy):
+  1. Refunds: the discount code is also applied to each damaged item in a partial refund, rounded down per item, e.g. a damaged ₹300 item with 10% off and ₹90 shipping refunds ₹360.
+  2. Refunds: if the damaged items are listed but the list is empty, only the shipping fee is refunded, e.g. ₹90.
+  3. Refunds: an order that has not been paid yet (pay later) gets ₹0 refund whatever the reason.
+  4. Refunds: an order that was cancelled after payment can still be refunded for a damaged item or other valid reason; cancellation alone does not block it.
+  5. Refunds: if both the delivery date and the order date are missing, the refund is ₹0.
+  6. Refunds: a negative number of days (a delivery date in the future) gets ₹0 refund.
+  7. Refunds: an exchange also applies the order's discount code and the ₹50 minimum, e.g. returning two ₹500 items from a 10%-off order on day 20 refunds ₹450 while a ₹40 item refunds ₹0.
+  8. Refunds: an exchange on a final-sale order, or with no delivery or order days, refunds ₹0, and the new item is sold separately.
+  9. Loyalty points: a negative discount percentage raises the price, so ₹1,000 with -10% counts as ₹1,100 and earns 22 points.
+  10. Messy or missing details: a refund reason typed in capitals or with extra spaces, like '  DAMAGED ' or 'Changed   my mind', is understood the same as the plain wording.
+  11. Messy or missing details: a reason is recognised if it contains the word fragment anywhere, so 'Item damaged on arrival', 'too late', and 'mind changed' all work (changed mind needs both 'changed' and 'mind').
+  12. Messy or missing details: a reason with a dash such as 'changed-mind' still works, but a shortened 'dam' or a blank, missing or numeric reason gets ₹0.
+  13. Messy or missing details: any reason containing the letters 'late' counts as late delivery, so 'translate' or 'plate broken' is refunded as late.
+  14. Messy or missing details: a payment method written differently from the exact lowercase 'store_credit', such as 'Store_Credit' or missing, is treated as card, so the refund goes to the card.
+  Numbers of any that are wrong (Enter = all correct) > 
+  > 6, 7. Rule 6 is wrong: a negative number of days is a data mistake and should be treated as day 0, so it gets the normal day-0 full refund, not ₹0. Rule 7 is wrong because the minimum refund is ₹100, not ₹50, except for damaged goods. So a ₹450 refund is paid, but anything under ₹100 is 0.
+  Rule 6: Refunds: a negative number of days (a delivery date in the future) gets ₹0 refund.
+  What should it be? > 
+  > A negative number of days is a data mistake and should be treated as day 0, so it gets the normal day-0 full refund, not ₹0. Also, anything else about rule 7 that I said earlier still stands: the minimum is ₹100, not ₹50, except for damaged goods.
+  Rule 7: Refunds: an exchange also applies the order's discount code and the ₹50 minimum, e.g. returning two ₹500 items from a 10%-off order on day 20 refunds ₹450 while a ₹40 item refunds ₹0.
+  What should it be? > 
+  > A refund for an exchange applies the order's discount code, and the minimum refund is ₹100, not ₹50, except for damaged goods. So returning two ₹500 items from a 10%-off order on day 20 refunds ₹450, and anything under ₹100 is ₹0.
+  Rule 6: Refunds: a negative number of days (a delivery date in the future) is a data mistake and is treated as day 0, so it gets the normal day-0 full refund. The minimum refund is ₹100, not ₹50, except for damaged goods.
+  What should it be? > 
+  > A negative number of days is a data mistake and is treated as day 0, so it gets the normal day-0 full refund. The minimum refund is ₹100, not ₹50, except for damaged goods.
+  Rule 7: A refund for an exchange applies the order's discount code, and the minimum refund is ₹100, not ₹50, except for damaged goods. So returning two ₹500 items from a 10%-off order on day 20 refunds ₹450, and anything under ₹100 is ₹0.
+  What should it be? > 
+  > A negative number of days is a data mistake and is treated as day 0, so it gets the normal day-0 full refund. The minimum refund is ₹100, not ₹50, except for damaged goods.
+  Anything the builders should know that is not on this list? (Enter = nothing) > 
+  > The refund minimum is ₹100, not ₹50, and it applies to exchange refunds too. Anything under ₹100 is ₹0, except damaged goods. A negative number of days is a data mistake and counts as day 0, which gets the full refund.
+🔎 Last step, 6 quick checks on what the build does in real cases. They catch what a list of rules hides. Tap ✅ if a result is right, or tell me what should happen.
+1 of 6. A shopper's 1,000-rupee order with a 10% code is worth 900 after the discount, so it earns 18 points (1 point per 50 rupees, rounded down).
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > Right. ₹1,000 minus the 10% code is ₹900, which is 18 full ₹50 steps, and ₹900 is over the ₹500 minimum.
+2 of 6. A 1,000-rupee order is reported damaged but no delivery date and no order date are given: the refund is 0 rupees.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > Right. With no delivery or order date I can't tell if it's within 90 days, so no refund is paid.
+✍️ With your correction: The 1,000-rupee order reported damaged has no delivery or order date, so the 90-day window can't be checked and the refund is 0 rupees.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > 
+3 of 6. Ravi's 1,000-rupee order with 80 rupees shipping is returned for change of mind on day 7: he gets 1,000 rupees back, with the shipping not refunded; on day 8 he gets 500.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > Right. On day 7 he gets the full ₹1,000 back, shipping isn't refunded, and on day 8 he gets half, ₹500.
+✍️ With your correction: Ravi's 1,000-rupee order, returned for change of mind on day 7, refunds 1,000 rupees, with the 80 rupees shipping not refunded.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > 
+4 of 6. A 550-rupee order with a 10% code drops to 495 after the discount, just under the 500 minimum: it earns 0 points, while the same order with no code earns 11.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > Right. ₹550 minus 10% is ₹495, which is under ₹500, so no points. With no code it's ₹550, which is 11 full ₹50 steps, so 11 points.
+✍️ With your correction: The 550-rupee order with a 10% code comes to 495 rupees, under the 500 minimum, so it earns 0 points instead of 11.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > 
+5 of 6. A customer writes 'not damaged' (or 'not late') as the reason: it is read as damaged (or late) and the full 1,000 rupees is refunded.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > Wrong. "Not damaged" or "not late" should not be treated as damaged or late. It should follow the normal refund rules for change of mind: full amount up to day 7, half from day 8 to day 30, nothing after day 30.
+✍️ With your correction: A customer's 1,000-rupee order refund with the reason 'not damaged' (or 'not late') is treated as a change of mind, and with no dates it pays ₹0.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > Wrong. "Not damaged" or "not late" should be treated as a normal change-of-mind refund, not as damaged or late. With no delivery or order date it can't be checked, so the refund is ₹0.
+6 of 6. A 101-rupee order returned for change of mind 20 days after delivery is halved to 50 rupees and paid, but a 99-rupee order at the same timing gets 0 because of the 50-rupee minimum.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > Wrong. The minimum refund is ₹100, not ₹50. So the 101-rupee order halved to 50 gets 0, and a 99-rupee order also gets 0. Only a refund of ₹100 or more is paid (101 rupees at half is ₹50, so ₹0).
+✍️ With your correction: A 101-rupee order and a 99-rupee order, each returned for change of mind 20 days after delivery, both get a 0-rupee refund.
+
+Right now?
+  (Enter = right, or say what should happen) > 
+  > Wrong. The minimum refund is ₹100, not ₹50, so a 101-rupee order halved to 50 gets ₹0, and a 99-rupee order also gets ₹0. Both get 0 rupees, which is what your corrected line says.
+✅ Thank you. 5 of 6 cases changed; the builders will make them so.
+  [11:36] Builder w1 picked up: w1.
+  [11:36] Builder w1 landed: Refund min 100, negative days as day 0, negated reasons as change of mind, no-date...
+  [11:36] Builder w1 landed: Min refund 100 (not damaged), negatives -> day 0, negation handling -> change of mind,...
+  [11:36] Builder w1 landed: hive: leave build output and dependencies out of the shared branch
+
+Let me check the result.
+  12 tests, all passing. All 9 that passed before still pass.
+
+Done in under a minute, about $3.84 in all (builders $0.53, Hive's own questions and checks $3.31). Your result is on branch hive/some-of-my-shop-1102-1123.
+  See what changed:  git diff main...hive/some-of-my-shop-1102-1123
+  Take it:           git merge hive/some-of-my-shop-1102-1123
+(Everything from this build, including the questions and answers, is in /root/.hive/runs/some-of-my-shop-1102-1123.)
+
+Your 12 changes are in, and every test passes. It's yours.
