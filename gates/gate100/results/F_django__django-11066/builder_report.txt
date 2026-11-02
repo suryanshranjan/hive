@@ -1,0 +1,6 @@
+Landed the fix: `RenameContentType._rename()` now calls `content_type.save(using=db, update_fields={'model'})`, so the save goes to the migration's database. `hive land` reported 4/4 tests passing.
+
+- **Test:** I added `test_content_type_rename_saves_using_migration_db`, which spies on `Model.save`. It fails without the fix and passes with it.
+- **Least sure about:** the test only checks that `using='default'` is passed. It doesn't exercise a second real database. Its first draft patched `ContentType.save` directly and caught nothing, because the migration uses a historical model class, so it patches `Model.save` instead.
+- **Placeholder in the commit message:** it says "Fixed #30??" because I didn't know the ticket number. It would need editing before any upstream submission.
+- No questions asked, and the hive tools worked without problems.

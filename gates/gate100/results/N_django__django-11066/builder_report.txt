@@ -1,0 +1,6 @@
+I landed `ctfix`. `RenameContentType._rename` now saves with `using=db`, so the content type goes to the database the migration is running on instead of whatever the router picks for writes. The change is in `django/contrib/contenttypes/management/__init__.py`.
+
+- **Tests:** I added a router test in `contenttypes_tests/test_operations.py`. The router sends every write to `default`, and the test migrates `other` forwards and backwards. It errors without the fix and passes with it. All 4 tests in the module pass, and `hive land` reported 4/4.
+- **Least sure:** the test needs `databases = {'default', 'other'}`, which assumes the test settings define an `other` database.
+- **Surprising:** `hive claim` printed "working tree not clean", though the claim and land both succeeded. I did not check whether it is harmful.
+- **Questions asked:** none.

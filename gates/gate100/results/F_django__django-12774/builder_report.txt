@@ -1,0 +1,7 @@
+Landed. I'm finishing up now.
+
+- **Landed:** `in_bulk()` now accepts a field covered by an unconditional, single-field `UniqueConstraint`. The change is in `django/db/models/query.py`, and `hive land` reported 33/33 tests passing.
+- **Tests:** I added `test_in_bulk_unique_constraint` to `tests/lookup/tests.py`, plus two constraints on `Season` in `tests/lookup/models.py`. A partial (conditional) constraint is still rejected.
+- **Least sure:** I read the constraint list from `opts.constraints` directly rather than a helper like `total_unique_constraints`. I also gave the test model a partial constraint on `gt` just to cover the rejection case.
+- **Surprising:** `lookup.tests` ran 41 tests in my local run, but `hive land` counted 33. I didn't look into the gap.
+- **Hive tools:** no problems.

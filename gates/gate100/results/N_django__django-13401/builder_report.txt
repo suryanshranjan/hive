@@ -1,0 +1,5 @@
+I landed the `fieldeq` area, and `hive land` reported 20/20 tests passing.
+
+- **Fix:** in `django/db/models/fields/__init__.py`, `Field.__eq__` and `__hash__` now include the field's model, so fields inherited from the same abstract model are no longer equal across models. `__lt__` still orders by `creation_counter` first, so existing ordering is unchanged. When two fields share a counter, it breaks the tie by comparing the model's string form. That tie-break was the choice I was least sure of.
+- **Test:** I added a test to `tests/model_fields/tests.py` covering equality, set size and sorting for the abstract-inheritance case.
+- **Questions/problems:** none, and the hive tools worked as expected.

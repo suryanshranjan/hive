@@ -1,0 +1,7 @@
+I landed the fix: a migration whose `bases` include `models.Model` now gets `from django.db import models` in the generated file. The fix is one line in the `models.Model` case of `TypeSerializer` in `django/db/migrations/serializer.py`.
+
+- **Tests:** `migrations.test_writer` passes, 50 of 50 tests locally; `hive land` reported 40/40 on the shared branch.
+- **Added test:** `test_serialize_models_model_bases` checks the merged `from django.db import migrations, models` import. It uses a mixin plus `models.Model`, because the writer drops a lone `models.Model` base.
+- **Least sure about:** the test serializes `migrations.test_writer.WriterTests` as the mixin, a stand-in for the issue's custom mixin.
+- **Hive tools:** my first land recorded 40/41 tests (my own test was failing). The fix was committed only after the second `hive claim` failed on a dirty tree. `hive land` still went through.
+- **Questions:** none.

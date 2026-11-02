@@ -1,0 +1,6 @@
+I landed the fix. `hive land` reported 13/13 tests passing, and the ordering suite ran 27 tests, all OK.
+
+- **Fix:** in `find_ordering_name` in `django/db/models/sql/compiler.py`, the check for "ordering by the FK's own attname" now compares against `pieces[-1]` instead of the whole `name`. With a lookup like `order_by('parent_id')` on a self-referencing FK, Django no longer applies the related model's default ordering, which caused the descending sort and the extra join.
+- **Tests:** I added a `SelfRef` model to `tests/ordering/models.py` and one new test in `tests/ordering/tests.py`. It checks `order_by('parent_id')` and `order_by('parent__id')`, with no `DESC` and no join for the plain `parent_id` case.
+- **Least sure about:** the new test only covers the `ordering = ('-id',)` default on a self-FK model. I didn't try other default-ordering shapes, such as expressions.
+- **Process:** my first `hive claim` failed on an unclean working tree, so I committed the edit and claimed again. No other problems with the hive tools.

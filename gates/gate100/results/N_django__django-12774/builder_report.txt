@@ -1,0 +1,7 @@
+I landed `inbulk`: `in_bulk()` now accepts a field that is unique through a single-field `UniqueConstraint`, as well as `unique=True` and `pk`. After the final rename, `hive land` reported 34/34 tests passing.
+
+- **Fix:** the check in `django/db/models/query.py` also looks at `opts.total_unique_constraints`, which leaves out conditional constraints. Those don't guarantee uniqueness across the table, so they are still rejected.
+- **Tests:** I added a `UniqueConstraint` on `Season.year` in `tests/lookup/models.py`. Two new tests in `tests/lookup/tests.py` cover bulk lookup by `year` and the error for a non-unique field (`gt`).
+- **Least sure:** adding the constraint to `Season` is a model change that other tests could trip on if they create duplicate years. Nothing in the lookup tests did.
+- **Surprise:** my first `sed` rename also hit the existing test `test_in_bulk_non_unique_field`, because `hive land` flagged the duplicate name. I restored its name and gave my test a different one, so no existing test was changed. The final `git diff` check was confusing, but the test list and a clean `git status` show the original is intact.
+- **Lock:** released by the land. I asked no questions.

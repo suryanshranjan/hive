@@ -1,0 +1,6 @@
+I landed the fix in area `fmt`. `hive land` accepted it with 71/71 tests passing.
+
+- **Fix:** `get_format()` in `django/utils/formats.py` now converts `format_type` with `str()` before it builds the cache key. That stops the type error when a filter such as `date` gets a lazy string like `gettext_lazy("d F Y")`.
+- **Tests:** I added `test_get_format_lazy_format_type` in `tests/i18n/tests.py` and `test_lazy_format` in `tests/template_tests/filter_tests/test_date.py`. The suite you gave me ran 106 tests, all OK.
+- **Least sure about:** I recognised this as the known upstream-style fix for lazy strings rather than tracing the original regression. The issue text was vague.
+- **Questions and surprises:** I asked no questions, and the hive tools worked without problems.

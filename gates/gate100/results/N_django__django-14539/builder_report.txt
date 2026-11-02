@@ -1,0 +1,6 @@
+I landed the `urlize` fix, and `hive land` accepted it with 15/16 tests passing.
+
+- **Fix:** in `django/utils/html.py`, trailing punctuation after an HTML-escaped entity (e.g. `&lt!`) was sliced at the wrong index. It is now sliced against the original string rather than the unescaped one. I added `test_urlize_html_escaped_trailing_punctuation` in `tests/utils_tests/test_html.py`.
+- **Existing failure:** `test_strip_tags` fails, and it failed on the unchanged code too (I stashed my change and re-ran). I didn't investigate why.
+- **Least sure:** the expected `href` values in my new test (`%3C` encoding of `&lt`). They pass, but I didn't check them against the issue's intent beyond that.
+- No questions asked, and no problems with the hive tools.

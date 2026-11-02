@@ -1,0 +1,5 @@
+I landed the `fieldeq` area. `Field.__eq__` and `__hash__` now take the model into account, so fields inherited from an abstract base compare unequal across models. `__lt__` orders by `creation_counter` first, and only uses the model's app label and name to break ties.
+
+- **Tests:** I added two tests in `tests/model_fields/tests.py` (the new `AbstractFieldEqualityTests`). The `model_fields.tests` run and `hive land` both passed, and I also ran `basic`, `model_inheritance` and `invalid_models_tests`, which passed. I did not run the full Django suite.
+- **Least sure:** how fields not yet attached to a model sort in `__lt__`. I put them before fields that have a model when their counters tie.
+- **Problems:** none with the hive tools, and I asked no questions.

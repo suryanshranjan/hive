@@ -1,0 +1,5 @@
+Landed `qdecon`: `Q.deconstruct()` no longer crashes on a single child that isn't a (key, value) pair, such as `Exists`. The 205 tests in the specified modules pass (2 skipped), and `hive land` reported 192/192.
+- **Fix:** a single child goes into kwargs only if it is a 2-tuple. Anything else, including a lone `Exists`, goes into args.
+- **Least sure about:** I kept the old kwargs form for ordinary single-child `Q(a=1)` to stay backward compatible. That means single and multiple children are still not fully uniform. I did this because the existing tests could not be edited.
+- **Tests:** I added one test in `tests/queries/test_q.py` that deconstructs `Q(Exists(...))` and checks it round-trips.
+- No questions, and no problems with the hive tools.

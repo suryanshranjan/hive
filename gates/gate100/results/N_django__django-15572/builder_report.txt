@@ -1,0 +1,6 @@
+Landed the fix; wrapping up now.
+
+- **Landed:** area `reload`. `get_template_directories()` in `django/template/autoreload.py` now skips empty-string entries in `engine.dirs` and in loader `get_dirs()`. An empty string would otherwise normalize to the cwd. I added `EmptyDirsTests` with two tests, one for `["", dir]` and one for `[""]` alone. All 12 tests in `template_tests.test_autoreloader` pass (3 skipped), and `hive land` accepted it.
+- **Least sure about:** I used a plain truthiness check (`if dir`), so `Path("")` and other falsy values are also skipped. I think that's right, but I didn't test those cases.
+- **Questions asked:** none.
+- **Surprising:** my first `claim` call had the wrong argument order (it needs a description) and failed. The second one worked.

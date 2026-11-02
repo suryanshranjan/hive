@@ -1,0 +1,19 @@
+django__django-12774: F 1 N 1 S 1 | S prompts 1, cost $0.35
+django__django-14140: F 0 N 0 S 0 | S prompts 1, cost $0.27
+django__django-15741: F 1 N 1 S 1 | S prompts 0, cost $0.13
+django__django-11066: F 1 N 1 S 1 | S prompts 0, cost $0.14
+django__django-15572: F 1 N 1 S 1 | S prompts 0, cost $0.11
+django__django-13033: F 1 N 1 S 1 | S prompts 1, cost $0.34
+django__django-15368: F 1 N 1 S 1 | S prompts 1, cost $0.24
+django__django-13401: F 1 N 1 S 1 | S prompts 0, cost $0.13
+django__django-14539: F 1 N 1 S 1 | S prompts 0, cost $0.15
+django__django-14580: F 1 N 1 S 1 | S prompts 0, cost $0.16
+
+resolved {'F': 9, 'N': 9, 'S': 9}; S median prompts 0.0; issues where S's builders asked: 0
+
+predictions
+A1 N <= F - 3 -> failed
+A2 S >= N + 2 -> failed
+A3 builders asked on >= 5 issues -> failed
+A4 S median prompts <= 5 (0.0) -> held
+Claim A1 and A2 -> failed

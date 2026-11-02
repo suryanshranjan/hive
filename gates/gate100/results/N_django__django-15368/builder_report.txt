@@ -1,0 +1,7 @@
+I landed the `bulk_update()` fix with `hive land`, and all 30 tests in `queries.test_bulk_update` pass.
+
+- **Fix:** `bulk_update()` in `django/db/models/query.py` now checks `hasattr(attr, 'resolve_expression')` instead of `isinstance(attr, Expression)`. A plain `F('col')` now resolves to the column name instead of its string form.
+- **Test:** I added `test_plain_f_expression` to `tests/queries/test_bulk_update.py`.
+- **Least sure about:** choosing duck typing over adding `F` to the type check. It matches how the rest of `query.py` tests for expressions.
+- **Questions:** none.
+- **Surprises:** none with the hive tools.

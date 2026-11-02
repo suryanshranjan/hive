@@ -1,0 +1,5 @@
+I landed the fix. `bulk_update()` now treats any value with `resolve_expression` as an expression, so plain `F('name')` resolves to the column instead of its string repr (`django/db/models/query.py:673`).
+
+- **Tests:** I added `test_plain_f_expression` in `tests/queries/test_bulk_update.py`. The suite passes at 30/30 and `hive land` accepted the change.
+- **Choice I was least sure of:** I used the duck-type check from the issue rather than `isinstance(attr, (Expression, F))`. I also removed the now-unused `Expression` import from `query.py`.
+- **No questions asked, and nothing surprising** with the hive tools.

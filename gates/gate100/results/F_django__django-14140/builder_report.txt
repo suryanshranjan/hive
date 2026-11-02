@@ -1,0 +1,6 @@
+I landed the fix, and `hive land` reported 192/192 tests passing.
+
+- **Fix:** `Q.deconstruct()` in `django/db/models/query_utils.py` still returns kwargs when the single child is a 2-tuple. Any other single child, such as `Exists(...)`, now goes into `args`.
+- **Tests:** I added `test_deconstruct_boolean_expression` to `tests/queries/test_q.py`. It covers `Q(Exists(...))` and its negated form.
+- **Least sure of:** I took the backward-compatible option from the issue instead of removing the special case, as the linked patch does. That keeps the existing `deconstruct` tests unchanged, since I wasn't allowed to edit them.
+- **Questions and surprises:** none, and the hive tools worked normally.

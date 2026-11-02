@@ -1,0 +1,5 @@
+I landed the fix: `get_format` in `django/utils/formats.py` now converts `format_type` to a string first, so a lazy string like `_('Y-m-d')` works.
+
+- **Tests:** I added `test_get_format_lazy_format_type` in `tests/i18n/tests.py` and `test_lazy_format` in `tests/template_tests/filter_tests/test_date.py`. The run covering `i18n.tests` and `template_tests.filter_tests.test_date` passed (106 tests), and `hive land` reported 71/71 passing.
+- **Least sure about:** the conversion happens unconditionally at the top of the function, so a non-string `format_type` is also converted rather than raising an error.
+- **Questions / surprises:** none, and no problems with the hive tools. I claimed the area `core` and did not need `OWNER.md`.

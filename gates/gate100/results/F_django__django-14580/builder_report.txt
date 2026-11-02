@@ -1,0 +1,7 @@
+I landed the fix. Generated migrations now include `from django.db import models` when `models.Model` is a base class, so the `NameError` from the issue no longer occurs.
+
+- **Fix:** the `models.Model` special case in `TypeSerializer` (`django/db/migrations/serializer.py`) now returns that import instead of an empty list.
+- **Test:** I added `test_models_import_for_model_base` in `tests/migrations/test_writer.py`. It checks the serialized string and imports, and that a `CreateModel` with a mixin plus `models.Model` as bases produces `from django.db import migrations, models`.
+- **Checks:** `migrations.test_writer` passes with 50 tests, and `hive land` reported 40/40 tests passing.
+- **Least sure about:** I fixed this in the serializer rather than in `writer.py`, which the issue suspected. Every path that serializes `models.Model` now gets the import, and `writer.py` already merges it into the `migrations` import.
+- **Tooling:** `hive claim` failed on a dirty working tree, so I committed first and then claimed. I asked no questions.

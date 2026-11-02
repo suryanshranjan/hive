@@ -1,0 +1,3 @@
+Landed `fix`: `get_template_directories()` in `django/template/autoreload.py` now skips empty entries in `DIRS`. It also skips them in the loaders' `get_dirs()`. The new test `test_empty_string_in_dirs_ignored` covers `DIRS: [""]`. The autoreloader tests pass (11 run, 3 skipped), and `hive land` reported 11/11.
+Least sure: I skip any falsy dir, not only `""`, which seemed the safest reading of the issue. I did not run the wider Django suite.
+No questions and no problems with the hive tools. I claimed the area name `django-autoreload` by hand because none were configured.
