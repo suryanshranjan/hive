@@ -43,6 +43,7 @@ check("the builder is told the step, why, what to do, and his decision",
 # 3. he states the goal: the plan in his words, one yes, the one question asked now; his decision kept
 three = dict(c, steps=c['steps'][:3])
 plan.make = lambda *a, **k: three
+real_run_plan = assistant.run_plan; assistant.run_plan = lambda *a, **k: None   # no real build thread in a test (Linux CI raced it)
 fake = FakeTelegram([tap('pln|all'), tap('pq|0'), tap('pq|1')])
 r = assistant.handle(ch(fake), repo, 'I want more creators signing up this month', poll=1)
 check('the plan is shown in plain words, then he decides only what only he can', (r if r != 'planned' else 'planned',
@@ -64,6 +65,7 @@ screens.available = lambda: False
 def apply_build(state, rule, ch):
     applied.append(rule); return 0
 assistant.what_changed = lambda repo, ch=None: 'It now shows what creators earn.'
+assistant.run_plan = real_run_plan
 assistant.PLAN.update(goal='more sign-ups', steps=three['steps'], step=1, running=True, answers=['Yes, at first payout', '', '₹500'])
 fake = FakeTelegram([])
 r = assistant.run_plan(ch(fake), repo, apply_build)
