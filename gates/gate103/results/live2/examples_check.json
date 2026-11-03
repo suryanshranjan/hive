@@ -1,0 +1,20 @@
+[
+ {
+  "checks": 14,
+  "failing": [
+   {
+    "rule": "A refund goes back the way it was paid: a part-card, part-store-credit order is refunded to each in the amounts paid",
+    "example": "Meera paid Rs 1,500 for a lamp (Rs 1,000 card + Rs 500 store credit) and gets a full refund: Rs 1,000 to her card and Rs 500 as store credit",
+    "got": "{'amount': 1500, 'method': 'card'} - all Rs 1,500 to the card",
+    "where": "shop.refunds.refund"
+   },
+   {
+    "rule": "A partial refund on a mixed-payment order is split in the same proportion as the payment",
+    "example": "Meera (Rs 1,000 card + Rs 500 store credit) changed her mind on day 20 and gets Rs 750: Rs 500 to her card and Rs 250 as store credit",
+    "got": "{'amount': 750, 'method': 'card'} - all Rs 750 to the card",
+    "where": "shop.refunds.refund"
+   }
+  ],
+  "cost": 0.32184559999999995
+ }
+]

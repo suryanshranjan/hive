@@ -2,7 +2,10 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 2 2026, 23:30 IST, Gate 103b half flown)
+## Where we left off (Nov 3 2026, after Gate 103b; Gate 104 next)
+
+- **Gate 103b done, ships** (flown Nov 3 on the user's laptop, Docker lab): live 26, 27, 27 of 27 with the owner's-examples check (it caught a split-payment refund in live 2); X1, X2 held, X3 failed on minutes (+11.3, confounded: slower machine, and live 1 stalled about an hour while the laptop ran out of memory). Drift F3 not flown: `private/g92` and `runs/g101_day1` exist only on the cloud lab. The check stays on.
+- **Gate 104 next** (Gap 2, owner time): confirm his rules once at the end (`HIVE_CONFIRM_EACH=0`) vs each answer read back; 3 live flights per arm, alternated.
 
 - **Gate 66 done (the user, travelling: "test something that makes Hive the best tool"):** one Claude Code agent that asks the owner beat Hive's hand-over by 21-30 hidden points (CQ 93.0, CC 84.6, HV 63.4, N0 34.8%) at 1/13 of his reading. Wind tunnel, synthetic owner who answers from his policy.
 - **Gate 67 done:** the hand-over's memory does not compound (neither rule fired).

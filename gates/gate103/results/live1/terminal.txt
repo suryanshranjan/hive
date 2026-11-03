@@ -1,0 +1,213 @@
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: pytest. 2 tests, all passing.
+
+One choice before I start, asked only once: 3 builders would finish about 1.9× sooner than one, for about 1.8× the cost. Should I build fast or cheap, from now on? (Enter = fast)
+  > 
+  Got it: fast, from now on. (`hive pace fast` or `hive pace cheap` changes it.)
+
+I'll put 3 builders on it (the job has 3 parts that can be built at the same time): about 1.9× the speed of one builder, for about 1.8× the cost. They work on copies, so your branches stay exactly as they are.
+If they need a decision only you can make, the question will appear right here.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+
+First, a few quick situations where your own rules matter:
+
+1 of 14. Priya asks for her money back 35 days after her parcel was delivered. How long after delivery can a customer still get a refund?
+  A) Refunds up to 30 days after delivery; after that she gets nothing  B) Refunds up to 14 days after delivery; after that she gets nothing  C) Refunds up to 7 days after delivery; after that she gets nothing
+  Your answer (a letter, or your own words) > 
+  > Refunds are allowed up to 30 days after delivery: the full amount up to day 14 and half from day 15 to day 30. After day 30 she gets nothing, unless the goods arrived damaged, in which case she gets the full amount up to 90 days.
+  (Your answer also settles 1 of the coming question; I'll skip it.)
+
+2 of 14. Rahul bought a ₹2,000 shirt and paid ₹100 for delivery. He sends it back because he changed his mind, and it is not damaged. How much does he get back?
+  A) ₹2,000 for the shirt; the ₹100 delivery is not refunded (a damaged item would get the full ₹2,100)  B) The full ₹2,100, including delivery  C) ₹1,800: the shirt price minus a 10% return fee, and no delivery refund
+  Your answer (a letter, or your own words) > 
+  > A
+
+3 of 14. Anita returns a ₹1,500 kurta within the allowed time. Does her money go back to her card, or does she get store credit?
+  A) Back to her card, whether it was damaged or she changed her mind  B) Damaged items go back to her card; changed-mind returns get store credit only  C) Always store credit, whatever the reason
+  Your answer (a letter, or your own words) > 
+  > It goes back the way she paid. If she paid by card, the money goes back to her card, and if she paid with store credit, she gets store credit back. The reason for the return doesn't change this.
+
+5 of 14. Sunita bought a ₹1,000 dress using a ₹200 coupon, so she paid ₹800. She returns it. How much does she get back?
+  A) ₹800, what she actually paid  B) ₹1,000, the full listed price  C) ₹800, plus her ₹200 coupon back so she can use it again
+  Your answer (a letter, or your own words) > 
+  > A
+
+6 of 14. A refund works out to ₹499.60, an order earns 12.8 points, and a day's average sale is ₹733.50. How are the paise handled?
+  A) Refunds and points are rounded down (₹499, 12 points); report figures go to the nearest rupee  B) Everything goes to the nearest rupee or point (₹500, 13 points)  C) Always round in the customer's favour (₹500 refund, 13 points)
+  Your answer (a letter, or your own words) > 
+  > Refunds and points are both rounded down, so ₹499 and 12 points. The daily average is rounded down to whole rupees too, so ₹733, not rounded to the nearest rupee.
+
+7 of 14. Arjun spends ₹1,250 in one order. How many loyalty points does he earn?
+  A) 1 point for every ₹100, rounded down: 12 points  B) 1 point for every ₹10: 125 points  C) 1 point for every rupee: 1,250 points
+  Your answer (a letter, or your own words) > 
+  > 1 point for every full ₹100 he paid for the items after any discount code, rounded down, so 12 points; delivery charges earn nothing. Orders paid with store credit earn no points, orders under ₹500 for the items earn none, and final-sale orders earn double.
+
+8 of 14. Kavya's order has ₹2,000 of goods, a ₹300 coupon, ₹100 delivery and ₹200 tax. Which amount earns her points?
+  A) Only the goods after the coupon: ₹1,700  B) Everything she paid, including delivery and tax: ₹2,000  C) The goods before the coupon: ₹2,000
+  Your answer (a letter, or your own words) > 
+  > A
+
+9 of 14. Rohan's ₹1,000 order is paid with ₹600 from his card and ₹400 of store credit. Which part earns points?
+  A) Only the ₹600 paid from his card  B) The full ₹1,000  C) No points at all if any store credit is used
+  Your answer (a letter, or your own words) > 
+  > My rules only cover orders paid entirely by card or entirely with store credit. Card orders earn 1 point for every full ₹100 of the items after the discount, and store-credit orders earn no points. I haven't made a rule for orders split between card and store credit, so please don't build one in.
+
+10 of 14. Neha earned 20 points on a ₹2,000 order, then returned the whole order. What happens to her 20 points?
+  A) The 20 points are taken back; returned or cancelled orders earn no points  B) She keeps the 20 points  C) Points are only given once the return window is over, so there is nothing to take back
+  Your answer (a letter, or your own words) > 
+  > My rules don't say anything about taking points back when an order is returned, so I haven't made a rule for that. Please don't build one in; points are worked out only from the order itself.
+
+11 of 14. On Tuesday there are 10 paid orders, 2 cancelled orders, 1 order never paid for, and a ₹500 refund on one paid order. What goes into Tuesday's sales summary?
+  A) Only the 10 paid orders; cancelled and unpaid ones are left out, and the ₹500 refund is taken off the sales total  B) All 13 orders, including cancelled and unpaid ones  C) The 10 paid orders; the refund is shown separately and not taken off
+  Your answer (a letter, or your own words) > 
+  > "Orders" counts every order in the list, including store-credit ones. "Revenue" is the totals of card orders only (items after discount plus delivery), and the average is revenue divided by the number of card orders, rounded down. I have no rule about cancelled or unpaid orders or about taking refunds off, so please don't build one in.
+  (Your answer also settles 1 of the coming question; I'll skip it.)
+
+13 of 14. The shop is closed on Diwali and there are no orders that day. What should the daily summary show?
+  A) 0 orders, ₹0 sales, ₹0 average  B) A note saying 'No sales today' instead of numbers  C) No summary at all for that day
+  Your answer (a letter, or your own words) > 
+  > A
+
+14 of 14. A customer places an order at 11:50 pm on 5 March (Indian time) and the payment goes through at 12:10 am on 6 March. Which day's summary does it belong to?
+  A) 5 March, the day it was placed, using Indian time  B) 6 March, the day the payment went through  C) The day it was shipped
+  Your answer (a letter, or your own words) > 
+  > I haven't made a rule about which day an order belongs to or about time zones. The summary should just count whatever orders are in the list it is given, so please don't build a rule for this.
+
+Your rule, as I'll build it: Refund amount is based on the number of days since delivery: the full amount from day 0 to day 14, half the amount from day 15 to day 30, and nothing after day 30, except that if the goods arrived damaged, the full amount is refunded up to day 90.
+  Right? (Enter = yes, or say what's off) > 
+  > Yes, that's right. Also, damaged goods get nothing after day 90, and if the number of days is negative because of a mistake in the data, treat it as day 0.
+
+Your rule, as I'll build it: A refund for a return made within the allowed time must go back to the payment method the customer used: card payments are refunded to the card, and store-credit payments are refunded as store credit, whatever the reason for the return.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: Round refund amounts down to the whole rupee (₹499.60 → ₹499), loyalty points down to the whole point (12.8 → 12), and the daily average sale down to the whole rupee (₹733.50 → ₹733), never to the nearest.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: An order earns 1 loyalty point for every full ₹100 paid for the items after any discount code, rounded down, with delivery charges earning nothing (for example, ₹1,250 earns 12 points); orders paid with store credit earn no points, orders under ₹500 for the items earn no points, and final-sale orders earn double points.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: An order paid entirely by card earns 1 point for every full ₹100 of the item total after the discount; an order paid entirely with store credit earns no points; there is no rule for orders paid partly by card and partly with store credit, so none should be built.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Your rule, as I'll build it: For the day's sales summary, "Orders" is the count of every order in the list, including store-credit orders; "Revenue" is the sum of the totals of card orders only, where each total is the items after discount plus delivery; the average is Revenue divided by the number of card orders, rounded down; and there is no special handling that excludes cancelled or unpaid orders or subtracts refunds.
+  Right? (Enter = yes, or say what's off) > 
+  > Yes, that's right. Also, if there are no card orders that day, the average is 0.
+
+Your rule, as I'll build it: The summary counts every order in the list it receives. It applies no rule about which day an order belongs to and makes no time-zone adjustment.
+  Right? (Enter = yes, or say what's off) > 
+  > 
+
+Two of your answers pull different ways on one decision. Which is your policy?
+Should an order paid partly by card and partly with store credit earn points?
+  A) No. Any order paid with store credit earns no points.  B) There is no rule for mixed-payment orders, so none should be built.
+  > 
+  > B
+
+Two of your answers pull different ways on one decision. Which is your policy?
+Does a card order whose item total after discount is under ₹500 earn points?
+  A) No. Orders under ₹500 for the items earn no points.  B) Yes. Any order paid entirely by card earns 1 point for every full ₹100, so ₹400 earns 4 points.
+  > 
+  > A
+
+Two of your answers pull different ways on one decision. Which is your policy?
+Does a final-sale order earn double points?
+  A) Yes. Final-sale orders earn double points.  B) No. An order paid entirely by card earns 1 point for every full ₹100, with no doubling.
+  > 
+  > A
+
+Your rules for this feature, as the builders will follow them (each one applies to every case like it, not just the example):
+  1. Whenever an item is returned undamaged because the customer changed their mind, the customer gets back the item price but not the delivery charge (for example, a ₹2,000 shirt with ₹100 delivery gets ₹2,000 back). Whenever the item arrived damaged, the customer gets back the item price and the delivery charge (₹2,100 in the same example).
+  2. Whenever an item bought with a coupon is returned, the refund is based on what the customer actually paid after the coupon, not the price before it (for example, a ₹1,000 dress bought with a ₹200 coupon gets ₹800 back).
+  3. Whenever a refund is worked out, it depends on the number of days since delivery. If that number is negative because of a data mistake, treat it as day 0. For goods that did not arrive damaged, the full amount is refunded from day 0 to day 14, half from day 15 to day 30, and nothing after day 30. For goods that arrived damaged, the full amount is refunded from day 0 to day 90 and nothing after day 90.
+  4. Whenever a return is made within the allowed time, the refund goes back to the payment method the customer used, whatever the reason for the return: card payments go back to the card, and store-credit payments come back as store credit.
+  5. Whenever a refund amount, a number of loyalty points, or the daily average sale is calculated, it is rounded down, never to the nearest: refunds and the daily average to the whole rupee (₹499.60 → ₹499, ₹733.50 → ₹733), and points to the whole point (12.8 → 12).
+  6. Whenever loyalty points are worked out for an order, only the item total after any coupon or discount code counts. Delivery charges and tax earn nothing. The order earns 1 point for every full ₹100 of that amount, rounded down (for example, ₹2,000 of goods with a ₹300 coupon, ₹100 delivery and ₹200 tax gives ₹1,700, which earns 17 points; ₹1,250 earns 12 points). An order paid entirely with store credit earns no points.
+  7. Whenever a customer returns an order they earned loyalty points on, including a return of the whole order, they keep those points.
+  8. Whenever the daily sales summary is produced: 'Orders' is the count of every order in the list it receives, including store-credit orders. 'Revenue' is the sum of the totals of card orders only, where each total is the items after discount plus delivery. The average is Revenue divided by the number of card orders, rounded down to the whole rupee, and it is 0 when there are no card orders. Cancelled or unpaid orders are not excluded and refunds are not subtracted. The summary does not decide which day an order belongs to and makes no time-zone adjustment. On a day with no orders (for example, the shop is closed on Diwali), it shows 0 orders, ₹0 sales and ₹0 average.
+  9. Should an order paid partly by card and partly with store credit earn points? -> There is no rule for mixed-payment orders, so none should be built.
+  10. Does a card order whose item total after discount is under ₹500 earn points? -> No. Orders under ₹500 for the items earn no points.
+  11. Does a final-sale order earn double points? -> Yes. Final-sale orders earn double points.
+  Numbers of any that are wrong (Enter = all correct) > 
+  > 7 is wrong: I have no rule about points when an order is returned, so please don't build one, and points are worked out only from the order itself. Two refund rules are also missing. Final-sale orders get no refund unless the goods arrived damaged, and refunds under ₹50 are not paid (the amount is ₹0) except for damaged goods.
+  Rule 7: Whenever a customer returns an order they earned loyalty points on, including a return of the whole order, they keep those points.
+  What should it be? > 
+  > There is no rule for points when an order is returned, so please don't build one. Points are worked out only from the order itself, and a return doesn't change them.
+  Thank you. The builders will encode your 11 rules as tests before anything lands.
+
+[06:11] Starting.
+  [06:11] Builder w3 picked up: refunds.
+
+========================================================================
+ Question 1 of up to 30  -  from builder w3  -  asked 0:01 ago
+========================================================================
+
+  A customer returns a ₹2,000 shirt with ₹100 delivery after 5 days,
+  saying it was the wrong size (not damaged, not just a change of
+  mind). What should they get back?
+
+    A) ₹2,000, same as a change of mind
+    B) ₹2,100, same as damaged
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   > A
+  Thanks, sent to builder w3. (1 answered so far)
+  [06:11] Builder w2 picked up: report.
+
+========================================================================
+ Question 2 of up to 30  -  from builder w3  -  asked 0:06 ago
+========================================================================
+
+  A customer bought a ₹1,500 kurta marked final sale, and 3 days after
+  delivery wants to return it because they changed their mind. What
+  should they get back?
+
+    A) the usual refund, ₹1,500
+    B) nothing, final sale means no returns
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   > B
+  Thanks, sent to builder w3. (2 answered so far)
+  [06:12] Builder w2 landed: sales_summary in shop/report.py; Order gains coupon (fixed rupees) and tax fields and...
+  [06:12] Builder w2 landed: sales_summary per owner's rules (all orders counted, card-only revenue of total(),...
+  [06:12] Builder w2 landed: hive: leave build output and dependencies out of the shared branch
+
+========================================================================
+ Question 3 of up to 30  -  from builder w3  -  asked 0:07 ago
+========================================================================
+
+  A ₹1,500 kurta marked final sale, with ₹100 delivery, arrives
+  damaged and the customer asks for a refund 3 days later. What should
+  they get back?
+
+    A) ₹1,600, same as any damaged item
+    B) nothing, final sale means no returns
+    C) something else (please say)
+
+  Your answer (a letter, or say it in your own words) >   > A
+  Thanks, sent to builder w3. (3 answered so far)
+  [06:12] Builder w2 picked up: loyalty.
+  [06:12] Builder w2 landed: points_earned in shop/loyalty.py
+  [06:12] Builder w2 landed: points_earned: 1 pt per full Rs100 of items_paid() (after code+coupon; no...
+  [07:16] Builder w3 landed: Refunds: owner's windows, damage/coupon/final-sale rules
+  [07:16] Builder w3 landed: refund(): item total after discount (+delivery if damaged), 0-14 full/15-30 half/after...
+
+[07:23] All 3 builders are done.
+
+Let me check the result.
+  27 tests, all passing. All 2 that passed before still pass.
+  I've noted 3 new rulings of yours for the next build on this project.
+
+Done in 73 minutes, about $3.65 in all (builders $1.26, Hive's own questions and checks $2.39). Your result is on branch hive/add-three-things-to-1103-0603.
+  See what changed:  git diff main...hive/add-three-things-to-1103-0603
+  Take it:           git merge hive/add-three-things-to-1103-0603
+(Everything from this build, including the questions and answers, is in /home/node/fh/.hive/runs/add-three-things-to-1103-0603.)
+
+They asked you 3 questions while building, and your answers are built in. 27 tests, all passing. All 2 that passed before still pass. It's ready on branch hive/add-three-things-to-1103-0603.
