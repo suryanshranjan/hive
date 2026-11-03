@@ -24,7 +24,7 @@ What does he mean? Read it as a person would, using the conversation: "yes" or "
 proposed; "I already told you" or "that one" points back to what he said before; a short correction ("no, Sunny Shop
 Creators") changes what you just proposed. Reply with JSON only:
 {{"intent": "build" | "stop_build" | "change" | "rule" | "status" | "team" | "set_team" | "stop_builder" | "greeting" |
-"instruct" | "show" | "amend" | "ship" | "complaint" | "cloud_on" | "cloud_off" | "reply",
+"instruct" | "show" | "amend" | "ship" | "complaint" | "goal" | "cloud_on" | "cloud_off" | "reply",
 "rule": "for a build, exactly what to build (taken from the conversation if he points back to it); for a change or a
 rule, the rule he now wants; otherwise empty",
 "short": "for a build, what he wants in at most 12 plain words, as a person would say it back ('Redo the home page in
@@ -58,6 +58,9 @@ barternow.in's style'); otherwise empty",
   it to the dev", "looks good, give it to Rahul". Not putting it live himself, and not a new build.
 - "complaint": he passes on a customer's complaint or problem with the product ("a customer says she was charged
   twice", "a seller complained his payout never came"). Not his own request for a change.
+- "goal": he states a business outcome he wants, not a particular change ("I want more creators signing up", "sales
+  are low this month", "help me get more repeat buyers"). You will work out what to change. A particular thing to
+  build ("add an invite page") is "build".
 - "greeting": a hello, with no request yet.
 - "cloud_on" / "cloud_off": move Hive to the cloud / shut the cloud machine down.
 - "reply": anything else: a question, a complaint, frustration, small talk. Never a rule."""
@@ -501,7 +504,7 @@ def what_changed(repo, ch=None):
     reply = got.get('reply') if isinstance(got, dict) else None
     return reply.strip() if isinstance(reply, str) and reply.strip() else fallback
 
-def background_build(repo, goal, ch=None):
+def background_build(repo, goal, ch=None, interview=True, report=True, workers=None):
     """Run `hive start` for this goal in the background, so Hive keeps answering him; if it stops, tell him why at once
     (a cloud build stopped on "unsaved changes", and only the server's log knew)."""
     import subprocess, sys, tempfile, threading
@@ -511,8 +514,10 @@ def background_build(repo, goal, ch=None):
     os.makedirs(os.path.dirname(log), exist_ok=True)
     cmd = (argv(os.environ['HIVE_BUILD_CMD']) if os.environ.get('HIVE_BUILD_CMD') else   # tests: a stand-in
            [sys.executable, '-m', 'hive', 'start', '--overnight', '--goal', gf.name] +
+           ([] if interview else ['--no-interview']) +   # a plan step: its one question was asked already
            (['--agent', team.chosen()['agent']] if team.chosen().get('agent') else []) +   # the team he chose by phone
-           (['--workers', str(team.chosen()['workers'])] if team.chosen().get('workers') else []))
+           (['--workers', str(workers)] if workers else
+            ['--workers', str(team.chosen()['workers'])] if team.chosen().get('workers') else []))
     proc = subprocess.Popen(cmd, cwd=repo, start_new_session=os.name != 'nt',   # so a stop ends its builders too
                             stdout=open(log, 'w'), stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
                             env=dict(os.environ, HIVE_FROM_PHONE='1'))
@@ -529,7 +534,7 @@ def background_build(repo, goal, ch=None):
                 ch.send(f"⚠️ <b>The build stopped before it finished.</b>\n\n{telegram.esc(why)}", html=True)
             except Exception:
                 pass
-        elif rc == 0 and ch is not None and BUILD.get('proc') is proc and not BUILD.get('stopped'):
+        elif rc == 0 and report and ch is not None and BUILD.get('proc') is proc and not BUILD.get('stopped'):
             from . import screens   # a frontend: he sees it, unasked (the owner: "share the screenshot on my phone")
             try:
                 if screens.available() and screens.is_frontend(repo):
@@ -606,6 +611,9 @@ def _stop(p):
         pass
 
 def _building():
+    if PLAN.get('running'):   # a plan he gave the go-ahead to, step by step
+        return (f"A build is running: his plan for \"{PLAN['goal'][:120]}\", step {PLAN['step']} of {len(PLAN['steps'])} "
+                f"({PLAN['steps'][PLAN['step'] - 1]['title']}); steps done: {PLAN['step'] - 1}.")
     p = BUILD.get('proc')
     if p is None:
         return None
@@ -762,6 +770,97 @@ def complaint(ch, repo, text, poll, apply_build=None):
     ch.send('🐝 ' + telegram.esc(said), html=True)
     return 'complaint_bug' if verdict == 'bug' else 'complaint_unclear'
 
+PLAN = {}   # the plan he said yes to: {'goal', 'steps', 'step', 'running'}
+GOAL_WORDS = re.compile(r"^\s*(i want|we need|help me|how (do|can) (i|we))\b[^.?!]{0,60}\b(more|fewer|less|increase|grow|"
+                        r"reduce|boost|improve|get)\b|\b(badhana|badhao|zyada|kam karna)\b|\b(sign-?ups?|signups|sales|"
+                        r"conversions?|retention|churn|engagement)\b[^.?!]{0,30}\b(low|down|dropping|falling|bad|weak)\b")
+
+def pursue(ch, repo, text, poll, apply_build=None, run=True):
+    """A business goal ("I want more creators signing up"): read his product, propose a plan in his words, ask the few
+    things only he can decide, then build it step by step on one branch, showing each (the owner: "Tony just gives
+    him the business"). run=False stops after the plan is agreed (tests)."""
+    from . import plan as planner
+    ch.send("🔎 On it, sir. Let me look at your product with that in mind; a minute or two.")
+    import threading
+    box, done = {}, threading.Event()
+    def think():
+        box['plan'] = planner.make(repo, text, memory.notes(repo), [r['text'] for r in memory.load(repo)])
+        done.set()
+    threading.Thread(target=think, daemon=True).start()
+    while not done.wait(4):
+        if callable(getattr(ch, 'typing', None)):
+            ch.typing()
+    p = box.get('plan')
+    if not p:
+        ch.send("🐝 I couldn't find a clear way to that in your product as it stands, sir. Tell me a bit more about what "
+                "you're seeing, or what you'd try, and I'll look again.")
+        return 'no_plan'
+    steps = p['steps']
+    lines = '\n'.join(f"{k}. <b>{telegram.esc(s['title'])}</b>: {telegram.esc(s['why'])}" for k, s in enumerate(steps, 1))
+    ch.send(f"🧭 <b>Here's what I see, sir.</b> {telegram.esc(p['finding'])}\n\n<b>What I'd do:</b>\n{lines}\n\n<i>I'll "
+            "build them one after another and show you each. Your main version isn't touched.</i>", html=True,
+            buttons=[[('🚀 Yes, do it all', 'pln|all')], [('Just the first', 'pln|one')], [('Not now', 'pln|no')]])
+    choice, other = choose(ch, poll, [('pln|all', ('yes', 'do it', 'do it all', 'go ahead', 'all', 'haan', 'karo')),
+                                      ('pln|one', ('just the first', 'only the first', 'first one', 'pehla')),
+                                      ('pln|no', NO_WORDS)])
+    if other is not None:
+        ch.send("Very good, I'll hold the plan."); return handle(ch, repo, other, poll, apply_build)
+    if choice not in ('pln|all', 'pln|one'):
+        ch.send('Very good. The plan keeps; say "do the plan" when you want it.'); PLAN.update(goal=text, steps=steps, step=0, running=False)
+        return 'plan_held'
+    if choice == 'pln|one':
+        steps = steps[:1]
+    answers = []
+    for s in steps:   # the few things only he can decide, all asked now, so the building runs without him
+        if not s['decide']:
+            answers.append(''); continue
+        opts = s['options'] or []
+        ch.send(f"❓ <b>One thing only you can decide</b> ({telegram.esc(s['title'])}):\n{telegram.esc(s['decide'])}", html=True,
+                buttons=[[(o[:60], f'pq|{k}')] for k, o in enumerate(opts)] or None)
+        kind, ans = telegram._wait(ch, poll, {f'pq|{k}' for k in range(len(opts))})
+        answers.append(opts[int(ans.split('|')[1])] if kind == 'tap' else (ans or '').strip())
+        if answers[-1]:
+            memory.add(repo, f"{s['decide']} {answers[-1]}", 'plan')   # his decision is kept for every later build
+    PLAN.update(goal=text, steps=steps, step=1, running=True, answers=answers, cost=p.get('cost', 0))
+    ch.send(f"🛠 Right, sir. {'Building the first step now' if len(steps) > 1 else 'Building it now'}: "
+            f"{telegram.esc(steps[0]['title'])}. I'll show you each step as it lands; say \"status\" any time.", html=True)
+    if run:
+        threading.Thread(target=run_plan, args=(ch, repo, apply_build), daemon=True).start()
+    return 'planned'
+
+def run_plan(ch, repo, apply_build, wait=None):
+    """Build the agreed plan: step 1 as a build, every later step as a fix round on the same branch; after each, he sees
+    it (screenshots for a page, plain words otherwise). Stops, and says why, if a step fails."""
+    from . import plan as planner, screens
+    steps, answers = PLAN['steps'], PLAN.get('answers') or [''] * len(PLAN['steps'])
+    see = screens.available() and screens.is_frontend(repo)
+    try:
+        for k, s in enumerate(steps, 1):
+            PLAN['step'] = k
+            told = planner.instruction(s, answers[k - 1])
+            if k == 1:
+                proc = background_build(repo, told, ch, interview=False, report=False, workers=1)   # one small job
+                rc = (wait or proc.wait)()
+                if rc != 0 or not latest_build(repo):
+                    return 'failed'   # background_build's watcher has told him why
+            else:
+                ch.send(f"🛠 Step {k} of {len(steps)}: {telegram.esc(s['title'])}. On it.", html=True)
+                if not apply_build or apply_build(latest_build(repo), told, None) not in (0, None):
+                    ch.send(f"⚠️ Step {k} didn't pass its checks, so I've stopped here, sir. Everything before it is "
+                            "built and safe. Say \"status\" and I'll show you where it stands.")
+                    return 'failed'
+            head = f"✅ <b>Step {k} of {len(steps)} done: {telegram.esc(s['title'])}.</b>"
+            if see:
+                show(ch, repo, intro=head)
+            else:
+                ch.send(head + ' ' + telegram.esc(what_changed(repo, ch)), html=True)
+        st = latest_build(repo) or {}
+        ch.send(f"🎉 <b>That's the plan done, sir.</b> {telegram.esc(st.get('check', ''))}\n\nTell me what's off, or say "
+                "<b>ship it</b> and it all goes to your engineer as one pull request.", html=True)
+        return 'done'
+    finally:
+        PLAN['running'] = False
+
 def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=None):
     """Answer one message from the owner. apply_build(state, rule, ch) updates a build (hive.start.apply_ruling);
     start_build(repo, goal) runs a new build that reports to the phone (hive.start.start, overnight style);
@@ -789,6 +888,10 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         got = {'intent': 'ship'}
     elif COMPLAINT_WORDS.search(low) and not (_building() or '').startswith('A build is running'):
         got = {'intent': 'complaint'}
+    elif GOAL_WORDS.search(low) and not (_building() or '').startswith('A build is running'):
+        got = {'intent': 'goal'}
+    elif re.search(r"\b(do|start|run) (the|my|that) plan\b", low) and PLAN.get('steps') and not PLAN.get('running'):
+        got = {'intent': 'run_plan'}
     else:
         got = fast_read(ch, text) or read(ch, text)   # half a second when the trained reader is sure, else Claude
     intent, rule = got.get('intent', 'reply'), (got.get('rule') or text).strip()
@@ -800,6 +903,14 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         return ship_it(ch, repo, text, poll)
     if intent == 'complaint':   # a customer's complaint: his own rule at work, or a fault to fix
         return complaint(ch, repo, text, poll, apply_build)
+    if intent == 'goal':   # a business outcome: Hive works out what to change, and does it on his yes
+        return pursue(ch, repo, text, poll, apply_build)
+    if intent == 'run_plan':   # the plan he held
+        PLAN.update(step=1, running=True); PLAN.setdefault('answers', [''] * len(PLAN['steps']))
+        ch.send(f"🛠 Right, sir: the plan, starting with {telegram.esc(PLAN['steps'][0]['title'])}.", html=True)
+        import threading
+        threading.Thread(target=run_plan, args=(ch, repo, apply_build), daemon=True).start()
+        return 'planned'
     if intent == 'amend' and apply_build and latest_build(repo):   # change what he just saw; before and after
         st = latest_build(repo)
         before = shoot(repo)
