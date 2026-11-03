@@ -1022,6 +1022,12 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
         if not cfg:
             print('Not connected yet: run hive telegram setup.'); return 1
         ch = telegram.Channel(cfg, listener=True)
+    try:   # one listener only (live, Nov 3: two answered him, the older one from stale facts)
+        other = int(open(PIDFILE).read().strip())
+        if other != os.getpid() and telegram._alive(other):
+            print(f'Hive is already listening on this computer (process {other}). Stop that one first.'); return 1
+    except (OSError, ValueError):
+        pass
     CURRENT['ch'] = ch   # a background build reports its problems here
     try:   # so a move to the cloud can stop this listener: one Hive reads his chat at a time
         os.makedirs(os.path.dirname(PIDFILE), exist_ok=True); open(PIDFILE, 'w').write(str(os.getpid()))

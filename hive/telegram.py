@@ -28,8 +28,22 @@ BUSY = os.path.join(os.path.expanduser('~'), '.hive', 'telegram.busy')   # who i
 CONVERSATION = os.path.join(os.path.expanduser('~'), '.hive', 'conversation.json')   # the thread, kept across restarts
 
 def _alive(pid):
+    """Is this process running? Never signals it: on Windows os.kill(pid, 0) does not test a process, it terminates it."""
+    if not isinstance(pid, int) or pid <= 0:
+        return False
+    if os.name == 'nt':
+        import ctypes
+        k = ctypes.windll.kernel32
+        h = k.OpenProcess(0x1000, False, pid)   # PROCESS_QUERY_LIMITED_INFORMATION
+        if not h:
+            return False
+        code = ctypes.c_ulong()
+        ok = k.GetExitCodeProcess(h, ctypes.byref(code)); k.CloseHandle(h)
+        return bool(ok) and code.value == 259   # STILL_ACTIVE
     try:
         os.kill(pid, 0); return True
+    except PermissionError:
+        return True
     except Exception:
         return False
 

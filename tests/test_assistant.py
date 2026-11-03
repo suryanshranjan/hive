@@ -413,6 +413,12 @@ def flaky_handle(*a, **k):
 assistant.handle = flaky_handle
 assistant.listen(repo, poll=1, until=lambda: not fake.script, ch=telegram.Channel({'chat_id': ME, 'token': 'x', 'address': 'sir'}, api=fake, listener=True))
 assistant.handle = _handle
+other = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)'])   # another listener, still running
+open(assistant.PIDFILE, 'w').write(str(other.pid))
+check('a second listener refuses to start while one is running (live: two answered him)',
+      (assistant.listen(repo, poll=1, until=lambda: True, ch=telegram.Channel({'chat_id': ME, 'token': 'x'}, api=FakeTelegram([]))),
+       other.poll() is None), (1, True))
+other.kill(); other.wait()
 texts = [m['text'] for m in fake.sent]
 check('an old tap and a failing message do not stop the listener; it says sorry and answers the next',
       (any('went wrong on my side' in t for t in texts), any('The latest build' in t for t in texts)), (True, True))
