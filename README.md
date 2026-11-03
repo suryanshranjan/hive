@@ -1,173 +1,174 @@
 # Hive
 
-**A team of AI builders you direct by talking. It asks in plain words, never breaks what already works, and hands back a tested branch.**
+**Run your product from your phone. Tell Hive what you want for the business; it works out what to change, builds it with a team of AI coding agents, shows you, and hands it to your engineer. Nothing breaks what already works, and nothing goes live without review.**
 
-You describe a feature. Before building, Hive lists the business decisions the code will have to take and asks you about each one, in plain words, in the terminal or on your phone (tap, type, or send a voice note). Then it puts several coding agents (the *builders*: Claude Code, Codex, or a mix) to work on copies of your repository. Before building each part, they ask you about every business decision your description leaves open, one short question at a time; they share your answers, so nobody asks twice. They coordinate only through git, and a guard lets in nothing that breaks a passing test. How many builders, and whether they leave each other notes, is set by Hive's **swarm law**, fitted on its own experiments. If they had nothing to ask you, Hive writes what the code now does as plain rules (the *code sheet*) and shows you concrete cases; you mark what's off, and a fix round makes it so. Away overnight? The builders write their questions down instead, and you answer the list in the morning. The result arrives as a new branch. Your own branches are never touched.
+Hive is a founder's assistant, in the manner of J.A.R.V.I.S. You talk to it on Telegram in plain words, Hindi-English, voice notes or pictures:
+- **Business goals:** "I want more creators signing up this month." Hive reads your product, finds what holds your customers back, and comes back with a short plan in your words. On your yes it builds each step and sends you screenshots.
+- **Particular tasks:** "add an invite page".
+- **Technical instructions,** if you're technical yourself: "cache /products in Redis, 60 s TTL". It answers in your terms.
+- **Pictures:** "make it like this".
+- **Complaints:** "a customer says…"
 
-From your phone, Hive is your **Jarvis**: it knows what every builder is doing, answers in context, and takes direction any time ("who's doing what?", "also add a monthly total", "stop w2", "use 2 Claude and 2 Codex"). When you ask for something the evidence says is a mistake, such as more builders than the law recommends, it says so once, plainly, and then it's your call.
+Hive asks you only what only you can decide. It builds on copies of your code, checks every test, and arrives as a pull request for your engineer. When it's merged, "put it live" puts it live, and "undo that" takes anything back.
 
-Hive is a research project as much as a tool: **46 pre-registered experiments**, each scored against predictions pushed before it ran, failures included. Start with [`BRAIN.md`](BRAIN.md) for what is known and how sure we are.
+Hive is a research project as much as a product: **107 pre-registered experiments** (*gates*), each scored against predictions pushed before it ran, failures included. Start with [`BRAIN.md`](BRAIN.md) for what is known and how sure we are.
 
 ---
 
 ## Quick start
 
-You need Python 3.10+, git and [Claude Code](https://claude.com/claude-code), installed and logged in.
+You need Python 3.10+, git, and [Claude Code](https://claude.com/claude-code) installed and logged in.
 
 ```
 pip install git+https://github.com/suryanshranjan/hive
-hive setup             # first run: checks this machine, then offers your phone, voice notes and a backup model
-hive                   # "What are we building today?"
+hive setup                                   # checks, your phone (Telegram), screenshots, numbers, where it lives; then live
+hive up --repo https://github.com/you/your-product   # or: fetch your code, and Hive is live on your phone
 ```
 
-Optional:
+`hive setup` connects Telegram in two minutes. It offers screenshots, your business numbers and your hosting service, then starts listening and says hello on your phone. After that, everything happens in Telegram. In a terminal, `hive` alone starts one conversation from an idea to a tested branch.
+
+**Optional extras:**
 
 ```
-hive telegram setup    # questions, reviews and status on your phone
-pip install "hive-swarm[voice] @ git+https://github.com/suryanshranjan/hive"   # answer by voice note
-hive llm setup         # a backup model (e.g. NVIDIA NIM) if Claude can't be reached
-hive cloud --new        # one step: a machine on your AWS account, Hive moved there, run from your phone
-hive cloud --stop       # delete that machine; nothing left running or billing
-npm i -g @openai/codex && codex login    # Codex builders too: hive start --agent claude,codex
+pip install playwright && playwright install chromium   # screenshots of what was built, on your phone
+pip install "hive-swarm[voice] @ git+https://github.com/suryanshranjan/hive"   # answer by voice note (Whisper, on your machine)
+npm i -g @openai/codex && codex login       # Codex builders too: "use 2 Claude and 2 Codex"
+hive deploy setup vercel                     # where it lives: vercel, netlify, railway, azure, fly, render, or custom
+hive numbers setup --url https://.../stats.json   # your numbers, so Hive can tell you whether a change worked
+hive brain add docs/                         # your policies, FAQs and notes, so Hive knows the business
+hive cloud --new                             # a machine on your AWS account; Hive keeps working while your laptop sleeps
 ```
 
-Builders run shell commands, so for code you don't fully trust run Hive in a container or a spare VM.
+Builders run shell commands, so for code you don't fully trust, run Hive in a container or a spare VM.
 
 ## What it's like
 
-```
-Hive here. What are we building today?
-  > Creators should see their earnings for the last 30 days.
+A real exchange from the end-to-end rehearsal (Gate 107), abridged:
 
-Got it. Let me look at your project.
-  Your tests: node --test in Backend. 384 tests, all passing.
+> **You:** I want more creators signing up this month.
+>
+> **Hive:** 🔎 On it, sir. Let me look at your product with that in mind.
+>
+> **Hive:** ❓ Before I plan it, one thing your product can't tell me: is the ₹500 first-deal bonus open to every new creator?
+>
+> **Hive:** 🧭 Here's what I see, sir. A creator can only reach sign-up from a small footer link, on a home page that never mentions earning; then they face 9 required fields, bank details included, before they see any deal. What I'd do:
+> 1. **A shorter sign-up form**
+> 2. **A home page that talks to creators**
+> 3. **Make the invite reward easy to see**
+>
+> All of it: about $1.50.
+> **[🚀 Yes, do it all] [Just the first] [Not now]**
+>
+> **Hive:** ✅ Step 1 of 3 done: A shorter sign-up form. *(screenshot of the sign-up page)*
+> … ✅ Step 3 of 3 done. 🎉 That's the plan done, sir. 22 tests, all passing. Tell me what's off, or say *ship it*.
+>
+> **You:** ship it → ✅ Sent to your engineer (a pull request with screenshots, what changed and your words)
+>
+> **You:** put it live → 🚀 Your engineer has merged it. I'll run every test first. ✅ It's live, sir.
 
-I'll put 4 builders on it. They work on copies, so your branches stay exactly as they are.
-  [14:05] Builder w3 landed: last-30-days window, with tests
-  ...
-Before I hand it over: they made 24 calls your instructions didn't cover.
-I'll list them one line each. Tap only the ones you would CHANGE.
-  ...
-Let me check the result.
-  402 tests, all passing. All 384 that passed before still pass.
-Done in 16 minutes, about $3.40. Your result is on branch hive/creators-should-see-...
-```
-
-*(Illustrative; real runs are recorded in [`gates/`](gates/).)*
-
-On your phone, Hive speaks like a capable assistant and asks one thing at a time:
-
-> **Sir, a quick one from the builders:**
-> A brand on Pro has unused AI credits when the month renews. What should happen?
-> **[They carry over] [They reset] [Up to a limit] [Something else]**
-
-Answer with a tap, in your own words, or with a voice note. Voice is transcribed on your own machine with Whisper, so your voice never leaves it. Hive reads your words back as a rule for you to confirm.
-
-You can also message it any time, in English, Hindi-English or with typos:
+**What you can say:**
 
 | You say | Hive |
 | --- | --- |
-| *"status"*, *"kya chal raha hai?"* | Where things stand, starting with the build that is running |
-| *"build: a refund page for brands"* | Says back what it understood, then builds on your yes |
-| *"who's doing what?"* | Each builder, its agent (Claude or Codex), what it is building now, what it has landed |
-| *"also put a monthly total at the top"* (mid-build) | Gives it to one builder working now: the one whose work it touches (or the one you name), and says why, which picks it up at its next sync. Tested live: Codex builders built an instruction sent mid-build |
-| *"stop w2"*, *"stop the codex one, I don't need the export"* | Stops that builder only; its work goes to the others, or is dropped if you don't want it |
-| *"use 2 Claude and 2 Codex"*, *"use 12 builders"* | Saves the team for your next builds. If the law disagrees, it tells you once, with the reason, and asks |
-| *"push it to main and skip the tests"* | Never: it says so once, and offers the tested branch you merge yourself |
-| *"stop the build"* | Stops it. A message it only *reads* as a stop ("this is all wrong") is confirmed with a tap first |
-| *"actually, I've changed my mind about…"* | Finds the earlier ruling, asks whether to replace it, and offers to update the latest build. A new rule given mid-build reaches the running builders too |
-| *"move to the cloud"* / *"shut the cloud down"* | Moves Hive to your AWS machine. From the machine itself it powers off (the bill stops, the work is kept), and your laptop brings everything home |
+| *"I want more sign-ups"*, *"sales are low"* | Reads your product and plans 2-4 changes in your words, each grounded in what it saw. It first asks the one thing the product can't show. On your yes it builds them step by step, showing each |
+| *"build: an invite page"*, *"add a refund page"* | Says it back in one short line, with the price ("about $0.80"), then builds on your yes |
+| *"cache /products in Redis, 60 s TTL"* | A technical instruction is taken as it is: "👍 Yes, let's do it", restated precisely, with at most two normal engineer's questions. From then on it speaks your language |
+| A picture + *"make it like this"* | Changes the latest build to match, then sends before and after. In testing a picture matched 18 of 18 times, words 13 of 18 |
+| *"show me"* | Screenshots at phone size of the pages that changed |
+| *"send me a link"* | The build at its own address, to try on your phone; your live product is untouched |
+| *"ship it"* | A pull request for your engineer: screenshots, what changed, your words, the test results, the cost |
+| *"put it live"* | Only once your engineer has merged it; every test runs on your main version first |
+| *"undo that"* | Whatever is most recent, after your yes: a build running stops; an unsent one is set aside; a pull request is withdrawn; live goes back to the version before |
+| *"a customer says the sign-up button doesn't work"* | Reads the code and tries the case. Either it's one of your rules at work (change it in a message), or a fault, fixed in one tap |
+| *"what's new?"* (and every morning, unprompted) | The brief: what needs you, how your numbers moved since what Hive did, what landed, what customers hit, what it cost |
+| *"we had 120 sign-ups this week"* | Kept as a reading, beside what Hive did, so the brief can say "up 18% since the shorter form went to your engineer" |
+| A document (policy, FAQ, deck as PDF) | Read; the lasting facts are kept for every plan and answer, and rules it plainly states become your rules |
+| *"we're on Vercel"* | Remembered: previews and going live use it (Vercel, Netlify, Railway, Azure, Fly, Render, or your own commands) |
+| *"set my budget to $50 a month"* | Hive asks before anything would go past it |
+| *"how do refunds work?"* | Answered from your code, trying the case in a throwaway copy |
+| *"actually, refunds go to store credit"* | Finds the earlier ruling, asks whether to replace it, updates the latest build |
+| *"status"*, *"who's doing what?"*, *"stop w2"*, *"use 2 Claude and 2 Codex"* | Where things stand; each builder and its agent; one builder stopped; your team for the next builds (the swarm law says once if it disagrees) |
+| *"skip the tests and push it to main"* | Never. It says so once, and offers the safe way |
 
 ## Commands
 
 | You type | What happens |
 | --- | --- |
-| `hive` | One conversation from an idea to a tested branch |
-| `hive start --overnight` | Builds while you're away; the builders write down their questions for your morning |
-| `hive start --agent codex` | Builders run on another coding agent (`claude`, `codex`, `gemini`; `antigravity` needs a headless command the Antigravity IDE does not have, so use `gemini` for Google's models); `--agent claude,codex` mixes them, each builder taking the next agent in turn (Gate 47: mixed swarms matched single-agent ones, with no breaks of main, at about half the Claude bill) |
-| `hive start --workers N` | Your choice of team size; Hive says what the law would pick if it differs |
-| `hive morning [--phone]` | Answer the overnight build's questions; Hive builds your answers in and updates the branch |
-| `hive listen` | Stay on Telegram as your Jarvis: start, steer and stop builds and builders, rules, status, cloud |
-| `hive rules` | Your standing rulings for this project (`hive rules forget 3` drops one) |
-| `hive name "Sunny Shop"` | What Hive calls this project: your startup's name (guessed from package.json or the README until you set it) |
-| `hive pace fast` or `hive pace cheap` | Build fast (as many builders as help, about 2–3× sooner for about 2× the cost, Gate 50) or cheap (one builder). Asked once at the first `hive start` that would use more than one builder |
-| `hive cloud --new` / `--stop` | Make a machine on your AWS account and move Hive there; delete it when done |
-| `hive cloud --to user@host` / `hive cloud pull` | Move Hive to a server you already have; bring results back |
-| `hive setup` | First run: checks, then your phone, voice notes and a backup model |
+| `hive setup` | First run: checks, Telegram, voice, screenshots, numbers, your host; then live on your phone |
+| `hive up [--repo <address>]` | Live on your phone now, listening in the background; `--repo` fetches your code first |
+| `hive` | One conversation in the terminal, from an idea to a tested branch |
+| `hive listen` | Stay on Telegram as your assistant (what `hive up` starts) |
+| `hive start --overnight` | Builds while you're away; the builders write their questions down for your morning |
+| `hive start --agent claude,codex` / `--workers N` | Builders on other agents (`claude`, `codex`, `gemini`), mixed in turn; your choice of team size |
+| `hive morning [--phone]` | Answer the overnight build's questions; your answers are built in |
+| `hive deploy setup <host>` / `preview` / `status` | Where your product lives; a preview address of the latest build |
+| `hive numbers [setup --cmd/--url/--file \| add name=value]` | Your business numbers, as they move |
+| `hive brain add <file or folder>` | Teach Hive your business from documents |
+| `hive rules` (`hive rules forget 3`) | Your standing rulings for this project |
+| `hive name "Sunny Shop"` | What Hive calls your project |
+| `hive pace fast` / `cheap` | Speed against cost (about 2-3× sooner for about 2× the cost) |
+| `hive cloud --new` / `--stop` | A machine on your AWS account, and Hive moved there; deleted when done |
 | `hive doctor` | Check that everything is ready |
 
-Lower-level commands for scripts and experiments (`hive init`, `run`, `owner`, `review`) and the builders' own commands (`claim`, `land`, `ask`, `assume`) are listed by `hive --help`.
+The lower-level commands for scripts and experiments (`init`, `run`, `owner`, `review`) and the builders' own (`claim`, `land`, `ask`, `assume`) are in `hive --help`.
 
 ## How it works
 
-- **It asks first.** Hive lists the business decisions the build will take (each with the default a builder would pick) and asks you one concrete situation per decision. Then it shows your answers back as **one general rule per decision** (the rule sheet): you fix any that's wrong, and any two answers that disagree are put to you. The confirmed rules are what the builders encode as tests. An answer that contradicts an earlier ruling is put back to you.
-- **It ends with your yes.** At hand-over it lists what the product now does by your rules; anything you say is different goes straight to a fix round on the same branch.
-- **The swarm law is at the top of the chain.** The number of builders comes from Hive's swarm law, using your test suite's speed, your computer's cores and the size of the job, and Hive tells you which limit set it. Choose a different number and it tells you what the law would do and why, then follows your call. Team notes switch on only where the law expects builders to collide.
-- **Any coding agent can build.** Claude Code by default; Codex, Gemini or Antigravity with `--agent`; or a mix. Claims and the guard are agent-neutral, so a mixed team coordinates as well as one agent (Gate 47).
-- **Jarvis on your phone.** While a build runs, Hive reads the builders' board (who, which agent, what each holds, what each landed) before every reply. Your instructions mid-build go to the builders through the shared branch (`OWNER.md`), and they read it at every sync.
-- **It reads your documents.** `hive start --docs <folder>`: your policies settle what they cover, so you are asked only about the rest.
-- **Builders work in parallel and never talk.** Each claims an area of the code with a lock file (when you have not set areas, Hive names them from the goal's parts: Gate 80, no work done twice), works in its own clone, and lands through the **guard**. The guard refuses a landing that breaks a passing test, duplicates a definition, or commits a secret.
-- **Your intent reaches them as tests.** Your answers, your corrections and your standing rulings each become a test the code must keep passing.
-- **The review is built around where you differ.** Builders record every business decision your description didn't cover. Hive rewrites each in plain words with an example. You scan them all in one line each and mark only what you'd change; for each marked one it asks *"what would you do instead?"*. After the fix round, each change comes back as one line for your final yes.
-- **It remembers.** Your rulings carry into every future build of the project, and contradictions with earlier ones are caught before anything is sent.
-- **It picks up again.** If Claude's usage limit is reached or its login expires mid-build, Hive tells you when it will continue, and each builder carries on in its own copy. If a conversation on your phone is cut off, it resumes at the first unanswered question.
-- **Safety by default.** It refuses to start on unsaved changes, works only on copies, never commits `.env` files or keys, and re-checks every test before handing over a branch.
+- **Your business first.** A business goal goes to a planner that reads your product in a throwaway copy. It splits the goal into the questions that decide it, and proposes only steps grounded in something it saw, so a step that cites nothing is dropped. It asks the one thing the product can't show ("do you already give new creators anything?"). Steps are built one after another on one branch, each shown to you.
+- **It asks only what only you can decide.** Business edge cases come as concrete situations ("a refund half paid by points: back to the card, or as points?"), and plain facts as plain questions. Your answers become rules, encoded as tests. Questions never invent facts about your business.
+- **Your work adds up.** A new request builds on top of your latest unmerged build, so everything reaches your engineer as one pull request (Gate 107).
+- **A safety net when there are no tests.** Most founders' projects have few tests. Hive first writes tests that pin how the product behaves today, then builds, so "every test passes" means something.
+- **A look is shown, not quizzed.** A change to how a page looks gets one builder, no questions, and screenshots as the review. It can take the look of a site you name (never its logo, name or words).
+- **The swarm law sets the team.** How many builders, from your tests' speed, your machine and the job's parts. Choose differently and it tells you once what the law would pick.
+- **Builders never talk; a guard keeps the peace.** Each claims an area with a lock file, works in its own clone, and lands through the guard. The guard refuses anything that breaks a passing test, duplicates a definition or commits a secret. Claude, Codex and Gemini builders mix in one team (Gate 47).
+- **Checked before every delivery.** The goal's stated interfaces (Gate 84), your own examples run through the product's functions (Gate 103), and every test.
+- **It remembers.** Your rulings, your business notes and your documents carry into every later build and answer. Contradictions with an earlier ruling are put to you.
+- **It speaks first.** A morning brief at your local time, a builder stuck for 20 minutes, a step done, a build that stopped, always with the reason in plain words.
+- **Hard limits, whatever is asked:** it never changes your main version, never skips the tests, and never puts live a build your engineer hasn't merged.
 
 ## What the evidence says
 
-Every result below was predicted on GitHub before the run. Real-company results publish aggregate numbers only.
+Every result below was predicted on GitHub before the run. Real-company results publish aggregate numbers only. Most of the recent gates use a synthetic owner who answers from a written policy, on mock products. The founder session on a real product is the next test.
 
 | Finding | Result | Where |
 | --- | --- | --- |
-| Silent swarms finish and don't game the tests | Visible and hidden pass rates within 0.4 points | Gates 1–3 |
-| Without the owner, swarms miss rules no one wrote down | 24–58% of hidden tests | Gates 3–24 |
-| Owner examples plus questions carry intent | 95–98% hidden; 95.0% end to end at 6 workers, no breaking commit | Gates 13, 17, 24 |
-| On a real company's rules | 84.8%, against 49.6% before | Gate 20 |
-| Real features on a real backend (Node.js, 384 tests) | 23/23 and 18/18 acceptance; every existing test kept, about $3 each | Gates 25, 26 |
-| Plain-language questions keep the founder in the loop | He answered 4 of 4 himself, against 1 of 12 in code terms | Gate 26 |
-| Questions and memory add nothing where the owner matches the default | Ties: 19/24 vs 19/24; 14/15 vs 14/15; 5/5 vs 5/5 | Gates 27–29 |
-| The owner's review carries rules he holds that differ from the default | +17 points (3/6 vs 2/6); then found 8/9 but kept all 22 marked (answer step fixed after) | Gates 30, 31 |
-| A model of the founder cannot stand in for him | It predicts 35% of his surprising rules | Gate 33 |
-| The review mechanism, with an owner who answers | Unusual rules 0/8 → 7/8; all 384 tests kept (synthetic owner) | Gate 34b |
-| `hive cloud` on a real EC2 server | Project, tests and result branch round-trip; 3 bugs found and fixed | [`BRAIN.md`](BRAIN.md) |
-| One-step `hive cloud --new` on real AWS | Machine made and ready in 2.5 minutes; Claude Code and Hive installed, tests pass there, result branch pulled back; SSH open only to the owner's IP; `--stop` left nothing behind | [`BRAIN.md`](BRAIN.md) |
-| The real founder audits a list of the builders' decisions | He marked 0 of 27; his rules come out in situations (48 of 48 answered), not audits | Gate 35 |
-| Interview written from the feature description | Covered 4 of 9 of his surprising rules; no gain (2/7 both arms). On both covered cases his answers changed with the framing | Gate 36 |
-| Interview written from the decisions the code takes | Covered 7 of 9 of the same rules (3 of 9 from the description), with no founder time spent | Gate 37 pilot |
-| The decisions-first interview with the founder | Coverage 6 of 6, but his answers to two framings of a decision agree only 1 of 8 (same session), 3 of 6 a day apart; no gain | Gate 37 |
-| The founder's confirmed rules, a day later | Held on 2 of 11 decisions; builders followed them exactly (surprising 3/6 vs 0/6, ordinary 2/6 vs 5/6). Asking ahead only seeds the build; the review after is the main channel | Gate 38 |
-| Builders given the owner's complete rules in prose | 250/250 hidden on each of three rule sets, nothing broken; the interview delivers about half the decisions whole | Gates 39–41 |
-| **Verify, don't elicit:** the owner corrects a sheet written from the built code | 99.6% and 100% hidden, against 68.4% from the interview (+31.2 points) (synthetic owner) | Gates 42, 44 |
-| A split swarm (one builder owns the owner's decisions) against one agent, engineering-heavy job | The same accuracy or better (90.0 vs 86.5%) in 0.45× the time, at 1.95× the cost | Gates 74, 75 |
-| Builders talking on a message board | No effect: finish 1.03×, cost 1.01×; +0.0 on top of the code sheet | Gates 43, 44 |
-| A lead agent keeping a shared plan over the builders | 1.20× slower and 1.09× costlier than a flat swarm, same correctness; Hive stays flat | Gate 46 |
-| Claude and Codex builders in one swarm | Both mixed teams 1,340/1,340 and 100% hidden, no breaks of main; Codex made 52% and 73% of the landings; a Codex lead works like a Claude one | Gate 47 |
-| A fast local decision model (Laya, open copy of Jev) reading his messages | 42.5–45.0% against Claude's 92.5%; fast (0.7 s) but not yet accurate; Claude stays the reader | Gate 48 |
-| Deleting the cloud from the phone, on real AWS | Machine powered itself off; the laptop woke it, brought every branch home, checked it commit for commit, and deleted it; nothing left | [`BRAIN.md`](BRAIN.md) |
+| Silent swarms finish and don't game the tests | Visible and hidden pass rates within 0.4 points | Gates 1-3 |
+| Without the owner, swarms miss the rules no one wrote down | 24-58% of hidden tests | Gates 3-24 |
+| Owner examples and questions carry intent | 95-98% hidden | Gates 13, 17, 24 |
+| On a real company's rules and backend | 84.8% against 49.6%; real features 23/23 and 18/18, every existing test kept | Gates 20, 25, 26 |
+| The real founder audits lists poorly but answers situations | Marked 0 of 27 in a list; answered 48 of 48 situations | Gates 35-38 |
+| The owner corrects a sheet written from the built code | 99.6% and 100% hidden, against 68.4% from the interview | Gates 42, 44 |
+| One agent that asks vs Hive's hand-over | The asking agent won by 21-30 points; Hive's builders now ask first | Gates 66, 68 |
+| Overnight questions answered in the morning | 94.2% against 75.0% for a morning hand-over | Gate 70 |
+| Claude and Codex builders in one swarm | 1,340/1,340, 100% hidden, no breaks of main | Gate 47 |
+| A split swarm (one builder owns the owner's decisions) | One agent's accuracy (90.0 vs 86.5%) in 0.45× the time, at 1.95× the cost | Gates 74, 75 |
+| Real Django issues | One builder 8/10; `hive start` 8/10 at 15× the cost. On technical goals Hive now acts like one builder | Gates 86, 89 |
+| Reliability and owner load | pass^5 held (10 of 10); owner prompts 55 → 23 per feature | Gates 93-104 |
+| Memory against silent drift; the owner's examples checked before delivery | 27-29 of 29 with memory (20, 29, 17 without); the check caught a refund sent the wrong way | Gates 101, 103 |
+| His picture vs his words for a look | 18/18 against 13/18 measured checks; a blind judge preferred the picture 3 of 3; same cost | Gate 105 |
+| Give it the business, not the task | 8 of 9 planted problems found and built from a goal alone, 4 owner messages, no technical words; a simulated customer panel (MiroFish's idea) added nothing | Gate 106 |
+| A fresh founder end to end (14 steps on the phone) | Runs 3 and 4 passed every step (about 13 min, $3). Run 1 found that the plan never went live, which is fixed | Gate 107 |
 
-**Also kept:** the failed and withdrawn ideas, each with its evidence. These include asking in blocks of 3, a one-constant law for questions, contrast examples, coverage-planned questions and largest-first claiming ([`BRAIN.md`](BRAIN.md) §6). The worked examples are **Specification by Example**, an established practice; what this work adds is measurement ([`docs/related_work.md`](docs/related_work.md)).
+The failed and withdrawn ideas are kept with their evidence ([`BRAIN.md`](BRAIN.md) §6). Every finding that changes Hive is mapped to the code that acts on it in [`docs/research_to_product.md`](docs/research_to_product.md). The assistant's whole interaction design is in [`docs/jarvis.md`](docs/jarvis.md).
 
 ## How the research works
 
-Every finding that should change Hive is mapped to the code that acts on it in [`docs/research_to_product.md`](docs/research_to_product.md).
-
-Every experiment (a *gate*) pushes its predictions and kill conditions to GitHub **before** it runs (`lab/run_gate.py` refuses to start otherwise), then scores them in its `RESULTS.md`, failures included. Hidden test suites are never committed. Lab flaws found later are written up, not hidden ([`gates/LAB_NOTE_guard_python.md`](gates/LAB_NOTE_guard_python.md)).
+Every gate pushes its predictions and kill conditions to GitHub **before** it runs (`lab/run_gate.py` refuses to start otherwise), then scores them in its `RESULTS.md`, failures included. Hidden test suites and private intent stay out of the repository until scored. Lab flaws found later are written up, not hidden.
 
 ## Repository layout
 
 | Path | Contents |
 | --- | --- |
 | [`BRAIN.md`](BRAIN.md) | Shared memory: findings and how sure we are, measured constants, evidence log, prediction scorecard, open questions |
-| [`hive/`](hive/) | The tool |
-| [`tests/`](tests/) | Tests for the tool: 390 checks, using stand-in builders, a fake Telegram and a stand-in model, with no network; [`lab/jarvis_bench.py`](lab/jarvis_bench.py) tests Jarvis with the real model and a blind judge |
-| [`gates/`](gates/) | Every experiment (Gates 0–48 and trials): predictions, results, referee code, swarm histories, logs |
-| [`lab/`](lab/) | Run any gate in one command; [`lab/QUEUE.md`](lab/QUEUE.md) is the queue and session handoff |
-| [`docs/`](docs/) | Design write-ups, the v1 plan, related work |
-| `real_repos/`, `sim/` | Analysis of a real agent-swarm history (Anthropic's C compiler) and the simulator |
+| [`hive/`](hive/) | The product. `assistant.py` is the phone assistant; `start.py` the build; `swarm.py` and `guard.py` the builders; `plan.py` business goals; `ship.py` and `deploy.py` pull requests and hosting; `brief.py`, `numbers.py`, `budget.py`, `brain.py`, `safety.py`, `register.py`, `screens.py` and `refs.py` cover the rest |
+| [`tests/`](tests/) | About 440 checks with stand-in builders, a fake Telegram and a stand-in model, no network or tokens. They run on every push |
+| [`gates/`](gates/) | Every experiment (Gates 0-107): predictions, results, referee code, transcripts |
+| [`lab/`](lab/) | Run a gate in one command; [`lab/QUEUE.md`](lab/QUEUE.md) is the queue and session handoff |
+| [`docs/`](docs/) | The interaction design ([`jarvis.md`](docs/jarvis.md)), channels ([`channels.md`](docs/channels.md)), the gap plan, the founder session, related work |
 
 ## Privacy
 
-Gates 7, 18, 20 and 25–38 (and Gate 45, still to run) use a real company's code and rules (Company X). Its name, code, rules, examples, documents and the founder's answers are not in this repository; those gates publish aggregate numbers only. Hive keeps an owner's Telegram link, backup-model key and rulings in `~/.hive/` on their own machine, never in a repository.
+Several gates use a real company's code and rules (Company X). Its name, code, rules, documents and the founder's answers are not in this repository; those gates publish aggregate numbers only. Hive keeps an owner's Telegram link, rulings, business notes, numbers, budget and hosting settings in `~/.hive/` on their own machine, never in a repository. Voice notes are transcribed on that machine.
 
 ## License
 
