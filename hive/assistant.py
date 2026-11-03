@@ -137,6 +137,11 @@ def facts(repo, ch=None):
               'Running on his computer.'),
              (f"Latest build: branch hive/{st['name']}. {st.get('check', '')}" if st else 'Nothing built on this project yet.'),
              f"Standing rules he has given for this project: {len(memory.load(repo))}."]
+    try:
+        from . import numbers
+        lines += [f'His numbers: {x}' for x in numbers.changes(repo)[:6]]
+    except Exception:
+        pass
     if name:
         lines.insert(0, f'His startup, and this project, is called {name}.')
     if _building():
@@ -320,6 +325,14 @@ def ship_it(ch, repo, text, poll):
     if choice != 'shp|yes':
         ch.send('Very good. It stays here until you say.'); return 'not_shipped'
     r = ship.ship(repo, st)
+    if r['ok']:   # for the brief and his numbers: what went to his engineer, and when
+        from . import numbers
+        numbers.mark(repo, f'"{ship.title(st)[6:][:80]}" went to your engineer')
+        try:
+            st['shipped'] = time.time()
+            json.dump(st, open(os.path.join(st.get('home') or os.path.join(RUNS, st['name']), 'state.json'), 'w'), indent=1)
+        except (OSError, KeyError, TypeError):
+            pass
     if not r['ok']:
         ch.send({'no_remote': "⚠️ Your project has no online home I can send it to (no remote). It's ready here on "
                               f"branch <code>{r['branch']}</code>; your engineer can merge that directly.",
@@ -455,6 +468,12 @@ def remember(ch, repo, text):
     import threading
     history = ch.recent() if hasattr(ch, 'recent') else ''
     def run():
+        if re.search(r'\d', text):   # "we had 120 sign-ups this week": his numbers, kept with the time
+            try:
+                from . import numbers
+                numbers.told(repo, text)
+            except Exception:
+                pass
         try:
             got = explain.ask_json(REMEMBER.format(text=text, history=history))
             note = got.get('note') if isinstance(got, dict) else None
@@ -740,6 +759,8 @@ def complaint(ch, repo, text, poll, apply_build=None):
     "a customer says X" should get "that's your rule 3, sir; want it changed?", not a search through the code."""
     rules = memory.load(repo)
     listing = '\n'.join(f'{n}. {r["text"]}' for n, r in enumerate(rules, 1)) or '(none yet)'
+    from . import numbers
+    numbers.mark(repo, text[:200], kind='complaint')   # for the brief: what customers hit
     answer = look(ch, repo, COMPLAINT.format(text=text, rules=listing))
     if not answer:
         ch.send("🐝 I couldn't trace that one just now, sir. Tell me what the customer did, step by step, and I'll try again.")
@@ -770,10 +791,13 @@ def complaint(ch, repo, text, poll, apply_build=None):
     ch.send('🐝 ' + telegram.esc(said), html=True)
     return 'complaint_bug' if verdict == 'bug' else 'complaint_unclear'
 
+BRIEF_WORDS = re.compile(r"^\s*(what'?s new|whats up|any news|brief( me)?|morning brief|catch me up|update me|kya naya|"
+                         r"kya chal raha)\b")
+
 PLAN = {}   # the plan he said yes to: {'goal', 'steps', 'step', 'running'}
-GOAL_WORDS = re.compile(r"^\s*(i want|we need|help me|how (do|can) (i|we))\b[^.?!]{0,60}\b(more|fewer|less|increase|grow|"
-                        r"reduce|boost|improve|get)\b|\b(badhana|badhao|zyada|kam karna)\b|\b(sign-?ups?|signups|sales|"
-                        r"conversions?|retention|churn|engagement)\b[^.?!]{0,30}\b(low|down|dropping|falling|bad|weak)\b")
+GOAL_WORDS = re.compile(r"(^|[.!?]\s*)(i want|we need|help me|how (do|can) (i|we))\b[^.?!]{0,60}\b(more|fewer|increase|"
+                        r"grow|reduce|boost|get more|get them)\b|\b(badhana|badhao|zyada|kam karna)\b|\b(sign-?ups?|signups|"
+                        r"sales|conversions?|retention|churn|engagement)\b[^.?!]{0,30}\b(low|down|dropping|falling|bad|weak)\b")
 
 def pursue(ch, repo, text, poll, apply_build=None, run=True):
     """A business goal ("I want more creators signing up"): read his product, propose a plan in his words, ask the few
@@ -782,15 +806,26 @@ def pursue(ch, repo, text, poll, apply_build=None, run=True):
     from . import plan as planner
     ch.send("🔎 On it, sir. Let me look at your product with that in mind; a minute or two.")
     import threading
-    box, done = {}, threading.Event()
     def think():
-        box['plan'] = planner.make(repo, text, memory.notes(repo), [r['text'] for r in memory.load(repo)])
-        done.set()
-    threading.Thread(target=think, daemon=True).start()
-    while not done.wait(4):
-        if callable(getattr(ch, 'typing', None)):
-            ch.typing()
-    p = box.get('plan')
+        box, done = {}, threading.Event()
+        def go():
+            box['plan'] = planner.make(repo, text, memory.notes(repo), [r['text'] for r in memory.load(repo)])
+            done.set()
+        threading.Thread(target=go, daemon=True).start()
+        while not done.wait(4):
+            if callable(getattr(ch, 'typing', None)):
+                ch.typing()
+        return box.get('plan')
+    p = think()
+    if p and p.get('missing'):   # what the product can't show (Gate 106's one miss: a reward only in his payouts)
+        ch.send(f"❓ <b>Before I plan it, one thing your product can't tell me:</b>\n{telegram.esc(p['missing'])}", html=True,
+                buttons=[[('Nothing to add', 'pm|none')]])
+        kind, ans = telegram._wait(ch, poll, {'pm|none'})
+        said = (ans or '').strip() if kind != 'tap' else ''
+        if said and not re.fullmatch(r"(no|nope|nothing|none|nahi|kuch nahi|no,? nothing)[.! ]*", said.lower()):
+            memory.add_note(repo, f"{p['missing']} {said}")   # kept for every later plan, and planned with now
+            ch.send("Thank you, sir. Planning with that in mind.")
+            p = think() or p
     if not p:
         ch.send("🐝 I couldn't find a clear way to that in your product as it stands, sir. Tell me a bit more about what "
                 "you're seeing, or what you'd try, and I'll look again.")
@@ -822,6 +857,9 @@ def pursue(ch, repo, text, poll, apply_build=None, run=True):
         if answers[-1]:
             memory.add(repo, f"{s['decide']} {answers[-1]}", 'plan')   # his decision is kept for every later build
     PLAN.update(goal=text, steps=steps, step=1, running=True, answers=answers, cost=p.get('cost', 0))
+    from . import numbers
+    numbers.refresh(repo)   # where his numbers stand before the change, to compare with later
+    numbers.mark(repo, f'you agreed the plan for "{text[:80]}"')
     ch.send(f"🛠 Right, sir. {'Building the first step now' if len(steps) > 1 else 'Building it now'}: "
             f"{telegram.esc(steps[0]['title'])}. I'll show you each step as it lands; say \"status\" any time.", html=True)
     if run:
@@ -886,6 +924,8 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         got = {'intent': 'show'}
     elif SHIP_WORDS.search(low):
         got = {'intent': 'ship'}
+    elif BRIEF_WORDS.search(low):
+        got = {'intent': 'brief'}
     elif COMPLAINT_WORDS.search(low) and not (_building() or '').startswith('A build is running'):
         got = {'intent': 'complaint'}
     elif GOAL_WORDS.search(low) and not (_building() or '').startswith('A build is running'):
@@ -901,6 +941,10 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         return 'shown'
     if intent == 'ship':   # "ship it": the latest build to his engineer, as a pull request
         return ship_it(ch, repo, text, poll)
+    if intent == 'brief':   # "what's new?": the brief, now
+        from . import brief
+        brief.send(ch, repo, since=time.time() - 86400)
+        return 'brief'
     if intent == 'complaint':   # a customer's complaint: his own rule at work, or a fault to fix
         return complaint(ch, repo, text, poll, apply_build)
     if intent == 'goal':   # a business outcome: Hive works out what to change, and does it on his yes
@@ -1148,6 +1192,12 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
           flush=True)
     try:
         while not (until and until()):
+            try:   # the morning brief, unprompted, once a day
+                from . import brief
+                if brief.due() and not telegram.busy_elsewhere():
+                    brief.send(ch, repo)
+            except Exception as e:
+                print(f'Could not send the brief: {e!r}', flush=True)
             if telegram.busy_elsewhere():
                 time.sleep(poll); continue   # a build or review is talking to the owner: step aside
             try:

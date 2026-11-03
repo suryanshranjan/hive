@@ -76,6 +76,12 @@ def setup(repo='.', ask=input, claude_probe=True):
     if missing:
         print(f"\nFix {'that' if len(missing) == 1 else 'those'} first, then run hive setup again.")
         return 1
+    raw_ask = ask
+    def ask(q):   # no more input (a closed terminal, a script) is a no, never a crash
+        try:
+            return raw_ask(q)
+        except EOFError:
+            return ''
     yes = lambda q: ask(f'\n{q} [y/N] > ').strip().lower() in ('y', 'yes')
     from . import voice
     if not telegram.load() and yes('Would you like questions and reviews on your phone, through Telegram?'):
@@ -87,7 +93,52 @@ def setup(repo='.', ask=input, claude_probe=True):
               '  That did not install; you can try later: pip install "hive-swarm[voice]"')
     if not os.path.exists(explain.BACKUP) and yes('Add a backup model, used only if Claude cannot be reached?'):
         explain.setup_backup()
+    from . import numbers, screens
+    if telegram.load() and not screens.available() and yes('Would you like screenshots of what was built on your phone? '
+                                                            '(installs a browser for Hive, about 150 MB)'):
+        r = subprocess.run([sys.executable, '-m', 'pip', 'install', 'playwright'])
+        r = r.returncode == 0 and subprocess.run([sys.executable, '-m', 'playwright', 'install', 'chromium']).returncode == 0
+        print('  Screenshots are ready.' if r else '  That did not install; later: pip install playwright, then '
+              'playwright install chromium')
+    if not numbers.source(repo) and yes('Can Hive read your business numbers (sign-ups, sales), to tell you whether a '
+                                        'change worked?'):
+        how = ask("  How? Paste a command that prints them as JSON, a web address that returns JSON, or a JSON file in "
+                  "this project. (Your engineer can set this up; Enter to skip. You can also just tell me your numbers on "
+                  "Telegram.)\n  > ").strip()
+        if how:
+            src = numbers.set_source(repo, url=how if how.startswith(('http://', 'https://')) else None,
+                                     file=how if how.endswith('.json') and not how.startswith('http') else None,
+                                     cmd=how if not how.startswith(('http://', 'https://')) and not how.endswith('.json') else None)
+            got = numbers.refresh(repo)
+            print(f"  Read {len(got)} number{'s' if len(got) != 1 else ''}: " + ', '.join(f'{k} {v:g}' for k, v in got.items())
+                  if got else f"  Saved ({next(iter(src))}), but it gave me no numbers yet; I'll keep trying.")
+    if telegram.load() and yes('Start me on your phone now? (I keep listening in the background on this computer)'):
+        return go_live(repo)
     print("\nAll set. Type `hive` in your project folder and tell me what to build.")
+    return 0
+
+def go_live(repo='.'):
+    """Start Jarvis listening in the background on this computer, and say hello on his phone. One listener only."""
+    from . import assistant, memory
+    try:
+        other = int(open(assistant.PIDFILE).read().strip())
+        if telegram._alive(other):
+            print(f'\nI am already listening on this computer (process {other}). Say hello on Telegram.'); return 0
+    except (OSError, ValueError):
+        pass
+    log = os.path.join(os.path.expanduser('~'), '.hive', 'listen.log')
+    os.makedirs(os.path.dirname(log), exist_ok=True)
+    flags = dict(creationflags=0x00000008 | 0x00000200) if os.name == 'nt' else dict(start_new_session=True)
+    subprocess.Popen([sys.executable, '-m', 'hive', 'listen'], cwd=os.path.abspath(repo), stdout=open(log, 'a'),
+                     stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, **flags)
+    ch = telegram.Channel(telegram.load())
+    name = memory.project_name(repo) or 'your project'
+    who = ch.name() or 'sir'
+    ch.send(f"🐝 <b>At your service, {telegram.esc(who)}.</b> I'm on {telegram.esc(name)}, and I'll stay here.\n\n"
+            "Tell me what you want for the business (\"I want more sign-ups\"), something to build, or send a picture "
+            "of what you like. Say \"show me\" any time, \"ship it\" when you're happy, and I'll brief you each morning.",
+            html=True)
+    print(f'\nI am live on your phone. Close this window if you like; I keep listening (log: {log}).')
     return 0
 
 def main(repo='.', claude_probe=True):

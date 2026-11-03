@@ -32,8 +32,12 @@ anything outside the product. For each step:
 - "decide": a question only he can answer, because it is about his business (an amount, a promise to customers, what
   can wait), with 2 or 3 short "options"; empty if the step needs nothing from him. Never ask what the code, the page
   or common sense can settle. At most 2 steps may have a question.
+Also think about what the product cannot show you: something only he would know that would change this plan (an
+offer or reward his business already gives that the pages never mention, a promise, a limit). If there is likely to
+be one, put it as "missing": one short plain question to him ("Do you already give new creators anything for their
+first deal that the site doesn't mention?"); else "".
 Reply with JSON only:
-{{"finding": "one sentence: the main thing holding his customers back, as you saw it",
+{{"finding": "one sentence: the main thing holding his customers back, as you saw it", "missing": "",
   "steps": [{{"title": "...", "why": "...", "seen": "...", "build": "...", "look": false, "decide": "", "options": []}}]}}"""
 
 PANEL = """Here is a plan to change a product, and what we know about the business and its customers.
@@ -82,7 +86,8 @@ def clean(plan):
                       'build': str(s['build']).strip(), 'look': bool(s.get('look')),
                       'decide': q if q and sum(1 for x in steps if x['decide']) < 2 else '', 'options': opts if q else []})
     steps = steps[:4]
-    out = {'finding': str(plan.get('finding', '')).strip()[:300], 'steps': steps}
+    out = {'finding': str(plan.get('finding', '')).strip()[:300], 'steps': steps,
+           'missing': str(plan.get('missing') or '').strip()[:300]}
     if isinstance(plan.get('panel'), list):
         out['panel'] = [p for p in plan['panel'] if isinstance(p, dict)][:5]; out['changed'] = str(plan.get('changed', ''))[:300]
     return out if steps else None

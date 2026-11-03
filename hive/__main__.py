@@ -139,7 +139,9 @@ def build_parser():
     st.add_argument('--agent', type=agent_choice)   # which coding agent builds, or a mix (claude,codex)
     st.add_argument('--save-agent', action='store_true')   # remember --agent for every build on this computer
     st.add_argument('--overnight', action='store_true'); st.add_argument('--no-interview', action='store_true')   # no questions; check the assumptions later with `hive morning`
-    sub.add_parser('doctor'); sub.add_parser('setup')
+    sub.add_parser('doctor'); sub.add_parser('setup'); sub.add_parser('up')   # up: live on his phone, listening
+    nu = sub.add_parser('numbers'); nu.add_argument('action', nargs='?', choices=['setup', 'add'])
+    nu.add_argument('values', nargs='*'); nu.add_argument('--cmd', dest='cmd_'); nu.add_argument('--url'); nu.add_argument('--file')
     sub.add_parser('listen')
     cl = sub.add_parser('cloud'); cl.add_argument('action', nargs='?', choices=['pull']); cl.add_argument('--to')
     cl.add_argument('--from', dest='frm'); cl.add_argument('--with-login', action='store_true'); cl.add_argument('--no-start', action='store_true')
@@ -200,6 +202,27 @@ def main(argv=None):
     if a.cmd in ('doctor', 'setup'):
         from . import doctor
         return doctor.main('.') if a.cmd == 'doctor' else doctor.setup('.')
+    if a.cmd == 'up':   # straight to live on his phone (after hive setup has connected Telegram)
+        from . import doctor
+        if not telegram.load():
+            return doctor.setup('.')
+        return doctor.go_live('.')
+    if a.cmd == 'numbers':
+        from . import numbers
+        if a.action == 'setup':
+            src = numbers.set_source('.', cmd=a.cmd_, url=a.url, file=a.file)
+            got = numbers.refresh('.')
+            print(f'Saved {src}. ' + (f"Read: {', '.join(f'{k} {v:g}' for k, v in got.items())}" if got else
+                                      'It gave me no numbers yet (it should print JSON: {"sign-ups this week": 142}).'))
+            return 0 if got else 1
+        if a.action == 'add':   # hive numbers add "sign-ups this week=142"
+            vals = dict(v.split('=', 1) for v in a.values if '=' in v)
+            kept = numbers.record('.', vals, how='typed')
+            print(f'Kept: {kept}' if kept else 'Nothing kept: give name=number, e.g. "sign-ups this week=142"')
+            return 0 if kept else 1
+        numbers.refresh('.')
+        print('\n'.join(numbers.changes('.')) or 'No numbers yet. hive numbers setup --cmd/--url/--file, or tell me on Telegram.')
+        return 0
     if a.cmd == 'morning':
         return start.morning(a.name, a.phone)
     if a.cmd == 'name':
