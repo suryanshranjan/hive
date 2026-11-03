@@ -55,7 +55,8 @@ json.dump({'w1': {'agent': 'claude', 'state': 'working', 'pid': p.pid, 'started'
 assistant.BUILD.update(proc=p, goal='an invite page at /invite', started=time.time())
 fake = FakeTelegram([])
 r = assistant.handle(ch(fake), code, 'make the invite button like this [photo: ' + refs.PHOTO.search(text).group(1) + ']', poll=1)
-show = lambda path: subprocess.run(['git', '--git-dir', os.path.join(run, 'up.git'), 'show', f'main:{path}'], capture_output=True, text=True)
+show = lambda path: subprocess.run(['git', '--git-dir', os.path.join(run, 'up.git'), 'show', f'main:{path}'], capture_output=True,
+                                   text=not path.endswith('.jpg'), errors='replace')   # a picture is bytes, not text (Linux)
 check('a picture during a build goes to a builder with his words, and the picture is in the shared branch',
       (r, 'his picture: .hive/refs/ref_2.jpg' in show('OWNER.md').stdout, show('.hive/refs/ref_2.jpg').returncode == 0),
       ('instructed', True, True))
