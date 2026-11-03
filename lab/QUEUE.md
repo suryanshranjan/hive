@@ -2,8 +2,9 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 3 2026, after Gate 105)
+## Where we left off (Nov 3 2026, after Gate 106)
 
+- **Gate 106 done (ships):** business in, plan out. With only a business goal, Hive planned and built 8 of 9 planted problems on a mock creator site (4 owner messages, 0 technical words, $0.88-1.45 a goal). MiroFish read (AGPL, ideas re-implemented): the customer panel added nothing, off. Private files: `private/g106` on the laptop lab. Next on this thread: what the product doesn't show (BRAIN open question 0000, the first one), then a real product.
 - **Gate 105 done (all held):** his reference picture vs his words for a look, one fix round each: 18/18 vs 13/18 measured checks, blind judge 3 of 3 for the picture, same cost ($0.26 vs $0.25). Jarvis now suggests a screenshot when he describes a look in words. Targets and checks are in `private/g105` on the laptop lab (Docker `hive-g8`). Next on this thread: a picture from the wild (BRAIN open question 0000, the first one).
 - **Built on the owner's request (Tony scenario):** "ship it" from the phone (`hive/ship.py`, a pull request after he confirms, never his main); a customer's complaint traced to his rules or to a fault (`assistant.complaint`). Tests: `tests/test_ship.py`, `tests/test_complaint.py` (in CI).
 - **Lab:** Playwright and Chromium are now in the container (`PLAYWRIGHT_BROWSERS_PATH=/home/node/.cache/ms-playwright` under a clean home). The real home's Claude login now links to the live host login (`/host/creds.json`; the old copy is kept as `.credentials.json.bak-nov2`). A mock project for the live phone loop: `/home/node/sunnyshop` (origin `/home/node/sunnyshop-origin.git`).

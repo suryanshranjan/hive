@@ -1,0 +1,43 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invite</title><link rel="stylesheet" href="style.css"></head>
+<body>
+  <nav>☀️ Sunny Shop <a href="deals.html">Deals</a> <a href="invite.html">Invite &amp; earn ₹500</a> <a href="dashboard.html">Dashboard</a></nav>
+  <main>
+    <h1>Invite a friend, you both get ₹500</h1>
+    <p>When an invited creator finishes their first deal, you both get ₹500.</p>
+    <a id="wa" href="https://wa.me/" style="display:block;text-align:center;padding:14px 16px;background:#25d366;color:#fff;font-size:18px;font-weight:bold;text-decoration:none;border-radius:6px;margin:20px 0">Share on WhatsApp</a>
+    <label for="invite-link">Your invite link</label>
+    <input id="invite-link" type="text" readonly value="">
+    <p><button id="copy" type="button">Copy invite link</button></p>
+  </main>
+  <script>
+    (function () {
+      var chars = 'abcdefghjkmnpqrstuvwxyz23456789';
+      var code = null;
+      try { code = localStorage.getItem('sunny_ref'); } catch (e) {}
+      if (!code || !/^[a-z0-9]{4,12}$/.test(code)) {
+        code = '';
+        for (var i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+        try { localStorage.setItem('sunny_ref', code); } catch (e) {}
+      }
+      var link = new URL('signup.html?ref=' + code, location.href).href;
+      var msg = 'Brands on Sunny Shop pay ₹1,500–₹3,000 for an Instagram post. Join with my link and we both get ₹500 after your first deal: ' + link;
+      document.getElementById('wa').href = 'https://wa.me/?text=' + encodeURIComponent(msg);
+      var input = document.getElementById('invite-link');
+      input.value = link;
+      var btn = document.getElementById('copy');
+      btn.addEventListener('click', function () {
+        function done() {
+          btn.textContent = 'Copied!';
+          setTimeout(function () { btn.textContent = 'Copy invite link'; }, 2000);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(link).then(done, function () { input.select(); });
+        } else {
+          input.select();
+        }
+      });
+    })();
+  </script>
+</body></html>

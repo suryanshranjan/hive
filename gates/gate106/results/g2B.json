@@ -1,0 +1,161 @@
+{
+ "cell": "g2B",
+ "goal": "Creators who join never make their first deal. Help me get more of them to a first deal.",
+ "arm": "B",
+ "handled": "planned",
+ "ran": "done",
+ "minutes": 4.4,
+ "plan": {
+  "steps": [
+   {
+    "title": "A shorter sign-up form with no tax or bank details",
+    "why": "Sign-up asks students on phones for 9 things, including GST, PAN, bank account and IFSC, though the terms page says PAN is only needed before the first payout. Creators without GST may think they can't join at all. Asking for just name, email, phone and Instagram removes the point where most give up",
+    "seen": "signup.html: 9 required fields: name 'as on PAN', email, phone, Instagram, PAN, GST, bank account, IFSC, full postal address; h1 'Creator registration'. terms.html: 'PAN is required before the first payout.'",
+    "build": "In signup.html keep only name (relabel to 'Your name'), email (type=email, required), phone (type=tel, inputmode=numeric, required) and instagram (required, placeholder '@yourhandle'). Remove the pan, gst, account, ifsc and address inputs. Change the h1 to 'Join as a creator' and add a line under it: 'No GST needed. Takes 1 minute.' Change the button to 'Join and see deals'. Under the button add one line: 'We'll ask for PAN and bank details only when you're about to get paid.' Keep action=\"dashboard.html\". In test_pages.py keep the existing tests and add test_signup_is_short (fewer than 5 inputs with required) and test_signup_no_bank_or_gst (no 'name=\"gst\"', 'name=\"account\"', 'name=\"ifsc\"', 'name=\"pan\"').",
+    "look": false,
+    "decide": "",
+    "options": []
+   },
+   {
+    "title": "Show open deals on the dashboard after joining",
+    "why": "A new creator lands on a dashboard that only says 'No data.', and no page links to the deals page, so they never see a deal they could take. Busy creators need to apply in the same visit or they won't come back.",
+    "seen": "dashboard.html: only '<div class=\"empty\">No data.</div>'. deals.html exists, but no page links to it (index.html footer links only to Terms and sign-up; dashboard, deals and invite navs have no links).",
+    "build": "In dashboard.html replace 'No data.' with a welcome block: h2 'Pick your first deal', then the 3 deals from deals.html (brand, task, ₹ amount), each with a link to deals.html, and a big full-width button 'See all open deals' → deals.html. Add a 'Deals' link to the nav on dashboard.html, deals.html and invite.html. Keep the .empty class in style.css. Add test_dashboard_links_to_deals (checks 'deals.html' in dashboard.html) and test_dashboard_not_empty (checks 'No data.' is no longer there).",
+    "look": false,
+    "decide": "",
+    "options": []
+   },
+   {
+    "title": "Make Apply work and say what happens next",
+    "why": "Each Apply button on the deals page is a bare button with no form or link, so tapping it does nothing. Doubtful creators also decide whether to apply based on when they'll hear back and when they'll be paid, and the deals page says neither.",
+    "seen": "deals.html: three <li> deals (Chai Co ₹3,000, Kurta House ₹1,500, FitBottle ₹2,000), each with a plain '<button>Apply</button>' that has no form, link or script, and no word on payment timing. terms.html: 'Creators are paid within 7 days of a brand approving their content.'",
+    "build": "In deals.html add one line under the h1: 'Apply in one tap. Brands reply within the promised time. You're paid within 7 days of approval.' Wrap each Apply button in its own <form action=\"applied.html\" method=\"get\"> with a hidden input name=\"deal\" (the brand name), and make the button full-width on phones. Create applied.html (same nav and style.css) that reads ?deal= with a few lines of inline JS and shows 'You applied to <brand>!', plus what happens next: the brand reviews your profile and replies within the promised time, after approval you post the content, and you're paid within 7 days of approval. Link back to deals.html ('Apply to more deals'). Keep the 3 <li> deals so test_deals_listed still passes. Add test_apply_buttons_submit (deals.html has 'action=\"applied.html\"' at least 3 times), test_applied_page_exists and test_deals_mentions_payment (deals.html contains '7 days').",
+    "look": false,
+    "decide": "How soon should we promise creators a brand will reply after they apply?",
+    "options": [
+     "Within 2 days",
+     "Within 5 days",
+     "Don't promise a time"
+    ]
+   },
+   {
+    "title": "Tell creators on the home page what they can earn",
+    "why": "The home page talks about 'the future of commerce' and brand demos, and the only creator link is small in the footer. A creator sent there by a friend, including one who gave up on the old form, never learns they can earn or that joining is now quick.",
+    "seen": "index.html: h1 'Welcome to Sunny Shop', vague mission text, a 'Brands' section aimed at sales, and 'Creator sign-up' only as a 12px footer link.",
+    "build": "In index.html add a creator block at the top, above 'About us': h1 'Get paid by Indian brands for your Instagram posts', one line with real deal sizes from deals.html ('Deals from ₹1,500 to ₹3,000 per post'), 3 short steps (Join in 1 minute, no GST needed → Apply to a deal → Get paid within 7 days of approval), and a large full-width button 'Join as a creator' → signup.html. Keep the About and Brands sections and the footer links below it. Leave invite.html as it is. Add test_home_links_signup_above_footer (signup.html appears in index.html before '<footer'); keep test_invite_reward_is_500.",
+    "look": true,
+    "decide": "Can we show new creators the ₹8,000-a-month average from their first 3 months on the home page? (Recommended: per-deal amounts only, which doubtful creators find easier to believe.)",
+    "options": [
+     "Yes, show ₹8,000/month",
+     "Only show per-deal amounts"
+    ]
+   }
+  ],
+  "answers": [
+   "",
+   "",
+   "Don't promise a time",
+   "Yes, show ₹8,000/month"
+  ]
+ },
+ "plan_cost": 0.43192980000000003,
+ "builders_cost": 1.013841,
+ "check": "15 tests, all passing. All 5 that passed before still pass.",
+ "tests": "15/15",
+ "owner_messages": [
+  "Creators who join never make their first deal. Help me get more of them to a first deal.",
+  "[tap] Yes, do it all",
+  "[tap] Don't promise a time",
+  "[tap] Yes, show ₹8,000/month"
+ ],
+ "questions": [
+  {
+   "question": "❓ One thing only you can decide (Make Apply work and say what happens next):\nHow soon should we promise creators a brand will reply after they apply?",
+   "options": [
+    "Within 2 days",
+    "Within 5 days",
+    "Don't promise a time"
+   ],
+   "answer": "Don't promise a time"
+  },
+  {
+   "question": "❓ One thing only you can decide (Tell creators on the home page what they can earn):\nCan we show new creators the ₹8,000-a-month average from their first 3 months on the home page? (Recommended: per-deal amounts only, which doubtful creators find easier to believe.)",
+   "options": [
+    "Yes, show ₹8,000/month",
+    "Only show per-deal amounts"
+   ],
+   "answer": "Yes, show ₹8,000/month"
+  }
+ ],
+ "hive_messages": [
+  {
+   "text": "🔎 On it, sir. Let me look at your product with that in mind; a minute or two.",
+   "photo": false
+  },
+  {
+   "text": "🧭 Here's what I see, sir. A creator who tries to join hits a 9-field form that asks for GST, PAN and bank details up front, though the terms page says PAN is only needed before the first payout. If they get through it, they land on a dashboard that just says \"No data.\" Nothing links to the deals page, and the Apply buttons t\n\nWhat I'd do:\n1. A shorter sign-up form with no tax or bank details: Sign-up asks students on phones for 9 things, including GST, PAN, bank account and IFSC, though the terms page says PAN is only needed before the first payout. Creators without GST may think they can't join at all. Asking for just name, email, phone and Instagram removes the point where most give up\n2. Show open deals on the dashboard after joining: A new creator lands on a dashboard that only says 'No data.', and no page links to the deals page, so they never see a deal they could take. Busy creators need to apply in the same visit or they won't come back.\n3. Make Apply work and say what happens next: Each Apply button on the deals page is a bare button with no form or link, so tapping it does nothing. Doubtful creators also decide whether to apply based on when they'll hear back and when they'll be paid, and the deals page says neither.\n4. Tell creators on the home page what they can earn: The home page talks about 'the future of commerce' and brand demos, and the only creator link is small in the footer. A creator sent there by a friend, including one who gave up on the old form, never learns they can earn or that joining is now quick.\n\nI'll build them one after another and show you each. Your main version isn't touched.",
+   "photo": false
+  },
+  {
+   "text": "❓ One thing only you can decide (Make Apply work and say what happens next):\nHow soon should we promise creators a brand will reply after they apply?",
+   "photo": false
+  },
+  {
+   "text": "❓ One thing only you can decide (Tell creators on the home page what they can earn):\nCan we show new creators the ₹8,000-a-month average from their first 3 months on the home page? (Recommended: per-deal amounts only, which doubtful creators find easier to believe.)",
+   "photo": false
+  },
+  {
+   "text": "🛠 Right, sir. Building the first step now: A shorter sign-up form with no tax or bank details. I'll show you each step as it lands; say \"status\" any time.",
+   "photo": false
+  },
+  {
+   "text": "✅ Step 1 of 4 done: A shorter sign-up form with no tax or bank details.",
+   "photo": false
+  },
+  {
+   "text": "/",
+   "photo": true
+  },
+  {
+   "text": "🛠 Step 2 of 4: Show open deals on the dashboard after joining. On it.",
+   "photo": false
+  },
+  {
+   "text": "✅ Step 2 of 4 done: Show open deals on the dashboard after joining.",
+   "photo": false
+  },
+  {
+   "text": "/",
+   "photo": true
+  },
+  {
+   "text": "🛠 Step 3 of 4: Make Apply work and say what happens next. On it.",
+   "photo": false
+  },
+  {
+   "text": "✅ Step 3 of 4 done: Make Apply work and say what happens next.",
+   "photo": false
+  },
+  {
+   "text": "/",
+   "photo": true
+  },
+  {
+   "text": "🛠 Step 4 of 4: Tell creators on the home page what they can earn. On it.",
+   "photo": false
+  },
+  {
+   "text": "✅ Step 4 of 4 done: Tell creators on the home page what they can earn.",
+   "photo": false
+  },
+  {
+   "text": "/",
+   "photo": true
+  },
+  {
+   "text": "🎉 That's the plan done, sir. 15 tests, all passing. All 5 that passed before still pass.\n\nTell me what's off, or say ship it and it all goes to your engineer as one pull request.",
+   "photo": false
+  }
+ ],
+ "final": "/home/node/f106/g2B/final"
+}

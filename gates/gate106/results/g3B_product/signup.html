@@ -1,0 +1,34 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Creator sign-up</title><link rel="stylesheet" href="style.css"></head>
+<body>
+  <nav>☀️ Sunny Shop</nav>
+  <main>
+    <p id="invite-banner" hidden style="background:#dcfce7;color:#166534;padding:12px;border-radius:6px;font-weight:bold">A friend invited you: you'll both get ₹500 after your first deal</p>
+    <h1>Join Sunny Shop and get paid for Instagram posts</h1>
+    <p>Brands pay ₹1,500–₹3,000 per deal</p>
+    <form action="dashboard.html">
+      <input type="hidden" name="ref" id="ref">
+      <label>Full name</label><input name="name" required>
+      <label>Email</label><input name="email" type="email" required>
+      <label>Phone</label><input name="phone" required>
+      <label>Instagram handle</label><input name="instagram" required>
+      <fieldset>
+        <legend>Needed before your first payout, you can add later</legend>
+        <label>PAN number</label><input name="pan">
+        <label>GST number</label><input name="gst">
+        <label>Bank account number</label><input name="account">
+        <label>IFSC code</label><input name="ifsc">
+        <label>Full postal address</label><input name="address">
+      </fieldset>
+      <button type="submit">Join and see deals</button>
+    </form>
+  </main>
+  <script>
+    var ref = new URLSearchParams(location.search).get('ref');
+    if (ref) {
+      document.getElementById('ref').value = ref;
+      document.getElementById('invite-banner').hidden = false;
+    }
+  </script>
+</body></html>

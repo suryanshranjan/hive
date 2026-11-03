@@ -260,7 +260,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     elif look_job:
         pass   # said above: one builder for a look
     else:
-        say(f"\nI'll put {workers} builders on it, as you chose. They work on copies, so your branches stay exactly as "
+        say(f"\nI'll put {_n(workers, 'builder')} on it, as you chose. {'They work' if workers > 1 else 'It works'} on copies, so your branches stay exactly as "
             "they are.")
         n, why = law.builders(t_g)   # the law stays at the top: he hears it whenever his choice differs (the owner)
         if n < workers:

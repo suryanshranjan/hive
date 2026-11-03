@@ -1,0 +1,163 @@
+{
+ "cell": "g2A",
+ "goal": "Creators who join never make their first deal. Help me get more of them to a first deal.",
+ "arm": "A",
+ "handled": "planned",
+ "ran": "done",
+ "minutes": 3.4,
+ "plan": {
+  "steps": [
+   {
+    "title": "A shorter sign-up form",
+    "why": "Sign-up asks for 9 required things, including GST and bank details that students and part-timers often don't have, even though the terms say PAN is only needed before the first payout.",
+    "seen": "signup.html: 9 required fields (name as on PAN, email, phone, Instagram, PAN, GST, bank account, IFSC, postal address); terms.html: \"PAN is required before the first payout.\"; index.html: the only sign-up link is in the small footer",
+    "build": "In signup.html keep only four required fields: Full name (change the label to just 'Your name'), Instagram handle, Phone and Email. Keep name=\"email\" and name=\"instagram\" and keep action=\"dashboard.html\". Remove the PAN, GST, bank account, IFSC and address inputs. Change the heading to 'Join Sunny Shop' and the button to 'See deals'. Under the button add one line: 'You'll add PAN and bank details only when you get paid for your first deal.' Add the attribute inputmode=\"tel\" to the phone field so phones show the number keypad. Add a test in test_pages.py that checks signup.html has no name=\"pan\", name=\"gst\", name=\"account\", name=\"ifsc\" or name=\"address\", and has at most 4 'required' attributes. Keep all existing tests passing.",
+    "look": false,
+    "decide": "Do brands need a creator's GST number at all? Most students won't have one.",
+    "options": [
+     "Drop GST completely",
+     "Ask for it only at first payout, optional",
+     "Ask for it only at first payout, required"
+    ]
+   },
+   {
+    "title": "Show open deals right after sign-up",
+    "why": "Sign-up sends new creators to a dashboard that only says \"No data.\" Nothing on it links to the deals, so they are stuck with nothing to do.",
+    "seen": "dashboard.html: only an h1 and <div class=\"empty\">No data.</div>, no links; deals.html is not linked from any page",
+    "build": "In dashboard.html replace the 'No data.' block with: a heading 'Pick your first deal', the same three deals listed in deals.html (brand, task, ₹ amount), each with an 'Apply' link to deals.html, and a clear link 'See all open deals' to deals.html. Add a 'Deals' link in the nav on dashboard.html and deals.html. Keep the page title 'Dashboard'. Add tests: dashboard.html contains 'deals.html' and does not contain 'No data.'.",
+    "look": false,
+    "decide": "",
+    "options": []
+   },
+   {
+    "title": "Make the Apply button actually do something",
+    "why": "The Apply buttons on the deals page are plain buttons with no link or form, so a creator who taps Apply gets nothing back and has no idea what happens next or when they get paid.",
+    "seen": "deals.html: three <button>Apply</button> with no form, link or script; terms.html: \"Creators are paid within 7 days of a brand approving their content.\"",
+    "build": "In deals.html turn each Apply button into a link (styled like the button) to a new page applied.html, passing the brand in the address, e.g. applied.html?deal=chai-co. Create applied.html using the same nav and style.css: heading 'You've applied!', the deal name read from the address with a few lines of JS (show 'your deal' if it's missing), and three numbered steps: 1) the brand reviews your application, 2) you post the content, 3) you're paid within 7 days of the brand approving it (take this wording from terms.html). Add a link back to deals.html with the text 'Apply to another deal'. Keep the 3 <li> deals. Add tests: applied.html exists, deals.html links to applied.html at least 3 times, and applied.html contains '7 days'.",
+    "look": false,
+    "decide": "",
+    "options": []
+   },
+   {
+    "title": "Tell creators upfront what they can earn",
+    "why": "The home page talks in general terms ('a platform', 'deliver value'), never mentions creators or money, and hides the only sign-up link in the footer. A student on their phone has no reason to start.",
+    "seen": "index.html: 'Sunny Shop is a platform… deliver value', 'build the future of commerce'; creator sign-up is only a 12px footer link; deals.html shows real amounts (₹1,500–₹3,000) that never appear on the home page",
+    "build": "In index.html, put a creator section at the top: heading 'Get paid by Indian brands for your Instagram posts', one line of the earnings promise (wording depends on his answer below), 2–3 example deals copied from deals.html with their ₹ amounts, and a large 'Join free' button linking to signup.html. Move the mission/About text below this section and keep the Brands section and the footer as they are. In style.css, make the button on the home page full width on small screens. Add a test: index.html links to signup.html outside the footer (it should contain signup.html at least twice) and contains '₹'.",
+    "look": true,
+    "decide": "Can we show new creators the ₹8,000-a-month average as a headline figure?",
+    "options": [
+     "Show 'Creators earn ₹8,000/month on average'",
+     "Show only per-deal amounts (₹1,500–₹3,000)",
+     "Show both"
+    ]
+   }
+  ],
+  "answers": [
+   "Ask for it only at first payout, optional",
+   "",
+   "",
+   "Show 'Creators earn ₹8,000/month on average'"
+  ]
+ },
+ "plan_cost": 0.2056606,
+ "builders_cost": 0.921578,
+ "check": "12 tests, all passing. All 5 that passed before still pass.",
+ "tests": "12/12",
+ "owner_messages": [
+  "Creators who join never make their first deal. Help me get more of them to a first deal.",
+  "[tap] Yes, do it all",
+  "[tap] Ask for it only at first payout, optional",
+  "[tap] Show 'Creators earn ₹8,000/month on average'"
+ ],
+ "questions": [
+  {
+   "question": "❓ One thing only you can decide (A shorter sign-up form):\nDo brands need a creator's GST number at all? Most students won't have one.",
+   "options": [
+    "Drop GST completely",
+    "Ask for it only at first payout, optional",
+    "Ask for it only at first payout, required"
+   ],
+   "answer": "Ask for it only at first payout, optional"
+  },
+  {
+   "question": "❓ One thing only you can decide (Tell creators upfront what they can earn):\nCan we show new creators the ₹8,000-a-month average as a headline figure?",
+   "options": [
+    "Show 'Creators earn ₹8,000/month on average'",
+    "Show only per-deal amounts (₹1,500–₹3,000)",
+    "Show both"
+   ],
+   "answer": "Show 'Creators earn ₹8,000/month on average'"
+  }
+ ],
+ "hive_messages": [
+  {
+   "text": "🔎 On it, sir. Let me look at your product with that in mind; a minute or two.",
+   "photo": false
+  },
+  {
+   "text": "🧭 Here's what I see, sir. A creator has to give PAN, GST, bank account, IFSC and full address before seeing a single deal. After that they land on a dashboard that says only \"No data.\" with no way through to the deals, so most never reach a deal they could apply for.\n\nWhat I'd do:\n1. A shorter sign-up form: Sign-up asks for 9 required things, including GST and bank details that students and part-timers often don't have, even though the terms say PAN is only needed before the first payout.\n2. Show open deals right after sign-up: Sign-up sends new creators to a dashboard that only says \"No data.\" Nothing on it links to the deals, so they are stuck with nothing to do.\n3. Make the Apply button actually do something: The Apply buttons on the deals page are plain buttons with no link or form, so a creator who taps Apply gets nothing back and has no idea what happens next or when they get paid.\n4. Tell creators upfront what they can earn: The home page talks in general terms ('a platform', 'deliver value'), never mentions creators or money, and hides the only sign-up link in the footer. A student on their phone has no reason to start.\n\nI'll build them one after another and show you each. Your main version isn't touched.",
+   "photo": false
+  },
+  {
+   "text": "❓ One thing only you can decide (A shorter sign-up form):\nDo brands need a creator's GST number at all? Most students won't have one.",
+   "photo": false
+  },
+  {
+   "text": "❓ One thing only you can decide (Tell creators upfront what they can earn):\nCan we show new creators the ₹8,000-a-month average as a headline figure?",
+   "photo": false
+  },
+  {
+   "text": "🛠 Right, sir. Building the first step now: A shorter sign-up form. I'll show you each step as it lands; say \"status\" any time.",
+   "photo": false
+  },
+  {
+   "text": "✅ Step 1 of 4 done: A shorter sign-up form.",
+   "photo": false
+  },
+  {
+   "text": "/",
+   "photo": true
+  },
+  {
+   "text": "🛠 Step 2 of 4: Show open deals right after sign-up. On it.",
+   "photo": false
+  },
+  {
+   "text": "✅ Step 2 of 4 done: Show open deals right after sign-up.",
+   "photo": false
+  },
+  {
+   "text": "/",
+   "photo": true
+  },
+  {
+   "text": "🛠 Step 3 of 4: Make the Apply button actually do something. On it.",
+   "photo": false
+  },
+  {
+   "text": "✅ Step 3 of 4 done: Make the Apply button actually do something.",
+   "photo": false
+  },
+  {
+   "text": "/",
+   "photo": true
+  },
+  {
+   "text": "🛠 Step 4 of 4: Tell creators upfront what they can earn. On it.",
+   "photo": false
+  },
+  {
+   "text": "✅ Step 4 of 4 done: Tell creators upfront what they can earn.",
+   "photo": false
+  },
+  {
+   "text": "/",
+   "photo": true
+  },
+  {
+   "text": "🎉 That's the plan done, sir. 12 tests, all passing. All 5 that passed before still pass.\n\nTell me what's off, or say ship it and it all goes to your engineer as one pull request.",
+   "photo": false
+  }
+ ],
+ "final": "/home/node/f106/g2A/final"
+}

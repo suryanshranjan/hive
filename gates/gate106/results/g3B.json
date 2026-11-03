@@ -1,0 +1,123 @@
+{
+ "cell": "g3B",
+ "goal": "I want more creators to invite their friends.",
+ "arm": "B",
+ "handled": "planned",
+ "ran": "done",
+ "minutes": 3.6,
+ "plan": {
+  "steps": [
+   {
+    "title": "A working invite page that shows the ₹500",
+    "why": "The ₹500 reward is shown in 12px grey text 400px below the button, and the 'Copy invite link' button has no link or code behind it. A creator on a phone sees no reason to invite and has nothing to send.",
+    "seen": "invite.html: heading just says 'Invite', with 'You can invite other creators.'; <button>Copy invite link</button> has no link, script or handler; the reward line has style margin-top:400px;font-size:12px;color:#999",
+    "build": "In invite.html: change the h1 to 'Invite a friend, you both get ₹500' and move the reward sentence ('when an invited creator finishes their first deal, you both get ₹500') right under it at normal size. Remove the inline margin-top:400px/12px/#999 style. Add a small inline script that builds an invite link, signup.html?ref=CODE, where CODE is a short random code saved in localStorage ('sunny_ref') so it stays the same between visits. Put a big 'Share on WhatsApp' link first (an <a> styled as a button) pointing to https://wa.me/?text= followed by the URL-encoded message 'Brands on Sunny Shop pay ₹1,500–₹3,000 for an Instagram post. Join with my link and we both get ₹500 after your first deal: <link>'. Below it, show the link in a read-only input, and make 'Copy invite link' copy it with navigator.clipboard.writeText and change its text to 'Copied!' for 2 seconds. Keep the ₹500 text so test_invite_reward_is_500 still passes. Add tests to test_pages.py: invite.html contains 'wa.me', contains 'ref=', and no longer contains 'margin-top:400px'.",
+    "look": false,
+    "decide": "",
+    "options": []
+   },
+   {
+    "title": "A short sign-up for invited friends",
+    "why": "A friend who opens the invite link lands on a 9-field form asking for PAN, GST, bank account, IFSC and full address before seeing any deal. Most students and part-timers have no GST number, so few get through. The inviter's ₹500 only pays once the friend finishes a first deal.",
+    "seen": "signup.html: 9 required fields including PAN, GST number, bank account, IFSC and postal address; terms.html: 'PAN is required before the first payout', so PAN is only needed later; signup.html has no mention of the ₹500 or of who invited them",
+    "build": "In signup.html: keep name, email, phone and Instagram handle as required, and keep the form action pointing to dashboard.html. Change the 'Full name (as on PAN)' label to 'Full name'. Handle PAN, GST, bank account, IFSC and address according to the owner's answer below: either remove them from this form, or keep them in a section marked 'Needed before your first payout, you can add later' without the required attribute. Change the h1 to 'Join Sunny Shop and get paid for Instagram posts' and add the line 'Brands pay ₹1,500–₹3,000 per deal', since deals.html lists ₹1,500, ₹2,000 and ₹3,000. Change the submit button text to 'Join and see deals'. Add a small script: if the URL has ?ref=, show a banner at the top saying 'A friend invited you: you'll both get ₹500 after your first deal', and copy the ref value into a hidden input name=\"ref\". Keep the existing tests passing (email, instagram, dashboard.html). Add tests: signup.html has name=\"ref\"; the gst input is no longer marked required.",
+    "look": false,
+    "decide": "Which payment details can a new creator leave until their first payout?",
+    "options": [
+     "PAN, GST, bank and address all wait until first payout",
+     "Ask for PAN and bank at sign-up, drop GST and address",
+     "Keep everything required at sign-up"
+    ]
+   },
+   {
+    "title": "Dashboard that leads to a first deal and to inviting",
+    "why": "The dashboard both inviters and new friends land on after sign-up shows only 'No data.', and no page in the product links to the invite page. Creators never find out they can invite, and invited friends aren't pointed to the first deal that unlocks both ₹500 rewards.",
+    "seen": "dashboard.html: only an h1 and <div class=\"empty\">No data.</div>; the <nav> on every page is just '☀️ Sunny Shop' with no links; index.html footer links only to Terms and Creator sign-up; nothing links to invite.html",
+    "build": "In dashboard.html, replace 'No data.' with two cards in this order: (1) 'Find your first deal: brands pay ₹1,500–₹3,000' linking to deals.html, (2) 'Invite a friend, you both get ₹500 after their first deal' with a button linking to invite.html. In the <nav> of dashboard.html, deals.html and invite.html, add simple links: Deals (deals.html), Invite & earn ₹500 (invite.html), Dashboard (dashboard.html). Keep the current style.css look, and add only a small .card rule if needed (padding, border, rounded corners, full width on mobile). On deals.html, under the list, add one line: 'Know a creator who'd like these? Invite them, you both get ₹500', linking to invite.html. Add tests: dashboard.html contains 'invite.html' and 'deals.html', with 'deals.html' appearing before 'invite.html'; deals.html contains 'invite.html'.",
+    "look": true,
+    "decide": "",
+    "options": []
+   }
+  ],
+  "answers": [
+   "",
+   "PAN, GST, bank and address all wait until first payout",
+   ""
+  ]
+ },
+ "plan_cost": 0.429153,
+ "builders_cost": 0.755592,
+ "check": "15 tests, all passing. All 5 that passed before still pass.",
+ "tests": "15/15",
+ "owner_messages": [
+  "I want more creators to invite their friends.",
+  "[tap] Yes, do it all",
+  "[tap] PAN, GST, bank and address all wait until first payout"
+ ],
+ "questions": [
+  {
+   "question": "❓ One thing only you can decide (A short sign-up for invited friends):\nWhich payment details can a new creator leave until their first payout?",
+   "options": [
+    "PAN, GST, bank and address all wait until first payout",
+    "Ask for PAN and bank at sign-up, drop GST and address",
+    "Keep everything required at sign-up"
+   ],
+   "answer": "PAN, GST, bank and address all wait until first payout"
+  }
+ ],
+ "hive_messages": [
+  {
+   "text": "🔎 On it, sir. Let me look at your product with that in mind; a minute or two.",
+   "photo": false
+  },
+  {
+   "text": "🧭 Here's what I see, sir. Inviting barely works in the product. No page links to the invite page, its 'Copy invite link' button does nothing, and the ₹500 reward sits in small grey text 400px down the page. A friend who does follow a link lands on a 9-field form asking for GST and bank details, which most student creators ca\n\nWhat I'd do:\n1. A working invite page that shows the ₹500: The ₹500 reward is shown in 12px grey text 400px below the button, and the 'Copy invite link' button has no link or code behind it. A creator on a phone sees no reason to invite and has nothing to send.\n2. A short sign-up for invited friends: A friend who opens the invite link lands on a 9-field form asking for PAN, GST, bank account, IFSC and full address before seeing any deal. Most students and part-timers have no GST number, so few get through. The inviter's ₹500 only pays once the friend finishes a first deal.\n3. Dashboard that leads to a first deal and to inviting: The dashboard both inviters and new friends land on after sign-up shows only 'No data.', and no page in the product links to the invite page. Creators never find out they can invite, and invited friends aren't pointed to the first deal that unlocks both ₹500 rewards.\n\nI'll build them one after another and show you each. Your main version isn't touched.",
+   "photo": false
+  },
+  {
+   "text": "❓ One thing only you can decide (A short sign-up for invited friends):\nWhich payment details can a new creator leave until their first payout?",
+   "photo": false
+  },
+  {
+   "text": "🛠 Right, sir. Building the first step now: A working invite page that shows the ₹500. I'll show you each step as it lands; say \"status\" any time.",
+   "photo": false
+  },
+  {
+   "text": "✅ Step 1 of 3 done: A working invite page that shows the ₹500.",
+   "photo": false
+  },
+  {
+   "text": "/",
+   "photo": true
+  },
+  {
+   "text": "🛠 Step 2 of 3: A short sign-up for invited friends. On it.",
+   "photo": false
+  },
+  {
+   "text": "✅ Step 2 of 3 done: A short sign-up for invited friends.",
+   "photo": false
+  },
+  {
+   "text": "/",
+   "photo": true
+  },
+  {
+   "text": "🛠 Step 3 of 3: Dashboard that leads to a first deal and to inviting. On it.",
+   "photo": false
+  },
+  {
+   "text": "✅ Step 3 of 3 done: Dashboard that leads to a first deal and to inviting.",
+   "photo": false
+  },
+  {
+   "text": "/",
+   "photo": true
+  },
+  {
+   "text": "🎉 That's the plan done, sir. 15 tests, all passing. All 5 that passed before still pass.\n\nTell me what's off, or say ship it and it all goes to your engineer as one pull request.",
+   "photo": false
+  }
+ ],
+ "final": "/home/node/f106/g3B/final"
+}

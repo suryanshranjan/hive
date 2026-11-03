@@ -1,0 +1,20 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Applied</title><link rel="stylesheet" href="style.css"></head>
+<body>
+  <nav>☀️ Sunny Shop · <a href="deals.html">Deals</a></nav>
+  <main>
+    <h1>You applied to <span id="brand">this deal</span>!</h1>
+    <h2>What happens next</h2>
+    <ol>
+      <li>The brand reviews your profile and replies to you.</li>
+      <li>After approval, you post the content.</li>
+      <li>You're paid within 7 days of approval.</li>
+    </ol>
+    <a class="btn-block" href="deals.html">Apply to more deals</a>
+  </main>
+  <script>
+    var deal = new URLSearchParams(location.search).get('deal');
+    if (deal) document.getElementById('brand').textContent = deal;
+  </script>
+</body></html>

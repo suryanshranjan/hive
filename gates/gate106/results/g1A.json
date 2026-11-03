@@ -1,0 +1,139 @@
+{
+ "cell": "g1A",
+ "goal": "I want more creators signing up this month.",
+ "arm": "A",
+ "handled": "planned",
+ "ran": "done",
+ "minutes": 2.5,
+ "plan": {
+  "steps": [
+   {
+    "title": "A shorter sign-up form",
+    "why": "Sign-up makes a student on a phone type 9 required fields, including GST, bank account and full address, before they have seen a single deal, while the terms only need PAN before the first payout.",
+    "seen": "signup.html: 9 required fields (name 'as on PAN', email, phone, Instagram, PAN, GST, bank account, IFSC, postal address) and the button says 'Submit registration'. terms.html: 'Creators are paid within 7 days of a brand approving their content. PAN is required before the first payout.'",
+    "build": "In signup.html, keep only these fields: name (relabel as 'Your name'), email, phone (add type=\"tel\" and inputmode=\"numeric\"), and Instagram handle (add placeholder \"@yourhandle\"). Remove the pan, gst, account, ifsc and address inputs. Keep form action=\"dashboard.html\". Change the h1 to 'Join as a creator, it's free', add one line under it: 'Takes 1 minute. We ask for PAN and bank details only when you get your first payout.' Change the button text to 'Join and see deals'. Leave the other pages alone. In test_pages.py, keep the existing tests and add test_signup_is_short: it checks signup.html has at most 4 '<input', and contains none of name=\"gst\", name=\"pan\", name=\"account\", name=\"ifsc\", name=\"address\".",
+    "look": false,
+    "decide": "Do creators ever need a GST number for Sunny Shop deals, or can we stop asking for it altogether?",
+    "options": [
+     "Never ask for GST",
+     "Ask only at first payout",
+     "Ask only above a yearly earnings level"
+    ]
+   },
+   {
+    "title": "A home page that speaks to creators",
+    "why": "The home page talks about 'a platform' and 'the future of commerce' and has a section for brands but none for creators, so a creator never sees the real deals (₹1,500 to ₹3,000) or a clear button to join.",
+    "seen": "index.html: the copy is general ('Sunny Shop is a platform… deliver value'), there is a 'Brands' section with a sales email, and the only creator link is 'Creator sign-up' in the 12px grey footer. deals.html: real deals such as Chai Co 2 reels ₹3,000, Kurta House 1 post ₹1,500, FitBottle 3 stories ₹",
+    "build": "In index.html, put a creator section at the top of <main>, above the current text: h1 'Get paid by Indian brands for your Instagram posts', a line 'Free to join. Paid within 7 days of the brand approving your post.' (wording from terms.html), then a short list of the 3 deals copied from deals.html (brand, what to post, ₹ amount), and a large full-width link to signup.html with the text 'Join as a creator'. If he approves, add the earnings line from his answer below. Move 'About us' and 'Brands' below this section and keep their text. Keep the footer link. In style.css add a .cta class for the link (display:block; text-align:center; background #f59e0b; color #fff; padding 14px; border-radius 6px; font-weight bold; text-decoration none) so it is easy to tap on a phone. Add test_home_invites_creators to test_pages.py: index.html contains 'href=\"signup.html\"' at least twice and contains '₹3,000'.",
+    "look": true,
+    "decide": "Can the home page say that creators earn about ₹8,000 a month in their first 3 months?",
+    "options": [
+     "Yes, show '₹8,000 a month on average'",
+     "No, show only the deal amounts"
+    ]
+   },
+   {
+    "title": "Make the ₹500 invite reward easy to see",
+    "why": "The ₹500 reward for both creators is the best reason to bring a friend, but it is hidden in small grey text 400px below the button, and no page links to the invite page, so new creators never find it.",
+    "seen": "invite.html: the heading is just 'Invite', the text says 'You can invite other creators.', and 'Rewards: when an invited creator finishes their first deal, you both get ₹500.' sits in 12px #999 text with margin-top:400px. dashboard.html (where sign-up lands) shows only 'No data.' and links nowhere. ",
+    "build": "In invite.html, change the h1 to 'Invite a friend, you both get ₹500' and put the reward sentence in normal-size text right above the 'Copy invite link' button. Remove the inline style with margin-top:400px. In dashboard.html, replace 'No data.' with a short welcome: 'You're in! Here's what to do next:' and two full-width links: 'See open deals' → deals.html and 'Invite a friend, you both get ₹500' → invite.html (reuse the .cta class from the home page step, or add it to style.css if it isn't there yet). Keep test_invite_reward_is_500. Add test_invite_reward_visible: in invite.html the index of '₹500' comes before the index of '<button' and 'margin-top:400px' is gone. Add test_dashboard_links_next_steps: dashboard.html contains 'deals.html' and 'invite.html'.",
+    "look": true,
+    "decide": "",
+    "options": []
+   }
+  ],
+  "answers": [
+   "Ask only at first payout",
+   "Yes, show '₹8,000 a month on average'",
+   ""
+  ]
+ },
+ "plan_cost": 0.2076184,
+ "builders_cost": 0.6756390000000001,
+ "check": "9 tests, all passing. All 5 that passed before still pass.",
+ "tests": "9/9",
+ "owner_messages": [
+  "I want more creators signing up this month.",
+  "[tap] Yes, do it all",
+  "[tap] Ask only at first payout",
+  "[tap] Yes, show '₹8,000 a month on average'"
+ ],
+ "questions": [
+  {
+   "question": "❓ One thing only you can decide (A shorter sign-up form):\nDo creators ever need a GST number for Sunny Shop deals, or can we stop asking for it altogether?",
+   "options": [
+    "Never ask for GST",
+    "Ask only at first payout",
+    "Ask only above a yearly earnings level"
+   ],
+   "answer": "Ask only at first payout"
+  },
+  {
+   "question": "❓ One thing only you can decide (A home page that speaks to creators):\nCan the home page say that creators earn about ₹8,000 a month in their first 3 months?",
+   "options": [
+    "Yes, show '₹8,000 a month on average'",
+    "No, show only the deal amounts"
+   ],
+   "answer": "Yes, show '₹8,000 a month on average'"
+  }
+ ],
+ "hive_messages": [
+  {
+   "text": "🔎 On it, sir. Let me look at your product with that in mind; a minute or two.",
+   "photo": false
+  },
+  {
+   "text": "🧭 Here's what I see, sir. A creator who lands on Sunny Shop never sees what they could earn: the home page never mentions creators or money, and the only way to sign up is a small footer link to a 9-field form that asks for PAN, GST, bank account, IFSC and postal address, even though the terms say PAN is only needed before t\n\nWhat I'd do:\n1. A shorter sign-up form: Sign-up makes a student on a phone type 9 required fields, including GST, bank account and full address, before they have seen a single deal, while the terms only need PAN before the first payout.\n2. A home page that speaks to creators: The home page talks about 'a platform' and 'the future of commerce' and has a section for brands but none for creators, so a creator never sees the real deals (₹1,500 to ₹3,000) or a clear button to join.\n3. Make the ₹500 invite reward easy to see: The ₹500 reward for both creators is the best reason to bring a friend, but it is hidden in small grey text 400px below the button, and no page links to the invite page, so new creators never find it.\n\nI'll build them one after another and show you each. Your main version isn't touched.",
+   "photo": false
+  },
+  {
+   "text": "❓ One thing only you can decide (A shorter sign-up form):\nDo creators ever need a GST number for Sunny Shop deals, or can we stop asking for it altogether?",
+   "photo": false
+  },
+  {
+   "text": "❓ One thing only you can decide (A home page that speaks to creators):\nCan the home page say that creators earn about ₹8,000 a month in their first 3 months?",
+   "photo": false
+  },
+  {
+   "text": "🛠 Right, sir. Building the first step now: A shorter sign-up form. I'll show you each step as it lands; say \"status\" any time.",
+   "photo": false
+  },
+  {
+   "text": "✅ Step 1 of 3 done: A shorter sign-up form.",
+   "photo": false
+  },
+  {
+   "text": "/",
+   "photo": true
+  },
+  {
+   "text": "🛠 Step 2 of 3: A home page that speaks to creators. On it.",
+   "photo": false
+  },
+  {
+   "text": "✅ Step 2 of 3 done: A home page that speaks to creators.",
+   "photo": false
+  },
+  {
+   "text": "/",
+   "photo": true
+  },
+  {
+   "text": "🛠 Step 3 of 3: Make the ₹500 invite reward easy to see. On it.",
+   "photo": false
+  },
+  {
+   "text": "✅ Step 3 of 3 done: Make the ₹500 invite reward easy to see.",
+   "photo": false
+  },
+  {
+   "text": "/",
+   "photo": true
+  },
+  {
+   "text": "🎉 That's the plan done, sir. 9 tests, all passing. All 5 that passed before still pass.\n\nTell me what's off, or say ship it and it all goes to your engineer as one pull request.",
+   "photo": false
+  }
+ ],
+ "final": "/home/node/f106/g1A/final"
+}

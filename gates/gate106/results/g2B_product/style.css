@@ -1,0 +1,18 @@
+body { margin: 0; font-family: Arial, sans-serif; color: #222; background: #fafafa; }
+nav { background: #f59e0b; padding: 14px 18px; font-weight: bold; color: #fff; }
+main { padding: 20px 18px; }
+footer { padding: 30px 18px; color: #888; font-size: 12px; }
+label { display: block; margin: 10px 0 4px; font-size: 14px; }
+input, select { width: 100%; padding: 8px; box-sizing: border-box; }
+button { padding: 10px 16px; background: #111827; color: #fff; border: 0; border-radius: 6px; }
+.empty { color: #999; text-align: center; padding: 60px 0; }
+nav a { color: #fff; }
+.welcome li { margin: 10px 0; }
+.btn-block { display: block; width: 100%; box-sizing: border-box; margin-top: 16px; padding: 16px; background: #111827; color: #fff; text-align: center; text-decoration: none; font-size: 18px; border-radius: 6px; }
+.apply { display: inline; margin: 0; }
+@media (max-width: 600px) {
+  .apply { display: block; margin-top: 8px; }
+  .apply button { display: block; width: 100%; padding: 14px; font-size: 16px; }
+}
+.creator { margin-bottom: 32px; }
+.steps li { margin: 8px 0; }

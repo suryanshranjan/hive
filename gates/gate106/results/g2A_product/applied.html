@@ -1,0 +1,21 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>You've applied</title><link rel="stylesheet" href="style.css"></head>
+<body>
+  <nav>☀️ Sunny Shop <a href="deals.html">Deals</a></nav>
+  <main>
+    <h1>You've applied!</h1>
+    <p>You applied for <strong id="deal">your deal</strong>. Here's what happens next:</p>
+    <ol>
+      <li>The brand reviews your application.</li>
+      <li>You post the content.</li>
+      <li>You're paid within 7 days of the brand approving it.</li>
+    </ol>
+    <p><a href="deals.html">Apply to another deal</a></p>
+  </main>
+  <script>
+    var names = {'chai-co': 'Chai Co', 'kurta-house': 'Kurta House', 'fitbottle': 'FitBottle'};
+    var deal = (new URLSearchParams(location.search).get('deal') || '').trim();
+    if (deal) document.getElementById('deal').textContent = names[deal] || deal.replace(/-/g, ' ');
+  </script>
+</body></html>

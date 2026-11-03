@@ -1,0 +1,33 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Creator sign-up</title><link rel="stylesheet" href="style.css"></head>
+<body>
+  <nav><span class="logo">☀️ Sunny Shop</span> <a href="deals.html">Deals</a> <a href="invite.html">Invite ₹500</a></nav>
+  <main>
+    <h1>Join Sunny Shop as a creator</h1>
+    <p id="invite-banner" class="card" hidden>Your friend invited you. Finish your first deal and you both get ₹500.</p>
+    <p>Brands pay creators like you, e.g. Chai Co ₹3,000 for 2 reels, FitBottle ₹2,000 for 3 stories.</p>
+    <p>New creators earn ₹8,000 a month on average in their first 3 months.</p>
+    <form action="dashboard.html">
+      <input type="hidden" name="ref" id="ref">
+      <label>Full name</label><input name="name" required>
+      <label>Email</label><input name="email" type="email" required>
+      <label>Phone</label><input name="phone" type="tel" required>
+      <label>Instagram handle</label><input name="instagram" required>
+      <h2>Payout details (needed before your first payout, you can add these later)</h2>
+      <label>PAN number</label><input name="pan">
+      <label>GST number (optional)</label><input name="gst">
+      <label>Bank account number</label><input name="account">
+      <label>IFSC code</label><input name="ifsc">
+      <label>Full postal address</label><input name="address">
+      <button type="submit">Join and see deals</button>
+    </form>
+  </main>
+  <script>
+    var ref = new URLSearchParams(location.search).get('ref');
+    if (ref) {
+      document.getElementById('ref').value = ref;
+      document.getElementById('invite-banner').hidden = false;
+    }
+  </script>
+</body></html>

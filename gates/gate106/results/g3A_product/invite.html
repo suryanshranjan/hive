@@ -1,0 +1,43 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invite</title><link rel="stylesheet" href="style.css"></head>
+<body>
+  <nav><span class="logo">☀️ Sunny Shop</span> <a href="deals.html">Deals</a> <a href="invite.html">Invite ₹500</a></nav>
+  <main>
+    <h1>Invite a friend, you both get ₹500</h1>
+    <p>When a friend you invite finishes their first deal, you both get ₹500.</p>
+    <ol>
+      <li>Share your link</li>
+      <li>Your friend signs up and does a deal</li>
+      <li>You both get ₹500</li>
+    </ol>
+    <label for="invite-link">Your invite link</label>
+    <input id="invite-link" type="text" readonly value="signup.html?ref=friend">
+    <p><a id="whatsapp-share" href="https://wa.me/?text=Join%20me%20on%20Sunny%20Shop%2C%20brands%20pay%20Instagram%20creators%20for%20reels%20and%20posts.%20Sign%20up%20with%20my%20link%20and%20we%20both%20get%20%E2%82%B9500%20after%20your%20first%20deal%3A%20signup.html%3Fref%3Dfriend" style="display:block;padding:16px;background:#25D366;color:#fff;text-align:center;font-size:18px;font-weight:bold;border-radius:8px;text-decoration:none">Share on WhatsApp</a></p>
+    <button id="copy-invite" type="button">Copy invite link</button>
+  </main>
+  <script>
+    (function () {
+      var code = (new URLSearchParams(location.search).get('ref') || '').trim() || 'friend';
+      var path = 'signup.html?ref=' + encodeURIComponent(code);
+      var link;
+      try { link = new URL(path, location.href).href; } catch (e) { link = path; }
+      var input = document.getElementById('invite-link');
+      var button = document.getElementById('copy-invite');
+      input.value = link;
+      var message = 'Join me on Sunny Shop, brands pay Instagram creators for reels and posts. ' +
+        'Sign up with my link and we both get ₹500 after your first deal: ' + link;
+      document.getElementById('whatsapp-share').href = 'https://wa.me/?text=' + encodeURIComponent(message);
+      function selectLink() { input.focus(); input.select(); input.setSelectionRange(0, input.value.length); }
+      button.addEventListener('click', function () {
+        var done = function () { button.textContent = 'Copied!'; };
+        var fallback = function () { selectLink(); try { document.execCommand('copy'); } catch (e) {} done(); };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(link).then(done, fallback);
+        } else {
+          fallback();
+        }
+      });
+    })();
+  </script>
+</body></html>
