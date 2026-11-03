@@ -1,0 +1,266 @@
+{
+ "t1": {
+  "before": {
+   "matched": 0,
+   "judge": 3.0
+  },
+  "P": {
+   "matched": 6,
+   "judge": 10.0,
+   "why": "Same teal header, white background, teal-bordered square-cornered highlight box with large teal amount, full-width red rounded button, and matching serif type sizes and layout; only the wording and spacing from longer text differ.",
+   "kept_his_words": true,
+   "tests": "12/12",
+   "cost": 0.263,
+   "minutes": 0.7,
+   "checks": [
+    [
+     "header_bg",
+     true,
+     "rgb(15, 118, 110) (distance 0)"
+    ],
+    [
+     "h1_size",
+     true,
+     34
+    ],
+    [
+     "card_radius_max",
+     true,
+     0
+    ],
+    [
+     "reward_color",
+     true,
+     "rgb(15, 118, 110) (distance 0)"
+    ],
+    [
+     "button_bg",
+     true,
+     "rgb(225, 29, 72) (distance 0)"
+    ],
+    [
+     "button_full",
+     true,
+     0.8974358974358975
+    ]
+   ]
+  },
+  "W": {
+   "matched": 3,
+   "judge": 5.0,
+   "why": "The layout matches (coloured header bar, big heading, intro text, bordered highlight card, full-width red button, numbered list), but the page uses a darker forest-green header instead of teal, sans-serif type instead of serif, a rounded thin-bordered card instead of the square thick-bordered one, a coral button with larger corners instead of crimson, and a much bigger highlight figure.",
+   "kept_his_words": true,
+   "tests": "10/10",
+   "cost": 0.228,
+   "minutes": 0.6,
+   "checks": [
+    [
+     "header_bg",
+     false,
+     "rgb(20, 83, 45) (distance 74)"
+    ],
+    [
+     "h1_size",
+     true,
+     34
+    ],
+    [
+     "card_radius_max",
+     false,
+     12
+    ],
+    [
+     "reward_color",
+     false,
+     "rgb(22, 163, 74) (distance 58)"
+    ],
+    [
+     "button_bg",
+     true,
+     "rgb(239, 68, 68) (distance 42)"
+    ],
+    [
+     "button_full",
+     true,
+     0.8769230769230769
+    ]
+   ]
+  }
+ },
+ "t2": {
+  "before": {
+   "matched": 0,
+   "judge": 4.0
+  },
+  "P": {
+   "matched": 6,
+   "judge": 9.0,
+   "why": "The header purple, pale lavender background, white rounded card with pink highlight figure and purple subtext, pill-shaped purple button sized to its text, and the type scale and layout all match the reference; the only differences are a slightly taller header and the longer copy pushing things down.",
+   "kept_his_words": true,
+   "tests": "10/10",
+   "cost": 0.254,
+   "minutes": 0.6,
+   "checks": [
+    [
+     "header_bg",
+     true,
+     "rgb(109, 40, 217) (distance 0)"
+    ],
+    [
+     "h1_size",
+     true,
+     22
+    ],
+    [
+     "card_radius_min",
+     true,
+     24
+    ],
+    [
+     "reward_color",
+     true,
+     "rgb(219, 39, 119) (distance 0)"
+    ],
+    [
+     "button_bg",
+     true,
+     "rgb(109, 40, 217) (distance 0)"
+    ],
+    [
+     "button_pill",
+     true,
+     999
+    ]
+   ]
+  },
+  "W": {
+   "matched": 4,
+   "judge": 6.0,
+   "why": "The colours match closely (purple header, lavender background, white rounded card with a soft shadow, pink highlight, purple pill button), but the page centres its heading, intro and button where the reference left-aligns them, uses a much larger heading, makes the button wider and bold, and spaces everything out more.",
+   "kept_his_words": true,
+   "tests": "12/12",
+   "cost": 0.273,
+   "minutes": 0.8,
+   "checks": [
+    [
+     "header_bg",
+     true,
+     "rgb(124, 58, 237) (distance 31)"
+    ],
+    [
+     "h1_size",
+     false,
+     36
+    ],
+    [
+     "card_radius_min",
+     true,
+     28
+    ],
+    [
+     "reward_color",
+     false,
+     "rgb(236, 72, 153) (distance 50)"
+    ],
+    [
+     "button_bg",
+     true,
+     "rgb(124, 58, 237) (distance 31)"
+    ],
+    [
+     "button_pill",
+     true,
+     999
+    ]
+   ]
+  }
+ },
+ "t3": {
+  "before": {
+   "matched": 0,
+   "judge": 3.0
+  },
+  "P": {
+   "matched": 6,
+   "judge": 9.0,
+   "why": "The two pages share the same header, background, card, yellow button and layout; the only visible difference is the type: the page uses a different sans-serif font with slightly bigger, more spaced-out headings and body text, so things sit a little lower on the screen.",
+   "kept_his_words": true,
+   "tests": "10/10",
+   "cost": 0.25,
+   "minutes": 0.6,
+   "checks": [
+    [
+     "page_bg",
+     true,
+     "rgb(11, 18, 32) (distance 0)"
+    ],
+    [
+     "header_bg",
+     true,
+     "rgb(0, 0, 0) (distance 0)"
+    ],
+    [
+     "h1_color",
+     true,
+     "rgb(255, 255, 255) (distance 0)"
+    ],
+    [
+     "reward_color",
+     true,
+     "rgb(250, 204, 21) (distance 0)"
+    ],
+    [
+     "button_bg",
+     true,
+     "rgb(250, 204, 21) (distance 0)"
+    ],
+    [
+     "button_full",
+     true,
+     0.8974358974358975
+    ]
+   ]
+  },
+  "W": {
+   "matched": 6,
+   "judge": 8.0,
+   "why": "The layout, black header with a yellow brand name, rounded card, full-width rounded yellow button and type scale all match closely, but the page's background and card are neutral grey-black where the reference uses a navy tint, the font is different, and the list is less indented.",
+   "kept_his_words": true,
+   "tests": "11/11",
+   "cost": 0.251,
+   "minutes": 0.7,
+   "checks": [
+    [
+     "page_bg",
+     true,
+     "rgb(13, 13, 13) (distance 20)"
+    ],
+    [
+     "header_bg",
+     true,
+     "rgb(0, 0, 0) (distance 0)"
+    ],
+    [
+     "h1_color",
+     true,
+     "rgb(255, 255, 255) (distance 0)"
+    ],
+    [
+     "reward_color",
+     true,
+     "rgb(250, 204, 21) (distance 0)"
+    ],
+    [
+     "button_bg",
+     true,
+     "rgb(250, 204, 21) (distance 0)"
+    ],
+    [
+     "button_full",
+     true,
+     0.8974358974358975
+    ]
+   ]
+  }
+ }
+}

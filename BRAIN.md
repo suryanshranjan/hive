@@ -2,7 +2,7 @@
 
 Read this first. It is the shared memory for anyone working on Hive, human or agent: what we know, how sure we are, what is being tested, and exactly how to continue. When you learn something, update this file in the same commit as the evidence.
 
-Last updated: Nov 3 2026 (IST), after Gate 104.
+Last updated: Nov 3 2026 (IST), after Gate 105.
 
 ## 1. The question
 
@@ -102,6 +102,7 @@ The deeper limit is intent, and Gates 3 to 17 have now mapped it. On rules a mod
 - **Memory helps against silent drift (Gate 101):** with his rules changed and unannounced, memory-kept builds scored 27, 28, 29 of 29; without memory 20, 29, 17. The contradiction check is what notices the change ("which holds now?", 3-5 per flight); without memory the two failures were verification failures: his new rate was given (on the code sheet, or in the interview) but one change builder skipped it, and another wrote it in a new module nothing calls; Hive said "your changes are in". Next: check his examples through the product's own functions before delivery (Gate 103).
 - **The overnight path is now as reliable as the live one (Gate 102, shipped):** interviewing the owner before he leaves made 5 of 5 overnight flights right (27/27 each; Gate 99 without it: pass^1 0.60), at a median 30 prompts (14 before, all in the morning) and $1.53 a feature.
 - **Confirm his rules once, at the end (Gate 104):** with the own-words read-backs dropped and the rule sheet as the one confirmation, the owner's prompts fell from a median 30 to 23 per feature, every build 27 of 27 either way (3 flights an arm). His misreadings surfaced on the sheet instead (one "what should it be?" each). The bigger swing is elsewhere: when builders ask fewer than 3 questions the after-build review runs, and those flights cost 36-42 prompts. Shipped as the default (`HIVE_CONFIRM_EACH=1` restores read-backs).
+- **His picture beats his words for a look (Gate 105):** given the owner's reference screenshot through Hive's fix round, one builder matched 18 of 18 measured checks of three target designs (colours, sizes, corners, button shape); given the same request in a founder's words, 13 of 18 ("dark green" for teal, "big heading" for a small one). A blind judge preferred the picture 3 of 3; same cost ($0.26 vs $0.25), under a minute, every test passing, his own words kept. n = 1 a cell; targets in a well-known palette. Jarvis now suggests a screenshot when he describes a look in words.
 - **A check of the owner's own examples sees what builders' tests miss (Gate 103a, replay):** run through the functions the product used before the build, his examples flag both of Gate 101's verification failures and 1 of 23 good builds (a true rounding deviation), at $0.11 a check. **Flights (103b): ships.** Drift F with the check scored 29 and 29 of 29 (without: 20, 29, 17), live 26, 27, 27 of 27; in live 2 it caught a split-payment refund sent all to the card, and one fix round made it right. Cost $0.36 a flight; minutes +11.3 against Gate 98 (failed X3), confounded by a slower machine and a memory stall on the laptop.
 - **Spot checks woke the skimmer, but the sheet did not improve (Gate 57):** shown 30 concrete outcomes one at a time, the skimming owner corrected 17 (details he passes over in a list), against 11 replies to the 81-rule list. But after one model call turned his corrections into rules, the sheet had 7 decisions right (+4 partly) against the list's 9; hidden 51.2 vs 48.8% (N0 33.2). Corrections were lost in conversion (minimum and cap made to conflict), and some decisions were never shown as a case. Post hoc, the list and the spots fixed different decisions (5 and 3; together 12 of 25). Next: a combined review, with each corrected case re-run after the fix.
 - **Open:** an assumption review (builders list the defaults they applied, the owner marks the wrong ones); all 5 Gate 27 misses trace to defaults stated in the builders' own commit messages (post hoc). Also larger features with persistence and endpoints, and more founders and companies.
@@ -185,6 +186,7 @@ Status tags: **established** means outside theory or our data on real agents; **
 | Builder model on the deep project (4 builders) | Sonnet 5.3 min to 95%, $5.01, 17.5M tokens; Haiku 9.4–11.2 min, $4.89–5.13, 79–82M tokens; an Opus lead adds $0.97–1.30 | Gate 64 |
 | One builder asking an owner who answers from his policy | 84.6% hidden unprompted (10.5 questions), 93.0% told to ask first (16); $0.27–0.39 a run | Gate 66 |
 | Owner pace as the job's pace | With 60 s an answer, an asking agent's minutes ≈ its questions (25 in 27.7 min; 65 in 68.6); a 7-builder swarm kept the owner busy 103% of its time | Gate 71 |
+| A look changed from his picture vs his words (one builder, one fix round) | 18/18 vs 13/18 measured checks; blind judge 9.3 vs 6.3 of 10; $0.26 vs $0.25, 0.6-0.8 min | Gate 105 |
 | Builders given a complete rule sheet | 250/250 hidden twice; N0 edge errors fixed 217/217 and 193/193; 0 broken | Gates 39, 40 |
 | Asked decisions stated right on Hive's sheet | 0.76, 0.74, 0.69 (three interviews; about 11 rules each, one per function) | Gates 39, 40 |
 
@@ -208,6 +210,7 @@ Status tags: **established** means outside theory or our data on real agents; **
 | Gate 45, day 1 | Oct 29 | The founder reviews the paged code sheet (46 rules) on his phone | Finished; 0 rules marked, nothing added; restarted twice on Hive faults (disclosed): question filed as a correction, 40 pages; rules 19-46 reworded before he saw them |
 | Gate 48 | Oct 29 | Laya (open copy of Jev) vs Claude reading 120 owner-style messages (9 intents) | Claude 92.5%, Laya-ml 42.5%, Laya-en 45.0%, v3 tuned on a practice set 45.0%; 0.68 s with 2 threads (5.0 s untuned); 26 wrong stop/cloud calls (v1); L1, L5, A2, A4 held, L2–L4, L6, A1, A3 failed; kill fired |
 | Gate 47 | Oct 29 | Claude and Codex in one swarm (M1, M2), vs Claude only (C) and Codex only (X); Codex lead (LX) vs Claude lead (LC), deep project | 95% at 9.2 / 7.5 / 8.3 / 8.0 / 8.3 / 8.1 min; all 1,340 visible; hidden 99.8–100%; 0 breaks; Claude cost $6.72 / 10.83 / 0 / 13.31 / 12.82 / 5.74; P1–P4, P6–P8 held, P5 failed; ship fired. Registered analysis miscounted the seed's history as one break per team (disclosed, recounted) |
+| Gate 105 | Nov 3 | His reference picture vs his words for a look, one fix round each (start.apply_ruling, one Claude builder), 3 private targets; measured by role and a blind judge | P 18/18, W 13/18 measured; judge P 10, 9, 9 vs W 5, 6, 8 (start 3-4); all tests pass, his words kept; $0.26 vs $0.25; V1-V5 held. Found: the camera's raw error without a browser (fixed) |
 | Gate 104 | Nov 3 | Owner's rules confirmed once at the end (no own-words read-backs) vs each read back, live flights | Median prompts 30 vs 23; hidden 27/27 in all six; Q1-Q3 held; ship fired. Flights with fewer than 3 builder questions also ran the review (36-42 prompts) |
 | Gate 103b | Nov 3 | Owner's-examples check before every delivery, flown: drift F (no memory, silent drift) and live | Drift F 29, 29 of 29 (F3 not flown: its private files are on the cloud lab); live 26, 27, 27 of 27; X1, X2 held, X3 failed on minutes (+11.3; machine and memory stall confound); ships |
 | Gate 103a | Nov 2 | Owner's-examples check replayed on 32 stored builds (v1, then v2: test the functions that existed before the build) | v2 flags F1 and F3 (Gate 101), 1 of 23 good builds, $0.11 a check; v1 tested F3's new unused module |
@@ -315,6 +318,7 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 - **Failed (Gate 48):** Laya ≥ 80% (42.5%); ≤ 1 s as registered (5.0, a thread misconfiguration); hybrid with Laya answering half; no wrong stop or cloud calls (26); amendment: v3 at 55–72% (45.0%), ≤ 3 wrong stops (5).
 - **Held (Gate 47):** mixed teams reach 95% (9.2, 8.1 min), break main at most once (0, 0), each agent lands ≥ 25% (Codex 52%, 73%); mixing costs no speed (8.7 vs 9.1 allowed); hidden within 3 points (0.2); Codex lead's plan within 6 minutes (85 s); lead's agent within 20% (8.0 vs 8.3).
 - **Failed (Gate 47):** Codex builders ≥ 1.2× slower than Claude (1.11×).
+- **Held (Gate 105):** V1 (picture 18 vs words 13 of 18, P >= W each), V2 (6/6 on 3 of 3), V3 (judge 3 of 3), V4 (all tests, his words kept), V5 (cost 1.02x).
 - **Held (Gate 104):** Q1 (saves 7 prompts, median), Q2 (every B flight 27 of 27), Q3 (median hidden equal).
 - **Held (Gate 103b):** X1 (drift median 29), X2 (live 26, 27, 27). **Failed:** X3 on minutes (+11.3; cost $0.36 held).
 - **Held (Gate 103a/a2):** R2, R4, R1', R2', R4'. **Failed:** R1 (v1 missed F3), R3 (2 of 5 failed flights: the other three are other failures).
@@ -448,6 +452,7 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 
 ## 8. Open questions, most important first
 
+0000. **Does a picture from the wild work as well? (after Gate 105)** Gate 105's targets were clean one-page designs in a palette models know (18/18 with the picture). Open: a real screenshot of another site (noisy, other content, several sections), a picture of a whole app, and the founder's own pictures from his phone.
 000. **Will a real owner read and correct a code sheet?** With a synthetic owner, the corrected code sheet gave 99.6% (Gate 42). A real build's sheet runs to 50–80 rules; Gates 30–35 found real owners audit long lists of builder decisions poorly, though in Gate 38 the founder confirmed a 13-rule sheet of his own rules. Needs the founder: one real feature, the code sheet on his phone, his marks against his own later verdicts.
 000a2. **Answered (Gate 42, synthetic):** a sheet written from the built code, corrected by the owner, nearly matches his complete sheet.
 000a. **Answered (Gate 41):** keeping his rulings whole beside the sheet does not help (−6.8; more stretching).
@@ -517,6 +522,15 @@ Rules of the lab:
 - Give 95% intervals clustered by function, say when a comparison is observational, and remember that one run per team is not a replication.
 
 ## 12. Changelog
+
+- **Nov 3 2026 (IST), Gates 103b-105 and the Tony scenario:**
+  - **Shipped:** Gate 103b (the owner's-examples check) and Gate 104 (confirm once on the sheet).
+  - **The visual loop:** screenshots to his phone; his pictures reach the builders.
+  - **Gate 105 (all five predictions held):** his picture matched 18 of 18 checks of a look, against 13 of 18 for his words, at the same cost. Jarvis now suggests a screenshot when he describes a look in words.
+  - **From the phone:**
+    - **"ship it"** sends the latest build to his engineer as a pull request, after he confirms (`hive/ship.py`). Only `hive/<name>` is pushed, never his main.
+    - **A customer's complaint** is traced in his code. Either it is one of his rules at work (he is told which, and can change it in a message) or it is a fault (one tap fixes the latest build).
+  - **Fixed:** the camera, when the browser is missing, now says so in plain words.
 
 - **Oct 29 2026, Gate 38:** the rule sheet with the real founder. His 13 confirmed rules matched his next-day verdicts on 2 of 11 decisions (raw answers 2 of 11): kill fired. Builders followed the rules exactly (surprising 3/6 vs 0/6, ordinary 2/6 vs 5/6, tie 5/12). The hand-over (code sheet) becomes the main channel; Gate 45 measures it. Tool: the guard now also checks what a builder committed with plain git (one commit carried `node_modules` onto main), and no longer fails when the work was already committed.
 - **Oct 30 2026, no gaps (asked for by the user):** Jarvis runs the code in a throwaway copy to check an answer, warns about a stuck builder unprompted, remembers his business; real-model Jarvis bench 29 of 29 (mean 8.0), with product questions graded against real code. `hive doctor` on Windows reported Claude logged out (a bare `.cmd` name): fixed.

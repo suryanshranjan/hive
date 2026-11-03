@@ -86,6 +86,14 @@ sent = [(m['text'].split(chr(10))[0], m.get('photo')) for m in fake.sent]
 check('a picture after a build changes that build (his words and picture to the fix round), then before and after',
       (r, len(applied), refs.has(applied[0]) if applied else False, ('[photo] Before: /invite', png) in sent, ('[photo] After: /invite', after) in sent),
       ('amended', 1, True, True, True))
+check('with a picture, no tip to send one', 'a picture lands closer' in fake.sent[0]['text'], False)
+fake = FakeTelegram([])
+real_fast = assistant.fast_read
+assistant.fast_read = lambda c, t: {'intent': 'amend', 'rule': t}   # as Claude reads it right after a build he saw
+assistant.handle(ch(fake), code, 'make the header a darker colour', poll=1, apply_build=apply_build)
+assistant.fast_read = real_fast
+check('words about a look: the tip that a picture lands closer (Gate 105: 18/18 vs 13/18)',
+      'a picture lands closer' in fake.sent[0]['text'], True)
 
 # 7. when it cannot take screenshots, he is told why in plain words
 screens.take = real_take

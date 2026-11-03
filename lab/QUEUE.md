@@ -2,7 +2,12 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 3 2026, after Gates 103b and 104)
+## Where we left off (Nov 3 2026, after Gate 105)
+
+- **Gate 105 done (all held):** his reference picture vs his words for a look, one fix round each: 18/18 vs 13/18 measured checks, blind judge 3 of 3 for the picture, same cost ($0.26 vs $0.25). Jarvis now suggests a screenshot when he describes a look in words. Targets and checks are in `private/g105` on the laptop lab (Docker `hive-g8`). Next on this thread: a picture from the wild (BRAIN open question 0000, the first one).
+- **Built on the owner's request (Tony scenario):** "ship it" from the phone (`hive/ship.py`, a pull request after he confirms, never his main); a customer's complaint traced to his rules or to a fault (`assistant.complaint`). Tests: `tests/test_ship.py`, `tests/test_complaint.py` (in CI).
+- **Lab:** Playwright and Chromium are now in the container (`PLAYWRIGHT_BROWSERS_PATH=/home/node/.cache/ms-playwright` under a clean home). The real home's Claude login now links to the live host login (`/host/creds.json`; the old copy is kept as `.credentials.json.bak-nov2`). A mock project for the live phone loop: `/home/node/sunnyshop` (origin `/home/node/sunnyshop-origin.git`).
+- **Next with the founder:** the live phone loop (show me, a picture, ship it, a complaint) on the mock Sunny Shop; then the founder session (`docs/founder_session.md`).
 
 - **Gate 103b done, ships** (flown Nov 3 on the user's laptop, Docker lab): live 26, 27, 27 of 27 with the owner's-examples check (it caught a split-payment refund in live 2); X1, X2 held, X3 failed on minutes (+11.3, confounded: slower machine, and live 1 stalled about an hour while the laptop ran out of memory). Drift F3 not flown: `private/g92` and `runs/g101_day1` exist only on the cloud lab. The check stays on.
 - **Gate 104 done, ships** (Gap 2): confirming his rules once on the sheet (no own-words read-backs) took the median owner prompts from 30 to 23, every build 27/27; now the default. Next on owner time: the after-build review that runs when builders ask fewer than 3 questions (those flights cost 36-42 prompts).

@@ -71,19 +71,26 @@ def cell(t, arm):
     name = f'{t}{arm}'; home = os.path.join(WORK, name)
     if os.path.exists(os.path.join(OUT, name + '.json')):
         print(name, 'done already'); return
-    if os.path.exists(home):
-        start._rmtree(home)
-    os.makedirs(home)
-    repo, final = shop(home)
-    before = start.run_tests(repo, CMD)
-    state = dict(repo=repo, branch='main', name=f'g105-{name}', home=home, test_cmd=CMD, links=[], goal=GOAL, technical=True,
-                 minutes=15, before=before, started=time.time(), b='main', final=final, check='', code=0, cost=0.0, spent0=0.0)
     rule = ('Make the invite page look like this. [photo: ' + os.path.join(PRIV, t, 'ref.png') + ']' if arm == 'P'
             else 'Make the invite page look like this: ' + words_for(t))
-    t0 = time.time()
-    rc = start.apply_ruling(state, rule)
-    mins = (time.time() - t0) / 60
     result = os.path.join(home, 'result')
+    done = os.path.join(home, 'state.json')
+    if os.path.exists(done) and os.path.isdir(result) and os.path.exists(os.path.join(home, 'minutes')):
+        state = json.load(open(done)); rc = None; mins = float(open(os.path.join(home, 'minutes')).read())
+        print(name, 'fix round done already: measuring it')   # (the camera failed once after a finished round)
+    else:
+        if os.path.exists(home):
+            start._rmtree(home)
+        os.makedirs(home)
+        repo, final = shop(home)
+        before = start.run_tests(repo, CMD)
+        state = dict(repo=repo, branch='main', name=f'g105-{name}', home=home, test_cmd=CMD, links=[], goal=GOAL,
+                     technical=True, minutes=15, before=before, started=time.time(), b='main', final=final, check='',
+                     code=0, cost=0.0, spent0=0.0)
+        t0 = time.time()
+        rc = start.apply_ruling(state, rule)
+        mins = (time.time() - t0) / 60
+        open(os.path.join(home, 'minutes'), 'w').write(str(mins))
     os.makedirs(OUT, exist_ok=True)
     shot = os.path.join(OUT, name + '.png')
     try:

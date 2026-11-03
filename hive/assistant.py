@@ -24,7 +24,7 @@ What does he mean? Read it as a person would, using the conversation: "yes" or "
 proposed; "I already told you" or "that one" points back to what he said before; a short correction ("no, Sunny Shop
 Creators") changes what you just proposed. Reply with JSON only:
 {{"intent": "build" | "stop_build" | "change" | "rule" | "status" | "team" | "set_team" | "stop_builder" | "greeting" |
-"instruct" | "show" | "amend" | "cloud_on" | "cloud_off" | "reply",
+"instruct" | "show" | "amend" | "ship" | "complaint" | "cloud_on" | "cloud_off" | "reply",
 "rule": "for a build, exactly what to build (taken from the conversation if he points back to it); for a change or a
 rule, the rule he now wants; otherwise empty",
 "confirmed": true if he is agreeing to do what you just proposed (or clearly telling you to go ahead now), else false,
@@ -52,6 +52,10 @@ rule, the rule he now wants; otherwise empty",
 - "amend": right after seeing what was built (a screenshot you sent, or a build that just landed), he wants that build
   changed: how it looks or works ("the button is too small", "make the header like this"). "rule" carries the change.
   Not a separate new feature.
+- "ship": he wants his latest build sent to his engineer or team to review and merge (a pull request): "ship it", "send
+  it to the dev", "looks good, give it to Rahul". Not putting it live himself, and not a new build.
+- "complaint": he passes on a customer's complaint or problem with the product ("a customer says she was charged
+  twice", "a seller complained his payout never came"). Not his own request for a change.
 - "greeting": a hello, with no request yet.
 - "cloud_on" / "cloud_off": move Hive to the cloud / shut the cloud machine down.
 - "reply": anything else: a question, a complaint, frustration, small talk. Never a rule."""
@@ -92,8 +96,9 @@ How you speak:
 - What you can do from his phone: build something new from his description; stop a build; say how a build is going
   and why one stopped; say which builder is doing what, on which agent (Claude, Codex, Gemini, Antigravity), stop one
   builder, give the running builders a new instruction mid-build, and choose the team for his next builds (which
-  agents, how many: the swarm law has its say first, then it is his call); answer questions about his product from its code; keep a rule he gives for every build; move to
-  the cloud and back. Hard limits, whatever he asks: you never change his own main version and never skip the tests;
+  agents, how many: the swarm law has its say first, then it is his call); answer questions about his product from its code; keep a rule he gives for every build; show him
+  screenshots and change a build from a picture he sends; send his latest build to his engineer as a pull request when
+  he says "ship it"; move to the cloud and back. Hard limits, whatever he asks: you never change his own main version and never skip the tests;
   every build arrives as a separate tested copy that he looks at and merges himself. Say so plainly if he asks for it.
 - Reply in his language and his script: Hindi-English in English letters if that is how he writes, never Devanagari.
 - Own your mistakes plainly ("My error, sir; it is fixed."), without grovelling.
@@ -280,6 +285,51 @@ def route(run, text):
     return team.pick(run), ''
 
 SHOW_WORDS = re.compile(r"\b(show me|screenshots?|dikhao|dikha do|kaisa dikh|how does it look|how it looks|let me see)\b")
+# Gate 105: given his words, a builder matched 13 of 18 checks of a look; given the picture, 18 of 18 ("dark green"
+# for teal, "big heading" for a small one). Words about a look get the tip to send a picture.
+LOOK_WORDS = re.compile(r"\b(colou?rs?|look|looks|design|style|font|header|button|darker|lighter|bigger|smaller|"
+                        r"rounded|corners?|layout|theme|dark mode)\b")
+SHIP_WORDS = re.compile(r"^\s*(ok(ay)?[,.]?\s+|great[,.]?\s+|perfect[,.]?\s+|good[,.]?\s+)?(ship it|ship this|ship that|"
+                        r"send it to (my |the )?(engineer|developer|dev|team)|open an? (pr|pull request|merge request)|"
+                        r"raise an? (pr|pull request)|bhej do engineer ko|engineer ko bhej\w*)\b")
+
+def ship_it(ch, repo, text, poll):
+    """'Ship it': his latest build goes to his engineer as a pull request, after he confirms (it is seen by others).
+    Only Hive's own branch is pushed; his main branch is never touched (hive/ship.py)."""
+    from . import ship
+    st = latest_build(repo)
+    if not st:
+        ch.send("📦 Nothing built yet to ship, sir. Tell me what to build first."); return 'nothing_to_ship'
+    bad = 'now fail' in (st.get('check') or '')
+    ch.send(f"📦 <b>Send this to your engineer?</b>\n\n{telegram.esc(ship.title(st)[6:][:200])}\n{telegram.esc(st.get('check', ''))}"
+            + ("\n\n⚠️ <b>Some tests that passed before now fail.</b> They will see that first." if bad else '') +
+            "\n\n<i>I'll open a pull request for them to review and merge. Your main version is not touched.</i>", html=True,
+            buttons=[[('📦 Yes, send it', 'shp|yes')], [('Not now', 'shp|no')]])
+    choice, other = choose(ch, poll, [('shp|yes', ('yes', 'send it', 'ship it', 'go ahead', 'haan', 'bhej do')),
+                                      ('shp|no', NO_WORDS)])
+    if other is not None:
+        ch.send("Very good, I'll hold it for now.")
+        return handle(ch, repo, other, poll)
+    if choice != 'shp|yes':
+        ch.send('Very good. It stays here until you say.'); return 'not_shipped'
+    r = ship.ship(repo, st)
+    if not r['ok']:
+        ch.send({'no_remote': "⚠️ Your project has no online home I can send it to (no remote). It's ready here on "
+                              f"branch <code>{r['branch']}</code>; your engineer can merge that directly.",
+                 'no_build': "⚠️ I couldn't find that build's branch any more, sir. Say \"status\" and I'll show you what's there.",
+                 'push': "⚠️ I couldn't send it: your project's remote refused the upload. That is usually a login; on "
+                         "your computer, <code>git push</code> once to see why, and I'll try again when you say."}[r['why']],
+                html=True)
+        return 'ship_failed'
+    if r['how'] == 'pr':
+        ch.send(f"✅ <b>{'Already with your engineer' if r.get('again') else 'Sent to your engineer'}.</b> "
+                f"{'The pull request is updated with the latest.' if r.get('again') else 'Pull request:'}\n{r['url']}",
+                html=True)
+    elif r['how'] == 'link':
+        ch.send(f"✅ <b>Uploaded.</b> One tap opens the pull request for your engineer:\n{r['url']}", html=True)
+    else:
+        ch.send(f"✅ <b>Uploaded</b> as branch <code>{r['branch']}</code>. Your engineer merges it from there.", html=True)
+    return 'shipped'
 
 def _code_to_show(repo):
     """(folder, goal) of what he would want to see: the build running now, else his latest build, else his product."""
@@ -605,6 +655,61 @@ def look(ch, repo, text):
             typing()
     return box.get('answer') or None
 
+WHO_COMPLAINS = r"(customers?|users?|clients?|buyers?|sellers?|creators?)"
+COMPLAINT_WORDS = re.compile(rf"\b{WHO_COMPLAINS}\b[^.?!]{{0,40}}\b(complain(s|ed|ing)?|ne shikayat)\b|"
+                             rf"^(a |one |my |this )?{WHO_COMPLAINS} (says|said|told me|is angry|is upset|got charged|was "
+                             r"charged|didn'?t get|never got)\b")
+
+COMPLAINT = """A customer of his product complained. What the customer says (as he passed it on):
+"{text}"
+
+His standing rules for how the product should behave (numbered):
+{rules}
+
+Find what in the product makes this happen: read the code, and try the customer's case if you can (a small script).
+Then say, in at most 4 short sentences: what happened to the customer, and why. Is the product doing what one of his
+rules says (then the rule is the cause: say which, by number, in his words), or is it not doing what he wants (a bug)?
+End with one last line, exactly one of:
+VERDICT: rule <number>
+VERDICT: bug
+VERDICT: unclear"""
+
+def complaint(ch, repo, text, poll, apply_build=None):
+    """A customer's complaint, linked to his rules: Claude reads his code and tries the case; either it is one of his
+    own rules at work (he can change it in a message) or a bug (one tap fixes his latest build). The Tony scenario:
+    "a customer says X" should get "that's your rule 3, sir; want it changed?", not a search through the code."""
+    rules = memory.load(repo)
+    listing = '\n'.join(f'{n}. {r["text"]}' for n, r in enumerate(rules, 1)) or '(none yet)'
+    answer = look(ch, repo, COMPLAINT.format(text=text, rules=listing))
+    if not answer:
+        ch.send("🐝 I couldn't trace that one just now, sir. Tell me what the customer did, step by step, and I'll try again.")
+        return 'complaint_unclear'
+    m = re.search(r'VERDICT:\s*(rule\s*(\d+)|bug|unclear)', answer, re.I)
+    said = re.sub(r'\n?\s*VERDICT:.*$', '', answer, flags=re.I | re.S).strip()
+    verdict = (m.group(1).lower() if m else 'unclear')
+    n = int(m.group(2)) if m and m.group(2) else 0
+    if verdict.startswith('rule') and 1 <= n <= len(rules):
+        ch.send(f"🐝 {telegram.esc(said)}\n\n📌 <b>That's your rule {n}:</b> {telegram.esc(rules[n - 1]['text'])}\n\n"
+                "<i>If you want it to work differently, just tell me how, and I'll change the rule and your latest build.</i>",
+                html=True)
+        return 'complaint_rule'
+    st = latest_build(repo)
+    if verdict == 'bug' and st and apply_build:
+        ch.send(f"🐝 {telegram.esc(said)}\n\n🐞 <b>That's not what you want, so it's a fault.</b> Shall I fix it in your "
+                "latest build? Every test is checked again, and it stays a separate copy.", html=True,
+                buttons=[[('🛠 Fix it', 'cmp|fix')], [('Leave it', 'cmp|no')]])
+        choice, other = choose(ch, poll, [('cmp|fix', ('fix it', 'yes', 'haan', 'go ahead', 'theek karo')), ('cmp|no', NO_WORDS)])
+        if other is not None:
+            return handle(ch, repo, other, poll, apply_build)
+        if choice != 'cmp|fix':
+            ch.send('Very good, I have left it as it is.'); return 'complaint_kept'
+        ch.send("🛠 On it. I'll tell you when it's fixed.")
+        apply_build(st, f'A customer complained: "{text}". This is a fault, not what the owner wants: {said} Fix it so '
+                        'this cannot happen to a customer again, and add a test for the customer\'s case.', ch)
+        return 'complaint_fixed'
+    ch.send('🐝 ' + telegram.esc(said), html=True)
+    return 'complaint_bug' if verdict == 'bug' else 'complaint_unclear'
+
 def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=None):
     """Answer one message from the owner. apply_build(state, rule, ch) updates a build (hive.start.apply_ruling);
     start_build(repo, goal) runs a new build that reports to the phone (hive.start.start, overnight style);
@@ -628,6 +733,10 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
                'rule': text}
     elif SHOW_WORDS.search(low):
         got = {'intent': 'show'}
+    elif SHIP_WORDS.search(low):
+        got = {'intent': 'ship'}
+    elif COMPLAINT_WORDS.search(low) and not (_building() or '').startswith('A build is running'):
+        got = {'intent': 'complaint'}
     else:
         got = fast_read(ch, text) or read(ch, text)   # half a second when the trained reader is sure, else Claude
     intent, rule = got.get('intent', 'reply'), (got.get('rule') or text).strip()
@@ -635,12 +744,18 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     if intent == 'show':   # he wants to see it: screenshots of what was built, at phone size
         show(ch, repo)
         return 'shown'
+    if intent == 'ship':   # "ship it": the latest build to his engineer, as a pull request
+        return ship_it(ch, repo, text, poll)
+    if intent == 'complaint':   # a customer's complaint: his own rule at work, or a fault to fix
+        return complaint(ch, repo, text, poll, apply_build)
     if intent == 'amend' and apply_build and latest_build(repo):   # change what he just saw; before and after
         st = latest_build(repo)
         before = shoot(repo)
+        tip = ('' if refs.has(rule) or not LOOK_WORDS.search(rule.lower()) else
+               "\n\n<i>If you have a screenshot of a page you like, send it next time: a picture lands closer than words.</i>")
         ch.send(f"🛠 Very good, sir: {telegram.esc(refs.words(rule) or 'as in your picture')}" +
                 (" (with your picture)" if refs.has(rule) else '') + ". Changing your latest build now; I'll show you "
-                "before and after.", html=True)
+                "before and after." + tip, html=True)
         apply_build(st, rule, ch)
         show(ch, repo, before=before)
         return 'amended'

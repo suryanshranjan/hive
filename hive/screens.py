@@ -105,7 +105,13 @@ def take(code_dir, pages=('/',), out_dir=None, size=PHONE):
         from playwright.sync_api import sync_playwright
         shots = []
         with sync_playwright() as p:
-            browser = p.chromium.launch()
+            try:
+                browser = p.chromium.launch()
+            except Exception as e:   # Playwright without its browser (found in Gate 105: a clean home has none)
+                if "doesn't exist" in str(e) or 'Executable' in str(e):
+                    raise Unavailable("I can't take screenshots on this machine yet: the browser isn't installed "
+                                      "(run: playwright install chromium).") from None
+                raise
             page = browser.new_page(viewport=size, device_scale_factor=2)
             for k, path in enumerate(pages, 1):
                 page.goto(url.rstrip('/') + '/' + path.lstrip('/'), wait_until='networkidle', timeout=30000)
