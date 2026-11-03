@@ -76,7 +76,8 @@ def compose(repo, ch=None, since=None):
     fallback = f"🐝 <b>{hello}, {who}.</b>\n" + '\n'.join('• ' + telegram.esc(l.split(': ', 1)[1]) for l in lines)
     from . import explain
     got = explain.ask_json(assistant.VOICE.format(who=who, facts='\n'.join(lines), task=(
-        "Write his morning brief: at most 5 short lines, the most important first (what needs him, then what moved, "
+        f"Write his brief. It is {time.strftime('%H:%M', register.his_time())} where he is: start with \"{hello}, "
+        f"{who}.\" (Gate 107: it said good morning at his 5 pm). At most 5 short lines, the most important first (what needs him, then what moved, "
         "then what landed). Numbers exactly as given, with what Hive did that may explain them; never claim a cause "
         "the facts don't support. End with the one thing he could do next.")))
     reply = got.get('reply') if isinstance(got, dict) else None
