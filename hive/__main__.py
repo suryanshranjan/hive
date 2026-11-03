@@ -189,7 +189,7 @@ def main(argv=None):
         from . import assistant
         from . import cloud_aws
         return assistant.listen('.', apply_build=start.apply_ruling,
-                                start_build=lambda repo, goal: assistant.background_build(repo, goal),   # Hive keeps answering meanwhile
+                                start_build=lambda repo, goal, interview=True: assistant.background_build(repo, goal, interview=interview),   # Hive keeps answering meanwhile
                                 cloud=lambda repo, on, login=True: cloud_aws.new(repo, with_login=login) if on else
                                 cloud_aws.stop(ask=lambda q: 'y' if q.startswith(('Delete the Hive machine', 'Power this')) else 'n',
                                                relisten=False))   # this listener is already here   # never 'lose the work'

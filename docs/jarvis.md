@@ -53,6 +53,7 @@
 | Where it lives | "we're on Vercel" (or Netlify, Railway, Azure, Fly, Render, his own way) | Remembered per project; says plainly what his engineer does once (install the host's tool, log in) |
 | Try it | "send me a link" | The latest build at its own address, to tap and use; his live product untouched |
 | Put it live | "put it live" | Only once his engineer has merged it: his yes, every test on his main version, then live. Otherwise: "say ship it first" |
+| A technical instruction | "add a Redis cache in front of /products, 60s TTL" | Caught as the precise instruction it is: "Yes, let's do it", restated in his terms; at most 2 normal questions an engineer would ask; no business quiz; from then on Jarvis speaks his language |
 | Spin-up | `hive setup` once, or `hive up` | Checks, Telegram, screenshots, numbers, where it lives, then starts listening and says hello on his phone |
 
 ## Still to come

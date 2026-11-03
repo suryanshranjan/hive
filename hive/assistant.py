@@ -63,7 +63,9 @@ barternow.in's style'); otherwise empty",
   build ("add an invite page") is "build".
 - "greeting": a hello, with no request yet.
 - "cloud_on" / "cloud_off": move Hive to the cloud / shut the cloud machine down.
-- "reply": anything else: a question, a complaint, frustration, small talk. Never a rule."""
+- "reply": anything else: a question, a complaint, frustration, small talk. Never a rule.
+A technical instruction ("add an index on users.email", "make /products paginate, 20 a page", "cache it in Redis") is
+"build" (or "instruct" mid-build), never "rule" or "reply"; "rule" carries it in his own terms."""
 
 RELATED = """A business owner's earlier rulings for his product:
 {rulings}
@@ -93,7 +95,8 @@ superbly competent, unflappable butler who happens to run his builders. Address 
 How you speak:
 - Calm and precise. Lead with the one thing that matters to him right now. At most 3 short sentences, then the single
   most useful next step. Talk like a person, not a report: no labels, no lists, no folder, branch or file names unless
-  he asks; call the project by his startup's name when you know it (below), else "your project". No technical words.
+  he asks; call the project by his startup's name when you know it (below), else "your project". No technical words,
+  unless the facts say he is technical: then speak his language, precisely.
 - Dry, understated wit, used sparingly: at most one light touch, by understatement or gentle irony, and only when
   things are calm. Never a joke when something failed, money is at stake or he is frustrated; then be plain and
   useful. Never at his expense, never slapstick, no exclamation marks, no emoji in the words.
@@ -135,7 +138,9 @@ def facts(repo, ch=None):
     st = latest_build(repo)
     # the startup's name, never the folder's (given the folder, it said "your shop project")
     name = memory.project_name(repo)
-    lines = [('Running in the cloud; his computer can be off.' if os.environ.get('HIVE_IN_CLOUD') or
+    from . import register
+    talk = register.line(CURRENT.get('text', ''))
+    lines = ([talk] if talk else []) + [('Running in the cloud; his computer can be off.' if os.environ.get('HIVE_IN_CLOUD') or
               os.path.abspath(repo).startswith(os.path.join(os.path.expanduser('~'), 'hive-cloud')) else
               'Running on his computer.'),
              (f"Latest build: branch hive/{st['name']}. {st.get('check', '')}" if st else 'Nothing built on this project yet.'),
@@ -679,7 +684,8 @@ of his project: read the code to find the answer. When the answer depends on a c
 nothing you do reaches his product; never use the network and never install anything. Answer what the product actually
 does today, in plain business words he can act on, in at most 4 short sentences, in the manner of J.A.R.V.I.S.: calm,
 precise, a light dry touch at most. If you checked by running it, say so in a few words ("I tried it: ..."). No code,
-file names or technical terms unless he asks. If the code does not settle it, say so plainly and say what would.
+file names or technical terms unless he asks, or he writes technically himself (then answer in his terms, with the
+file and function names). If the code does not settle it, say so plainly and say what would.
 Reply in his language and his script: if he writes Hindi-English in English letters, answer the same way, never in
 Devanagari. Address him as "{who}".
 
@@ -991,6 +997,8 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     typing = getattr(ch, 'typing', None)
     if callable(typing):
         typing()   # "typing..." at once, as a person would (the owner found it slow)
+    from . import register
+    register.notice(text); CURRENT['text'] = text   # he writes technically: Hive answers in his terms
     said = text.split(':', 1)[1].strip() if low.startswith('build:') else ''
     if len(said.split()) >= 3:   # "build: <a real description>" needs no model; "build again" is read in context
         got = {'intent': 'build', 'rule': said}   # (it once took "again" as the thing to build)
@@ -1119,14 +1127,39 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         proposed = any(w == 'hive' and 'Shall I build this?' in t for w, t in getattr(ch, 'history', [])[-4:])
         go = bool(got.get('confirmed')) and proposed
         from . import screens
+        tech = register.is_technical(rule) or register.is_technical(text)   # his precise instruction, taken as such
+        restated, extra = '', ''
+        if tech and not go:   # the normal questions an engineer would ask, only where something real is unclear
+            import threading
+            box, done = {}, threading.Event()
+            threading.Thread(target=lambda: (box.update(c=register.clarify(repo, rule)), done.set()), daemon=True).start()
+            while not done.wait(4):   # "typing..." while it reads the code (half a minute or so)
+                if callable(typing):
+                    typing()
+            c = box.get('c') or {}
+            restated = c.get('restated', '')
+            for q in c.get('questions', []):
+                opts = q['options']
+                ch.send(f"❓ {telegram.esc(q['q'])}", html=True, buttons=[[(o[:60], f'tq|{k}')] for k, o in enumerate(opts)] or None)
+                kind, ans = telegram._wait(ch, poll, {f'tq|{k}' for k in range(len(opts))})
+                said = opts[int(ans.split('|')[1])] if kind == 'tap' else (ans or '').strip()
+                if said:
+                    extra += f"\n- {q['q']} -> {said}"
+        if extra:
+            rule += "\n\nHis answers:" + extra
         for _ in range(3):
             if go:
                 break
             short = (got.get('short') or '').strip() if rule == (got.get('rule') or '').strip() else ''
-            ch.send(f"🏗 <b>Shall I build this?</b>\n\n{telegram.esc(short or rule)}\n\n<i>" +
-                    ("I'll do it on a copy and show you how it looks." if screens.is_look_job(rule, repo) else
-                     "I'll work on copies, then bring you the decisions to check.") + " Tap, or just tell me.</i>", html=True,
-                    buttons=[[('🚀 Yes, build it', 'bld|yes')], [('Not now', 'bld|no')]])
+            if tech:
+                ch.send(f"👍 <b>Yes, let's do it.</b>\n\n{telegram.esc(restated or rule)}\n\n<i>Shall I build this? Tap, "
+                        "or correct me; every test is run before you see it.</i>", html=True,
+                        buttons=[[('🚀 Go', 'bld|yes')], [('Not now', 'bld|no')]])
+            else:
+                ch.send(f"🏗 <b>Shall I build this?</b>\n\n{telegram.esc(short or rule)}\n\n<i>" +
+                        ("I'll do it on a copy and show you how it looks." if screens.is_look_job(rule, repo) else
+                         "I'll work on copies, then bring you the decisions to check.") + " Tap, or just tell me.</i>", html=True,
+                        buttons=[[('🚀 Yes, build it', 'bld|yes')], [('Not now', 'bld|no')]])
             kind, ans = telegram._wait(ch, poll, {'bld|yes', 'bld|no'})
             if kind == 'tap':
                 go = ans == 'bld|yes'
@@ -1147,9 +1180,16 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         from . import screens
         ch.send("🛠 On it, sir. " + ("I'll study it, make the change, and come back with screenshots of how it looks. "
                                      if screens.is_look_job(rule, repo) else
+                                     "I'll come back with what changed and the test results. " if tech else
                                      "I'll keep you posted, and come back when it's ready for you to look at. ") +
                 "Say \"status\" any time.", html=True)
-        start_build(repo, rule)
+        if tech:   # a precise instruction: no business situations quiz (edge cases of business rules keep theirs)
+            try:
+                start_build(repo, rule, interview=False)
+            except TypeError:
+                start_build(repo, rule)
+        else:
+            start_build(repo, rule)
         return 'built'
     if intent in ('cloud_on', 'cloud_off') and cloud:
         on = intent == 'cloud_on'

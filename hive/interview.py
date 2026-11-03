@@ -30,6 +30,10 @@ description already settles. Each situation is one concrete case in plain words 
 realistic outcomes a business might choose, clearly different from each other. No technical words. For each, add
 "why": one short line on what it costs his business if the builders simply guess (money paid out wrongly, an angry
 customer, a legal risk, abuse), so he sees the question is worth his time.
+Where what the builders need is a plain fact rather than a choice in a case (an amount, a name, which payment provider,
+a time limit), ask it as a plain question ("How much is the invite reward?") with its likely answers, not dressed up as
+a situation. Never invent facts about his business inside a question (live, Nov 3: "your brand colour is, for example,
+deep blue"); ask instead.
 
 Reply with JSON only: {{"situations": [{{"situation": "...", "options": ["...", "...", "..."], "why": "..."}}]}}"""
 
