@@ -42,7 +42,9 @@ check('team notes stay off for small swarms that rarely collide (Gates 43-44)', 
 check('size alone does not switch notes on (Gate 51: not faster at 12 builders)', law.notes(12)[0], False)
 check('team notes switch on when this swarm keeps colliding, not on one early collision',
       (law.notes(4, 3, 5)[0], law.notes(4, 1, 1)[0]), (True, False))
-home = tempfile.mkdtemp(); old_home = os.environ.get('HOME'); os.environ['HOME'] = home
+home = tempfile.mkdtemp(); old_home, old_profile = os.environ.get('HOME'), os.environ.get('USERPROFILE')
+os.environ['HOME'] = os.environ['USERPROFILE'] = home   # Windows finds ~ through USERPROFILE: this test once wrote
+# the owner's real ~/.hive/pace
 check('no pace chosen yet: None', law.pace(), None)
 check('cheap: one builder, whatever the machine allows (Gate 50: the cheapest way)', law.builders(5, cpus=16, pace='cheap'),
       (1, 'you asked for the cheapest builds'))
@@ -53,4 +55,6 @@ check('his reply in his own words: Enter is fast; money words are cheap; unclear
       [law.read_pace(x) for x in ('', 'cheap please', 'save money', 'jaldi chahiye', 'fast', 'hmm not sure')],
       ['fast', 'cheap', 'cheap', 'fast', 'fast', None])
 os.environ['HOME'] = old_home or ''
+if old_profile is not None:
+    os.environ['USERPROFILE'] = old_profile
 sys.exit(fail)

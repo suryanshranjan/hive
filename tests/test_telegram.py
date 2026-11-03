@@ -3,7 +3,10 @@ usage: python3 tests/test_telegram.py   (run from the hive repo root)"""
 import json, os, sys, tempfile, time
 sys.path.insert(0, os.getcwd())
 os.environ['HOME'] = os.environ['USERPROFILE'] = tempfile.mkdtemp()   # never the owner's real Hive folder
-from hive import owner, telegram
+from hive import explain, owner, telegram
+# the stand-in model from the first call: an earlier check (repeated questions) reached the real Claude, which fails in
+# this empty home, and Hive then skipped Claude for 10 minutes, so every later call failed (CI red from Nov 2)
+explain.CMD = '"' + sys.executable.replace(chr(92), '/') + '" tests/fake_explain.py'   # shlex would eat Windows backslashes
 
 ME, STRANGER = 111, 999
 fail = 0

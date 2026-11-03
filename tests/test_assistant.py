@@ -254,6 +254,18 @@ check('a yes in his own words keeps the reading; "whatever" leaves it to the bui
       'of its situation, keeping what he did not object to (Gate 39)',
       rules, ['A late fee is charged only after 7 days.', 'A late fee is charged only after 7 days. Amended: Shut the campaign off'])
 
+# 3f2. Gate 104 (under test): HIVE_CONFIRM_EACH=0 reads nothing back one by one; the rule sheet is the one check
+os.environ['HIVE_CONFIRM_EACH'] = '0'
+fake = FakeTelegram([say('Only after a week'), say('Refund it at once'), say('Shut the campaign off'), tap('sheet|done')])
+try:
+    interview.interview('Fees', ch(fake), situations=qs, poll=1)
+except RuntimeError:
+    pass
+os.environ.pop('HIVE_CONFIRM_EACH')
+texts = [m['text'] for m in fake.sent]
+check('confirmed once: no answer is read back on its own, and the rules go to one sheet',
+      (sum("Your rule, as I'll build it" in t for t in texts), any(interview.SHEET_TITLE in t for t in texts)), (0, True))
+
 # 3g. an interview answer that contradicts an earlier ruling: he is asked which holds now, and his choice goes in
 fake = FakeTelegram([tap('q01|1'), tap('q02|0'), tap('set|0|1')])
 rules = interview.interview('Fees', ch(fake), rulings=['CONFLICT-ME: a tip carries no fee'], poll=1)

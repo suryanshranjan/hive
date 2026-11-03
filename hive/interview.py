@@ -197,6 +197,7 @@ def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll
             rules.append(f"{q['situation']} -> {a}")
         else:
             free.append((q, a))
+    batch = False
     if free:   # his own words: write each as a rule and let him confirm it
         old = {d['id']: d for d in telegram._load(save and save + '.drafts.json').get('drafts', [])}
         drafts = [old[q['id']] if q['id'] in old and old[q['id']]['own'] == a else
@@ -204,7 +205,10 @@ def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll
                    'options': ["Yes, exactly", 'Not quite']}
                   for q, a in free]
         telegram._save(save and save + '.drafts.json', {'drafts': drafts})
-        if ch:
+        batch = os.environ.get('HIVE_CONFIRM_EACH') == '0' and sheet and len(rules) + len(drafts) >= 2
+        if batch:   # Gate 104 (under test): no reading confirmed one by one; the rule sheet that follows is the one check
+            ok = {d['id']: 'Yes, exactly' for d in drafts}
+        elif ch:
             ok = telegram.verdicts(ch, [{'id': d['id'], 'situation': f"Your rule, as I'll build it: {d['situation']}",
                                          'options': d['options']} for d in drafts],
                                    intro='Thank you. A few you answered in your own words; here is how I read them.',
@@ -223,7 +227,7 @@ def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll
             elif not no_rule(v):   # "mostly right, but ...": the reading, amended (Gate 39)
                 rules.append(_amend(d['situation'], v))
     if sheet and len(rules) >= 2:
-        rules = rule_sheet(rules, ch, ask, poll, save)
+        rules = rule_sheet(rules, ch, ask, poll, save, always=batch)
     if rulings and rules:
         rules = _settle(rules, list(rulings), ch, ask, poll)
     return rules
@@ -238,7 +242,7 @@ with a plain question and the two choices.
 Reply with JSON only: {{"rules": [{{"rule": "...", "from": [1]}}], "disagree": [{{"from": [2, 5], "question": "...",
 "option_a": "...", "option_b": "..."}}]}}"""
 
-def rule_sheet(rules, ch=None, ask=None, poll=20, save=None):
+def rule_sheet(rules, ch=None, ask=None, poll=20, save=None, always=False):
     """Decide once, as a rule (Gate 37: his answers to two framings of one decision agreed 1 of 8 times in a session).
     His answers become one general rule per decision; answers that disagree are put to him; then he sees the whole
     sheet and marks only what is wrong. Returns the confirmed rules. If no model is reachable, the answers stand."""
@@ -250,7 +254,9 @@ def rule_sheet(rules, ch=None, ask=None, poll=20, save=None):
         listing='\n'.join(f'{n}. {r}' for n, r in enumerate(rules, 1)))) or {}
     general = [r['rule'].strip() for r in got.get('rules', []) if isinstance(r, dict) and r.get('rule')]
     if not general:
-        return rules
+        if not always:
+            return rules
+        general, got = list(rules), {}   # nothing was read back one by one: he still confirms them once, as read
     telegram._save(path, {'draft': got})
     for n, c in enumerate(d for d in got.get('disagree', []) if isinstance(d, dict) and d.get('question')):
         opts = [c.get('option_a') or 'The first', c.get('option_b') or 'The second']
