@@ -199,7 +199,9 @@ check('"update the fee to 5%" is not a status request', (telegram.is_status('upd
       (False, True))
 
 # 3c. the interview on the phone: a tap, his own words, his confirmation of the reading -> rules for the builders
+# (these check the one-by-one read-backs, opt-in since Gate 104; the default, confirmed once, is checked in 3f2)
 from hive import interview
+os.environ['HIVE_CONFIRM_EACH'] = '1'
 fake = FakeTelegram([tap('q01|0'), say('Only after a week'), tap('q02|0')])
 rules = interview.interview('Fees and tips for a shop', ch(fake), poll=1)
 check('the interview turns a tap and confirmed own words into rules',
@@ -254,14 +256,14 @@ check('a yes in his own words keeps the reading; "whatever" leaves it to the bui
       'of its situation, keeping what he did not object to (Gate 39)',
       rules, ['A late fee is charged only after 7 days.', 'A late fee is charged only after 7 days. Amended: Shut the campaign off'])
 
-# 3f2. Gate 104 (under test): HIVE_CONFIRM_EACH=0 reads nothing back one by one; the rule sheet is the one check
-os.environ['HIVE_CONFIRM_EACH'] = '0'
+# 3f2. Gate 104, the default: nothing read back one by one; the rule sheet is the one check
+os.environ.pop('HIVE_CONFIRM_EACH')   # the default since Gate 104
 fake = FakeTelegram([say('Only after a week'), say('Refund it at once'), say('Shut the campaign off'), tap('sheet|done')])
 try:
     interview.interview('Fees', ch(fake), situations=qs, poll=1)
 except RuntimeError:
     pass
-os.environ.pop('HIVE_CONFIRM_EACH')
+os.environ['HIVE_CONFIRM_EACH'] = '1'
 texts = [m['text'] for m in fake.sent]
 check('confirmed once: no answer is read back on its own, and the rules go to one sheet',
       (sum("Your rule, as I'll build it" in t for t in texts), any(interview.SHEET_TITLE in t for t in texts)), (0, True))

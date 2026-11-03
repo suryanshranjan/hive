@@ -1,0 +1,286 @@
+[08:41:11] predictions registered on origin/main: gates/gate104/prompts/PREDICTIONS.md
+
+Hive here. What are we building today?
+
+Got it. Let me look at your project.
+  Git repository on branch main, no unsaved changes.
+  Your tests: pytest. 2 tests, all passing.
+
+One choice before I start, asked only once: 3 builders would finish about 1.9× sooner than one, for about 1.8× the cost. Should I build fast or cheap, from now on? (Enter = fast)
+  > 
+  Got it: fast, from now on. (`hive pace fast` or `hive pace cheap` changes it.)
+
+I'll put 3 builders on it (the job has 3 parts that can be built at the same time): about 1.9× the speed of one builder, for about 1.8× the cost. They work on copies, so your branches stay exactly as they are.
+If they need a decision only you can make, the question will appear right here.
+(Builders run commands on this computer. For code you don't trust, run me in a container.)
+
+First, a few quick situations where your own rules matter:
+
+1 of 14. Priya got her kurta on 1 March. On 10 April (40 days later) she asks for her money back. Nothing is wrong with it.
+  A) Full refund up to 30 days after delivery; after that no refund, except for damaged items  B) Full refund up to 7 days after delivery; after that no refund, except for damaged items  C) Full refund up to 15 days, half refund from 16 to 30 days, nothing after 30 days
+  Your answer (a letter, or your own words) > 
+  > Full refund up to 14 days after delivery (day 14 included), half refund from day 15 to day 30, and nothing after 30 days, unless the item arrived damaged. So Priya gets nothing back.
+
+2 of 14. Anjali paid ₹1,500 by card for shoes and returns them. Should the money go back to her card or become store credit?
+  A) Damaged items go back to the card. Changed-mind returns inside the window go back to the card; store credit only for late changed-mind returns if you choose to offer it  B) Every refund goes back to the card  C) Changed-mind refunds are always store credit; only damaged items go back to the card
+  Your answer (a letter, or your own words) > 
+  > The money goes back the way it was paid: Anjali paid by card, so her refund goes back to her card. Orders paid with store credit are refunded as store credit.
+
+3 of 14. Vikram paid ₹800 for a lamp plus ₹100 shipping, then returned it. Does he get the ₹100 shipping back?
+  A) Refund shipping only if the item was damaged; keep it if he changed his mind  B) Always refund shipping  C) Never refund shipping
+  Your answer (a letter, or your own words) > 
+  > A
+
+4 of 14. Meera bought a ₹1,000 dress with a 20% coupon and paid ₹800. She returns it. How much does she get back?
+  A) ₹800, what she actually paid  B) ₹1,000, the full list price  C) ₹800 as money, and the coupon is given back to her for future use
+  Your answer (a letter, or your own words) > 
+  > A
+
+5 of 14. A refund works out to ₹449.60. How much is paid?
+  A) ₹449 (round down)  B) ₹450 (round to the nearest rupee)  C) ₹450 (always round up in the customer's favour)
+  Your answer (a letter, or your own words) > 
+  > A
+  (Your answer also settles 1 of the coming question; I'll skip it.)
+
+6 of 14. Arjun earned 15 loyalty points on a ₹1,500 order, then returned the whole order for a refund. What happens to his 15 points?
+  A) Take the 15 points back  B) He keeps the points  C) Take the points back, and if he has already spent them, take the value off his refund
+  Your answer (a letter, or your own words) > 
+  > My rules don't cover taking points back after a refund. Points are only worked out on each order as it's paid, so leave his 15 points as they are.
+
+8 of 14. Karan's order: ₹2,000 of items, a ₹200 discount, ₹100 shipping and ₹180 tax. He paid ₹2,080. Which amount earns points?
+  A) ₹1,800, what he paid for the items after the discount, without shipping or tax  B) ₹2,080, everything he paid  C) ₹2,000, the item price before the discount
+  Your answer (a letter, or your own words) > 
+  > A
+
+9 of 14. Divya pays for a ₹1,000 order with ₹600 of store credit and ₹400 by card. How many points does she earn?
+  A) Points only on the ₹400 paid by card  B) Points on the full ₹1,000  C) No points at all when store credit is used
+  Your answer (a letter, or your own words) > 
+  > My rules say orders paid with store credit earn no points, and card orders earn one point for every full ₹100 of items after the discount. I don't have a rule for an order paid partly with store credit and partly by card.
+
+10 of 14. Today there were 10 orders: 7 paid, 1 cancelled, 1 not yet paid (cash on delivery) and 1 paid then refunded. Which of these count in your daily summary?
+  A) Count only paid orders; leave out cancelled ones; take refunds off the revenue  B) Count all 10 orders placed, whatever happened to them  C) Count paid and cash-on-delivery orders; leave out cancelled ones; ignore refunds on the day they happen
+  Your answer (a letter, or your own words) > 
+  > I count every order in the list in "Orders", including store-credit ones. "Revenue" is only the money that came in: the totals of card orders (items after discount, plus shipping), because store-credit orders bring in no new money. My rules don't cover cancelled, cash-on-delivery or refunded orders separately.
+  (Your answer also settles 1 of the coming question; I'll skip it.)
+
+12 of 14. On Diwali day the shop got no orders. What should the summary show?
+  A) 0 orders, ₹0 revenue, ₹0 average  B) No summary at all for that day  C) A note saying 'no orders today' and no numbers
+  Your answer (a letter, or your own words) > 
+  > A
+
+13 of 14. Three orders total ₹1,000, so the average is ₹333.33. What should the summary show?
+  A) ₹333 (round to the nearest rupee)  B) ₹333 (always round down)  C) ₹333.33 (show the paise)
+  Your answer (a letter, or your own words) > 
+  > B. Always round down to whole rupees. The average is the card-order revenue divided by the number of card orders.
+
+14 of 14. A customer orders at 11:30 pm on 5 March in India. That is still 5 March in London but already 6 March in Singapore. Which day's summary should it go in?
+  A) 5 March, the day it was placed by Indian time  B) The day it was paid, by Indian time  C) The day it was shipped
+  Your answer (a letter, or your own words) > 
+  > My rules don't say which day an order belongs to. The summary just counts every order in the list it's given for that day.
+
+Your rules for this feature, as the builders will follow them (each one applies to every case like it, not just the example):
+  1. Whenever an order is returned, the shipping charge is refunded only if the item arrived damaged. If the customer changed their mind, the shop keeps the shipping charge.
+  2. Whenever an item is refunded, the refund is based on what the customer actually paid for it after any coupon or discount, not on its list price. For example, a ₹1,000 dress bought with a 20% coupon for ₹800 is refunded ₹800.
+  3. Whenever a refund is requested 14 or fewer days after delivery (day 14 included), the full price is refunded. Whenever it is requested 15 to 30 days after delivery, half the price is refunded. Whenever it is requested more than 30 days after delivery, nothing is refunded, unless the item arrived damaged.
+  4. Whenever a refund amount works out to a fraction of a rupee, it is rounded down to a whole rupee (₹449.60 is paid as ₹449).
+  5. Whenever a refund is issued, it goes to the payment method used for the order: orders paid by card are refunded to that card, and orders paid with store credit are refunded as store credit.
+  6. Whenever an order is returned for a refund, the customer keeps the loyalty points that order earned.
+  7. Whenever an order is paid entirely by card, it earns 1 loyalty point for every full ₹100 of the item total after the discount, rounded down, without shipping or tax. For example, ₹2,000 of items with a ₹200 discount earns points on ₹1,800. Whenever an order is paid entirely with store credit, it earns 0 points. For orders paid partly with store credit and partly by card, the owner has not decided yet, and this case needs his decision before it can be built.
+  8. Whenever the daily summary is produced, 'Orders' is the count of every order in the list it is given for that day, including store-credit orders. 'Revenue' is the sum of the totals of card orders only, where a total is the item amounts after discount plus shipping. Store-credit orders add nothing to Revenue. Cancelled, cash-on-delivery and refunded orders get no separate handling. An order counts in whichever day's list it was put in. Whenever the day has no orders, the summary shows 0 orders and ₹0 revenue.
+  9. Whenever the daily summary shows the average order value, it is the total revenue from card orders divided by the number of card orders, always rounded down to a whole rupee. Whenever the day has no orders, the average shows ₹0.
+  Numbers of any that are wrong (Enter = all correct) > 
+  > 3, 7, 9. In 3, damaged goods always get the full amount plus shipping up to 90 days after delivery and nothing after that, final-sale orders get nothing unless damaged, refunds under ₹50 are not paid unless damaged, and a negative day count counts as day 0. In 7, orders whose items come to under ₹500 after the discount earn no points and final-sale orders earn double points; in 9, the average is ₹0 whenever there are no card orders, not just when there are no orders.
+  Rule 3: Whenever a refund is requested 14 or fewer days after delivery (day 14 included), the full price is refunded. Whenever it is requested 15 to 30 days after delivery, half the price is refunded. Whenever it is requested more than 30 days after delivery, nothing is refunded, unless the item arrived damaged.
+  What should it be? > 
+  > Full amount up to day 14 (day 14 included), half from day 15 to 30, nothing after 30, and a negative day count is treated as day 0. Damaged goods always get the full amount plus shipping up to 90 days after delivery, and nothing after that. Final-sale orders get nothing unless damaged, and refunds under ₹50 are not paid (₹0) unless the goods are damaged.
+  Rule 7: Whenever an order is paid entirely by card, it earns 1 loyalty point for every full ₹100 of the item total after the discount, rounded down, without shipping or tax. For example, ₹2,000 of items with a ₹200 discount earns points on ₹1,800. Whenever an order is paid entirely with store credit, it earns 0 points. For orders paid partly with store credit and partly by card, the owner has not decided yet, and this case needs his decision before it can be built.
+  What should it be? > 
+  > One point for every full ₹100 of items after the discount, with nothing for shipping or tax. Orders paid with store credit earn no points, and orders whose items come to under ₹500 after the discount also earn none. Final-sale orders earn double points.
+  Rule 9: Whenever the daily summary shows the average order value, it is the total revenue from card orders divided by the number of card orders, always rounded down to a whole rupee. Whenever the day has no orders, the average shows ₹0.
+  What should it be? > 
+  > The average is the card-order revenue divided by the number of card orders, always rounded down to whole rupees. If there are no card orders that day, the average is ₹0, even when there were store-credit orders.
+  Rule 3: Count the days from delivery to the refund request. If the count is negative, treat it as day 0. If the item arrived damaged, refund the full price plus shipping when the refund is requested up to 90 days after delivery, and refund nothing when it is requested more than 90 days after delivery. If the item did not arrive damaged: when the order is final sale, nothing is refunded. Otherwise, when the refund is requested 14 or fewer days after delivery (day 14 included), the full price is refunded. When it is requested 15 to 30 days after delivery, half the price is refunded. When it is requested more than 30 days after delivery, nothing is refunded. Also, when the item did not arrive damaged and the refund comes to less than ₹50, it is not paid (₹0).
+  What should it be? > 
+  > 
+  Rule 7: Whenever an order is paid entirely by card, it earns 1 loyalty point for every full ₹100 of the item total after the discount, rounded down, without shipping or tax. For example, ₹2,000 of items with a ₹200 discount earns points on ₹1,800. An order whose item total after the discount is under ₹500 earns 0 points. A final-sale order earns double the points it would otherwise earn. Whenever an order is paid entirely with store credit, it earns 0 points. For orders paid partly with store credit and partly by card, the owner has not decided yet, and this case needs his decision before it can be built.
+  What should it be? > 
+  > Nearly right. Each order is paid one way, either by card or with store credit, so there's no mixed case to wait on: any order paid with store credit earns no points.
+  Rule 9: Whenever the daily summary shows the average order value, it is the total revenue from card orders divided by the number of card orders, always rounded down to a whole rupee. Whenever the day has no card orders, the average shows ₹0, even when there were store-credit orders that day.
+  What should it be? > 
+  > 
+  Thank you. The builders will encode your 9 rules as tests before anything lands.
+
+[08:48] Starting.
+  [08:48] Builder w1 picked up: report.
+  [08:48] Builder w3 picked up: refunds.
+
+========================================================================
+ Question 1 of up to 30  -  from builder w3  -  asked 0:01 ago
+========================================================================
+
+  Priya returns a ₹1,200 kurta 10 days after delivery, saying the
+  wrong size was sent. That is neither damaged nor a change of mind.
+  How should her refund work?
+
+    A) Like a change of mind: ₹1,200, shop keeps shipping.
+    B) Like a damaged item: ₹1,200 plus shipping.
+    C) Something else (please say).
+
+  Your answer (a letter, or say it in your own words) >   > A
+  Thanks, sent to builder w3. (1 answered so far)
+  [08:49] Builder w2 picked up: loyalty.
+  [08:49] Builder w1 landed: Add daily sales summary (shop/report.py) with tests
+  [08:49] Builder w1 landed: sales_summary: orders=len(list), revenue=sum of total() for paid_with=='card' only,...
+  [08:49] Builder w2 landed: Loyalty points: points_earned(order)
+  [08:49] Builder w2 landed: points_earned(order): card orders only, 1 pt per full Rs100 of items after discount...
+  [08:49] Builder w3 landed: Refunds per owner rules
+  [08:49] Builder w3 landed: refund(): damaged = full paid + shipping up to day 90; else final sale 0, <=14 full,...
+
+[08:49] All 3 builders are done.
+They made 7 assumptions your description didn't cover. Rather than going through them one by one, I'll show you everything the build does, as rules: that covers them all.
+
+Let me check the result.
+  30 tests, all passing. All 2 that passed before still pass.
+  I've noted 1 new ruling of yours for the next build on this project.
+
+Done in 3 minutes, about $2.66 in all (builders $1.03, Hive's own questions and checks $1.62). Your result is on branch hive/add-three-things-to-1103-0841.
+  See what changed:  git diff main...hive/add-three-things-to-1103-0841
+  Take it:           git merge hive/add-three-things-to-1103-0841
+(Everything from this build, including the questions and answers, is in /home/node/fh/.hive/runs/add-three-things-to-1103-0841.)
+
+Here is everything the build does now, written from its code (25 more only repeat your own rules, so I left them out).
+
+What the build does now, as rules (each one is what the product will do. Mark any that is not your policy):
+  1. Refunds: any reason other than 'damaged', such as 'wrong size' or 'broken', is treated exactly like a change of mind; a wrong-size dress returned on day 10 gives 1,000 rupees, without shipping.
+  2. Refunds: a customer who paid with store credit is refunded in store credit; everyone else, including card payers, is refunded to their card.
+  3. Refunds: there is no upper limit on the refund; an order of 1,000,000,000,000 rupees returned on day 1 is refunded in full.
+  4. Loyalty points: an empty order earns 0 points, and there is no upper limit; an order of 1,000,000,000,000 rupees earns 10,000,000,000 points.
+  5. Orders: when a discount code gives a part-rupee discount, the discount is rounded down so the customer pays slightly more; a 999-rupee item with a 10% code costs 900 rupees, not 899.10.
+  6. Messy or missing details: if the reason is typed as ' Damaged ' or 'DAMAGED', with capitals or extra spaces around it, it still counts as damaged and Priya gets 1,100 rupees including shipping.
+  7. Messy or missing details: if the reason is misspelt or decorated, such as 'Damaged!' or 'damgd', it is not recognised as damage and is refunded like a change of mind (1,000 rupees, no shipping, nothing for final sale).
+  8. Messy or missing details: if the reason is left blank, only spaces, or missing altogether, the return is treated as a change of mind; a blank reason on day 10 gives 1,000 rupees for a 1,000-rupee dress.
+  9. Messy or missing details: if the number of days since delivery is missing or written as text such as '5', the refund fails with an error and no amount is worked out.
+  10. Messy or missing details: a part-day counts past the boundary; a change-of-mind return 14.5 days after delivery gets only half (500 rupees for a 1,000-rupee dress).
+  11. Messy or missing details: the payment method must be written exactly as the system's lowercase 'card' or 'store_credit'; a store-credit order written as 'Store Credit', 'STORE_CREDIT' or with a leading space is refunded to a card.
+  12. Messy or missing details: an order whose payment method is written any other way than exactly lowercase 'card', for example 'Card', 'cash' or left blank, earns no loyalty points and adds nothing to the day's revenue, though it is still counted in the number of orders.
+  13. Messy or missing details: if the daily summary is given nothing at all instead of a list of orders (even an empty one), it fails with an error instead of showing zeros.
+  14. Messy or missing details: a discount code above 100% makes the paid amount negative; a 1,000-rupee item with a 150% code and 100 rupees shipping gives a damaged refund of -400 rupees, a change-of-mind refund of 0, no points, and -400 rupees of revenue in the summary.
+  15. Messy or missing details: a negative item price is not stopped; a damaged item priced at -500 rupees gives a refund of -500 rupees and lowers the day's revenue by 500 rupees.
+  16. Messy or missing details: a negative discount code acts as a surcharge; a 1,000-rupee item with a -10% code is refunded at 1,100 rupees on a change of mind and earns 11 points.
+  17. Messy or missing details: a negative shipping fee is not stopped and reduces a damaged refund; a 1,000-rupee item with -100 rupees shipping is refunded 900 rupees when damaged.
+  18. Messy or missing details: if prices contain paise, the amounts are not always whole rupees; a 100.50-rupee card order shows revenue of 100.5 in the summary, while the average (100) and the refund are still whole numbers.
+  Numbers of any that are wrong (Enter = all correct) > 
+  > 5, 11, 12, 14, 15, 18. Amounts are worked out on what the customer actually paid and then rounded down to whole rupees, so 899.10 is refunded as 899 and revenue is shown in whole rupees. "Store Credit" or "Card" written with capitals or spaces still means store credit or card, and a refund or revenue figure can never go below zero.
+  Rule 5: Orders: when a discount code gives a part-rupee discount, the discount is rounded down so the customer pays slightly more; a 999-rupee item with a 10% code costs 900 rupees, not 899.10.
+  What should it be? > 
+  > The customer pays 899.10 rupees: the discount is not rounded first. Refunds, points and revenue are then worked out on that amount and rounded down to whole rupees, so the refund is 899 rupees.
+  Rule 11: Messy or missing details: the payment method must be written exactly as the system's lowercase 'card' or 'store_credit'; a store-credit order written as 'Store Credit', 'STORE_CREDIT' or with a leading space is refunded to a card.
+  What should it be? > 
+  > Store credit means store credit however it's written, with capitals, spaces or "Store Credit", and that money goes back as store credit. Card means card the same way. The money always goes back the way the customer paid.
+  Rule 12: Messy or missing details: an order whose payment method is written any other way than exactly lowercase 'card', for example 'Card', 'cash' or left blank, earns no loyalty points and adds nothing to the day's revenue, though it is still counted in the number of orders.
+  What should it be? > 
+  > "Card" written with capitals or spaces is still a card order: it earns loyalty points as usual and its total counts in the day's revenue. Only store-credit orders earn no points and add no revenue, and every order is still counted in the number of orders.
+  Rule 14: Messy or missing details: a discount code above 100% makes the paid amount negative; a 1,000-rupee item with a 150% code and 100 rupees shipping gives a damaged refund of -400 rupees, a change-of-mind refund of 0, no points, and -400 rupees of revenue in the summary.
+  What should it be? > 
+  > A discount can never take the items below zero, so with a 150% code the items count as 0 rupees. A damaged refund is then just the 100 rupees shipping, a change-of-mind refund is 0, it earns no points, and the summary shows 100 rupees of revenue (only the shipping).
+  Rule 15: Messy or missing details: a negative item price is not stopped; a damaged item priced at -500 rupees gives a refund of -500 rupees and lowers the day's revenue by 500 rupees.
+  What should it be? > 
+  > A price can't be below zero, so a negative price counts as 0 rupees. The damaged refund is then 0 (plus any shipping), and the order adds nothing to revenue and never takes revenue down.
+  Rule 18: Messy or missing details: if prices contain paise, the amounts are not always whole rupees; a 100.50-rupee card order shows revenue of 100.5 in the summary, while the average (100) and the refund are still whole numbers.
+  What should it be? > 
+  > Revenue is shown in whole rupees, rounded down, so a 100.50-rupee card order shows revenue of 100 rupees. The average and the refund stay rounded down to whole rupees as they are now.
+  Rule 10: Messy or missing details: a part-day counts past the boundary; a change-of-mind return 14.5 days after delivery gets only half (500 rupees for a 1,000-rupee dress).
+  What should it be? > 
+  > Count only full days, so 14.5 days is still day 14 and gets the full 1,000 rupees. Half the refund only starts from day 15.
+  Anything the builders should know that is not on this list? (Enter = nothing) > 
+  > A discount code or shipping fee written as a negative number counts as 0, so a negative code never adds a surcharge and negative shipping never reduces a refund.
+🔎 Last step, 6 quick checks on what the build does in real cases. They catch what a list of rules hides. Tap ✅ if a result is right, or tell me what should happen.
+1 of 6. Priya returns her 1,200-rupee kurta (paid by card, 100 rupees shipping) 7 days after delivery because she changed her mind: she gets 1,200 rupees back on her card, and the shipping is not refunded.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+2 of 6. Priya buys a 1,200-rupee kurta by card with 100 rupees shipping: she earns 12 points, since shipping does not count.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+3 of 6. Today three customers pay by card for orders of 1,200 rupees plus 100 shipping, 800 rupees plus 100 shipping, and 500 rupees with free shipping: the daily summary shows 3 orders, 2,700 rupees revenue and a 900-rupee average.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+4 of 6. Sunil writes 'arrived damaged' instead of 'damaged' when returning his 1,200-rupee kurta 20 days after delivery: it is treated as a change of mind and he gets 600 rupees instead of 1,300.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+5 of 6. Priya returns the same 1,200-rupee kurta for a change of mind 20 days after delivery: she gets only half, 600 rupees, and after day 30 she would get nothing.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+6 of 6. Rohan pays 599 rupees by card: he earns 5 points, the extra 99 rupees count for nothing, and any order under 500 rupees earns 0.
+
+Right?
+  (Enter = right, or say what should happen) > 
+  > 
+✅ Thank you. Every case is as you want it.
+  [08:56] Builder w1 picked up: messy inputs.
+  [08:56] Builder w1 landed: Owner's new rulings: exact part-rupee discounts, full days only, lenient payment...
+  [08:56] Builder w1 landed: Order now keeps amounts exact (Fraction): discount not rounded, negative...
+
+Let me check the result.
+  37 tests, all passing. All 2 that passed before still pass.
+
+Done in under a minute, about $3.91 in all (builders $1.52, Hive's own questions and checks $2.40). Your result is on branch hive/add-three-things-to-1103-0841.
+  See what changed:  git diff main...hive/add-three-things-to-1103-0841
+  Take it:           git merge hive/add-three-things-to-1103-0841
+(Everything from this build, including the questions and answers, is in /home/node/fh/.hive/runs/add-three-things-to-1103-0841.)
+
+Your 8 changes are in, and every test passes. It's yours.
+{
+ "arm": "B",
+ "confirmations": 0,
+ "mode": "live",
+ "rc": 0,
+ "error": null,
+ "minutes": 16.2,
+ "branches": [
+  "hive/add-three-things-to-1103-0841"
+ ],
+ "before": {
+  "passed": 27,
+  "failed": 0,
+  "errors": 0,
+  "line": "27 passed in 0.03s"
+ },
+ "night": {},
+ "after": {
+  "passed": 27,
+  "failed": 0,
+  "errors": 0,
+  "line": "27 passed in 0.04s"
+ },
+ "owner_replies": 36,
+ "owner_cost": 4.52,
+ "build_cost": 1.52,
+ "hive_own": 2.4,
+ "hive_own_by": {
+  "law.part_names": 0.052848,
+  "interview.decisions": 0.036693,
+  "interview.write_situations": 0.075762,
+  "interview._dedupe": 0.033714,
+  "telegram.understand": 0.177617,
+  "interview.settled_by": 0.262497,
+  "interview._rule": 0.143044,
+  "interview.rule_sheet": 0.063906,
+  "interview._amend": 0.3115,
+  "codesheet.describe": 0.339405,
+  "contract.stated": 0.019278,
+  "examples.check": 0.534397,
+  "codesheet.split_known": 0.081118,
+  "spotcheck.find": 0.263843
+ },
+ "owner_typed_words": 853
+}

@@ -205,8 +205,10 @@ def interview(goal, ch=None, rulings=None, n=12, ask=None, situations=None, poll
                    'options': ["Yes, exactly", 'Not quite']}
                   for q, a in free]
         telegram._save(save and save + '.drafts.json', {'drafts': drafts})
-        batch = os.environ.get('HIVE_CONFIRM_EACH') == '0' and sheet and len(rules) + len(drafts) >= 2
-        if batch:   # Gate 104 (under test): no reading confirmed one by one; the rule sheet that follows is the one check
+        # Gate 104: confirmed once, on the rule sheet, the owner gave about 7 fewer answers per feature (median 23 vs 30)
+        # with every build 27 of 27 either way; HIVE_CONFIRM_EACH=1 reads each own-words answer back as before
+        batch = os.environ.get('HIVE_CONFIRM_EACH', '0') != '1' and sheet and len(rules) + len(drafts) >= 2
+        if batch:   # no reading confirmed one by one: the rule sheet that follows is the one check
             ok = {d['id']: 'Yes, exactly' for d in drafts}
         elif ch:
             ok = telegram.verdicts(ch, [{'id': d['id'], 'situation': f"Your rule, as I'll build it: {d['situation']}",

@@ -2,10 +2,12 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 3 2026, after Gate 103b; Gate 104 next)
+## Where we left off (Nov 3 2026, after Gates 103b and 104)
 
 - **Gate 103b done, ships** (flown Nov 3 on the user's laptop, Docker lab): live 26, 27, 27 of 27 with the owner's-examples check (it caught a split-payment refund in live 2); X1, X2 held, X3 failed on minutes (+11.3, confounded: slower machine, and live 1 stalled about an hour while the laptop ran out of memory). Drift F3 not flown: `private/g92` and `runs/g101_day1` exist only on the cloud lab. The check stays on.
-- **Gate 104 next** (Gap 2, owner time): confirm his rules once at the end (`HIVE_CONFIRM_EACH=0`) vs each answer read back; 3 live flights per arm, alternated.
+- **Gate 104 done, ships** (Gap 2): confirming his rules once on the sheet (no own-words read-backs) took the median owner prompts from 30 to 23, every build 27/27; now the default. Next on owner time: the after-build review that runs when builders ask fewer than 3 questions (those flights cost 36-42 prompts).
+- **Also Nov 3:** CI was red since Nov 2 (test_telegram reached the real Claude before its stand-in was set); fixed. test_law wrote the owner's real `~/.hive/pace` on Windows; fixed, and the stray file removed.
+- **Next:** the founder session (`docs/founder_session.md`); drift F3 of Gate 103b only if the cloud lab's `private/g92` is reachable.
 
 - **Gate 66 done (the user, travelling: "test something that makes Hive the best tool"):** one Claude Code agent that asks the owner beat Hive's hand-over by 21-30 hidden points (CQ 93.0, CC 84.6, HV 63.4, N0 34.8%) at 1/13 of his reading. Wind tunnel, synthetic owner who answers from his policy.
 - **Gate 67 done:** the hand-over's memory does not compound (neither rule fired).
