@@ -909,6 +909,7 @@ def go_live(ch, repo, poll):
     if choice != 'liv|yes':
         ch.send('Very good. It stays as it is until you say.'); return 'not_live'
     ch.send("🛠 Checking every test on your main version, then putting it live.")
+    deploy.note_before(repo, main)   # the first time: what was live before, so "undo that" can go back
     r = deploy.live(repo, main, st.get('test_cmd'))
     if not r['ok']:
         ch.send('⚠️ ' + telegram.esc(r['say'])); return 'live_failed'

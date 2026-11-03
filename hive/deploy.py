@@ -152,6 +152,20 @@ def live(repo, main_ref, test_cmd=None):
     finally:
         shutil.rmtree(work, ignore_errors=True)
 
+def note_before(repo, main_ref):
+    """The first time Hive puts his product live: remember his main version from just before the merge as what was
+    live, so "undo that" has somewhere to go back to (his main is what his host was showing)."""
+    cfg = config(repo)
+    if cfg.get('history'):
+        return False
+    sha = subprocess.run(['git', '-C', repo, 'rev-parse', '-q', '--verify', f'{main_ref}^1'], capture_output=True,
+                         text=True).stdout.strip()
+    if not sha:
+        return False
+    cfg['history'] = [{'t': 0, 'sha': sha, 'url': None, 'assumed': True}]
+    json.dump(cfg, open(os.path.join(DIR, _key(repo) + '.json'), 'w'), indent=1)
+    return True
+
 def back(repo):
     """Put live the version that was live before the last one Hive put live (undo). {'ok', 'url', 'say', 'when'}"""
     h = config(repo).get('history') or []
