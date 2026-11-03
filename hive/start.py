@@ -153,7 +153,7 @@ def _phase(source, run, workers, goal, minutes, questions, assumptions, narrate_
     narrator.tick(); log.close()
     return meta['branch'], result.get('code', 1)
 
-def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interview_first=True, docs=None):
+def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interview_first=True, docs=None, on=None):
     repo = os.path.abspath(repo)
     spent0 = explain.SPENT[0]   # what Hive's own model calls cost from here on is reported with the builders'
     say("\nHive here. What are we building today?")
@@ -212,7 +212,9 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
         name = f'{base}-{k}'; k += 1
     home = os.path.join(RUNS, name); os.makedirs(home)
     source = os.path.join(home, 'source')
-    sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', branch, repo, source)
+    # on: his latest build, not merged yet: this one builds on top of it, so his work adds up in one line and one
+    # pull request (Gate 107: a new build started from main, and the plan's changes never reached his live product)
+    sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', on or branch, repo, source)
     sh('git', '-C', source, 'config', 'user.name', 'hive'); sh('git', '-C', source, 'config', 'user.email', 'hive@local')
     _link(repo, source, links)
     if test_cmd == safety.command():

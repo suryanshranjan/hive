@@ -85,7 +85,7 @@ def latest_build(repo):
                     if os.path.exists(os.path.join(h, 'state.json'))), key=os.path.getmtime)
     for h in reversed(homes):
         st = json.load(open(os.path.join(h, 'state.json')))
-        if os.path.abspath(st.get('repo', '')) == os.path.abspath(repo) and not st.get('undone'):
+        if os.path.abspath(st.get('repo', '')) == os.path.abspath(repo) and not st.get('undone') and not st.get('folded'):
             return st   # (a build he undid is set aside: the one before it is his latest again)
     return None
 
@@ -112,9 +112,10 @@ def undo(ch, repo, poll):
         ch.send("There's nothing of mine to undo, sir."); return 'nothing'
     hist = deploy.config(repo).get('history') or []
     is_live = bool(hist) and hist[-1]['t'] >= (st.get('shipped') or 0) and deploy.merged(repo, f"hive/{st['name']}", st.get('branch') or 'main')
-    what = (f"Put your live product back to how it was before {_goal_words(st)} went live?" if is_live else
-            f"Withdraw {_goal_words(st)} from your engineer and set it aside?" if st.get('shipped') else
-            f"Set aside {_goal_words(st)}? Your product stays exactly as it is.")
+    name = f'"{_goal_words(st)}"'
+    what = (f"Put your live product back to how it was before {name} went live?" if is_live else
+            f"Withdraw {name} from your engineer and set it aside?" if st.get('shipped') else
+            f"Set aside {name}? Your product stays exactly as it is.")
     ch.send(f"↩️ <b>{telegram.esc(what)}</b>", html=True, buttons=[[('↩️ Yes, undo it', 'und|yes')], [('Not now', 'und|no')]])
     choice, other = choose(ch, poll, [('und|yes', ('yes', 'undo it', 'do it', 'haan')), ('und|no', NO_WORDS)])
     if other is not None:
@@ -449,11 +450,14 @@ def show(ch, repo, before=None, intro=None):
     old = dict(before) if isinstance(before, list) else {}
     if intro:
         ch.send(intro, html=True)
+    def label(page):   # as he would say it: "Home page", "Invite page" (Gate 107: a caption read "/")
+        words = page.strip('/').replace('-', ' ').replace('_', ' ').split('/')[-1]
+        return 'Home page' if not words else (words[:1].upper() + words[1:]).removesuffix('.html') + ' page'
     for k, (page, png) in enumerate(shots, 1):
         if page in old:
-            ch.send_photo(old[page], f'Before: {page}')
+            ch.send_photo(old[page], f'Before: {label(page)}')
         last = k == len(shots)
-        ch.send_photo(png, (f'After: {page}' if page in old else f'{page}') +
+        ch.send_photo(png, (f'After: {label(page)}' if page in old else label(page)) +
                       ('\n\nHow does it look, sir? Tell me what\'s off, or send a picture of what you\'d like.'
                        if last and not intro else ''))
     return True
@@ -584,6 +588,29 @@ def what_changed(repo, ch=None):
     reply = got.get('reply') if isinstance(got, dict) else None
     return reply.strip() if isinstance(reply, str) and reply.strip() else fallback
 
+def _unmerged(repo):
+    """His latest build if it isn't in his main version yet (then the next build goes on top of it), else None."""
+    st = latest_build(repo)
+    if not st or not st.get('name'):
+        return None
+    ref = f"hive/{st['name']}"
+    if subprocess.run(['git', '-C', repo, 'rev-parse', '-q', '--verify', ref], capture_output=True).returncode:
+        return None
+    from . import deploy
+    return None if deploy.merged(repo, ref, st.get('branch') or 'main') else st
+
+def _fold(repo, old):
+    """The earlier build went into a newer one: set it aside, and withdraw its own pull request if it had one."""
+    from . import ship
+    try:
+        path = os.path.join(old.get('home') or os.path.join(RUNS, old['name']), 'state.json')
+        st = json.load(open(path)); st['folded'] = time.time()
+        json.dump(st, open(path, 'w'), indent=1)
+        if st.get('shipped'):
+            ship.close(repo, st)
+    except (OSError, ValueError, KeyError):
+        pass
+
 def background_build(repo, goal, ch=None, interview=True, report=True, workers=None):
     """Run `hive start` for this goal in the background, so Hive keeps answering him; if it stops, tell him why at once
     (a cloud build stopped on "unsaved changes", and only the server's log knew)."""
@@ -592,8 +619,10 @@ def background_build(repo, goal, ch=None, interview=True, report=True, workers=N
     gf = tempfile.NamedTemporaryFile('w', suffix='.md', delete=False); gf.write(goal); gf.close()
     log = os.path.join(os.path.expanduser('~'), '.hive', 'build.log')
     os.makedirs(os.path.dirname(log), exist_ok=True)
+    prev = _unmerged(repo)   # his latest build, not merged yet: this one builds on top of it (Gate 107)
     cmd = (argv(os.environ['HIVE_BUILD_CMD']) if os.environ.get('HIVE_BUILD_CMD') else   # tests: a stand-in
            [sys.executable, '-m', 'hive', 'start', '--overnight', '--goal', gf.name] +
+           (['--on', f"hive/{prev['name']}"] if prev else []) +
            ([] if interview else ['--no-interview']) +   # a plan step: its one question was asked already
            (['--agent', team.chosen()['agent']] if team.chosen().get('agent') else []) +   # the team he chose by phone
            (['--workers', str(workers)] if workers else
@@ -614,7 +643,9 @@ def background_build(repo, goal, ch=None, interview=True, report=True, workers=N
                 ch.send(f"⚠️ <b>The build stopped before it finished.</b>\n\n{telegram.esc(why)}", html=True)
             except Exception:
                 pass
-        elif rc == 0 and report and ch is not None and BUILD.get('proc') is proc and not BUILD.get('stopped'):
+        if rc == 0 and prev:   # the earlier build is part of this one now: one line of work, one pull request
+            _fold(repo, prev)
+        if rc == 0 and report and ch is not None and BUILD.get('proc') is proc and not BUILD.get('stopped'):
             from . import screens   # a frontend: he sees it, unasked (the owner: "share the screenshot on my phone")
             try:
                 if screens.available() and screens.is_frontend(repo):
@@ -848,7 +879,9 @@ def complaint(ch, repo, text, poll, apply_build=None):
             ch.send('Very good, I have left it as it is.'); return 'complaint_kept'
         ch.send("🛠 On it. I'll tell you when it's fixed.")
         apply_build(st, f'A customer complained: "{text}". This is a fault, not what the owner wants: {said} Fix it so '
-                        'this cannot happen to a customer again, and add a test for the customer\'s case.', ch)
+                        'this cannot happen to a customer again, and add a test for the customer\'s case.', None)
+        ch.send(f"✅ <b>Fixed, sir.</b> {telegram.esc((latest_build(repo) or {}).get('check', ''))} Say \"ship it\" and it "
+                "goes to your engineer.", html=True)
         return 'complaint_fixed'
     ch.send('🐝 ' + telegram.esc(said), html=True)
     return 'complaint_bug' if verdict == 'bug' else 'complaint_unclear'
@@ -899,7 +932,7 @@ def go_live(ch, repo, poll):
                 "have reviewed. " + ("It's with them now; the moment it's merged, say \"put it live\"." if st.get('shipped')
                                      else "Say \"ship it\" and it goes to them; once merged, I'll put it live."))
         return 'not_merged'
-    host = deploy.config(repo)['host'].title()
+    host = deploy.title(repo)
     ch.send(f"🚀 <b>Put it live on {host}?</b>\n\nYour engineer has merged it. I'll run every test on your main version "
             "first, and only put it live if they all pass.", html=True,
             buttons=[[('🚀 Put it live', 'liv|yes')], [('Not now', 'liv|no')]])
@@ -1155,8 +1188,8 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         ch.send(f"🛠 Very good, sir: {telegram.esc(refs.words(rule) or 'as in your picture')}" +
                 (" (with your picture)" if refs.has(rule) else '') + ". Changing your latest build now; I'll show you "
                 "before and after." + tip, html=True)
-        apply_build(st, rule, ch)
-        show(ch, repo, before=before)
+        apply_build(st, rule, None)   # (its own message spoke of 'your new ruling' and a branch: Gate 107)
+        show(ch, repo, before=before, intro='✅ <b>Done, sir.</b> ' + telegram.esc((latest_build(repo) or {}).get('check', '')))
         return 'amended'
     if intent == 'amend':   # nothing built yet to change: it is a build request
         intent = 'build'

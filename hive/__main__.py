@@ -127,7 +127,8 @@ def _start(a):
             os.makedirs(os.path.join(os.path.expanduser('~'), '.hive'), exist_ok=True)
             open(os.path.join(os.path.expanduser('~'), '.hive', 'agent'), 'w').write(a.agent)
     return start.start('.', getattr(a, 'workers', None), getattr(a, 'goal', None), getattr(a, 'minutes', 40),
-                           getattr(a, 'overnight', False), not getattr(a, 'no_interview', False), getattr(a, 'docs', None))
+                           getattr(a, 'overnight', False), not getattr(a, 'no_interview', False), getattr(a, 'docs', None),
+                           getattr(a, 'on', None))
 
 def build_parser():
     ap = Parser(prog='hive', description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -135,6 +136,7 @@ def build_parser():
     st = sub.add_parser('start'); st.add_argument('--goal')
     st.add_argument('--workers', type=positive)   # default: the swarm law decides (a comment here once swallowed --goal)
     st.add_argument('--minutes', type=positive, default=40)
+    st.add_argument('--on')   # build on top of this branch (his latest unmerged build), still for his main
     st.add_argument('--docs', type=existing)   # the company's own documents: a file or a folder
     st.add_argument('--agent', type=agent_choice)   # which coding agent builds, or a mix (claude,codex)
     st.add_argument('--save-agent', action='store_true')   # remember --agent for every build on this computer

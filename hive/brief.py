@@ -41,7 +41,7 @@ def facts(repo, since):
             continue
         if os.path.getmtime(h) > since:
             landed.append(f"Built: {_goal(st.get('goal'))}. {st.get('check', '')}")
-        if not st.get('shipped') and os.path.getmtime(h) > since - 7 * 86400:
+        if not st.get('shipped') and not st.get('folded') and not st.get('undone') and os.path.getmtime(h) > since - 7 * 86400:
             waiting.append(f"Ready, not yet sent to his engineer: {_goal(st.get('goal'))} (he says \"ship it\").")
     p = assistant.PLAN
     if p.get('steps') and not p.get('running') and p.get('step', 0) == 0:

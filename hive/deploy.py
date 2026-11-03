@@ -26,6 +26,11 @@ def _key(repo):
     from . import memory
     return memory.project_key(repo)
 
+def title(repo):
+    """His host, as he would say it: "Vercel", "Netlify", or "your site" for his own commands."""
+    h = config(repo).get('host', '')
+    return {'custom': 'your site', 'fly': 'Fly'}.get(h, h.title() or 'your site')
+
 def config(repo):
     try:
         return json.load(open(os.path.join(DIR, _key(repo) + '.json')))

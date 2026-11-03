@@ -77,7 +77,7 @@ fake = FakeTelegram([])
 check('"show me" is read without a model', assistant.SHOW_WORDS.search('show me the invite page') is not None, True)
 r = assistant.handle(ch(fake), code, 'show me the invite page', poll=1)
 check('"show me" sends the screens, asking what is off', (r, [m['text'].split(chr(10))[0] for m in fake.sent],
-      'send a picture of what you' in fake.sent[-1]['text']), ('shown', ['[photo] /invite'], True))
+      'send a picture of what you' in fake.sent[-1]['text']), ('shown', ['[photo] Invite page'], True))
 
 # 6. after seeing it, a picture changes his latest build, and he sees before and after
 st = {'repo': code, 'name': 'invites-1103', 'b': 'main', 'final': run, 'goal': 'an invite page at /invite', 'check': ''}
@@ -91,7 +91,7 @@ r = assistant.handle(ch(fake), code, 'bigger button, like this [photo: ' + refs.
                      apply_build=apply_build)
 sent = [(m['text'].split(chr(10))[0], m.get('photo')) for m in fake.sent]
 check('a picture after a build changes that build (his words and picture to the fix round), then before and after',
-      (r, len(applied), refs.has(applied[0]) if applied else False, ('[photo] Before: /invite', png) in sent, ('[photo] After: /invite', after) in sent),
+      (r, len(applied), refs.has(applied[0]) if applied else False, ('[photo] Before: Invite page', png) in sent, ('[photo] After: Invite page', after) in sent),
       ('amended', 1, True, True, True))
 check('with a picture, no tip to send one', 'a picture lands closer' in fake.sent[0]['text'], False)
 fake = FakeTelegram([])

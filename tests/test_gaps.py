@@ -77,7 +77,9 @@ body = ship.body(dict(st, goal='Show prices in rupees'), repo, [('/', '.hive/scr
 check('the pull request shows how it looks and what changed', ('github.com/acme/shop/blob/hive/price-1103/.hive/screens/01_home.png?raw=true' in body,
       '**What changed**' in body, 'app.py' in body, 'Show prices in rupees' in body), (True, True, True, True))
 
+check('his latest build, not merged yet: the next build goes on top of it (Gate 107)', (assistant._unmerged(repo) or {}).get('name'), 'price-1103')
 c('merge', '-q', 'hive/price-1103')
+check('once merged, the next build starts from his main', assistant._unmerged(repo), None)
 deploy.setup(repo, 'vercel'); deploy.shutil.which = lambda n: '/usr/bin/' + n
 ran = []
 deploy._run = lambda cmd, cwd, timeout=900: ran.append(git(cwd, 'rev-parse', 'HEAD').stdout.strip()) or subprocess.CompletedProcess(cmd, 0, 'https://shop.acme.app\n', '')
@@ -104,4 +106,8 @@ check('a document he sends: facts kept for plans, rules kept as his rules', (r, 
       ('document', 'New creators get ₹500 extra on their first completed deal.', ['Refunds go back to the card.'], True))
 explain.ask_json = real
 check("a kind it can't read is said plainly", brain.learn(repo, os.path.join(home, 'x.bin')), None)
+# 7. a build folded into a newer one is set aside (its pull request withdrawn), not offered again
+st.pop('undone', None); st['shipped'] = 1; json.dump(st, open(os.path.join(st['home'], 'state.json'), 'w')); closed.clear()
+assistant._fold(repo, st)
+check('folded into a newer build: set aside, its pull request withdrawn', (assistant.latest_build(repo), closed), (None, ['price-1103']))
 sys.exit(fail)
