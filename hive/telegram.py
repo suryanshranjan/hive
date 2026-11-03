@@ -265,6 +265,15 @@ class Channel:
                         self.remember('owner', f'{words} [sent a picture]'.strip())
                     else:
                         self.send("I couldn't open that picture, sir. Could you send it again?")
+                elif m.get('document'):   # a document about his business (a policy, a pitch, notes): Hive learns from it
+                    path = self.photo(m['document']['file_id'])
+                    words = (m.get('caption') or '').strip()
+                    name = m['document'].get('file_name') or 'document'
+                    if path:
+                        out.append((f'{words} [document: {path} | {name}]'.strip(), None, reply_to))
+                        self.remember('owner', f'{words} [sent a document: {name}]'.strip())
+                    else:
+                        self.send("I couldn't open that document, sir. Could you send it again?")
         return out
 
     def listen(self, file_id):

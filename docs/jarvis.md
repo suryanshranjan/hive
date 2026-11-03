@@ -54,6 +54,10 @@
 | Try it | "send me a link" | The latest build at its own address, to tap and use; his live product untouched |
 | Put it live | "put it live" | Only once his engineer has merged it: his yes, every test on his main version, then live. Otherwise: "say ship it first" |
 | A technical instruction | "add a Redis cache in front of /products, 60s TTL" | Caught as the precise instruction it is: "Yes, let's do it", restated in his terms; at most 2 normal questions an engineer would ask; no business quiz; from then on Jarvis speaks his language |
+| Price | any build or plan | "It'll cost about $0.80"; past his monthly cap, it asks first. "Set my budget to $50 a month" |
+| Undo | "undo that" | Whatever is most recent, after his yes: a build running stops; an unsent one is set aside; a pull request is withdrawn; live goes back to the version before |
+| A document | a PDF, notes, a policy | Read; what lasts about his business is kept for every plan and answer; rules it plainly states become his rules |
+| No tests | a project without tests | Hive writes a safety net first (tests pinning today's behaviour), instead of stopping |
 | Spin-up | `hive setup` once, or `hive up` | Checks, Telegram, screenshots, numbers, where it lives, then starts listening and says hello on his phone |
 
 ## Still to come

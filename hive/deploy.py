@@ -144,6 +144,23 @@ def live(repo, main_ref, test_cmd=None):
         if p.returncode:
             return {'ok': False, 'why': 'failed', 'say': f"{cfg['host'].title()} refused it (for your engineer: "
                     f"{(p.stderr or p.stdout).strip()[-200:]}). Nothing changed on your live product."}
-        return {'ok': True, 'url': _url(p.stdout + '\n' + p.stderr), 'why': None, 'say': ''}
+        url = _url(p.stdout + '\n' + p.stderr)
+        sha = subprocess.run(['git', '-C', code, 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip()
+        cfg.setdefault('history', []).append({'t': __import__('time').time(), 'sha': sha, 'url': url})   # for undo
+        json.dump(cfg, open(os.path.join(DIR, _key(repo) + '.json'), 'w'), indent=1)
+        return {'ok': True, 'url': url, 'why': None, 'say': ''}
     finally:
         shutil.rmtree(work, ignore_errors=True)
+
+def back(repo):
+    """Put live the version that was live before the last one Hive put live (undo). {'ok', 'url', 'say', 'when'}"""
+    h = config(repo).get('history') or []
+    if len(h) < 2:
+        return {'ok': False, 'say': "I've no earlier version of yours that I put live, so I can't take it back from here; "
+                "your host can (on Vercel: Deployments, then Promote the previous one)."}
+    prev = h[-2]
+    r = live(repo, prev['sha'])   # it passed its tests when it went live
+    if r['ok']:   # the restored version is the current one again
+        cfg = config(repo); cfg['history'] = h[:-1]
+        json.dump(cfg, open(os.path.join(DIR, _key(repo) + '.json'), 'w'), indent=1)
+    return dict(r, when=prev['t'])

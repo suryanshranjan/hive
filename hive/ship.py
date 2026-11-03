@@ -21,11 +21,22 @@ def web(url):
     host, path = m.group(1).lower(), m.group(2)
     return ('github' if 'github' in host else 'gitlab' if 'gitlab' in host else None), (host, path)
 
-def body(state):
-    """What the engineer reads: what the owner asked for, what Hive checked, what it cost, and that he asked to ship it."""
+def body(state, repo=None, shots=(), where=None):
+    """What the engineer reads: what the owner asked for, screenshots of the result, what changed, what Hive checked,
+    what it cost, and that he asked to ship it (the founder's view: engineers who enjoy reviewing Hive's work are its
+    champions; those who don't, block it)."""
     goal = re.sub(r'\(his picture: [^)]*\)', '(with a picture he sent, in .hive/refs)', state.get('goal', '')).strip()
-    lines = ['Built by Hive. The owner asked to ship it from his phone.', '', '**What he asked for**', '', goal[:3000], '',
-             '**Checked**', '', state.get('check') or 'Every test was run on the result.']
+    goal = re.sub(r'\n\n# How to work on the look.*', '', goal, flags=re.S)
+    branch, base = f"hive/{state['name']}", state.get('branch') or 'main'
+    lines = ['Built by Hive. The owner asked to ship it from his phone.', '', '**What he asked for**', '', goal[:3000]]
+    if shots and where:   # how it looks, at phone size, committed to this branch
+        lines += ['', '**How it looks** (phone size)', ''] + [
+            f'<img src="https://{where[0]}/{where[1]}/blob/{branch}/{rel}?raw=true" width="260" alt="{page}">' for page, rel in shots]
+    if repo:
+        stat = _git(repo, 'diff', '--stat', f'{base}...{branch}').stdout.strip()
+        if stat:
+            lines += ['', '**What changed**', '', '```', stat[-2500:], '```']
+    lines += ['', '**Checked**', '', state.get('check') or 'Every test was run on the result.']
     if state.get('cost'):
         lines += ['', f"Builders' cost: about ${state['cost']:.2f}."]
     lines += ['', 'This branch never touched your main branch. Review it, and merge it when you are happy.']
@@ -46,6 +57,7 @@ def ship(repo, state):
     url = _git(repo, 'remote', 'get-url', 'origin').stdout.strip()
     if not url:
         out['why'] = 'no_remote'; return out
+    shots = _screens(repo, branch)   # for the engineer: how it looks, in the pull request
     # only Hive's own branch, by its full name; a fix round rewrites it in place, so it is replaced, never merged into
     p = _git(repo, 'push', '-q', 'origin', f'+refs/heads/{branch}:refs/heads/{branch}')
     if p.returncode:
@@ -60,13 +72,14 @@ def ship(repo, state):
             j = {}
         if r.returncode == 0 and j.get('state') == 'OPEN':
             out.update(url=j['url'], how='pr', again=True); return out
-        r = _run(['gh', 'pr', 'create', '--head', branch, '--base', base, '--title', title(state), '--body', body(state)], repo)
+        r = _run(['gh', 'pr', 'create', '--head', branch, '--base', base, '--title', title(state), '--body',
+                  body(state, repo, shots, where)], repo)
         found = re.findall(r'https://\S+/pull/\d+', r.stdout + r.stderr)
         if found:
             out.update(url=found[-1], how='pr'); return out
     if kind == 'gitlab' and shutil.which('glab'):
         r = _run(['glab', 'mr', 'create', '--source-branch', branch, '--target-branch', base, '--title', title(state),
-                  '--description', body(state), '--yes'], repo)
+                  '--description', body(state, repo, shots, where), '--yes'], repo)
         found = re.findall(r'https://\S+/merge_requests/\d+', r.stdout + r.stderr)
         if found:
             out.update(url=found[-1], how='pr'); return out
@@ -78,3 +91,34 @@ def ship(repo, state):
     else:
         out['how'] = 'pushed'
     return out
+
+def _screens(repo, branch):
+    """Screenshots of a frontend build, committed to its branch (.hive/screens) before it is pushed: [(page, path)]."""
+    import tempfile
+    from . import screens
+    try:
+        if not screens.available():
+            return []
+        work = tempfile.mkdtemp(prefix='hive_ship_'); code = os.path.join(work, 'code')
+        if subprocess.run(['git', 'clone', '-q', '-b', branch, os.path.abspath(repo), code], capture_output=True).returncode:
+            return []
+        if not screens.is_frontend(code):
+            return []
+        got = screens.take(code, screens.pages_of('', code)[:3], os.path.join(code, '.hive', 'screens'))
+        rels = [(page, os.path.relpath(png, code).replace(os.sep, '/')) for page, png in got]
+        g = lambda *a: subprocess.run(['git', '-C', code, *a], capture_output=True, text=True)
+        g('add', '-f', '.hive/screens/'); g('reset', '-q', '.hive/screens/server.log')
+        g('-c', 'user.name=hive', '-c', 'user.email=hive@local', 'commit', '-q', '-m', 'hive: screenshots for the review')
+        g('push', '-q', 'origin', f'HEAD:refs/heads/{branch}')   # back into his project's hive branch (never main)
+        shutil.rmtree(work, ignore_errors=True)
+        return rels
+    except Exception:
+        return []
+
+def close(repo, state):
+    """Withdraw the pull request for this build (he said "undo that" after shipping). True if one was closed."""
+    branch = f"hive/{state['name']}"
+    if not shutil.which('gh'):
+        return False
+    r = _run(['gh', 'pr', 'close', branch, '--comment', 'The owner took this back from his phone (Hive: "undo that").'], repo)
+    return r.returncode == 0

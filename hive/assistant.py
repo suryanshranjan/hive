@@ -85,9 +85,60 @@ def latest_build(repo):
                     if os.path.exists(os.path.join(h, 'state.json'))), key=os.path.getmtime)
     for h in reversed(homes):
         st = json.load(open(os.path.join(h, 'state.json')))
-        if os.path.abspath(st.get('repo', '')) == os.path.abspath(repo):
-            return st
+        if os.path.abspath(st.get('repo', '')) == os.path.abspath(repo) and not st.get('undone'):
+            return st   # (a build he undid is set aside: the one before it is his latest again)
     return None
+
+UNDO_WORDS = re.compile(r"^\s*(please\s+)?(undo( that| it| this| the last( one| change)?)?|revert( that| it)?|roll ?(it )?back|"
+                        r"take (it|that) back|put it back|go back to (how it was|before)|wapas karo|pehle jaisa karo)\b")
+
+def undo(ch, repo, poll):
+    """'Undo that': whatever is most recent, taken back after his yes. A build running is stopped; a build not yet sent
+    is set aside; one with his engineer has its pull request withdrawn; one live goes back to the version before."""
+    from . import deploy, numbers, ship
+    p = BUILD.get('proc')
+    if (p is not None and p.poll() is None) or PLAN.get('running'):
+        ch.send("↩️ <b>Stop what's being built now?</b> Nothing from it is kept.", html=True,
+                buttons=[[('↩️ Stop it', 'und|yes')], [('Keep going', 'und|no')]])
+        choice, other = choose(ch, poll, [('und|yes', ('yes', 'stop it', 'undo it', 'haan')), ('und|no', NO_WORDS)])
+        if choice != 'und|yes':
+            ch.send('Very good, it carries on.'); return 'kept'
+        PLAN['running'] = False; PLAN['cancel'] = True
+        if p is not None and p.poll() is None:
+            _stop(p)
+        ch.send('↩️ Stopped. Nothing from it was kept.'); return 'undone'
+    st = latest_build(repo)
+    if not st:
+        ch.send("There's nothing of mine to undo, sir."); return 'nothing'
+    hist = deploy.config(repo).get('history') or []
+    is_live = bool(hist) and hist[-1]['t'] >= (st.get('shipped') or 0) and deploy.merged(repo, f"hive/{st['name']}", st.get('branch') or 'main')
+    what = (f"Put your live product back to how it was before {_goal_words(st)} went live?" if is_live else
+            f"Withdraw {_goal_words(st)} from your engineer and set it aside?" if st.get('shipped') else
+            f"Set aside {_goal_words(st)}? Your product stays exactly as it is.")
+    ch.send(f"↩️ <b>{telegram.esc(what)}</b>", html=True, buttons=[[('↩️ Yes, undo it', 'und|yes')], [('Not now', 'und|no')]])
+    choice, other = choose(ch, poll, [('und|yes', ('yes', 'undo it', 'do it', 'haan')), ('und|no', NO_WORDS)])
+    if other is not None:
+        return handle(ch, repo, other, poll)
+    if choice != 'und|yes':
+        ch.send('Very good. Nothing changed.'); return 'kept'
+    if is_live:
+        r = deploy.back(repo)
+        if not r['ok']:
+            ch.send('⚠️ ' + telegram.esc(r['say'])); return 'undo_failed'
+        numbers.mark(repo, f'went back to the version before "{_goal_words(st)}"')
+        ch.send("↩️ <b>Done: your live product is back to how it was.</b> Your engineer should undo the merge in your main "
+                "version too, so the next build starts from there; I've left that to them.", html=True)
+        return 'undone_live'
+    if st.get('shipped'):
+        ship.close(repo, st)
+    st['undone'] = time.time()
+    try:
+        json.dump(st, open(os.path.join(st.get('home') or os.path.join(RUNS, st['name']), 'state.json'), 'w'), indent=1)
+    except (OSError, KeyError):
+        pass
+    ch.send("↩️ Done, sir: set aside" + (", and withdrawn from your engineer." if st.get('shipped') else ".") +
+            " Your product is exactly as it was.")
+    return 'undone'
 
 VOICE = """You are Hive, a business owner's software assistant. Your manner is J.A.R.V.I.S. with Tony Stark: a
 superbly competent, unflappable butler who happens to run his builders. Address him as "{who}".
@@ -146,7 +197,9 @@ def facts(repo, ch=None):
              (f"Latest build: branch hive/{st['name']}. {st.get('check', '')}" if st else 'Nothing built on this project yet.'),
              f"Standing rules he has given for this project: {len(memory.load(repo))}."]
     try:
-        from . import numbers
+        from . import budget, numbers
+        c = budget.cap()
+        lines.append(f'Spent on builds this month: ${budget.spent_month():.2f}' + (f' (his limit: ${c:g} a month)' if c else ''))
         lines += [f'His numbers: {x}' for x in numbers.changes(repo)[:6]]
     except Exception:
         pass
@@ -922,8 +975,11 @@ def pursue(ch, repo, text, poll, apply_build=None, run=True):
         return 'no_plan'
     steps = p['steps']
     lines = '\n'.join(f"{k}. <b>{telegram.esc(s['title'])}</b>: {telegram.esc(s['why'])}" for k, s in enumerate(steps, 1))
+    from . import budget
+    est = budget.estimate(repo, 'step', steps=len(steps)); warn = budget.over(est)
     ch.send(f"🧭 <b>Here's what I see, sir.</b> {telegram.esc(p['finding'])}\n\n<b>What I'd do:</b>\n{lines}\n\n<i>I'll "
-            "build them one after another and show you each. Your main version isn't touched.</i>", html=True,
+            "build them one after another and show you each. Your main version isn't touched.</i> "
+            f"All of it: {budget.say(est)}." + (f"\n⚠️ {telegram.esc(warn)}" if warn else ''), html=True,
             buttons=[[('🚀 Yes, do it all', 'pln|all')], [('Just the first', 'pln|one')], [('Not now', 'pln|no')]])
     choice, other = choose(ch, poll, [('pln|all', ('yes', 'do it', 'do it all', 'go ahead', 'all', 'haan', 'karo')),
                                       ('pln|one', ('just the first', 'only the first', 'first one', 'pehla')),
@@ -946,7 +1002,7 @@ def pursue(ch, repo, text, poll, apply_build=None, run=True):
         answers.append(opts[int(ans.split('|')[1])] if kind == 'tap' else (ans or '').strip())
         if answers[-1]:
             memory.add(repo, f"{s['decide']} {answers[-1]}", 'plan')   # his decision is kept for every later build
-    PLAN.update(goal=text, steps=steps, step=1, running=True, answers=answers, cost=p.get('cost', 0))
+    PLAN.update(goal=text, steps=steps, step=1, running=True, answers=answers, cost=p.get('cost', 0)); PLAN.pop('cancel', None)
     from . import numbers
     numbers.refresh(repo)   # where his numbers stand before the change, to compare with later
     numbers.mark(repo, f'you agreed the plan for "{text[:80]}"')
@@ -964,6 +1020,8 @@ def run_plan(ch, repo, apply_build, wait=None):
     see = screens.available() and screens.is_frontend(repo)
     try:
         for k, s in enumerate(steps, 1):
+            if PLAN.pop('cancel', False):   # he said "undo that" mid-plan
+                return 'cancelled'
             PLAN['step'] = k
             told = planner.instruction(s, answers[k - 1])
             if k == 1:
@@ -1022,8 +1080,14 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         got = {'intent': 'show'}
     elif SHIP_WORDS.search(low):
         got = {'intent': 'ship'}
+    elif __import__('hive.brain', fromlist=['x']).DOC.search(text):   # a document about his business: learned
+        got = {'intent': 'document'}
     elif BRIEF_WORDS.search(low):
         got = {'intent': 'brief'}
+    elif UNDO_WORDS.search(low):
+        got = {'intent': 'undo'}
+    elif re.search(r"\b(budget|limit|cap)\b", low) and __import__('hive.budget', fromlist=['x']).SET.search(low):
+        got = {'intent': 'budget'}
     elif COMPLAINT_WORDS.search(low) and not (_building() or '').startswith('A build is running'):
         got = {'intent': 'complaint'}
     elif GOAL_WORDS.search(low) and not (_building() or '').startswith('A build is running'):
@@ -1045,6 +1109,29 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         return connect_host(ch, repo, text)
     if intent == 'preview':
         return preview_it(ch, repo)
+    if intent == 'document':   # the company brain: what lasts in his document, kept for plans and answers
+        from . import brain
+        m = brain.DOC.search(text)
+        ch.send("📚 Reading it now, sir.")
+        got = brain.learn(repo, m.group(1).strip(), m.group(2).strip())
+        if got is None:
+            ch.send("📚 I couldn't read that kind of document, sir. Text, PDF, Markdown, or a spreadsheet saved as CSV all "
+                    "work; a Word file saved as PDF does too.")
+            return 'document_unread'
+        facts, rules = got['facts'], got['rules']
+        ch.send(f"📚 <b>Read and kept, sir:</b> {len(facts)} thing{'s' if len(facts) != 1 else ''} about your business" +
+                (f" and {len(rules)} rule{'s' if len(rules) != 1 else ''} for how your product should behave" if rules else '') +
+                ".\n\n" + '\n'.join('• ' + telegram.esc(f) for f in facts[:5]) +
+                ("\n\n<i>I'll use them in every plan and answer from now on.</i>"), html=True)
+        return 'document'
+    if intent == 'undo':   # "undo that": whatever is most recent, taken back after his yes
+        return undo(ch, repo, poll)
+    if intent == 'budget':   # "set my budget to $50 a month"
+        from . import budget
+        amount = budget.set_from(text)
+        ch.send(f"💰 Done, sir: at most ${amount:g} a month on builds. So far this month: ${budget.spent_month():.2f}. "
+                "I'll ask before anything would go past it.")
+        return 'budget'
     if intent == 'brief':   # "what's new?": the brief, now
         from . import brief
         brief.send(ch, repo, since=time.time() - 86400)
@@ -1147,18 +1234,24 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
                     extra += f"\n- {q['q']} -> {said}"
         if extra:
             rule += "\n\nHis answers:" + extra
+        from . import budget
+        est = budget.estimate(repo, 'build'); price = f" It'll cost {budget.say(est)}."
+        if budget.over(est):
+            price = f" ⚠️ {budget.over(est)} Tap to go ahead anyway."
+            go = False   # past his cap, even "go ahead" waits for this tap
         for _ in range(3):
             if go:
                 break
             short = (got.get('short') or '').strip() if rule == (got.get('rule') or '').strip() else ''
             if tech:
                 ch.send(f"👍 <b>Yes, let's do it.</b>\n\n{telegram.esc(restated or rule)}\n\n<i>Shall I build this? Tap, "
-                        "or correct me; every test is run before you see it.</i>", html=True,
+                        "or correct me; every test is run before you see it.</i>" + telegram.esc(price), html=True,
                         buttons=[[('🚀 Go', 'bld|yes')], [('Not now', 'bld|no')]])
             else:
                 ch.send(f"🏗 <b>Shall I build this?</b>\n\n{telegram.esc(short or rule)}\n\n<i>" +
                         ("I'll do it on a copy and show you how it looks." if screens.is_look_job(rule, repo) else
-                         "I'll work on copies, then bring you the decisions to check.") + " Tap, or just tell me.</i>", html=True,
+                         "I'll work on copies, then bring you the decisions to check.") + " Tap, or just tell me.</i>" +
+                        telegram.esc(price), html=True,
                         buttons=[[('🚀 Yes, build it', 'bld|yes')], [('Not now', 'bld|no')]])
             kind, ans = telegram._wait(ch, poll, {'bld|yes', 'bld|no'})
             if kind == 'tap':

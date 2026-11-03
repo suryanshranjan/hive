@@ -139,7 +139,9 @@ def build_parser():
     st.add_argument('--agent', type=agent_choice)   # which coding agent builds, or a mix (claude,codex)
     st.add_argument('--save-agent', action='store_true')   # remember --agent for every build on this computer
     st.add_argument('--overnight', action='store_true'); st.add_argument('--no-interview', action='store_true')   # no questions; check the assumptions later with `hive morning`
-    sub.add_parser('doctor'); sub.add_parser('setup'); sub.add_parser('up')   # up: live on his phone, listening
+    sub.add_parser('doctor'); sub.add_parser('setup')
+    up = sub.add_parser('up'); up.add_argument('--repo')   # live on his phone, listening; --repo: his code's GitHub address
+    br = sub.add_parser('brain'); br.add_argument('action', choices=['add']); br.add_argument('path')
     de = sub.add_parser('deploy'); de.add_argument('action', choices=['setup', 'preview', 'status'])
     de.add_argument('host', nargs='?'); de.add_argument('--preview'); de.add_argument('--live'); de.add_argument('--hook')
     nu = sub.add_parser('numbers'); nu.add_argument('action', nargs='?', choices=['setup', 'add'])
@@ -206,9 +208,18 @@ def main(argv=None):
         return doctor.main('.') if a.cmd == 'doctor' else doctor.setup('.')
     if a.cmd == 'up':   # straight to live on his phone (after hive setup has connected Telegram)
         from . import doctor
+        here = doctor.fetch_repo(a.repo) if a.repo else '.'
+        if not here:
+            return 2
         if not telegram.load():
-            return doctor.setup('.')
-        return doctor.go_live('.')
+            return doctor.setup(here)
+        return doctor.go_live(here)
+    if a.cmd == 'brain':   # the company brain: hive brain add <file or folder>
+        from . import brain
+        n, facts, rules = brain.learn_all('.', a.path)
+        print(f'Read {n} document{"s" if n != 1 else ""}: kept {facts} facts about the business and {rules} rules.' if n else
+              "I couldn't read anything there (text, Markdown, CSV, JSON, HTML, or PDF with pypdf installed).")
+        return 0 if n else 1
     if a.cmd == 'deploy':   # where his product lives: his choice (going live is from the phone, after a merge)
         from . import deploy
         if a.action == 'setup':

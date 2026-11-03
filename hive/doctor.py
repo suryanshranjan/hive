@@ -125,6 +125,23 @@ def setup(repo='.', ask=input, claude_probe=True):
     print("\nAll set. Type `hive` in your project folder and tell me what to build.")
     return 0
 
+def fetch_repo(url):
+    """His code from where it lives (a GitHub or GitLab address): fetched once into ~/hive-projects/<name>, brought up
+    to date after that. Returns the folder, or None (said plainly)."""
+    import re
+    name = re.sub(r'\.git$', '', re.split(r'[\\/:]', url.rstrip('/\\'))[-1]) or 'project'   # an address or a folder
+    here = os.path.join(os.path.expanduser('~'), 'hive-projects', name)
+    if os.path.isdir(os.path.join(here, '.git')):
+        subprocess.run(['git', '-C', here, 'pull', '-q', '--ff-only'], capture_output=True)
+        print(f'Your project {name} is here: {here} (brought up to date).'); return here
+    os.makedirs(os.path.dirname(here), exist_ok=True)
+    p = subprocess.run(['git', 'clone', '-q', url, here], capture_output=True, text=True)
+    if p.returncode:
+        print(f"I couldn't fetch {url}: {(p.stderr or '').strip()[-200:]}\nIf it's private, log in once with your git "
+              "host's tool (for GitHub: gh auth login), then run this again.")
+        return None
+    print(f'Fetched your project {name} into {here}.'); return here
+
 def go_live(repo='.'):
     """Start Jarvis listening in the background on this computer, and say hello on his phone. One listener only."""
     from . import assistant, memory

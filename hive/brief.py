@@ -54,6 +54,10 @@ def facts(repo, since):
     lines += [f'Waiting on him: {x}' for x in waiting[:3]]
     lines += [f'A customer complained: {c}' for c in complaints[:3]]
     lines += [f'His numbers: {x}' for x in numbers.changes(repo)[:5]]
+    if lines:
+        from . import budget
+        c = budget.cap()
+        lines.append(f'Spent on builds this month: ${budget.spent_month():.2f}' + (f' of his ${c:g} limit' if c else ''))
     return lines
 
 def compose(repo, ch=None, since=None):

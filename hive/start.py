@@ -179,12 +179,24 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     test_cmd, how = cfg.get('test_cmd'), 'the command in your hive settings'
     if not test_cmd:
         test_cmd, how = detect_tests(repo)
-    if not test_cmd:
-        test_cmd = _ask("  I could not find your tests. What command runs them? It must write a JUnit report to "
-                        ".hive/junit.xml.")
-        how = 'your command'
-        if not test_cmd:
-            say('  Builders need tests to know when the work is right. Add some and run me again.'); return 4
+    from . import safety
+    if not test_cmd and safety.has(repo):   # the safety net Hive wrote for this project earlier
+        test_cmd, how = safety.command(), "the safety net I wrote for your project"
+    if not test_cmd:   # most founders' projects: Hive writes the net first, instead of stopping
+        say("  Your project has no tests yet, so first I'll write a safety net: tests that pin how it works today, so "
+            "nothing I change later can quietly break it. A few minutes; your own folder isn't touched.")
+        net = safety.make(repo)
+        if net.get('ok'):
+            test_cmd, how = safety.command(), "the safety net I just wrote for your project"
+            say(f"  Done: {_n(net['tests'], 'test')}" + (f" ({net['covers']})" if net.get('covers') else '') +
+                ". They come with this build, so your engineer gets them too.")
+        else:
+            test_cmd = _ask("  I could not find your tests, and couldn't write a safety net"
+                            + (f" ({net['why']})" if net.get('why') else '') + ". What command runs them? It must write a "
+                            "JUnit report to .hive/junit.xml.")
+            how = 'your command'
+            if not test_cmd:
+                say('  Builders need tests to know when the work is right. Add some and run me again.'); return 4
     links = cfg.get('snapshot_links') or detect_links(repo)
     say(f'  Git repository on branch {branch}, no unsaved changes.')
     if not overnight and not memory.project_name(repo) and sys.stdin.isatty():   # asked once, then remembered
@@ -203,6 +215,8 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', branch, repo, source)
     sh('git', '-C', source, 'config', 'user.name', 'hive'); sh('git', '-C', source, 'config', 'user.email', 'hive@local')
     _link(repo, source, links)
+    if test_cmd == safety.command():
+        safety.install(repo, source)   # the net goes in with this build (and to his engineer)
     t0 = time.time(); before = run_tests(source, test_cmd); t_g = time.time() - t0   # the gate term of the law
     passed, total = sum(before.values()), len(before)
     if total >= 20 and passed < 0.5 * total and how != 'your command':   # a fresh feature's few failing tests are normal
