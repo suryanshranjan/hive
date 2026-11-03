@@ -9,7 +9,7 @@ Only one Hive process reads the bot at a time: while a build or review is talkin
 aside (see telegram.busy_elsewhere)."""
 import glob, json, os, re, subprocess, time
 
-from . import argv, explain, memory, team, telegram
+from . import argv, explain, memory, refs, team, telegram
 
 RUNS = os.path.join(os.path.expanduser('~'), '.hive', 'runs')   # where `hive start` keeps its builds
 PIDFILE = os.path.join(os.path.expanduser('~'), '.hive', 'listen.pid')   # the listener running on this computer
@@ -24,7 +24,7 @@ What does he mean? Read it as a person would, using the conversation: "yes" or "
 proposed; "I already told you" or "that one" points back to what he said before; a short correction ("no, Sunny Shop
 Creators") changes what you just proposed. Reply with JSON only:
 {{"intent": "build" | "stop_build" | "change" | "rule" | "status" | "team" | "set_team" | "stop_builder" | "greeting" |
-"instruct" | "cloud_on" | "cloud_off" | "reply",
+"instruct" | "show" | "amend" | "cloud_on" | "cloud_off" | "reply",
 "rule": "for a build, exactly what to build (taken from the conversation if he points back to it); for a change or a
 rule, the rule he now wants; otherwise empty",
 "confirmed": true if he is agreeing to do what you just proposed (or clearly telling you to go ahead now), else false,
@@ -47,6 +47,11 @@ rule, the rule he now wants; otherwise empty",
 - "instruct": while a build is running, he tells the builders to do something different or extra in this build (a
   change of direction, more work, or a new job for one builder); "rule" carries the instruction, "builder" the builder
   if he names one. Not a separate new build, and not a standing rule for every build.
+- "show": he wants to see how it looks: screenshots of his product or of what was just built ("show me", "screenshot
+  bhejo", "how does the page look?").
+- "amend": right after seeing what was built (a screenshot you sent, or a build that just landed), he wants that build
+  changed: how it looks or works ("the button is too small", "make the header like this"). "rule" carries the change.
+  Not a separate new feature.
 - "greeting": a hello, with no request yet.
 - "cloud_on" / "cloud_off": move Hive to the cloud / shut the cloud machine down.
 - "reply": anything else: a question, a complaint, frustration, small talk. Never a rule."""
@@ -274,6 +279,53 @@ def route(run, text):
         return got['builder'], (got.get('why') or '').strip().rstrip('.')
     return team.pick(run), ''
 
+SHOW_WORDS = re.compile(r"\b(show me|screenshots?|dikhao|dikha do|kaisa dikh|how does it look|how it looks|let me see)\b")
+
+def _code_to_show(repo):
+    """(folder, goal) of what he would want to see: the build running now, else his latest build, else his product."""
+    import tempfile
+    tmp = tempfile.mkdtemp(prefix='hive_show_')
+    run = team.current_run()
+    if run and _building() and _building().startswith('A build is running'):
+        meta = json.load(open(os.path.join(run, 'run.json')))
+        subprocess.run(['git', 'clone', '-q', '-b', meta.get('branch', 'main'), os.path.join(run, 'up.git'), tmp + '/c'],
+                       capture_output=True)
+        return tmp + '/c', BUILD.get('goal', '')
+    st = latest_build(repo)
+    if st and st.get('final') and st.get('b'):
+        subprocess.run(['git', 'clone', '-q', '-b', st['b'], os.path.join(st['final'], 'up.git'), tmp + '/c'],
+                       capture_output=True)
+        if os.path.isdir(tmp + '/c'):
+            return tmp + '/c', st.get('goal', '')
+    return repo, ''
+
+def shoot(repo):
+    """Screenshots of what he would want to see: [(page, png)], or a plain reason why not (a string)."""
+    from . import screens
+    code, goal = _code_to_show(repo)
+    try:
+        return screens.take(code, screens.pages_of(goal, code))
+    except screens.Unavailable as e:
+        return str(e)
+    except Exception as e:   # a page that would not load is told, not a crash in his chat
+        return f"I couldn't take the screenshots just now ({str(e)[:120]})."
+
+def show(ch, repo, before=None, intro=None):
+    """Send him the screens, at phone size; with `before`, each page before and after his change."""
+    shots = shoot(repo)
+    if isinstance(shots, str):
+        ch.send(f"📷 {shots}"); return False
+    old = dict(before) if isinstance(before, list) else {}
+    if intro:
+        ch.send(intro, html=True)
+    for k, (page, png) in enumerate(shots, 1):
+        if page in old:
+            ch.send_photo(old[page], f'Before: {page}')
+        last = k == len(shots)
+        ch.send_photo(png, (f'After: {page}' if page in old else f'{page}') +
+                      ('\n\nHow does it look, sir? Tell me what\'s off, or send a picture of what you\'d like.' if last else ''))
+    return True
+
 def is_risky(text):
     """He asks for what Hive never does: skip the tests, or put work straight onto his own main branch or live. Answered
     in Hive's voice with its limits and the safe way, never started as a build."""
@@ -387,6 +439,13 @@ def background_build(repo, goal, ch=None):
             why = plain_reason(lines[-1] if lines else '')   # in his words, with the next step; never a raw error
             try:
                 ch.send(f"⚠️ <b>The build stopped before it finished.</b>\n\n{telegram.esc(why)}", html=True)
+            except Exception:
+                pass
+        elif rc == 0 and ch is not None and BUILD.get('proc') is proc and not BUILD.get('stopped'):
+            from . import screens   # a frontend: he sees it, unasked (the owner: "share the screenshot on my phone")
+            try:
+                if screens.available() and screens.is_frontend(repo):
+                    show(ch, repo, intro="🎉 <b>It's built, sir. Here's how it looks.</b>")
             except Exception:
                 pass
     threading.Thread(target=watch, daemon=True).start()
@@ -563,10 +622,30 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         got = {'intent': 'status'}
     elif is_risky(text):   # never a build, whatever the model reads (the Jarvis bench: once read as one)
         got = {'intent': 'reply'}
+    elif refs.has(text):   # a picture ("make it like this"): to the builders working now, else to the latest build
+        live = _building() and _building().startswith('A build is running')
+        got = {'intent': 'instruct' if live else ('amend' if latest_build(repo) and apply_build else 'build'),
+               'rule': text}
+    elif SHOW_WORDS.search(low):
+        got = {'intent': 'show'}
     else:
         got = fast_read(ch, text) or read(ch, text)   # half a second when the trained reader is sure, else Claude
     intent, rule = got.get('intent', 'reply'), (got.get('rule') or text).strip()
     who = _who(ch)
+    if intent == 'show':   # he wants to see it: screenshots of what was built, at phone size
+        show(ch, repo)
+        return 'shown'
+    if intent == 'amend' and apply_build and latest_build(repo):   # change what he just saw; before and after
+        st = latest_build(repo)
+        before = shoot(repo)
+        ch.send(f"🛠 Very good, sir: {telegram.esc(refs.words(rule) or 'as in your picture')}" +
+                (" (with your picture)" if refs.has(rule) else '') + ". Changing your latest build now; I'll show you "
+                "before and after.", html=True)
+        apply_build(st, rule, ch)
+        show(ch, repo, before=before)
+        return 'amended'
+    if intent == 'amend':   # nothing built yet to change: it is a build request
+        intent = 'build'
     if intent in ('team', 'set_team', 'stop_builder'):   # the builders themselves, from his phone
         return _team(ch, repo, text, got, poll,
                      lambda other: handle(ch, repo, other, poll, apply_build, start_build, cloud))

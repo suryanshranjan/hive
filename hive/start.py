@@ -5,7 +5,7 @@ and their assumptions to the owner in plain words, sends back what the owner cor
 over a branch. The owner's own branches are never changed: the result arrives as a new branch, hive/<name>."""
 import csv, glob, json, os, re, shlex, shutil, subprocess, sys, threading, time
 
-from . import PY, codesheet, contract, docs as docs_mod, examples, explain, interview, junit, law, memory, owner, spotcheck, swarm, telegram
+from . import PY, refs, codesheet, contract, docs as docs_mod, examples, explain, interview, junit, law, memory, owner, spotcheck, swarm, telegram
 from .guard import sh
 
 RUNS = os.path.join(os.path.expanduser('~'), '.hive', 'runs')
@@ -228,6 +228,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
         open(ignore, 'a').write(('' if text.endswith('\n') or not text else '\n') + '.hive/junit.xml\n')
     sh('git', '-C', source, 'add', '.hive/config.json', 'current_tasks/.keep', '.gitignore')
     sh('git', '-C', source, 'commit', '-q', '-m', 'hive: settings for this build')
+    goal_text = refs.attach(goal_text, source, commit=True)   # his pictures go into the code the builders get
 
     auto = workers is None   # the swarm law picks the number from this project's measurements (hive/law.py)
     job_parts = law.parts(goal_text) if auto else None   # Gate 52: size the team by the work, not only the machine
@@ -732,6 +733,7 @@ def apply_ruling(state, rule, ch=None):
     src = os.path.join(home, f'change{n}_source'); run = os.path.join(home, f'change{n}')
     sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', state['b'], os.path.join(state['final'], 'up.git'), src)
     _link(state['repo'], src, state['links'])
+    rule = refs.attach(rule, src, commit=True)   # a picture he sent ("make it like this") goes in with his words
     note = ("\n\n# The owner changed his mind\n\nAfter this was built, the owner gave this ruling. Change the code to "
             "follow it, encode it as a test, change any existing test that asserts the old behaviour, and leave "
             f"everything else alone:\n\n- {rule}\n")

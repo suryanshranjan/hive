@@ -15,10 +15,14 @@ class FakeTelegram:
         if method == 'sendMessage':   # tests read the text as the owner sees it: tags dropped, entities unescaped
             p = dict(p, html=p['text'], text=html.unescape(re.sub(r'<[^>]+>', '', p['text'])))
             self.sent.append(p); return {'message_id': len(self.sent)}
+        if method == 'sendPhoto':   # a screenshot: recorded with its caption and the file it came from
+            p = dict(p, text='[photo] ' + html.unescape(re.sub(r'<[^>]+>', '', p.get('caption', ''))), photo=p['_upload'][1])
+            self.sent.append(p); return {'message_id': len(self.sent)}
         if method == 'answerCallbackQuery':
             return True
         if method == 'getFile':
-            return {'file_path': 'voice/' + p['file_id'] + '.oga'}
+            return {'file_path': ('photos/' + p['file_id'] + '.jpg') if p['file_id'].startswith('PHOTO')
+                    else 'voice/' + p['file_id'] + '.oga'}
         if method == 'getChat':
             return {'first_name': 'Suryansh'}
         if method == 'getUpdates':
@@ -42,6 +46,11 @@ class FakeTelegram:
                     m = {'message_id': 1000 + self.uid, 'chat': {'id': chat}}
                     if text.startswith('VOICE:'):   # a voice note: only a file id arrives
                         m['voice'] = {'file_id': text[6:], 'duration': 4}
+                    elif text.startswith('PHOTO:'):   # a picture, with its caption after the bar: PHOTO:<id>|<caption>
+                        fid, _, cap = text[6:].partition('|')
+                        m['photo'] = [{'file_id': 'PHOTO' + fid + 'small'}, {'file_id': 'PHOTO' + fid}]
+                        if cap:
+                            m['caption'] = cap
                     else:
                         m['text'] = text
                     if reply_to:
@@ -55,3 +64,4 @@ class FakeTelegram:
 
 tap = lambda data: (lambda f: [(ME, None, data, 2)])
 say = lambda words: (lambda f: [(ME, words, None, None)])
+photo = lambda fid, caption='': (lambda f: [(ME, f'PHOTO:{fid}|{caption}', None, None)])

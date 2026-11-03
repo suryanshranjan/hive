@@ -151,19 +151,21 @@ def instruct(run, text, builder=None):
     """Give the running builders a new instruction from him (a change of direction, more work, one builder's new job).
     It is committed to OWNER.md on the shared branch, newest first, so every builder sees it at its next sync. True if
     it reached the shared branch."""
+    from . import refs
     meta = json.load(open(os.path.join(run, 'run.json'))); b = meta.get('branch', 'main')
-    line = f"- {time.strftime('%H:%M')} {'to ' + builder + ': ' if builder else ''}{text.strip()}"
     tmp = tempfile.mkdtemp()
     for k in range(5):   # builders push too: on a lost race, start again from the new tip
         c = os.path.join(tmp, f'c{k}')
         subprocess.run(['git', 'clone', '-q', '-b', b, os.path.join(run, 'up.git'), c], capture_output=True)
         g = lambda *a: subprocess.run(['git', '-C', c, *a], capture_output=True, text=True)
+        said = refs.attach(text, c)   # a picture he sent goes into the shared branch, and his words point to it
+        line = f"- {time.strftime('%H:%M')} {'to ' + builder + ': ' if builder else ''}{said.strip()}"
         path = os.path.join(c, OWNER_FILE)
         old = open(path, encoding='utf-8').read().split('\n', 2)[2] if os.path.exists(path) else ''
         open(path, 'w', encoding='utf-8').write("# The owner's instructions (newest first; they override the goal where "
                                                  "they differ)\n\n" + line + '\n' + old)
-        g('add', OWNER_FILE)
-        g('-c', 'user.name=hive', '-c', 'user.email=hive@local', 'commit', '-q', '-m', f'hive: the owner says: {text.strip()[:80]}')
+        g('add', OWNER_FILE); g('add', '-f', '.hive/refs') if refs.has(text) else None
+        g('-c', 'user.name=hive', '-c', 'user.email=hive@local', 'commit', '-q', '-m', f'hive: the owner says: {refs.words(text)[:80]}')
         if g('push', '-q', 'origin', f'HEAD:{b}').returncode == 0:
             return True
     return False

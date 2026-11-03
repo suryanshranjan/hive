@@ -41,9 +41,28 @@ def busy_elsewhere(stale=90):
         return False
     return b.get('pid') != os.getpid() and _alive(b.get('pid', -1)) and time.time() - b.get('at', 0) < stale
 
+def _multipart(params, field, path):
+    """A Telegram call that uploads a file (a screenshot for the owner): multipart form data, the other parameters as
+    form fields (objects as JSON)."""
+    import uuid
+    edge = uuid.uuid4().hex
+    parts = []
+    for k, v in params.items():
+        v = json.dumps(v) if isinstance(v, (dict, list)) else str(v)
+        parts.append(f'--{edge}\r\nContent-Disposition: form-data; name="{k}"\r\n\r\n{v}\r\n'.encode())
+    name = os.path.basename(path)
+    parts.append(f'--{edge}\r\nContent-Disposition: form-data; name="{field}"; filename="{name}"\r\n'
+                 f'Content-Type: image/png\r\n\r\n'.encode() + open(path, 'rb').read() + b'\r\n')
+    parts.append(f'--{edge}--\r\n'.encode())
+    return b''.join(parts), f'multipart/form-data; boundary={edge}'
+
 def _call(token, method, **params):
-    req = urllib.request.Request(f'https://api.telegram.org/bot{token}/{method}', data=json.dumps(params).encode(),
-                                 headers={'Content-Type': 'application/json'})
+    upload = params.pop('_upload', None)   # (field, path): a file to send, such as a screenshot
+    if upload:
+        body, kind = _multipart(params, *upload)
+    else:
+        body, kind = json.dumps(params).encode(), 'application/json'
+    req = urllib.request.Request(f'https://api.telegram.org/bot{token}/{method}', data=body, headers={'Content-Type': kind})
     try:
         with urllib.request.urlopen(req, timeout=params.get('timeout', 0) + 30) as r:
             body = json.load(r)
@@ -96,6 +115,36 @@ class Channel:
                 if wait is None:
                     raise
                 time.sleep(wait)
+
+    def send_photo(self, path, caption='', buttons=None, html=False):
+        """A picture for the owner (a screenshot of what was built), with a caption and optional buttons. Founders judge
+        a screen by looking at it, not by reading what it does (the owner: "share the screenshot on my phone")."""
+        p = {'chat_id': self.chat, 'caption': (caption if html else esc(caption))[:1000], 'parse_mode': 'HTML',
+             '_upload': ('photo', path)}
+        if buttons:
+            rows = buttons if isinstance(buttons[0], list) else [buttons]
+            p['reply_markup'] = {'inline_keyboard': [[{'text': label, 'callback_data': data} for label, data in row]
+                                                     for row in rows]}
+        self.remember('hive', f'[a screenshot: {os.path.basename(path)}] ' + _html.unescape(re.sub(r'<[^>]+>', '', p['caption'])))
+        for wait in (2, 5, 15, None):
+            try:
+                return self.api('sendPhoto', **p)['message_id']
+            except (OSError, http.client.HTTPException):
+                if wait is None:
+                    raise
+                time.sleep(wait)
+
+    def photo(self, file_id):
+        """A picture the owner sent (a reference he likes, or a screenshot he marked), saved on this machine. Returns
+        its path, or None."""
+        try:
+            f = self.api('getFile', file_id=file_id)
+            folder = os.path.join(os.path.dirname(PATH), 'inbox'); os.makedirs(folder, exist_ok=True)
+            local = os.path.join(folder, f"{int(time.time() * 1000)}{os.path.splitext(f.get('file_path') or '.jpg')[1] or '.jpg'}")
+            self.fetch(f['file_path'], local)
+            return local
+        except Exception:
+            return None
 
     def remember(self, who, text, keep=16):
         self.history = (self.history + [(who, (text or '').strip()[:600])])[-keep:]
@@ -192,6 +241,16 @@ class Channel:
                     heard = self.listen((m.get('voice') or m.get('audio'))['file_id'])
                     if heard:
                         out.append((heard, None, reply_to))
+                elif m.get('photo') or (m.get('document') or {}).get('mime_type', '').startswith('image/'):
+                    # a reference he likes, or a screenshot he marked: kept, and passed on as words plus the picture
+                    fid = m['photo'][-1]['file_id'] if m.get('photo') else m['document']['file_id']
+                    path = self.photo(fid)
+                    words = (m.get('caption') or '').strip()
+                    if path:
+                        out.append((f'{words} [photo: {path}]'.strip(), None, reply_to))
+                        self.remember('owner', f'{words} [sent a picture]'.strip())
+                    else:
+                        self.send("I couldn't open that picture, sir. Could you send it again?")
         return out
 
     def listen(self, file_id):
