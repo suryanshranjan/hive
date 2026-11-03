@@ -373,7 +373,8 @@ def show(ch, repo, before=None, intro=None):
             ch.send_photo(old[page], f'Before: {page}')
         last = k == len(shots)
         ch.send_photo(png, (f'After: {page}' if page in old else f'{page}') +
-                      ('\n\nHow does it look, sir? Tell me what\'s off, or send a picture of what you\'d like.' if last else ''))
+                      ('\n\nHow does it look, sir? Tell me what\'s off, or send a picture of what you\'d like.'
+                       if last and not intro else ''))
     return True
 
 def is_risky(text):
@@ -466,6 +467,34 @@ def read(ch, text):
 BUILD = {}   # the build running in the background: {'proc', 'goal', 'started', 'log'}
 CURRENT = {}   # the owner's chat, for news from a background build
 
+CHANGED = """You are Hive, a business owner's assistant, in the manner of J.A.R.V.I.S.: calm, precise, warm, a light dry
+touch at most. A build he asked for from his phone has just finished, and you are about to send him its screenshots.
+What he asked for: "{goal}"
+What the builder wrote about its work:
+{log}
+{check}
+
+Tell him, in 2 or 3 short plain sentences, as a person reporting back: that it's done, and what changed in what he will
+see (colours, layout, buttons, wording), in words he would use. No file names, branches, code or technical words. End
+by inviting him to say what's off or send a picture. Address him as "{who}". Reply with JSON only: {{"reply": "..."}}"""
+
+def what_changed(repo, ch=None):
+    """What a finished build changed, in his words, to go with its screenshots; a plain fallback without a model."""
+    st = latest_build(repo) or {}
+    who = (_who(ch) if ch else '') or 'sir'
+    fallback = f"It's done, {who}. Here's how it looks; tell me what's off, or send a picture of what you'd like."
+    if not st.get('name'):
+        return fallback
+    log = subprocess.run(['git', '-C', repo, 'log', '--format=%s%n%b', f"{st.get('branch', 'main')}..hive/{st['name']}"],
+                         capture_output=True, text=True, encoding='utf-8', errors='replace').stdout
+    log = '\n'.join(l for l in log.splitlines() if l.strip() and not l.startswith(('Lock:', 'hive:', 'Co-Authored', 'Release lock')))
+    if not log:
+        return fallback
+    goal = re.sub(r'\n\n# How to work on the look.*', '', st.get('goal', ''), flags=re.S)
+    got = explain.ask_json(CHANGED.format(goal=goal[:1500], log=log[:2500], check=st.get('check', ''), who=who))
+    reply = got.get('reply') if isinstance(got, dict) else None
+    return reply.strip() if isinstance(reply, str) and reply.strip() else fallback
+
 def background_build(repo, goal, ch=None):
     """Run `hive start` for this goal in the background, so Hive keeps answering him; if it stops, tell him why at once
     (a cloud build stopped on "unsaved changes", and only the server's log knew)."""
@@ -479,7 +508,8 @@ def background_build(repo, goal, ch=None):
            (['--agent', team.chosen()['agent']] if team.chosen().get('agent') else []) +   # the team he chose by phone
            (['--workers', str(team.chosen()['workers'])] if team.chosen().get('workers') else []))
     proc = subprocess.Popen(cmd, cwd=repo, start_new_session=os.name != 'nt',   # so a stop ends its builders too
-                            stdout=open(log, 'w'), stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL)
+                            stdout=open(log, 'w'), stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
+                            env=dict(os.environ, HIVE_FROM_PHONE='1'))
     BUILD.update(proc=proc, goal=goal, started=time.time(), log=log)
 
     def watch():
@@ -495,7 +525,7 @@ def background_build(repo, goal, ch=None):
             from . import screens   # a frontend: he sees it, unasked (the owner: "share the screenshot on my phone")
             try:
                 if screens.available() and screens.is_frontend(repo):
-                    show(ch, repo, intro="🎉 <b>It's built, sir. Here's how it looks.</b>")
+                    show(ch, repo, intro='🎉 ' + telegram.esc(what_changed(repo, ch)))
             except Exception:
                 pass
     threading.Thread(target=watch, daemon=True).start()
@@ -838,8 +868,11 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
                 return handle(ch, repo, ans, poll, apply_build, start_build, cloud)
         if not go:
             ch.send('Very good. Just say the word.'); return 'not_built'
-        ch.send(f"🛠 Right away: {telegram.esc(rule[:200])}. I'll message you as it goes; say \"status\" any time.",
-                html=True)
+        from . import screens
+        ch.send("🛠 On it, sir. " + ("I'll study it, make the change, and come back with screenshots of how it looks. "
+                                     if screens.is_look_job(rule, repo) else
+                                     "I'll keep you posted, and come back when it's ready for you to look at. ") +
+                "Say \"status\" any time.", html=True)
         start_build(repo, rule)
         return 'built'
     if intent in ('cloud_on', 'cloud_off') and cloud:

@@ -111,6 +111,12 @@ open(os.path.join(site, 'index.html'), 'w').write('<h1>Sunny Shop</h1><button>In
 check('the pages worth showing come from the goal, else the home page',
       (screens.pages_of('a pricing page at /pricing and /invite', site), screens.pages_of('a nicer header', site)), (['/pricing', '/invite'], ['/']))
 check('a folder with index.html is a frontend; one without is not', (screens.is_frontend(site), screens.is_frontend(code)), (True, False))
+check('a look job (no quiz, one builder): restyling, a picture; not a feature, and not on a project with nothing to see',
+      [screens.is_look_job(g, r) for g, r in (
+          ('Look up a site I like and redo the home page in its style', site),
+          ('make it like this (his picture: .hive/refs/ref_1.png; open it and match what it shows)', site),
+          ('add refunds to the store credit page with a nicer layout', site),
+          ('make the header darker', code))], [True, True, False, False])
 if screens.available():
     try:
         got = screens.take(site, ['/'], os.path.join(home, 'shots'))

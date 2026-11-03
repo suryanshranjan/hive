@@ -230,6 +230,15 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     sh('git', '-C', source, 'commit', '-q', '-m', 'hive: settings for this build')
     goal_text = refs.attach(goal_text, source, commit=True)   # his pictures go into the code the builders get
 
+    from . import screens
+    look_job = screens.is_look_job(goal_text, repo)   # how it looks, not how it works: no quiz, one builder, screenshots
+    if look_job:
+        goal_text += screens.LOOK_NOTE
+        interview_first = False
+        if workers is None:   # one page's look is one job: more builders would only restyle it against each other
+            workers = 1
+            say("\nThis is about how your product looks, so I'll put one builder on it and won't quiz you: "
+                "the screenshots will be the review.")
     auto = workers is None   # the swarm law picks the number from this project's measurements (hive/law.py)
     job_parts = law.parts(goal_text) if auto else None   # Gate 52: size the team by the work, not only the machine
     if auto:
@@ -271,7 +280,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     if rules:
         k = len(memory.load(repo))
         say(f"I'll remind them of your {_n(k, 'earlier ruling')} on this project, so you won't be asked those again.")
-    asked = []; technical = False
+    asked = []; technical = look_job
     if interview_first:   # the owner is here: ask him first (Gates 30-35); overnight too, before he leaves (Gate 102)
         past = [r['text'] for r in memory.load(repo)]
         qs = telegram._load(os.path.join(home, 'interview') + '.questions.json').get('qs') or interview.write_situations(goal_text, past)
@@ -296,7 +305,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     say(f'\n[{_now()}] Starting.')
     state = dict(repo=repo, branch=branch, name=name, home=home, test_cmd=test_cmd, links=links, goal=goal_text, t_g=t_g, technical=technical,
                  rules=rules, workers=workers, minutes=minutes, before=before, started=time.time(), overnight=overnight,
-                 asked=asked, spent0=spent0)
+                 asked=asked, spent0=spent0, look=look_job)
     run1 = os.path.join(home, 'build')
     b, code = _phase(source, run1, workers, goal_text + rules, minutes, 'later' if overnight else QUESTIONS_PER_BUILDER * workers, True,
                      not overnight, phone)
@@ -305,6 +314,11 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     say(f'\n[{_now()}] ' + (f'All {workers} builders are done.' if workers > 1 else 'The builder is done.'))
     found = owner._assumptions(os.path.join(run1, 'owner'), False)   # business defaults only; technical ones go to engineers
     recorded = owner.pending(run1) if overnight else []
+    if look_job:   # the review is seeing it: Jarvis sends the screenshots and says what changed (hive/assistant.py)
+        rc = _deliver(state)
+        if not os.environ.get('HIVE_FROM_PHONE'):
+            say(f"\nDone. {state.get('check', '')} It's ready on branch hive/{name}; say \"show me\" on your phone to see it.")
+        return rc
     if recorded:   # Gate 70: the night's questions, answered in the morning, beat reviewing the finished build (94 vs 75%)
         rc = _deliver(state)
         if phone:

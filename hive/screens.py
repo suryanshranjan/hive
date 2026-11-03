@@ -26,6 +26,23 @@ def is_frontend(repo):
     scripts = _scripts(repo)
     return bool(scripts.get('dev') or scripts.get('start'))
 
+LOOK = re.compile(r"\b(design|style|styling|look|looks|colou?rs?|fonts?|typography|layout|spacing|theme|dark mode|"
+                  r"ui|header|button|redo|restyle|redesign|make it like|like this|prettier|nicer)\b|\[photo: |his picture:")
+LOGIC = re.compile(r"\b(refunds?|pay(ment|out)?s?|charge|discounts?|points|orders?|checkout|calculate|logic|api|database|"
+                   r"emails?|login|signup|sign up|stock|tax|invoice|rules?)\b")
+
+def is_look_job(goal, repo):
+    """A job about how his product looks, not how it works ("redo this page in their style", a picture he sent): no
+    business decisions to ask him about, one builder, and the screenshots are the review (the owner: "for a UI change
+    Jarvis shouldn't give me situations; tell me about the page simply")."""
+    g = (goal or '').lower()
+    return is_frontend(repo) and bool(LOOK.search(g)) and not LOGIC.search(re.sub(r'\(his picture:[^)]*\)', '', g))
+
+LOOK_NOTE = ("\n\n# How to work on the look\n\nThis job is about how the page looks; keep what it says and does. If he names "
+             "another website, fetch it (curl its HTML and its CSS files) and take its look: colours, fonts, spacing, "
+             "shapes of cards and buttons, layout. Never take its logo, name, wording or images: the page stays his. "
+             "Check your work by its appearance at phone width.\n")
+
 def glob_any(repo, rels):
     return any(os.path.exists(os.path.join(repo, r)) for r in rels)
 
