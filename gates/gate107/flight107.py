@@ -147,8 +147,7 @@ def main():
                'plan_cost': assistant.PLAN.get('cost', 0), 'host': sorted(os.listdir(HOST)) if os.path.isdir(HOST) else [],
                # the plan's work must be live after step 10 (run 1: it wasn't; the next build had started from main)
                'live_after_10': {'still_the_old_home_page': 'Sunny Shop is a platform' in live_after_10['index'],
-                                 'signup_required_fields': live_after_10['signup_required'],
-                                 'email_check': 'regex' in live_after_10['index'] or True},
+                                 'signup_required_fields': live_after_10['signup_required']},
                'live_now': open(os.path.join(HOST, 'live', 'index.html'), encoding='utf-8').read()[:300] if os.path.exists(os.path.join(HOST, 'live', 'index.html')) else ''}
     json.dump({'steps': steps, 'transcript': phone.log, 'summary': summary}, open(os.path.join(OUT, 'transcript.json'), 'w'),
               indent=1, ensure_ascii=False)
