@@ -110,4 +110,13 @@ printf 'Implement creator fees and payouts.\nA\nB\nA\n' | HIVE_WORKER_CMD="sh $H
   HIVE_DESCRIBE_CMD="$PY $HIVE/tests/fake_describe_sheet.py" $PY -m hive start --workers 1 --no-interview > $T/asked.txt 2>&1
 check "after builders asked him, the hand-over is skipped and his answers are said to be built in (Gate 68)" \
   "$(grep -c 'asked you 3 questions while building' $T/asked.txt) $(grep -c 'What the build does now, as rules' $T/asked.txt)" "1 0"
+# a new build on top of his latest unmerged build (Gate 107: one started from main, and the earlier work never went live)
+prev=$(git for-each-ref --sort=-committerdate --format='%(refname:short)' 'refs/heads/hive/*' | head -1)
+printf 'Add a monthly payout report.\n' > $T/goal2.md
+$PY -m hive start --workers 1 --overnight --goal $T/goal2.md --on "$prev" > $T/on.txt 2>&1
+code=$?
+new=$(git for-each-ref --sort=-committerdate --format='%(refname:short)' 'refs/heads/hive/*' | head -1)
+git merge-base --is-ancestor "$prev" "$new"
+check "a build on top of his latest one keeps that work, in one line" "$code $? $([ "$new" != "$prev" ] && echo new)" "0 0 new"
+check "and his own branch is still untouched" "$(git rev-parse --abbrev-ref HEAD)" main
 rm -rf $T; exit $fail

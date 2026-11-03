@@ -84,7 +84,10 @@ def _rmtree(path):
     """Delete a folder, including git's read-only files (Windows refuses those: found running Hive natively there)."""
     import stat
     def writable(func, p, *_):
-        os.chmod(p, stat.S_IWRITE); func(p)
+        try:
+            os.chmod(p, stat.S_IWRITE); func(p)
+        except FileNotFoundError:   # already gone: nothing to delete (Gate 107 run 2 crashed a build on this)
+            pass
     shutil.rmtree(path, onerror=writable)
 
 def _link(src_root, dst_root, links):
@@ -215,6 +218,8 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     # on: his latest build, not merged yet: this one builds on top of it, so his work adds up in one line and one
     # pull request (Gate 107: a new build started from main, and the plan's changes never reached his live product)
     sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', on or branch, repo, source)
+    if on:   # in Hive's own copy his latest build *is* the starting point, under his branch's name: the builders and
+        sh('git', '-C', source, 'checkout', '-q', '-B', branch)   # the delivery use that name (run 2: they found none)
     sh('git', '-C', source, 'config', 'user.name', 'hive'); sh('git', '-C', source, 'config', 'user.email', 'hive@local')
     _link(repo, source, links)
     if test_cmd == safety.command():
