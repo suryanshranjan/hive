@@ -98,9 +98,12 @@ def main():
     api = Owner()
     ch = telegram.Channel({'chat_id': 1, 'token': 'x', 'address': 'sir'}, api=api)
     t0 = time.time()
-    r = assistant.handle(ch, repo, GOALS[GOAL_ID], poll=1, apply_build=start.apply_ruling)
+    run_plan = assistant.run_plan
+    assistant.run_plan = lambda *a, **k: None   # handle starts the plan in a thread, as on his phone; here it is run
+    r = assistant.handle(ch, repo, GOALS[GOAL_ID], poll=1, apply_build=start.apply_ruling)   # once, in the foreground
+    assistant.run_plan = run_plan
     plan = {k: assistant.PLAN.get(k) for k in ('steps', 'answers')}
-    ran = assistant.run_plan(ch, repo, start.apply_ruling) if r == 'planned' else r
+    ran = run_plan(ch, repo, start.apply_ruling) if r == 'planned' else r
     mins = (time.time() - t0) / 60
     st = assistant.latest_build(repo) or {}
     final = os.path.join(HOME, 'final')
