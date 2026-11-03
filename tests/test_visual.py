@@ -61,6 +61,13 @@ check('a picture during a build goes to a builder with his words, and the pictur
       (r, 'his picture: .hive/refs/ref_2.jpg' in show('OWNER.md').stdout, show('.hive/refs/ref_2.jpg').returncode == 0),
       ('instructed', True, True))
 p.kill(); p.wait(); assistant.BUILD.clear()
+check('before a look builder reports, there is nothing to relay', screens.found(run), '')
+tmpc = os.path.join(home, 'foundclone'); subprocess.run(['git', 'clone', '-q', os.path.join(run, 'up.git'), tmpc])
+os.makedirs(os.path.join(tmpc, '.hive'), exist_ok=True)
+open(os.path.join(tmpc, '.hive', 'found.md'), 'w').write('Warm cream background, bold black headings, big rounded green buttons.')
+git(tmpc, 'add', '-f', '.hive/found.md'); git(tmpc, '-c', 'user.name=w1', '-c', 'user.email=w@x', 'commit', '-qm', 'found'); git(tmpc, 'push', '-q', 'origin', 'HEAD:main')
+check("what the look builder found is read from the shared branch, for Jarvis to relay mid-build", screens.found(run),
+      'Warm cream background, bold black headings, big rounded green buttons.')
 
 # 5. "show me": screenshots at phone size, with an invitation to say what's off (a stand-in camera)
 shots = [('/invite', png)]

@@ -41,7 +41,20 @@ def is_look_job(goal, repo):
 LOOK_NOTE = ("\n\n# How to work on the look\n\nThis job is about how the page looks; keep what it says and does. If he names "
              "another website, fetch it (curl its HTML and its CSS files) and take its look: colours, fonts, spacing, "
              "shapes of cards and buttons, layout. Never take its logo, name, wording or images: the page stays his. "
-             "Check your work by its appearance at phone width.\n")
+             "Before you change anything, write what you found, in 2 plain sentences for him (no colour codes or "
+             "technical words: \"warm cream background, bold black headings, big rounded green buttons\"), to "
+             ".hive/found.md, and commit and push it: he hears it while you work. Check your work by its appearance at "
+             "phone width.\n")
+
+def found(run):
+    """What a look builder reported finding (.hive/found.md on the shared branch), or ''."""
+    try:
+        meta = json.load(open(os.path.join(run, 'run.json')))
+    except (OSError, ValueError):
+        return ''
+    p = subprocess.run(['git', '--git-dir', os.path.join(run, 'up.git'), 'show', f"{meta.get('branch', 'main')}:.hive/found.md"],
+                       capture_output=True, text=True, encoding='utf-8', errors='replace')
+    return p.stdout.strip() if p.returncode == 0 else ''
 
 def glob_any(repo, rels):
     return any(os.path.exists(os.path.join(repo, r)) for r in rels)

@@ -27,6 +27,8 @@ Creators") changes what you just proposed. Reply with JSON only:
 "instruct" | "show" | "amend" | "ship" | "complaint" | "cloud_on" | "cloud_off" | "reply",
 "rule": "for a build, exactly what to build (taken from the conversation if he points back to it); for a change or a
 rule, the rule he now wants; otherwise empty",
+"short": "for a build, what he wants in at most 12 plain words, as a person would say it back ('Redo the home page in
+barternow.in's style'); otherwise empty",
 "confirmed": true if he is agreeing to do what you just proposed (or clearly telling you to go ahead now), else false,
 "clarify": for a build too vague to build ("make it better", "fix it"), one short question asking what exactly; else "",
 "about_product": true if he asks how his product works or what it does in some case (to be answered from its code),
@@ -103,7 +105,9 @@ How you speak:
 - Reply in his language and his script: Hindi-English in English letters if that is how he writes, never Devanagari.
 - Own your mistakes plainly ("My error, sir; it is fixed."), without grovelling.
 - Anticipate: offer the next step before he has to ask. Never "Great question", never filler, never servile.
-- Use only the facts below; never invent a build, a number, a feature or an event.
+- Use only the facts below; never invent a build, a number, a feature or an event. Where the facts and the
+  conversation disagree (a build said to have stopped, which the facts show running or done), the facts are newer and
+  right: say what is true now.
 
 The tone, in examples (not to copy):
 - Nothing built yet: "Good afternoon, sir. Your project is ready and waiting, and so am I. What shall we build first?"
@@ -476,13 +480,15 @@ What the builder wrote about its work:
 
 Tell him, in 2 or 3 short plain sentences, as a person reporting back: that it's done, and what changed in what he will
 see (colours, layout, buttons, wording), in words he would use. No file names, branches, code or technical words. End
-by inviting him to say what's off or send a picture. Address him as "{who}". Reply with JSON only: {{"reply": "..."}}"""
+with his next step in one short sentence: tell you what's off (or send a picture), or say "ship it" to send it to his
+engineer. Address him as "{who}". Reply with JSON only: {{"reply": "..."}}"""
 
 def what_changed(repo, ch=None):
     """What a finished build changed, in his words, to go with its screenshots; a plain fallback without a model."""
     st = latest_build(repo) or {}
     who = (_who(ch) if ch else '') or 'sir'
-    fallback = f"It's done, {who}. Here's how it looks; tell me what's off, or send a picture of what you'd like."
+    fallback = (f"It's done, {who}. Here's how it looks. Tell me what's off, or send a picture; or say \"ship it\" "
+                "and it goes to your engineer.")
     if not st.get('name'):
         return fallback
     log = subprocess.run(['git', '-C', repo, 'log', '--format=%s%n%b', f"{st.get('branch', 'main')}..hive/{st['name']}"],
@@ -510,10 +516,12 @@ def background_build(repo, goal, ch=None):
     proc = subprocess.Popen(cmd, cwd=repo, start_new_session=os.name != 'nt',   # so a stop ends its builders too
                             stdout=open(log, 'w'), stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
                             env=dict(os.environ, HIVE_FROM_PHONE='1'))
-    BUILD.update(proc=proc, goal=goal, started=time.time(), log=log)
+    BUILD.update(proc=proc, goal=goal, started=time.time(), log=log, stopped=False)
 
     def watch():
         rc = proc.wait()
+        if rc != 0 and (rc < 0 or rc in (130, 137, 143) or BUILD.get('stopped') or BUILD.get('proc') is not proc):
+            return   # stopped on purpose (by him, or replaced by a new build): no alarm (live: "technical problem")
         if rc != 0 and ch is not None:
             lines = [l.strip() for l in open(log, encoding='utf-8', errors='replace').read().splitlines() if l.strip()]
             why = plain_reason(lines[-1] if lines else '')   # in his words, with the next step; never a raw error
@@ -531,12 +539,21 @@ def background_build(repo, goal, ch=None):
     threading.Thread(target=watch, daemon=True).start()
 
     def keep_an_eye():   # speak up unprompted (the owner: no gaps): a builder making no progress is worth his attention
-        seen = {}
+        from . import screens
+        seen, told = {}, set()
         while proc.poll() is None:
             time.sleep(float(os.environ.get('HIVE_WATCH_SECONDS', 60)))
             run = team.current_run()
             if not run or ch is None:
                 continue
+            news = screens.found(run) if run not in told else ''
+            if news:   # the research, brought back while the work goes on (the owner: "I'm on the research, and
+                told.add(run)   # I'll bring back the results")
+                try:
+                    ch.send(f"🔎 <b>Had a look, sir.</b> {telegram.esc(news[:600])}\n\n<i>Working it into your page now; "
+                            "screenshots when it's done.</i>", html=True)
+                except Exception:
+                    pass
             for r in team.stuck(run, seen):
                 doing = '; '.join(r['holding'])[:160] or 'its piece of the work'
                 try:
@@ -565,12 +582,17 @@ def plain_reason(line):
     for pattern, said in PLAIN_REASONS:
         if re.search(pattern, line or '', re.I):
             return said
+    if line and not re.search(r'error|exception|traceback|failed|fatal|refused|denied|not found|cannot|can\'t|'
+                              r'no such|invalid|timed? ?out|killed', line, re.I):   # Hive's own words, not an error
+        return "It stopped partway without saying why. Say \"build again\" and I'll pick it up."
     return (f"It hit a technical problem I can't fix from here (for your engineer: {line.strip()[:200]}). Say \"build "
             "again\" to retry, or send that line to your engineer.") if line else "No reason was recorded. Say \"build again\" to retry."
 
 def _stop(p):
     """End a background build and every builder it started."""
     import signal
+    if BUILD.get('proc') is p:
+        BUILD['stopped'] = True   # before the kill: the watcher must not report it as a failure (Windows exits 1)
     try:
         if os.name != 'nt':
             os.killpg(p.pid, signal.SIGTERM)
@@ -845,11 +867,14 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         # (the Jarvis bench: a typo-ridden first request was built at once, unrestated)
         proposed = any(w == 'hive' and 'Shall I build this?' in t for w, t in getattr(ch, 'history', [])[-4:])
         go = bool(got.get('confirmed')) and proposed
+        from . import screens
         for _ in range(3):
             if go:
                 break
-            ch.send(f"🏗 <b>Shall I build this?</b>\n\n{telegram.esc(rule)}\n\n"
-                    "<i>I'll work on copies, then bring you the decisions to check. Tap, or just tell me.</i>", html=True,
+            short = (got.get('short') or '').strip() if rule == (got.get('rule') or '').strip() else ''
+            ch.send(f"🏗 <b>Shall I build this?</b>\n\n{telegram.esc(short or rule)}\n\n<i>" +
+                    ("I'll do it on a copy and show you how it looks." if screens.is_look_job(rule, repo) else
+                     "I'll work on copies, then bring you the decisions to check.") + " Tap, or just tell me.</i>", html=True,
                     buttons=[[('🚀 Yes, build it', 'bld|yes')], [('Not now', 'bld|no')]])
             kind, ans = telegram._wait(ch, poll, {'bld|yes', 'bld|no'})
             if kind == 'tap':

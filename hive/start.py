@@ -257,6 +257,8 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
         say(f"\nI'll put {_n(workers, 'builder')} on it ({why}): {law.trade(workers)}. "
             + ("They work on copies" if workers > 1 else "It works on a copy")
             + ", so your branches stay exactly as they are.")   # the trade from Gate 50, so he knows what speed costs
+    elif look_job:
+        pass   # said above: one builder for a look
     else:
         say(f"\nI'll put {workers} builders on it, as you chose. They work on copies, so your branches stay exactly as "
             "they are.")
@@ -270,7 +272,8 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     if overnight:
         say("While you're away they won't ask you anything: they'll decide, and write down every business question "
             + ("for you. When they finish, I'll message you on Telegram to check them." if phone else
-               "for you to answer when you're back.") + " Before you go, a few quick situations, so they start from your rules.")
+               "for you to answer when you're back.") +
+            ('' if look_job else " Before you go, a few quick situations, so they start from your rules."))
     elif phone:
         say("If they need a decision only you can make, the question will come to your phone on Telegram.")
     else:

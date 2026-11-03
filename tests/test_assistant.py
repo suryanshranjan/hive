@@ -81,6 +81,11 @@ time.sleep(4)
 check('while it builds, status says a build is running; when it stops, he is told why',
       ('build is running' in running, any('The build stopped' in m['text'] and "edits that aren't saved" in m['text'] for m in fake.sent)),
       (True, True))
+os.environ['HIVE_BUILD_CMD'] = 'sh -c "sleep 30"'   # a build stopped on purpose, then replaced: no false alarm (live)
+fake = FakeTelegram([])
+p = assistant.background_build(repo, 'a page saying Sunny Shop Creators', ch(fake))
+assistant._stop(p); time.sleep(2)
+check('a build stopped on purpose raises no "it stopped" alarm', [m['text'] for m in fake.sent if 'stopped before' in m['text']], [])
 del os.environ['HIVE_BUILD_CMD']; assistant.BUILD.clear()
 
 # 3a4. stopping a build: said plainly, it stops at once; only read as a stop (Gate 48: a fast reader called "stop" for
@@ -126,6 +131,9 @@ check('every known reason is said plainly, with what to do', [assistant.plain_re
 check('an unknown error is kept for his engineer, with what he can do', (
       'for your engineer: KeyError' in assistant.plain_reason("KeyError: 'x'"), 'build again' in assistant.plain_reason("KeyError: 'x'"),
       assistant.plain_reason('').startswith('No reason was recorded')), (True, True, True))
+check("Hive's own last words are not called a technical problem (live: a stopped interview was)",
+      assistant.plain_reason('First, a few quick situations where your own rules matter, on your phone.'),
+      'It stopped partway without saying why. Say "build again" and I\'ll pick it up.')
 
 # 3a7. the fast local reader (Gate 49) decides alone only where it is safe; everything else goes to Claude
 from hive import fastread
