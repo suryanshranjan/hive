@@ -4,7 +4,7 @@ is: restated in his terms, not turned into business situations; questions about 
 would ask, only where something real is unclear. Plain words stay the default for an owner who isn't technical.
 
 Once he has written technically twice (or says he is technical), it is remembered for every later conversation."""
-import json, os, re
+import json, os, re, time
 
 PATH = os.path.join(os.path.expanduser('~'), '.hive', 'profile.json')
 
@@ -85,3 +85,19 @@ def clarify(repo, text, timeout=300):
     qs = [{'q': str(q.get('q', '')).strip(), 'options': [str(o) for o in (q.get('options') or [])][:3]}
           for q in (got.get('questions') or []) if isinstance(q, dict) and str(q.get('q', '')).strip()][:2]
     return {'restated': str(got.get('restated') or '').strip(), 'questions': qs}
+
+def remember_timezone(offset_seconds=None):
+    """His time zone, from his own computer (at setup), so a brief from a cloud machine still says 'Good evening' at
+    his evening (Gate 107: the lab's clock said morning at his 5 pm)."""
+    p = _load()
+    p['utc_offset'] = int(offset_seconds if offset_seconds is not None else time.localtime().tm_gmtoff)
+    os.makedirs(os.path.dirname(PATH), exist_ok=True)
+    json.dump(p, open(PATH, 'w'))
+    return p['utc_offset']
+
+def his_time(now=None):
+    """time.struct_time at his clock: HIVE_UTC_OFFSET (seconds), else what setup remembered, else this machine's."""
+    now = now or time.time()
+    off = os.environ.get('HIVE_UTC_OFFSET')
+    off = int(off) if off not in (None, '') else _load().get('utc_offset')
+    return time.gmtime(now + off) if off is not None else time.localtime(now)

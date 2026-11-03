@@ -14,14 +14,16 @@ def _last():
 
 def due(now=None):
     """True once a day, after the brief hour."""
+    from . import register
     now = now or time.time()
-    lt = time.localtime(now)
+    lt = register.his_time(now)
     return lt.tm_hour >= int(os.environ.get('HIVE_BRIEF_HOUR', 9)) and _last().get('date') != time.strftime('%Y-%m-%d', lt)
 
 def _sent(now=None):
     now = now or time.time()
     os.makedirs(os.path.dirname(PATH), exist_ok=True)
-    json.dump({'date': time.strftime('%Y-%m-%d', time.localtime(now)), 't': now}, open(PATH, 'w'))
+    from . import register
+    json.dump({'date': time.strftime('%Y-%m-%d', register.his_time(now)), 't': now}, open(PATH, 'w'))
 
 def _goal(text):
     t = re.sub(r'\n\n# .*', '', text or '', flags=re.S)
@@ -66,7 +68,8 @@ def compose(repo, ch=None, since=None):
     since = since if since is not None else (_last().get('t') or time.time() - 86400)
     lines = facts(repo, since)
     who = (assistant._who(ch) if ch else '') or 'sir'
-    hour = time.localtime().tm_hour
+    from . import register
+    hour = register.his_time().tm_hour
     hello = 'Good morning' if hour < 12 else 'Good afternoon' if hour < 17 else 'Good evening'
     if not lines:
         return f"🐝 {hello}, {who}. A quiet one: nothing new, and nothing waiting on you. Tell me what you want for the business."

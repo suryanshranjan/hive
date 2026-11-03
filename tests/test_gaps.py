@@ -110,4 +110,11 @@ check("a kind it can't read is said plainly", brain.learn(repo, os.path.join(hom
 st.pop('undone', None); st['shipped'] = 1; json.dump(st, open(os.path.join(st['home'], 'state.json'), 'w')); closed.clear()
 assistant._fold(repo, st)
 check('folded into a newer build: set aside, its pull request withdrawn', (assistant.latest_build(repo), closed), (None, ['price-1103']))
+# 8. screenshots of the pages the work changed; the brief at his clock, wherever Hive runs (Gate 107)
+from hive import register, screens
+check('the pages a change touched are the ones shown', (screens.pages_of('', '.', ['signup.html', 'style.css']),
+      screens.page_of_file('app/invite/page.tsx'), screens.page_of_file('pages/_app.tsx')), (['/signup.html'], '/invite', None))
+register.PATH = os.path.join(home, '.hive', 'profile.json'); register.remember_timezone(19800)   # India, at setup
+noon_utc = time.mktime((2026, 11, 3, 12, 0, 0, 0, 0, 0)) - time.timezone
+check("his clock, not the machine's: 12:00 UTC is 17:30 for him", (register.his_time(noon_utc).tm_hour, register.his_time(noon_utc).tm_min), (17, 30))
 sys.exit(fail)

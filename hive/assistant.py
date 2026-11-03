@@ -435,8 +435,12 @@ def shoot(repo):
     """Screenshots of what he would want to see: [(page, png)], or a plain reason why not (a string)."""
     from . import screens
     code, goal = _code_to_show(repo)
-    try:
-        return screens.take(code, screens.pages_of(goal, code))
+    try:   # the pages the latest work changed (its last few commits, Hive's own bookkeeping aside)
+        log = subprocess.run(['git', '-C', code, 'log', '-4', '--name-only', '--format=%s'], capture_output=True,
+                             text=True, encoding='utf-8', errors='replace').stdout.splitlines()
+        changed = [l.strip() for l in log if l.strip() and not l.startswith(('hive:', 'Lock:', 'Release lock')) and
+                   os.path.exists(os.path.join(code, l.strip()))]
+        return screens.take(code, screens.pages_of(goal, code, changed))
     except screens.Unavailable as e:
         return str(e)
     except Exception as e:   # a page that would not load is told, not a crash in his chat

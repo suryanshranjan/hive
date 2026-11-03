@@ -153,8 +153,24 @@ def take(code_dir, pages=('/',), out_dir=None, size=PHONE):
     finally:
         _stop(proc); log.close()
 
-def pages_of(goal, repo):
-    """The pages worth showing: the paths the goal names ("/pricing"), else the home page."""
-    found = re.findall(r'(?<![\w/])(/[a-z0-9][a-z0-9/_-]*)', goal or '')
-    found = [f for f in dict.fromkeys(found) if not f.startswith(('/home/', '/tmp/', '/usr/'))][:4]
+def page_of_file(path):
+    """The address a changed file is seen at: index.html -> /, signup.html -> /signup.html, pages/pricing.tsx ->
+    /pricing, app/invite/page.tsx -> /invite; None for a file that isn't a page."""
+    p = path.replace('\\', '/')
+    m = re.match(r'(?:src/)?app/(.*?)/?page\.(tsx|jsx|js|ts)$', p)
+    if m:
+        return '/' + m.group(1).strip('/')
+    m = re.match(r'(?:src/)?pages/(.*)\.(tsx|jsx|js|ts|vue|svelte)$', p)
+    if m and not m.group(1).startswith(('_', 'api/')):
+        return '/' + re.sub(r'(^|/)index$', '', m.group(1))
+    if p.endswith('.html') and '/' not in p.strip('/'):
+        return '/' if p in ('index.html',) else '/' + p
+    return None
+
+def pages_of(goal, repo, changed=()):
+    """The pages worth showing: the ones the latest work changed (Gate 107: each plan step showed the home page,
+    though it changed sign-up), the paths the goal names ("/pricing"), else the home page. At most 3."""
+    found = [page_of_file(f) for f in changed]
+    found += re.findall(r'(?<![\w/])(/[a-z0-9][a-z0-9/_-]*)', goal or '')
+    found = [f for f in dict.fromkeys(x for x in found if x) if not f.startswith(('/home/', '/tmp/', '/usr/'))][:3]
     return found or ['/']

@@ -100,6 +100,7 @@ def main():
     repo = doctor.fetch_repo(origin)   # hive up --repo <address>
     deploy.setup(repo, 'custom', preview=COPY + ' preview https://preview.sunnyshop.test', live=COPY + ' live https://sunnyshop.test')
     phone = Phone(); ch = telegram.Channel({'chat_id': 1, 'token': 'x', 'address': 'sir'}, api=phone)
+    assistant.CURRENT['ch'] = ch   # as hive listen does: a background build's news reaches him (runs 1-3 lacked it)
     open(os.path.join(HOME, 'policy.md'), 'w', encoding='utf-8').write(
         '# Sunny Shop creator policy\n\nNew creators get ₹500 extra on their first completed deal.\nThe invite reward is ₹500 '
         'each, paid after the invited creator\'s first deal.\nBank details are needed only before the first payout.\n'
