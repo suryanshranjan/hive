@@ -43,13 +43,23 @@
 | Voice note | 🎙 | Transcribed and handled like text | Built |
 | The cloud | "move to the cloud" | Starts a machine, moves there, keeps working while his computer is off | Built |
 
-## What comes next (in order)
+## Built since (Nov 3, evening)
 
-1. **A daily brief, unprompted.** In the morning: what landed, what waits on him, what customers hit. One message, three lines.
-2. **Live preview link.** Alongside screenshots, a link he can tap and use on his phone (a tunnel to the page). For flows that a still picture can't show.
-3. **"Ship it" all the way to live, with his engineer's approval.** After the pull request is merged, the assistant tells him it's live and watches the first customers through it.
-4. **Complaints from where customers are** (email, WhatsApp, support desk), linked to rules the same way, without him forwarding them.
-5. **Tested, not assumed.** A live-phone bench in the style of Gate 59: scripted founder conversations (look jobs, ship, complaints) scored on "did he ever need his computer?" and "did it ever ask what it could find out?".
+| Moment | He says or does | The assistant does |
+|---|---|---|
+| Give it the business | "I want more creators signing up" | First asks the one thing the product can't show ("do you already give new creators anything for a first deal?"). Then plans 2-4 changes in his words, takes one yes and his few decisions, and builds them step by step, each shown. Gate 106: 8 of 9 planted problems found and fixed, 4 messages |
+| Morning brief | nothing, it comes at 9 | What needs him, what moved, what landed, what customers hit. "What's new?" any time |
+| His numbers | "we had 120 sign-ups this week", or a source set up once | Kept with the time, beside what Hive did: "sign-ups 142, up 18% since the shorter form went to your engineer" |
+| Where it lives | "we're on Vercel" (or Netlify, Railway, Azure, Fly, Render, his own way) | Remembered per project; says plainly what his engineer does once (install the host's tool, log in) |
+| Try it | "send me a link" | The latest build at its own address, to tap and use; his live product untouched |
+| Put it live | "put it live" | Only once his engineer has merged it: his yes, every test on his main version, then live. Otherwise: "say ship it first" |
+| Spin-up | `hive setup` once, or `hive up` | Checks, Telegram, screenshots, numbers, where it lives, then starts listening and says hello on his phone |
+
+## Still to come
+
+1. **Complaints from where customers are** (email, WhatsApp, a support desk), without him forwarding them.
+2. **The live-phone bench:** scripted founder conversations scored on "did he ever need his computer?".
+3. **The founder session** on his real product: the real test.
 
 ## Lessons from the live test (Nov 3)
 

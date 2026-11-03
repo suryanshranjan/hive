@@ -140,6 +140,8 @@ def build_parser():
     st.add_argument('--save-agent', action='store_true')   # remember --agent for every build on this computer
     st.add_argument('--overnight', action='store_true'); st.add_argument('--no-interview', action='store_true')   # no questions; check the assumptions later with `hive morning`
     sub.add_parser('doctor'); sub.add_parser('setup'); sub.add_parser('up')   # up: live on his phone, listening
+    de = sub.add_parser('deploy'); de.add_argument('action', choices=['setup', 'preview', 'status'])
+    de.add_argument('host', nargs='?'); de.add_argument('--preview'); de.add_argument('--live'); de.add_argument('--hook')
     nu = sub.add_parser('numbers'); nu.add_argument('action', nargs='?', choices=['setup', 'add'])
     nu.add_argument('values', nargs='*'); nu.add_argument('--cmd', dest='cmd_'); nu.add_argument('--url'); nu.add_argument('--file')
     sub.add_parser('listen')
@@ -207,6 +209,23 @@ def main(argv=None):
         if not telegram.load():
             return doctor.setup('.')
         return doctor.go_live('.')
+    if a.cmd == 'deploy':   # where his product lives: his choice (going live is from the phone, after a merge)
+        from . import deploy
+        if a.action == 'setup':
+            try:
+                cfg = deploy.setup('.', a.host or '', a.preview, a.live, a.hook)
+            except ValueError as e:
+                print(e); return 2
+            state, why = deploy.ready('.')
+            print(f"Connected: {cfg['host']}." + ('' if state == 'ok' else ' ' + why)); return 0
+        if a.action == 'status':
+            cfg = deploy.config('.'); state, why = deploy.ready('.')
+            print((f"{cfg['host']}: " if cfg else '') + ('ready.' if state == 'ok' else why)); return 0 if state == 'ok' else 1
+        st = __import__('hive.assistant', fromlist=['x']).latest_build('.')
+        if not st:
+            print('Nothing built yet.'); return 1
+        r = deploy.preview('.', f"hive/{st['name']}")
+        print(r['url'] if r['ok'] else r['say']); return 0 if r['ok'] else 1
     if a.cmd == 'numbers':
         from . import numbers
         if a.action == 'setup':

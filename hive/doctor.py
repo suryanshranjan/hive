@@ -112,6 +112,14 @@ def setup(repo='.', ask=input, claude_probe=True):
             got = numbers.refresh(repo)
             print(f"  Read {len(got)} number{'s' if len(got) != 1 else ''}: " + ', '.join(f'{k} {v:g}' for k, v in got.items())
                   if got else f"  Saved ({next(iter(src))}), but it gave me no numbers yet; I'll keep trying.")
+    from . import deploy
+    if not deploy.config(repo):
+        where = ask("\nWhere does your product live? (vercel, netlify, railway, azure, fly, render, or Enter to skip; "
+                    "you can tell me later on Telegram)\n  > ").strip().lower()
+        if where in deploy.HOSTS:
+            deploy.setup(repo, where)
+            state, why = deploy.ready(repo)
+            print(f'  Connected: {where}.' + ('' if state == 'ok' else ' ' + why))
     if telegram.load() and yes('Start me on your phone now? (I keep listening in the background on this computer)'):
         return go_live(repo)
     print("\nAll set. Type `hive` in your project folder and tell me what to build.")

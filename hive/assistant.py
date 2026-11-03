@@ -103,7 +103,10 @@ How you speak:
   builder, give the running builders a new instruction mid-build, and choose the team for his next builds (which
   agents, how many: the swarm law has its say first, then it is his call); answer questions about his product from its code; keep a rule he gives for every build; show him
   screenshots and change a build from a picture he sends; send his latest build to his engineer as a pull request when
-  he says "ship it"; move to the cloud and back. Hard limits, whatever he asks: you never change his own main version and never skip the tests;
+  he says "ship it"; take a business goal and plan and build it; brief him each morning with what landed and how his
+  numbers moved; connect to where his product lives (Vercel, Netlify, Railway, Azure, Fly, Render, his own way), send
+  him a preview link of a build, and put it live once his engineer has merged it and every test passes; move to the
+  cloud and back. Hard limits, whatever he asks: you never change his own main version and never skip the tests;
   every build arrives as a separate tested copy that he looks at and merges himself. Say so plainly if he asks for it.
 - Reply in his language and his script: Hindi-English in English letters if that is how he writes, never Devanagari.
 - Own your mistakes plainly ("My error, sir; it is fixed."), without grovelling.
@@ -794,6 +797,87 @@ def complaint(ch, repo, text, poll, apply_build=None):
 BRIEF_WORDS = re.compile(r"^\s*(what'?s new|whats up|any news|brief( me)?|morning brief|catch me up|update me|kya naya|"
                          r"kya chal raha)\b")
 
+PREVIEW_WORDS = re.compile(r"\b(send me (a|the) link|preview( link)?|let me try it|a link to try|link bhejo|try it on my "
+                           r"phone|can i try it)\b")
+LIVE_WORDS = re.compile(r"\b(put it live|make it live|go live|take it live|deploy( it)?|launch it|publish it|live kar do|"
+                        r"to production|on production|to prod)\b")
+SKIP_WORDS = re.compile(r"\b(skip(ping)?|without|no|bina|chhod\w*)\s+(the\s+|any\s+)?tests?\b|\b(main|master)\b")
+CONNECT_WORDS = re.compile(r"\b(connect|link|use|set up|setup|we use|we're on|we are on|hosted on|it's on|it is on|"
+                           r"deployed on|our site is on|switch to|move to)\b[^.?!]{0,30}"
+                           r"\b(vercel|netlify|railway|azure|fly|render)\b")
+
+def _build_ref(st):
+    return f"hive/{st['name']}"
+
+def preview_it(ch, repo):
+    """'Send me a link': the latest build at its own address on his host, to tap and use. His live product untouched."""
+    from . import deploy
+    st = latest_build(repo)
+    if not st:
+        ch.send("Nothing built yet to try, sir. Tell me what to build first."); return 'nothing'
+    ch.send("🔗 Putting your latest build at its own address; a minute or two.")
+    r = deploy.preview(repo, _build_ref(st))
+    if r['ok']:
+        ch.send(f"🔗 <b>Here it is, sir, to try on your phone:</b>\n{r['url']}\n\n<i>A separate copy: your live product is "
+                "untouched. Tell me what's off, or say \"ship it\".</i>", html=True)
+        return 'previewed'
+    ch.send('🔗 ' + telegram.esc(r['say']), html=True)
+    return 'no_preview'
+
+def go_live(ch, repo, poll):
+    """'Put it live': only his own main version, only after his engineer merged the build, only on his yes, and only with
+    every test passing (hive/deploy.py). An unmerged build is never put live."""
+    from . import deploy, numbers
+    st = latest_build(repo)
+    if not st:
+        ch.send("Nothing built yet to put live, sir."); return 'nothing'
+    state, why = deploy.ready(repo)
+    if state != 'ok':
+        ch.send('🚀 ' + telegram.esc(why)); return 'not_connected'
+    main = deploy.merged(repo, _build_ref(st), st.get('branch') or 'main')
+    if not main:
+        ch.send("🚀 Not yet, sir: your engineer hasn't merged it into your main version, and I only put live what they "
+                "have reviewed. " + ("It's with them now; the moment it's merged, say \"put it live\"." if st.get('shipped')
+                                     else "Say \"ship it\" and it goes to them; once merged, I'll put it live."))
+        return 'not_merged'
+    host = deploy.config(repo)['host'].title()
+    ch.send(f"🚀 <b>Put it live on {host}?</b>\n\nYour engineer has merged it. I'll run every test on your main version "
+            "first, and only put it live if they all pass.", html=True,
+            buttons=[[('🚀 Put it live', 'liv|yes')], [('Not now', 'liv|no')]])
+    choice, other = choose(ch, poll, [('liv|yes', ('yes', 'put it live', 'go', 'go ahead', 'haan')), ('liv|no', NO_WORDS)])
+    if other is not None:
+        return handle(ch, repo, other, poll)
+    if choice != 'liv|yes':
+        ch.send('Very good. It stays as it is until you say.'); return 'not_live'
+    ch.send("🛠 Checking every test on your main version, then putting it live.")
+    r = deploy.live(repo, main, st.get('test_cmd'))
+    if not r['ok']:
+        ch.send('⚠️ ' + telegram.esc(r['say'])); return 'live_failed'
+    numbers.mark(repo, f'"{_goal_words(st)}" went live')
+    ch.send(f"✅ <b>It's live, sir.</b>" + (f"\n{r['url']}" if r.get('url') else '') + "\n\nI'll tell you in the "
+            "morning brief how your numbers move.", html=True)
+    return 'live'
+
+def _goal_words(st):
+    from . import ship
+    return ship.title(st)[6:][:80]
+
+def connect_host(ch, repo, text):
+    """'We're on Vercel': remember where his product lives, and say plainly what (if anything) his engineer does once."""
+    from . import deploy
+    host = CONNECT_WORDS.search(text.lower()).group(2)
+    deploy.setup(repo, host)
+    state, why = deploy.ready(repo)
+    if host == 'render':
+        ch.send("🔌 Noted: Render. To put it live I need its deploy hook address (Render, Settings, Deploy Hook); your "
+                "engineer runs: hive deploy setup render --hook <address>.")
+    elif state == 'ok':
+        ch.send(f"🔌 <b>Connected: {host.title()}.</b> Say \"send me a link\" to try a build on your phone, and \"put it "
+                "live\" once your engineer has merged it.", html=True)
+    else:
+        ch.send(f"🔌 Noted: {host.title()}. " + telegram.esc(why))
+    return 'connected'
+
 PLAN = {}   # the plan he said yes to: {'goal', 'steps', 'step', 'running'}
 GOAL_WORDS = re.compile(r"(^|[.!?]\s*)(i want|we need|help me|how (do|can) (i|we))\b[^.?!]{0,60}\b(more|fewer|increase|"
                         r"grow|reduce|boost|get more|get them)\b|\b(badhana|badhao|zyada|kam karna)\b|\b(sign-?ups?|signups|"
@@ -914,6 +998,12 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         got = {'intent': 'greeting'}
     elif telegram.is_status(text):
         got = {'intent': 'status'}
+    elif LIVE_WORDS.search(low) and not SKIP_WORDS.search(low):   # live, the safe way: merged, tested, his yes
+        got = {'intent': 'go_live'}
+    elif CONNECT_WORDS.search(low):
+        got = {'intent': 'connect_host'}
+    elif PREVIEW_WORDS.search(low):
+        got = {'intent': 'preview'}
     elif is_risky(text):   # never a build, whatever the model reads (the Jarvis bench: once read as one)
         got = {'intent': 'reply'}
     elif refs.has(text):   # a picture ("make it like this"): to the builders working now, else to the latest build
@@ -941,6 +1031,12 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         return 'shown'
     if intent == 'ship':   # "ship it": the latest build to his engineer, as a pull request
         return ship_it(ch, repo, text, poll)
+    if intent == 'go_live':
+        return go_live(ch, repo, poll)
+    if intent == 'connect_host':
+        return connect_host(ch, repo, text)
+    if intent == 'preview':
+        return preview_it(ch, repo)
     if intent == 'brief':   # "what's new?": the brief, now
         from . import brief
         brief.send(ch, repo, since=time.time() - 86400)
