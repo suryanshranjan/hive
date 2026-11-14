@@ -377,6 +377,19 @@ def previews(repo, sources=None):
             out.append((s, None, str(e)[:100]))
     return out
 
+def _source_named(srcs, said):
+    """The database a query names: by its name, else loosely (the model wrote "db", the kind, for "dabba database",
+    and every query was dropped: Gate 108 run 2, 5 of 10 questions), else the only database he gave."""
+    dbs = [s for s in srcs if s['kind'] == 'db']
+    said = str(said or '').strip().strip('[]').lower()
+    exact = [s for s in dbs if s['name'].lower() == said]
+    if exact:
+        return exact[0]
+    loose = [s for s in dbs if said and (said in s['name'].lower() or s['name'].lower() in said)]
+    if len(loose) == 1:
+        return loose[0]
+    return dbs[0] if len(dbs) == 1 else None
+
 def answer(repo, question):
     """His question answered from his data: {'answer', 'found', 'sources'} or None when he has given Hive none."""
     from . import explain
@@ -393,9 +406,8 @@ def answer(repo, question):
             got = explain.ask_json(PICK.format(question=question, sources=listing, today=_today())) or {}
             if got.get('queries'):
                 break
-        byname = {s['name']: s for s in srcs}
         for q in (got.get('queries') or [])[:3]:
-            s = byname.get((q or {}).get('source')) if isinstance(q, dict) else None
+            s = _source_named(srcs, (q or {}).get('source')) if isinstance(q, dict) else None
             if not s or s['kind'] != 'db':
                 continue
             try:

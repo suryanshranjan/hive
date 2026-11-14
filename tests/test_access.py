@@ -94,6 +94,11 @@ r = assistant.handle(ch(fake), repo, 'how many orders are paid? EMPTY-ME', poll=
 check('no query comes back: a plain reason, never an empty one (Gate 108 q1)',
       (r, fake.sent[-1]['text'].startswith("🤔 I couldn't work that out from your data just now.")), ('data_unanswered', True))
 
+fake = FakeTelegram([])
+r = assistant.handle(ch(fake), repo, 'how many orders are paid? KIND-NAME', poll=1)
+check('a query naming its source by kind ("db") still runs (Gate 108 run 2: 5 of 10 dropped)',
+      (r, fake.sent[-1]['text']), ('data_answered', '📊 2 paid orders so far.'))
+
 # 6. from the phone: handing over a database
 db2 = os.path.join(home, 'more.db'); c = sqlite3.connect(db2); c.execute('CREATE TABLE payouts (id INTEGER)'); c.commit(); c.close()
 fake = FakeTelegram([])

@@ -55,7 +55,7 @@ if 'His newest message:' in prompt and 'What does he mean?' in prompt:   # the l
 if 'Write read-only SQL to answer it' in prompt:   # hive/access.py: one count from the first database listed
     db = re.search(r'^\[([^\]]+)\] \(db\)', prompt, re.M)
     sql = 'DELETE FROM orders' if 'DROP-ME' in prompt else "SELECT COUNT(*) AS orders FROM orders WHERE status = 'paid'"
-    print(json.dumps({'result': json.dumps({'queries': [{'source': db.group(1), 'sql': sql}] if db and 'EMPTY-ME' not in prompt else []})}))
+    print(json.dumps({'result': json.dumps({'queries': [{'source': 'db' if 'KIND-NAME' in prompt else db.group(1), 'sql': sql}] if db and 'EMPTY-ME' not in prompt else []})}))
     sys.exit(0)
 if 'Answer his question from his own data' in prompt:   # the last number the data shows, said plainly
     data = prompt.split('What his data shows:')[1].split('Answer him in')[0]

@@ -66,7 +66,9 @@ BACKUP = os.path.join(os.path.expanduser('~'), '.hive', 'llm.json')   # {"base_u
 def _json_reply(text):
     if isinstance(text, dict):
         return text
-    return json.loads(text[text.index('{'):text.rindex('}') + 1])
+    # strict=False: a model often writes multi-line text (SQL, a rule) inside a JSON string, with raw line breaks that
+    # strict JSON rejects (Gate 108: 5 of 10 data questions failed in one flight, silently)
+    return json.loads(text[text.index('{'):text.rindex('}') + 1], strict=False)
 
 SPENT = [0.0]   # dollars spent on Hive's own model calls in this process (Gates 52-54: they were not in the cost reported)
 SPENT_BY = {}   # the same, by the Hive step that made the call (Gate 85: where Hive's own spend goes)
@@ -281,6 +283,21 @@ def ask_json(prompt):
             reply = ask(prompt)
             if reply is not None:
                 return reply
-        except Exception:
+        except Exception as e:
+            _log_failure(ask.__name__, e, prompt)
             continue
     return None
+
+def _log_failure(who, e, prompt):
+    """Why a model call failed, kept in ~/.hive/explain.log (Gate 108: failures were silent, so a parsing fault looked
+    like 'couldn't work that out' five times before it was found)."""
+    try:
+        log = os.path.join(os.path.expanduser('~'), '.hive', 'explain.log')
+        os.makedirs(os.path.dirname(log), exist_ok=True)
+        if os.path.exists(log) and os.path.getsize(log) > 1_000_000:
+            os.replace(log, log + '.old')
+        import time
+        with open(log, 'a', encoding='utf-8') as f:
+            f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} {who}: {e!r:.300} | {prompt[:120]!r}\n")
+    except Exception:
+        pass
