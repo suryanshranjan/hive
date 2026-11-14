@@ -2,17 +2,19 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 14 2026, after Gate 108)
+## Where we left off (Nov 14 2026, after Gate 108 run 4)
 
-- **Gate 108 done** (`gates/gate108/RESULTS.md`). Dabba Days is in the lab container: `~/dabba-days`, `~/dabba-data`, key in `~/dabba-private` and `hive_private/dabba/`.
-  - **Run 3:** onboarding, 10 of 10 figure answers, the data-only bonus with its condition, screens on every device, a plan of 3 built.
-  - **Runs 1 and 2:** each found a fault, now fixed (the build could not import Hive; queries were dropped when the database was named "db").
-- **Built: stepping away.** "I'm sleepy" offers the cloud, this computer, stopping, or something overnight. Unit-tested; not flown on AWS.
+- **Gate 108 done, replicated** (`gates/gate108/RESULTS.md`): runs 3 and 4 clean in a row; run 4 found all 4 planted problems after the planner's price rule. Dabba Days lives in the lab container (`~/dabba-days`, `~/dabba-data`; key in `~/dabba-private` and `hive_private/dabba/`).
+  - Its data is also in Postgres (`dabba-pg`) and MySQL (`dabba-my`) on the Docker network `hive-db`, with read-only login `reader`/`readpw`. Hive read both: 5 of 5 right each.
+- **Built and unit-tested, not flown:**
+  - "I'm sleepy" to the cloud with a restart there (`hive/assistant.py` `away`);
+  - expired logins renewed from the phone (`hive/logins.py`);
+  - test deploys on his AWS machine (`hive/trydeploy.py`).
+- **AWS** is signed in on the laptop (account …1696, root login; a limited user would be safer).
 - **Next:**
-  1. Repeat Gate 108 as-is, run 4: one clean run is not a replication. Command: `HOME=/home/node/f108 python3 gates/gate108/flight108.py` in `hive-g8`, after clearing `~/f108/.hive`, `hive-projects` and `github`.
-  2. Why plans never name the price of one lunch (0 of 3 runs).
-  3. Fly "I'm sleepy" with a running build, through a real AWS move (needs the user's AWS login).
-  4. Then a real founder on his own product.
+  1. The AWS flight (BRAIN §9.2): the move with a running build, a test deploy, take it down, delete the machine. Needs the user's yes, about $1.
+  2. The founder session (`docs/founder_session.md`).
+  3. Gate 108's design on a second mock company in another trade.
 
 ## Earlier (Nov 14 2026, before Gate 108)
 

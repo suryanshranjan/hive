@@ -226,7 +226,12 @@ def stop(ask=input, say=print, repo='.', relisten=True):
     cfg = os.path.join(os.path.expanduser('~'), '.hive', 'cloud.json')
     if os.path.exists(cfg) and json.load(open(cfg)).get('to', '').endswith(m.get('ip', '-')):
         os.remove(cfg)
-    say("Deleted: the machine, its key and its firewall rule. Nothing is left running.")
+    from . import trydeploy   # a test page on that machine is gone with it: forget it (the owner: when the cloud
+    test = os.path.exists(trydeploy.STATE())   # machine is deleted and the work brought home, the test goes too)
+    if test:
+        os.remove(trydeploy.STATE())
+    say("Deleted: the machine, its key and its firewall rule" + (", and the test page that was on it" if test else '') +
+        ". Nothing is left running.")
     if relisten:
         _home(repo, say)
     return 0

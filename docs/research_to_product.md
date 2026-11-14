@@ -145,6 +145,10 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 
 | "Anything must be answered simply; any founder can be the case" | None: an owner request (Nov 14 2026) | One plain-reply rule in every founder-facing prompt; builder instructions and rule sheets untouched | `hive/explain.py` `PLAIN`, `plain()` (in the tool) |
 
+| How prices are shown is product work (what he charges is not) | Gate 108: the hidden price of one lunch missed in runs 1-3, found in run 4 after the rule changed | The planner reads each page as a first-time customer deciding whether to pay | `hive/plan.py` `PLAN` (in the tool; replicate on a second company) |
+| Expired logins must not stop the work | None: an owner request (an expired AWS sign-in stopped the cloud test) | AWS and GitHub sign-ins renewed from his phone, never switching accounts silently | `hive/logins.py` (in the tool, not flown) |
+| A test deploy without a host | None: an owner request | Static pages on his AWS machine at a private link for two hours; deleted with the machine | `hive/trydeploy.py` (in the tool, not flown) |
+
 ## Still to turn into the product
 
 - **Gates 55–56:** a skimming owner repairs about a quarter of the code sheet's wrong rules, whether by list, conversation or a short sheet; nothing changes in the product from these. Next to test with the founder: spot checks on concrete outcomes.

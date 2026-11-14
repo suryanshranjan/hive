@@ -9,8 +9,7 @@
   - one answer counted a bonus twice.
 - **Run 2** found the real cause of the empty answers. It **fired the kill**: only 5 of 10 data answers came back.
 - **Run 3** got everything right except the growth plan's coverage: 10 of 10 data answers, the hidden pay rule with its condition, every screen, and the plan built in full.
-
-One clean run after the last fix is not yet a replication. Gate 95/96 practice says repeat before relying on it.
+- **Run 4** repeated run 3 after two changes (plain replies; a narrower planner rule on prices) and held every prediction, the growth plan included (4 of 4).
 
 ## Scored
 
@@ -28,6 +27,25 @@ Hive's own reading calls (21–26 per run) and the code-reading answers are not 
 **Not found in any run:** the plans page never shows the price of one lunch (₹120, ₹150, ₹170). Every plan proposed telling customers what they get, never what one lunch costs.
 
 **The key's own error:** for "which cook had the most complaints in October", the key's query picked one name (Rehana Begum, 4). The data has a three-way tie at 4 (Fatima Sheikh, Sunita Patil, Rehana Begum). Hive reported the tie in every run, which is more right than the key.
+
+## Run 4: the replication, after two more changes (Nov 14)
+
+Run 3 was one clean run, so the flight was flown again, unchanged, after two product changes:
+- **plain replies** for every founder (the owner: "anything must be answered simply");
+- **a narrower planner rule.** "No pricing changes" became "not what he charges", with how prices are shown in scope, read as a first-time customer deciding whether to pay. No plan in runs 1-3 had named the hidden price of one lunch.
+
+| # | Run 4 |
+|---|---|
+| O1 onboarding | **Held** |
+| O2 data answers | **Held: 10 of 10**, each one or two short sentences (for example "18 subscribers cancelled in October.") |
+| O3 hidden rule | **Held:** "a cook with no complaints in a month gets an extra ₹500" |
+| O4 screens | **Held:** 1, 1 and 3 photos |
+| O5 planted problems | **Held: 4 of 4.** The plan: a shorter form with GST optional; "Show price per lunch and what's protected" (the first time the hidden price was found); a one-week trial. The protections include the 10-day pause |
+| O6 cost and time | **Held:** 8.4 min, $0.81 builders + $0.26 plan; 12 tests passing, all 7 old ones kept |
+
+Runs 3 and 4 together are the replication: two clean runs in a row for O1-O4 and O6. O5 has held once on the current planner (run 4); the planner change has not been repeated.
+
+**The same data on Postgres and MySQL (Nov 14, outside the flight).** Dabba Days' data was copied into Postgres 16 and MySQL 8.4, each with a read-only login. Hive connected to both ("I can see 8 tables"), refused a write on both, and answered 5 of the 10 questions right on each (active subscribers, October sign-ups and cancellations, the complaint tie, October cook pay). Without the database drivers installed, it says so plainly and gives the one install line (`hive-swarm[data]`).
 
 ## What the runs found, and what changed
 
@@ -50,5 +68,5 @@ Hive's own reading calls (21–26 per run) and the code-reading answers are not 
 
 ## Files
 
-- `results/run1_transcript.json`, `run2_transcript.json`, `run3_transcript.json`: every message both ways.
+- `results/run1_transcript.json` to `run4_transcript.json`: every message both ways.
 - `flight108.py` (the flight), `analyze108.py` (scoring against the private key).

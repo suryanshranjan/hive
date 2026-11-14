@@ -4,7 +4,8 @@ usage: python3 tests/test_away.py   (run from the hive repo root)"""
 import json, os, subprocess, sys, tempfile, time
 sys.path.insert(0, os.getcwd()); sys.path.insert(0, os.path.join(os.getcwd(), 'tests'))
 home = tempfile.mkdtemp(); os.environ['HOME'] = os.environ['USERPROFILE'] = home
-from hive import assistant, explain, memory, telegram
+from hive import assistant, explain, logins, memory, telegram
+logins.ensure = lambda ch, service, poll=20: True   # signed in (renewal itself: tests/test_logins.py)
 explain.CMD = '"' + sys.executable.replace(chr(92), '/') + '" tests/fake_explain.py'
 memory.DIR = os.path.join(home, '.hive', 'rules'); telegram.BUSY = os.path.join(home, '.hive', 'telegram.busy')
 assistant.RUNS = os.path.join(home, '.hive', 'runs')
@@ -76,6 +77,16 @@ r = assistant.handle(ch(fake), repo, 'going to bed', poll=1, cloud=lambda rp, on
 check('a failed move keeps the work running here and says so',
       (r, p.poll() is None, os.path.exists(assistant.RESUME()), 'leave your computer on' in fake.sent[-1]['text']),
       ('away_cloud_failed', True, False, True))
+
+# 4b. his AWS sign-in expired and he says "not now": nothing moves, the work carries on here, he is told
+p = running()
+logins.ensure = lambda ch, service, poll=20: False
+fake = FakeTelegram([tap('awy|cloud')])
+r = assistant.handle(ch(fake), repo, 'going to bed', poll=1, cloud=lambda rp, on, login=True: 0)
+check('no sign-in: nothing moves, the work goes on here, and he is asked to leave the computer on',
+      (r, p.poll() is None, os.path.exists(assistant.RESUME()), 'leave your computer on' in fake.sent[-1]['text']),
+      ('away_login_needed', True, False, True))
+logins.ensure = lambda ch, service, poll=20: True
 
 # 5. carry on here / stop for tonight
 fake = FakeTelegram([tap('awy|here')])

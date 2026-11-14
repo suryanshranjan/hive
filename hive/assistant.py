@@ -7,7 +7,7 @@ one should be one message, not a new build.
 
 Only one Hive process reads the bot at a time: while a build or review is talking to the owner, the listener steps
 aside (see telegram.busy_elsewhere)."""
-import glob, json, os, re, subprocess, time
+import glob, json, os, re, shutil, subprocess, time
 
 from . import argv, explain, memory, refs, team, telegram
 
@@ -407,6 +407,11 @@ def ship_it(ch, repo, text, poll):
         return handle(ch, repo, other, poll)
     if choice != 'shp|yes':
         ch.send('Very good. It stays here until you say.'); return 'not_shipped'
+    remote = subprocess.run(['git', '-C', repo, 'remote', 'get-url', 'origin'], capture_output=True, text=True).stdout
+    if 'github.com' in remote and shutil.which('gh'):   # an expired GitHub login is renewed from his phone first
+        from . import logins
+        if not logins.ensure(ch, 'github', poll):
+            return 'login_needed'
     r = ship.ship(repo, st)
     if r['ok']:   # for the brief and his numbers: what went to his engineer, and when
         from . import numbers
@@ -1106,6 +1111,11 @@ def away(ch, repo, text, poll, apply_build=None, start_build=None, cloud=None):
     os.makedirs(os.path.dirname(RESUME()), exist_ok=True)
     _json.dump({'goal': work, 'said': (BUILD.get('goal') or PLAN.get('goal') or '')[:300], 't': time.time()},
                open(RESUME(), 'w', encoding='utf-8'))
+    from . import logins
+    if not logins.ensure(ch, 'aws', poll):   # an expired AWS sign-in is renewed from his phone, not a dead end
+        os.remove(RESUME())
+        ch.send(f"Then I'll carry on here{sir}: please leave your computer on and awake tonight.", html=True)
+        return 'away_login_needed'
     ch.send("☁️ Moving to the cloud now: about 5 minutes. Keep your computer on until I say I'm there.")
     try:
         try:
@@ -1150,12 +1160,15 @@ def resume_here(ch, repo):
 def _build_ref(st):
     return f"hive/{st['name']}"
 
-def preview_it(ch, repo):
-    """'Send me a link': the latest build at its own address on his host, to tap and use. His live product untouched."""
+def preview_it(ch, repo, poll=20):
+    """'Send me a link': the latest build at its own address on his host, to tap and use. His live product untouched.
+    With no host set up but AWS on this computer: a test deploy on his cloud machine, for two hours (hive/trydeploy.py)."""
     from . import deploy
     st = latest_build(repo)
     if not st:
         ch.send("Nothing built yet to try, sir. Tell me what to build first."); return 'nothing'
+    if deploy.ready(repo)[0] == 'none' and shutil.which('aws') and not in_cloud(repo):
+        return try_deploy(ch, repo, st, poll)
     ch.send("🔗 Putting your latest build at its own address; a minute or two.")
     r = deploy.preview(repo, _build_ref(st))
     if r['ok']:
@@ -1164,6 +1177,37 @@ def preview_it(ch, repo):
         return 'previewed'
     ch.send('🔗 ' + telegram.esc(r['say']), html=True)
     return 'no_preview'
+
+def try_deploy(ch, repo, st, poll):
+    """No host set up: offer the build's pages on a test machine on his AWS, at a secret address, for two hours."""
+    from . import logins, trydeploy
+    ch.send("🔗 You haven't set up a hosting service yet, sir. I can put this build on a test machine on your AWS "
+            "account, at a private link, for up to two hours (about $0.09 an hour), then take it down and delete the "
+            "machine. Your live product isn't touched.",
+            buttons=[[('🔗 Yes, put it up', 'tdp|yes')], [('Not now', 'tdp|no')]])
+    choice, other = choose(ch, poll, [('tdp|yes', ('yes', 'put it up', 'go', 'haan')), ('tdp|no', NO_WORDS)])
+    if other is not None:
+        return handle(ch, repo, other, poll)
+    if choice != 'tdp|yes':
+        ch.send("Very good. Screenshots it is: say \"show me\"."); return 'no_preview'
+    if not logins.ensure(ch, 'aws', poll):
+        return 'login_needed'
+    ch.send("🛠 Putting it up. If I have to make the test machine first, that's about 5 minutes.")
+    try:
+        r = trydeploy.up(repo, _build_ref(st), say=lambda *a: None)
+    except Exception as e:
+        r = {'ok': False, 'say': f"That didn't work ({str(e)[:120]})."}
+    if not r['ok']:
+        ch.send('🔗 ' + telegram.esc(r['say']), html=True); return 'no_preview'
+    ch.send(f"🔗 <b>Here it is, sir, to try on your phone:</b>\n{r['url']}\n\n<i>A private test copy, up for two hours. "
+            "Say \"take it down\" when you're done, and I'll remove it" + (" and delete the test machine" if r.get('made')
+            else '') + ".</i>", html=True)
+    return 'test_deployed'
+
+def take_down(ch, repo):
+    from . import trydeploy
+    ch.send('🧹 ' + telegram.esc(trydeploy.down(repo)), html=True)
+    return 'taken_down'
 
 def go_live(ch, repo, poll):
     """'Put it live': only his own main version, only after his engineer merged the build, only on his yes, and only with
@@ -1362,6 +1406,8 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         got = {'intent': 'connect_host'}
     elif PREVIEW_WORDS.search(low):
         got = {'intent': 'preview'}
+    elif __import__('hive.trydeploy', fromlist=['x']).TAKE_DOWN.search(low) and             __import__('hive.trydeploy', fromlist=['x']).state():   # "take it down": the test page, when one is up
+        got = {'intent': 'take_down'}
     elif is_risky(text):   # never a build, whatever the model reads (the Jarvis bench: once read as one)
         got = {'intent': 'reply'}
     elif is_away(low):   # "I'm sleepy": offer the way to carry on while he's away
@@ -1424,7 +1470,9 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         ch.send(('📊 ' if got.get('found') else '🤔 ') + telegram.esc(got.get('answer', '')), html=True)
         return 'data_answered' if got.get('found') else 'data_unanswered'
     if intent == 'preview':
-        return preview_it(ch, repo)
+        return preview_it(ch, repo, poll)
+    if intent == 'take_down':
+        return take_down(ch, repo)
     if intent == 'document':   # the company brain: what lasts in his document, kept for plans and answers
         from . import brain
         m = brain.DOC.search(text)
@@ -1618,6 +1666,10 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
             return handle(ch, repo, other, poll, apply_build, start_build, cloud)
         if choice not in ('cld|yes', 'cld|bare'):
             ch.send('Very good. Just say the word.'); return 'not_moved'
+        if not in_cloud(repo):   # his AWS sign-in, renewed from his phone if it has expired
+            from . import logins
+            if not logins.ensure(ch, 'aws', poll):
+                return 'login_needed'
         if on:   # (for a delete, say nothing until it is known to be possible: it said "Deleting it now", then that it can't)
             ch.send("🛠 On it. This takes about 5 minutes; I'll tell you when I'm there.")
         try:
@@ -1745,6 +1797,12 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
           flush=True)
     try:
         while not (until and until()):
+            try:   # a test page past its two hours: taken down (and its test machine deleted), and he is told
+                from . import trydeploy
+                if trydeploy.expired():
+                    ch.send('⏱ The two-hour test is over. ' + telegram.esc(trydeploy.down(repo)), html=True)
+            except Exception as e:
+                print(f'Could not take the test page down: {e!r}', flush=True)
             try:   # the morning brief, unprompted, once a day
                 from . import brief
                 if brief.due() and not telegram.busy_elsewhere():

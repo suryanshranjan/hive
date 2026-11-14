@@ -103,7 +103,7 @@ The deeper limit is intent, and Gates 3 to 17 have now mapped it. On rules a mod
 - **The overnight path is now as reliable as the live one (Gate 102, shipped):** interviewing the owner before he leaves made 5 of 5 overnight flights right (27/27 each; Gate 99 without it: pass^1 0.60), at a median 30 prompts (14 before, all in the morning) and $1.53 a feature.
 - **Confirm his rules once, at the end (Gate 104):** with the own-words read-backs dropped and the rule sheet as the one confirmation, the owner's prompts fell from a median 30 to 23 per feature, every build 27 of 27 either way (3 flights an arm). His misreadings surfaced on the sheet instead (one "what should it be?" each). The bigger swing is elsewhere: when builders ask fewer than 3 questions the after-build review runs, and those flights cost 36-42 prompts. Shipped as the default (`HIVE_CONFIRM_EACH=1` restores read-backs).
 - **The whole product holds together end to end (Gate 107):** a fresh founder's 14 steps on his phone (hello, a document, a business goal with the safety net, show me, a picture, a technical instruction, a preview, ship it, his engineer's merge, live, undo, a complaint, what's new, a budget), with real Claude and builds, passed every step in runs 3 and 4 (about 13 min and $3 a run). Run 1 found the serious fault: a new build started from main, so the plan's changes never went live; builds from the phone now go on top of his latest unmerged build. Run 2 found the fix's own bug, now tested.
-- **A founder can run a company's numbers through Hive (Gate 108, 3 runs with fixes between):** on Dabba Days (a made-up lunchbox company: 200 subscribers, 12 cooks, a SQLite database), "set me up" took 0.3 minutes and confirmed the database ("I can see 8 tables"). After the fixes, run 3 answered 10 of 10 figure questions exactly from the data. It also found a ₹500 bonus that only the payouts table holds, and named its condition by checking it against complaints: cooks with no complaints that month. Screens worked on every device, and a growth plan of 3 steps was built and shown in 7.9 minutes for $0.76. Run 1 found that a plan's build could not import Hive (fixed). Run 2 fired the kill (5 of 10): queries naming the database "db" were dropped (fixed). The plan found 3 of 4 planted problems in run 1 and 2 of 4 in runs 2-3, and never the hidden price of one lunch. One clean run after the fixes: repeat before relying on it.
+- **A founder can run a company's numbers through Hive (Gate 108, 4 runs; runs 3 and 4 clean in a row):** on Dabba Days (a made-up lunchbox company: 200 subscribers, 12 cooks, a SQLite database), "set me up" took 0.3 minutes and confirmed the database ("I can see 8 tables"). After the fixes, run 3 answered 10 of 10 figure questions exactly from the data. It also found a ₹500 bonus that only the payouts table holds, and named its condition by checking it against complaints: cooks with no complaints that month. Screens worked on every device, and a growth plan of 3 steps was built and shown in 7.9 minutes for $0.76. Run 1 found that a plan's build could not import Hive (fixed). Run 2 fired the kill (5 of 10): queries naming the database "db" were dropped (fixed). The plan found 3 of 4 planted problems in run 1 and 2 of 4 in runs 2-3, and never the hidden price of one lunch. Run 4 replicated run 3 (10 of 10, the rule, the screens) and, after the planner was told how prices are shown is in scope, its plan found all 4 planted problems, the price of one lunch included. The same data on Postgres and MySQL: 5 of 5 answers right on each, writes refused.
 - **Give Hive the business, not the task (Gate 106):** with only a business goal ("I want more creators signing up"), Hive read the mock product, planned 3-4 changes in plain words, asked 2 owner-only questions, and built them on one branch, each shown: 8 of 9 planted problems found and removed, every test passing, 4 owner messages, 0 technical words, $0.88-1.45 and 2-4 minutes a goal. The miss: a reward that exists only in his payouts, never on the site; what the product doesn't show, Hive can't find. A simulated customer panel (MiroFish's idea, re-implemented) added nothing (8 vs 8 of 9) at twice the planning cost; off.
 - **His picture beats his words for a look (Gate 105):** given the owner's reference screenshot through Hive's fix round, one builder matched 18 of 18 measured checks of three target designs (colours, sizes, corners, button shape); given the same request in a founder's words, 13 of 18 ("dark green" for teal, "big heading" for a small one). A blind judge preferred the picture 3 of 3; same cost ($0.26 vs $0.25), under a minute, every test passing, his own words kept. n = 1 a cell; targets in a well-known palette. Jarvis now suggests a screenshot when he describes a look in words.
 - **A check of the owner's own examples sees what builders' tests miss (Gate 103a, replay):** run through the functions the product used before the build, his examples flag both of Gate 101's verification failures and 1 of 23 good builds (a true rounding deviation), at $0.11 a check. **Flights (103b): ships.** Drift F with the check scored 29 and 29 of 29 (without: 20, 29, 17), live 26, 27, 27 of 27; in live 2 it caught a split-payment refund sent all to the card, and one fix round made it right. Cost $0.36 a flight; minutes +11.3 against Gate 98 (failed X3), confounded by a slower machine and a memory stall on the laptop.
@@ -215,6 +215,7 @@ Status tags: **established** means outside theory or our data on real agents; **
 | Gate 48 | Oct 29 | Laya (open copy of Jev) vs Claude reading 120 owner-style messages (9 intents) | Claude 92.5%, Laya-ml 42.5%, Laya-en 45.0%, v3 tuned on a practice set 45.0%; 0.68 s with 2 threads (5.0 s untuned); 26 wrong stop/cloud calls (v1); L1, L5, A2, A4 held, L2–L4, L6, A1, A3 failed; kill fired |
 | Gate 47 | Oct 29 | Claude and Codex in one swarm (M1, M2), vs Claude only (C) and Codex only (X); Codex lead (LX) vs Claude lead (LC), deep project | 95% at 9.2 / 7.5 / 8.3 / 8.0 / 8.3 / 8.1 min; all 1,340 visible; hidden 99.8–100%; 0 breaks; Claude cost $6.72 / 10.83 / 0 / 13.31 / 12.82 / 5.74; P1–P4, P6–P8 held, P5 failed; ship fired. Registered analysis miscounted the seed's history as one break per team (disclosed, recounted) |
 | Gate 108 | Nov 14 | Can a founder run his company through Hive: Dabba Days (made-up lunchbox company, SQLite data), onboarding, 1 hidden-rule question, 10 figure questions, screens, a growth goal; 3 runs with fixes between | Run 3: onboarding, 10/10 figures, the hidden ₹500 rule with its condition, 1/1/3 screen photos, plan of 3 built (10 tests passing), 7.9 min, $0.76 + $0.26 plan. Run 1: the plan's build could not import Hive (fixed), 8/10, rule found without its condition. Run 2: 5/10, kill fired (queries naming the source "db" dropped; fixed). Plan coverage 3, 2, 2 of 4 planted |
+| Gate 108 run 4 | Nov 14 | The same flight after plain replies and the planner's price rule | 10/10 figures, the hidden rule, 1/1/3 screens, plan 4 of 4 planted (price per lunch found), 12 tests passing, 8.4 min, $0.81 + $0.26 |
 | Gate 107 | Nov 3 | A fresh founder end to end, 14 steps on his phone, untested project, 4 runs with fixes between | Runs 3, 4: 13/13 steps right, 12.7 and 13.9 min, $3.20 and $2.62; run 1: the plan never went live (fixed: build on top); run 2: 9/13 (the fix's own bug, fixed); E2-E5 held in all runs, E1 in runs 3-4 |
 | Gate 106 | Nov 3 | Business goal only (3 goals, mock creator site with 9 planted problems), through Jarvis: plan, one yes, his decisions, step-by-step build; A planner vs B planner plus simulated customer panel | Found and built 8/9 (A and B alike; miss: a reward only in his payouts); 4 owner messages; 11/11 questions owner-only; 0 technical words; $0.88-1.45; J1-J5, J7 held, J6 failed |
 | Gate 105 | Nov 3 | His reference picture vs his words for a look, one fix round each (start.apply_ruling, one Claude builder), 3 private targets; measured by role and a blind judge | P 18/18, W 13/18 measured; judge P 10, 9, 9 vs W 5, 6, 8 (start 3-4); all tests pass, his words kept; $0.26 vs $0.25; V1-V5 held. Found: the camera's raw error without a browser (fixed) |
@@ -325,7 +326,7 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 - **Failed (Gate 48):** Laya ≥ 80% (42.5%); ≤ 1 s as registered (5.0, a thread misconfiguration); hybrid with Laya answering half; no wrong stop or cloud calls (26); amendment: v3 at 55–72% (45.0%), ≤ 3 wrong stops (5).
 - **Held (Gate 47):** mixed teams reach 95% (9.2, 8.1 min), break main at most once (0, 0), each agent lands ≥ 25% (Codex 52%, 73%); mixing costs no speed (8.7 vs 9.1 allowed); hidden within 3 points (0.2); Codex lead's plan within 6 minutes (85 s); lead's agent within 20% (8.0 vs 8.3).
 - **Failed (Gate 47):** Codex builders ≥ 1.2× slower than Claude (1.11×).
-- **Gate 108 (by run 1/2/3):** O1 held in all; O2 held 8, **failed 5 (kill fired)**, held 10; O3 **failed (half: no condition)**, held, held; O4 held in all; O5 held 3, **failed 2**, **failed 2**; O6 held in all.
+- **Gate 108 (by run 1/2/3/4):** O1 held in all; O2 held 8, **failed 5 (kill fired)**, held 10, held 10; O3 **failed (half: no condition)**, held, held, held; O4 held in all; O5 held 3, **failed 2**, **failed 2**, held 4; O6 held in all.
 - **Held (Gate 107):** E1 in runs 3 and 4 (13, 13; failed in run 2, 9), E2-E5 in every run.
 - **Held (Gate 106):** J1 (found 3, 2, 3), J2 (built 3, 2, 3), J3 (4 messages), J4 (11 of 11 owner-only), J5 (0 technical words), J7. **Failed:** J6 (the customer panel: 8 vs 8 of 9).
 - **Held (Gate 105):** V1 (picture 18 vs words 13 of 18, P >= W each), V2 (6/6 on 3 of 3), V3 (judge 3 of 3), V4 (all tests, his words kept), V5 (cost 1.02x).
@@ -424,80 +425,88 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 - **Dropped before running:** 'one question per function before any gets a third'. Our own table predicted 0–1 points of effect against ±10 of noise, and Gate 6's curve later showed it would have been the worst allocation. (Later corrected: Gate 8 traced that curve to a headroom imbalance, and Gate 11 found spreading beats blocks of 3, 1.25×.)
 - **Flawed check, disclosed:** one cheating-signature rule (CHECKSUM +97) could be read off a visible example.
 
-## 7. Design as of now (Hive v2 plus protocol v2)
+## 7. Design now (Nov 14 2026)
 
-- Workers never talk. Long-lived workers take task after task, because onboarding costs about 20 tasks' worth of tokens.
-- Claims name test categories (`gates/gate3/tools/claim.py`); overlapping claims are refused and races resolved by commit order.
-- Landing is guarded (`gates/gate3/tools/land.py`): no new duplicate definitions, and no test that passes on main may fail after the change.
-- Two suites: visible tests guide the workers, hidden tests judge. Hidden suites are never committed.
-- No founder phase: the swarm shapes its own extension points within minutes.
-- **Next changes:**
-  - Guard caches main's suite results (Gates 21, 22: same safety, 0.84× and 0.72× the finish on a CPU-bound machine). Key the cache by code content, not commit: half of main's commits are lock commits that change no code (Gate 22). Give swarms about a core per worker.
-  - Modules register themselves, which removes most conflicts.
-  - `land.py --continue` squashes the fix into the blocked commit, so every commit on main passes.
-- **Intent interface** (Gates 3, 4):
-  - Write every answer into a shared test at once.
-  - Label each answer as a ruling on that input only. Builders stretched rulings into rules, within and across functions (Gate 4: about 45 of 139 failing calls).
-  - Planning questions by coverage (Gate 4) and asking about defaults first (Gate 5) did not beat free asking. Don't rely on either.
-  - Spread a fixed budget across functions, about 2 per function before any gets a third. Blocks of 3 lost head to head (Gate 11: 1.25×), and within the same functions the 3rd question added nothing. The value of the 1st and 3rd questions varies with the rule set.
-  - **Step one: the owner gives a decision tour**, one worked example per policy decision, as tests (Gates 13, 14: 57.8% → 89.4% and 42.4% → 95.6% hidden; 67.2% for the same number of builder-chosen answers). Do not add contrast examples (Gate 14: they moved boundaries). **Step two: builders ask questions around it** (95.2% with both). Builder questions alone hit a floor at decisions builders cannot imagine (Gate 12).
-  - **When the owner has documents rather than a list:** ship the handbook, examples an extractor picked and the owner answered, and builder questions together; each layer added (Gate 16: 60.8% → 71.0% → 83.2%). Prefer the owner's own decision list when it can be had (about 10 points better). Treat a document's silence as unknown, not as "standard": a handbook that waved at "the standard" misled builders on an unwritten rule (Gate 16).
-  - **Questions to the owner are plain language** (Gate 25): one real-life situation, amounts in rupees, 2 or 3 lettered choices. All 12 questions workers asked in Gate 25 were in code terms, and the founder delegated after the first; `hive ask` now refuses code words, symbols and status codes.
-  - A question that confirms the builders' guess buys nothing; confirmation does not mean the function is right (Gate 8, conjecture).
-  - **Interview first, but from the decisions the build will make** (Gate 36): questions written from the description alone covered 44% of where the owner differs. Write them from the interface or the builders' plan (conjecture). Save every answer as it comes, answer stale taps, read "you decide" as no rule, and put any answer that contradicts an earlier ruling back to the owner (all in the tool since Gate 36).
-  - **Builds pick up again:** a builder stopped by a usage limit or an expired login waits, tells the owner, and resumes in its own clone (Gate 36; Gate 35's first build was written off).
-  - **Rank the owner's review by where he differs, not by impact** (Gate 30): builders recorded all 6 surprising rules, but impact ranking showed only 3. **Ask open first on high-stakes decisions:** a menu of alternatives led the founder away from his own free-text rule (Gate 30). Check new answers against earlier rulings.
-  - **A stretched answer can cost as much as the answer gains** (Gate 28): a founder's ruling on a wording-only change was stretched into "a different item never matters", which broke a case the swarm would otherwise have passed. Keep labelling each answer as a ruling on that input only, and consider having the owner confirm the rule a builder derives from an answer before it lands.
-  - **Assumption lists need ranking** (Gate 28): 27 items, mostly error handling an owner cannot judge, and the one that mattered appeared only beside a related item. Show the owner the few business defaults that change outcomes, not every guard clause.
-  - **Questions miss the rules that matter most** (Gate 27): builders ask where they are uncertain, and never about a default they are confident in. A real founder's 9 answers changed nothing a no-question swarm did not already get right; all 5 misses were confident defaults that differed from his rule. Next step: an assumption review, where builders list the defaults they applied in plain words for the owner to correct (conjecture, to be tested in Gate 28).
-  - Put the allowed input values (statuses, types, categories) in the spec. Their absence caused the largest losses with a real company's rules (Gate 7).
-  - Read the company's own documents first. They overturned two of the owner's rules before any code was written (Gate 7).
-  - Vary one thing per question. A question that mixed a small group with an invalid value taught the wrong rule (Gate 5, `nps_score`).
-  - **The goal is a complete rule sheet** (Gate 39): builders given every decision in plain words passed 250 of 250 and broke nothing; one example per decision fixed 0.85 and broke 20. Aim every intent channel at getting each decision stated whole.
-  - **A correction amends the rule; it never replaces it** (Gate 39: "mostly right, but you left out a minimum" erased the rate and cap he had just confirmed). An answer in his own words counts as a choice only if it adds nothing the choice lacks. The terminal restates a rule before asking for its correction.
-  - **Unusual input is a business decision** (Gate 39): all 8 decisions the interview never asked were what the product shows for an unreadable date, a lowercase code, separators or leftover fractions. But telling the planner so did not raise coverage (Gate 40), so `inputs=True` stays off.
-  - **Hand over general rules, not case rulings** (Gate 41): adding his answers word for word beside the sheet cost 6.8 points and broke more (16 vs 6). The sheet's merge lost nothing measurable; the loss is that a question about a case returns a rule about that case.
-  - **Builders stay silent; team notes switch on only when they collide** (Gate 51: size alone no longer turns them on; at 12 builders they were not faster) (Gates 43–44: a message board added nothing at 3–6 builders). A note is one line in a landing's commit, carried by git, not a chat. It turns on for 10+ builders or at 0.5 collisions per landing (conjecture, the measured 12-worker rate was 0.48); every rebase conflict shows the recent notes. Untested where it could matter: a large, tightly coupled codebase.
-  - **Hand over a sheet written from the built code** (Gate 42, synthetic owner: 99.6% vs 68.4% from the interview): every behaviour as a whole rule; the owner marks what is wrong, says it right, adds what is missing; the changes go to a fix round. In the tool (`hive/codesheet.py`, `start.handover`). Keep the interview before the build for the decisions that change what gets built.
+What Hive is today. The evidence for each part is in §2 and `docs/research_to_product.md`; how to use it is in `README.md`.
+
+- **The owner's side (his phone):**
+  - "Set me up" first asks who he is (a business, a developer with a product, or something new) and follows that path.
+  - Business goals become a plan grounded in what the planner saw. How prices are shown is in scope; what he charges is not.
+  - Particular tasks and technical instructions are restated and priced, then built on his yes.
+  - Screenshots on any screen, of the pages he names. A test deploy on his own cloud machine when no host is set up: two hours at a private link, then taken down.
+  - "Ship it" sends a pull request; "put it live" works only after his engineer merges; "undo that" works at every stage.
+  - Customer complaints are traced to his rules or to a fault.
+  - A morning brief at his local time.
+  - "I'm sleepy" moves the work to the cloud (handed over, restarted there), or keeps this computer on, stops, or builds overnight.
+  - Expired AWS and GitHub logins are renewed from his phone.
+  - Every reply is plain: the answer first, short (`explain.PLAIN`).
+- **His intent:**
+  - Builders ask first, in plain situations, edge cases included. They never ask what his rules, documents or notes already settle.
+  - With the owner there and 3+ builders, one builder owns his decisions (Gates 74-75).
+  - After a build whose builders asked fewer than 3 questions: the code sheet, then spot checks, the ordinary case first, at most 6.
+  - Before every delivery: the goal's stated interfaces, his own examples run through the product's functions, and every test.
+  - Memory of his rulings and notes. Contradictions are put to him; the latest word wins.
+- **His data:** read-only sources (site, admin or analytics address with its key, SQLite, Postgres, MySQL, spreadsheets, files).
+  - One checked SELECT at a time, in a read-only session, at most 200 rows. Keys stay in `~/.hive/`.
+  - Questions about his figures are answered from it; plans see a summary; what only the data shows is explained from the data before he is asked.
+- **The builders:**
+  - Silent. Each claims an area (derived from the goal when none are configured), works in its own clone, and lands through the guard.
+  - The guard refuses a broken passing test, a duplicate definition or a secret. Main's test results are cached.
+  - The swarm law sizes the team. Claude, Codex and Gemini mix in one team.
+  - A project with no tests first gets a safety net that pins today's behaviour.
+- **Hard limits:** never his main branch, never skipping tests, never live without his engineer's merge, never a write to his data.
 
 ## 8. Open questions, most important first
 
-00000. **Does a real founder run his company through Hive? (Nov 14 2026)** Flown with a simulated founder in Gate 108: after its fixes, 10 of 10 figure answers, the data-only rule found with its condition, screens and a built plan. Still open: a repeat of run 3 (one clean run so far); why plans never name the price of one lunch; whether stepping away to the cloud works end to end on AWS. Open: does a founder finish "set me up"? Will he hand over a read-only login? Are answers from his data right, and checked against his own admin panel? Does a developer's path fit a developer? Needs a real founder and a real developer, each on their own product.
-0000. **Can Hive find what the product doesn't show? (after Gate 106)** The only miss in 9 was a reward that exists in his payouts but not on the site. Candidate: one more question when a goal touches money or promises ("anything you offer that the site doesn't say?"); or reading his business notes for offers. Also open: a real product, where problems are not planted in plain sight.
-0000. **Does a picture from the wild work as well? (after Gate 105)** Gate 105's targets were clean one-page designs in a palette models know (18/18 with the picture). Open: a real screenshot of another site (noisy, other content, several sections), a picture of a whole app, and the founder's own pictures from his phone.
-000. **Will a real owner read and correct a code sheet?** With a synthetic owner, the corrected code sheet gave 99.6% (Gate 42). A real build's sheet runs to 50–80 rules; Gates 30–35 found real owners audit long lists of builder decisions poorly, though in Gate 38 the founder confirmed a 13-rule sheet of his own rules. Needs the founder: one real feature, the code sheet on his phone, his marks against his own later verdicts.
-000a2. **Answered (Gate 42, synthetic):** a sheet written from the built code, corrected by the owner, nearly matches his complete sheet.
-000a. **Answered (Gate 41):** keeping his rulings whole beside the sheet does not help (−6.8; more stretching).
-000b. **Answered (Gate 40):** telling the planner that unusual input is an owner decision did not raise coverage (0.64 vs 0.76).
+1. **Does a real founder run his company through Hive?** Every result since Gate 40 is from a simulated owner. Plan: `docs/founder_session.md`, on his own product. Inside it:
+   - Will he read and correct a code sheet, and is a verdict given while looking at what was built stable a day later (Gate 45 day 2, never run)?
+   - Do builders' questions still win when his answers drift (Gates 36-38)?
+2. **A real developer, and a second company.** Onboarding's developer path has only been unit-tested. Every real-company result rests on one founder.
+3. **The real-world paths not flown:**
+   - the move to AWS with a running build restarted there;
+   - the test deploy on AWS and its take-down;
+   - expired logins renewed from the phone, against real AWS and GitHub;
+   - a real host's preview and going live.
+4. **Does the planner's price rule replicate?** It found the hidden price of one lunch in Gate 108 run 4 (0 of 3 before), once, on one company. Next: a second mock company in another trade.
+5. **What neither the product nor the data shows** (Gate 106's miss was in the data, and Gate 108 found it there). Still open: what lives only in his head.
+6. **Pictures from the wild** (Gate 105's targets were clean designs): a real site's screenshot, a whole app, his own phone photos.
+7. **Where the owner is surprising.** Intent channels add value only where his rule differs from the builders' default (Gates 27-29). An assumption review (Gate 28) was never measured with him.
+8. **Does a flight log cut what he reads on the next build** (Gate 61 left it open)?
+9. **Lab-scale questions:**
+   - the intent curve (hidden correctness against 0 to 300 answered questions);
+   - the guard's floor on small machines;
+   - 20+ builders;
+   - turning intent into tests automatically;
+   - breakers at scale;
+   - code maps on codebases much larger than 85,000 lines.
 
-00. **Answered, no (Gate 38):** confirming a decision as a general rule does not make it stable. His confirmed rules matched his next-day verdicts on 2 of 11, the same as raw answers. Open in its place: is a verdict given while looking at what was built (the code sheet) stable? If even that drifts, the referee itself is unstable, and Hive should treat his latest word as the rule and make changing it cheap.
-00b. **Answered (Gate 37):** where to ask. Questions written from the code's decisions cover his surprising rules (6 of 6). Questions written from the description do not (4 of 9 in Gate 36, 3 of 9 decisions-first).
-0000. **Is Hive better than one agent that asks?** In the wind tunnel, Hive now matches it (Gate 68: 98.4% each, once Hive's builders ask first), but does not beat it on one feature, and memory did not compound across features (Gates 67, 69). (a) Overnight, saved questions answered in the morning replace the hand-over (Gate 70: 94.2 vs 75.0%; shipped). As flown, about 25 of 27 after the morning (Gates 76-77); splitting the night builders added +0.7 (Gate 77, not shipped). Untested: a short interview before he leaves. (b) with a real founder, whose answers drift, do questions still win (needs him: Gate 45 day 2 with builders asking)? (c) Hive's edge over one agent is the engineering (Gate 50: 3×; Gate 72: 2.4-7× to 95%) and working while he is away (Gate 70); on decisions the owner's pace binds both (Gates 71-72). Answered (Gates 74-75): with one builder owning the owner's decisions, the swarm is as right as one agent or more, and on an engineering-heavy job reaches that accuracy in 0.45× the time.
-000c. **Answered (Gate 63): spot-check the touched parts too.** +8 of 50 decisions, +7.6 hidden; now in the hand-over. Open in its place: how many cases will a real founder read? A skimmer may now see 40–70 after the list. Ranking cases by what is at stake, and stopping when he tires, is the next lever (needs the founder, Gate 45).
-000g. **Answered in part (Gate 84): skipping the review is safe for stated interfaces now.** A check of the goal's stated names, arguments and dict-result keys repaired Gate 83's build (14 -> 26/27) and raised no false alarm in two flights. Unchecked: behaviour the goal states in words, and results not written as dict literals.
-000f. **Answered for 85,000 lines (Gates 78-79): a map of the code does not help builders.** Unguided, nobody opened it; guided by graphify's rule and hook, on bug reports, builders ran it once each at most and kept grepping; no saving. Untested: far larger codebases, or symptoms that do not grep to their cause.
-000e. **Does a flight log cut what the owner reads on the next build (Gate 61 left it open)?** Confirmed outcomes survived a clean-up without one. The untested value is asking less: a later build's code sheet and spot checks covering only what the log does not already pin down. And a task that pulls against an old decision was not tried.
-000d. **Answered for Claude models (Gate 62): a different model does not disagree where it matters** (Opus 25%, Haiku 20%, all three 29% of the first build's errors). A second vendor is untested and unlikely to differ much.
-0. **Cases where the owner is surprising.** Intent channels can only add value where the owner's rule differs from builders' defaults (Gates 27, 28: 4 of 10, then 1 of 15). Ask the owner first what people usually get wrong about the business, and build cases there. Then rerun the assumption review with a ranked, business-only list and the founder reviewing blind.
-0b. **The assumption review (Gate 28, unmeasured).** Builders list the defaults they applied in plain words, and the owner marks the wrong ones. Does this recover the head-only rules that live questions miss (Gate 27: 6/10 with or without questions)?
-1. **The intent curve.** How does hidden correctness grow with the number of answered values: 0, 10, 30, 100, 300 questions, repeated? This would turn limit 7 from evidence into a measured law.
-2. **Real owners.** Every owner so far was an agent that wrote its own rules. Does the documented-owner interface hold with a real company's documents and a person answering? Does a cheap elicitation step ("here are the decisions we found; which are missing?") recover the unwritten ones (Gate 17's remaining gap)?
-3. **The guard's floor.** CPU per guard check sets the finish on small machines (Gate 21: 3.5 → 12.1 minutes from 24 to 4 CPUs). Caching saved 16%; the model puts the floor near 5.9 minutes on that load. Does a near-100% cache plus checking only touched categories reach it without letting regressions through?
-4. **The largest swarm this lab allows**: 20 workers with largest-first claiming.
-5. **Turning intent into tests automatically**: the referee as the product.
-6. **Breakers at scale**: do they shorten the 31-hour unseen-bug lifetime?
+**Answered (kept short; the evidence is in §2 and §5):**
+- A code sheet corrected by the owner nearly matches his complete sheet (Gates 42, 44; synthetic owner).
+- Keeping his rulings beside the sheet does not help (Gate 41).
+- Telling the planner unusual input is his decision does not raise coverage (Gate 40).
+- A rule he confirmed does not predict his next-day verdict (Gate 38).
+- Ask from the code's decisions, not the description (Gate 37).
+- Spot-check the touched parts too (Gate 63).
+- When the review is skipped, the stated interfaces are checked (Gate 84).
+- A code map does not help builders at 85,000 lines (Gates 78-79).
+- Other Claude models do not disagree where it matters (Gate 62).
+- Talking, a lead, bigger models and memory did not help (Gates 43-46, 51, 64-69).
+- A founder can run a company's numbers through Hive with a simulated owner (Gate 108).
 
 ## 9. Next experiments, exactly
 
-00. **Code sheet with the real founder** (needs about 20 minutes of his time, after Gate 38). A real feature, built once; Hive's hand-over shows the code sheet on his phone; measure rules read, marked, time, and agreement with his verdicts on a held-out referee set.
+1. **The founder session** on his real product: `docs/founder_session.md`. It needs about an hour of his time.
+2. **The AWS flight**, in one session:
+   - "I'm sleepy" with a running build: the move, the restart there, his computer off;
+   - "send me a link" as a test deploy on that machine, then "take it down";
+   - the machine deleted, with the work back home.
 
-0. **Gate 45: is a verdict on the code sheet stable a day later?** Registered. The founder reviews the paged code sheet of one built feature on his phone (day 1); a day later, a fresh referee. Measure his marks against his own day-2 verdicts, against Gate 38's 2 of 11.
-1. **Owner-chosen examples on real rules** (needs the owner's time): the founder writes one example per decision for Gate 7's functions, without seeing the QA list; compare with the same number of builder questions. Tests the Gate 18 conjecture.
-2. **The documented-owner interface on real documents** (needs the company's policy pages).
-2. **Repeat Gate 11 on a new rule-giver** (about $8.4).
-3. **Intent curve** (about 1.7M tokens per repeat). Fresh rules; teams of 3 with 0, 10, 30, 100 and 300 questions; then repeat. Fit hidden error against answered values, and register the form of the fit before the repeat.
-4. **Content-keyed guard cache** (about $30): key main's results by the tree hash of the tested code so lock commits hit. Prediction: ≥ 85% hits; ratio to Gate 3's guard ≤ 0.7 (noisy).
-5. **Self-registering modules** at 12 workers: conflicts per landing below 0.2.
+   AWS is signed in on the laptop (account …1696). It needs his yes for about $1.
+3. **Gate 108 on a second mock company** in another trade, with predictions registered first: the planner's price rule and the data answers, away from Dabba Days.
+4. **A real developer's onboarding** on their own product.
+5. **The intent curve** (about 1.7M tokens per repeat): fresh rules; teams of 3 with 0, 10, 30, 100 and 300 questions; then repeat.
+
+The day-to-day queue and session handoff live in `lab/QUEUE.md`.
 
 ## Related systems
 
@@ -534,6 +543,13 @@ Rules of the lab:
 - Give 95% intervals clustered by function, say when a comparison is observational, and remember that one run per team is not a replication.
 
 ## 12. Changelog
+
+- **Nov 14 2026 (IST), Gate 108 run 4, real databases, logins, test deploys, BRAIN tidied:**
+  - **Gate 108 run 4** replicated run 3. After the planner's price rule ("how prices are shown is in scope"), the plan found all 4 planted problems.
+  - **Postgres and MySQL** read with read-only logins (5 of 5 right on each). Missing drivers are said plainly (`hive-swarm[data]`).
+  - **Logins** (`hive/logins.py`): an expired AWS or GitHub sign-in is renewed from his phone (the link, his code, a question before switching accounts), before the cloud, the test deploy and "ship it".
+  - **Test deploys** (`hive/trydeploy.py`): with no host set up, "send me a link" can put static pages on his AWS machine at a private link for two hours. "Take it down" or the two hours end it, and a machine made for it is deleted. Deleting the cloud machine takes its test page too.
+  - §7-9 rewritten: the current design, open questions renumbered with answered ones folded in, next experiments current. The old text is in git history.
 
 - **Nov 14 2026 (IST), plain replies for every founder** (the owner: "anything must be answered simply; any founder can be the case"). One rule (`explain.PLAIN`: the answer first, short sentences, everyday words, nothing he didn't ask for, no filler) is put into every prompt whose words a founder reads: the voice (greetings, status, replies, the brief), what changed, answers about his product, complaints, answers from his data, what a question means, and how a built part works. Builder instructions and rule sheets are left whole. Tested in `tests/test_explain.py`; tried on the real model with Dabba Days.
 - **Nov 14 2026 (IST), Gate 108 and stepping away:**

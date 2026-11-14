@@ -1,0 +1,610 @@
+{
+ "steps": [
+  {
+   "step": "hello",
+   "said": "hi",
+   "result": "greeting",
+   "minutes": 0.1,
+   "script_left": 0,
+   "hive": [
+    "🐝 Good day, sir. Dabba Days is set up on your computer and ready, though nothing has been built yet. What shall we build first?",
+    "We haven't met properly yet. Say \"set me up\" and I'll get to know your business or your product in about two minutes, or help you start something new."
+   ]
+  },
+  {
+   "step": "onboard",
+   "said": "set me up",
+   "result": "onboard_done",
+   "minutes": 0.3,
+   "script_left": 0,
+   "hive": [
+    "🐝 Let's get you set up. First, which of these is you?",
+    "Very good. 5 quick steps, about two minutes. Say skip to any, or stop to carry on later; I keep everything as you go.",
+    "1 of 5. Your business.\nWhat is it called, what does it do, and who are your customers? A line or two is plenty (🎙 a voice note works too).",
+    "✅ Got it, Dabba Days: Home cooks make lunch and we deliver it to office workers. We deliver Monday to Friday. Our customers are people working in offices.",
+    "2 of 5. Where it runs.\nWhere can I see it? Send its web address.",
+    "3 of 5. Numbers and data.\nI already have the code here (15 files). So I can answer things like \"how many orders this week?\", send me any of these, as many as you like:\n• an admin or analytics address, with its key\n• a database address (please a read-only login)\n• a shared spreadsheet link, or a CSV or Excel file\n\nI only ever read; I never change your data. Keys stay on this computer. Say done when finished.",
+    "✅ dabba database: I can see 8 tables: complaints, cooks, customers, deliveries, payments, payouts, plans, subscriptions.\n\nAnything else? Or say done.",
+    "4 of 5. How you run things.\nAnything written down: policies, FAQ, price list, a pitch deck? Send the files here (PDF, text, CSV), or tell me in a few lines. Say done when finished.",
+    "📚 Read: 13 things kept, and 7 rules for how the product behaves. Anything else, or done?",
+    "5 of 5. Hosting.\nVercel, Netlify, Render, Railway, Fly or Azure? Or say don't know.",
+    "✅ All set, Dabba Days. I know 18 things about your business; read-only access to dabba database.\n\nFrom now on, just tell me what you want. For example:\n• \"how many orders this week?\"\n• \"show me the pricing page on desktop\"\n• \"I want more repeat buyers\"\n• \"add a referral page\"\n\nI'll ask only what I can't work out myself: your own rules for the unusual cases."
+   ]
+  },
+  {
+   "step": "cooks",
+   "said": "How are our cooks paid?",
+   "result": "answered",
+   "minutes": 0.7,
+   "script_left": 0,
+   "hive": [
+    "🐝 Sir, cooks get ₹70 for each lunch they make, paid every Monday for the week before. Your payout records show this happens every week.\n\nOne thing your policy doesn't say: a cook with no complaints in a month gets an extra ₹500, paid with that month's last weekly payout. Is that your rule? I can add it to the policy."
+   ]
+  },
+  {
+   "step": "q1",
+   "said": "How many active subscribers do we have right now?",
+   "result": "data_answered",
+   "minutes": 0.3,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 You have 150 active subscribers right now. Another 17 have paused their subscription and could be won back."
+   ]
+  },
+  {
+   "step": "q2",
+   "said": "How many new subscribers signed up in October?",
+   "result": "data_answered",
+   "minutes": 0.3,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 62 new subscribers signed up in October. 49 are still active, 7 have paused and 6 have cancelled."
+   ]
+  },
+  {
+   "step": "q3",
+   "said": "How many subscribers cancelled in October?",
+   "result": "data_answered",
+   "minutes": 0.3,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 18 subscribers cancelled in October."
+   ]
+  },
+  {
+   "step": "q4",
+   "said": "Which cook had the most complaints in October?",
+   "result": "data_answered",
+   "minutes": 0.4,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 Three cooks tied with 4 complaints each in October: Fatima Sheikh, Sunita Patil and Rehana Begum. Two of Rehana's are still unresolved, and 3 of Sunita's were about cold food."
+   ]
+  },
+  {
+   "step": "q5",
+   "said": "How much skip credit did we give in October?",
+   "result": "data_answered",
+   "minutes": 0.3,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 You gave ₹12,800 in skip credit in October, for 128 skipped deliveries."
+   ]
+  },
+  {
+   "step": "q6",
+   "said": "What is our refund total this month?",
+   "result": "data_answered",
+   "minutes": 0.3,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 You've refunded Rs 1700 so far this month. Separately, customers got Rs 7600 in credits instead of cash refunds."
+   ]
+  },
+  {
+   "step": "q7",
+   "said": "What was our revenue from subscriptions in October?",
+   "result": "data_answered",
+   "minutes": 0.3,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 October subscription revenue was Rs 485,800 from 171 payments. You also paid back Rs 4,610 in refunds that month, all for meals that weren't delivered."
+   ]
+  },
+  {
+   "step": "q8",
+   "said": "Which plan is most popular among active subscribers?",
+   "result": "data_answered",
+   "minutes": 0.3,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 Veg Basic is your most popular plan, with 68 of your 150 active subscribers."
+   ]
+  },
+  {
+   "step": "q9",
+   "said": "Which area has the most active subscribers?",
+   "result": "data_answered",
+   "minutes": 0.4,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 HSR Layout has the most active subscribers, with 40. Koramangala is next with 32."
+   ]
+  },
+  {
+   "step": "q10",
+   "said": "How much did we pay our cooks in October, bonuses included?",
+   "result": "data_answered",
+   "minutes": 0.3,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 You paid your cooks Rs 171,820 in October, including Rs 2,000 in bonuses."
+   ]
+  },
+  {
+   "step": "screen1",
+   "said": "show me the plans page on desktop",
+   "result": "shown",
+   "minutes": 0.0,
+   "script_left": 0,
+   "hive": [
+    "Plans page on desktop\n\nHow does it look, sir? Tell me what's off, or send a picture of what you'd like. [photo 01_plans_html_desktop.png]"
+   ]
+  },
+  {
+   "step": "screen2",
+   "said": "and on tablet?",
+   "result": "shown",
+   "minutes": 0.0,
+   "script_left": 0,
+   "hive": [
+    "Plans page on tablet\n\nHow does it look, sir? Tell me what's off, or send a picture of what you'd like. [photo 01_plans_html_tablet.png]"
+   ]
+  },
+  {
+   "step": "screen3",
+   "said": "show me the sign up page on every screen",
+   "result": "shown",
+   "minutes": 0.1,
+   "script_left": 0,
+   "hive": [
+    "Signup page on phone [photo 01_signup_html_phone.png]",
+    "Signup page on tablet [photo 01_signup_html_tablet.png]",
+    "Signup page on desktop\n\nHow does it look, sir? Tell me what's off, or send a picture of what you'd like. [photo 01_signup_html_desktop.png]"
+   ]
+  },
+  {
+   "step": "goal",
+   "said": "I want more office workers subscribing",
+   "result": "planned",
+   "minutes": 4.1,
+   "script_left": 0,
+   "hive": [
+    "🔎 On it, sir. Let me look at your product with that in mind; a minute or two.",
+    "❓ Before I plan it, one thing your product can't tell me:\nDo you already offer anything the site doesn't mention, such as a trial week, a first-lunch guarantee, or a deal when several people from one office sign up?",
+    "Thank you, sir. Planning with that in mind.",
+    "🧭 Here's what I see, sir. An office worker can't sign up without their company's GST number. They also pay for a full month before tasting a lunch, and the Plans page shows only a monthly total, with nothing on the cost per lunch, credits, refunds or how to stop.\n\nWhat I'd do:\n1. A shorter sign-up form with GST optional: Sign-up asks for 9 things, all required, including a company GST number most office workers don't have, so many can't finish; making GST and desk number optional lets them pay and start.\n2. Show price per lunch and what's protected: The Plans page shows only a monthly total and says nothing about skip credit, unpaid pauses, holidays or missed-lunch refunds, so a first-time buyer can't tell what one lunch costs or what happens on days they're away.\n3. A one-week trial before the full month: Sign-up charges a whole month today before the customer has tasted anything, a big first step for one office worker; a week of 5 lunches lets them try it before committing.\n\nI'll build them one after another and show you each. Your main version isn't touched. All of it: about $1.50.",
+    "❓ One thing only you can decide (A one-week trial before the full month):\nWhat should a trial week (5 lunches) cost?",
+    "🛠 Right, sir. Building the first step now: A shorter sign-up form with GST optional. I'll show you each step as it lands; say \"status\" any time.",
+    "✅ Step 1 of 3 done: A shorter sign-up form with GST optional.",
+    "Signup page [photo 01_signup_html.png]",
+    "Account page [photo 02_account_html.png]",
+    "Become a cook page [photo 03_become_a_cook_html.png]",
+    "🛠 Step 2 of 3: Show price per lunch and what's protected. On it.",
+    "✅ Step 2 of 3 done: Show price per lunch and what's protected.",
+    "Home page [photo 01_home.png]",
+    "Plans page [photo 02_plans_html.png]",
+    "Signup page [photo 03_signup_html.png]",
+    "🛠 Step 3 of 3: A one-week trial before the full month. On it.",
+    "✅ Step 3 of 3 done: A one-week trial before the full month.",
+    "Plans page [photo 01_plans_html.png]",
+    "Signup page [photo 02_signup_html.png]",
+    "Home page [photo 03_home.png]",
+    "🎉 That's the plan done, sir. 12 tests, all passing. All 7 that passed before still pass.\n\nTell me what's off, or say ship it and it all goes to your engineer as one pull request."
+   ]
+  }
+ ],
+ "transcript": [
+  [
+   "owner",
+   "hi"
+  ],
+  [
+   "hive",
+   "🐝 Good day, sir. Dabba Days is set up on your computer and ready, though nothing has been built yet. What shall we build first?"
+  ],
+  [
+   "hive",
+   "We haven't met properly yet. Say \"set me up\" and I'll get to know your business or your product in about two minutes, or help you start something new."
+  ],
+  [
+   "owner",
+   "set me up"
+  ],
+  [
+   "hive",
+   "🐝 Let's get you set up. First, which of these is you?"
+  ],
+  [
+   "owner",
+   "[tap] onb|who|business"
+  ],
+  [
+   "hive",
+   "Very good. 5 quick steps, about two minutes. Say skip to any, or stop to carry on later; I keep everything as you go."
+  ],
+  [
+   "hive",
+   "1 of 5. Your business.\nWhat is it called, what does it do, and who are your customers? A line or two is plenty (🎙 a voice note works too)."
+  ],
+  [
+   "owner",
+   "Dabba Days. Home cooks make lunch and we deliver it to office workers in Bengaluru, Monday to Friday. Our customers are people working in offices in six areas."
+  ],
+  [
+   "hive",
+   "✅ Got it, Dabba Days: Home cooks make lunch and we deliver it to office workers. We deliver Monday to Friday. Our customers are people working in offices."
+  ],
+  [
+   "hive",
+   "2 of 5. Where it runs.\nWhere can I see it? Send its web address."
+  ],
+  [
+   "owner",
+   "[tap] onb|skip|2"
+  ],
+  [
+   "hive",
+   "3 of 5. Numbers and data.\nI already have the code here (15 files). So I can answer things like \"how many orders this week?\", send me any of these, as many as you like:\n• an admin or analytics address, with its key\n• a database address (please a read-only login)\n• a shared spreadsheet link, or a CSV or Excel file\n\nI only ever read; I never change your data. Keys stay on this computer. Say done when finished."
+  ],
+  [
+   "owner",
+   "here is our database /home/node/f108/dabba-data/dabba.db"
+  ],
+  [
+   "hive",
+   "✅ dabba database: I can see 8 tables: complaints, cooks, customers, deliveries, payments, payouts, plans, subscriptions.\n\nAnything else? Or say done."
+  ],
+  [
+   "owner",
+   "done"
+  ],
+  [
+   "hive",
+   "4 of 5. How you run things.\nAnything written down: policies, FAQ, price list, a pitch deck? Send the files here (PDF, text, CSV), or tell me in a few lines. Say done when finished."
+  ],
+  [
+   "owner",
+   "our policy [document: /home/node/f108/dabba-data/docs/policy.md | policy.md]"
+  ],
+  [
+   "hive",
+   "📚 Read: 13 things kept, and 7 rules for how the product behaves. Anything else, or done?"
+  ],
+  [
+   "owner",
+   "done"
+  ],
+  [
+   "hive",
+   "5 of 5. Hosting.\nVercel, Netlify, Render, Railway, Fly or Azure? Or say don't know."
+  ],
+  [
+   "owner",
+   "[tap] onb|skip|5"
+  ],
+  [
+   "hive",
+   "✅ All set, Dabba Days. I know 18 things about your business; read-only access to dabba database.\n\nFrom now on, just tell me what you want. For example:\n• \"how many orders this week?\"\n• \"show me the pricing page on desktop\"\n• \"I want more repeat buyers\"\n• \"add a referral page\"\n\nI'll ask only what I can't work out myself: your own rules for the unusual cases."
+  ],
+  [
+   "owner",
+   "How are our cooks paid?"
+  ],
+  [
+   "hive",
+   "🐝 Sir, cooks get ₹70 for each lunch they make, paid every Monday for the week before. Your payout records show this happens every week.\n\nOne thing your policy doesn't say: a cook with no complaints in a month gets an extra ₹500, paid with that month's last weekly payout. Is that your rule? I can add it to the policy."
+  ],
+  [
+   "owner",
+   "How many active subscribers do we have right now?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 You have 150 active subscribers right now. Another 17 have paused their subscription and could be won back."
+  ],
+  [
+   "owner",
+   "How many new subscribers signed up in October?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 62 new subscribers signed up in October. 49 are still active, 7 have paused and 6 have cancelled."
+  ],
+  [
+   "owner",
+   "How many subscribers cancelled in October?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 18 subscribers cancelled in October."
+  ],
+  [
+   "owner",
+   "Which cook had the most complaints in October?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 Three cooks tied with 4 complaints each in October: Fatima Sheikh, Sunita Patil and Rehana Begum. Two of Rehana's are still unresolved, and 3 of Sunita's were about cold food."
+  ],
+  [
+   "owner",
+   "How much skip credit did we give in October?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 You gave ₹12,800 in skip credit in October, for 128 skipped deliveries."
+  ],
+  [
+   "owner",
+   "What is our refund total this month?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 You've refunded Rs 1700 so far this month. Separately, customers got Rs 7600 in credits instead of cash refunds."
+  ],
+  [
+   "owner",
+   "What was our revenue from subscriptions in October?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 October subscription revenue was Rs 485,800 from 171 payments. You also paid back Rs 4,610 in refunds that month, all for meals that weren't delivered."
+  ],
+  [
+   "owner",
+   "Which plan is most popular among active subscribers?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 Veg Basic is your most popular plan, with 68 of your 150 active subscribers."
+  ],
+  [
+   "owner",
+   "Which area has the most active subscribers?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 HSR Layout has the most active subscribers, with 40. Koramangala is next with 32."
+  ],
+  [
+   "owner",
+   "How much did we pay our cooks in October, bonuses included?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 You paid your cooks Rs 171,820 in October, including Rs 2,000 in bonuses."
+  ],
+  [
+   "owner",
+   "show me the plans page on desktop"
+  ],
+  [
+   "hive",
+   "Plans page on desktop\n\nHow does it look, sir? Tell me what's off, or send a picture of what you'd like. [photo]"
+  ],
+  [
+   "owner",
+   "and on tablet?"
+  ],
+  [
+   "hive",
+   "Plans page on tablet\n\nHow does it look, sir? Tell me what's off, or send a picture of what you'd like. [photo]"
+  ],
+  [
+   "owner",
+   "show me the sign up page on every screen"
+  ],
+  [
+   "hive",
+   "Signup page on phone [photo]"
+  ],
+  [
+   "hive",
+   "Signup page on tablet [photo]"
+  ],
+  [
+   "hive",
+   "Signup page on desktop\n\nHow does it look, sir? Tell me what's off, or send a picture of what you'd like. [photo]"
+  ],
+  [
+   "owner",
+   "I want more office workers subscribing"
+  ],
+  [
+   "hive",
+   "🔎 On it, sir. Let me look at your product with that in mind; a minute or two."
+  ],
+  [
+   "hive",
+   "❓ Before I plan it, one thing your product can't tell me:\nDo you already offer anything the site doesn't mention, such as a trial week, a first-lunch guarantee, or a deal when several people from one office sign up?"
+  ],
+  [
+   "owner",
+   "No, nothing off the site. No trial week, no guarantee, no office deal. I'd be open to a cheap trial week if it brings people in."
+  ],
+  [
+   "hive",
+   "Thank you, sir. Planning with that in mind."
+  ],
+  [
+   "hive",
+   "🧭 Here's what I see, sir. An office worker can't sign up without their company's GST number. They also pay for a full month before tasting a lunch, and the Plans page shows only a monthly total, with nothing on the cost per lunch, credits, refunds or how to stop.\n\nWhat I'd do:\n1. A shorter sign-up form with GST optional: Sign-up asks for 9 things, all required, including a company GST number most office workers don't have, so many can't finish; making GST and desk number optional lets them pay and start.\n2. Show price per lunch and what's protected: The Plans page shows only a monthly total and says nothing about skip credit, unpaid pauses, holidays or missed-lunch refunds, so a first-time buyer can't tell what one lunch costs or what happens on days they're away.\n3. A one-week trial before the full month: Sign-up charges a whole month today before the customer has tasted anything, a big first step for one office worker; a week of 5 lunches lets them try it before committing.\n\nI'll build them one after another and show you each. Your main version isn't touched. All of it: about $1.50."
+  ],
+  [
+   "owner",
+   "[tap] 🚀 Yes, do it all"
+  ],
+  [
+   "hive",
+   "❓ One thing only you can decide (A one-week trial before the full month):\nWhat should a trial week (5 lunches) cost?"
+  ],
+  [
+   "owner",
+   "[tap] A cheaper first week, e.g. ₹500 for any plan"
+  ],
+  [
+   "hive",
+   "🛠 Right, sir. Building the first step now: A shorter sign-up form with GST optional. I'll show you each step as it lands; say \"status\" any time."
+  ],
+  [
+   "hive",
+   "✅ Step 1 of 3 done: A shorter sign-up form with GST optional."
+  ],
+  [
+   "hive",
+   "Signup page [photo]"
+  ],
+  [
+   "hive",
+   "Account page [photo]"
+  ],
+  [
+   "hive",
+   "Become a cook page [photo]"
+  ],
+  [
+   "hive",
+   "🛠 Step 2 of 3: Show price per lunch and what's protected. On it."
+  ],
+  [
+   "hive",
+   "✅ Step 2 of 3 done: Show price per lunch and what's protected."
+  ],
+  [
+   "hive",
+   "Home page [photo]"
+  ],
+  [
+   "hive",
+   "Plans page [photo]"
+  ],
+  [
+   "hive",
+   "Signup page [photo]"
+  ],
+  [
+   "hive",
+   "🛠 Step 3 of 3: A one-week trial before the full month. On it."
+  ],
+  [
+   "hive",
+   "✅ Step 3 of 3 done: A one-week trial before the full month."
+  ],
+  [
+   "hive",
+   "Plans page [photo]"
+  ],
+  [
+   "hive",
+   "Signup page [photo]"
+  ],
+  [
+   "hive",
+   "Home page [photo]"
+  ],
+  [
+   "hive",
+   "🎉 That's the plan done, sir. 12 tests, all passing. All 7 that passed before still pass.\n\nTell me what's off, or say ship it and it all goes to your engineer as one pull request."
+  ]
+ ],
+ "summary": {
+  "minutes": 8.4,
+  "builders_cost": 0.81,
+  "plan_cost": 0.26493279999999997,
+  "reader_calls": 26,
+  "plan": [
+   {
+    "title": "A shorter sign-up form with GST optional",
+    "why": "Sign-up asks for 9 things, all required, including a company GST number most office workers don't have, so many can't finish; making GST and desk number optional lets them pay and start.",
+    "seen": "signup.html: 9 fields, among them 'Company GST number' and 'Floor and desk number', with the note 'All fields are required. Your first month is charged today.'",
+    "build": "In signup.html, keep name, email, phone, company name, office address, area and plan as required (add the `required` attribute). Mark 'Company GST number' as '(optional, only if you want a company invoice)' and 'Floor and desk number' as '(optional)', without `required`. Change the note to 'Fields marked optional can be left blank. Your first month is charged today.' Keep the field names, area list, plan list and button. In test_dabba.py add test_signup_gst_optional: read signup.html and check that the gst input has no `required` attribute and that name, email, phone and address do.",
+    "look": false,
+    "decide": "",
+    "options": []
+   },
+   {
+    "title": "Show price per lunch and what's protected",
+    "why": "The Plans page shows only a monthly total and says nothing about skip credit, unpaid pauses, holidays or missed-lunch refunds, so a first-time buyer can't tell what one lunch costs or what happens on days they're away.",
+    "seen": "plans.html: '₹2,400 / month' etc., with only 'Every plan is 20 lunches a month... Billed monthly.' index.html says only 'Skip a lunch and get credit' with no amount. The rules exist only on skip.html and pause.html, which are reached from My account, and in billing.py (SKIP_CREDIT_RS=100, MAX_PAUSE_",
+    "build": "In billing.py add price_per_lunch(plan_price_rs) returning plan_price_rs // LUNCHES_PER_MONTH, and have refund_for_missed_lunch use it. In plans.html, under each monthly price, add a muted line: 'That's ₹120 a lunch' / '₹150 a lunch' / '₹170 a lunch'. Below the cards, add a card 'What you're covered for' with: 'Skip a lunch before 9 pm the night before: ₹100 off your next bill.'; 'Pause up to 10 days a month. Paused days aren't charged.'; 'No lunch and no charge on Karnataka public holidays.'; 'If your cook is sick we send another cook from your area. If no one can cook, that lunch is refunded in full.'; 'A missing lunch is always refunded.' On index.html change 'Skip a lunch and get credit.' to 'Skip before 9 pm the night before and get ₹100 off your next bill.' Keep the existing prices. In test_dabba.py add tests: price_per_lunch(2400)==120, (3000)==150, (3400)==170, and plans.html contains '₹120', '₹150', '₹170', '9 pm', '10 days' and 'public holidays'.",
+    "look": true,
+    "decide": "",
+    "options": []
+   },
+   {
+    "title": "A one-week trial before the full month",
+    "why": "Sign-up charges a whole month today before the customer has tasted anything, a big first step for one office worker; a week of 5 lunches lets them try it before committing.",
+    "seen": "signup.html: 'Your first month is charged today.' and a 'Pay and subscribe' button with no smaller option. plans.html offers only monthly plans. You said there's no trial now but you'd be open to a cheap trial week.",
+    "build": "In billing.py add TRIAL_LUNCHES = 5 and trial_week_price(plan_price_rs) returning the trial amount you choose (if it's the normal rate, price_per_lunch(plan_price_rs) * TRIAL_LUNCHES). In signup.html add a 'Start with' choice: 'A trial week (5 lunches)' or 'A full month (20 lunches)', and show the amount charged today for the chosen plan. When trial is picked, change the note to 'Your trial week is charged today. After it, you can carry on monthly or stop.' On plans.html add a line above the Subscribe button: 'Not sure? Try a week first: 5 lunches for ₹X.' using your amounts per plan. Keep the existing monthly prices and all skip/pause rules. In test_dabba.py, test trial_week_price for all 3 plans and check that signup.html and plans.html mention 'trial week'.",
+    "look": false,
+    "decide": "What should a trial week (5 lunches) cost?",
+    "options": [
+     "Same per-lunch rate: ₹600 / ₹750 / ₹850",
+     "A cheaper first week, e.g. ₹500 for any plan",
+     "No trial week for now"
+    ]
+   }
+  ]
+ }
+}

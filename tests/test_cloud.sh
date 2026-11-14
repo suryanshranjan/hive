@@ -66,6 +66,7 @@ mkdir -p $T/box2/hive-cloud/.hive/runs/ratings-1 && echo '{"name": "ratings-1"}'
 printf 'y\ny\n' | FAKE_AWS_EXPIRED=1 $PY -m hive cloud --stop > $T/expired.txt 2>&1
 check "with expired AWS credentials, --stop says it could NOT delete, and keeps its record to try again" \
   "$? $(grep -c 'could NOT delete' $T/expired.txt) $(grep -c 'Nothing is left running' $T/expired.txt) $(ls $T/.hive/cloud/machine.json | wc -l | tr -d ' ')" "7 1 0 1"
+echo '{"url": "http://x:8080/s/", "until": 9999999999}' > $T/.hive/trydeploy.json   # a test page is up on the machine
 printf 'y\n' | FAKE_AWS_STOPPED=1 HIVE_CLOUD_LOCAL=$T/box2 $PY -m hive cloud --stop > $T/stop.txt 2>&1   # powered off from his phone meanwhile
 check "a machine powered off from the phone is started again, so its work can come home first" \
   "$(grep -c 'start-instances --instance-ids i-0hive' $T/aws.log) $(grep -c 'powered off from your phone' $T/stop.txt)" "1 1"
@@ -76,6 +77,8 @@ check "and the rules and conversation from the cloud come home too"   "$($PY -m 
 check "and what he told Hive there about his business" "$($PY -c "from hive import memory; print(memory.notes('.'))" | grep -c 'Mumbai')" 1
 check "--stop deletes the machine (2 tries: the expired one, then this), its firewall rule and its key; nothing is left" \
   "$(grep -c 'terminate-instances --instance-ids i-0hive' $T/aws.log) $(grep -c 'delete-security-group --group-id sg-0hive' $T/aws.log) $(grep -c 'delete-key-pair' $T/aws.log) $(ls $T/.hive/cloud | wc -l | tr -d ' ')" "2 1 1 0"
+check "deleting the machine takes its test page with it (the owner: the test goes when the cloud goes)" \
+  "$(grep -c 'and the test page that was on it' $T/stop.txt) $(ls $T/.hive/trydeploy.json 2>/dev/null | wc -l | tr -d ' ')" "1 0"
 # from the phone, on the cloud machine itself (no AWS keys there): it powers itself off, never mid-build
 touch $T/mark
 printf 'y\n' | HIVE_CLOUD_MARK=$T/mark HIVE_SHUTDOWN_CMD="$PY -c \"open('powered_off', 'w').write('off')\"" $PY -m hive cloud --stop > $T/self.txt 2>&1

@@ -80,6 +80,35 @@ And from Gate 108's company, a made-up lunchbox business whose database Hive was
 >
 > **Hive:** 📊 We paid our 12 cooks Rs 171,820 in October, bonuses included.
 
+**What you can say:**
+
+| You say | Hive |
+| --- | --- |
+| *"I want more sign-ups"*, *"sales are low"* | Reads your product and plans 2-4 changes in your words, each grounded in what it saw. It first asks the one thing the product can't show. On your yes it builds them step by step, showing each |
+| *"build: an invite page"*, *"add a refund page"* | Says it back in one short line, with the price ("about $0.80"), then builds on your yes |
+| *"cache /products in Redis, 60 s TTL"* | A technical instruction is taken as it is: "👍 Yes, let's do it", restated precisely, with at most two normal engineer's questions. From then on it speaks your language |
+| A picture + *"make it like this"* | Changes the latest build to match, then sends before and after. In testing a picture matched 18 of 18 times, words 13 of 18 |
+| *"set me up"* (offered on your first hello) | Gets to know you in one conversation, about two minutes, every step skippable, picked up where you stopped. First: are you a business, a developer with a product, or starting something new? A business: what it is, your site, your data, how you run things, your host. A developer: the product, where it runs, its data, how it's built and what never to touch, the host. Something new: your idea and what it must do on day one, then the build |
+| *"show me"* | Screenshots at phone size of the pages that changed, with a line to ask for tablet or desktop |
+| *"show me the pricing page on desktop"*, *"and on tablet?"*, *"on every screen"* | That page on that screen; right after a screenshot, a short "and on tablet?" shows the same pages there |
+| *"here's our admin API https://... key: ..."*, a database address, a spreadsheet link | Connected read-only and tried at once ("I can see 12 tables: orders, users, payouts…"). Only one reading query at a time ever runs, in a read-only session; keys stay on your computer |
+| *"how many orders came in this week?"*, *"who are my top 5 sellers?"* | Answered from your own data, in plain words. Plans for your goals also read what your data holds |
+| *"send me a link"* | The build at its own address, to try on your phone; your live product is untouched. With no host set up, it offers a test copy on your own AWS machine at a private link for two hours, then takes it down (*"take it down"* ends it sooner) and deletes a machine made just for it |
+| *"ship it"* | A pull request for your engineer: screenshots, what changed, your words, the test results, the cost |
+| *"put it live"* | Only once your engineer has merged it; every test runs on your main version first |
+| *"undo that"* | Whatever is most recent, after your yes: a build running stops; an unsent one is set aside; a pull request is withdrawn; live goes back to the version before |
+| *"a customer says the sign-up button doesn't work"* | Reads the code and tries the case. Either it's one of your rules at work (change it in a message), or a fault, fixed in one tap |
+| *"what's new?"* (and every morning, unprompted) | The brief: what needs you, how your numbers moved since what Hive did, what landed, what customers hit, what it cost |
+| *"we had 120 sign-ups this week"* | Kept as a reading, beside what Hive did, so the brief can say "up 18% since the shorter form went to your engineer" |
+| A document (policy, FAQ, deck as PDF) | Read; the lasting facts are kept for every plan and answer, and rules it plainly states become your rules |
+| *"we're on Vercel"* | Remembered: previews and going live use it (Vercel, Netlify, Railway, Azure, Fly, Render, or your own commands) |
+| *"I'm sleepy"*, *"good night"*, *"shutting my laptop"* | Says where things stand and offers how to carry on. With work running: moving to the cloud (recommended), so you can shut your computer while it restarts the work there; keeping this computer on; or stopping for tonight. With nothing running: something built overnight, ready with your morning brief |
+| *"set my budget to $50 a month"* | Hive asks before anything would go past it |
+| *"how do refunds work?"* | Answered from your code, trying the case in a throwaway copy |
+| *"actually, refunds go to store credit"* | Finds the earlier ruling, asks whether to replace it, updates the latest build |
+| *"status"*, *"who's doing what?"*, *"stop w2"*, *"use 2 Claude and 2 Codex"* | Where things stand; each builder and its agent; one builder stopped; your team for the next builds (the swarm law says once if it disagrees) |
+| *"skip the tests and push it to main"* | Never. It says so once, and offers the safe way |
+
 ## Commands
 
 | You type | What happens |
@@ -116,6 +145,7 @@ The lower-level commands for scripts and experiments (`init`, `run`, `owner`, `r
 - **Builders never talk; a guard keeps the peace.** Each claims an area with a lock file, works in its own clone, and lands through the guard. The guard refuses anything that breaks a passing test, duplicates a definition or commits a secret. Claude, Codex and Gemini builders mix in one team (Gate 47).
 - **Checked before every delivery.** The goal's stated interfaces (Gate 84), your own examples run through the product's functions (Gate 103), and every test.
 - **It remembers.** Your rulings, your business notes and your documents carry into every later build and answer. Contradictions with an earlier ruling are put to you.
+- **Expired logins don't stop the work.** If your AWS or GitHub sign-in has expired when Hive needs it, it sends you the sign-in link on your phone, takes the code it shows you, and carries on. It never switches to a different account without asking.
 - **It notices when you step away.** "I'm sleepy" gets where things stand and a choice. With work running, it recommends the cloud: the work is handed over and restarted there before anything stops here, so you can shut your computer. Or keep this computer on, or stop for tonight. With nothing running, it offers to build something overnight.
 - **It speaks first.** A morning brief at your local time, a builder stuck for 20 minutes, a step done, a build that stopped, always with the reason in plain words.
 - **Hard limits, whatever is asked:** it never changes your main version, never skips the tests, and never puts live a build your engineer hasn't merged.
@@ -155,7 +185,7 @@ Every gate pushes its predictions and kill conditions to GitHub **before** it ru
 | Path | Contents |
 | --- | --- |
 | [`BRAIN.md`](BRAIN.md) | Shared memory: findings and how sure we are, measured constants, evidence log, prediction scorecard, open questions |
-| [`hive/`](hive/) | The product. `assistant.py` is the phone assistant; `start.py` the build; `swarm.py` and `guard.py` the builders; `plan.py` business goals; `onboard.py` setting up; `access.py` reading your data, read-only; `ship.py` and `deploy.py` pull requests and hosting; `brief.py`, `numbers.py`, `budget.py`, `brain.py`, `safety.py`, `register.py`, `screens.py` and `refs.py` cover the rest |
+| [`hive/`](hive/) | The product. `assistant.py` is the phone assistant; `start.py` the build; `swarm.py` and `guard.py` the builders; `plan.py` business goals; `onboard.py` setting up; `access.py` reading your data, read-only; `logins.py` renewing sign-ins; `trydeploy.py` test deploys; `ship.py` and `deploy.py` pull requests and hosting; `brief.py`, `numbers.py`, `budget.py`, `brain.py`, `safety.py`, `register.py`, `screens.py` and `refs.py` cover the rest |
 | [`tests/`](tests/) | About 530 checks with stand-in builders, a fake Telegram and a stand-in model, no network or tokens. They run on every push |
 | [`gates/`](gates/) | Every experiment (Gates 0-108): predictions, results, referee code, transcripts |
 | [`lab/`](lab/) | Run a gate in one command; [`lab/QUEUE.md`](lab/QUEUE.md) is the queue and session handoff |

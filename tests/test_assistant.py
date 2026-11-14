@@ -4,7 +4,8 @@ usage: python3 tests/test_assistant.py   (run from the hive repo root)"""
 import json, os, subprocess, sys, tempfile, time
 sys.path.insert(0, os.getcwd())
 home = tempfile.mkdtemp(); os.environ['HOME'] = os.environ['USERPROFILE'] = home   # Windows: USERPROFILE
-from hive import assistant, explain, memory, telegram
+from hive import assistant, explain, logins, memory, telegram
+logins.ensure = lambda ch, service, poll=20: True   # signed in (renewal itself: tests/test_logins.py)
 explain.CMD = '"' + sys.executable.replace(chr(92), '/') + '" tests/fake_explain.py'
 memory.DIR = os.path.join(home, '.hive', 'rules')
 assistant.RUNS = os.path.join(home, '.hive', 'runs')
