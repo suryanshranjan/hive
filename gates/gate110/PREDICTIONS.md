@@ -34,3 +34,11 @@
 - One run.
 - Only the install path is flown. The sign-in is already valid, so renewing it from the phone runs only in unit tests (`tests/test_logins.py` §8), An earlier sign-in by hand during set-up did not finish; the old login stayed.
 - Plain static pages; no framework build.
+
+## Amendment before attempt 3 (Nov 15 2026, registered before launch)
+
+Attempt 2 found that Vercel puts a new project's first deployment live, so "send me a link" put the unmerged build at the live address. Fixed: previews are asked for as previews, and on a new project Hive asks him first; on his yes it puts his current version (not the build) live, then sends the build's link. In attempt 3 he taps yes to that question. V2 and V3 are read more strictly:
+- **V2:** the link is not the live address, and Hive asked before anything went live.
+- **V3:** after "send me a link" and after the refused "put it live", the live plans page does not show the trial line.
+
+V1, V4-V6 and the kill are unchanged.

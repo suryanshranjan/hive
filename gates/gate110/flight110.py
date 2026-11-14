@@ -92,14 +92,17 @@ def main(src):
         note('connect', result=r, told=told, installed_now=bool(shutil.which('vercel')), signed_in=logins.ok('vercel'),
              projects_before=before)
         # 2. "send me a link"
-        t = time.time(); r, told = say([], 'send me a link')
-        link = next((w for m in told for w in m.split() if '.vercel.app' in w), None)
+        # attempt 3: new on Vercel, Hive asks first (its first version goes live); he says yes
+        t = time.time(); r, told = say([tap('fst|yes')], 'send me a link')
+        link = next((w for w in told[-1].split() if '.vercel.app' in w), None)
+        live_after_preview = fetch(plans)
         code, body = fetch(link) if link else (None, '')
         pcode, pbody = fetch(link.rstrip('/') + '/plans.html') if link else (None, '')
         note('preview', result=r, minutes=round((time.time() - t) / 60, 1), link=link, status=code,
              has_home_page='Dabba Days' in body, plans_status=pcode, link_shows_build=LINE in pbody,
              is_main_address=bool(link) and link.rstrip('/') == prod, project_made=NAME in projects(),
-             named_code='code' in projects(), told=told[-1][:300], vercel_said=RAW[-1:] )
+             named_code='code' in projects(), told=[x[:300] for x in told], asked_first=any("isn't on Vercel yet" in x for x in told),
+             live_status=live_after_preview[0], live_shows_unmerged_build=LINE in live_after_preview[1], vercel_said=RAW[-3:])
         # 3. "put it live" before the merge
         r, told = say([], 'put it live')
         code0, body0 = fetch(plans)

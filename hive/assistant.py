@@ -1175,6 +1175,20 @@ def preview_it(ch, repo, poll=20):
         return 'login_needed'
     ch.send("🔗 Putting your latest build at its own address; a minute or two.")
     r = deploy.preview(repo, _build_ref(st))
+    if r.get('why') == 'first':   # new on his host, whose first version always goes live: his current one, on his yes
+        host = deploy.title(repo)
+        ch.send(f"🔗 Your product isn't on {host} yet, sir, and {host} always puts a product's first version live. "
+                "Shall I put your current version there first (as it is now, without this build), then send you the "
+                "link to try the build?", buttons=[[('🔗 Yes, do that', 'fst|yes')], [('Not now', 'fst|no')]])
+        choice, other = choose(ch, poll, [('fst|yes', ('yes', 'do that', 'go', 'haan')), ('fst|no', NO_WORDS)])
+        if other is not None:
+            return handle(ch, repo, other, poll)
+        if choice != 'fst|yes':
+            ch.send('Very good. Nothing was put up. Screenshots it is: say "show me".'); return 'no_preview'
+        first = deploy.live(repo, st.get('branch') or 'main', st.get('test_cmd'))
+        if not first['ok']:
+            ch.send('⚠️ ' + telegram.esc(first['say'])); return 'no_preview'
+        r = deploy.preview(repo, _build_ref(st))
     if r['ok']:
         ch.send(f"🔗 <b>Here it is, sir, to try on your phone:</b>\n{r['url']}\n\n<i>A separate copy: your live product is "
                 "untouched. Tell me what's off, or say \"ship it\".</i>", html=True)

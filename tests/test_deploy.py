@@ -63,7 +63,7 @@ deploy.setup(repo, 'vercel')
 fake = FakeTelegram([])
 check('"send me a link": the build at its own address', (assistant.handle(ch(fake), repo, 'send me a link', poll=1),
       ran[-1], 'https://shop-git-preview-acme.vercel.app' in fake.sent[-1]['text']),
-      ('previewed', ('vercel deploy --yes', 'new', True), True))
+      ('previewed', ('vercel deploy --yes --environment preview', 'new', True), True))
 
 # 4. "put it live" before his engineer merged it: never; he is told the way
 ran.clear(); fake = FakeTelegram([])
@@ -100,5 +100,35 @@ check('the copy is named as his project, and the host link is kept, out of his g
       (r['ok'], seen, open(os.path.join(fresh, '.vercel', 'project.json')).read(),
        '.vercel' in open(os.path.join(fresh, '.git', 'info', 'exclude')).read(), git(fresh, 'status', '--porcelain').stdout),
       (True, ['dabba-days'], '{"projectId": "p1"}', True, ''))
+deploy.shutil.which = real_which
+
+# 8. new on Vercel (Gate 110): the first deployment of a project goes live, so a preview asked for as one is refused;
+#    Hive asks him, and only on his yes puts his current version (not the build) live first, then sends the link
+REFUSED = ("Error: Can't create a Preview deployment. This deploy would create a new project, and a project's first "
+           "deployment is assigned to Production. To deploy to Production, retry with --prod.")
+def vercel_new(cmd, cwd, timeout=900):
+    ran.append((cmd, open(os.path.join(cwd, 'index.html')).read()))
+    if '--prod' in cmd:
+        live_now.append(1)
+        return subprocess.CompletedProcess(cmd, 0, '', 'Production  https://shop-abc.vercel.app\nAliased  https://shop.vercel.app\n')
+    if not live_now:
+        return subprocess.CompletedProcess(cmd, 1, '', REFUSED)
+    return subprocess.CompletedProcess(cmd, 0, '{"next": [{"command": "vercel inspect https://shop-zz.vercel.app"}]}',
+                                       'Preview  https://shop-git-x.vercel.app\n')
+deploy._run = vercel_new; deploy.shutil.which = lambda t: '/bin/' + t
+c('reset', '-q', '--hard', git(repo, 'rev-list', '--max-parents=0', 'main').stdout.strip())   # main before the build was merged
+for words, taps, want in (('no', [tap('fst|no')], 'no_preview'), ('yes', [tap('fst|yes')], 'previewed')):
+    ran.clear(); live_now = []; deploy.setup(repo, 'vercel'); fake = FakeTelegram(taps)
+    r = assistant.handle(ch(fake), repo, 'send me a link', poll=1)
+    texts = [m['text'] for m in fake.sent]
+    if words == 'no':
+        check('new on Vercel: asked first; on "not now" nothing goes live', (r, any("isn't on Vercel yet" in t for t in texts),
+              [x[0] for x in ran if '--prod' in x[0]]), (want, True, []))
+    else:
+        check('on his yes: his current version live first (not the build), then the build at its own preview address',
+              (r, [(x[0].split()[2], x[1]) for x in ran], 'https://shop-git-x.vercel.app' in texts[-1]),
+              (want, [('--yes', 'new'), ('--prod', 'old'), ('--yes', 'new')], True))
+check('Vercel\'s labelled address is the one read, not the last link printed',
+      deploy._url('{"x": "vercel inspect https://a-1.vercel.app"}\nPreview  https://a-git.vercel.app\n'), 'https://a-git.vercel.app')
 deploy.shutil.which = real_which
 sys.exit(fail)

@@ -13,7 +13,9 @@ import json, os, re, shutil, subprocess, tempfile
 DIR = os.path.join(os.path.expanduser('~'), '.hive', 'deploy')
 
 HOSTS = {   # name: (tool, preview command or None, live command, how to log in)
-    'vercel': ('vercel', 'vercel deploy --yes', 'vercel deploy --prod --yes', 'vercel login'),
+    # a preview asked for as one: on a new project Vercel otherwise puts the first deployment live (Gate 110: "send me
+    # a link" put an unmerged build at the live address); asked this way it refuses instead, and Hive asks him
+    'vercel': ('vercel', 'vercel deploy --yes --environment preview', 'vercel deploy --prod --yes', 'vercel login'),
     'netlify': ('netlify', 'netlify deploy --json', 'netlify deploy --prod --json', 'netlify login'),
     'railway': ('railway', None, 'railway up --detach', 'railway login'),
     'azure': ('swa', 'swa deploy --env preview', 'swa deploy --env production', 'swa login'),
@@ -101,7 +103,14 @@ def _run(cmd, cwd, timeout=900):   # the host's tool (tests replace this)
     return subprocess.run(cmd, shell=True, cwd=cwd, capture_output=True, text=True, encoding='utf-8', errors='replace',
                           timeout=timeout)
 
+FIRST_DEPLOY = re.compile(r'first_deployment_production|first deployment is assigned to Production', re.I)
+OLD = {'vercel deploy --yes': 'vercel deploy --yes --environment preview'}   # set up before Gate 110: made safe
+
 def _url(out):
+    named = {k.lower(): u for k, u in re.findall(r'\b(Aliased|Preview|Production)\s+(https://[^\s"\'<>]+)', out or '')}
+    for k in ('aliased', 'preview', 'production'):   # Vercel labels its addresses; the alias is the one to share
+        if k in named:
+            return named[k].rstrip('.,)')
     try:   # netlify --json
         j = json.loads(out)
         for k in ('deploy_url', 'url', 'site_url'):
@@ -113,7 +122,8 @@ def _url(out):
     return found[-1].rstrip('.,)') if found else None
 
 def preview(repo, branch):
-    """Put this branch at its own address. {'ok', 'url', 'why'}; why: 'none', 'tool', 'no_preview', 'failed'."""
+    """Put this branch at its own address. {'ok', 'url', 'why'}; why: 'none', 'tool', 'no_preview', 'failed', or 'first'
+    (his host has nothing of his yet and would put its first version live, so nothing was sent)."""
     state, why = ready(repo)
     if state != 'ok':
         return {'ok': False, 'why': state, 'say': why}
@@ -125,8 +135,10 @@ def preview(repo, branch):
     if not code:
         return {'ok': False, 'why': 'failed', 'say': "I couldn't find that build to put up."}
     try:
-        p = _run(cfg['preview'], code)
+        p = _run(OLD.get(cfg['preview'], cfg['preview']), code)
         _keep_link(repo, code)
+        if p.returncode and FIRST_DEPLOY.search(p.stdout + p.stderr):
+            return {'ok': False, 'why': 'first', 'say': ''}
         url = _url(p.stdout + '\n' + p.stderr) if p.returncode == 0 else None
         return {'ok': bool(url), 'url': url, 'why': None if url else 'failed',
                 'say': '' if url else f"{cfg['host'].title()} refused the preview (for your engineer: "
