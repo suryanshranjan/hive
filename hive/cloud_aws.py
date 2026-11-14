@@ -18,7 +18,7 @@ AWS = os.environ.get('HIVE_AWS', 'aws')
 HOME = lambda: os.path.join(os.path.expanduser('~'), '.hive', 'cloud')
 STATE = lambda: os.path.join(HOME(), 'machine.json')
 UBUNTU = '/aws/service/canonical/ubuntu/server/24.04/stable/current/amd64/hvm/ebs-gp3/ami-id'
-PRICE = {'t3.medium': 0.045, 't3.large': 0.09, 't3.xlarge': 0.18, 'm7i.large': 0.11, 'm7i.xlarge': 0.22}   # $/hour, about
+PRICE = {'t3.small': 0.0224, 't3.medium': 0.045, 't3.large': 0.09, 't3.xlarge': 0.18, 'm7i.large': 0.11, 'm7i.xlarge': 0.22}   # $/hour, about
 FIRST_BOOT = """#!/bin/bash
 set -e
 export DEBIAN_FRONTEND=noninteractive
