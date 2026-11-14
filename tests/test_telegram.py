@@ -78,8 +78,16 @@ check('the owner was thanked', fake.sent[-1]['text'] == '✅ Thank you. Passing 
 run, d = make_run()
 question(d, 'q1', 'w1', 'A deal is cut by Rs 500. Must both accept again? A) Yes B) No')
 question(d, 'q2', 'w3', 'A typo is fixed in the brief. Must both accept again? A) Yes B) No')
-fake = FakeTelegram([lambda f: [(ME, 'Yes, any cut needs both', None, None)], lambda f: [(ME, 'No', None, 2)]])
+seen = []
+def first(f):
+    seen.append([m['text'] for m in f.sent if 'quick one' in m['text']]); return [(ME, 'Yes, any cut needs both', None, None)]
+def second(f):
+    asked = [m for m in f.sent if 'quick one' in m['text']]
+    seen.append([m['text'] for m in asked]); return [(ME, 'No', None, f.sent.index(asked[-1]) + 1)]   # the fake's message ids count from 1
+fake = FakeTelegram([first, second])
 telegram.bridge_questions(run, telegram.Channel({'chat_id': ME, 'token': 'x'}, api=fake), until=lambda: True, poll=1)
+check('one question at a time: the second goes out only after the first is answered (the owner, Gate 109)',
+      ([('cut by' in t, 'typo' in t) for t in seen[0]], len(seen[1])), ([(True, False)], 2))
 check('a typed reply answers the oldest question', json.load(open(os.path.join(d, 'answers', 'q1.json')))['answer'],
       'Yes, any cut needs both')
 check('a reply to a message answers that question', json.load(open(os.path.join(d, 'answers', 'q2.json')))['answer'], 'No')
