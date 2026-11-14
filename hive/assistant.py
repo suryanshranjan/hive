@@ -220,6 +220,8 @@ def facts(repo, ch=None):
         given = access.summary(repo)
         if given:
             lines.append(given + ' Questions about his figures are answered from it.')
+        from . import office
+        lines += [s + '.' for s in office.summary(repo)]   # his mail, calendar, payments, when connected
     except Exception:
         pass
     if name:
@@ -1142,6 +1144,10 @@ def away(ch, repo, text, poll, apply_build=None, start_build=None, cloud=None):
                 ", so I'm carrying on here: please leave your computer on and awake tonight. Your morning brief will "
                 "say how it went.", html=True)
         return 'away_cloud_failed'
+    try:   # handed over: the cloud has its copy; this one must not be handed over again on the next move (Gate 111)
+        os.remove(RESUME())
+    except OSError:
+        pass
     p = BUILD.get('proc')   # the cloud copy restarts it; this copy stops
     if p is not None and p.poll() is None:
         BUILD['stopped'] = True; _stop(p)
@@ -1159,8 +1165,8 @@ def resume_here(ch, repo):
         os.remove(RESUME())
     except (OSError, ValueError):
         return ''
-    if not r.get('goal'):
-        return ''
+    if not r.get('goal') or time.time() - r.get('t', 0) > 12 * 3600:   # stale: not tonight's hand-over (Gate 111
+        return ''   # restarted work handed over the night before, and the machine then refused to be deleted mid-build)
     ch.send("☁️ I'm in the cloud and picking up where your computer left off: <i>" +
             telegram.esc((r.get('said') or r['goal'])[:200]) + "</i>. I'll tell you here when it's done.", html=True)
     background_build(repo, r['goal'], ch, interview=False)
@@ -1471,6 +1477,8 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         got = {'intent': 'goal'}
     elif re.search(r"\b(do|start|run) (the|my|that) plan\b", low) and PLAN.get('steps') and not PLAN.get('running'):
         got = {'intent': 'run_plan'}
+    elif __import__('hive.office', fromlist=['x']).route(text, repo):   # his mail, calendar, payments (hive/office.py)
+        got = {'intent': 'office'}
     elif DATA_WORDS.search(low) and __import__('hive.access', fromlist=['x']).load(repo):   # "how many orders this week?"
         got = {'intent': 'data'}
     else:
@@ -1486,6 +1494,9 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         return go_live(ch, repo, poll)
     if intent == 'connect_host':
         return connect_host(ch, repo, text, poll)
+    if intent == 'office':
+        from . import office
+        return office.handle(ch, repo, text, poll)
     if intent == 'away':
         return away(ch, repo, text, poll, apply_build, start_build, cloud)
     if intent == 'onboard':

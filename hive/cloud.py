@@ -22,7 +22,10 @@ class Target:
         self.local = os.path.isabs(to) or to.startswith('.') or (':' not in to and '@' not in to)
         # forward slashes for a local folder: the shell dropped Windows backslashes from its path
         self.to = os.path.abspath(to).replace(os.sep, '/') if self.local else to
-        self.opts = ['-o', 'BatchMode=yes'] + (['-i', key, '-o', 'StrictHostKeyChecking=accept-new'] if key else [])
+        # ConnectTimeout: a machine still booting can swallow the first connection, and without it one ssh waited 9
+        # minutes while the machine sat ready (Gate 111); now it fails in 20 seconds and the wait tries again
+        self.opts = ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=20'] + \
+                    (['-i', key, '-o', 'StrictHostKeyChecking=accept-new'] if key else [])
 
     def run(self, cmd, check=True):
         full = ['sh', '-c', cmd] if self.local else ['ssh'] + self.opts + [self.to, cmd]

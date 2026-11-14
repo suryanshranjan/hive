@@ -170,6 +170,19 @@ class Channel:
             except Exception:
                 pass
 
+    def forget(self, secret, message_id=None):
+        """A password or key he sent: deleted from the chat (Telegram lets a bot delete his messages in a private chat)
+        and from Hive's record of the conversation. True if the chat message went."""
+        secret = (secret or '').strip()
+        if secret:
+            self.history = [(w, t.replace(secret, '••••')) for w, t in self.history]
+            self.remember('hive', '(a password or key was given and put away)')
+        try:
+            self.api('deleteMessage', chat_id=self.chat, message_id=message_id or getattr(self, 'last_id', None))
+            return True
+        except Exception:
+            return False
+
     def recent(self, n=10):
         """The last few turns, as plain lines, for a model reading his next message in context."""
         return '\n'.join(f"{'Owner' if w == 'owner' else 'Hive'}: {t}" for w, t in self.history[-n:]) or '(nothing yet)'
@@ -250,6 +263,7 @@ class Channel:
                     continue   # someone else: ignored
                 reply_to = (m.get('reply_to_message') or {}).get('message_id')
                 if m.get('text'):
+                    self.last_id = m.get('message_id')   # so a message carrying a password can be taken back out
                     out.append((m['text'].strip(), None, reply_to)); self.remember('owner', m['text'].strip())
                 elif m.get('voice') or m.get('audio'):
                     heard = self.listen((m.get('voice') or m.get('audio'))['file_id'])

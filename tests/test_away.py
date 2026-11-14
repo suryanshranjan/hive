@@ -66,6 +66,8 @@ check('with work running, the cloud is recommended first', ('My suggestion: let 
       fake.sent[0]['reply_markup']['inline_keyboard'][0][0]['callback_data']), (True, 'awy|cloud'))
 check('the work is handed to the cloud, and kept running here until the move is done',
       (seen['resume']['goal'], seen['alive_during_move']), ('a referral page', True))
+check("once moved, the laptop's copy of the hand-over is cleared, so the next move can't replay it (Gate 111)",
+      os.path.exists(assistant.RESUME()), False)
 time.sleep(1)
 check('once moved, the build here is stopped and he is told he can shut his computer',
       (r, p.poll() is not None, "You can shut your computer now" in texts[-1]), ('moved', True, True))
@@ -117,7 +119,10 @@ del os.environ['HIVE_IN_CLOUD']
 
 # 8. the cloud copy, on waking, picks the handed-over work up and says so
 idle()
-json.dump({'goal': 'a referral page', 'said': 'a referral page'}, open(assistant.RESUME(), 'w'))
+json.dump({'goal': 'old work', 'said': 'old work', 't': time.time() - 13 * 3600}, open(assistant.RESUME(), 'w'))
+check("a hand-over from the night before is not restarted (Gate 111: it was, and blocked the machine's delete)",
+      (assistant.resume_here(ch(FakeTelegram([])), repo), os.path.exists(assistant.RESUME())), ('', False))
+json.dump({'goal': 'a referral page', 'said': 'a referral page', 't': time.time()}, open(assistant.RESUME(), 'w'))
 os.environ['HIVE_BUILD_CMD'] = f'"{sys.executable}" -c "import time; time.sleep(1)"'
 fake = FakeTelegram([])
 got = assistant.resume_here(ch(fake), repo)

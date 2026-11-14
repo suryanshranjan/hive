@@ -20,6 +20,8 @@ class FakeTelegram:
             self.sent.append(p); return {'message_id': len(self.sent)}
         if method == 'answerCallbackQuery':
             return True
+        if method == 'deleteMessage':   # a message carrying a password, taken back out of the chat
+            self.deleted = getattr(self, 'deleted', []) + [p.get('message_id')]; return True
         if method == 'getFile':
             return {'file_path': ('photos/' + p['file_id'] + '.jpg') if p['file_id'].startswith('PHOTO')
                     else 'voice/' + p['file_id'] + '.oga'}

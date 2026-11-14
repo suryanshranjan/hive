@@ -2,6 +2,24 @@
 ranks them by their position, and marks the last one as something an owner cannot judge."""
 import json, re, sys
 prompt = sys.stdin.read()
+def _out(d):
+    print(json.dumps({'result': json.dumps(d)})); sys.exit(0)
+if 'asked his assistant about his email' in prompt:   # hive/mail.py: the first message, by sender and subject
+    frm = re.search(r'^\[1\] From: (.+)$', prompt, re.M); sub = re.search(r'^Subject: (.+)$', prompt, re.M)
+    _out({'answer': f"{frm.group(1)} wrote about {sub.group(1)}." if frm else 'Nothing.', 'about': [1]})
+if 'Which of these emails does he mean' in prompt:   # the message whose sender he names
+    said = prompt.split('told his assistant: "')[1].split('"')[0]
+    froms = re.findall(r'^\[(\d+)\] From: (.+)$', prompt, re.M)
+    pick = next((int(k) for k, f in froms if any(w in f for w in re.findall(r'[A-Z][a-z]+', said))), 0)
+    _out({'number': pick})
+if 'wants to reply to this email' in prompt:   # a draft that carries what he asked to say
+    said = prompt.split('His words: "')[1].split('"')[0]
+    _out({'body': 'Hi, ' + (said.split('saying', 1)[1].strip() if 'saying' in said else said) + '\nThanks'})
+if 'asked his assistant about his calendar' in prompt:   # the first event line
+    evs = prompt.split('His events:\n')[1].split('\n\n')[0].splitlines()
+    _out({'answer': f"{len(evs)} events: " + '; '.join(evs) if evs and evs[0] != '(nothing)' else 'Nothing on.'})
+if 'asked his assistant about his payments' in prompt:   # the exact sums, as given
+    _out({'answer': prompt.split('sums worked out exactly below):\n')[1].split('\n\n')[0]})
 if 'would settle the new question completely' in prompt:   # duplicate questions: the same text is the same decision
     earlier = dict(re.findall(r'^(\d+)\. (.+)$', prompt.split('New question:')[0], re.M))
     new = prompt.split('New question: ')[1].split('\n')[0].strip()

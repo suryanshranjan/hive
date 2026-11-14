@@ -60,6 +60,17 @@ def facts(repo, since):
         from . import budget
         c = budget.cap()
         lines.append(f'Spent on builds this month: ${budget.spent_month():.2f}' + (f' of his ${c:g} limit' if c else ''))
+    from . import calendar_, payments   # his day and his takings, when he has connected them (hive/office.py)
+    today = calendar_.today_lines(repo)
+    if today:
+        lines.append('On his calendar today: ' + '; '.join(today))
+    if payments.load(repo):
+        try:
+            for cur, v in payments.totals(payments.fetch(repo, time.time() - 86400)).items():
+                lines.append(f"Payments in the last 24 hours ({cur}): {v['paid']:.2f} from {v['count']}, {v['failed']} "
+                             "failed" + (f", {v['refunded']:.2f} refunded" if v['refunded'] else ''))
+        except Exception:
+            pass
     return lines
 
 def compose(repo, ch=None, since=None):
