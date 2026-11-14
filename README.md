@@ -19,13 +19,22 @@ Hive is a research project as much as a product: **108 pre-registered experiment
 
 ## Quick start
 
-You need Python 3.10+, git, and [Claude Code](https://claude.com/claude-code) installed and logged in.
+One line installs everything Hive needs (git, Python, Node.js, Claude Code, Hive), on a machine with none of it:
 
 ```
-pip install git+https://github.com/suryanshranjan/hive
-hive setup                                   # checks, your phone (Telegram), screenshots, numbers, where it lives; then live
+curl -fsSL https://raw.githubusercontent.com/suryanshranjan/hive/main/install.sh | sh     # Linux, macOS
+irm https://raw.githubusercontent.com/suryanshranjan/hive/main/install.ps1 | iex         # Windows (PowerShell)
+```
+
+Then, once on the computer (about three minutes), and everything after that is on your phone:
+
+```
+claude                                       # log in to Claude once, then /exit
+hive setup                                   # your phone (Telegram), screenshots, numbers, where it lives; then live
 hive up --repo https://github.com/you/your-product   # or: fetch your code, and Hive is live on your phone
 ```
+
+Already have Python 3.10+, git and Claude Code? `pip install git+https://github.com/suryanshranjan/hive` is enough.
 
 `hive setup` connects Telegram in two minutes. It offers screenshots, your business numbers and your hosting service, then starts listening and says hello on your phone. Say **"set me up"** there, and Hive gets to know your business or product. After that, everything happens in Telegram. In a terminal, `hive` alone starts one conversation from an idea to a tested branch.
 
