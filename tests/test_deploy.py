@@ -5,6 +5,7 @@ import json, os, subprocess, sys, tempfile
 sys.path.insert(0, os.getcwd()); sys.path.insert(0, os.path.join(os.getcwd(), 'tests'))
 home = tempfile.mkdtemp(); os.environ['HOME'] = os.environ['USERPROFILE'] = home
 from hive import assistant, deploy, explain, memory, numbers, team, telegram
+from hive import logins as _logins; _logins.ensure = lambda ch, service, poll=20: True   # signed in (renewal: tests/test_logins.py)
 explain.CMD = '"' + sys.executable.replace(chr(92), '/') + '" tests/fake_explain.py'
 memory.DIR = os.path.join(home, '.hive', 'rules'); telegram.BUSY = os.path.join(home, '.hive', 'telegram.busy')
 telegram.PATH = os.path.join(home, '.hive', 'telegram.json'); deploy.DIR = os.path.join(home, '.hive', 'deploy')
@@ -81,5 +82,23 @@ open(os.path.join(repo, 'test_ok.py'), 'w').write('def test_ok(): assert 0\n'); 
 ran.clear(); fake = FakeTelegram([tap('liv|yes')])
 check('a failing test on main: nothing goes live', (assistant.handle(ch(fake), repo, 'put it live', poll=1), ran,
       'stays as it is' in fake.sent[-1]['text']), ('live_failed', [], True))
+deploy.shutil.which = real_which
+
+# 7. a first deploy: the copy carries his project's name (a host names a new project after its folder; Vercel would have
+#    called every one "code"), and the link the host makes is kept beside his code, out of his git, for next time
+fresh = os.path.join(home, 'Dabba Days'); os.makedirs(fresh); git(fresh, 'init', '-q', '-b', 'main')
+open(os.path.join(fresh, 'index.html'), 'w').write('x'); git(fresh, 'add', '.')
+git(fresh, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-qm', 'x')
+deploy.setup(fresh, 'vercel'); seen = []
+def first(cmd, cwd, timeout=900):
+    seen.append(os.path.basename(cwd)); os.makedirs(os.path.join(cwd, '.vercel'), exist_ok=True)
+    open(os.path.join(cwd, '.vercel', 'project.json'), 'w').write('{"projectId": "p1"}')
+    return subprocess.CompletedProcess(cmd, 0, 'Preview: https://dabba-days-x.vercel.app\n', '')
+deploy._run = first; deploy.shutil.which = lambda t: '/bin/' + t
+r = deploy.preview(fresh, 'main')
+check('the copy is named as his project, and the host link is kept, out of his git',
+      (r['ok'], seen, open(os.path.join(fresh, '.vercel', 'project.json')).read(),
+       '.vercel' in open(os.path.join(fresh, '.git', 'info', 'exclude')).read(), git(fresh, 'status', '--porcelain').stdout),
+      (True, ['dabba-days'], '{"projectId": "p1"}', True, ''))
 deploy.shutil.which = real_which
 sys.exit(fail)

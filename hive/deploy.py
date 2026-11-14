@@ -68,7 +68,9 @@ def ready(repo):
 def _copy(repo, branch):
     """A clean copy of one branch, with the host's project link files (kept out of git) carried over."""
     work = tempfile.mkdtemp(prefix='hive_deploy_')
-    code = os.path.join(work, 'code')
+    # named as his project: a host names a new project after its folder (Vercel would have called every one "code")
+    code = os.path.join(work, re.sub(r'[^a-z0-9-]+', '-', os.path.basename(os.path.abspath(repo)).lower()).strip('-')
+                        or 'site')
     sha = subprocess.run(['git', '-C', repo, 'rev-parse', '-q', '--verify', branch + '^{commit}'], capture_output=True,
                          text=True).stdout.strip()   # a branch here, or his remote's main (origin/main)
     ok = sha and subprocess.run(['git', 'clone', '-q', '--no-checkout', os.path.abspath(repo), code], capture_output=True).returncode == 0 \
@@ -81,6 +83,19 @@ def _copy(repo, branch):
         if os.path.exists(src) and not os.path.exists(os.path.join(code, name)):
             (shutil.copytree if os.path.isdir(src) else shutil.copy)(src, os.path.join(code, name))
     return work, code
+
+def _keep_link(repo, code):
+    """After the first deploy, keep the host's link to his project (e.g. .vercel/) beside his code, out of his git, so
+    the next preview or going live goes to the same project instead of making a new one."""
+    for name in LINKS:
+        src, dst = os.path.join(code, name), os.path.join(repo, name)
+        if os.path.exists(src) and not os.path.exists(dst):
+            (shutil.copytree if os.path.isdir(src) else shutil.copy)(src, dst)
+            exclude = os.path.join(repo, '.git', 'info', 'exclude')
+            if os.path.isdir(os.path.dirname(exclude)):
+                have = open(exclude).read() if os.path.exists(exclude) else ''
+                if name not in have.split():
+                    open(exclude, 'a').write(('' if have.endswith('\n') or not have else '\n') + name + '\n')
 
 def _run(cmd, cwd, timeout=900):   # the host's tool (tests replace this)
     return subprocess.run(cmd, shell=True, cwd=cwd, capture_output=True, text=True, encoding='utf-8', errors='replace',
@@ -111,6 +126,7 @@ def preview(repo, branch):
         return {'ok': False, 'why': 'failed', 'say': "I couldn't find that build to put up."}
     try:
         p = _run(cfg['preview'], code)
+        _keep_link(repo, code)
         url = _url(p.stdout + '\n' + p.stderr) if p.returncode == 0 else None
         return {'ok': bool(url), 'url': url, 'why': None if url else 'failed',
                 'say': '' if url else f"{cfg['host'].title()} refused the preview (for your engineer: "
@@ -146,6 +162,7 @@ def live(repo, main_ref, test_cmd=None):
                 return {'ok': False, 'why': 'tests', 'say': f"{sum(1 for v in res.values() if not v) if res else 'The'} "
                         "tests fail on your main version, so it stays as it is. Your engineer should look first."}
         p = _run(cfg['live'], code)
+        _keep_link(repo, code)
         if p.returncode:
             return {'ok': False, 'why': 'failed', 'say': f"{cfg['host'].title()} refused it (for your engineer: "
                     f"{(p.stderr or p.stdout).strip()[-200:]}). Nothing changed on your live product."}

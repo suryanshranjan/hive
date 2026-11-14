@@ -131,6 +131,8 @@ def undo(ch, repo, poll):
     if choice != 'und|yes':
         ch.send('Very good. Nothing changed.'); return 'kept'
     if is_live:
+        if not host_login(ch, repo, poll):
+            return 'login_needed'
         r = deploy.back(repo)
         if not r['ok']:
             ch.send('⚠️ ' + telegram.esc(r['say'])); return 'undo_failed'
@@ -1169,6 +1171,8 @@ def preview_it(ch, repo, poll=20):
         ch.send("Nothing built yet to try, sir. Tell me what to build first."); return 'nothing'
     if deploy.ready(repo)[0] == 'none' and shutil.which('aws') and not in_cloud(repo):
         return try_deploy(ch, repo, st, poll)
+    if not host_login(ch, repo, poll):
+        return 'login_needed'
     ch.send("🔗 Putting your latest build at its own address; a minute or two.")
     r = deploy.preview(repo, _build_ref(st))
     if r['ok']:
@@ -1216,6 +1220,8 @@ def go_live(ch, repo, poll):
     st = latest_build(repo)
     if not st:
         ch.send("Nothing built yet to put live, sir."); return 'nothing'
+    if deploy.config(repo) and not host_login(ch, repo, poll):
+        return 'login_needed'
     state, why = deploy.ready(repo)
     if state != 'ok':
         ch.send('🚀 ' + telegram.esc(why)); return 'not_connected'
@@ -1248,11 +1254,19 @@ def _goal_words(st):
     from . import ship
     return ship.title(st)[6:][:80]
 
-def connect_host(ch, repo, text):
-    """'We're on Vercel': remember where his product lives, and say plainly what (if anything) his engineer does once."""
+def host_login(ch, repo, poll=20):
+    """His host's tool installed and signed in, from his phone if need be (Vercel: hive/logins.py). True when ready."""
+    from . import deploy, logins
+    host = deploy.config(repo).get('host')
+    return logins.ensure(ch, host, poll) if host in logins.SERVICES else True
+
+def connect_host(ch, repo, text, poll=20):
+    """'We're on Vercel': remember where his product lives; install its tool and sign in from his phone where Hive can
+    (Vercel); otherwise say plainly what his engineer does once."""
     from . import deploy
     host = CONNECT_WORDS.search(text.lower()).group(2)
     deploy.setup(repo, host)
+    host_login(ch, repo, poll)
     state, why = deploy.ready(repo)
     if host == 'render':
         ch.send("🔌 Noted: Render. To put it live I need its deploy hook address (Render, Settings, Deploy Hook); your "
@@ -1448,7 +1462,7 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     if intent == 'go_live':
         return go_live(ch, repo, poll)
     if intent == 'connect_host':
-        return connect_host(ch, repo, text)
+        return connect_host(ch, repo, text, poll)
     if intent == 'away':
         return away(ch, repo, text, poll, apply_build, start_build, cloud)
     if intent == 'onboard':

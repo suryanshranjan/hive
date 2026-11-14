@@ -8,6 +8,7 @@ import json, os, sqlite3, subprocess, sys, tempfile
 sys.path.insert(0, os.getcwd()); sys.path.insert(0, os.path.join(os.getcwd(), 'tests'))
 home = tempfile.mkdtemp(); os.environ['HOME'] = os.environ['USERPROFILE'] = home
 from hive import access, assistant, explain, interview, memory, onboard, telegram
+from hive import logins as _logins; _logins.ensure = lambda ch, service, poll=20: True   # signed in (renewal: tests/test_logins.py)
 explain.CMD = '"' + sys.executable.replace(chr(92), '/') + '" tests/fake_explain.py'
 memory.DIR = os.path.join(home, '.hive', 'rules'); telegram.BUSY = os.path.join(home, '.hive', 'telegram.busy')
 access.DIR = os.path.join(home, '.hive', 'access'); onboard.DIR = os.path.join(home, '.hive', 'onboarding')

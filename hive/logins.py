@@ -6,6 +6,9 @@ works from another device, sends him the link on Telegram, takes the code it sho
 sign-in, checks it worked and carries on. He never needs to be at the computer:
 - AWS: `aws login --remote` shows a link; after he signs in, AWS shows a code he sends back.
 - GitHub: `gh auth login --web` shows a one-time code; he opens github.com/login/device and types it in.
+- Vercel: `vercel login` shows a link with the code in it; he opens it and approves.
+A missing tool that installs with one command (Vercel's, through npm) is installed first, so "we're on Vercel" works
+from the phone with nobody at the computer.
 A login on a different account than before is not switched silently: he is asked."""
 import os, queue, re, shutil, subprocess, threading, time
 
@@ -17,7 +20,29 @@ SERVICES = {
     'github': {'name': 'GitHub', 'check': ['gh', 'auth', 'status', '--hostname', 'github.com'],
                'login': ['gh', 'auth', 'login', '--web', '--hostname', 'github.com', '--git-protocol', 'https'],
                'pastes_code': False},
+    'vercel': {'name': 'Vercel', 'check': ['vercel', 'whoami'], 'login': ['vercel', 'login'], 'pastes_code': False,
+               'install': ['npm', 'install', '-g', 'vercel'], 'device': 'https://vercel.com/oauth/device'},
 }
+
+def _exe(cmd):
+    """The command with its program found on this computer, or None when it is not installed. On Windows npm's tools
+    are .cmd files, which a bare program name does not start (found setting up Gate 110)."""
+    path = shutil.which(cmd[0])
+    return [path] + list(cmd[1:]) if path else None
+
+def install(ch, service):
+    """Install a missing tool that installs with one command; True when it is there afterwards."""
+    s = SERVICES[service]
+    if _exe(s['login']):
+        return True
+    if not s.get('install') or not _exe(s['install']):
+        return False
+    ch.send(f"🔧 Installing {s['name']}'s tool on this computer first; a minute or two.")
+    try:
+        subprocess.run(_exe(s['install']), capture_output=True, text=True, timeout=600)
+    except (subprocess.TimeoutExpired, OSError):
+        return False
+    return bool(_exe(s['login']))
 URL = re.compile(r'https://\S+')
 DEVICE_CODE = re.compile(r'\b([A-Z0-9]{4}-[A-Z0-9]{4})\b')
 SWITCH = re.compile(r'already configured to use .*overwrite it.*\(y/n\)', re.I | re.S)
@@ -25,10 +50,11 @@ SWITCH = re.compile(r'already configured to use .*overwrite it.*\(y/n\)', re.I |
 def ok(service, timeout=60):
     """True when the login works now."""
     s = SERVICES[service]
-    if not shutil.which(s['check'][0]):
+    cmd = _exe(s['check'])
+    if not cmd:
         return False
     try:
-        return subprocess.run(s['check'], capture_output=True, text=True, timeout=timeout).returncode == 0
+        return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout).returncode == 0
     except (subprocess.TimeoutExpired, OSError):
         return False
 
@@ -61,11 +87,13 @@ def ensure(ch, service, poll=20, popen=subprocess.Popen, wait_s=900):
     s = SERVICES[service]
     if ok(service):
         return True
-    if not shutil.which(s['login'][0]):
+    if not install(ch, service):
         ch.send(f"🔑 I need the {s['name']} command line on this computer to do that, and it isn't installed. Your "
                 f"engineer installs it once; then I can carry on from here.")
         return False
-    proc = popen(s['login'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+    if ok(service):
+        return True
+    proc = popen(_exe(s['login']), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
                  bufsize=0)
     q, seen = queue.Queue(), []
     threading.Thread(target=_reader, args=(proc, q), daemon=True).start()
@@ -89,8 +117,10 @@ def ensure(ch, service, poll=20, popen=subprocess.Popen, wait_s=900):
             if not code:
                 ch.send(f"⚠️ I couldn't start the {s['name']} sign-in just now. Try again in a minute."); return False
             proc.stdin.write('\n'); proc.stdin.flush()   # "press Enter to open the browser": not on this computer
-            ch.send(f"🔑 Your {s['name']} sign-in has expired, so I'll renew it.\n\n1. Tap this link: "
-                    f"{m.group(0) if m else 'https://github.com/login/device'}\n2. Type this code: <b>{code.group(1)}</b>\n\n"
+            link = m.group(0) if m else s.get('device', 'https://github.com/login/device')
+            how = "Check it shows this code, then approve" if code.group(1) in link else "Type this code"
+            ch.send(f"🔑 I need you to sign in to {s['name']} (it isn't signed in on this computer, or it has expired)."
+                    f"\n\n1. Tap this link: {link}\n2. {how}: <b>{code.group(1)}</b>\n\n"
                     "I'll carry on by myself once you've approved it.", html=True)
         text = _until(q, lambda t: bool(SWITCH.search(t[-400:])), wait_s, seen)
         if SWITCH.search(text[-400:]):   # signed in with another account than before: his choice, never silent
@@ -109,7 +139,7 @@ def ensure(ch, service, poll=20, popen=subprocess.Popen, wait_s=900):
         except Exception:
             pass
     if ok(service):
-        ch.send(f"✅ Signed in to {s['name']} again. Carrying on."); return True
+        ch.send(f"✅ Signed in to {s['name']}. Carrying on."); return True
     tail = ' '.join(''.join(seen).split())[-160:]
     ch.send(f"⚠️ That {s['name']} sign-in didn't go through" + (f" ({telegram.esc(tail)})" if tail else '') +
             ". Say it again when you're ready and I'll start a fresh one.", html=True)
