@@ -187,6 +187,8 @@ def handle(ch, repo, text, poll, kind=None):
     mod = {'mail': mail, 'cal': calendar_, 'pay': payments}.get(kind)
     if not mod:
         return None
+    # an answer takes 7-10 seconds (Gate 112); say at once what is happening, as a person would
+    ch.send({'mail': '📧 Reading your mail…', 'cal': '📅 Checking your calendar…', 'pay': '💳 Adding up your payments…'}[kind])
     try:
         r = mod.answer(repo, text)
     except Exception as e:
