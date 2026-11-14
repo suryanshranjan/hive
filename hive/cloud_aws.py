@@ -241,7 +241,7 @@ def _home(repo, say=print):
     log = os.path.join(os.path.expanduser('~'), '.hive', 'listen.log')
     kw = {'creationflags': 0x00000008 | 0x00000200} if os.name == 'nt' else {'start_new_session': True}   # outlives this
     subprocess.Popen([sys.executable, '-m', 'hive', 'listen'], cwd=os.path.abspath(repo), stdout=open(log, 'a'),
-                     stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, **kw)
+                     stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, env=__import__('hive.assistant', fromlist=['x']).hive_env(), **kw)
     say("Hive is back on this computer and listening on your Telegram (log: ~/.hive/listen.log).")
     try:
         telegram.Channel(cfg).send("🏠 <b>I'm back on your computer.</b> Everything built in the cloud is here, and so "

@@ -155,7 +155,7 @@ def go_live(repo='.'):
     os.makedirs(os.path.dirname(log), exist_ok=True)
     flags = dict(creationflags=0x00000008 | 0x00000200) if os.name == 'nt' else dict(start_new_session=True)
     subprocess.Popen([sys.executable, '-m', 'hive', 'listen'], cwd=os.path.abspath(repo), stdout=open(log, 'a'),
-                     stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, **flags)
+                     stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, env=__import__('hive.assistant', fromlist=['x']).hive_env(), **flags)
     from . import register
     register.remember_timezone()   # his clock, for the morning brief wherever Hive runs later
     ch = telegram.Channel(telegram.load())

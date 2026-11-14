@@ -148,7 +148,7 @@ def build_parser():
     de.add_argument('host', nargs='?'); de.add_argument('--preview'); de.add_argument('--live'); de.add_argument('--hook')
     nu = sub.add_parser('numbers'); nu.add_argument('action', nargs='?', choices=['setup', 'add'])
     nu.add_argument('values', nargs='*'); nu.add_argument('--cmd', dest='cmd_'); nu.add_argument('--url'); nu.add_argument('--file')
-    ac = sub.add_parser('access'); ac.add_argument('action', nargs='?', choices=['add', 'remove', 'ask'])
+    ac = sub.add_parser('access'); ac.add_argument('action', nargs='?', choices=['add', 'remove', 'ask', 'sql'])
     ac.add_argument('what', nargs='*'); ac.add_argument('--db'); ac.add_argument('--url'); ac.add_argument('--file')
     ac.add_argument('--cmd', dest='cmd_'); ac.add_argument('--name'); ac.add_argument('--header', action='append', default=[])
     sub.add_parser('listen')
@@ -221,6 +221,15 @@ def main(argv=None):
         return doctor.go_live(here)
     if a.cmd == 'access':   # what Hive may read, read-only: hive access add --db/--url/--file/--cmd; hive access ask "..."
         from . import access
+        here = os.environ.get('HIVE_ACCESS_REPO', '.')   # his project, when asked from a throwaway copy of it
+        if a.action == 'sql':   # one read-only query (for the code-reading assistant): hive access sql [--name N] "SELECT ..."
+            dbs = [s_ for s_ in access.load(here) if s_['kind'] == 'db' and (not a.name or s_['name'] == a.name)]
+            if not dbs:
+                print('No database of his to read.'); return 1
+            try:
+                print(access.run_sql(dbs[0]['where'], ' '.join(a.what)), end=''); return 0
+            except access.Unreadable as e:
+                print(e); return 1
         if a.action == 'add':
             kind, where = next(((k, v) for k, v in (('db', a.db), ('url', a.url), ('file', a.file), ('cmd', a.cmd_)) if v),
                                (None, None))
@@ -237,9 +246,9 @@ def main(argv=None):
             name = ' '.join(a.what)
             print(f'Removed {name}.' if access.remove('.', name) else f'Nothing called {name!r}.'); return 0
         if a.action == 'ask':
-            got = access.answer('.', ' '.join(a.what))
+            got = access.answer(here, ' '.join(a.what))
             print(got['answer'] if got else 'Nothing to read yet: hive access add --db/--url/--file/--cmd.'); return 0
-        srcs = access.load('.')
+        srcs = access.load(here)
         for s_ in srcs:
             ok, line = access.check(s_)
             print(f"- {s_['name']} ({s_['kind']}, {access.secret_free(s_['where'])}): {line}")

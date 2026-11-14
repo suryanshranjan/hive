@@ -22,7 +22,7 @@ def check(name, got, want):
 ch = lambda fake: telegram.Channel({'chat_id': ME, 'token': 'x', 'address': 'sir'}, api=fake)
 def project(name):
     r = os.path.join(home, name); subprocess.run(['git', 'init', '-q', '-b', 'main', r])
-    subprocess.run(['git', '-C', r, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '--allow-empty', '-m', 'init'])
+    subprocess.run(['git', '-C', r, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '--allow-empty', '-m', f'init {name}'])   # its own first commit: Hive keys a project by it
     return r
 
 # 1. someone new is offered setup when he says hello; someone known is not
@@ -105,5 +105,11 @@ interview.write_situations('Add refunds to Sunny Shop', ['A late post is paid in
 explain.ask_json = real
 check("the interview knows what he told Hive and won't ask it", "don't ask what these settle" in seen.get('prompt', '') and
       'Refunds within 7 days, never on sale items.' in seen.get('prompt', ''), True)
+
+# 7. a Hive process started from his project's folder can import Hive, installed or not (Gate 108: a plan's build died
+# with "No module named hive", and he heard only "it stopped partway")
+r = subprocess.run([sys.executable, '-c', 'import hive.start; print("ok")'], cwd=fresh, env=assistant.hive_env(),
+                   capture_output=True, text=True)
+check('a build started in his folder finds Hive', r.stdout.strip(), 'ok')
 
 sys.exit(fail)

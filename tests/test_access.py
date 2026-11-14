@@ -89,6 +89,11 @@ r = assistant.handle(ch(fake), repo, 'how many orders are paid? DROP-ME', poll=1
 check('a writing query the model writes is refused, and he hears it plainly', r, 'data_unanswered')
 check('...and nothing was changed', sqlite3.connect(db).execute('SELECT COUNT(*) FROM orders').fetchone()[0], 3)
 
+fake = FakeTelegram([])
+r = assistant.handle(ch(fake), repo, 'how many orders are paid? EMPTY-ME', poll=1)
+check('no query comes back: a plain reason, never an empty one (Gate 108 q1)',
+      (r, fake.sent[-1]['text'].startswith("🤔 I couldn't work that out from your data just now.")), ('data_unanswered', True))
+
 # 6. from the phone: handing over a database
 db2 = os.path.join(home, 'more.db'); c = sqlite3.connect(db2); c.execute('CREATE TABLE payouts (id INTEGER)'); c.commit(); c.close()
 fake = FakeTelegram([])

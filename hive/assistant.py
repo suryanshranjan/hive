@@ -652,6 +652,16 @@ def _fold(repo, old):
     except (OSError, ValueError, KeyError):
         pass
 
+def hive_env(**extra):
+    """The environment for a Hive process started from here: it can always import Hive, installed or run from a
+    source folder (Gate 108: a build started in his project's folder died with "No module named hive", and he heard
+    only "it stopped partway")."""
+    pkg_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    path = os.environ.get('PYTHONPATH', '')
+    if pkg_root not in path.split(os.pathsep):
+        path = pkg_root + (os.pathsep + path if path else '')
+    return dict(os.environ, PYTHONPATH=path, **extra)
+
 def background_build(repo, goal, ch=None, interview=True, report=True, workers=None):
     """Run `hive start` for this goal in the background, so Hive keeps answering him; if it stops, tell him why at once
     (a cloud build stopped on "unsaved changes", and only the server's log knew)."""
@@ -670,7 +680,7 @@ def background_build(repo, goal, ch=None, interview=True, report=True, workers=N
             ['--workers', str(team.chosen()['workers'])] if team.chosen().get('workers') else []))
     proc = subprocess.Popen(cmd, cwd=repo, start_new_session=os.name != 'nt',   # so a stop ends its builders too
                             stdout=open(log, 'w'), stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
-                            env=dict(os.environ, HIVE_FROM_PHONE='1'))
+                            env=hive_env(HIVE_FROM_PHONE='1'))
     BUILD.update(proc=proc, goal=goal, started=time.time(), log=log, stopped=False)
 
     def watch():
@@ -813,7 +823,7 @@ file names or technical terms unless he asks, or he writes technically himself (
 file and function names). If the code does not settle it, say so plainly and say what would.
 Reply in his language and his script: if he writes Hindi-English in English letters, answer the same way, never in
 Devanagari. Address him as "{who}".
-
+{data}
 The conversation so far:
 {history}
 
@@ -838,6 +848,31 @@ def _scratch(repo):
         pass
     return work, copy
 
+def _data_note(repo):
+    """For the code-reading assistant: the data he gave Hive, how to read it, and to explain what only the data shows
+    (Gate 108: it found an unwritten Rs 500 payment to some cooks by searching the computer, then asked him what earns
+    it, though the data showed the reason: no complaints the month before)."""
+    from . import access
+    srcs = access.load(repo)
+    if not srcs:
+        return ''
+    lines = []
+    for s in srcs:
+        if s['kind'] == 'db':
+            lines.append(f"- {s['name']} (database): read it with `python3 -m hive access sql --name \"{s['name']}\" "
+                         f"\"SELECT ...\"` (one SELECT at a time; anything else is refused)")
+        elif s['kind'] == 'file':
+            lines.append(f"- {s['name']} (file): {s['where']}")
+        else:
+            lines.append(f"- {s['name']} ({s['kind']}): ask `python3 -m hive access ask \"<question>\"`")
+    return ("\nHe has also given you read-only access to his business data:\n" + '\n'.join(lines) + "\n"
+            "When his question is about how his business actually runs (who is paid what, who gets what, what happens "
+            "in practice), check his data as well as the code: the code says what should happen, the data what does. If "
+            "the data shows something no page or document explains (an extra payment, a discount, a pattern), find what "
+            "explains it in the data itself before asking him: compare who gets it with who doesn't, and when, against "
+            "everything else you can see (complaints, plans, areas, dates). Then tell him your best reading and ask him "
+            "to confirm it.\n")
+
 def look(ch, repo, text):
     """Answer a question about his product by having Claude read his code, and run it where a case needs checking, in a
     throwaway copy: "how do refunds work?" gets what the code does, not a guess. Shows "typing..." while it works.
@@ -850,7 +885,8 @@ def look(ch, repo, text):
         try:
             work, copy = _scratch(repo)
             p = subprocess.run(argv(ASK_CMD), cwd=copy, input=LOOK.format(
-                who=_who(ch) or 'sir', history=ch.recent() if hasattr(ch, 'recent') else '', text=text),
+                who=_who(ch) or 'sir', history=ch.recent() if hasattr(ch, 'recent') else '', text=text,
+                data=_data_note(repo)), env=hive_env(HIVE_ACCESS_REPO=os.path.abspath(repo)),
                 capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=300)
             reply = json.loads(p.stdout)
             if not reply.get('is_error'):

@@ -346,7 +346,9 @@ Here is the data he has given read-only access to:
 
 Write read-only SQL to answer it from his databases, if they hold the answer: plain SELECT (or WITH ... SELECT) queries,
 one statement each, at most 3, using only the tables and columns listed, aggregated where you can (counts, sums, top
-10) rather than raw rows. Today is {today}. If the other sources above already answer it, or nothing does, write none.
+10) rather than raw rows. Before adding two money columns, check how they relate (does one already include the other?
+compare a total with its parts in a query); Gate 108 added a bonus to a total that already held it. Today is {today}. If
+the other sources above already answer it, or nothing does, write none.
 Reply with JSON only: {{"queries": [{{"source": "<source name>", "sql": "SELECT ..."}}]}}"""
 
 ANSWER = """Answer his question from his own data. A business owner asked his assistant: "{question}"
@@ -355,7 +357,9 @@ What his data shows:
 {data}
 
 Answer him in 1 to 3 short plain sentences, numbers exactly as the data gives them, no technical words (no table,
-column or SQL). If the data does not answer it, say plainly what is missing and what would answer it. Today is {today}.
+column or SQL). Never add a part to a total that may already contain it: if the data shows a total equals its parts
+(say amount = rate x count + bonus), the total is the answer. If the data does not answer it, say plainly what is
+missing and what would answer it. Today is {today}.
 Reply with JSON only: {{"answer": "...", "found": true or false}}"""
 
 def _today():
@@ -384,7 +388,11 @@ def answer(repo, question):
                           for s, t, p in seen)
     data = [f"[{s['name']}]\n{t}" for s, t, _ in seen if t is not None and s['kind'] != 'db']
     if any(s['kind'] == 'db' and t is not None for s, t, _ in seen):
-        got = explain.ask_json(PICK.format(question=question, sources=listing, today=_today())) or {}
+        got = {}
+        for _ in range(2):   # Gate 108: one model call came back empty and he heard "couldn't read your data: ."
+            got = explain.ask_json(PICK.format(question=question, sources=listing, today=_today())) or {}
+            if got.get('queries'):
+                break
         byname = {s['name']: s for s in srcs}
         for q in (got.get('queries') or [])[:3]:
             s = byname.get((q or {}).get('source')) if isinstance(q, dict) else None
@@ -395,8 +403,10 @@ def answer(repo, question):
             except Unreadable as e:
                 data.append(f"[{s['name']}] a query could not run: {e}")
     if not data:
-        return {'answer': "I couldn't read your data just now: " + '; '.join(p for _, t, p in seen if p) + '.',
-                'found': False, 'sources': []}
+        why = '; '.join(p for _, t, p in seen if p)
+        return {'answer': (f"I couldn't read your data just now: {why}." if why else
+                           "I couldn't work that out from your data just now. Ask me again in a moment, or put it "
+                           "another way."), 'found': False, 'sources': []}
     got = explain.ask_json(ANSWER.format(question=question, data='\n\n'.join(data)[:40000], today=_today())) or {}
     return {'answer': (got.get('answer') or "I looked, but couldn't work that out from your data.").strip(),
             'found': bool(got.get('found')), 'sources': [s['name'] for s, t, _ in seen if t is not None]}
