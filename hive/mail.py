@@ -183,8 +183,8 @@ SUMMARY = """A business owner asked his assistant about his email: "{question}"
 His recent mail (newest first, numbered):
 {mail}
 
-Answer him: what matters first (customers, money, deadlines, people waiting on him), then anything else worth knowing
-in one line. Skip newsletters, receipts and notifications unless he asked about them. Name who wrote and what they need.
+Answer him in under 70 words: what matters first (customers, money, deadlines, people waiting on him), one short
+line each, then anything else worth knowing in one line. Skip newsletters, receipts and notifications unless he asked about them. Name who wrote and what they need.
 Never invent anything that is not in the mail above; if nothing matches his question, say so.
 Reply with JSON only: {{"answer": "...", "about": [numbers of the messages the answer is about]}}"""
 
@@ -197,7 +197,8 @@ What his business is, as he told his assistant:
 {facts}
 
 Write the reply he would send: in his voice, short, warm and businesslike, in the language the email is written in.
-Say only what he asked to say, or what plainly follows from it; never promise money, dates or terms he did not give.
+Say only what he asked to say. Never add a figure, total, tax, discount, date or term he did not give, even one you
+could work out from his (Gate 112: a draft added "Rs 4,800 in total" by itself); he quotes his own numbers.
 No subject line, no placeholders like [Name]; sign off with his name only if you know it from the facts.
 Reply with JSON only: {{"body": "..."}}"""
 

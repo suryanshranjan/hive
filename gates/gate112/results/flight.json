@@ -1,0 +1,133 @@
+{
+ "steps": [
+  {
+   "mail": [
+    true,
+    "Connected to me@dabbadays.in: I can see 1 folders. I only read; nothing is sent without your yes."
+   ],
+   "unread": 6,
+   "step": "setup",
+   "minute": 0.1
+  },
+  {
+   "result": "mail_answered",
+   "answer": "📧 Asha Rao wants a price for 40 veg lunches for her office this Thursday.\nMeera Iyer's lunch came cold twice this week. She may cancel.\nFresh Veg Co sent invoice 2211 for Rs 18,400, due this Friday.\nRavi Kumar wants to know when you'll pay his Rs 500 October bonus.",
+   "seconds": 11.1,
+   "words": 50,
+   "names_asha": true,
+   "names_complaint": true,
+   "leads_with_noise": false,
+   "unread_after": 6,
+   "step": "O1_mail",
+   "minute": 0.2
+  },
+  {
+   "result": "mail_not_sent",
+   "draft": "📧 Your reply to Asha Rao <asha@client.in>\nRe: Lunch order for 40 people\n\nHi Asha,\n\nThank you for reaching out! Thursday works for us. We can do 40 veg lunches at ₹120 each.\n\nBest regards,\nSuresh\n\nSend it from your address?",
+   "asha_inbox": 0,
+   "numbers": [
+    "120",
+    "40"
+   ],
+   "days": [
+    "Thursday"
+   ],
+   "step": "O4_not_sent",
+   "minute": 0.5
+  },
+  {
+   "result": "mail_sent",
+   "told": "✅ Sent to asha@client.in.",
+   "asha_inbox": 1,
+   "sent_from": "me@dabbadays.in",
+   "in_reply_to": "<179469987030.15080.17104774942667700337@seed.test>",
+   "asha_message_id": "<179469987030.15080.17104774942667700337@seed.test>",
+   "subject": "Re: Lunch order for 40 people",
+   "body": "Hi Asha,\r\n\r\nThanks for reaching out! Thursday works for us. We can do 40 veg lunches at =\r\n=E2=82=B9120 each.\r\n\r\nWarm regards,\r\nSuresh\r\nDabba Days",
+   "unread_after": 6,
+   "step": "O3_sent",
+   "minute": 0.7
+  },
+  {
+   "stripe": [
+    true,
+    "Connected to Stripe (a full key: please make a restricted, read-only one when you can (Dashboard, Developers, API keys)). I never move money."
+   ],
+   "razorpay": [
+    true,
+    "Connected to Razorpay (Razorpay keys can't be limited to reading, so know that I only ever read with it). I never move money."
+   ],
+   "requests": [
+    [
+     "stripe",
+     "/v1/charges",
+     200
+    ],
+    [
+     "razorpay",
+     "/v1/payments",
+     200
+    ],
+    [
+     "stripe",
+     "/v1/charges",
+     200
+    ],
+    [
+     "razorpay",
+     "/v1/payments",
+     200
+    ],
+    [
+     "stripe",
+     "/v1/charges",
+     200
+    ],
+    [
+     "razorpay",
+     "/v1/payments",
+     200
+    ]
+   ],
+   "methods_to_stand_in": [
+    "GET"
+   ],
+   "hive_totals": {
+    "INR": {
+     "paid": 4500.0,
+     "count": 2,
+     "failed": 1,
+     "refunded": 0.0
+    }
+   },
+   "result": "pay_answered",
+   "answer": "💳 You made ₹4,500 this week from 2 payments: ₹3,000 from asha@client.in and ₹1,500 from meera@gmail.com. No refunds.\n\n1 payment failed: ₹999 from late@x.in. The customer cancelled it, so you may want to follow up.",
+   "seconds": 7.2,
+   "words": 34,
+   "says_4500": true,
+   "says_failed": true,
+   "step": "O5_payments",
+   "minute": 0.9
+  },
+  {
+   "setup": [
+    true,
+    "Connected to your calendar: 2 events in the next 7 days. I can only read it."
+   ],
+   "result": "cal_answered",
+   "answer": "📅 No. You have a tasting with Asha (40 lunches) from 3 to 4pm tomorrow at the Koramangala office.",
+   "seconds": 6.1,
+   "words": 18,
+   "says_no": true,
+   "names_tasting": true,
+   "step": "O6_calendar",
+   "minute": 1.0
+  },
+  {
+   "containers_left": "",
+   "total_minutes": 1.0,
+   "step": "cleanup",
+   "minute": 1.0
+  }
+ ]
+}

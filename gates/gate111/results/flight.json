@@ -1,0 +1,44 @@
+{
+ "steps": [
+  {
+   "result": "moved",
+   "minutes": 2.3,
+   "offer": "☁️ Shall I move to the cloud?\n\nI'll make a machine on your AWS account, move this project there, and keep working while your computer is off. It bills for as long as it runs; say \"delete the cloud machine\" any time and it stops.\n\n• Small, about $23 a month: talking with you, and one builder at a time.\n• Bigger, about $72 a month: several builders at once, faster.\n\nOr keep me on this computer, free: I stop when it's off.",
+   "offer_has_prices": [
+    true,
+    true,
+    true
+   ],
+   "aws_type": [
+    "t3.small"
+   ],
+   "remembered": "t3.small",
+   "told_last": "🛠 On it. This takes about 5 minutes; I'll tell you when I'm there.",
+   "step": "move",
+   "minute": 2.3
+  },
+  {
+   "listener_running": true,
+   "seen": "6040 /home/ubuntu/hive-cloud/venv/bin/python -m hive listen\n---\nListening on Telegram. Tell Hive anything, any time: a change of mind, a new rule, or 'status'. Ctrl+C to stop.\n",
+   "step": "always_on",
+   "minute": 2.7
+  },
+  {
+   "result": "cloud_off",
+   "told": "✅ Deleted. Nothing is left running.",
+   "step": "delete_said",
+   "minute": 3.5
+  },
+  {
+   "instance_state": [
+    "terminated"
+   ],
+   "firewall_rule_left": false,
+   "key_left": false,
+   "machine_dollars": 0.002,
+   "total_minutes": 3.5,
+   "step": "delete",
+   "minute": 3.5
+  }
+ ]
+}

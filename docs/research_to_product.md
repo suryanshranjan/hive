@@ -157,6 +157,13 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 | Say what the person will meet | Gate 110: a Vercel preview opens Vercel's sign-in page for anyone else | The link comes with one line: Vercel will ask him to sign in | `hive/assistant.py` `preview_it` |
 | Clean up what a deploy copies | Gate 110: 172 copies of projects left in temp on Windows | A delete that handles git's read-only files | `hive/deploy.py` `remove` |
 
+| "It depends on the user": always on is his choice | Gate 111 | This computer, small or bigger, at real monthly prices, in "move to the cloud" and in setup; remembered; used when he steps away | `hive/cloud_aws.py` SIZES, `monthly`; `hive/onboard.py` step_home |
+| A machine still booting must not hang Hive | Gate 111: one ssh waited 8 minutes on a ready machine | ssh and scp give up after 20 s and the wait retries | `hive/cloud.py` |
+| A hand-over is used once | Gate 111: last night's work restarted in the cloud and blocked the delete | Cleared once moved; ignored after 12 h | `hive/assistant.py` away, resume_here |
+| His office, read-only: mail, calendar, payments (the owner: Gmail and IMAP, Google Calendar, Razorpay, Stripe) | Gate 112 | `hive/mail.py`, `calendar_.py`, `payments.py`, routed by `office.py`; secrets deleted from the chat (`telegram.Channel.forget`) | `tests/test_office.py` |
+| A draft carries only his figures | Gate 112 run 1: "₹4,800 in total" added | The draft rule forbids any figure he did not give | `hive/mail.py` DRAFT |
+| Money to chase is always said | Gate 112 run 2: a failed payment left out | One line on failed payments, always | `hive/payments.py` ANSWER |
+
 ## Still to turn into the product
 
 - **Gates 55–56:** a skimming owner repairs about a quarter of the code sheet's wrong rules, whether by list, conversation or a short sheet; nothing changes in the product from these. Next to test with the founder: spot checks on concrete outcomes.

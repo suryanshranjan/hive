@@ -135,8 +135,8 @@ The payments:
 {table}
 
 Answer from these records only. Money that came in means successful payments (succeeded or captured), less refunds if
-he asks what he kept. Use the exact sums above rather than adding up yourself. Name failed payments and who they were
-from if he asks. If what he asks is outside these dates, say so.
+he asks what he kept. Use the exact sums above rather than adding up yourself. If any payment failed, always add
+one short line: how many, how much, from whom, so he can follow up (Gate 112: it was left out as "not asked"). If what he asks is outside these dates, say so.
 Reply with JSON only: {{"answer": "..."}}"""
 
 def _range(question):
