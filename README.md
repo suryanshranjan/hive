@@ -8,10 +8,12 @@ Hive is a founder's assistant, in the manner of J.A.R.V.I.S. You talk to it on T
 - **Technical instructions,** if you're technical yourself: "cache /products in Redis, 60 s TTL". It answers in your terms.
 - **Pictures:** "make it like this".
 - **Complaints:** "a customer says…"
+- **Your numbers:** "how many orders came in this week?" Answered from your own data, read-only, once you've connected it.
+- **Stepping away:** "I'm sleepy." Hive offers to carry the work on in the cloud so you can shut your computer, or another way.
 
-Hive asks you only what only you can decide. It builds on copies of your code, checks every test, and arrives as a pull request for your engineer. When it's merged, "put it live" puts it live, and "undo that" takes anything back.
+Getting started is one conversation: say "set me up", and Hive asks whether you run a business, have a product you build, or want to start something new, then gets to know it in about two minutes. Hive asks you only what only you can decide. It builds on copies of your code, checks every test, and arrives as a pull request for your engineer. When it's merged, "put it live" puts it live, and "undo that" takes anything back.
 
-Hive is a research project as much as a product: **107 pre-registered experiments** (*gates*), each scored against predictions pushed before it ran, failures included. Start with [`BRAIN.md`](BRAIN.md) for what is known and how sure we are.
+Hive is a research project as much as a product: **108 pre-registered experiments** (*gates*), each scored against predictions pushed before it ran, failures included. Start with [`BRAIN.md`](BRAIN.md) for what is known and how sure we are.
 
 ---
 
@@ -25,7 +27,7 @@ hive setup                                   # checks, your phone (Telegram), sc
 hive up --repo https://github.com/you/your-product   # or: fetch your code, and Hive is live on your phone
 ```
 
-`hive setup` connects Telegram in two minutes. It offers screenshots, your business numbers and your hosting service, then starts listening and says hello on your phone. After that, everything happens in Telegram. In a terminal, `hive` alone starts one conversation from an idea to a tested branch.
+`hive setup` connects Telegram in two minutes. It offers screenshots, your business numbers and your hosting service, then starts listening and says hello on your phone. Say **"set me up"** there, and Hive gets to know your business or product. After that, everything happens in Telegram. In a terminal, `hive` alone starts one conversation from an idea to a tested branch.
 
 **Optional extras:**
 
@@ -36,6 +38,7 @@ npm i -g @openai/codex && codex login       # Codex builders too: "use 2 Claude 
 hive deploy setup vercel                     # where it lives: vercel, netlify, railway, azure, fly, render, or custom
 hive numbers setup --url https://.../stats.json   # your numbers, so Hive can tell you whether a change worked
 hive brain add docs/                         # your policies, FAQs and notes, so Hive knows the business
+hive access add --db postgres://reader:...@host/db   # your data, read-only, so Hive can answer "how many orders this week?"
 hive cloud --new                             # a machine on your AWS account; Hive keeps working while your laptop sleeps
 ```
 
@@ -66,6 +69,16 @@ A real exchange from the end-to-end rehearsal (Gate 107), abridged:
 >
 > **You:** put it live → 🚀 Your engineer has merged it. I'll run every test first. ✅ It's live, sir.
 
+And from Gate 108 (run 3, abridged), on a made-up lunchbox company whose database Hive was given in setup:
+
+> **You:** How are our cooks paid?
+>
+> **Hive:** 🐝 Sir, on paper it is simple: a cook earns ₹70 for every lunch they make, paid each Monday for the previous week. Your records also show something the policy never mentions: a ₹500 "clean month" bonus. I checked it against the complaints, and it went to every cook with zero complaints that month and to none of the others, without exception. Is that your rule, Sir? If so, it deserves a line in the policy.
+>
+> **You:** How much did we pay our cooks in October, bonuses included?
+>
+> **Hive:** 📊 Cooks were paid ₹1,71,820 in October, and that already includes ₹2,000 in bonuses. That covers 48 payouts to 12 cooks.
+
 **What you can say:**
 
 | You say | Hive |
@@ -75,7 +88,7 @@ A real exchange from the end-to-end rehearsal (Gate 107), abridged:
 | *"cache /products in Redis, 60 s TTL"* | A technical instruction is taken as it is: "👍 Yes, let's do it", restated precisely, with at most two normal engineer's questions. From then on it speaks your language |
 | A picture + *"make it like this"* | Changes the latest build to match, then sends before and after. In testing a picture matched 18 of 18 times, words 13 of 18 |
 | *"set me up"* (offered on your first hello) | Gets to know you in one conversation, about two minutes, every step skippable, picked up where you stopped. First: are you a business, a developer with a product, or starting something new? A business: what it is, your site, your data, how you run things, your host. A developer: the product, where it runs, its data, how it's built and what never to touch, the host. Something new: your idea and what it must do on day one, then the build |
-| *"show me"* | Screenshots at phone size of the pages that changed |
+| *"show me"* | Screenshots at phone size of the pages that changed, with a line to ask for tablet or desktop |
 | *"show me the pricing page on desktop"*, *"and on tablet?"*, *"on every screen"* | That page on that screen; right after a screenshot, a short "and on tablet?" shows the same pages there |
 | *"here's our admin API https://... key: ..."*, a database address, a spreadsheet link | Connected read-only and tried at once ("I can see 12 tables: orders, users, payouts…"). Only one reading query at a time ever runs, in a read-only session; keys stay on your computer |
 | *"how many orders came in this week?"*, *"who are my top 5 sellers?"* | Answered from your own data, in plain words. Plans for your goals also read what your data holds |
@@ -120,6 +133,8 @@ The lower-level commands for scripts and experiments (`init`, `run`, `owner`, `r
 
 ## How it works
 
+- **It gets to know you first.** "Set me up" asks who you are and follows that path: a business (what it is, your site, your data, how you run things, your host), a developer with a product (how it's built and what never to touch), or something new (the idea and day one, then the build). Every step is skippable, checked as you give it, and kept if you stop.
+- **It reads your business, read-only.** Your site, an admin or analytics address with its key, your database (SQLite, Postgres, MySQL), a spreadsheet. Only one checked SELECT at a time runs, in a read-only session, at most 200 rows. Keys stay on your computer. Questions about your figures are answered from it, plans see what it holds, and anything only the data shows (a payment no document mentions) is explained from the data before you're asked.
 - **Your business first.** A business goal goes to a planner that reads your product in a throwaway copy. It splits the goal into the questions that decide it, and proposes only steps grounded in something it saw, so a step that cites nothing is dropped. It asks the one thing the product can't show ("do you already give new creators anything?"). Steps are built one after another on one branch, each shown to you.
 - **It asks only what only you can decide.** Business edge cases come as concrete situations ("a refund half paid by points: back to the card, or as points?"), and plain facts as plain questions. Your answers become rules, encoded as tests. Questions never invent facts about your business.
 - **Your work adds up.** A new request builds on top of your latest unmerged build, so everything reaches your engineer as one pull request (Gate 107).
@@ -129,6 +144,7 @@ The lower-level commands for scripts and experiments (`init`, `run`, `owner`, `r
 - **Builders never talk; a guard keeps the peace.** Each claims an area with a lock file, works in its own clone, and lands through the guard. The guard refuses anything that breaks a passing test, duplicates a definition or commits a secret. Claude, Codex and Gemini builders mix in one team (Gate 47).
 - **Checked before every delivery.** The goal's stated interfaces (Gate 84), your own examples run through the product's functions (Gate 103), and every test.
 - **It remembers.** Your rulings, your business notes and your documents carry into every later build and answer. Contradictions with an earlier ruling are put to you.
+- **It notices when you step away.** "I'm sleepy" gets where things stand and a choice. With work running, it recommends the cloud: the work is handed over and restarted there before anything stops here, so you can shut your computer. Or keep this computer on, or stop for tonight. With nothing running, it offers to build something overnight.
 - **It speaks first.** A morning brief at your local time, a builder stuck for 20 minutes, a step done, a build that stopped, always with the reason in plain words.
 - **Hard limits, whatever is asked:** it never changes your main version, never skips the tests, and never puts live a build your engineer hasn't merged.
 
@@ -154,6 +170,7 @@ Every result below was predicted on GitHub before the run. Real-company results 
 | His picture vs his words for a look | 18/18 against 13/18 measured checks; a blind judge preferred the picture 3 of 3; same cost | Gate 105 |
 | Give it the business, not the task | 8 of 9 planted problems found and built from a goal alone, 4 owner messages, no technical words; a simulated customer panel (MiroFish's idea) added nothing | Gate 106 |
 | A fresh founder end to end (14 steps on the phone) | Runs 3 and 4 passed every step (about 13 min, $3). Run 1 found that the plan never went live, which is fixed | Gate 107 |
+| Run a company's numbers through Hive | After fixes, run 3: onboarding in 0.3 min, 10 of 10 figure answers from the data, a ₹500 rule found only in the payouts and explained, screens on every device, a 3-step plan built (7.9 min, $0.76). Runs 1-2 found 2 faults (a build that couldn't start; queries dropped, which fired the kill at 5 of 10), both fixed. One clean run: to be repeated | Gate 108 |
 
 The failed and withdrawn ideas are kept with their evidence ([`BRAIN.md`](BRAIN.md) §6). Every finding that changes Hive is mapped to the code that acts on it in [`docs/research_to_product.md`](docs/research_to_product.md). The assistant's whole interaction design is in [`docs/jarvis.md`](docs/jarvis.md).
 
@@ -166,15 +183,15 @@ Every gate pushes its predictions and kill conditions to GitHub **before** it ru
 | Path | Contents |
 | --- | --- |
 | [`BRAIN.md`](BRAIN.md) | Shared memory: findings and how sure we are, measured constants, evidence log, prediction scorecard, open questions |
-| [`hive/`](hive/) | The product. `assistant.py` is the phone assistant; `start.py` the build; `swarm.py` and `guard.py` the builders; `plan.py` business goals; `ship.py` and `deploy.py` pull requests and hosting; `brief.py`, `numbers.py`, `budget.py`, `brain.py`, `safety.py`, `register.py`, `screens.py` and `refs.py` cover the rest |
-| [`tests/`](tests/) | About 440 checks with stand-in builders, a fake Telegram and a stand-in model, no network or tokens. They run on every push |
-| [`gates/`](gates/) | Every experiment (Gates 0-107): predictions, results, referee code, transcripts |
+| [`hive/`](hive/) | The product. `assistant.py` is the phone assistant; `start.py` the build; `swarm.py` and `guard.py` the builders; `plan.py` business goals; `onboard.py` setting up; `access.py` reading your data, read-only; `ship.py` and `deploy.py` pull requests and hosting; `brief.py`, `numbers.py`, `budget.py`, `brain.py`, `safety.py`, `register.py`, `screens.py` and `refs.py` cover the rest |
+| [`tests/`](tests/) | About 530 checks with stand-in builders, a fake Telegram and a stand-in model, no network or tokens. They run on every push |
+| [`gates/`](gates/) | Every experiment (Gates 0-108): predictions, results, referee code, transcripts |
 | [`lab/`](lab/) | Run a gate in one command; [`lab/QUEUE.md`](lab/QUEUE.md) is the queue and session handoff |
 | [`docs/`](docs/) | The interaction design ([`jarvis.md`](docs/jarvis.md)), channels ([`channels.md`](docs/channels.md)), the gap plan, the founder session, related work |
 
 ## Privacy
 
-Several gates use a real company's code and rules (Company X). Its name, code, rules, documents and the founder's answers are not in this repository; those gates publish aggregate numbers only. Hive keeps an owner's Telegram link, rulings, business notes, numbers, budget and hosting settings in `~/.hive/` on their own machine, never in a repository. Voice notes are transcribed on that machine.
+Several gates use a real company's code and rules (Company X). Its name, code, rules, documents and the founder's answers are not in this repository; those gates publish aggregate numbers only. Hive keeps an owner's Telegram link, rulings, business notes, numbers, budget, hosting settings and data access (with its keys, readable by the owner only) in `~/.hive/` on their own machine, never in a repository. It only ever reads his data, and asks for read-only logins. Moving Hive to the cloud copies these to his own machine there. Voice notes are transcribed on that machine.
 
 ## License
 
