@@ -1,0 +1,36 @@
+{
+ "steps": [
+  {
+   "ok": true,
+   "made_machine": true,
+   "size": "t3.small",
+   "url_secret_len": 16,
+   "status": 200,
+   "has_home_page": true,
+   "plans_has_trial_line": true,
+   "said": "",
+   "step": "test_deploy",
+   "minute": 2.4
+  },
+  {
+   "said": "The test page is down, and the test machine is deleted: nothing is left running or billing.",
+   "status_after": null,
+   "step": "take_down",
+   "minute": 3.4
+  },
+  {
+   "instance_state": [
+    "terminated"
+   ],
+   "instance_type": [
+    "t3.small"
+   ],
+   "firewall_rule_left": false,
+   "key_left": false,
+   "machine_dollars": 0.001,
+   "total_minutes": 3.4,
+   "step": "delete",
+   "minute": 3.4
+  }
+ ]
+}

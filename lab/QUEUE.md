@@ -2,7 +2,12 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 14 2026, after Gate 108 run 4)
+## Where we left off (Nov 15 2026, after Gate 109)
+
+- **Gate 109 done** (`gates/gate109/RESULTS.md`): the cloud paths on real AWS, t3.small. The move, the restart in the cloud with his answers, the work home and the delete all held. The test page failed (its stop command killed its own shell), was fixed, and held in flight 109b. Nothing of Hive's is left in AWS (checked); only the owner's own `barternow-staging` runs there, untouched.
+- Fixed from it: questions to the phone one at a time; a test-only machine is a t3.small.
+
+## Before that (Nov 14 2026, after Gate 108 run 4)
 
 - **Gate 108 done, replicated** (`gates/gate108/RESULTS.md`): runs 3 and 4 clean in a row; run 4 found all 4 planted problems after the planner's price rule. Dabba Days lives in the lab container (`~/dabba-days`, `~/dabba-data`; key in `~/dabba-private` and `hive_private/dabba/`).
   - Its data is also in Postgres (`dabba-pg`) and MySQL (`dabba-my`) on the Docker network `hive-db`, with read-only login `reader`/`readpw`. Hive read both: 5 of 5 right each.
@@ -13,7 +18,7 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 - **AWS** is signed in on the laptop (account …1696, root login; a limited user would be safer).
 - **Gate 109 attempt 1 (Nov 15):** interrupted, because the laptop ran low on memory while the machine set itself up. The machine was deleted and checked in AWS; nothing is billing. One fix: deleting a machine never moved to no longer asks for a safety word (`gates/gate109/RESULTS.md`).
 - **Next:**
-  1. Gate 109 again, same predictions: `python gates/gate109/flight109.py <Dabba Days copy>` from the laptop (AWS signed in, account …1696). Free memory first (the test databases are stopped). Copy the lab's Telegram link to `~/.hive/telegram.json` for the flight and remove it after. Only on the user's word.
+  1. (Done: Gate 109.) Still unflown: an expired login renewed from the phone, against real AWS and GitHub.
   2. The founder session (`docs/founder_session.md`).
   3. Gate 108's design on a second mock company in another trade.
 

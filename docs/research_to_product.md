@@ -149,6 +149,9 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 | Expired logins must not stop the work | None: an owner request (an expired AWS sign-in stopped the cloud test) | AWS and GitHub sign-ins renewed from his phone, never switching accounts silently | `hive/logins.py` (in the tool, not flown) |
 | A test deploy without a host | None: an owner request | Static pages on his AWS machine at a private link for two hours; deleted with the machine | `hive/trydeploy.py` (in the tool, not flown) |
 
+| A command that stops a process must not match itself | Gate 109: `pkill -f "http.server 8080"` killed its own shell, so the test page never went up | `[h]ttp`; the test's stand-in machine runs its commands in a real shell; flown in 109b (200, down, deleted) | `hive/trydeploy.py`, `tests/test_trydeploy.py` |
+| "I'll send them one at a time" must be true | Gate 109: two questions arrived together (the owner) | The next question goes out only once the last is answered | `hive/telegram.py`, `tests/test_telegram.py` |
+
 ## Still to turn into the product
 
 - **Gates 55–56:** a skimming owner repairs about a quarter of the code sheet's wrong rules, whether by list, conversation or a short sheet; nothing changes in the product from these. Next to test with the founder: spot checks on concrete outcomes.
