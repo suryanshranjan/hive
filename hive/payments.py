@@ -105,7 +105,9 @@ def fetch(repo, since, until=None, cap=2000):
             if len(items) < 100:
                 break
             skip += 100
-    return sorted(out, key=lambda p: -p['created'])
+    # only what falls in the dates asked about, whatever a provider sends back (stripe-mock ignores the filter; a real
+    # API's paging could too), so an old payment is never counted as this week's
+    return sorted((p for p in out if since <= p['created'] <= until), key=lambda p: -p['created'])
 
 def totals(pays):
     """What came in, by currency: {'INR': {'paid': n, 'count': k, 'failed': f, 'refunded': r}}."""
