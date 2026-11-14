@@ -67,6 +67,17 @@ def ready(repo):
                         f"({HOSTS[cfg['host']][3]}).")
     return 'ok', ''
 
+def remove(path):
+    """Delete a folder, read-only files too: git makes its object files read-only, and on Windows the plain delete
+    failed silently, so every preview and going live left a whole copy of his project behind (172 found, Gate 110)."""
+    import stat
+    def unlock(f, p, _):
+        try:
+            os.chmod(p, stat.S_IWRITE); f(p)
+        except OSError:
+            pass
+    shutil.rmtree(path, onerror=unlock)
+
 def _copy(repo, branch):
     """A clean copy of one branch, with the host's project link files (kept out of git) carried over."""
     work = tempfile.mkdtemp(prefix='hive_deploy_')
@@ -78,7 +89,7 @@ def _copy(repo, branch):
     ok = sha and subprocess.run(['git', 'clone', '-q', '--no-checkout', os.path.abspath(repo), code], capture_output=True).returncode == 0 \
         and subprocess.run(['git', '-C', code, 'checkout', '-q', sha], capture_output=True).returncode == 0
     if not ok:
-        shutil.rmtree(work, ignore_errors=True)
+        remove(work)
         return None, None
     for name in LINKS:
         src = os.path.join(repo, name)
@@ -144,7 +155,7 @@ def preview(repo, branch):
                 'say': '' if url else f"{cfg['host'].title()} refused the preview (for your engineer: "
                                       f"{(p.stderr or p.stdout).strip()[-200:]})"}
     finally:
-        shutil.rmtree(work, ignore_errors=True)
+        remove(work)
 
 def merged(repo, branch, main='main'):
     """Is this build in his main version (his engineer merged it), here or on his remote's main?"""
@@ -184,7 +195,7 @@ def live(repo, main_ref, test_cmd=None):
         json.dump(cfg, open(os.path.join(DIR, _key(repo) + '.json'), 'w'), indent=1)
         return {'ok': True, 'url': url, 'why': None, 'say': ''}
     finally:
-        shutil.rmtree(work, ignore_errors=True)
+        remove(work)
 
 def note_before(repo, main_ref):
     """The first time Hive puts his product live: remember his main version from just before the merge as what was

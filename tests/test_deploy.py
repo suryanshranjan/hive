@@ -128,6 +128,11 @@ for words, taps, want in (('no', [tap('fst|no')], 'no_preview'), ('yes', [tap('f
         check('on his yes: his current version live first (not the build), then the build at its own preview address',
               (r, [(x[0].split()[2], x[1]) for x in ran], 'https://shop-git-x.vercel.app' in texts[-1]),
               (want, [('--yes', 'new'), ('--prod', 'old'), ('--yes', 'new')], True))
+        import glob, tempfile
+        check('no copy of his project is left behind after a deploy (on Windows, 172 were, Gate 110)',
+              glob.glob(os.path.join(tempfile.gettempdir(), 'hive_deploy_*')), [])
+        check("a Vercel preview says it asks him to sign in to Vercel (Gate 110: anyone else meets Vercel's login page)",
+              'sign in to Vercel first' in texts[-1], True)
 check('Vercel\'s labelled address is the one read, not the last link printed',
       deploy._url('{"x": "vercel inspect https://a-1.vercel.app"}\nPreview  https://a-git.vercel.app\n'), 'https://a-git.vercel.app')
 deploy.shutil.which = real_which

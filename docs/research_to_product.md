@@ -152,6 +152,11 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 | A command that stops a process must not match itself | Gate 109: `pkill -f "http.server 8080"` killed its own shell, so the test page never went up | `[h]ttp`; the test's stand-in machine runs its commands in a real shell; flown in 109b (200, down, deleted) | `hive/trydeploy.py`, `tests/test_trydeploy.py` |
 | "I'll send them one at a time" must be true | Gate 109: two questions arrived together (the owner) | The next question goes out only once the last is answered | `hive/telegram.py`, `tests/test_telegram.py` |
 
+| A preview must never go live | Gate 110 attempt 2: on a new Vercel project the first deployment goes live, so "send me a link" put the unmerged build live | Previews asked for as previews; on a new project he is asked, and his current version (not the build) goes live first; flown in attempt 3 | `hive/deploy.py`, `hive/assistant.py` `preview_it`, `tests/test_deploy.py` §8 |
+| "Hive has the autonomy to do all this from the phone" (the owner) | Gate 110: the host's tool installed and signed in with nobody at the computer | Missing one-command tools installed; Vercel sign-in by a link on his phone | `hive/logins.py`, `tests/test_logins.py` §8 |
+| Say what the person will meet | Gate 110: a Vercel preview opens Vercel's sign-in page for anyone else | The link comes with one line: Vercel will ask him to sign in | `hive/assistant.py` `preview_it` |
+| Clean up what a deploy copies | Gate 110: 172 copies of projects left in temp on Windows | A delete that handles git's read-only files | `hive/deploy.py` `remove` |
+
 ## Still to turn into the product
 
 - **Gates 55–56:** a skimming owner repairs about a quarter of the code sheet's wrong rules, whether by list, conversation or a short sheet; nothing changes in the product from these. Next to test with the founder: spot checks on concrete outcomes.

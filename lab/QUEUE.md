@@ -2,7 +2,12 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 15 2026, after Gate 109)
+## Where we left off (Nov 15 2026, after Gate 110)
+
+- **Gate 110 done** (`gates/gate110/RESULTS.md`): Vercel from the phone on the owner's personal Vercel. Attempt 3 held on every prediction after the first-deployment fix. Everything the test made is deleted; his `portfolio` is untouched. Vercel's tool is installed on the laptop (Hive installed it), signed in to his personal account.
+- Still unflown: a login renewed from the phone (all were valid); a framework build on a host.
+
+## Before that (Nov 15 2026, after Gate 109)
 
 - **Gate 109 done** (`gates/gate109/RESULTS.md`): the cloud paths on real AWS, t3.small. The move, the restart in the cloud with his answers, the work home and the delete all held. The test page failed (its stop command killed its own shell), was fixed, and held in flight 109b. Nothing of Hive's is left in AWS (checked); only the owner's own `barternow-staging` runs there, untouched.
 - Fixed from it: questions to the phone one at a time; a test-only machine is a t3.small.

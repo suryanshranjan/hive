@@ -1190,8 +1190,10 @@ def preview_it(ch, repo, poll=20):
             ch.send('⚠️ ' + telegram.esc(first['say'])); return 'no_preview'
         r = deploy.preview(repo, _build_ref(st))
     if r['ok']:
-        ch.send(f"🔗 <b>Here it is, sir, to try on your phone:</b>\n{r['url']}\n\n<i>A separate copy: your live product is "
-                "untouched. Tell me what's off, or say \"ship it\".</i>", html=True)
+        wall = ("\n\nVercel keeps previews private: it will ask you to sign in to Vercel first, and only people on your "
+                "Vercel team can open it." if deploy.config(repo).get('host') == 'vercel' else '')   # Gate 110
+        ch.send(f"🔗 <b>Here it is, sir, to try on your phone:</b>\n{r['url']}{telegram.esc(wall)}\n\n<i>A separate copy: your "
+                "live product is untouched. Tell me what's off, or say \"ship it\".</i>", html=True)
         return 'previewed'
     ch.send('🔗 ' + telegram.esc(r['say']), html=True)
     return 'no_preview'

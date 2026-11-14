@@ -10,7 +10,7 @@ The machine's port 8080 is opened to the internet while the test runs (a phone's
 advance), so the address carries a random secret and the server stops by itself after two hours."""
 import json, os, re, secrets, shutil, subprocess, tempfile, time
 
-from . import cloud, cloud_aws
+from . import cloud, cloud_aws, deploy
 
 PORT = 8080
 HOURS = 2
@@ -63,7 +63,7 @@ def _export(repo, branch):
     tar = os.path.join(work, 'site.tar')
     p = subprocess.run(['git', '-C', repo, 'archive', '--format=tar', '-o', tar, branch], capture_output=True, text=True)
     if p.returncode:
-        shutil.rmtree(work, ignore_errors=True)
+        deploy.remove(work)
         return None, None
     files = os.path.join(work, 'files'); os.makedirs(files)
     subprocess.run(['tar', '-xf', tar, '-C', files], capture_output=True)
@@ -109,7 +109,7 @@ def up(repo, branch, say=print, new_machine=None, target=None):
                'until': time.time() + HOURS * 3600, 'made_machine': made or state().get('made_machine', False)})
         return {'ok': True, 'url': url, 'made': made, 'say': ''}
     finally:
-        shutil.rmtree(os.path.dirname(tar), ignore_errors=True)
+        deploy.remove(os.path.dirname(tar))
 
 def down(repo, delete_machine=None, target=None):
     """Stop the test: the server stops, its files go, the port closes; a machine made only for the test is deleted.
