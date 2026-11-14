@@ -34,6 +34,7 @@ hive up --repo https://github.com/you/your-product   # or: fetch your code, and 
 ```
 pip install playwright && playwright install chromium   # screenshots of what was built, on your phone
 pip install "hive-swarm[voice] @ git+https://github.com/suryanshranjan/hive"   # answer by voice note (Whisper, on your machine)
+pip install "hive-swarm[data] @ git+https://github.com/suryanshranjan/hive"    # read Postgres, MySQL, Excel and PDF data
 npm i -g @openai/codex && codex login       # Codex builders too: "use 2 Claude and 2 Codex"
 hive deploy setup vercel                     # where it lives: vercel, netlify, railway, azure, fly, render, or custom
 hive numbers setup --url https://.../stats.json   # your numbers, so Hive can tell you whether a change worked

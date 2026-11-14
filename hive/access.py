@@ -166,7 +166,8 @@ def _text_of_file(path):
         try:
             import openpyxl
         except ImportError:
-            raise Unreadable('an Excel file needs openpyxl here (pip install openpyxl); or save it as CSV') from None
+            raise Unreadable("I can't open Excel files on this computer yet. Save it as CSV and send it again, or have your "
+                             "engineer run once: pip install \"hive-swarm[data] @ git+https://github.com/suryanshranjan/hive\"") from None
         wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
         out = []
         for ws in wb.worksheets[:5]:
@@ -258,7 +259,8 @@ def run_sql(where, query, timeout=30):
             p = subprocess.run(['psql', where, '-X', '-q', '--csv', '-v', 'ON_ERROR_STOP=1', '-c', limited], env=env,
                                capture_output=True, text=True, timeout=timeout + 30)
         except FileNotFoundError:
-            raise Unreadable('reading Postgres needs psql or psycopg here (pip install "psycopg[binary]")') from None
+            raise Unreadable("I can't read a Postgres database on this computer yet. Your engineer runs this once: "
+                             "pip install \"hive-swarm[data] @ git+https://github.com/suryanshranjan/hive\"") from None
         if p.returncode:
             raise Unreadable(f'the query failed ({p.stderr.strip()[-160:]})')
         return p.stdout
@@ -276,7 +278,8 @@ def run_sql(where, query, timeout=30):
         finally:
             con.close()
     except ImportError:
-        raise Unreadable('reading MySQL needs pymysql here (pip install pymysql)') from None
+        raise Unreadable("I can't read a MySQL database on this computer yet. Your engineer runs this once: "
+                             "pip install \"hive-swarm[data] @ git+https://github.com/suryanshranjan/hive\"") from None
     except Exception as e:
         raise Unreadable(f'the query failed ({str(e)[:120]})') from None
 

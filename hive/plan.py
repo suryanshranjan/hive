@@ -20,8 +20,10 @@ His standing rules (never plan against them):
 {rules}
 
 Propose 2 to 4 changes to the product, most effective first, that together move his goal. Each step must be buildable
-in this codebase now, by one builder, in under an hour. Do not propose marketing, ads, outreach, pricing changes or
-anything outside the product. For each step:
+in this codebase now, by one builder, in under an hour. Do not propose marketing, ads, outreach, changing what he
+charges, or anything outside the product. How his prices are shown is the product, and in scope: read each page as a
+first-time customer deciding whether to pay, and ask what they cannot tell from it (what one unit costs, what is
+included, what happens if they stop). For each step:
 - "title": what it is, in at most 8 plain words a shop owner would use ("A shorter sign-up form").
 - "why": one plain sentence on what you saw that holds his customers back, and how this helps ("Sign-up asks for 9
   things, bank details included, before a creator sees what they'd earn.").
