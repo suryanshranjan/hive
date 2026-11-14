@@ -356,11 +356,16 @@ ANSWER = """Answer his question from his own data. A business owner asked his as
 What his data shows:
 {data}
 
-Answer him in 1 to 3 short plain sentences, numbers exactly as the data gives them, no technical words (no table,
-column or SQL). Never add a part to a total that may already contain it: if the data shows a total equals its parts
+Answer him so he gets it in one glance on his phone: the answer first, in one short sentence with the number exactly as
+the data gives it ("62 new subscribers signed up in October."), then at most one more short sentence, only if it
+changes what he'd do. Everyday words; no technical words (no table, column or SQL), no hedging, no repeating his
+question. Never add a part to a total that may already contain it: if the data shows a total equals its parts
 (say amount = rate x count + bonus), the total is the answer. If the data does not answer it, say plainly what is
 missing and what would answer it. Today is {today}.
 Reply with JSON only: {{"answer": "...", "found": true or false}}"""
+
+from . import explain as _explain
+ANSWER = _explain.plain(ANSWER)
 
 def _today():
     return time.strftime('%A %d %B %Y')

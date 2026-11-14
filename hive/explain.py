@@ -276,6 +276,22 @@ def conflicts(decisions):
             continue
     return []
 
+# How everything a founder reads is written (the owner: "anything must be answered simply; any founder can be the
+# case"). Added to every prompt whose words reach him, just before its reply format.
+PLAIN = ("How to write what he reads: any founder, reading on his phone, must get it in one glance. Put the answer or "
+         "the point first. Short sentences, everyday words, one idea each. Leave out what he did not ask for and does "
+         "not need to act on; he can always ask for more (but never leave out what this task says to cover). No "
+         "jargon or code words unless he writes that way himself, no filler or hedging (\"on paper\", \"without "
+         "exception\", \"I checked it against\", \"it's worth noting\"), and never repeat his question back.")
+
+def plain(prompt, before=('Reply with JSON only', 'Reply with the answer only', 'End with one last line')):
+    """The prompt with the plain-reply rule put just before its reply format (or at its end)."""
+    for marker in before:
+        k = prompt.rfind(marker)
+        if k >= 0:
+            return prompt[:k] + PLAIN + '\n' + prompt[k:]
+    return prompt.rstrip() + '\n\n' + PLAIN
+
 def ask_json(prompt):
     """One question to a model that answers in JSON: Claude first, the backup model second; None if neither answers."""
     for ask in (_ask_claude, _ask_backup):
@@ -301,3 +317,5 @@ def _log_failure(who, e, prompt):
             f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} {who}: {e!r:.300} | {prompt[:120]!r}\n")
     except Exception:
         pass
+
+UNDERSTAND = plain(UNDERSTAND)   # his "what does this mean?" gets a plain answer

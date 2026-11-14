@@ -63,4 +63,15 @@ open(fake, 'w').write('import json, sys; sys.stdin.read(); print(json.dumps({"re
 explain.CMD = f'"{sys.executable}" "{fake}"'
 before = explain.SPENT[0]; explain.ask_json('anything')
 check("a model call's cost is counted in Hive's own spending", round(explain.SPENT[0] - before, 2), 0.05)
+
+# every reply a founder reads is written plainly (the owner: "anything must be answered simply; any founder can be the
+# case"): the rule sits in each such prompt, before its reply format, and the prompts still fill in
+from hive import access, assistant, interview
+for name, prompt in (('greetings, status, replies, the brief', assistant.VOICE), ('what changed', assistant.CHANGED),
+                     ('answers about his product', assistant.LOOK), ('a customer complaint', assistant.COMPLAINT),
+                     ('answers from his data', access.ANSWER), ('what a question means', explain.UNDERSTAND),
+                     ('how a built part works', interview.TALK)):
+    k = prompt.find(explain.PLAIN)
+    check(f'plain replies: {name}', k > 0 and prompt.find('Reply with', k) > k or 'End with one last line' in prompt[k:], True)
+check('the voice still fills in', assistant.VOICE.format(who='sir', facts='f', task='t').count(explain.PLAIN), 1)
 sys.exit(fail)

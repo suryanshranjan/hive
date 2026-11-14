@@ -143,6 +143,8 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 | Explain what only the data shows before asking him | Gate 108 run 1 vs runs 2-3: the hidden bonus found, then its condition named | The code-reading assistant reads his data read-only and compares who gets what | `hive/assistant.py` `_data_note`, `hive access sql` (in the tool) |
 | "I'm sleepy": offer how to carry on | None: an owner request | The cloud recommended when work runs (handed over, restarted there), or keep the computer on, stop, or something overnight | `hive/assistant.py` `away`, `resume_here`; `hive/cloud.py` (in the tool, AWS move not flown) |
 
+| "Anything must be answered simply; any founder can be the case" | None: an owner request (Nov 14 2026) | One plain-reply rule in every founder-facing prompt; builder instructions and rule sheets untouched | `hive/explain.py` `PLAIN`, `plain()` (in the tool) |
+
 ## Still to turn into the product
 
 - **Gates 55–56:** a skimming owner repairs about a quarter of the code sheet's wrong rules, whether by list, conversation or a short sheet; nothing changes in the product from these. Next to test with the founder: spot checks on concrete outcomes.

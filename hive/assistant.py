@@ -193,6 +193,8 @@ What you know right now:
 {task}
 Reply with JSON only: {{"reply": "..."}}"""
 
+VOICE = explain.plain(VOICE)   # greetings, status, replies, the morning brief: plain for any founder
+
 def facts(repo, ch=None):
     """What Hive knows about this owner's project right now, in plain lines, for its replies."""
     st = latest_build(repo)
@@ -613,6 +615,8 @@ see (colours, layout, buttons, wording), in words he would use. No file names, b
 with his next step in one short sentence: tell you what's off (or send a picture), or say "ship it" to send it to his
 engineer. Address him as "{who}". Reply with JSON only: {{"reply": "..."}}"""
 
+CHANGED = explain.plain(CHANGED)
+
 def what_changed(repo, ch=None):
     """What a finished build changed, in his words, to go with its screenshots; a plain fallback without a model."""
     st = latest_build(repo) or {}
@@ -819,8 +823,13 @@ LOOK = """You are Hive, the business owner's assistant, answering him about his 
 of his project: read the code to find the answer. When the answer depends on a case the code does not make obvious
 (a date, an amount, an edge), check it: run the tests or a small script here. This folder is a throwaway copy, so
 nothing you do reaches his product; never use the network and never install anything. Answer what the product actually
-does today, in plain business words he can act on, in at most 4 short sentences, in the manner of J.A.R.V.I.S.: calm,
-precise, a light dry touch at most. If you checked by running it, say so in a few words ("I tried it: ..."). No code,
+does today, so he gets it in one glance on his phone: the answer first, in one short sentence ("Cooks get ₹70 a lunch,
+paid every Monday."), then at most two more short sentences, only if they add something he needs: three short
+sentences and about 45 words in all, at most. No examples, names or counts he didn't ask for; he can ask for more. Everyday words, the
+way a sharp assistant talks to a busy founder: no "on paper", "without exception", "I checked it against", no hedging,
+no repeating what he asked. If you found something no page or document says, give it in one line with its reason, and
+ask one yes-or-no question ("One thing your policy doesn't say: cooks with no complaints in a month get an extra ₹500.
+Is that your rule? I can add it to the policy."). If you checked by running it, say so in a few words ("I tried it: ..."). No code,
 file names or technical terms unless he asks, or he writes technically himself (then answer in his terms, with the
 file and function names). If the code does not settle it, say so plainly and say what would.
 Reply in his language and his script: if he writes Hindi-English in English letters, answer the same way, never in
@@ -832,6 +841,8 @@ The conversation so far:
 His question: "{text}"
 
 Reply with the answer only."""
+
+LOOK = explain.plain(LOOK)
 
 ASK_CMD = os.environ.get('HIVE_LOOK_CMD', 'claude -p --output-format json --allowedTools Read Grep Glob Bash')
 
@@ -924,6 +935,8 @@ End with one last line, exactly one of:
 VERDICT: rule <number>
 VERDICT: bug
 VERDICT: unclear"""
+
+COMPLAINT = explain.plain(COMPLAINT)
 
 def complaint(ch, repo, text, poll, apply_build=None):
     """A customer's complaint, linked to his rules: Claude reads his code and tries the case; either it is one of his

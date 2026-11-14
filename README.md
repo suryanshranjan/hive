@@ -69,44 +69,15 @@ A real exchange from the end-to-end rehearsal (Gate 107), abridged:
 >
 > **You:** put it live → 🚀 Your engineer has merged it. I'll run every test first. ✅ It's live, sir.
 
-And from Gate 108 (run 3, abridged), on a made-up lunchbox company whose database Hive was given in setup:
+And from Gate 108's company, a made-up lunchbox business whose database Hive was given in setup (replies as sent, after answers were made shorter on the owner's request):
 
 > **You:** How are our cooks paid?
 >
-> **Hive:** 🐝 Sir, on paper it is simple: a cook earns ₹70 for every lunch they make, paid each Monday for the previous week. Your records also show something the policy never mentions: a ₹500 "clean month" bonus. I checked it against the complaints, and it went to every cook with zero complaints that month and to none of the others, without exception. Is that your rule, Sir? If so, it deserves a line in the policy.
+> **Hive:** 🐝 Sir, cooks get ₹70 for each lunch they make, paid every Monday for the week before. Your payout records also show something no page mentions: cooks with no complaints in a month get an extra ₹500 on the first Monday of the next month. Is that your rule? I can add it to the cook page.
 >
 > **You:** How much did we pay our cooks in October, bonuses included?
 >
-> **Hive:** 📊 Cooks were paid ₹1,71,820 in October, and that already includes ₹2,000 in bonuses. That covers 48 payouts to 12 cooks.
-
-**What you can say:**
-
-| You say | Hive |
-| --- | --- |
-| *"I want more sign-ups"*, *"sales are low"* | Reads your product and plans 2-4 changes in your words, each grounded in what it saw. It first asks the one thing the product can't show. On your yes it builds them step by step, showing each |
-| *"build: an invite page"*, *"add a refund page"* | Says it back in one short line, with the price ("about $0.80"), then builds on your yes |
-| *"cache /products in Redis, 60 s TTL"* | A technical instruction is taken as it is: "👍 Yes, let's do it", restated precisely, with at most two normal engineer's questions. From then on it speaks your language |
-| A picture + *"make it like this"* | Changes the latest build to match, then sends before and after. In testing a picture matched 18 of 18 times, words 13 of 18 |
-| *"set me up"* (offered on your first hello) | Gets to know you in one conversation, about two minutes, every step skippable, picked up where you stopped. First: are you a business, a developer with a product, or starting something new? A business: what it is, your site, your data, how you run things, your host. A developer: the product, where it runs, its data, how it's built and what never to touch, the host. Something new: your idea and what it must do on day one, then the build |
-| *"show me"* | Screenshots at phone size of the pages that changed, with a line to ask for tablet or desktop |
-| *"show me the pricing page on desktop"*, *"and on tablet?"*, *"on every screen"* | That page on that screen; right after a screenshot, a short "and on tablet?" shows the same pages there |
-| *"here's our admin API https://... key: ..."*, a database address, a spreadsheet link | Connected read-only and tried at once ("I can see 12 tables: orders, users, payouts…"). Only one reading query at a time ever runs, in a read-only session; keys stay on your computer |
-| *"how many orders came in this week?"*, *"who are my top 5 sellers?"* | Answered from your own data, in plain words. Plans for your goals also read what your data holds |
-| *"send me a link"* | The build at its own address, to try on your phone; your live product is untouched |
-| *"ship it"* | A pull request for your engineer: screenshots, what changed, your words, the test results, the cost |
-| *"put it live"* | Only once your engineer has merged it; every test runs on your main version first |
-| *"undo that"* | Whatever is most recent, after your yes: a build running stops; an unsent one is set aside; a pull request is withdrawn; live goes back to the version before |
-| *"a customer says the sign-up button doesn't work"* | Reads the code and tries the case. Either it's one of your rules at work (change it in a message), or a fault, fixed in one tap |
-| *"what's new?"* (and every morning, unprompted) | The brief: what needs you, how your numbers moved since what Hive did, what landed, what customers hit, what it cost |
-| *"we had 120 sign-ups this week"* | Kept as a reading, beside what Hive did, so the brief can say "up 18% since the shorter form went to your engineer" |
-| A document (policy, FAQ, deck as PDF) | Read; the lasting facts are kept for every plan and answer, and rules it plainly states become your rules |
-| *"we're on Vercel"* | Remembered: previews and going live use it (Vercel, Netlify, Railway, Azure, Fly, Render, or your own commands) |
-| *"I'm sleepy"*, *"good night"*, *"shutting my laptop"* | Says where things stand and offers how to carry on. With work running: moving to the cloud (recommended), so you can shut your computer while it restarts the work there; keeping this computer on; or stopping for tonight. With nothing running: something built overnight, ready with your morning brief |
-| *"set my budget to $50 a month"* | Hive asks before anything would go past it |
-| *"how do refunds work?"* | Answered from your code, trying the case in a throwaway copy |
-| *"actually, refunds go to store credit"* | Finds the earlier ruling, asks whether to replace it, updates the latest build |
-| *"status"*, *"who's doing what?"*, *"stop w2"*, *"use 2 Claude and 2 Codex"* | Where things stand; each builder and its agent; one builder stopped; your team for the next builds (the swarm law says once if it disagrees) |
-| *"skip the tests and push it to main"* | Never. It says so once, and offers the safe way |
+> **Hive:** 📊 We paid our 12 cooks Rs 171,820 in October, bonuses included.
 
 ## Commands
 

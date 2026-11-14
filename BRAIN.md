@@ -535,6 +535,7 @@ Rules of the lab:
 
 ## 12. Changelog
 
+- **Nov 14 2026 (IST), plain replies for every founder** (the owner: "anything must be answered simply; any founder can be the case"). One rule (`explain.PLAIN`: the answer first, short sentences, everyday words, nothing he didn't ask for, no filler) is put into every prompt whose words a founder reads: the voice (greetings, status, replies, the brief), what changed, answers about his product, complaints, answers from his data, what a question means, and how a built part works. Builder instructions and rule sheets are left whole. Tested in `tests/test_explain.py`; tried on the real model with Dabba Days.
 - **Nov 14 2026 (IST), Gate 108 and stepping away:**
   - **Gate 108 scored** (`gates/gate108/RESULTS.md`). Fixes from the flight:
     - every Hive process gets the package's path (a plan's build died on "No module named hive");

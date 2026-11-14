@@ -391,6 +391,8 @@ Cover every rule above: merge similar ones, leave none out, add nothing. No code
 question asking whether that is how he wants it, pointing at the decision most worth his attention.
 Reply with JSON only: {{"say": "...", "ask": "...", "covers": [the rule numbers your message covers]}}"""
 
+TALK = explain.plain(TALK)
+
 HEAR = """Hive told a business owner how part of his product works. The rules behind it, numbered:
 {rules}
 
