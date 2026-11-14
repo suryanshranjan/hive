@@ -11,8 +11,9 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
   - expired logins renewed from the phone (`hive/logins.py`);
   - test deploys on his AWS machine (`hive/trydeploy.py`).
 - **AWS** is signed in on the laptop (account …1696, root login; a limited user would be safer).
+- **Gate 109 attempt 1 (Nov 15):** interrupted, because the laptop ran low on memory while the machine set itself up. The machine was deleted and checked in AWS; nothing is billing. One fix: deleting a machine never moved to no longer asks for a safety word (`gates/gate109/RESULTS.md`).
 - **Next:**
-  1. The AWS flight (BRAIN §9.2): the move with a running build, a test deploy, take it down, delete the machine. Needs the user's yes, about $1.
+  1. Gate 109 again, same predictions: `python gates/gate109/flight109.py <Dabba Days copy>` from the laptop (AWS signed in, account …1696). Free memory first (the test databases are stopped). Copy the lab's Telegram link to `~/.hive/telegram.json` for the flight and remove it after. Only on the user's word.
   2. The founder session (`docs/founder_session.md`).
   3. Gate 108's design on a second mock company in another trade.
 

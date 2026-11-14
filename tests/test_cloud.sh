@@ -86,4 +86,11 @@ check "on the cloud machine, --stop powers it off (the disk keeps the work for t
   "$? $(cat powered_off 2>/dev/null; rm -f powered_off) $(grep -c 'hive cloud --stop. brings it home' $T/self.txt)" "9 off 1"
 printf 'y\n' | HIVE_CLOUD_MARK=$T/no-mark $PY -m hive cloud --stop > $T/none.txt 2>&1
 check "anywhere else, with no machine, it says so" "$? $(grep -c 'no Hive machine' $T/none.txt)" "5 1"
+# a machine made but never moved to (Gate 109: the laptop ran out of memory while it set itself up): nothing to bring
+# home, so it is deleted at once, without asking him for a safety word
+mkdir -p $T/.hive/cloud; rm -f $T/.hive/cloud.json
+echo '{"name": "hive-half", "region": "ap-south-1", "instance": "i-0half", "group": "sg-0half", "key_name": "hive-half", "ip": "10.9.9.9"}' > $T/.hive/cloud/machine.json
+printf 'y\n' | $PY -m hive cloud --stop > $T/half.txt 2>&1
+check "a machine never moved to: said plainly, deleted without a safety word, nothing left" \
+  "$? $(grep -c 'Nothing was ever moved to it' $T/half.txt) $(grep -c 'type DELETE' $T/half.txt) $(grep -c 'terminate-instances --instance-ids i-0half' $T/aws.log) $(ls $T/.hive/cloud | wc -l | tr -d ' ')" "0 1 0 1 0"
 rm -rf $T; exit $fail

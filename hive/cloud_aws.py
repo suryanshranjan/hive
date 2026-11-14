@@ -176,7 +176,10 @@ def stop(ask=input, say=print, repo='.', relisten=True):
         except Exception as e:
             say(f"  I could not start it again to bring its work home ({e}); I kept it. Check your AWS login (aws login), "
                 "then run `hive cloud --stop` again."); return 7
-    if m.get('ip') and os.path.isdir(os.path.join(repo, '.git')):   # nothing built there may be lost (the owner)
+    moved = os.path.exists(os.path.join(os.path.expanduser('~'), '.hive', 'cloud.json'))   # written once a move completes
+    if m.get('ip') and not moved:   # made, but nothing ever moved there (Gate 109: the laptop ran out of memory while it
+        say('  Nothing was ever moved to it (it was still setting itself up), so there is nothing to bring home.')   # set up)
+    elif m.get('ip') and os.path.isdir(os.path.join(repo, '.git')):   # nothing built there may be lost (the owner)
         local = os.environ.get('HIVE_CLOUD_LOCAL')
         t = cloud.Target(local or f"ubuntu@{m['ip']}", None if local else m.get('key'))
         if cloud.building(t):   # a build still running there: never delete it mid-way

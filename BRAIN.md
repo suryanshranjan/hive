@@ -544,6 +544,7 @@ Rules of the lab:
 
 ## 12. Changelog
 
+- **Nov 15 2026 (IST), Gate 109 attempt 1:** interrupted, because the laptop ran low on memory while the t3.small set itself up. Predictions not scored. The machine was deleted and checked in AWS (nothing billing). Fixed: deleting a machine nothing was ever moved to deletes it at once, said plainly, instead of asking for a safety word.
 - **Nov 14 2026 (IST), Gate 108 run 4, real databases, logins, test deploys, BRAIN tidied:**
   - **Gate 108 run 4** replicated run 3. After the planner's price rule ("how prices are shown is in scope"), the plan found all 4 planted problems.
   - **Postgres and MySQL** read with read-only logins (5 of 5 right on each). Missing drivers are said plainly (`hive-swarm[data]`).
