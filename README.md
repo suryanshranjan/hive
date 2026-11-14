@@ -88,6 +88,7 @@ A real exchange from the end-to-end rehearsal (Gate 107), abridged:
 | *"we had 120 sign-ups this week"* | Kept as a reading, beside what Hive did, so the brief can say "up 18% since the shorter form went to your engineer" |
 | A document (policy, FAQ, deck as PDF) | Read; the lasting facts are kept for every plan and answer, and rules it plainly states become your rules |
 | *"we're on Vercel"* | Remembered: previews and going live use it (Vercel, Netlify, Railway, Azure, Fly, Render, or your own commands) |
+| *"I'm sleepy"*, *"good night"*, *"shutting my laptop"* | Says where things stand and offers how to carry on. With work running: moving to the cloud (recommended), so you can shut your computer while it restarts the work there; keeping this computer on; or stopping for tonight. With nothing running: something built overnight, ready with your morning brief |
 | *"set my budget to $50 a month"* | Hive asks before anything would go past it |
 | *"how do refunds work?"* | Answered from your code, trying the case in a throwaway copy |
 | *"actually, refunds go to store credit"* | Finds the earlier ruling, asks whether to replace it, updates the latest build |

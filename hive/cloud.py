@@ -10,7 +10,7 @@ Never sent: .env files, keys, node_modules (dependencies are installed fresh the
 For tests and mounted disks, --to may also be a local folder."""
 import json, os, shlex, shutil, subprocess, tempfile, time
 
-from . import memory, telegram
+from . import access, memory, telegram
 
 Q = shlex.quote   # every path in a shell command is quoted: owners' paths have spaces
 REMOTE_HOME = 'hive-cloud'   # relative to the remote home folder (scp and ssh both start there; '~' is not expanded)
@@ -92,7 +92,9 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
                      (os.path.join(hive_dir, 'llm.json'), f'{dst_hive}/llm.json'),
                      (telegram.CONVERSATION, f'{dst_hive}/conversation.json'),
                      (memory._names(), f'{dst_hive}/names.json'),   # the thread goes too: "yes" stays in context
-                     (memory._notes_path(repo), f'{dst_hive}/rules/{os.path.basename(memory._notes_path(repo))}')):   # his business
+                     (memory._notes_path(repo), f'{dst_hive}/rules/{os.path.basename(memory._notes_path(repo))}'),   # his business
+                     (os.path.join(hive_dir, 'resume.json'), f'{dst_hive}/resume.json'),   # work to pick up there ("I'm sleepy")
+                     (access._path(repo), f'{dst_hive}/access/{os.path.basename(access._path(repo))}')):   # his data, read-only
         if os.path.exists(src):
             t.put(src, dst); sent.append(os.path.basename(src))
     if with_login:

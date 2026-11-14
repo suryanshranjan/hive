@@ -1,0 +1,594 @@
+{
+ "steps": [
+  {
+   "step": "hello",
+   "said": "hi",
+   "result": "greeting",
+   "minutes": 0.1,
+   "script_left": 0,
+   "hive": [
+    "🐝 Good day, sir. Dabba Days is set up on your computer and nothing has been built yet, so we're starting with a clean slate. What shall we build first?",
+    "We haven't met properly yet. Say \"set me up\" and I'll get to know your business or your product in about two minutes, or help you start something new."
+   ]
+  },
+  {
+   "step": "onboard",
+   "said": "set me up",
+   "result": "onboard_done",
+   "minutes": 0.2,
+   "script_left": 0,
+   "hive": [
+    "🐝 Let's get you set up. First, which of these is you?",
+    "Very good. 5 quick steps, about two minutes. Say skip to any, or stop to carry on later; I keep everything as you go.",
+    "1 of 5. Your business.\nWhat is it called, what does it do, and who are your customers? A line or two is plenty (🎙 a voice note works too).",
+    "✅ Got it, Dabba Days: Home cooks make lunch and we deliver it to office workers. Our customers are people working in offices. We deliver in Bengaluru.",
+    "2 of 5. Where it runs.\nWhere can I see it? Send its web address.",
+    "3 of 5. Numbers and data.\nI already have the code here (15 files). So I can answer things like \"how many orders this week?\", send me any of these, as many as you like:\n• an admin or analytics address, with its key\n• a database address (please a read-only login)\n• a shared spreadsheet link, or a CSV or Excel file\n\nI only ever read; I never change your data. Keys stay on this computer. Say done when finished.",
+    "✅ dabba database: I can see 8 tables: complaints, cooks, customers, deliveries, payments, payouts, plans, subscriptions.\n\nAnything else? Or say done.",
+    "4 of 5. How you run things.\nAnything written down: policies, FAQ, price list, a pitch deck? Send the files here (PDF, text, CSV), or tell me in a few lines. Say done when finished.",
+    "📚 Read: 13 things kept, and 6 rules for how the product behaves. Anything else, or done?",
+    "5 of 5. Hosting.\nVercel, Netlify, Render, Railway, Fly or Azure? Or say don't know.",
+    "✅ All set, Dabba Days. I know 18 things about your business; read-only access to dabba database.\n\nFrom now on, just tell me what you want. For example:\n• \"how many orders this week?\"\n• \"show me the pricing page on desktop\"\n• \"I want more repeat buyers\"\n• \"add a referral page\"\n\nI'll ask only what I can't work out myself: your own rules for the unusual cases."
+   ]
+  },
+  {
+   "step": "cooks",
+   "said": "How are our cooks paid?",
+   "result": "answered",
+   "minutes": 0.6,
+   "script_left": 0,
+   "hive": [
+    "🐝 Sir, on paper it is simple: a cook earns Rs 70 for every lunch they make, paid each Monday for the previous week. The product's own calculation does exactly that, and the 161 payouts since August all match it and all landed on the Monday. Your records also show something the policy never mentions: a Rs 500 \"clean month\" bonus, added to the last payout of the month. I checked it against the complaints, and it went to every cook with zero complaints that month and to none of the others, without exception, in August, September and October. Is that your rule, Sir? If so, it deserves a line in the policy and a place on the cook sign-up page."
+   ]
+  },
+  {
+   "step": "q1",
+   "said": "How many active subscribers do we have right now?",
+   "result": "data_answered",
+   "minutes": 0.2,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 You have 150 active subscribers right now, each with one active subscription, and all 150 got a delivery in the last two weeks. Another 17 subscriptions are paused and 33 are cancelled, and neither group is counted in the 150."
+   ]
+  },
+  {
+   "step": "q2",
+   "said": "How many new subscribers signed up in October?",
+   "result": "data_answered",
+   "minutes": 0.3,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 You got 62 new subscribers in October 2026. The biggest sources were Instagram with 20, referrals with 17, office flyers with 13 and Google with 12."
+   ]
+  },
+  {
+   "step": "q3",
+   "said": "How many subscribers cancelled in October?",
+   "result": "data_answered",
+   "minutes": 0.3,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 18 subscribers cancelled in October, and none of them are still subscribed on another plan."
+   ]
+  },
+  {
+   "step": "q4",
+   "said": "Which cook had the most complaints in October?",
+   "result": "data_answered",
+   "minutes": 0.4,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 Three cooks tied for the most complaints in October, with 4 each: Fatima Sheikh, Sunita Patil and Rehana Begum. Fatima and Sunita resolved all 4 of theirs. Rehana resolved only 2, and she made far fewer deliveries (144, against 434 for Fatima and 383 for Sunita), so she stands out most."
+   ]
+  },
+  {
+   "step": "q5",
+   "said": "How much skip credit did we give in October?",
+   "result": "data_answered",
+   "minutes": 0.3,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 In October you gave ₹12,800 in skip credit: ₹100 each on 128 skipped deliveries. Another 48 deliveries were skipped late and got no credit. No refunds went to skipped deliveries."
+   ]
+  },
+  {
+   "step": "q6",
+   "said": "What is our refund total this month?",
+   "result": "data_answered",
+   "minutes": 0.4,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 So far this month, refunds add up to Rs 1700, spread over 12 refunds to 12 customers. Your delivery records and payment records both show that same Rs 1700. Separately, Rs 7600 was given as credits rather than cash refunds, and that amount is not part of the Rs 1700."
+   ]
+  },
+  {
+   "step": "q7",
+   "said": "What was our revenue from subscriptions in October?",
+   "result": "data_answered",
+   "minutes": 0.3,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 In October you took in Rs 485800 from 171 subscription payments. Separately, you paid back Rs 4610 in 33 refunds, so you kept Rs 481190 after refunds."
+   ]
+  },
+  {
+   "step": "q8",
+   "said": "Which plan is most popular among active subscribers?",
+   "result": "data_answered",
+   "minutes": 0.3,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 Veg Basic is your most popular plan, with 68 of your 150 active subscribers. Veg Plus comes next with 42, then Non-veg with 40."
+   ]
+  },
+  {
+   "step": "q9",
+   "said": "Which area has the most active subscribers?",
+   "result": "data_answered",
+   "minutes": 0.4,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 HSR Layout has the most active subscribers, with 40. Koramangala comes next with 32, then Whitefield with 29 and Indiranagar with 28."
+   ]
+  },
+  {
+   "step": "q10",
+   "said": "How much did we pay our cooks in October, bonuses included?",
+   "result": "data_answered",
+   "minutes": 0.4,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 Cooks were paid Rs 171820 in October, and that already includes Rs 2000 in bonuses. That covers 48 payouts to 12 cooks. If you count by the weeks worked in October instead of the date paid, the total is Rs 185380, which includes Rs 1000 in bonuses."
+   ]
+  },
+  {
+   "step": "screen1",
+   "said": "show me the plans page on desktop",
+   "result": "shown",
+   "minutes": 0.0,
+   "script_left": 0,
+   "hive": [
+    "Plans page on desktop\n\nHow does it look, sir? Tell me what's off, or send a picture of what you'd like. [photo 01_plans_html_desktop.png]"
+   ]
+  },
+  {
+   "step": "screen2",
+   "said": "and on tablet?",
+   "result": "shown",
+   "minutes": 0.0,
+   "script_left": 0,
+   "hive": [
+    "Plans page on tablet\n\nHow does it look, sir? Tell me what's off, or send a picture of what you'd like. [photo 01_plans_html_tablet.png]"
+   ]
+  },
+  {
+   "step": "screen3",
+   "said": "show me the sign up page on every screen",
+   "result": "shown",
+   "minutes": 0.1,
+   "script_left": 0,
+   "hive": [
+    "Signup page on phone [photo 01_signup_html_phone.png]",
+    "Signup page on tablet [photo 01_signup_html_tablet.png]",
+    "Signup page on desktop\n\nHow does it look, sir? Tell me what's off, or send a picture of what you'd like. [photo 01_signup_html_desktop.png]"
+   ]
+  },
+  {
+   "step": "goal",
+   "said": "I want more office workers subscribing",
+   "result": "planned",
+   "minutes": 3.7,
+   "script_left": 0,
+   "hive": [
+    "🔎 On it, sir. Let me look at your product with that in mind; a minute or two.",
+    "❓ Before I plan it, one thing your product can't tell me:\nCan a customer cancel whenever they like, and do they get money back for the rest of the month? No page says, and the cancel link on subscription-options.html goes nowhere.",
+    "Thank you, sir. Planning with that in mind.",
+    "🧭 Here's what I see, sir. Office workers have to get past a 9-field sign-up that asks for a company GST number and desk number and charges the first month straight away, and no page before payment says they can skip, pause or cancel. The only cancel link (subscription-options.html) goes nowhere.\n\nWhat I'd do:\n1. A shorter sign-up form: Sign-up asks for 9 things, including a company GST number that most office workers don't have, and says every field is required before it charges the first month, so many people will stop there.\n2. Show 'cancel anytime' and fix the cancel link: No page says people can cancel whenever they like, so signing up looks like a lock-in, and an existing subscriber who clicks 'Cancel my subscription' gets nowhere.\n3. Explain skips, holidays and refunds on the plans page: Office workers take leave, have holidays and worry about paying for lunches they don't get, but the plans page only lists prices. The ₹100 skip credit, the 10-day pause, free public holidays and full refunds for missed lunches only appear on pages inside the account, or nowhere.\n\nI'll build them one after another and show you each. Your main version isn't touched. All of it: about $1.50.",
+    "❓ One thing only you can decide (A shorter sign-up form):\nDo you need a company GST number from people who subscribe?",
+    "🛠 Right, sir. Building the first step now: A shorter sign-up form. I'll show you each step as it lands; say \"status\" any time.",
+    "✅ Step 1 of 3 done: A shorter sign-up form.",
+    "Signup page [photo 01_signup_html.png]",
+    "🛠 Step 2 of 3: Show 'cancel anytime' and fix the cancel link. On it.",
+    "✅ Step 2 of 3 done: Show 'cancel anytime' and fix the cancel link.",
+    "Cancel page [photo 01_cancel_html.png]",
+    "Plans page [photo 02_plans_html.png]",
+    "Signup page [photo 03_signup_html.png]",
+    "🛠 Step 3 of 3: Explain skips, holidays and refunds on the plans page. On it.",
+    "✅ Step 3 of 3 done: Explain skips, holidays and refunds on the plans page.",
+    "Home page [photo 01_home.png]",
+    "Plans page [photo 02_plans_html.png]",
+    "🎉 That's the plan done, sir. 10 tests, all passing. All 7 that passed before still pass.\n\nTell me what's off, or say ship it and it all goes to your engineer as one pull request."
+   ]
+  }
+ ],
+ "transcript": [
+  [
+   "owner",
+   "hi"
+  ],
+  [
+   "hive",
+   "🐝 Good day, sir. Dabba Days is set up on your computer and nothing has been built yet, so we're starting with a clean slate. What shall we build first?"
+  ],
+  [
+   "hive",
+   "We haven't met properly yet. Say \"set me up\" and I'll get to know your business or your product in about two minutes, or help you start something new."
+  ],
+  [
+   "owner",
+   "set me up"
+  ],
+  [
+   "hive",
+   "🐝 Let's get you set up. First, which of these is you?"
+  ],
+  [
+   "owner",
+   "[tap] onb|who|business"
+  ],
+  [
+   "hive",
+   "Very good. 5 quick steps, about two minutes. Say skip to any, or stop to carry on later; I keep everything as you go."
+  ],
+  [
+   "hive",
+   "1 of 5. Your business.\nWhat is it called, what does it do, and who are your customers? A line or two is plenty (🎙 a voice note works too)."
+  ],
+  [
+   "owner",
+   "Dabba Days. Home cooks make lunch and we deliver it to office workers in Bengaluru, Monday to Friday. Our customers are people working in offices in six areas."
+  ],
+  [
+   "hive",
+   "✅ Got it, Dabba Days: Home cooks make lunch and we deliver it to office workers. Our customers are people working in offices. We deliver in Bengaluru."
+  ],
+  [
+   "hive",
+   "2 of 5. Where it runs.\nWhere can I see it? Send its web address."
+  ],
+  [
+   "owner",
+   "[tap] onb|skip|2"
+  ],
+  [
+   "hive",
+   "3 of 5. Numbers and data.\nI already have the code here (15 files). So I can answer things like \"how many orders this week?\", send me any of these, as many as you like:\n• an admin or analytics address, with its key\n• a database address (please a read-only login)\n• a shared spreadsheet link, or a CSV or Excel file\n\nI only ever read; I never change your data. Keys stay on this computer. Say done when finished."
+  ],
+  [
+   "owner",
+   "here is our database /home/node/f108/dabba-data/dabba.db"
+  ],
+  [
+   "hive",
+   "✅ dabba database: I can see 8 tables: complaints, cooks, customers, deliveries, payments, payouts, plans, subscriptions.\n\nAnything else? Or say done."
+  ],
+  [
+   "owner",
+   "done"
+  ],
+  [
+   "hive",
+   "4 of 5. How you run things.\nAnything written down: policies, FAQ, price list, a pitch deck? Send the files here (PDF, text, CSV), or tell me in a few lines. Say done when finished."
+  ],
+  [
+   "owner",
+   "our policy [document: /home/node/f108/dabba-data/docs/policy.md | policy.md]"
+  ],
+  [
+   "hive",
+   "📚 Read: 13 things kept, and 6 rules for how the product behaves. Anything else, or done?"
+  ],
+  [
+   "owner",
+   "done"
+  ],
+  [
+   "hive",
+   "5 of 5. Hosting.\nVercel, Netlify, Render, Railway, Fly or Azure? Or say don't know."
+  ],
+  [
+   "owner",
+   "[tap] onb|skip|5"
+  ],
+  [
+   "hive",
+   "✅ All set, Dabba Days. I know 18 things about your business; read-only access to dabba database.\n\nFrom now on, just tell me what you want. For example:\n• \"how many orders this week?\"\n• \"show me the pricing page on desktop\"\n• \"I want more repeat buyers\"\n• \"add a referral page\"\n\nI'll ask only what I can't work out myself: your own rules for the unusual cases."
+  ],
+  [
+   "owner",
+   "How are our cooks paid?"
+  ],
+  [
+   "hive",
+   "🐝 Sir, on paper it is simple: a cook earns Rs 70 for every lunch they make, paid each Monday for the previous week. The product's own calculation does exactly that, and the 161 payouts since August all match it and all landed on the Monday. Your records also show something the policy never mentions: a Rs 500 \"clean month\" bonus, added to the last payout of the month. I checked it against the complaints, and it went to every cook with zero complaints that month and to none of the others, without exception, in August, September and October. Is that your rule, Sir? If so, it deserves a line in the policy and a place on the cook sign-up page."
+  ],
+  [
+   "owner",
+   "How many active subscribers do we have right now?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 You have 150 active subscribers right now, each with one active subscription, and all 150 got a delivery in the last two weeks. Another 17 subscriptions are paused and 33 are cancelled, and neither group is counted in the 150."
+  ],
+  [
+   "owner",
+   "How many new subscribers signed up in October?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 You got 62 new subscribers in October 2026. The biggest sources were Instagram with 20, referrals with 17, office flyers with 13 and Google with 12."
+  ],
+  [
+   "owner",
+   "How many subscribers cancelled in October?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 18 subscribers cancelled in October, and none of them are still subscribed on another plan."
+  ],
+  [
+   "owner",
+   "Which cook had the most complaints in October?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 Three cooks tied for the most complaints in October, with 4 each: Fatima Sheikh, Sunita Patil and Rehana Begum. Fatima and Sunita resolved all 4 of theirs. Rehana resolved only 2, and she made far fewer deliveries (144, against 434 for Fatima and 383 for Sunita), so she stands out most."
+  ],
+  [
+   "owner",
+   "How much skip credit did we give in October?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 In October you gave ₹12,800 in skip credit: ₹100 each on 128 skipped deliveries. Another 48 deliveries were skipped late and got no credit. No refunds went to skipped deliveries."
+  ],
+  [
+   "owner",
+   "What is our refund total this month?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 So far this month, refunds add up to Rs 1700, spread over 12 refunds to 12 customers. Your delivery records and payment records both show that same Rs 1700. Separately, Rs 7600 was given as credits rather than cash refunds, and that amount is not part of the Rs 1700."
+  ],
+  [
+   "owner",
+   "What was our revenue from subscriptions in October?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 In October you took in Rs 485800 from 171 subscription payments. Separately, you paid back Rs 4610 in 33 refunds, so you kept Rs 481190 after refunds."
+  ],
+  [
+   "owner",
+   "Which plan is most popular among active subscribers?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 Veg Basic is your most popular plan, with 68 of your 150 active subscribers. Veg Plus comes next with 42, then Non-veg with 40."
+  ],
+  [
+   "owner",
+   "Which area has the most active subscribers?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 HSR Layout has the most active subscribers, with 40. Koramangala comes next with 32, then Whitefield with 29 and Indiranagar with 28."
+  ],
+  [
+   "owner",
+   "How much did we pay our cooks in October, bonuses included?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 Cooks were paid Rs 171820 in October, and that already includes Rs 2000 in bonuses. That covers 48 payouts to 12 cooks. If you count by the weeks worked in October instead of the date paid, the total is Rs 185380, which includes Rs 1000 in bonuses."
+  ],
+  [
+   "owner",
+   "show me the plans page on desktop"
+  ],
+  [
+   "hive",
+   "Plans page on desktop\n\nHow does it look, sir? Tell me what's off, or send a picture of what you'd like. [photo]"
+  ],
+  [
+   "owner",
+   "and on tablet?"
+  ],
+  [
+   "hive",
+   "Plans page on tablet\n\nHow does it look, sir? Tell me what's off, or send a picture of what you'd like. [photo]"
+  ],
+  [
+   "owner",
+   "show me the sign up page on every screen"
+  ],
+  [
+   "hive",
+   "Signup page on phone [photo]"
+  ],
+  [
+   "hive",
+   "Signup page on tablet [photo]"
+  ],
+  [
+   "hive",
+   "Signup page on desktop\n\nHow does it look, sir? Tell me what's off, or send a picture of what you'd like. [photo]"
+  ],
+  [
+   "owner",
+   "I want more office workers subscribing"
+  ],
+  [
+   "hive",
+   "🔎 On it, sir. Let me look at your product with that in mind; a minute or two."
+  ],
+  [
+   "hive",
+   "❓ Before I plan it, one thing your product can't tell me:\nCan a customer cancel whenever they like, and do they get money back for the rest of the month? No page says, and the cancel link on subscription-options.html goes nowhere."
+  ],
+  [
+   "owner",
+   "Yes, they can cancel anytime. There's no refund for the current month; the plan just doesn't renew next month. Please fix that link."
+  ],
+  [
+   "hive",
+   "Thank you, sir. Planning with that in mind."
+  ],
+  [
+   "hive",
+   "🧭 Here's what I see, sir. Office workers have to get past a 9-field sign-up that asks for a company GST number and desk number and charges the first month straight away, and no page before payment says they can skip, pause or cancel. The only cancel link (subscription-options.html) goes nowhere.\n\nWhat I'd do:\n1. A shorter sign-up form: Sign-up asks for 9 things, including a company GST number that most office workers don't have, and says every field is required before it charges the first month, so many people will stop there.\n2. Show 'cancel anytime' and fix the cancel link: No page says people can cancel whenever they like, so signing up looks like a lock-in, and an existing subscriber who clicks 'Cancel my subscription' gets nowhere.\n3. Explain skips, holidays and refunds on the plans page: Office workers take leave, have holidays and worry about paying for lunches they don't get, but the plans page only lists prices. The ₹100 skip credit, the 10-day pause, free public holidays and full refunds for missed lunches only appear on pages inside the account, or nowhere.\n\nI'll build them one after another and show you each. Your main version isn't touched. All of it: about $1.50."
+  ],
+  [
+   "owner",
+   "[tap] 🚀 Yes, do it all"
+  ],
+  [
+   "hive",
+   "❓ One thing only you can decide (A shorter sign-up form):\nDo you need a company GST number from people who subscribe?"
+  ],
+  [
+   "owner",
+   "[tap] Remove it from sign-up"
+  ],
+  [
+   "hive",
+   "🛠 Right, sir. Building the first step now: A shorter sign-up form. I'll show you each step as it lands; say \"status\" any time."
+  ],
+  [
+   "hive",
+   "✅ Step 1 of 3 done: A shorter sign-up form."
+  ],
+  [
+   "hive",
+   "Signup page [photo]"
+  ],
+  [
+   "hive",
+   "🛠 Step 2 of 3: Show 'cancel anytime' and fix the cancel link. On it."
+  ],
+  [
+   "hive",
+   "✅ Step 2 of 3 done: Show 'cancel anytime' and fix the cancel link."
+  ],
+  [
+   "hive",
+   "Cancel page [photo]"
+  ],
+  [
+   "hive",
+   "Plans page [photo]"
+  ],
+  [
+   "hive",
+   "Signup page [photo]"
+  ],
+  [
+   "hive",
+   "🛠 Step 3 of 3: Explain skips, holidays and refunds on the plans page. On it."
+  ],
+  [
+   "hive",
+   "✅ Step 3 of 3 done: Explain skips, holidays and refunds on the plans page."
+  ],
+  [
+   "hive",
+   "Home page [photo]"
+  ],
+  [
+   "hive",
+   "Plans page [photo]"
+  ],
+  [
+   "hive",
+   "🎉 That's the plan done, sir. 10 tests, all passing. All 7 that passed before still pass.\n\nTell me what's off, or say ship it and it all goes to your engineer as one pull request."
+  ]
+ ],
+ "summary": {
+  "minutes": 7.9,
+  "builders_cost": 0.76,
+  "plan_cost": 0.25608759999999997,
+  "reader_calls": 26,
+  "plan": [
+   {
+    "title": "A shorter sign-up form",
+    "why": "Sign-up asks for 9 things, including a company GST number that most office workers don't have, and says every field is required before it charges the first month, so many people will stop there.",
+    "seen": "signup.html: name, email, phone, company, company GST number, office address, floor and desk number, area, plan; 'All fields are required. Your first month is charged today.'",
+    "build": "In signup.html, keep name, phone, email, office address, area and plan as required (add the `required` attribute to them). Make company name and floor/desk number optional and put '(optional)' in their labels. Handle the GST field according to the owner's answer: either mark it optional with the label 'Company GST number (optional, only if your company needs a GST invoice)', or remove it. Replace 'All fields are required.' with a line under the plan select that shows the chosen plan's price ('Veg Basic · ₹2,400 / month, 20 lunches'), and keep 'Your first month is charged today.' Change the button to 'Pay ₹… and subscribe' using a few lines of inline JS that update the price when the plan changes (2,400 / 3,000 / 3,400). Add a test to test_dabba.py that reads signup.html and checks that name=\"gst\" is either absent or has no `required` attribute, that name=\"desk\" has no `required` attribute, and that 'All fields are required' no longer appears.",
+    "look": false,
+    "decide": "Do you need a company GST number from people who subscribe?",
+    "options": [
+     "Keep it, but optional",
+     "Remove it from sign-up"
+    ]
+   },
+   {
+    "title": "Show 'cancel anytime' and fix the cancel link",
+    "why": "No page says people can cancel whenever they like, so signing up looks like a lock-in, and an existing subscriber who clicks 'Cancel my subscription' gets nowhere.",
+    "seen": "subscription-options.html: 'Cancel my subscription' links to '#'; plans.html and signup.html never mention cancelling.",
+    "build": "Create cancel.html in the same layout as pause.html (same header, nav and footer). Use the heading 'Cancel my subscription' and the text 'You can cancel anytime. Your lunches carry on until the end of this month, and your plan won't renew next month. There is no refund for the current month.' Below that, add a form with a 'Cancel my subscription' button and a link to pause.html: 'Just away for a while? Pause for up to 10 days instead.' In subscription-options.html, change href=\"#\" on the cancel link to cancel.html and keep the pause link. On plans.html, under 'Billed monthly.', add 'Cancel anytime. Your plan simply stops renewing at the end of the month.' Add the same line to the muted note on signup.html. Tests: add cancel.html to test_pages_exist, assert that subscription-options.html contains href=\"cancel.html\" and no href=\"#\", and assert that plans.html contains 'Cancel anytime'.",
+    "look": false,
+    "decide": "",
+    "options": []
+   },
+   {
+    "title": "Explain skips, holidays and refunds on the plans page",
+    "why": "Office workers take leave, have holidays and worry about paying for lunches they don't get, but the plans page only lists prices. The ₹100 skip credit, the 10-day pause, free public holidays and full refunds for missed lunches only appear on pages inside the account, or nowhere.",
+    "seen": "plans.html: only '20 lunches a month… Billed monthly.' and three prices. skip.html and pause.html (reached only from My account) explain skips and pauses. No page mentions Karnataka public holidays, refunds for missed lunches or same-day replies to complaints. billing.py has SKIP_CREDIT_RS=100 and M",
+    "build": "On plans.html, between the plan cards and the Subscribe button, add a card titled 'You only pay for lunches you get' with these 5 short lines: 'Skip a lunch before 9 pm the night before: ₹100 off your next bill.' / 'Going away? Pause for up to 10 days a month. Paused days aren't charged.' / 'No lunch and no charge on Karnataka public holidays.' / 'If your cook is ill we send another cook from your area. If no one can cook, that lunch is refunded in full.' / 'Lunch didn't arrive? It's always refunded, and we answer complaints the same day.' Use the existing .card style. Under the 'Skip any day' card on index.html, change the text to 'Skip before 9 pm the night before and get ₹100 off your next bill.' Add a test that reads plans.html and checks that it contains '₹100', '9 pm', '10 days' and 'public holiday', so the page stays in line with the rules in billing.py.",
+    "look": true,
+    "decide": "",
+    "options": []
+   }
+  ]
+ }
+}

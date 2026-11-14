@@ -138,6 +138,11 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 | "Show me how it looks on desktop; tell me in tablet" | None: an owner request | Screenshots on phone, tablet or desktop, of the pages he names; "and on tablet?" follows up | `hive/screens.py` `take_on`, `tests/test_devices.py` (in the tool) |
 | "Situations only when required; for edge cases they're most welcome" | Gates 27-38 (asking where the owner differs), Gate 89 (no decisions, no interview) | The interview now also skips what he has told Hive about his business, not only his rulings | `hive/interview.py` `write_situations(known=...)` (in the tool) |
 
+| A plan's build must start wherever Hive runs from | Gate 108 run 1: "No module named hive"; he heard "it stopped partway" | Every Hive process it starts gets the package path | `hive/assistant.py` `hive_env` (in the tool) |
+| Data questions must not depend on the model naming a source exactly | Gate 108 run 2: kill fired, 5 of 10 dropped for `"db"` | Loose match, else his only database; failed model calls logged | `hive/access.py` `_source_named`, `hive/explain.py` (in the tool) |
+| Explain what only the data shows before asking him | Gate 108 run 1 vs runs 2-3: the hidden bonus found, then its condition named | The code-reading assistant reads his data read-only and compares who gets what | `hive/assistant.py` `_data_note`, `hive access sql` (in the tool) |
+| "I'm sleepy": offer how to carry on | None: an owner request | The cloud recommended when work runs (handed over, restarted there), or keep the computer on, stop, or something overnight | `hive/assistant.py` `away`, `resume_here`; `hive/cloud.py` (in the tool, AWS move not flown) |
+
 ## Still to turn into the product
 
 - **Gates 55–56:** a skimming owner repairs about a quarter of the code sheet's wrong rules, whether by list, conversation or a short sheet; nothing changes in the product from these. Next to test with the founder: spot checks on concrete outcomes.

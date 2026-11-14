@@ -2,7 +2,19 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 14 2026)
+## Where we left off (Nov 14 2026, after Gate 108)
+
+- **Gate 108 done** (`gates/gate108/RESULTS.md`). Dabba Days is in the lab container: `~/dabba-days`, `~/dabba-data`, key in `~/dabba-private` and `hive_private/dabba/`.
+  - **Run 3:** onboarding, 10 of 10 figure answers, the data-only bonus with its condition, screens on every device, a plan of 3 built.
+  - **Runs 1 and 2:** each found a fault, now fixed (the build could not import Hive; queries were dropped when the database was named "db").
+- **Built: stepping away.** "I'm sleepy" offers the cloud, this computer, stopping, or something overnight. Unit-tested; not flown on AWS.
+- **Next:**
+  1. Repeat Gate 108 as-is, run 4: one clean run is not a replication. Command: `HOME=/home/node/f108 python3 gates/gate108/flight108.py` in `hive-g8`, after clearing `~/f108/.hive`, `hive-projects` and `github`.
+  2. Why plans never name the price of one lunch (0 of 3 runs).
+  3. Fly "I'm sleepy" with a running build, through a real AWS move (needs the user's AWS login).
+  4. Then a real founder on his own product.
+
+## Earlier (Nov 14 2026, before Gate 108)
 
 - **Built on the owner's request: run the company through Hive (unit-tested, not flown).**
   - "set me up" onboarding with three paths: a business, a developer with a product, or something new (`hive/onboard.py`).

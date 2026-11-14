@@ -24,7 +24,8 @@ What does he mean? Read it as a person would, using the conversation: "yes" or "
 proposed; "I already told you" or "that one" points back to what he said before; a short correction ("no, Sunny Shop
 Creators") changes what you just proposed. Reply with JSON only:
 {{"intent": "build" | "stop_build" | "change" | "rule" | "status" | "team" | "set_team" | "stop_builder" | "greeting" |
-"instruct" | "show" | "amend" | "ship" | "complaint" | "goal" | "data" | "onboard" | "cloud_on" | "cloud_off" | "reply",
+"instruct" | "show" | "amend" | "ship" | "complaint" | "goal" | "data" | "onboard" | "away" | "cloud_on" | "cloud_off" |
+"reply",
 "rule": "for a build, exactly what to build (taken from the conversation if he points back to it); for a change or a
 rule, the rule he now wants; otherwise empty",
 "short": "for a build, what he wants in at most 12 plain words, as a person would say it back ('Redo the home page in
@@ -66,6 +67,8 @@ barternow.in's style'); otherwise empty",
   "who are my top 5 sellers?"). How the product behaves in a case is a question about the product, not "data".
 - "onboard": he wants to set his company up with you, or carry on setting it up ("let's get started", "connect my
   business").
+- "away": he is stepping away for a while (tired, going to sleep, shutting his laptop, leaving for the day). Not an
+  explicit "move to the cloud" (that is "cloud_on").
 - "greeting": a hello, with no request yet.
 - "cloud_on" / "cloud_off": move Hive to the cloud / shut the cloud machine down.
 - "reply": anything else: a question, a complaint, frustration, small talk. Never a rule.
@@ -197,8 +200,7 @@ def facts(repo, ch=None):
     name = memory.project_name(repo)
     from . import register
     talk = register.line(CURRENT.get('text', ''))
-    lines = ([talk] if talk else []) + [('Running in the cloud; his computer can be off.' if os.environ.get('HIVE_IN_CLOUD') or
-              os.path.abspath(repo).startswith(os.path.join(os.path.expanduser('~'), 'hive-cloud')) else
+    lines = ([talk] if talk else []) + [('Running in the cloud; his computer can be off.' if in_cloud(repo) else
               'Running on his computer.'),
              (f"Latest build: branch hive/{st['name']}. {st.get('check', '')}" if st else 'Nothing built on this project yet.'),
              f"Standing rules he has given for this project: {len(memory.load(repo))}."]
@@ -998,6 +1000,140 @@ def connect_data(ch, repo, text):
              if ok else "\n\nI kept it; send it again once it's fixed."), html=True)
     return 'connect_data' if ok else 'connect_data_failed'
 
+# he is stepping away (the owner: "if the founder says I'm feeling sleepy, Hive should say: shall we move to the cloud so
+# you can shut your computer and I carry on, or would you like me to proceed another way")
+AWAY_WORDS = re.compile(r"\b(sleepy|feeling sleepy|going to (sleep|bed)|off to (sleep|bed)|time (for|to) (bed|sleep)|"
+                        r"good ?night|(i'?m|i am|feeling|so|very|really|getting) (tired|exhausted|sleepy|knackered)|"
+                        r"need (some )?(rest|sleep)|calling it a (day|night)|signing off|logging off|"
+                        r"done for (the )?(day|night|today)|"
+                        r"(shut|shutting|switch(ing)?( off)?|turn(ing)? off|clos(e|ing)|power(ing)? off) (down )?(my |the )?"
+                        r"(laptop|computer|pc|system|mac|machine)( down| off)?|"
+                        r"heading (out|home)|leaving (the office|for (the day|home)|now|for a while)|stepping out|"
+                        r"be back (later|tomorrow|in the morning)|bye for (now|today|tonight)|"
+                        r"so (raha|rahi|jaunga|jaungi|jata|jati) (hu|hoon|hun)?|sone ja\w*|neend\w*|thak (gaya|gayi)|"
+                        r"nikal raha|ghar ja (raha|rahi))\b")
+
+REQUEST = re.compile(r"^\s*(please\s+|can you\s+|could you\s+)?(add|make|build|create|change|update|fix|remove|put|write|"
+                     r"design|show|send|use|set|rename|move)\b")
+
+def is_away(low):
+    """He is stepping away, not asking for something about sleep or nights ("add a good night message" is a build)."""
+    return bool(AWAY_WORDS.search(low)) and len(low.split()) <= 25 and not REQUEST.match(low)
+
+def in_cloud(repo):
+    """Hive itself is running on the cloud machine (his computer can be off)."""
+    return bool(os.environ.get('HIVE_IN_CLOUD') or
+                os.path.abspath(repo).startswith(os.path.join(os.path.expanduser('~'), 'hive-cloud')))
+
+RESUME = lambda: os.path.join(os.path.expanduser('~'), '.hive', 'resume.json')   # work for the cloud copy to pick up
+
+def _work_left():
+    """What is running, as one goal a build can be given again: the build, or the plan's steps not done yet."""
+    if PLAN.get('running') and PLAN.get('steps'):
+        from . import plan as planner
+        k = max(1, PLAN.get('step', 1))
+        answers = PLAN.get('answers') or [''] * len(PLAN['steps'])
+        return '\n\n'.join(planner.instruction(s, answers[i]) for i, s in enumerate(PLAN['steps']) if i + 1 >= k)
+    p = BUILD.get('proc')
+    return BUILD.get('goal', '') if p is not None and p.poll() is None else ''
+
+def away(ch, repo, text, poll, apply_build=None, start_build=None, cloud=None):
+    """He is stepping away: say where things stand and offer the way to carry on that fits: the cloud, so his computer
+    can be off (recommended when work is running); this computer, left on; stop for tonight; or something overnight."""
+    who = _who(ch)
+    sir = f', {telegram.esc(who)}' if who else ', sir'
+    work = _work_left()
+    if in_cloud(repo):
+        ch.send(f"😴 Sleep well{sir}. I'm running in the cloud, so your computer can be off. " +
+                (f"I'll keep going with: {telegram.esc(BUILD.get('goal', PLAN.get('goal', ''))[:150])}. " if work else '') +
+                "Your morning brief will be waiting.", html=True)
+        return 'away_cloud'
+    if work:
+        opts = ([('☁️ Move to the cloud: shut your computer, I carry on', 'awy|cloud')] if cloud else []) + [
+            ('💻 Carry on here (I\'ll leave my computer on)', 'awy|here'), ('⏸ Stop for tonight', 'awy|stop')]
+        tip = ("<b>My suggestion:</b> let me move to the cloud (about $0.09 an hour while it runs). I'll restart this "
+               "work there in about 5 minutes; once I say I'm there, you can shut your computer, and the morning "
+               "brief will tell you how it went." if cloud else
+               "To finish it, I need this computer on and awake through the night (plugged in, sleep turned off). "
+               "If you'd rather shut it, I can stop here and pick it up in the morning.")
+        ch.send(f"😴 Of course{sir}, get some rest. Right now I'm working on: "
+                f"<i>{telegram.esc((BUILD.get('goal') or PLAN.get('goal') or '')[:160])}</i>.\n\n{tip}\n\n"
+                "How would you like me to carry on?", html=True, buttons=[[o] for o in opts])
+        options = ([('awy|cloud', ('cloud', 'move', 'shift'))] if cloud else []) + [
+            ('awy|here', ('here', 'leave it on', 'carry on', 'keep going')), ('awy|stop', ('stop', 'pause', 'morning'))]
+    else:
+        ch.send(f"😴 Of course{sir}, get some rest. Nothing is running, so you can shut your computer whenever you "
+                "like.\n\nShall I build something while you sleep? Tell me what, and it'll be ready with your morning "
+                "brief" + (", built in the cloud so your computer can be off." if cloud else
+                           " (this computer needs to stay on for that)."), html=True,
+                buttons=[[('🌙 Yes, build something overnight', 'awy|night')], [('😴 Nothing tonight', 'awy|none')]])
+        options = [('awy|night', ('overnight', 'build', 'yes')), ('awy|none', ('nothing', 'no'))]
+    choice, other = choose(ch, poll, options)
+    if other is not None:   # he answered with something else (often the thing to build): that, as a new message
+        return handle(ch, repo, other, poll, apply_build, start_build, cloud)
+    if choice == 'awy|none':
+        ch.send(f"Sleep well{sir}. Your morning brief will be waiting.", html=True); return 'away_none'
+    if choice == 'awy|night':
+        ch.send("🌙 Very good. What would you like ready by morning? Tell me in a line or two."); return 'away_night'
+    if choice == 'awy|here':
+        ch.send(f"💻 Very good{sir}. Leave it plugged in, with sleep turned off, and I'll keep going. I'll tell you here "
+                "the moment it's done, and the morning brief will have it too. Sleep well.", html=True)
+        return 'away_here'
+    if choice == 'awy|stop':
+        p = BUILD.get('proc')
+        if p is not None and p.poll() is None:
+            BUILD['stopped'] = True; _stop(p)
+        if PLAN.get('running'):
+            PLAN['cancel'] = True
+        ch.send(f"⏸ Stopped for tonight{sir}. Nothing half-done is handed over. In the morning, say \"build again\" and "
+                "I'll pick it up. Sleep well.", html=True)
+        return 'away_stopped'
+    # to the cloud: leave the work for the cloud copy to restart, move, and only then stop it here
+    import json as _json
+    os.makedirs(os.path.dirname(RESUME()), exist_ok=True)
+    _json.dump({'goal': work, 'said': (BUILD.get('goal') or PLAN.get('goal') or '')[:300], 't': time.time()},
+               open(RESUME(), 'w', encoding='utf-8'))
+    ch.send("☁️ Moving to the cloud now: about 5 minutes. Keep your computer on until I say I'm there.")
+    try:
+        try:
+            rc = cloud(repo, True, True)   # with his Claude login: builders work there
+        except TypeError:
+            rc = cloud(repo, True)
+    except Exception as e:
+        rc = f'{e!r}'[:120]
+    if rc != 0:
+        try:
+            os.remove(RESUME())
+        except OSError:
+            pass
+        ch.send(f"⚠️ I couldn't move to the cloud{sir}" + (f" ({telegram.esc(str(rc))})" if isinstance(rc, str) else '') +
+                ", so I'm carrying on here: please leave your computer on and awake tonight. Your morning brief will "
+                "say how it went.", html=True)
+        return 'away_cloud_failed'
+    p = BUILD.get('proc')   # the cloud copy restarts it; this copy stops
+    if p is not None and p.poll() is None:
+        BUILD['stopped'] = True; _stop(p)
+    if PLAN.get('running'):
+        PLAN['cancel'] = True
+    ch.send(f"✅ <b>I'm in the cloud{sir}.</b> You can shut your computer now. I'm picking the work up there, and "
+            "I'll tell you here when it's done. Sleep well.", html=True)
+    return 'moved'
+
+def resume_here(ch, repo):
+    """On waking (the cloud copy's listener): restart the work his computer handed over, and say so. Returns the goal."""
+    import json as _json
+    try:
+        r = _json.load(open(RESUME(), encoding='utf-8'))
+        os.remove(RESUME())
+    except (OSError, ValueError):
+        return ''
+    if not r.get('goal'):
+        return ''
+    ch.send("☁️ I'm in the cloud and picking up where your computer left off: <i>" +
+            telegram.esc((r.get('said') or r['goal'])[:200]) + "</i>. I'll tell you here when it's done.", html=True)
+    background_build(repo, r['goal'], ch, interview=False)
+    return r['goal']
+
 def _build_ref(st):
     return f"hive/{st['name']}"
 
@@ -1215,6 +1351,8 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         got = {'intent': 'preview'}
     elif is_risky(text):   # never a build, whatever the model reads (the Jarvis bench: once read as one)
         got = {'intent': 'reply'}
+    elif is_away(low):   # "I'm sleepy": offer the way to carry on while he's away
+        got = {'intent': 'away'}
     elif refs.has(text):   # a picture ("make it like this"): to the builders working now, else to the latest build
         live = _building() and _building().startswith('A build is running')
         got = {'intent': 'instruct' if live else ('amend' if latest_build(repo) and apply_build else 'build'),
@@ -1252,6 +1390,8 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         return go_live(ch, repo, poll)
     if intent == 'connect_host':
         return connect_host(ch, repo, text)
+    if intent == 'away':
+        return away(ch, repo, text, poll, apply_build, start_build, cloud)
     if intent == 'onboard':
         from . import onboard
         r = onboard.run(ch, repo, poll)
@@ -1580,6 +1720,10 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
     except (OSError, ValueError):
         pass
     CURRENT['ch'] = ch   # a background build reports its problems here
+    try:   # work his computer handed over before he shut it ("I'm sleepy" -> to the cloud): pick it up now
+        resume_here(ch, repo)
+    except Exception as e:
+        print(f'Could not pick up the handed-over work: {e!r}', flush=True)
     try:   # so a move to the cloud can stop this listener: one Hive reads his chat at a time
         os.makedirs(os.path.dirname(PIDFILE), exist_ok=True); open(PIDFILE, 'w').write(str(os.getpid()))
     except OSError:
