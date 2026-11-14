@@ -69,6 +69,11 @@ def _export(repo, branch):
     subprocess.run(['tar', '-xf', tar, '-C', files], capture_output=True)
     return tar, files
 
+# "[h]ttp" so the pattern does not match this command's own shell (Gate 109: `pkill -f "http.server 8080"` killed the
+# shell running it, before the folder for the pages was made, and the test page never went up)
+SIZE = 't3.small'   # plain pages need little; the owner asked for t3.small (Gate 109)
+STOP_SERVER = f'pkill -f "[h]ttp.server {PORT}" || true'
+
 def up(repo, branch, say=print, new_machine=None, target=None):
     """Put this branch's pages up for a test. Returns {'ok', 'url', 'say', 'made'}. new_machine() makes the machine
     when there is none (its return code); target(m) gives the machine to copy to (tests pass stand-ins)."""
@@ -84,7 +89,7 @@ def up(repo, branch, say=print, new_machine=None, target=None):
         m = _machine()
         if not m or not m.get('ip'):
             say('No cloud machine yet: making one for the test (about 5 minutes).')
-            rc = (new_machine or (lambda: cloud_aws.new(repo, with_login=False, start=False, say=say)))()
+            rc = (new_machine or (lambda: cloud_aws.new(repo, size=SIZE, with_login=False, start=False, say=say)))()
             m = _machine()
             if rc != 0 or not m or not m.get('ip'):
                 return {'ok': False, 'say': "I couldn't make the test machine on your AWS account just now."}
@@ -93,7 +98,8 @@ def up(repo, branch, say=print, new_machine=None, target=None):
         t = target(m) if target else cloud.Target(f"ubuntu@{m['ip']}", m['key'])
         token = secrets.token_urlsafe(12)
         root = 'hive-try'
-        t.run(f'pkill -f "http.server {PORT}" || true; rm -rf {root}; mkdir -p {root}/{token}', check=False)
+        t.run(STOP_SERVER, check=False)
+        t.run(f'rm -rf {root} && mkdir -p {root}/{token}')
         t.put(tar, f'{root}/site.tar')
         t.run(f'tar -xf {root}/site.tar -C {root}/{token} && rm {root}/site.tar')
         t.run(f'cd {root} && (nohup timeout {HOURS * 3600} python3 -m http.server {PORT} --bind 0.0.0.0 '
@@ -115,7 +121,7 @@ def down(repo, delete_machine=None, target=None):
     if m and m.get('ip'):
         try:
             t = target(m) if target else cloud.Target(f"ubuntu@{m['ip']}", m['key'])
-            t.run(f'pkill -f "http.server {PORT}" || true; rm -rf hive-try', check=False)
+            t.run(STOP_SERVER + '; rm -rf hive-try', check=False)
         except Exception:
             pass
         _close_port(m)

@@ -24,8 +24,14 @@ cloud_aws._aws = lambda args, profile=None, region=None, check=True: aws_calls.a
 class Machine:   # the cloud machine: commands recorded, files copied into a folder
     def __init__(self):
         self.cmds, self.dir = [], tempfile.mkdtemp()
-    def run(self, cmd, check=True):
-        self.cmds.append(cmd); return subprocess.CompletedProcess(cmd, 0, '', '')
+    def run(self, cmd, check=True):   # run for real in a shell in its folder (Gate 109: a command that killed its own
+        self.cmds.append(cmd)          # shell went unnoticed while they were only recorded); only the web server is not started
+        if 'http.server 8080 --bind' in cmd:
+            return subprocess.CompletedProcess(cmd, 0, '', '')
+        p = subprocess.run(['sh', '-c', cmd], cwd=self.dir, capture_output=True, text=True)
+        if check and p.returncode != 0:
+            raise RuntimeError(f'{cmd}: {p.stderr[:300]}')
+        return p
     def put(self, src, dst):
         os.makedirs(os.path.dirname(os.path.join(self.dir, dst)), exist_ok=True); shutil.copy(src, os.path.join(self.dir, dst))
 box = Machine()
@@ -55,11 +61,15 @@ r = trydeploy.up(plain, 'hive/b1', target=lambda m: box)
 check('it goes up at a secret address on the machine', bool(r['ok'] and re.match(r'^http://3\.110\.0\.7:8080/[\w-]{16}/$', r['url'])), True)
 check('the server stops by itself after two hours', any('timeout 7200 python3 -m http.server 8080' in c for c in box.cmds), True)
 check('the port was opened', aws_calls[-1], 'authorize-security-group-ingress')
-check('his pages were copied over', os.path.exists(os.path.join(box.dir, 'hive-try', 'site.tar')), True)
+token = r['url'].rstrip('/').split('/')[-1]
+check('his pages were copied over and unpacked at the secret address',
+      os.path.exists(os.path.join(box.dir, 'hive-try', token, 'index.html')), True)
+p = subprocess.run(['sh', '-c', trydeploy.STOP_SERVER + '; echo still-here'], capture_output=True, text=True)
+check('stopping an old test server does not stop the command itself (Gate 109)', p.stdout.strip(), 'still-here')
 check('an existing machine is not marked as made for the test', trydeploy.state()['made_machine'], False)
 msg = trydeploy.down(plain, target=lambda m: box)
 check('"take it down": server stopped, port closed, machine kept', (aws_calls[-1], os.path.exists(trydeploy.STATE()),
-      'stays' in msg, any('pkill -f "http.server 8080"' in c for c in box.cmds[-1:])),
+      'stays' in msg, any(trydeploy.STOP_SERVER in c for c in box.cmds[-1:])),
       ('revoke-security-group-ingress', False, True, True))
 r = trydeploy.up(built, 'hive/b1', target=lambda m: box)
 check('a built site is served from its dist/ folder', r['url'].endswith('/dist/'), True)
