@@ -4,7 +4,7 @@ uninstalled first:   python gates/gate110/flight110.py <Dabba Days project with 
 "we're on Vercel" -> "send me a link" -> "put it live" (refused: not merged) -> his engineer merges -> "put it live", yes
 -> "undo that", yes -> everything deleted. Whatever happens, the flight ends by deleting the test project and checking
 that his own project was not touched."""
-import json, os, shutil, subprocess, sys, tempfile, time, urllib.request
+import json, os, shutil, stat, subprocess, sys, tempfile, time, urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, ROOT); sys.path.insert(0, os.path.join(ROOT, 'tests'))
@@ -52,6 +52,14 @@ def wait_for(url, want, minutes=5):
         time.sleep(10)
     return last
 
+RAW = []   # what Vercel's tool printed, each time (attempt 1 could not tell why the preview link was the main address)
+_real_run = deploy._run
+def _logged_run(cmd, cwd, timeout=900):
+    p = _real_run(cmd, cwd, timeout)
+    RAW.append({'cmd': cmd, 'rc': p.returncode, 'stdout': (p.stdout or '')[-800:], 'stderr': (p.stderr or '')[-1500:]})
+    return p
+deploy._run = _logged_run
+
 def say(fake_script, words):
     fake = FakeTelegram(fake_script)
     ch = telegram.Channel({'chat_id': ME, 'token': 'x', 'address': 'sir'}, api=fake)
@@ -64,7 +72,7 @@ def git(*a):
 
 def main(src):
     global repo
-    before = projects()
+    before = projects()   # empty when Vercel's tool is not installed yet: taken again after "we're on Vercel"
     work = tempfile.mkdtemp(prefix='hive110_')
     repo = os.path.join(work, NAME)
     subprocess.run(['git', 'clone', '-q', os.path.abspath(src), repo], check=True)
@@ -76,31 +84,36 @@ def main(src):
               open(os.path.join(home, 'state.json'), 'w', encoding='utf-8'))
     note('setup', vercel_installed_before=bool(shutil.which('vercel')), projects_before=before)
     prod = f'https://{NAME}.vercel.app'
+    plans = prod + '/plans.html'   # the trial line is on the plans page (attempt 1 looked at the home page)
     try:
         # 1. "we're on Vercel": the tool installed by Hive, the sign-in checked, connected
         r, told = say([], "we're on Vercel")
-        note('connect', result=r, told=told, installed_now=bool(shutil.which('vercel')), signed_in=logins.ok('vercel'))
+        before = before or projects()
+        note('connect', result=r, told=told, installed_now=bool(shutil.which('vercel')), signed_in=logins.ok('vercel'),
+             projects_before=before)
         # 2. "send me a link"
         t = time.time(); r, told = say([], 'send me a link')
         link = next((w for m in told for w in m.split() if '.vercel.app' in w), None)
         code, body = fetch(link) if link else (None, '')
+        pcode, pbody = fetch(link.rstrip('/') + '/plans.html') if link else (None, '')
         note('preview', result=r, minutes=round((time.time() - t) / 60, 1), link=link, status=code,
-             has_home_page='Dabba Days' in body, project_made=NAME in projects(), named_code='code' in projects(),
-             told=told[-1][:300])
+             has_home_page='Dabba Days' in body, plans_status=pcode, link_shows_build=LINE in pbody,
+             is_main_address=bool(link) and link.rstrip('/') == prod, project_made=NAME in projects(),
+             named_code='code' in projects(), told=told[-1][:300], vercel_said=RAW[-1:] )
         # 3. "put it live" before the merge
         r, told = say([], 'put it live')
-        code0, body0 = fetch(prod)
+        code0, body0 = fetch(plans)
         note('live_unmerged', result=r, told=told[-1][:300], prod_status=code0, prod_has_line=LINE in body0)
         # 4. his engineer merges (as a pull request would); "put it live", yes
         m = git('merge', '--no-ff', '-q', '-m', 'Merge the trial-week line', f'hive/{BUILD}')
         t = time.time(); r, told = say([tap('liv|yes')], 'put it live')
         asked = any('Put it live on' in x for x in told)
-        code1, body1 = wait_for(prod, True)
+        code1, body1 = wait_for(plans, True)
         note('live', merge_rc=m.returncode, result=r, asked_first=asked, minutes=round((time.time() - t) / 60, 1),
-             prod_status=code1, prod_has_line=LINE in body1, told=told[-1][:300])
+             prod_status=code1, prod_has_line=LINE in body1, told=told[-1][:300], vercel_said=RAW[-1:])
         # 5. "undo that", yes
         t = time.time(); r, told = say([tap('und|yes')], 'undo that')
-        code2, body2 = wait_for(prod, False)
+        code2, body2 = wait_for(plans, False)
         note('undo', result=r, minutes=round((time.time() - t) / 60, 1), prod_status=code2, prod_has_line=LINE in body2,
              told=told[-1][:300])
     finally:
@@ -110,12 +123,12 @@ def main(src):
         key = os.path.join(deploy.DIR, memory.project_key(repo) + '.json')
         if os.path.exists(key):
             os.remove(key)
-        shutil.rmtree(work, ignore_errors=True)
+        shutil.rmtree(work, onerror=lambda f, p, e: (os.chmod(p, stat.S_IWRITE), f(p)))   # git's read-only files
         note('delete', rm_rc=rm.returncode if rm else None, rm_said=(rm.stdout + rm.stderr)[-200:] if rm else '',
              test_project_left=NAME in after, projects_after=after,
              others_untouched=all(after.get(k) == v for k, v in before.items()),
              host_record_left=os.path.exists(key), work_left=os.path.exists(work),
-             total_minutes=round((time.time() - t0) / 60, 1))
+             total_minutes=round((time.time() - t0) / 60, 1), vercel_said_all=RAW)
 
 if __name__ == '__main__':
     main(sys.argv[1])

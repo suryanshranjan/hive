@@ -1,0 +1,75 @@
+{
+ "steps": [
+  {
+   "vercel_installed_before": false,
+   "projects_before": {},
+   "step": "setup",
+   "minute": 0.0
+  },
+  {
+   "result": "connected",
+   "told": [
+    "🔧 Installing Vercel's tool on this computer first; a minute or two.",
+    "🔌 Connected: Vercel. Say \"send me a link\" to try a build on your phone, and \"put it live\" once your engineer has merged it."
+   ],
+   "installed_now": true,
+   "signed_in": true,
+   "step": "connect",
+   "minute": 0.4
+  },
+  {
+   "result": "previewed",
+   "minutes": 0.1,
+   "link": "https://hive-test-dabba-days.vercel.app",
+   "status": 200,
+   "has_home_page": true,
+   "project_made": true,
+   "named_code": false,
+   "told": "🔗 Here it is, sir, to try on your phone:\nhttps://hive-test-dabba-days.vercel.app\n\nA separate copy: your live product is untouched. Tell me what's off, or say \"ship it\".",
+   "step": "preview",
+   "minute": 0.6
+  },
+  {
+   "result": "not_merged",
+   "told": "🚀 Not yet, sir: your engineer hasn't merged it into your main version, and I only put live what they have reviewed. Say \"ship it\" and it goes to them; once merged, I'll put it live.",
+   "prod_status": 200,
+   "prod_has_line": false,
+   "step": "live_unmerged",
+   "minute": 0.6
+  },
+  {
+   "merge_rc": 0,
+   "result": "live",
+   "asked_first": true,
+   "minutes": 5.2,
+   "prod_status": 200,
+   "prod_has_line": false,
+   "told": "✅ It's live, sir.\nhttps://hive-test-dabba-days.vercel.app\n\nI'll tell you in the morning brief how your numbers move.",
+   "step": "live",
+   "minute": 5.8
+  },
+  {
+   "result": "undone_live",
+   "minutes": 0.1,
+   "prod_status": 200,
+   "prod_has_line": false,
+   "told": "↩️ Done: your live product is back to how it was. Your engineer should undo the merge in your main version too, so the next build starts from there; I've left that to them.",
+   "step": "undo",
+   "minute": 5.9
+  },
+  {
+   "rm_rc": 0,
+   "rm_said": "<claude-code-hint v=\"1\" type=\"plugin\" value=\"vercel@claude-plugins-official\" />\nVercel CLI 65.16.0\n\n✓ Deleted         hive-test-dabba-days\n",
+   "test_project_left": false,
+   "projects_after": {
+    "portfolio": 1794573488896
+   },
+   "others_untouched": true,
+   "host_record_left": false,
+   "work_left": true,
+   "total_minutes": 6.0,
+   "step": "delete",
+   "minute": 6.0
+  }
+ ]
+}
