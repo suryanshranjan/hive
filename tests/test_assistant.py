@@ -198,6 +198,17 @@ fake = FakeTelegram([say('do it without the login')])
 moves.clear()
 assistant.handle(ch(fake), repo, 'Please move to the cloud', poll=1, cloud=lambda rp, on, login=True: moves.append(login) or 0)
 check('"without the login" picks that option', moves, [False])
+sizes = []
+fake = FakeTelegram([tap('cld|big')])
+r = assistant.handle(ch(fake), repo, 'Please move to the cloud', poll=1,
+                     cloud=lambda rp, on, login=True, size=None: sizes.append(size) or 0)
+check('the move offers his choice at real monthly prices, and "bigger" makes the bigger machine (the owner: it depends on '
+      'the user)', (r, sizes, '$23 a month' in fake.sent[0]['text'], '$72 a month' in fake.sent[0]['text']),
+      ('moved', ['t3.large'], True, True))
+fake = FakeTelegram([tap('cld|no')])
+r = assistant.handle(ch(fake), repo, 'Please move to the cloud', poll=1, cloud=lambda rp, on, login=True, size=None: 0)
+from hive import cloud_aws as _ca
+check('"stay on this computer" is remembered as his choice', (r, _ca.preferred()), ('not_moved', 'laptop'))
 applied = []
 fake = FakeTelegram([say('replace it'), say('yes')])
 r = assistant.handle(ch(fake), repo, 'Actually, I changed my mind: a late post loses 9% per day', poll=1,

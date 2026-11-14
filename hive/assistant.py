@@ -1071,7 +1071,11 @@ def away(ch, repo, text, poll, apply_build=None, start_build=None, cloud=None):
     if work:
         opts = ([('☁️ Move to the cloud: shut your computer, I carry on', 'awy|cloud')] if cloud else []) + [
             ('💻 Carry on here (I\'ll leave my computer on)', 'awy|here'), ('⏸ Stop for tonight', 'awy|stop')]
-        tip = ("<b>My suggestion:</b> let me move to the cloud (about $0.09 an hour while it runs). I'll restart this "
+        from . import cloud_aws
+        size = cloud_aws.preferred() if cloud_aws.preferred() in cloud_aws.PRICE else cloud_aws.SIZES[0][0]
+        hour = cloud_aws.PRICE[size] + cloud_aws.ADDRESS
+        tip = (f"<b>My suggestion:</b> let me move to the cloud (about ${hour:.2f} an hour while it runs, ${hour * 8:.2f} "
+               "for a night; say \"delete the cloud machine\" in the morning and it stops). I'll restart this "
                "work there in about 5 minutes; once I say I'm there, you can shut your computer, and the morning "
                "brief will tell you how it went." if cloud else
                "To finish it, I need this computer on and awake through the night (plugged in, sleep turned off). "
@@ -1121,7 +1125,10 @@ def away(ch, repo, text, poll, apply_build=None, start_build=None, cloud=None):
     ch.send("☁️ Moving to the cloud now: about 5 minutes. Keep your computer on until I say I'm there.")
     try:
         try:
-            rc = cloud(repo, True, True)   # with his Claude login: builders work there
+            try:
+                rc = cloud(repo, True, True, size=size)   # with his Claude login: builders work there; his size
+            except TypeError:
+                rc = cloud(repo, True, True)
         except TypeError:
             rc = cloud(repo, True)
     except Exception as e:
@@ -1202,7 +1209,7 @@ def try_deploy(ch, repo, st, poll):
     """No host set up: offer the build's pages on a test machine on his AWS, at a secret address, for two hours."""
     from . import logins, trydeploy
     ch.send("🔗 You haven't set up a hosting service yet, sir. I can put this build on a test machine on your AWS "
-            "account, at a private link, for up to two hours (about $0.09 an hour), then take it down and delete the "
+            "account, at a private link, for up to two hours (about $0.03 an hour), then take it down and delete the "
             "machine. Your live product isn't touched.",
             buttons=[[('🔗 Yes, put it up', 'tdp|yes')], [('Not now', 'tdp|no')]])
     choice, other = choose(ch, poll, [('tdp|yes', ('yes', 'put it up', 'go', 'haan')), ('tdp|no', NO_WORDS)])
@@ -1484,6 +1491,26 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     if intent == 'onboard':
         from . import onboard
         r = onboard.run(ch, repo, poll)
+        home = onboard.progress(repo).get('home')
+        if r == 'done' and cloud and home and home != 'laptop' and not in_cloud(repo):   # always on, as he chose
+            from . import cloud_aws, logins
+            if not logins.ensure(ch, 'aws', poll):
+                return 'onboard_login_needed'
+            ch.send(f"☁️ Moving to the cloud now, as you chose (about ${cloud_aws.monthly(home)} a month): about 5 "
+                    "minutes. Keep your computer on until I say I'm there.")
+            try:
+                rc = cloud(repo, True, True, size=home)
+            except TypeError:
+                rc = cloud(repo, True, True)
+            except Exception as e:
+                rc = f'{e!r}'[:120]
+            if rc != 0:
+                ch.send("⚠️ I couldn't move to the cloud just now, so I'm staying on this computer. Say \"move to the "
+                        "cloud\" to try again.")
+                return 'onboard_cloud_failed'
+            ch.send("✅ <b>I'm in the cloud, always on.</b> You can shut your computer whenever you like; talk to me "
+                    "here as before.", html=True)
+            return 'onboard_moved'
         if r == 'build':   # someone starting fresh: his idea goes to the usual build proposal (restated, priced, his yes)
             return handle(ch, repo, 'build: ' + onboard.goal_of(repo), poll, apply_build, start_build, cloud)
         return 'onboard_' + r
@@ -1680,22 +1707,39 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         return 'built'
     if intent in ('cloud_on', 'cloud_off') and cloud:
         on = intent == 'cloud_on'
-        ch.send("☁️ <b>Shall I move to the cloud?</b>\n\nI'll make a machine on your AWS account (about $0.09 an hour "
-                "while it runs), move this project there, and keep working while your computer is off.\n\n<i>With your "
-                "Claude login, builders can work there too; without it, I can only talk with you there.</i>"
+        from . import cloud_aws
+        small, big = cloud_aws.SIZES   # his choice, at its real monthly price (the owner: "it depends on the user")
+        ch.send("☁️ <b>Shall I move to the cloud?</b>\n\nI'll make a machine on your AWS account, move this project "
+                "there, and keep working while your computer is off. It bills for as long as it runs; say \"delete the "
+                "cloud machine\" any time and it stops.\n\n"
+                f"• <b>Small</b>, about ${cloud_aws.monthly(small[0])} a month: {small[1]}.\n"
+                f"• <b>Bigger</b>, about ${cloud_aws.monthly(big[0])} a month: {big[1]}.\n\n"
+                "<i>Or keep me on this computer, free: I stop when it's off.</i>"
                 if on else "☁️ <b>Shall I delete the cloud machine?</b>\n\nBring results back first if you need them; "
                 "after this nothing is left running or billing.", html=True,
-                buttons=([[('⭐ Yes, with my Claude login', 'cld|yes')], [('Yes, without it (chat only)', 'cld|bare')],
-                          [('Not now', 'cld|no')]] if on else [[('🗑 Yes, delete it', 'cld|yes')], [('Not now', 'cld|no')]]))
-        choice, other = choose(ch, poll, [('cld|yes', ('with login', 'with my login', 'with my claude', 'yes')),
+                buttons=([[(f'☁️ Small, about ${cloud_aws.monthly(small[0])} a month', 'cld|yes')],
+                          [(f'☁️ Bigger, about ${cloud_aws.monthly(big[0])} a month', 'cld|big')],
+                          [('💻 Stay on this computer', 'cld|no')]] if on else
+                         [[('🗑 Yes, delete it', 'cld|yes')], [('Not now', 'cld|no')]]))
+        choice, other = choose(ch, poll, [('cld|yes', ('small', 'with login', 'with my login', 'with my claude', 'yes')),
+                                          ('cld|big', ('bigger', 'big', 'large')),
                                           ('cld|bare', ('without', 'chat only', 'no login')),
-                                          ('cld|no', NO_WORDS)] if on else
+                                          ('cld|no', NO_WORDS + ('stay', 'this computer', 'laptop'))] if on else
                                [('cld|yes', ('delete it', 'yes')), ('cld|no', NO_WORDS)])
         if other is not None:   # something else entirely: hold this, and answer what he said
             ch.send("Very good, I'll hold that for now.")
             return handle(ch, repo, other, poll, apply_build, start_build, cloud)
-        if choice not in ('cld|yes', 'cld|bare'):
-            ch.send('Very good. Just say the word.'); return 'not_moved'
+        if choice not in ('cld|yes', 'cld|bare', 'cld|big'):
+            if on:
+                cloud_aws.prefer('laptop')
+                ch.send("💻 Very good: I'll stay on this computer, free. I stop when it's off; say \"move to the cloud\" "
+                        "any time to change that.")
+            else:
+                ch.send('Very good. Just say the word.')
+            return 'not_moved'
+        size = big[0] if choice == 'cld|big' else small[0]
+        if on:
+            cloud_aws.prefer(size)   # "I'm sleepy" moves to the size he chose
         if not in_cloud(repo):   # his AWS sign-in, renewed from his phone if it has expired
             from . import logins
             if not logins.ensure(ch, 'aws', poll):
@@ -1703,7 +1747,10 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         if on:   # (for a delete, say nothing until it is known to be possible: it said "Deleting it now", then that it can't)
             ch.send("🛠 On it. This takes about 5 minutes; I'll tell you when I'm there.")
         try:
-            rc = cloud(repo, on, choice == 'cld|yes')   # with the login: builders can work there
+            try:
+                rc = cloud(repo, on, choice != 'cld|bare', size=size)   # with the login: builders can work there
+            except TypeError:
+                rc = cloud(repo, on, choice != 'cld|bare')
         except TypeError:
             rc = cloud(repo, on)
         if rc == 9:   # the cloud copy powered its own machine off: no hourly bill, and nothing built there is lost

@@ -30,8 +30,8 @@ WHO = {'business': re.compile(r'\b(business|company|shop|store|startup|brand|age
                                r'freelanc\w*|i code|i build apps)\b'),
        'new': re.compile(r'\b(new|from scratch|an idea|build something|make something|start fresh|nothing yet|'
                          r'naya|banana hai)\b')}
-PATHS = {'business': ('about_business', 'site', 'data', 'documents', 'host'),
-         'developer': ('about_product', 'site', 'data', 'conventions', 'host'),
+PATHS = {'business': ('about_business', 'site', 'data', 'documents', 'host', 'home'),
+         'developer': ('about_product', 'site', 'data', 'conventions', 'host', 'home'),
          'new': ('idea', 'day_one')}
 
 ABOUT = """Someone describes {what} to his new assistant: "{text}"
@@ -214,6 +214,44 @@ def step_host(ch, repo, poll, k, n):
         memory.add_note(repo, f'Where the product runs: {text.strip()[:200]}')
         ch.send("📝 Noted.")
 
+def step_home(ch, repo, poll, k, n):
+    """Where Hive runs: his choice, at real monthly prices (the owner: "it depends on the user"). A machine he picks is
+    made after set-up, once the rest is done (Hive moves there and keeps listening while his computer is off)."""
+    from . import cloud_aws
+    (small, what_s), (big, what_b) = cloud_aws.SIZES
+    ch.send(f"<b>{k} of {n}. Where should I run?</b>\n\n"
+            "• <b>On this computer</b>: free, but I stop when it's off or asleep.\n"
+            f"• <b>Always on, small</b>: about ${cloud_aws.monthly(small)} a month on your AWS account; {what_s}.\n"
+            f"• <b>Always on, bigger</b>: about ${cloud_aws.monthly(big)} a month; {what_b}.\n\n"
+            "<i>You can change this any time: \"move to the cloud\" or \"delete the cloud machine\".</i>", html=True,
+            buttons=[[('💻 This computer, free', f'onb|home|laptop')],
+                     [(f'☁️ Small, ~${cloud_aws.monthly(small)}/month', f'onb|home|{small}')],
+                     [(f'☁️ Bigger, ~${cloud_aws.monthly(big)}/month', f'onb|home|{big}')]])
+    while True:
+        kind, got = telegram._wait(ch, poll, {'onb|home|laptop', f'onb|home|{small}', f'onb|home|{big}',
+                                              f'onb|skip|{k}', 'onb|stop'})
+        if kind == 'tap':
+            choice = got.split('|')[2] if got.startswith('onb|home|') else None
+            if got == 'onb|stop':
+                raise _Paused
+        else:
+            n_ = _norm(got)
+            if n_ in STOP:
+                raise _Paused
+            choice = (big if re.search(r'\b(big|bigger|large)\b', n_) else small if re.search(r'\b(small|cloud|always)\b', n_)
+                      else 'laptop' if re.search(r'\b(computer|laptop|free|here|this)\b', n_) else
+                      None if n_ in SKIP else '?')
+            if choice == '?':
+                ch.send("Tap one, or say \"this computer\", \"small\" or \"bigger\"."); continue
+        break
+    if not choice:
+        return
+    cloud_aws.prefer(choice)
+    _keep(repo, home=choice)
+    ch.send("💻 Very good: I'll run on this computer." if choice == 'laptop' else
+            f"☁️ Very good: always on, about ${cloud_aws.monthly(choice)} a month. I'll move there when we've finished "
+            "setting up.")
+
 def step_idea(ch, repo, poll, k, n):
     text = _about(ch, repo, poll, k, n, 'Your idea.', "What do you want to build, and who is it for? Say it the way you'd "
                   "tell a friend (🎙 a voice note works too).", 'what he wants to build')
@@ -236,7 +274,7 @@ def step_day_one(ch, repo, poll, k, n):
         ch.send(f"📝 Noted ({len(musts)} so far). Anything else, or done?", buttons=[[('✅ Done', f'onb|done|{k}')]])
 
 STEPS = {'about_business': step_about_business, 'about_product': step_about_product, 'site': step_site,
-         'data': step_data, 'documents': step_documents, 'conventions': step_conventions, 'host': step_host,
+         'data': step_data, 'documents': step_documents, 'conventions': step_conventions, 'host': step_host, 'home': step_home,
          'idea': step_idea, 'day_one': step_day_one}
 
 # ---- the conversation -----------------------------------------------------------------------------------------------

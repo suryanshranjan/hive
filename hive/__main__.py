@@ -15,7 +15,7 @@ For the owner:
   hive doctor                            check this machine and project are ready
   hive telegram setup | test | call <name>   connect your phone; how Hive addresses you
   hive llm setup                         optional: a backup model (e.g. NVIDIA NIM) for plain words
-  hive cloud --new [--size t3.large]     one step: make a machine on your AWS account and move Hive there
+  hive cloud --new [--size t3.small]     one step: make a machine on your AWS account and move Hive there
   hive cloud --stop                      delete that machine (nothing left running or billing)
   hive cloud --to user@host [--with-login]   move this project's Hive to a server you already have
   hive cloud pull [--from user@host]     bring the result branches back
@@ -156,7 +156,7 @@ def build_parser():
     cl.add_argument('--from', dest='frm'); cl.add_argument('--with-login', action='store_true'); cl.add_argument('--no-start', action='store_true')
     cl.add_argument('--new', action='store_true'); cl.add_argument('--stop', action='store_true')   # make / delete an AWS machine
     cl.add_argument('--no-login', action='store_true')   # --new brings the Claude login (builders work there) unless this
-    cl.add_argument('--size', default='t3.large'); cl.add_argument('--region'); cl.add_argument('--profile')
+    cl.add_argument('--size', default='t3.small'); cl.add_argument('--region'); cl.add_argument('--profile')
     mo = sub.add_parser('morning'); mo.add_argument('name', nargs='?'); mo.add_argument('--phone', action='store_true')
     tg = sub.add_parser('telegram'); tg.add_argument('action', choices=['setup', 'test', 'call', 'ask', 'verdicts'])
     tg.add_argument('address', nargs='?'); tg.add_argument('--out'); tg.add_argument('--intro')
@@ -197,7 +197,7 @@ def main(argv=None):
         from . import cloud_aws
         return assistant.listen('.', apply_build=start.apply_ruling,
                                 start_build=lambda repo, goal, interview=True: assistant.background_build(repo, goal, interview=interview),   # Hive keeps answering meanwhile
-                                cloud=lambda repo, on, login=True: cloud_aws.new(repo, with_login=login) if on else
+                                cloud=lambda repo, on, login=True, size='t3.small': cloud_aws.new(repo, size=size, with_login=login) if on else
                                 cloud_aws.stop(ask=lambda q: 'y' if q.startswith(('Delete the Hive machine', 'Power this')) else 'n',
                                                relisten=False))   # this listener is already here   # never 'lose the work'
     if a.cmd == 'cloud':

@@ -1,7 +1,7 @@
 """hive cloud --new / --stop: one command makes a cloud machine for Hive on the owner's own AWS account, and one deletes
 it, so nothing is left running (and billing).
 
-  hive cloud --new [--size t3.large] [--region ap-south-1] [--profile name] [--no-login]
+  hive cloud --new [--size t3.small] [--region ap-south-1] [--profile name] [--no-login]
                        make the machine, then move the project; the Claude login goes too, so builders work there
   hive cloud --stop                                                           delete the machine, its key and firewall
 
@@ -18,7 +18,28 @@ AWS = os.environ.get('HIVE_AWS', 'aws')
 HOME = lambda: os.path.join(os.path.expanduser('~'), '.hive', 'cloud')
 STATE = lambda: os.path.join(HOME(), 'machine.json')
 UBUNTU = '/aws/service/canonical/ubuntu/server/24.04/stable/current/amd64/hvm/ebs-gp3/ami-id'
-PRICE = {'t3.small': 0.0224, 't3.medium': 0.045, 't3.large': 0.09, 't3.xlarge': 0.18, 'm7i.large': 0.11, 'm7i.xlarge': 0.22}   # $/hour, about
+PRICE = {'t3.small': 0.0224, 't3.medium': 0.0448, 't3.large': 0.0896, 't3.xlarge': 0.1792, 'm7i.large': 0.11, 'm7i.xlarge': 0.22}   # $/hour, Mumbai (AWS price list, Nov 2026)
+DISK_GB, GB_MONTH, ADDRESS = 30, 0.0912, 0.005   # gp3 $ per GB-month, and AWS's charge for a public address, $ an hour
+# the founder's choice of always-on machine, in his words (the owner: "it depends on the user"); t3.small flown in Gate 109
+SIZES = (('t3.small', 'talking with you, and one builder at a time'), ('t3.large', 'several builders at once, faster'))
+
+def monthly(size):
+    """What a machine left on costs a month, all in: the machine, its disk and its public address (dollars, rounded)."""
+    return round(PRICE.get(size, 0.1) * 730 + DISK_GB * GB_MONTH + ADDRESS * 730)
+
+CHOICE = lambda: os.path.join(os.path.expanduser('~'), '.hive', 'always_on.json')
+
+def prefer(size):
+    """Remember where he chose Hive runs: 'laptop', or a machine size."""
+    os.makedirs(os.path.dirname(CHOICE()), exist_ok=True)
+    json.dump({'choice': size, 't': time.time()}, open(CHOICE(), 'w'))
+
+def preferred():
+    """His choice, or None if he hasn't made one."""
+    try:
+        return json.load(open(CHOICE())).get('choice')
+    except (OSError, ValueError):
+        return None
 FIRST_BOOT = """#!/bin/bash
 set -e
 export DEBIAN_FRONTEND=noninteractive
@@ -46,7 +67,7 @@ def _my_ip():
     with urllib.request.urlopen('https://checkip.amazonaws.com', timeout=15) as r:
         return r.read().decode().strip()
 
-def new(repo='.', size='t3.large', region=None, profile=None, with_login=True, start=True, say=print):
+def new(repo='.', size='t3.small', region=None, profile=None, with_login=True, start=True, say=print):
     """Make a machine on the owner's AWS account, wait until it is ready, and move the project there."""
     if os.path.exists(STATE()):
         m = json.load(open(STATE()))

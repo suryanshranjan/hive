@@ -40,7 +40,7 @@ fake = FakeTelegram([tap('onb|who|business'),
                      tap('onb|skip|2'),
                      say(f'our orders database {db}'), say('done'),
                      say('Refunds within 7 days, never on sale items.'), tap('onb|done|4'),
-                     say("we're on vercel")])
+                     say("we're on vercel"), tap('onb|home|laptop')])
 r = assistant.handle(ch(fake), shop, 'set me up', poll=1)
 texts = [m['text'] for m in fake.sent]
 check('setup finishes', r, 'onboard_done')
@@ -49,7 +49,10 @@ check('his business is named from his words', memory.project_name(shop), 'Sunny 
 check('what he said about his business is kept', 'We sell handmade candles' in ' '.join(memory.notes(shop)), True)
 check('his database is connected and tried at once', any('I can see 2 tables: orders, payouts.' in t for t in texts), True)
 check('a few lines about how he runs things are kept', 'Refunds within 7 days, never on sale items.' in memory.notes(shop), True)
-check('the steps are numbered for a business (5)', any(t.startswith('5 of 5. Hosting.') for t in texts), True)
+check('the steps are numbered for a business (6)', any(t.startswith('5 of 6. Hosting.') for t in texts), True)
+check('where Hive runs is his choice, with real monthly prices, and "this computer" is kept',
+      (any(t.startswith('6 of 6. Where should I run?') and '$23 a month' in t and '$72 a month' in t for t in texts),
+       __import__('hive.cloud_aws', fromlist=['x']).preferred()), (True, 'laptop'))
 check('the wrap-up tells him what he can ask now', ('All set, Sunny Shop.' in texts[-1], 'how many orders this week?' in texts[-1]),
       (True, True))
 fake = FakeTelegram([])
@@ -65,14 +68,25 @@ check('...keeping what he gave', (memory.project_name(app), onboard.progress(app
       ('Tiny Notes', 'developer', 1))
 fake = FakeTelegram([tap('onb|skip|2'), tap('onb|skip|3'),
                      say('Next.js and Postgres. Never touch the billing folder. Tests: npm test'), tap('onb|done|4'),
-                     tap('onb|skip|5')])
+                     tap('onb|skip|5'), tap('onb|skip|6')])
 r = assistant.handle(ch(fake), app, 'set me up', poll=1)
 texts = [m['text'] for m in fake.sent]
-check('"set me up" again picks up at the step he stopped at', (r, texts[0]), ('onboard_done', '🐝 Picking up where we left off: step 2 of 5.'))
+check('"set me up" again picks up at the step he stopped at', (r, texts[0]), ('onboard_done', '🐝 Picking up where we left off: step 2 of 6.'))
 check("a developer is asked how it is built, not for policies", (any('How it is built.' in t for t in texts),
       any('How you run things.' in t for t in texts)), (True, False))
 check('his conventions are kept for the builders', any('Never touch the billing folder' in n for n in memory.notes(app)), True)
 check("a developer's wrap-up suggests technical asks", 'add an index on users.email' in texts[-1], True)
+
+# 3b. a business that picks "always on, small": after set-up Hive moves to a machine of that size, and says so
+from hive import cloud_aws
+shop2 = project('shop2'); moved = []
+fake = FakeTelegram([tap('onb|who|business'), tap('onb|skip|1'), tap('onb|skip|2'), tap('onb|skip|3'), tap('onb|skip|4'),
+                     tap('onb|skip|5'), say('small please')])
+r = assistant.handle(ch(fake), shop2, 'set me up', poll=1,
+                     cloud=lambda repo, on, login=True, size=None: moved.append((on, login, size)) or 0)
+check('"always on, small" in set-up: moved to a t3.small after set-up, his choice kept',
+      (r, moved, cloud_aws.preferred(), "I'm in the cloud, always on." in fake.sent[-1]['text']),
+      ('onboard_moved', [(True, True, 't3.small')], 't3.small', True))
 
 # 4. something new: the idea and day one, then the usual build proposal (one "shall I?", with its price)
 fresh = project('fresh')
