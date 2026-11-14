@@ -24,7 +24,7 @@ What does he mean? Read it as a person would, using the conversation: "yes" or "
 proposed; "I already told you" or "that one" points back to what he said before; a short correction ("no, Sunny Shop
 Creators") changes what you just proposed. Reply with JSON only:
 {{"intent": "build" | "stop_build" | "change" | "rule" | "status" | "team" | "set_team" | "stop_builder" | "greeting" |
-"instruct" | "show" | "amend" | "ship" | "complaint" | "goal" | "cloud_on" | "cloud_off" | "reply",
+"instruct" | "show" | "amend" | "ship" | "complaint" | "goal" | "data" | "onboard" | "cloud_on" | "cloud_off" | "reply",
 "rule": "for a build, exactly what to build (taken from the conversation if he points back to it); for a change or a
 rule, the rule he now wants; otherwise empty",
 "short": "for a build, what he wants in at most 12 plain words, as a person would say it back ('Redo the home page in
@@ -61,6 +61,11 @@ barternow.in's style'); otherwise empty",
 - "goal": he states a business outcome he wants, not a particular change ("I want more creators signing up", "sales
   are low this month", "help me get more repeat buyers"). You will work out what to change. A particular thing to
   build ("add an invite page") is "build".
+- "data": he asks about his business's own figures or records (orders, sign-ups, revenue, payouts, which customers or
+  sellers ...), to be answered from the data he has given you, not from the code ("how many orders came in today?",
+  "who are my top 5 sellers?"). How the product behaves in a case is a question about the product, not "data".
+- "onboard": he wants to set his company up with you, or carry on setting it up ("let's get started", "connect my
+  business").
 - "greeting": a hello, with no request yet.
 - "cloud_on" / "cloud_off": move Hive to the cloud / shut the cloud machine down.
 - "reply": anything else: a question, a complaint, frustration, small talk. Never a rule.
@@ -202,6 +207,13 @@ def facts(repo, ch=None):
         c = budget.cap()
         lines.append(f'Spent on builds this month: ${budget.spent_month():.2f}' + (f' (his limit: ${c:g} a month)' if c else ''))
         lines += [f'His numbers: {x}' for x in numbers.changes(repo)[:6]]
+    except Exception:
+        pass
+    try:
+        from . import access
+        given = access.summary(repo)
+        if given:
+            lines.append(given + ' Questions about his figures are answered from it.')
     except Exception:
         pass
     if name:
@@ -358,7 +370,12 @@ def route(run, text):
         return got['builder'], (got.get('why') or '').strip().rstrip('.')
     return team.pick(run), ''
 
-SHOW_WORDS = re.compile(r"\b(show me|screenshots?|dikhao|dikha do|kaisa dikh|how does it look|how it looks|let me see)\b")
+SHOW_WORDS = re.compile(r"\b(show me|screenshots?|screen ?shot|dikhao|dikha do|kaisa dikh\w*|how does it look|how it looks|"
+                        r"how (will|would|does) (it|this|that|the [a-z ]{1,20}) look|let me see|"
+                        r"send me (a |the )?(picture|photo|pic))\b")
+# right after a screenshot, a short "and on tablet?" or "desktop?" asks for the same pages on that screen
+FOLLOW_DEVICE = re.compile(r"^\s*(and|also|now|what about|how about|ab|aur)?\s*(in|on|for)?\s*(the\s+|a\s+)?[a-z ]{0,14}\??\s*$")
+SHOWN = {}   # the last screenshots he saw: {'t', 'pages'}, so "and on desktop?" shows the same pages
 # Gate 105: given his words, a builder matched 13 of 18 checks of a look; given the picture, 18 of 18 ("dark green"
 # for teal, "big heading" for a small one). Words about a look get the tip to send a picture.
 LOOK_WORDS = re.compile(r"\b(colou?rs?|look|looks|design|style|font|header|button|darker|lighter|bigger|smaller|"
@@ -431,40 +448,60 @@ def _code_to_show(repo):
             return tmp + '/c', st.get('goal', '')
     return repo, ''
 
-def shoot(repo):
-    """Screenshots of what he would want to see: [(page, png)], or a plain reason why not (a string)."""
+def shoot(repo, text=''):
+    """Screenshots of what he would want to see: [(page, png)] at phone size, or [(page, device, png)] when he named a
+    screen or a page ("the pricing page on desktop"); or a plain reason why not (a string)."""
     from . import screens
     code, goal = _code_to_show(repo)
+    devices = screens.devices_in(text)
+    named = screens.pages_named(text, code) if text else []
+    if not named and devices and SHOWN.get('pages') and time.time() - SHOWN.get('t', 0) < 1800:
+        named = SHOWN['pages']   # "and on desktop?": the pages he just saw
     try:   # the pages the latest work changed (its last few commits, Hive's own bookkeeping aside)
         log = subprocess.run(['git', '-C', code, 'log', '-4', '--name-only', '--format=%s'], capture_output=True,
                              text=True, encoding='utf-8', errors='replace').stdout.splitlines()
         changed = [l.strip() for l in log if l.strip() and not l.startswith(('hive:', 'Lock:', 'Release lock')) and
                    os.path.exists(os.path.join(code, l.strip()))]
-        return screens.take(code, screens.pages_of(goal, code, changed))
+        pages = named or screens.pages_of(goal, code, changed)
+        shots = screens.take_on(code, pages, devices or ['phone']) if devices or named else screens.take(code, pages)
+        SHOWN.update(t=time.time(), pages=pages)
+        return shots
     except screens.Unavailable as e:
         return str(e)
     except Exception as e:   # a page that would not load is told, not a crash in his chat
         return f"I couldn't take the screenshots just now ({str(e)[:120]})."
 
-def show(ch, repo, before=None, intro=None):
-    """Send him the screens, at phone size; with `before`, each page before and after his change."""
-    shots = shoot(repo)
+def label(page, device=None):
+    """A page as he would say it: "Home page", "Invite page" (Gate 107: a caption read "/"), with the screen if asked."""
+    words = page.strip('/').replace('-', ' ').replace('_', ' ').split('/')[-1]
+    name = 'Home page' if not words else (words[:1].upper() + words[1:]).removesuffix('.html') + ' page'
+    return name + (f' on {device}' if device else '')
+
+def show(ch, repo, before=None, intro=None, text=''):
+    """Send him the screens, at phone size or on the screens and pages he names; with `before`, each page before and
+    after his change."""
+    shots = shoot(repo, text)
     if isinstance(shots, str):
         ch.send(f"📷 {shots}"); return False
     old = dict(before) if isinstance(before, list) else {}
     if intro:
         ch.send(intro, html=True)
-    def label(page):   # as he would say it: "Home page", "Invite page" (Gate 107: a caption read "/")
-        words = page.strip('/').replace('-', ' ').replace('_', ' ').split('/')[-1]
-        return 'Home page' if not words else (words[:1].upper() + words[1:]).removesuffix('.html') + ' page'
-    for k, (page, png) in enumerate(shots, 1):
-        if page in old:
+    for k, shot in enumerate(shots, 1):
+        page, png = shot[0], shot[-1]
+        device = shot[1] if len(shot) == 3 else None
+        if page in old and not device:
             ch.send_photo(old[page], f'Before: {label(page)}')
         last = k == len(shots)
-        ch.send_photo(png, (f'After: {label(page)}' if page in old else label(page)) +
-                      ('\n\nHow does it look, sir? Tell me what\'s off, or send a picture of what you\'d like.'
-                       if last and not intro else ''))
+        tail = ('\n\nHow does it look, sir? Tell me what\'s off, or send a picture of what you\'d like.' +
+                ('' if device else ' Say "on desktop" or "on tablet" to see it there.')) if last and not intro else ''
+        ch.send_photo(png, (f'After: {label(page)}' if page in old and not device else label(page, device)) + tail)
     return True
+
+def _device_follow_up(low):
+    """'and on desktop?' / 'tablet?' within half an hour of a screenshot: the same pages on that screen."""
+    from . import screens
+    return bool(SHOWN.get('t') and time.time() - SHOWN['t'] < 1800 and screens.devices_in(low)
+                and FOLLOW_DEVICE.match(low) and len(low.split()) <= 5)
 
 def is_risky(text):
     """He asks for what Hive never does: skip the tests, or put work straight onto his own main branch or live. Answered
@@ -902,6 +939,29 @@ CONNECT_WORDS = re.compile(r"\b(connect|link|use|set up|setup|we use|we're on|we
                            r"deployed on|our site is on|switch to|move to)\b[^.?!]{0,30}"
                            r"\b(vercel|netlify|railway|azure|fly|render)\b")
 
+# a question about his business's own figures, answered from the data he gave (hive/access.py), not from the code
+DATA_WORDS = re.compile(r"^\s*(so\s+|and\s+|ok(ay)?\s+)?(how many|how much|kitne|kitna|kitni|total|what('s| is| are| was| were)"
+                        r" (my|our|the|today'?s|this week'?s|this month'?s|last month'?s) (revenue|sales|orders?|sign-?ups?|"
+                        r"users?|customers?|payouts?|refunds?|numbers|gmv|income|profit|signups|traffic|visitors|"
+                        r"subscribers?|churn|conversion)|which (customers?|sellers?|creators?|products?|users?|orders?|"
+                        r"items?|cities|plans?)|who (are|is|were|was) (my|our|the) (top|best|biggest|most|latest|newest))\b")
+
+def connect_data(ch, repo, text):
+    """'Here's our admin API https://... key ...' / 'postgres://...': keep it read-only, try it now, say what he gave."""
+    from . import access
+    src = access.detect(text)
+    if not src:
+        ch.send("I couldn't find the address in that, sir. Send the link itself (https://...) or the database address "
+                "(postgres://...).")
+        return 'connect_data_none'
+    kept = access.add(repo, src['kind'], src['where'], headers=src.get('headers'))
+    ok, line = access.check(kept)
+    ch.send((f"✅ <b>Connected, read-only: {telegram.esc(kept['name'])}.</b> " if ok else
+             f"⚠️ <b>{telegram.esc(kept['name'])}:</b> ") + telegram.esc(line) +
+            ("\n\nAsk me anything it holds: <i>\"how many orders this week?\"</i>. I only read; I never change it."
+             if ok else "\n\nI kept it; send it again once it's fixed."), html=True)
+    return 'connect_data' if ok else 'connect_data_failed'
+
 def _build_ref(st):
     return f"hive/{st['name']}"
 
@@ -990,7 +1050,12 @@ def pursue(ch, repo, text, poll, apply_build=None, run=True):
     def think():
         box, done = {}, threading.Event()
         def go():
-            box['plan'] = planner.make(repo, text, memory.notes(repo), [r['text'] for r in memory.load(repo)])
+            from . import access   # what his data holds: what the product doesn't show may be there (Gate 106's miss)
+            try:
+                seen = access.for_plan(repo)
+            except Exception:
+                seen = []
+            box['plan'] = planner.make(repo, text, memory.notes(repo) + seen, [r['text'] for r in memory.load(repo)])
             done.set()
         threading.Thread(target=go, daemon=True).start()
         while not done.wait(4):
@@ -1104,6 +1169,10 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         got = {'intent': 'status'}
     elif LIVE_WORDS.search(low) and not SKIP_WORDS.search(low):   # live, the safe way: merged, tested, his yes
         got = {'intent': 'go_live'}
+    elif __import__('hive.onboard', fromlist=['x']).START_WORDS.search(low):   # "set me up": get to know his company
+        got = {'intent': 'onboard'}
+    elif __import__('hive.access', fromlist=['x']).is_handover(text):   # "here's our admin API https://... key ..."
+        got = {'intent': 'connect_data'}
     elif CONNECT_WORDS.search(low):
         got = {'intent': 'connect_host'}
     elif PREVIEW_WORDS.search(low):
@@ -1114,7 +1183,7 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         live = _building() and _building().startswith('A build is running')
         got = {'intent': 'instruct' if live else ('amend' if latest_build(repo) and apply_build else 'build'),
                'rule': text}
-    elif SHOW_WORDS.search(low):
+    elif SHOW_WORDS.search(low) or _device_follow_up(low):
         got = {'intent': 'show'}
     elif SHIP_WORDS.search(low):
         got = {'intent': 'ship'}
@@ -1132,12 +1201,14 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         got = {'intent': 'goal'}
     elif re.search(r"\b(do|start|run) (the|my|that) plan\b", low) and PLAN.get('steps') and not PLAN.get('running'):
         got = {'intent': 'run_plan'}
+    elif DATA_WORDS.search(low) and __import__('hive.access', fromlist=['x']).load(repo):   # "how many orders this week?"
+        got = {'intent': 'data'}
     else:
         got = fast_read(ch, text) or read(ch, text)   # half a second when the trained reader is sure, else Claude
     intent, rule = got.get('intent', 'reply'), (got.get('rule') or text).strip()
     who = _who(ch)
-    if intent == 'show':   # he wants to see it: screenshots of what was built, at phone size
-        show(ch, repo)
+    if intent == 'show':   # he wants to see it: at phone size, or on the screens and pages he names
+        show(ch, repo, text=text)
         return 'shown'
     if intent == 'ship':   # "ship it": the latest build to his engineer, as a pull request
         return ship_it(ch, repo, text, poll)
@@ -1145,6 +1216,24 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         return go_live(ch, repo, poll)
     if intent == 'connect_host':
         return connect_host(ch, repo, text)
+    if intent == 'onboard':
+        from . import onboard
+        r = onboard.run(ch, repo, poll)
+        if r == 'build':   # someone starting fresh: his idea goes to the usual build proposal (restated, priced, his yes)
+            return handle(ch, repo, 'build: ' + onboard.goal_of(repo), poll, apply_build, start_build, cloud)
+        return 'onboard_' + r
+    if intent == 'connect_data':
+        return connect_data(ch, repo, text)
+    if intent == 'data':
+        from . import access
+        if not access.load(repo):
+            ch.send("I can't see your data yet, sir. Send me your admin or analytics address with its key, a read-only "
+                    "database address, or a spreadsheet link, and I'll answer from it. Or say \"set me up\".")
+            return 'no_data'
+        ch.send("🔎 Looking in your data.")
+        got = access.answer(repo, text) or {}
+        ch.send(('📊 ' if got.get('found') else '🤔 ') + telegram.esc(got.get('answer', '')), html=True)
+        return 'data_answered' if got.get('found') else 'data_unanswered'
     if intent == 'preview':
         return preview_it(ch, repo)
     if intent == 'document':   # the company brain: what lasts in his document, kept for plans and answers
@@ -1372,6 +1461,10 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         speak(ch, repo, f'He just said: "{text}". Greet him and say, in a sentence, where things stand.',
               f"🐝 <b>At your service{', ' + telegram.esc(who) if who else ''}.</b>\n\nTell me if you've changed your "
               "mind about anything, give me a new rule, or ask for the status. 🎙 Voice notes work too.")
+        from . import onboard
+        if onboard.knows_nothing(repo):   # a company Hive has not met: offer to get to know it
+            ch.send("We haven't met properly yet. Say <b>\"set me up\"</b> and I'll get to know your business or your "
+                    "product in about two minutes, or help you start something new.", html=True)
         return 'greeting'
     if intent == 'status' and _building():   # a build in the background: say so first
         speak(ch, repo, f'He asked: "{text}". Tell him exactly where things stand, starting with the build.',

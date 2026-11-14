@@ -7,6 +7,18 @@ optional: pip install playwright && playwright install chromium), and photograph
 import json, os, re, socket, subprocess, sys, tempfile, time, urllib.request
 
 PHONE = {'width': 390, 'height': 844}   # how he will see it, on his phone
+DEVICES = {'phone': PHONE, 'tablet': {'width': 820, 'height': 1180}, 'desktop': {'width': 1440, 'height': 900}}
+DEVICE_WORDS = (('phone', r'phones?|mobiles?|iphones?|androids?|small screens?'),
+                ('tablet', r'tablets?|ipads?'),
+                ('desktop', r'desktops?|laptops?|computers?|pcs?|macs?|monitors?|big screens?|wide screens?'))
+ALL_DEVICES = re.compile(r"\b(every|all|each|har)\s+(the\s+)?(devices?|screens?|sizes?)\b|\ball\s+three\b")
+
+def devices_in(text):
+    """The screens he asks to see it on ("how does it look on desktop and tablet?"), in a fixed order; [] if none."""
+    low = (text or '').lower()
+    if ALL_DEVICES.search(low):
+        return list(DEVICES)
+    return [d for d, words in DEVICE_WORDS if re.search(rf'\b({words})\b', low)]
 
 class Unavailable(RuntimeError):
     """Screenshots cannot be taken on this machine (no browser, or the product would not start)."""
@@ -113,6 +125,13 @@ def _stop(proc):
 def take(code_dir, pages=('/',), out_dir=None, size=PHONE):
     """Photograph these pages of the product in code_dir at phone size. Returns [(page, png path)]. Raises Unavailable
     with a plain reason when it cannot (no browser here, or the product would not start)."""
+    sizes = {'phone': size}
+    return [(page, png) for page, _, png in take_on(code_dir, pages, ('phone',), out_dir, sizes)]
+
+def take_on(code_dir, pages=('/',), devices=('phone',), out_dir=None, sizes=None):
+    """Photograph each page on each screen he asked for ("show me the pricing page on desktop and tablet"), with one
+    start of his product. Returns [(page, device, png path)], page by page. Raises Unavailable as take does."""
+    sizes = sizes or DEVICES
     if not available():
         raise Unavailable("I can't take screenshots on this machine yet (run: pip install playwright, then playwright "
                           "install chromium).")
@@ -142,12 +161,18 @@ def take(code_dir, pages=('/',), out_dir=None, size=PHONE):
                     raise Unavailable("I can't take screenshots on this machine yet: the browser isn't installed "
                                       "(run: playwright install chromium).") from None
                 raise
-            page = browser.new_page(viewport=size, device_scale_factor=2)
+            tabs = {}
+            for d in devices:   # a phone shot sharp on his phone; a desktop shot at 1x stays within Telegram's photo limit
+                mobile = d in ('phone', 'tablet')
+                tabs[d] = browser.new_page(viewport=sizes.get(d, PHONE), device_scale_factor=2 if d == 'phone' else 1,
+                                           is_mobile=mobile, has_touch=mobile)
             for k, path in enumerate(pages, 1):
-                page.goto(url.rstrip('/') + '/' + path.lstrip('/'), wait_until='networkidle', timeout=30000)
-                png = os.path.join(out_dir, f'{k:02d}_{re.sub(r"[^a-z0-9]+", "_", path.lower()).strip("_") or "home"}.png')
-                page.screenshot(path=png, full_page=True)
-                shots.append((path, png))
+                for d in devices:
+                    tabs[d].goto(url.rstrip('/') + '/' + path.lstrip('/'), wait_until='networkidle', timeout=30000)
+                    name = re.sub(r"[^a-z0-9]+", "_", path.lower()).strip("_") or "home"
+                    png = os.path.join(out_dir, f'{k:02d}_{name}' + ('' if tuple(devices) == ('phone',) else f'_{d}') + '.png')
+                    tabs[d].screenshot(path=png, full_page=True)
+                    shots.append((path, d, png))
             browser.close()
         return shots
     finally:
@@ -166,6 +191,33 @@ def page_of_file(path):
     if p.endswith('.html') and '/' not in p.strip('/'):
         return '/' if p in ('index.html',) else '/' + p
     return None
+
+def all_pages(repo):
+    """Every page his product has that Hive can name from its files (/, /pricing, /invite ...)."""
+    out = []
+    for d, dirs, files in os.walk(repo):
+        dirs[:] = [x for x in dirs if not x.startswith('.') and x not in ('node_modules', 'dist', 'build', '.next', 'venv')]
+        for f in files:
+            rel = os.path.relpath(os.path.join(d, f), repo).replace('\\', '/')
+            p = page_of_file(rel) or (('/' + rel[len('public/'):]) if rel.startswith('public/') and rel.endswith('.html')
+                                      and rel != 'public/index.html' else None)
+            if p:
+                out.append(p)
+    return sorted(set(out))
+
+def pages_named(text, repo):
+    """The pages he names in words ("the pricing page", "sign up", "home"), found among his product's pages; [] if he
+    names none Hive can find."""
+    low = (text or '').lower()
+    known = all_pages(repo)
+    out = ['/'] if re.search(r'\b(home ?page|homepage|landing( page)?|front page|main page)\b', low) else []
+    out += re.findall(r'(?<![\w/])(/[a-z0-9][a-z0-9/_.-]*)', low)
+    for p in known:
+        leaf = p.strip('/').split('/')[-1].removesuffix('.html') if p != '/' else ''
+        if leaf and re.search(r'\b' + re.escape(leaf).replace(r'\-', '[- ]?').replace('_', '[_ ]?') + r'\b',
+                              low.replace('sign up', 'signup').replace('log in', 'login')):
+            out.append(p)
+    return list(dict.fromkeys(out))[:4]
 
 def pages_of(goal, repo, changed=()):
     """The pages worth showing: the ones the latest work changed (Gate 107: each plan step showed the home page,

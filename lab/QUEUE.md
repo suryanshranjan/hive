@@ -2,7 +2,19 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 3 2026, after Gate 107)
+## Where we left off (Nov 14 2026)
+
+- **Built on the owner's request: run the company through Hive (unit-tested, not flown).**
+  - "set me up" onboarding with three paths: a business, a developer with a product, or something new (`hive/onboard.py`).
+  - Read-only access to his data, and answers from it (`hive/access.py`, `hive access`).
+  - Screenshots on phone, tablet or desktop of the pages he names.
+  - The interview skips what he has already said.
+- **Next:** fly it.
+  - A fresh founder runs "set me up" on the mock Sunny Shop, with a SQLite copy of its orders, then asks figures questions. Score the answers against the data.
+  - Then a developer on his own product.
+  - Then the founder session on his real product.
+
+## Earlier (Nov 3 2026, after Gate 107)
 
 - **Gate 107 done (ready for a second founder):** the full founder journey, 14 steps on the phone, passed in runs 3 and 4 after two fixes (builds from the phone go on top of his latest unmerged build). Not yet flown: the brief greeting at his clock (fixed after run 4). Next: a second founder on a practice project, then on his real product.
 - **Product rounded out (not yet flown):** the missing-question before a plan, numbers (`hive numbers`), the morning brief, hosts (`hive deploy setup <host>`: preview links, live only after a merge), `hive up`. Next: test it all, then the founder session on his real product.

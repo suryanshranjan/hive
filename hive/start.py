@@ -307,7 +307,8 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     asked = []; technical = look_job
     if interview_first:   # the owner is here: ask him first (Gates 30-35); overnight too, before he leaves (Gate 102)
         past = [r['text'] for r in memory.load(repo)]
-        qs = telegram._load(os.path.join(home, 'interview') + '.questions.json').get('qs') or interview.write_situations(goal_text, past)
+        qs = telegram._load(os.path.join(home, 'interview') + '.questions.json').get('qs') or interview.write_situations(
+            goal_text, past, known=memory.notes(repo))   # never ask what he has already told Hive
         if qs:
             say("\nFirst, a few quick situations where your own rules matter" + (", on your phone." if phone else ":"))
             asked = interview.interview(goal_text, phone, past, ask=lambda p: _ask(p, ''), situations=qs,

@@ -2,7 +2,7 @@
 
 Read this first. It is the shared memory for anyone working on Hive, human or agent: what we know, how sure we are, what is being tested, and exactly how to continue. When you learn something, update this file in the same commit as the evidence.
 
-Last updated: Nov 3 2026 (IST), after Gate 107.
+Last updated: Nov 14 2026 (IST), after Gate 107 and the onboarding, data access and devices work.
 
 ## 1. The question
 
@@ -459,6 +459,7 @@ All predictions are written down before the run, in each gate's `PREDICTIONS.md`
 
 ## 8. Open questions, most important first
 
+00000. **Does a real founder run his company through Hive? (Nov 14 2026)** Onboarding, read-only data access and screenshots on any screen are built and unit-tested, not flown. Open: does a founder finish "set me up"? Will he hand over a read-only login? Are answers from his data right, and checked against his own admin panel? Does a developer's path fit a developer? Needs a real founder and a real developer, each on their own product.
 0000. **Can Hive find what the product doesn't show? (after Gate 106)** The only miss in 9 was a reward that exists in his payouts but not on the site. Candidate: one more question when a goal touches money or promises ("anything you offer that the site doesn't say?"); or reading his business notes for offers. Also open: a real product, where problems are not planted in plain sight.
 0000. **Does a picture from the wild work as well? (after Gate 105)** Gate 105's targets were clean one-page designs in a palette models know (18/18 with the picture). Open: a real screenshot of another site (noisy, other content, several sections), a picture of a whole app, and the founder's own pictures from his phone.
 000. **Will a real owner read and correct a code sheet?** With a synthetic owner, the corrected code sheet gave 99.6% (Gate 42). A real build's sheet runs to 50–80 rules; Gates 30–35 found real owners audit long lists of builder decisions poorly, though in Gate 38 the founder confirmed a 13-rule sheet of his own rules. Needs the founder: one real feature, the code sheet on his phone, his marks against his own later verdicts.
@@ -530,6 +531,13 @@ Rules of the lab:
 - Give 95% intervals clustered by function, say when a comparison is observational, and remember that one run per team is not a replication.
 
 ## 12. Changelog
+
+- **Nov 14 2026 (IST), the owner's north star (no gate):** "the owner should feel he could run his entire company through Hive."
+  - **Onboarding** (`hive/onboard.py`): "set me up", offered on a first hello. It asks who he is first: a business (what it is, site, data, documents, host), a developer with a product (product, where it runs, data, how it is built, host), or someone starting fresh (idea, day one, then the usual build proposal). Every step is skippable, kept as given and resumable.
+  - **Read-only data access** (`hive/access.py`, `hive access`): his site, admin or analytics addresses with keys, SQLite, Postgres or MySQL, spreadsheets, files. Only one SELECT runs at a time, checked and in a read-only session, at most 200 rows. Questions about his figures are answered from it, and plans see a summary of it (Gate 106's miss lived in his payouts).
+  - **Screenshots on any screen:** phone, tablet or desktop, of the pages he names. "And on tablet?" follows up. Phone and tablet now render as mobile browsers.
+  - **The interview** also skips what he has already told Hive.
+  - Unit-tested (`tests/test_onboard.py`, `test_access.py`, `test_devices.py`, real screenshots included). Not yet flown with a real founder.
 
 - **Nov 3 2026 (IST), Gates 103b-105 and the Tony scenario:**
   - **Shipped:** Gate 103b (the owner's-examples check) and Gate 104 (confirm once on the sheet).

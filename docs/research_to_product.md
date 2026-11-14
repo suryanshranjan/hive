@@ -129,6 +129,15 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 | The founder: delete the cloud from the phone, and never lose development | The founder, Oct 29 | From the phone, the cloud copy powers its own machine off (no AWS keys there): the hourly bill stops and the disk keeps every branch. The computer's `hive cloud --stop` starts it again, brings everything home, checks every branch, then deletes it | `hive/cloud_aws.py` (`power_off_here`, `_wake`), `hive/assistant.py` |
 | Codex as the builder, tested for real: 2 Codex builders claimed, locked, built and landed through the guard in 7.8 minutes, all tests passing | Codex 0.160.1, Oct 29 | The Codex preset is verified; its token use is now recorded (its JSON-lines output) | `hive/swarm.py` |
 
+## The owner's own requests (no gate behind them)
+
+| Request | Evidence | What Hive does | Where |
+| --- | --- | --- | --- |
+| "The owner should feel he could run his entire company through Hive": easy onboarding, for a business, a developer with a product, or someone starting fresh | None yet: an owner request (Nov 14 2026). Gate 106's one miss (a reward only in his payouts) is why data access matters for plans | "set me up": one conversation, who he is first, then that path's steps; each skippable, kept as given, resumable | `hive/onboard.py`, `tests/test_onboard.py` (in the tool, not yet flown) |
+| "Hive can read the admin numbers, everything, the access given" | As above | Read-only sources (site, admin/analytics address with key, SQLite/Postgres/MySQL, spreadsheet, file, engineer's command); his figure questions answered from them; plans see a summary | `hive/access.py`, `tests/test_access.py` (in the tool, not yet flown) |
+| "Show me how it looks on desktop; tell me in tablet" | None: an owner request | Screenshots on phone, tablet or desktop, of the pages he names; "and on tablet?" follows up | `hive/screens.py` `take_on`, `tests/test_devices.py` (in the tool) |
+| "Situations only when required; for edge cases they're most welcome" | Gates 27-38 (asking where the owner differs), Gate 89 (no decisions, no interview) | The interview now also skips what he has told Hive about his business, not only his rulings | `hive/interview.py` `write_situations(known=...)` (in the tool) |
+
 ## Still to turn into the product
 
 - **Gates 55–56:** a skimming owner repairs about a quarter of the code sheet's wrong rules, whether by list, conversation or a short sheet; nothing changes in the product from these. Next to test with the founder: spot checks on concrete outcomes.

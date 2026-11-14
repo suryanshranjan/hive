@@ -148,6 +148,9 @@ def build_parser():
     de.add_argument('host', nargs='?'); de.add_argument('--preview'); de.add_argument('--live'); de.add_argument('--hook')
     nu = sub.add_parser('numbers'); nu.add_argument('action', nargs='?', choices=['setup', 'add'])
     nu.add_argument('values', nargs='*'); nu.add_argument('--cmd', dest='cmd_'); nu.add_argument('--url'); nu.add_argument('--file')
+    ac = sub.add_parser('access'); ac.add_argument('action', nargs='?', choices=['add', 'remove', 'ask'])
+    ac.add_argument('what', nargs='*'); ac.add_argument('--db'); ac.add_argument('--url'); ac.add_argument('--file')
+    ac.add_argument('--cmd', dest='cmd_'); ac.add_argument('--name'); ac.add_argument('--header', action='append', default=[])
     sub.add_parser('listen')
     cl = sub.add_parser('cloud'); cl.add_argument('action', nargs='?', choices=['pull']); cl.add_argument('--to')
     cl.add_argument('--from', dest='frm'); cl.add_argument('--with-login', action='store_true'); cl.add_argument('--no-start', action='store_true')
@@ -216,6 +219,33 @@ def main(argv=None):
         if not telegram.load():
             return doctor.setup(here)
         return doctor.go_live(here)
+    if a.cmd == 'access':   # what Hive may read, read-only: hive access add --db/--url/--file/--cmd; hive access ask "..."
+        from . import access
+        if a.action == 'add':
+            kind, where = next(((k, v) for k, v in (('db', a.db), ('url', a.url), ('file', a.file), ('cmd', a.cmd_)) if v),
+                               (None, None))
+            if not kind:
+                print('Give one of --db <address or file>, --url <address>, --file <path>, --cmd "<command>".'); return 2
+            headers = dict(h.split(':', 1) for h in a.header if ':' in h) or None
+            local = kind == 'file' or (kind == 'db' and '://' not in where)   # a file: kept by its full path
+            src = access.add('.', kind, os.path.abspath(where) if local else where, a.name,
+                             {k.strip(): v.strip() for k, v in headers.items()} if headers else None)
+            ok, line = access.check(src)
+            print(f"{'Connected' if ok else 'Kept, but not readable yet'}: {src['name']} ({access.secret_free(where)}). {line}")
+            return 0 if ok else 1
+        if a.action == 'remove':
+            name = ' '.join(a.what)
+            print(f'Removed {name}.' if access.remove('.', name) else f'Nothing called {name!r}.'); return 0
+        if a.action == 'ask':
+            got = access.answer('.', ' '.join(a.what))
+            print(got['answer'] if got else 'Nothing to read yet: hive access add --db/--url/--file/--cmd.'); return 0
+        srcs = access.load('.')
+        for s_ in srcs:
+            ok, line = access.check(s_)
+            print(f"- {s_['name']} ({s_['kind']}, {access.secret_free(s_['where'])}): {line}")
+        if not srcs:
+            print('Hive reads nothing of yours yet. Add a read-only source: hive access add --db postgres://reader:...@host/db')
+        return 0
     if a.cmd == 'brain':   # the company brain: hive brain add <file or folder>
         from . import brain
         n, facts, rules = brain.learn_all('.', a.path)

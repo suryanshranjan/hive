@@ -52,6 +52,23 @@ if 'His newest message:' in prompt and 'What does he mean?' in prompt:   # the l
     print(json.dumps({'result': json.dumps({'intent': 'reply' if about else intent, 'rule': rule,
                                             'confirmed': bool(confirmed and asked), 'about_product': about})}))
     sys.exit(0)
+if 'Write read-only SQL to answer it' in prompt:   # hive/access.py: one count from the first database listed
+    db = re.search(r'^\[([^\]]+)\] \(db\)', prompt, re.M)
+    sql = 'DELETE FROM orders' if 'DROP-ME' in prompt else "SELECT COUNT(*) AS orders FROM orders WHERE status = 'paid'"
+    print(json.dumps({'result': json.dumps({'queries': [{'source': db.group(1), 'sql': sql}] if db else []})}))
+    sys.exit(0)
+if 'Answer his question from his own data' in prompt:   # the last number the data shows, said plainly
+    data = prompt.split('What his data shows:')[1].split('Answer him in')[0]
+    nums = re.findall(r'^(\d+)\s*$', data, re.M)
+    print(json.dumps({'result': json.dumps({'answer': f'{nums[-1]} paid orders so far.' if nums else
+                                            'Your data does not show that.', 'found': bool(nums)})}))
+    sys.exit(0)
+if 'lasting facts does this give' in prompt:   # hive/onboard.py: name and facts from his description
+    said = prompt.split('to his new assistant: "')[1].split('"\n')[0]
+    name = re.search(r'\b(Sunny Shop|Tiny Notes)\b', said)
+    print(json.dumps({'result': json.dumps({'name': name.group(1) if name else '',
+                                            'facts': [s.strip() + '.' for s in re.split(r'[.;]', said) if s.strip()][:6]})}))
+    sys.exit(0)
 if 'Which earlier rulings does this replace' in prompt:
     print(json.dumps({'result': json.dumps({'replaces': [1] if 'late' in prompt.split('He now says:')[1] else []})}))
     sys.exit(0)

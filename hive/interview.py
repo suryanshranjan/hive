@@ -112,9 +112,15 @@ def decisions(goal, inputs=False):
     got = explain.ask_json(plan.format(goal=re.sub(r'^#+\s*(goal:?)?\s*', '', goal.strip(), flags=re.I)[:24000])) or {}
     return [d for d in got.get('decisions', []) if isinstance(d, dict) and d.get('case')][:40]
 
-def write_situations(goal, rulings=None, n=12, inputs=False):
+def write_situations(goal, rulings=None, n=12, inputs=False, known=None):
+    """Situations to ask him before the build: one per business decision the code must take, edge cases included (the
+    owner: "situations for the edge cases are most welcome"), but never one that his rules, his documents or what he
+    has told Hive already settle (the owner: "not redundant; only when required")."""
     past = ("\nRules he has already given (don't ask about these again):\n" + '\n'.join(f'- {r}' for r in rulings[-40:])
             + '\n') if rulings else ''
+    if known:
+        past += ("\nWhat he has already told you about his business (don't ask what these settle):\n" +
+                 '\n'.join(f'- {k}' for k in known[-30:]) + '\n')
     ds = decisions(goal, inputs)
     if not ds and os.environ.get('HIVE_INTERVIEW_WITHOUT_DECISIONS') != '1':
         return []   # Gate 89: no business decisions, no interview (Gate 86: with none, it invented a shop for a Django bug)

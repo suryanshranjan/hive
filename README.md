@@ -74,7 +74,11 @@ A real exchange from the end-to-end rehearsal (Gate 107), abridged:
 | *"build: an invite page"*, *"add a refund page"* | Says it back in one short line, with the price ("about $0.80"), then builds on your yes |
 | *"cache /products in Redis, 60 s TTL"* | A technical instruction is taken as it is: "👍 Yes, let's do it", restated precisely, with at most two normal engineer's questions. From then on it speaks your language |
 | A picture + *"make it like this"* | Changes the latest build to match, then sends before and after. In testing a picture matched 18 of 18 times, words 13 of 18 |
+| *"set me up"* (offered on your first hello) | Gets to know you in one conversation, about two minutes, every step skippable, picked up where you stopped. First: are you a business, a developer with a product, or starting something new? A business: what it is, your site, your data, how you run things, your host. A developer: the product, where it runs, its data, how it's built and what never to touch, the host. Something new: your idea and what it must do on day one, then the build |
 | *"show me"* | Screenshots at phone size of the pages that changed |
+| *"show me the pricing page on desktop"*, *"and on tablet?"*, *"on every screen"* | That page on that screen; right after a screenshot, a short "and on tablet?" shows the same pages there |
+| *"here's our admin API https://... key: ..."*, a database address, a spreadsheet link | Connected read-only and tried at once ("I can see 12 tables: orders, users, payouts…"). Only one reading query at a time ever runs, in a read-only session; keys stay on your computer |
+| *"how many orders came in this week?"*, *"who are my top 5 sellers?"* | Answered from your own data, in plain words. Plans for your goals also read what your data holds |
 | *"send me a link"* | The build at its own address, to try on your phone; your live product is untouched |
 | *"ship it"* | A pull request for your engineer: screenshots, what changed, your words, the test results, the cost |
 | *"put it live"* | Only once your engineer has merged it; every test runs on your main version first |
@@ -104,6 +108,7 @@ A real exchange from the end-to-end rehearsal (Gate 107), abridged:
 | `hive deploy setup <host>` / `preview` / `status` | Where your product lives; a preview address of the latest build |
 | `hive numbers [setup --cmd/--url/--file \| add name=value]` | Your business numbers, as they move |
 | `hive brain add <file or folder>` | Teach Hive your business from documents |
+| `hive access [add --db/--url/--file/--cmd \| remove <name> \| ask "..."]` | What Hive may read of your data, read-only; a command source can only be added here, never from the phone |
 | `hive rules` (`hive rules forget 3`) | Your standing rulings for this project |
 | `hive name "Sunny Shop"` | What Hive calls your project |
 | `hive pace fast` / `cheap` | Speed against cost (about 2-3× sooner for about 2× the cost) |
