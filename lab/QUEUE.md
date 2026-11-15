@@ -2,7 +2,32 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 15 2026, after Gate 110)
+## Where we left off (Nov 15 2026 morning, after the night's work: Gates 111-113)
+
+The owner said "fix everything" toward a Jarvis for the whole company, chose the order (always on first), then "complete everything, I'm going to sleep".
+- **Gate 111, always on is his choice** (`gates/gate111/RESULTS.md`). The phone and setup offer this computer (free), small (~$23 a month) or bigger (~$72), priced from AWS's list. Attempt 2 held on all predictions on real AWS. Fixed from attempt 1: ssh had no timeout; an old hand-over was replayed in the cloud.
+- **Gate 112, his office: mail, calendar, payments** (`gates/gate112/RESULTS.md`).
+  - **What it covers:** any IMAP mailbox, Gmail included, read without marking read, replies only on his yes; Google Calendar by its private iCal address; Stripe and Razorpay, read-only.
+  - **How it was flown:** on GreenMail and stripe-mock with the real model. Run 3 held on all 7 predictions.
+  - **Secrets** are deleted from the chat and from Hive's record of the conversation.
+  - **His real accounts are not connected yet.** He says "connect my email", "connect my calendar", "connect Stripe" or "connect Razorpay" on the phone.
+- **Gate 113, Gate 108 on a second company** (FixKaro, appliance repair; key in `hive_private/fixkaro/`). Everything held:
+  - 9 of 10 figures;
+  - the hidden rule found;
+  - the planner's price rule replicated;
+  - screens on re-run, after my launch lacked the browser path.
+  The one miss, a deduction taken twice, is fixed (3/3 re-asked).
+- **One-line installers:** `install.sh` (Linux, macOS) and `install.ps1` (Windows). Tested on a bare Ubuntu container and on Windows.
+- **Faster replies, measured:** a reply is mostly the model's own time (7-8 s for reading a message; Haiku saves about 1 s). The real speed-up needs an Anthropic API key and streaming; there is none on this laptop. Meanwhile, mail, calendar and payments say at once what they are doing.
+- **Phone-only setup:** the computer part is now one line plus `claude` and `hive setup`. A setup with no computer at all needs Hive hosted for the founder: the owner's call.
+- **AWS:** nothing of Hive's is left (checked). His `barternow-staging` runs, untouched. The lab's Docker test containers are removed.
+- **Next (his word needed):**
+  1. connect his real mail, calendar and payments, and fly Gate 112's questions on them;
+  2. an Anthropic API key, for faster replies;
+  3. Render as a second always-on choice (he asked; to discuss);
+  4. the founder session.
+
+## Before that (Nov 15 2026, after Gate 110)
 
 - **Gate 110 done** (`gates/gate110/RESULTS.md`): Vercel from the phone on the owner's personal Vercel. Attempt 3 held on every prediction after the first-deployment fix. Everything the test made is deleted; his `portfolio` is untouched. Vercel's tool is installed on the laptop (Hive installed it), signed in to his personal account.
 - Still unflown: a login renewed from the phone (all were valid); a framework build on a host.

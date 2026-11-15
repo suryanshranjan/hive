@@ -350,7 +350,12 @@ Here is the data he has given read-only access to:
 Write read-only SQL to answer it from his databases, if they hold the answer: plain SELECT (or WITH ... SELECT) queries,
 one statement each, at most 3, using only the tables and columns listed, aggregated where you can (counts, sums, top
 10) rather than raw rows. Before adding two money columns, check how they relate (does one already include the other?
-compare a total with its parts in a query); Gate 108 added a bonus to a total that already held it. Today is {today}. If
+compare a total with its parts in a query); Gate 108 added a bonus to a total that already held it. The same for taking
+one off: a deduction may already be taken out of the amount paid (Gate 113 took Rs 900 off a total that was already net).
+So whenever a table has an amount next to a bonus, deduction, fee or discount column, add one query that shows a few
+rows with the amount, that column and the parts it is made of, so the answer can see which already includes which; the
+stored amount paid is the answer unless those rows show otherwise.
+Today is {today}. If
 the other sources above already answer it, or nothing does, write none.
 Reply with JSON only: {{"queries": [{{"source": "<source name>", "sql": "SELECT ..."}}]}}"""
 
@@ -362,8 +367,8 @@ What his data shows:
 Answer him so he gets it in one glance on his phone: the answer first, in one short sentence with the number exactly as
 the data gives it ("62 new subscribers signed up in October."), then at most one more short sentence, only if it
 changes what he'd do. Everyday words; no technical words (no table, column or SQL), no hedging, no repeating his
-question. Never add a part to a total that may already contain it: if the data shows a total equals its parts
-(say amount = rate x count + bonus), the total is the answer. If the data does not answer it, say plainly what is
+question. Never add a part to a total that may already contain it, or take off a part already taken off: if the data
+shows a total equals its parts (say amount = rate x count + bonus - deduction), the total is the answer. If the data does not answer it, say plainly what is
 missing and what would answer it. Today is {today}.
 Reply with JSON only: {{"answer": "...", "found": true or false}}"""
 

@@ -164,6 +164,9 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 | A draft carries only his figures | Gate 112 run 1: "₹4,800 in total" added | The draft rule forbids any figure he did not give | `hive/mail.py` DRAFT |
 | Money to chase is always said | Gate 112 run 2: a failed payment left out | One line on failed payments, always | `hive/payments.py` ANSWER |
 
+| A deduction is never taken twice | Gate 113: ₹900 taken off a total already net (the mirror of Gate 108's double bonus) | The query step shows a few rows of an amount beside its bonus, deduction, fee or discount column, so the answer sees which includes which; re-asked 3/3, Dabba Days still right | `hive/access.py` PICK, ANSWER |
+| Install in one line | The owner: a founder should not need an engineer to start | `install.sh` (Linux, macOS), `install.ps1` (Windows): git, Python, Node, Claude Code, Hive; tested on a bare Ubuntu and on Windows | README Quick start |
+
 ## Still to turn into the product
 
 - **Gates 55–56:** a skimming owner repairs about a quarter of the code sheet's wrong rules, whether by list, conversation or a short sheet; nothing changes in the product from these. Next to test with the founder: spot checks on concrete outcomes.

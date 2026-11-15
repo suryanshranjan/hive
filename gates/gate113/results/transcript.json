@@ -1,0 +1,568 @@
+{
+ "steps": [
+  {
+   "step": "hello",
+   "said": "hi",
+   "result": "greeting",
+   "minutes": 0.1,
+   "script_left": 0,
+   "hive": [
+    "🐝 Good day, sir. FixKaro is set up and ready, with nothing built yet and not a penny spent. What shall we build first?",
+    "We haven't met properly yet. Say \"set me up\" and I'll get to know your business or your product in about two minutes, or help you start something new."
+   ]
+  },
+  {
+   "step": "onboard",
+   "said": "set me up",
+   "result": "onboard_done",
+   "minutes": 0.3,
+   "script_left": 0,
+   "hive": [
+    "🐝 Let's get you set up. First, which of these is you?",
+    "Very good. 6 quick steps, about two minutes. Say skip to any, or stop to carry on later; I keep everything as you go.",
+    "1 of 6. Your business.\nWhat is it called, what does it do, and who are your customers? A line or two is plenty (🎙 a voice note works too).",
+    "✅ Got it, FixKaro: FixKaro sends verified technicians to repair appliances at people's homes. It repairs ACs, washing machines, fridges, water purifiers and microwaves. The technicians are verified.",
+    "2 of 6. Where it runs.\nWhere can I see it? Send its web address.",
+    "3 of 6. Numbers and data.\nI already have the code here (11 files). So I can answer things like \"how many orders this week?\", send me any of these, as many as you like:\n• an admin or analytics address, with its key\n• a database address (please a read-only login)\n• a shared spreadsheet link, or a CSV or Excel file\n\nI only ever read; I never change your data. Keys stay on this computer. Say done when finished.",
+    "✅ fixkaro database: I can see 8 tables: amc, amc_plans, customers, jobs, payments, payouts, services, technicians.\n\nAnything else? Or say done.",
+    "4 of 6. How you run things.\nAnything written down: policies, FAQ, price list, a pitch deck? Send the files here (PDF, text, CSV), or tell me in a few lines. Say done when finished.",
+    "📚 Read: 10 things kept. Anything else, or done?",
+    "5 of 6. Hosting.\nVercel, Netlify, Render, Railway, Fly or Azure? Or say don't know.",
+    "6 of 6. Where should I run?\n\n• On this computer: free, but I stop when it's off or asleep.\n• Always on, small: about $23 a month on your AWS account; talking with you, and one builder at a time.\n• Always on, bigger: about $72 a month; several builders at once, faster.\n\nYou can change this any time: \"move to the cloud\" or \"delete the cloud machine\".",
+    "💻 Very good: I'll run on this computer.",
+    "✅ All set, FixKaro. I know 15 things about your business; read-only access to fixkaro database.\n\nFrom now on, just tell me what you want. For example:\n• \"how many orders this week?\"\n• \"show me the pricing page on desktop\"\n• \"I want more repeat buyers\"\n• \"add a referral page\"\n\nI'll ask only what I can't work out myself: your own rules for the unusual cases."
+   ]
+  },
+  {
+   "step": "techs",
+   "said": "How are our technicians paid?",
+   "result": "answered",
+   "minutes": 0.6,
+   "script_left": 0,
+   "hive": [
+    "🐝 Sir, technicians get ₹250 for every completed job plus 30% of its labour, paid every Monday for the week before. Your payouts show one thing your policy doesn't: they're paid nothing for a free 7-day re-fix and lose another ₹100 for each one. Is that your rule?"
+   ]
+  },
+  {
+   "step": "q1",
+   "said": "How many customers have an active maintenance plan right now?",
+   "result": "data_answered",
+   "minutes": 0.2,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 37 customers have an active maintenance plan right now, 23 on Silver and 14 on Gold."
+   ]
+  },
+  {
+   "step": "q2",
+   "said": "How many jobs did we complete in October?",
+   "result": "data_answered",
+   "minutes": 0.3,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 137 jobs were completed in October. 9 of them were return visits to fix earlier jobs, and another 28 booked jobs were cancelled."
+   ]
+  },
+  {
+   "step": "q3",
+   "said": "How many bookings did we cancel in October because the address was outside our service area?",
+   "result": "data_answered",
+   "minutes": 0.4,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 15 bookings were cancelled in October because the address was outside your service area. That's the most common reason for cancelling, ahead of \"customer not home\" (7)."
+   ]
+  },
+  {
+   "step": "q4",
+   "said": "Which technician had the most jobs redone in October?",
+   "result": "data_answered",
+   "minutes": 0.4,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 Salim Pathan had the most jobs redone: 5 of his 14 October jobs needed a second visit. Next was Amol Shinde with 2, so Salim is the one to look at."
+   ]
+  },
+  {
+   "step": "q5",
+   "said": "How much did we make from maintenance plans in October?",
+   "result": "data_answered",
+   "minutes": 0.3,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 You made Rs 41,483 from 17 maintenance plans sold in October. One of them, a Silver plan worth Rs 1,999, has since been cancelled and hasn't been refunded, so that money may need to go back."
+   ]
+  },
+  {
+   "step": "q6",
+   "said": "How much did we refund in October?",
+   "result": "data_answered",
+   "minutes": 0.3,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 You refunded Rs 1,700 in October, across 2 refunds to 2 customers."
+   ]
+  },
+  {
+   "step": "q7",
+   "said": "Which service was booked the most in October?",
+   "result": "data_answered",
+   "minutes": 0.4,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 AC service and repair was booked the most in October, with 50 bookings. But 11 of those were cancelled, so washing machine repair had more jobs that went ahead: 41 against 39."
+   ]
+  },
+  {
+   "step": "q8",
+   "said": "Which area had the most bookings in October?",
+   "result": "data_answered",
+   "minutes": 0.4,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 Baner had the most bookings in October, with 49."
+   ]
+  },
+  {
+   "step": "q9",
+   "said": "How many new customers did we get in October?",
+   "result": "data_answered",
+   "minutes": 0.2,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 You got 95 new customers in October. Most came from Google (38) and referrals (28)."
+   ]
+  },
+  {
+   "step": "q10",
+   "said": "How much did we pay our technicians in October, after deductions?",
+   "result": "data_answered",
+   "minutes": 0.4,
+   "script_left": 0,
+   "hive": [
+    "🔎 Looking in your data.",
+    "📊 You paid your technicians Rs 47,195 in October, after Rs 900 taken off for redone jobs. That covers 12 technicians and 113 jobs, paid between 5 and 26 October."
+   ]
+  },
+  {
+   "step": "screen1",
+   "said": "show me the services page on desktop",
+   "result": "shown",
+   "minutes": 0.0,
+   "script_left": 0,
+   "hive": [
+    "📷 I can't take screenshots on this machine yet: the browser isn't installed (run: playwright install chromium)."
+   ]
+  },
+  {
+   "step": "screen2",
+   "said": "and on tablet?",
+   "result": "shown",
+   "minutes": 0.1,
+   "script_left": 0,
+   "hive": [
+    "📷 I can't take screenshots on this machine yet: the browser isn't installed (run: playwright install chromium)."
+   ]
+  },
+  {
+   "step": "screen3",
+   "said": "show me the booking page on every screen",
+   "result": "shown",
+   "minutes": 0.0,
+   "script_left": 0,
+   "hive": [
+    "📷 I can't take screenshots on this machine yet: the browser isn't installed (run: playwright install chromium)."
+   ]
+  },
+  {
+   "step": "goal",
+   "said": "I want more people booking repairs",
+   "result": "planned",
+   "minutes": 3.7,
+   "script_left": 0,
+   "hive": [
+    "🔎 On it, sir. Let me look at your product with that in mind; a minute or two.",
+    "❓ Before I plan it, one thing your product can't tell me:\nDo you already give first-time customers anything, like a discount or a free check-up, that the site doesn't mention?",
+    "Thank you, sir. Planning with that in mind.",
+    "🧭 Here's what I see, sir. Before booking, a first-time customer has to create an account with a password, and no page tells them that the visit costs Rs 299 and is free if FixKaro does the repair; every service only says \"Price on inspection\", and the site never lists which areas FixKaro covers or says cancelling is free.\n\nWhat I'd do:\n1. Book without making an account: Before anyone can book, the form asks for an email, a password and the password again, 11 boxes in all, and it never asks which area they live in or what time suits them, so people who just want a technician to come give up.\n2. Show what a visit costs, up front: Every service card says only 'Price on inspection', and no page mentions the Rs 299 visit fee, that it is waived if FixKaro does the repair, or that parts are charged at their printed price, so a new customer can't tell what they are agreeing to pay.\n3. Show the areas served and free cancellation: No page names the six areas FixKaro serves or says cancelling is free up to 2 hours before the slot, so people can't tell whether a technician will come to them, and they worry about getting stuck once they book.\n\nI'll build them one after another and show you each. Your main version isn't touched. All of it: about $1.50.",
+    "❓ One thing only you can decide (Show what a visit costs, up front):\nShould each service card also show a typical labour price, so customers can guess the full bill?",
+    "🛠 Right, sir. Building the first step now: Book without making an account. I'll show you each step as it lands; say \"status\" any time.",
+    "📷 I can't take screenshots on this machine yet: the browser isn't installed (run: playwright install chromium).",
+    "🛠 Step 2 of 3: Show what a visit costs, up front. On it.",
+    "📷 I can't take screenshots on this machine yet: the browser isn't installed (run: playwright install chromium).",
+    "🛠 Step 3 of 3: Show the areas served and free cancellation. On it.",
+    "📷 I can't take screenshots on this machine yet: the browser isn't installed (run: playwright install chromium).",
+    "🎉 That's the plan done, sir. 12 tests, all passing. All 6 that passed before still pass.\n\nTell me what's off, or say ship it and it all goes to your engineer as one pull request."
+   ]
+  }
+ ],
+ "transcript": [
+  [
+   "owner",
+   "hi"
+  ],
+  [
+   "hive",
+   "🐝 Good day, sir. FixKaro is set up and ready, with nothing built yet and not a penny spent. What shall we build first?"
+  ],
+  [
+   "hive",
+   "We haven't met properly yet. Say \"set me up\" and I'll get to know your business or your product in about two minutes, or help you start something new."
+  ],
+  [
+   "owner",
+   "set me up"
+  ],
+  [
+   "hive",
+   "🐝 Let's get you set up. First, which of these is you?"
+  ],
+  [
+   "owner",
+   "[tap] onb|who|business"
+  ],
+  [
+   "hive",
+   "Very good. 6 quick steps, about two minutes. Say skip to any, or stop to carry on later; I keep everything as you go."
+  ],
+  [
+   "hive",
+   "1 of 6. Your business.\nWhat is it called, what does it do, and who are your customers? A line or two is plenty (🎙 a voice note works too)."
+  ],
+  [
+   "owner",
+   "FixKaro. We send verified technicians to repair ACs, washing machines, fridges, water purifiers and microwaves at homes across Pune, the same day or the next."
+  ],
+  [
+   "hive",
+   "✅ Got it, FixKaro: FixKaro sends verified technicians to repair appliances at people's homes. It repairs ACs, washing machines, fridges, water purifiers and microwaves. The technicians are verified."
+  ],
+  [
+   "hive",
+   "2 of 6. Where it runs.\nWhere can I see it? Send its web address."
+  ],
+  [
+   "owner",
+   "[tap] onb|skip|2"
+  ],
+  [
+   "hive",
+   "3 of 6. Numbers and data.\nI already have the code here (11 files). So I can answer things like \"how many orders this week?\", send me any of these, as many as you like:\n• an admin or analytics address, with its key\n• a database address (please a read-only login)\n• a shared spreadsheet link, or a CSV or Excel file\n\nI only ever read; I never change your data. Keys stay on this computer. Say done when finished."
+  ],
+  [
+   "owner",
+   "here is our database /home/node/f113/fixkaro-data/fixkaro.db"
+  ],
+  [
+   "hive",
+   "✅ fixkaro database: I can see 8 tables: amc, amc_plans, customers, jobs, payments, payouts, services, technicians.\n\nAnything else? Or say done."
+  ],
+  [
+   "owner",
+   "done"
+  ],
+  [
+   "hive",
+   "4 of 6. How you run things.\nAnything written down: policies, FAQ, price list, a pitch deck? Send the files here (PDF, text, CSV), or tell me in a few lines. Say done when finished."
+  ],
+  [
+   "owner",
+   "our policy [document: /home/node/f113/fixkaro-data/docs/policy.md | policy.md]"
+  ],
+  [
+   "hive",
+   "📚 Read: 10 things kept. Anything else, or done?"
+  ],
+  [
+   "owner",
+   "done"
+  ],
+  [
+   "hive",
+   "5 of 6. Hosting.\nVercel, Netlify, Render, Railway, Fly or Azure? Or say don't know."
+  ],
+  [
+   "owner",
+   "[tap] onb|skip|5"
+  ],
+  [
+   "hive",
+   "6 of 6. Where should I run?\n\n• On this computer: free, but I stop when it's off or asleep.\n• Always on, small: about $23 a month on your AWS account; talking with you, and one builder at a time.\n• Always on, bigger: about $72 a month; several builders at once, faster.\n\nYou can change this any time: \"move to the cloud\" or \"delete the cloud machine\"."
+  ],
+  [
+   "owner",
+   "[tap] onb|home|laptop"
+  ],
+  [
+   "hive",
+   "💻 Very good: I'll run on this computer."
+  ],
+  [
+   "hive",
+   "✅ All set, FixKaro. I know 15 things about your business; read-only access to fixkaro database.\n\nFrom now on, just tell me what you want. For example:\n• \"how many orders this week?\"\n• \"show me the pricing page on desktop\"\n• \"I want more repeat buyers\"\n• \"add a referral page\"\n\nI'll ask only what I can't work out myself: your own rules for the unusual cases."
+  ],
+  [
+   "owner",
+   "How are our technicians paid?"
+  ],
+  [
+   "hive",
+   "🐝 Sir, technicians get ₹250 for every completed job plus 30% of its labour, paid every Monday for the week before. Your payouts show one thing your policy doesn't: they're paid nothing for a free 7-day re-fix and lose another ₹100 for each one. Is that your rule?"
+  ],
+  [
+   "owner",
+   "How many customers have an active maintenance plan right now?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 37 customers have an active maintenance plan right now, 23 on Silver and 14 on Gold."
+  ],
+  [
+   "owner",
+   "How many jobs did we complete in October?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 137 jobs were completed in October. 9 of them were return visits to fix earlier jobs, and another 28 booked jobs were cancelled."
+  ],
+  [
+   "owner",
+   "How many bookings did we cancel in October because the address was outside our service area?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 15 bookings were cancelled in October because the address was outside your service area. That's the most common reason for cancelling, ahead of \"customer not home\" (7)."
+  ],
+  [
+   "owner",
+   "Which technician had the most jobs redone in October?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 Salim Pathan had the most jobs redone: 5 of his 14 October jobs needed a second visit. Next was Amol Shinde with 2, so Salim is the one to look at."
+  ],
+  [
+   "owner",
+   "How much did we make from maintenance plans in October?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 You made Rs 41,483 from 17 maintenance plans sold in October. One of them, a Silver plan worth Rs 1,999, has since been cancelled and hasn't been refunded, so that money may need to go back."
+  ],
+  [
+   "owner",
+   "How much did we refund in October?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 You refunded Rs 1,700 in October, across 2 refunds to 2 customers."
+  ],
+  [
+   "owner",
+   "Which service was booked the most in October?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 AC service and repair was booked the most in October, with 50 bookings. But 11 of those were cancelled, so washing machine repair had more jobs that went ahead: 41 against 39."
+  ],
+  [
+   "owner",
+   "Which area had the most bookings in October?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 Baner had the most bookings in October, with 49."
+  ],
+  [
+   "owner",
+   "How many new customers did we get in October?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 You got 95 new customers in October. Most came from Google (38) and referrals (28)."
+  ],
+  [
+   "owner",
+   "How much did we pay our technicians in October, after deductions?"
+  ],
+  [
+   "hive",
+   "🔎 Looking in your data."
+  ],
+  [
+   "hive",
+   "📊 You paid your technicians Rs 47,195 in October, after Rs 900 taken off for redone jobs. That covers 12 technicians and 113 jobs, paid between 5 and 26 October."
+  ],
+  [
+   "owner",
+   "show me the services page on desktop"
+  ],
+  [
+   "hive",
+   "📷 I can't take screenshots on this machine yet: the browser isn't installed (run: playwright install chromium)."
+  ],
+  [
+   "owner",
+   "and on tablet?"
+  ],
+  [
+   "hive",
+   "📷 I can't take screenshots on this machine yet: the browser isn't installed (run: playwright install chromium)."
+  ],
+  [
+   "owner",
+   "show me the booking page on every screen"
+  ],
+  [
+   "hive",
+   "📷 I can't take screenshots on this machine yet: the browser isn't installed (run: playwright install chromium)."
+  ],
+  [
+   "owner",
+   "I want more people booking repairs"
+  ],
+  [
+   "hive",
+   "🔎 On it, sir. Let me look at your product with that in mind; a minute or two."
+  ],
+  [
+   "hive",
+   "❓ Before I plan it, one thing your product can't tell me:\nDo you already give first-time customers anything, like a discount or a free check-up, that the site doesn't mention?"
+  ],
+  [
+   "owner",
+   "No, nothing special for first-timers. The Rs 299 visit fee is waived if we repair, but that's for every customer, not just new ones. I'm open to adding a first-time offer if you think it's worth it."
+  ],
+  [
+   "hive",
+   "Thank you, sir. Planning with that in mind."
+  ],
+  [
+   "hive",
+   "🧭 Here's what I see, sir. Before booking, a first-time customer has to create an account with a password, and no page tells them that the visit costs Rs 299 and is free if FixKaro does the repair; every service only says \"Price on inspection\", and the site never lists which areas FixKaro covers or says cancelling is free.\n\nWhat I'd do:\n1. Book without making an account: Before anyone can book, the form asks for an email, a password and the password again, 11 boxes in all, and it never asks which area they live in or what time suits them, so people who just want a technician to come give up.\n2. Show what a visit costs, up front: Every service card says only 'Price on inspection', and no page mentions the Rs 299 visit fee, that it is waived if FixKaro does the repair, or that parts are charged at their printed price, so a new customer can't tell what they are agreeing to pay.\n3. Show the areas served and free cancellation: No page names the six areas FixKaro serves or says cancelling is free up to 2 hours before the slot, so people can't tell whether a technician will come to them, and they worry about getting stuck once they book.\n\nI'll build them one after another and show you each. Your main version isn't touched. All of it: about $1.50."
+  ],
+  [
+   "owner",
+   "[tap] 🚀 Yes, do it all"
+  ],
+  [
+   "hive",
+   "❓ One thing only you can decide (Show what a visit costs, up front):\nShould each service card also show a typical labour price, so customers can guess the full bill?"
+  ],
+  [
+   "owner",
+   "[tap] Yes, show 'usually from ₹X' for each service"
+  ],
+  [
+   "hive",
+   "🛠 Right, sir. Building the first step now: Book without making an account. I'll show you each step as it lands; say \"status\" any time."
+  ],
+  [
+   "hive",
+   "📷 I can't take screenshots on this machine yet: the browser isn't installed (run: playwright install chromium)."
+  ],
+  [
+   "hive",
+   "🛠 Step 2 of 3: Show what a visit costs, up front. On it."
+  ],
+  [
+   "hive",
+   "📷 I can't take screenshots on this machine yet: the browser isn't installed (run: playwright install chromium)."
+  ],
+  [
+   "hive",
+   "🛠 Step 3 of 3: Show the areas served and free cancellation. On it."
+  ],
+  [
+   "hive",
+   "📷 I can't take screenshots on this machine yet: the browser isn't installed (run: playwright install chromium)."
+  ],
+  [
+   "hive",
+   "🎉 That's the plan done, sir. 12 tests, all passing. All 6 that passed before still pass.\n\nTell me what's off, or say ship it and it all goes to your engineer as one pull request."
+  ]
+ ],
+ "summary": {
+  "minutes": 8.1,
+  "builders_cost": 0.83,
+  "plan_cost": 0.241667,
+  "reader_calls": 28,
+  "plan": [
+   {
+    "title": "Book without making an account",
+    "why": "Before anyone can book, the form asks for an email, a password and the password again, 11 boxes in all, and it never asks which area they live in or what time suits them, so people who just want a technician to come give up.",
+    "seen": "book.html: 'Create your FixKaro account to book.' and 11 fields: name, email, phone, password, confirm password, address, pincode, appliance, brand and model, date. The button says 'Create account and book'. There is no area or time choice, but my-bookings.html shows bookings in time slots ('Tuesday",
+    "build": "In book.html: remove the 'Create your FixKaro account to book.' line and the email, password and password2 inputs. Keep name, phone, address, appliance and date. Add an 'Area' select listing exactly Kothrud, Baner, Viman Nagar, Hadapsar, Wakad and Aundh, and keep pincode. Add a 'Time' select with 2-hour slots (8-10 am, 10-12 am, 12-2 pm, 2-4 pm, 4-6 pm, 6-8 pm), using the same style as the slot shown in my-bookings.html. Make 'Brand and model' optional by changing its label to 'Brand and model (optional)'. Change the button text to 'Book repair'. Above the button add one muted line: 'We'll call to confirm. No account or password needed.' Keep the existing styles and header. Add tests in test_fixkaro.py: book.html has no type=\"password\" input and no name=\"email\" input; it contains all six area names and an input with name=\"phone\"; and the button text contains 'Book repair'.",
+    "look": false,
+    "decide": "",
+    "options": []
+   },
+   {
+    "title": "Show what a visit costs, up front",
+    "why": "Every service card says only 'Price on inspection', and no page mentions the Rs 299 visit fee, that it is waived if FixKaro does the repair, or that parts are charged at their printed price, so a new customer can't tell what they are agreeing to pay.",
+    "seen": "services.html: all 5 cards end with 'Price on inspection'. 299 appears only in billing.py (VISIT_RS = 299, waived when repaired) and in no HTML page. book.html shows no price at all next to the booking button.",
+    "build": "In services.html, replace each 'Price on inspection' with 'Visit ₹299, free if we do the repair', and add one paragraph under the grid: 'Labour is charged by the job. Parts are charged at their printed price, with a bill. If the repair fails within 7 days, we fix it free.' In book.html, add a short card above the button: 'Visit: ₹299, free if we do the repair. Labour by the job; parts at printed price with a bill.' On index.html, add 'Visit ₹299, free if we repair' under the 'Book a repair' button. Keep the existing card layout and the 'muted' class. If the owner chooses to show typical labour, also add a 'Labour usually from ₹X' line to each service card, using the amounts he gives. Add a test that services.html, book.html and index.html each contain '299' and 'free if we', and that services.html no longer contains 'Price on inspection'.",
+    "look": true,
+    "decide": "Should each service card also show a typical labour price, so customers can guess the full bill?",
+    "options": [
+     "Yes, show 'usually from ₹X' for each service",
+     "No, only show the ₹299 visit and how labour is charged"
+    ]
+   },
+   {
+    "title": "Show the areas served and free cancellation",
+    "why": "No page names the six areas FixKaro serves or says cancelling is free up to 2 hours before the slot, so people can't tell whether a technician will come to them, and they worry about getting stuck once they book.",
+    "seen": "index.html says only 'across Pune', and none of the pages names Kothrud, Baner, Viman Nagar, Hadapsar, Wakad or Aundh. my-bookings.html has a bare 'Cancel booking' link with no terms, and book.html says nothing about cancelling.",
+    "build": "On index.html, add a line under the hero paragraph: 'We serve Kothrud, Baner, Viman Nagar, Hadapsar, Wakad and Aundh.' In book.html, add 'Free cancellation up to 2 hours before your slot.' in the muted line near the button. In my-bookings.html, put 'Free to cancel up to 2 hours before your slot' in a muted note next to the 'Cancel booking' link. Keep the existing markup and classes. Add tests: index.html contains all six area names; book.html and my-bookings.html both contain '2 hours'.",
+    "look": true,
+    "decide": "",
+    "options": []
+   }
+  ]
+ }
+}
