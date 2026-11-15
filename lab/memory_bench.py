@@ -100,10 +100,12 @@ CONTROLS_AFTER = [   # said after the originals, on the same topics, changing no
 
 def setup():
     home = tempfile.mkdtemp(prefix='gate118_')
-    os.environ['HOME'] = os.environ['USERPROFILE'] = home
+    # HOME stays his: the real model (Claude Code) logs in from it. Everything Hive writes goes to the temp folder.
+    # (First live attempt: HOME pointed here too, Claude Code found no login, and every call failed: 0 kept, $0.)
     sys.path.insert(0, ROOT)
-    from hive import memory
+    from hive import memory, numbers, register
     memory.DIR = os.path.join(home, '.hive', 'rules')
+    numbers.DIR = os.path.join(home, '.hive', 'numbers'); register.PATH = os.path.join(home, '.hive', 'profile.json')
     repo = os.path.join(home, 'dabba'); subprocess.run(['git', 'init', '-q', '-b', 'main', repo])
     subprocess.run(['git', '-C', repo, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '--allow-empty', '-m', 'i'])
     return home, repo
@@ -169,6 +171,8 @@ def live():
             'changes_new_recalled': sum(r['new_in'] for r in changes), 'changes_old_gone': sum(r['old_out'] for r in changes),
             'changes': len(changes), 'controls_still_recalled': sum(r['new_in'] for r in controls), 'controls': len(controls),
             'asha_linked': bool(asha and store.facts_about(asha['id'])),
+            'facts_replaced': store.connect().execute('SELECT COUNT(*) FROM facts WHERE superseded_by IS NOT NULL').fetchone()[0],
+            'spent_by': {k: round(v, 4) for k, v in explain.SPENT_BY.items()},
             'rows': rows, 'live_facts': live_texts,
             'spent_usd': round((explain.SPENT[0] if isinstance(explain.SPENT, list) else 0) - spent0, 4)}
 

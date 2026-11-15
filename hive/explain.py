@@ -93,7 +93,8 @@ def _ask_claude(prompt):
         raise RuntimeError('claude failed recently; using the backup')
     try:
         # UTF-8 both ways: Windows' default encoding cannot carry "₹", emoji or curly quotes, so every model call failed there
-        p = subprocess.run(argv(CMD), input=prompt, capture_output=True, text=True, encoding='utf-8', cwd=_quiet_dir() if CMD == LEAN else None,
+        cmd = CMD + (f' --model {SMALL_MODEL}' if _small() and CMD == LEAN else '')
+        p = subprocess.run(argv(cmd), input=prompt, capture_output=True, text=True, encoding='utf-8', cwd=_quiet_dir() if CMD == LEAN else None,
                            errors='replace', timeout=300, env=dict(os.environ, PYTHONIOENCODING='utf-8'))
         reply = json.loads(p.stdout)
     except Exception:
@@ -165,7 +166,7 @@ def _anthropic(cfg):
     return _API['client']
 
 def _anthropic_request(cfg, prompt):
-    return dict(model=cfg['model'], max_tokens=16000, output_config={'effort': 'low'},   # chat-like reading: low is fastest
+    return dict(model=SMALL_MODEL if _small() and cfg.get('provider') == 'anthropic' else cfg['model'], max_tokens=16000, output_config={'effort': 'low'},   # chat-like reading: low is fastest
                 system=SYSTEM, messages=[{'role': 'user', 'content': prompt}])
 
 def _anthropic_text(msg):
@@ -519,6 +520,23 @@ def plain(prompt, before=('Reply with JSON only', 'Reply with the answer only', 
         if k >= 0:
             return prompt[:k] + PLAIN + '\n' + prompt[k:]
     return prompt.rstrip() + '\n\n' + PLAIN
+
+# Small reading jobs (is this worth remembering? does it replace an older fact?) go to the small model. Gate 118: on the
+# default model, memory's calls cost $6.80 for 16 messages and their changes.
+SMALL_MODEL = os.environ.get('HIVE_SMALL_MODEL', 'claude-haiku-5-5')
+import threading as _threading
+_SMALL = _threading.local()
+
+def _small():
+    return getattr(_SMALL, 'on', False)
+
+def ask_small(prompt):
+    """ask_json on the small model (Anthropic's API or Claude Code; another provider keeps its own model)."""
+    _SMALL.on = True
+    try:
+        return ask_json(prompt)
+    finally:
+        _SMALL.on = False
 
 def ask_json(prompt):
     """One question to a model that answers in JSON: the API (with a key), Claude Code, then the backup; None if none answers."""

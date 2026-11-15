@@ -118,6 +118,9 @@ def stop_builder(run, me):
         return False
     os.makedirs(os.path.join(run, 'stopped'), exist_ok=True)
     open(os.path.join(run, 'stopped', me), 'w').write(str(int(time.time())))   # the swarm reports it as stopped
+    if r.get('container'):   # a builder in the sandbox: its container goes, and everything in it
+        from . import sandbox
+        sandbox.kill(run, me)
     try:
         if os.name == 'nt':
             subprocess.run(['taskkill', '/F', '/T', '/PID', str(r['pid'])], capture_output=True)

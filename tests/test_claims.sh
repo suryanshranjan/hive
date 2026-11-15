@@ -53,4 +53,11 @@ cd $T/q && echo "x = 2" > x.py && $PY -m hive land qx2 "x fixed" >/dev/null; git
 HIVE_WORKER=w1 $PY -m hive claim qnot x,y "x again and y" >/dev/null; check "another builder still may not" $? 1
 HIVE_WORKER=w2 $PY -m hive claim qbiz x,y "fill placeholders in x, and y" >/dev/null; check "the business builder claims a landed area and more than a share" $? 0
 unset HIVE_RUN
+# a builder with work committed but not landed: claim refuses, nothing reaches the shared branch, the work stays (the audit,
+# Nov 15: the claim pushed it past the guard, or a lost race threw it away)
+git clone -q $T/up.git $T/e && cd $T/e && git config user.email e@t && git config user.name e
+before=$(git -C $T/up.git rev-parse main)
+echo "def fee(x): return 0   # unchecked" > fees.py && git commit -qam "unlanded work"
+$PY -m hive claim fe refunds "refunds e" >/dev/null; rc=$?
+check "a claim with unlanded commits is refused, nothing pushed, the work kept"   "$rc $([ "$(git -C $T/up.git rev-parse main)" = "$before" ] && echo same) $(git log -1 --format=%s)" "3 same unlanded work"
 rm -rf $T; exit $fail

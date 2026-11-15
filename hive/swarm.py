@@ -258,13 +258,21 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
     """Run every worker (at most max_parallel at once), wait for all, and write <run>/agents.csv."""
     run = os.path.abspath(run)
     agents(); kth = lambda me: int(me[1:]) if me[1:].isdigit() else 1   # an unknown agent stops here, before any start
-    missing = missing_agents()
-    if missing:   # an agent that is not here would fail every builder on it, one by one: say so once, before any start
-        raise SystemExit(' '.join(f"{a} isn't installed here. {AGENT_HELP.get(a, '')}".strip() for a in missing))
     env = dict(builder_env(), PYTHONPATH=HIVE_ROOT + os.pathsep + os.environ.get('PYTHONPATH', ''),
                HIVE_GUARD_CACHE=os.path.join(run, 'guard_cache'), HIVE_RUN=run)
     env = codemap.path_env(run, env)   # Gate 78-79: graphify on the builders' PATH when there is a map
     queue = sorted(f[:-3] for f in os.listdir(os.path.join(run, 'prompts')) if f.endswith('.md'))
+    from . import sandbox   # in a container where Docker runs (the owner's choice, Nov 15); hive/sandbox.py says why
+    w1 = os.path.join(run, 'work', 'w1'); boxed = False
+    if os.path.isdir(w1):
+        c = config.load(w1)
+        boxed = sandbox.decide(run, c['test_cmd'], c.get('junit', '.hive/junit.xml'), env, say,
+                               custom=bool(os.environ.get('HIVE_WORKER_CMD')))
+    missing = [] if boxed else missing_agents()   # in the sandbox the agents come with the image
+    if missing:   # an agent that is not here would fail every builder on it, one by one: say so once, before any start
+        raise SystemExit(' '.join(f"{a} isn't installed here. {AGENT_HELP.get(a, '')}".strip() for a in missing))
+    if boxed:
+        say("Builders run in a sandbox: each sees only its own copy of the project, never your keys or files.")
     meta = json.load(open(os.path.join(run, 'run.json'))); meta['started'] = int(time.time())
     json.dump(meta, open(os.path.join(run, 'run.json'), 'w'), indent=1)
 
@@ -289,17 +297,25 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
     def start(me):
         out = open(os.path.join(run, 'out', f'{me}.json'), 'w')
         group = ({'creationflags': subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == 'nt' else {'start_new_session': True})
-        p = subprocess.Popen(argv(builder_cmd(k=kth(me))), cwd=os.path.join(run, 'work', me), stdin=subprocess.PIPE, stdout=out,
+        prompt = open(os.path.join(run, 'prompts', f'{me}.md'), encoding='utf-8').read() + (RESUME if attempts.get(me) else '')
+        if boxed:
+            sandbox.kill(run, me)   # a container left from an earlier attempt of this builder
+            cmd, denv = sandbox.command(run, me, builder_cmd(k=kth(me)), env, agent=builder_agent(k=kth(me)))
+            cmd[0] = shutil.which(cmd[0]) or cmd[0]
+            penv, prompt = sandbox.popen_env(env, denv), sandbox.inside(prompt, run)
+        else:
+            cmd, penv = argv(builder_cmd(k=kth(me))), dict(env, HIVE_WORKER=me, PYTHONIOENCODING='utf-8')
+        p = subprocess.Popen(cmd, cwd=os.path.join(run, 'work', me), stdin=subprocess.PIPE, stdout=out,
                              stderr=subprocess.STDOUT, text=True, encoding='utf-8', errors='replace',   # Windows: "₹" in a goal
-                             env=dict(env, HIVE_WORKER=me, PYTHONIOENCODING='utf-8'), **group)
+                             env=penv, **group)
         try:
-            p.stdin.write(open(os.path.join(run, 'prompts', f'{me}.md'), encoding='utf-8').read() + (RESUME if attempts.get(me) else ''))
+            p.stdin.write(prompt)
             p.stdin.close()
         except BrokenPipeError:
             pass
         say(f'{"picked up" if attempts.get(me) else "launched"} {me}' + (f' ({builder_agent(k=kth(me))})' if len(agents()) > 1 else ''))
         first.setdefault(me, time.time())
-        mark(me, state='working', pid=p.pid, started=int(first[me]))
+        mark(me, state='working', pid=p.pid, started=int(first[me]), **({'container': sandbox.name(run, me)} if boxed else {}))
         return [me, time.time(), p, out]
 
     cap = max_parallel or len(queue); live = []; rows = []; waiting = []   # waiting: [(when, worker)]
@@ -315,6 +331,8 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
                 if time.time() - t0 > limit:   # past its time: the builder and everything it started are stopped
                     from . import run as _run
                     _run._kill_tree(p); p.wait()
+                    if boxed:
+                        sandbox.kill(run, me)
                     open(os.path.join(run, 'out', f'{me}.timeout'), 'w').write(str(int(limit)))
                     say(f'{me} ran past {limit / 3600:g} h and was stopped (HIVE_BUILDER_HOURS); what it landed is kept.')
                 continue
@@ -345,6 +363,8 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
                  ended=int(time.time()), exit=p.returncode)
             say(f'{me} finished: exit {p.returncode}, {rows[-1]["minutes"]} min, cost {cost}' + (f', API ERROR {err}' if err else ''))
         time.sleep(2)
+    if boxed:
+        sandbox.forget_logins(run)   # the copies of the agents' logins go with the run
     with open(os.path.join(run, 'agents.csv'), 'w', newline='') as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0])); w.writeheader(); w.writerows(rows)
     errors = [r for r in rows if r['api_error']]

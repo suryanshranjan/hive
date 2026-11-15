@@ -53,9 +53,11 @@ def checks(repo='.', claude_probe=True):
             cmd, how = start.detect_tests(os.path.abspath(repo))
         out.append((bool(cmd), True, f'tests found ({how})' if cmd else 'tests found',
                     "Add tests (Node's built-in test runner or pytest), or tell Hive the command when it asks."))
-    in_container = os.path.exists('/.dockerenv') or bool(os.environ.get('HIVE_SANDBOX'))
-    out.append((in_container, False, 'running in a container (safer: builders run commands)',
-                'Optional: run Hive inside Docker or a spare VM for code you do not fully trust.'))
+    from . import sandbox
+    boxed = os.path.exists('/.dockerenv') or (sandbox.mode() != 'off' and sandbox.running())
+    out.append((boxed, False, "builders work in a sandbox (they never see your keys or other files)",
+                'Optional: install Docker (Docker Desktop on Windows and macOS) and keep it running; Hive then puts each '
+                'builder in a container by itself.'))
     out.append((bool(telegram.load()), False, "the owner's phone is connected (Telegram)",
                 'Optional: hive telegram setup, so questions and reviews reach your phone.'))
     from . import vault

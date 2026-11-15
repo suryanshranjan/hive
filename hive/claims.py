@@ -75,6 +75,12 @@ def claim(name, areas, desc, again=False):
         print('working tree not clean: commit or stash first'); return 3
     if sh('git', 'pull', '-q', '--rebase', 'origin', b).returncode:
         sh('git', 'rebase', '--abort'); return 2
+    # a claim pushes only its lock: commits not yet landed would ride along onto the shared branch past the guard, or
+    # be thrown away by the reset after a lost race (the audit, Nov 15)
+    ahead = sh('git', 'rev-list', '--count', f'origin/{b}..HEAD').stdout.strip()
+    if ahead and ahead != '0':
+        print(f'you have {ahead} commit(s) not yet landed: land them first (hive land <name> "<message>"), then claim')
+        return 3
     held = locks()
     from .guard import landed
     done = {a: d for a, d in landed().items() if a in wanted}

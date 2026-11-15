@@ -185,6 +185,11 @@ class Channel:
                 os.chmod(CONVERSATION, 0o600)
             except Exception:
                 pass
+            try:   # the whole conversation, searchable (memory 2.0); the 16 above are what a reply reads at once
+                from . import store
+                store.log_message(who, text)
+            except Exception:
+                pass
 
     def forget(self, secret, message_id=None):
         """A password or key he sent: deleted from the chat (Telegram lets a bot delete his messages in a private chat)
@@ -192,6 +197,11 @@ class Channel:
         secret = (secret or '').strip()
         if secret:
             self.history = [(w, t.replace(secret, '••••')) for w, t in self.history]
+            try:   # out of the long archive too
+                from . import store
+                store.forget_messages_with(secret)
+            except Exception:
+                pass
             self.remember('hive', '(a password or key was given and put away)')
         try:
             self.api('deleteMessage', chat_id=self.chat, message_id=message_id or getattr(self, 'last_id', None))

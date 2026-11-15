@@ -5,10 +5,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends git curl ca-cer
  && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
  && apt-get install -y --no-install-recommends nodejs \
  && npm install -g @anthropic-ai/claude-code \
- && rm -rf /var/lib/apt/lists/* /root/.npm
+ && useradd -m -u 1000 hive  && rm -rf /var/lib/apt/lists/* /root/.npm
 WORKDIR /opt/hive
 COPY . .
 RUN pip install --no-cache-dir ".[api,secure]"   # secure: his keys encrypted on the disk (HIVE_MASTER_KEY)
 # HOME on the disk (render.yaml mounts it at /data); HIVE_HOST tells setup it is already always on
-ENV HOME=/data/home HIVE_HOST=render PYTHONUNBUFFERED=1 IS_SANDBOX=1
-CMD ["sh", "-c", "mkdir -p \"$HOME\" && exec hive boot"]
+ENV HOME=/data/home HIVE_HOST=render PYTHONUNBUFFERED=1
+# Render's disk arrives owned by root: the start makes HOME his user's (once), then Hive and its builders run as that
+# user, never as root (the audit, Nov 15: everything ran as root, with Claude Code told it was a sandbox).
+CMD ["sh", "-c", "mkdir -p \"$HOME\" && { [ \"$(stat -c %U \"$HOME\")\" = hive ] || chown -R hive:hive \"$HOME\"; } && exec runuser -u hive -- env HOME=\"$HOME\" hive boot"]

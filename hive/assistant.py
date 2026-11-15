@@ -233,9 +233,13 @@ def facts(repo, ch=None):
         lines.append('The builders right now:\n' + team.board_text(run))
     if team.chosen():
         lines.append(f'The team he chose for builds: {team.describe(team.chosen())}.')
-    known = memory.notes(repo)[-15:]
+    try:   # memory 2.0: what bears on what he just said (and the latest few), not only his 15 newest notes
+        from . import recall
+        known = recall.render(recall.recall(repo, CURRENT.get('text', '')))
+    except Exception:
+        known = '\n'.join(f'- {n}' for n in memory.notes(repo)[-15:])
     if known:   # what he has told you about his business, so answers fit his world
-        lines.append('What he has told you about his business:\n' + '\n'.join(f'- {n}' for n in known))
+        lines.append('What you know about him and his business (what bears on his message first):\n' + known)
     note = ch.note() if ch is not None and callable(getattr(ch, 'note', None)) else None
     if note:
         lines.append(f'Happening now: {note}')
@@ -613,10 +617,17 @@ REMEMBER = """A business owner is chatting with his software assistant. His newe
 The conversation before it:
 {history}
 
-Does this message tell the assistant something lasting about his business that is worth remembering for future
-conversations: his customers, market, team, plans, priorities, deadlines, or how he likes to work? Not a rule for how the
-product should behave (those are kept elsewhere), not a question, not small talk, not about one build. Reply with JSON
-only: {{"note": "the fact, in one short plain sentence, or empty if there is nothing lasting"}}"""
+Does this message tell the assistant something lasting about his business or his life that is worth remembering for
+future conversations: his customers, market, team, plans, priorities, deadlines, the people he works with, or how he
+likes things done? Not a rule for how the product should behave (those are kept elsewhere), not a question, not small
+talk, not about one build. Today is {today}.
+Reply with JSON only: {{"note": "the fact, in one short plain sentence with names and numbers as he gave them, or empty
+if there is nothing lasting",
+"kind": "note" | "preference" (how he likes things done) | "deadline" (something due by a date) | "person" (about
+someone in his world),
+"person": {{"name": "the person's name as he says it", "relation": "customer, supplier, cofounder, investor, employee,
+family... or empty", "org": "their company or empty"}} if the fact is about one named person, else null,
+"until": "YYYY-MM-DD" for a deadline (the day it is due), else ""}}"""
 
 def remember(ch, repo, text):
     """Keep any lasting fact about his business from his message, in the background so his reply is not slowed (the
@@ -631,14 +642,153 @@ def remember(ch, repo, text):
             except Exception:
                 pass
         try:
-            got = explain.ask_json(REMEMBER.format(text=text, history=history))
-            note = got.get('note') if isinstance(got, dict) else None
-            if isinstance(note, str) and note.strip():
-                memory.add_note(repo, note.strip())
+            got = explain.ask_small(REMEMBER.format(text=text, history=history, today=time.strftime('%Y-%m-%d (%A)')))
+            if isinstance(got, dict):
+                keep(repo, got)
         except Exception:
             pass
     t = threading.Thread(target=run, daemon=True); t.start()
     return t
+
+def keep(repo, got):
+    """Keep what REMEMBER found, with its kind, who it is about and until when it holds (memory 2.0)."""
+    note = got.get('note')
+    if not (isinstance(note, str) and note.strip()):
+        return None
+    kind = got.get('kind') if got.get('kind') in ('note', 'preference', 'deadline', 'person') else 'note'
+    who = got.get('person') if isinstance(got.get('person'), dict) else {}
+    name = (who.get('name') or '').strip()
+    if name:
+        try:
+            from . import store
+            store.person_id(name, relation=(who.get('relation') or '').strip(), org=(who.get('org') or '').strip())
+        except Exception:
+            pass
+    until = None
+    if kind == 'deadline' and re.fullmatch(r'\d{4}-\d{2}-\d{2}', str(got.get('until') or '')):
+        until = time.mktime(time.strptime(got['until'], '%Y-%m-%d')) + 86400   # holds through the day it is due
+    try:   # what it may replace, looked up before it is kept (so it is not its own match)
+        from . import store
+        similar = [f for f, _ in store.search(note, project=memory.project_key(repo), k=4)
+                   if store.norm(f['text']) != store.norm(note) and f['kind'] != 'rule']
+    except Exception:
+        similar = []
+    memory.add_note(repo, note.strip(), kind=kind, person=name or None, valid_until=until)
+    LAST_KEPT.update(text=note.strip(), at=time.time())
+    if similar:
+        replaced(repo, note.strip(), similar)
+    return note.strip()
+
+REPLACES = """A business owner's assistant keeps facts about his business. He has just said something new:
+"{new}"
+
+Facts kept from before:
+{old}
+
+Which of the facts from before does the new one make untrue (he changed supplier, the price moved, the date changed,
+someone left)? Only a fact the new one contradicts or updates, not one that is merely about the same topic.
+Reply with JSON only: {{"replaced": [numbers of the facts that are no longer true]}}"""
+
+def replaced(repo, new, similar):
+    """A change of mind about a fact, not only a rule (memory 2.0): the facts the new one makes untrue are marked as
+    replaced by it, so a reply sees "the supplier is now Gupta Foods" and not also "the supplier is Sharma Traders"."""
+    from . import store
+    got = explain.ask_small(REPLACES.format(new=new, old='\n'.join(f'{i}. {f["text"]}' for i, f in enumerate(similar, 1))))
+    nums = (got or {}).get('replaced') if isinstance(got, dict) else None
+    now = store.find_fact(new, project=memory.project_key(repo))
+    gone = []
+    for k in nums if isinstance(nums, list) else []:
+        if isinstance(k, int) and 1 <= k <= len(similar) and now:
+            store.supersede(similar[k - 1]['id'], now['id']); gone.append(similar[k - 1]['text'])
+    if gone:   # out of the plain notes builds and plans read, too
+        kept = [n for n in memory.notes(repo) if store.norm(n) not in {store.norm(g) for g in gone}]
+        import json as _json
+        with open(memory._notes_path(repo), 'w', encoding='utf-8') as f:
+            _json.dump(kept, f, indent=1, ensure_ascii=False)
+    return gone
+
+MEMORY_ASK = re.compile(r"\bwhat (do|did) you (know|remember)\b|\bwhat have i told you\b|\b(kya|kitna) (pata|yaad) hai\b")
+# about his memory without doubt: a number from the list, everything about someone, what he told Hive
+FORGET_SURE = re.compile(r"\b(forget|delete|remove|erase)\s+(number\s+|no\.?\s*|#)?\d+\b|\b(forget|delete|remove|erase) "
+                         r"(everything|all) (about|on)\b|\bforget what i (said|told you)\b")
+# "forget that": the fact just kept, only when one was kept in the last 10 minutes and no build is running ("this is
+# all wrong, forget it" mid-build means stop the build: tests/test_assistant.py caught the first version taking it)
+FORGET_THAT = re.compile(r"^\s*(please\s+|ok(ay)?[,.]?\s+|no[,.]?\s+)?(forget|don'?t remember|bhool ja\w*) (that|this)\b")
+SHOWN_FACTS = []   # the facts last listed for him, so "forget 2" knows which
+LAST_KEPT = {}     # the fact kept from his latest messages, so "forget that" knows which
+
+def _about(text):
+    m = re.search(r"\b(?:about|on|regarding|baare mein)\s+(.+?)[?.!]*$", text.strip(), re.I)
+    if m:
+        return m.group(1).strip()
+    m = re.search(r"\bwho is\s+(.+?)[?.!]*$", text.strip(), re.I)
+    return m.group(1).strip() if m else ''
+
+def memory_ask(ch, repo, text):
+    """"What do you know about Asha?": what Hive keeps, numbered, with how to correct it (memory 2.0)."""
+    from . import recall, store
+    about = _about(text)
+    p = store.person(about) if about else None
+    facts = recall.recall(repo, about or text, k=15)
+    if p:
+        facts = store.facts_about(p['id']) + [f for f in facts if f.get('person_id') != p['id']]
+    facts = [f for f in facts if f.get('trust') == 'owner'][:12] if about else facts[:12]
+    if about and not p:   # only what is about it: the recent filler recall adds would not be
+        words = set(re.findall(r'"(\w+)"', store._fts_query(about)))   # its real words, not "the" or "about"
+        facts = [f for f in facts if words & set(re.findall(r'\w+', f['text'].lower()))]
+    SHOWN_FACTS[:] = facts
+    if not facts:
+        ch.send(f"🐝 I don't have anything kept{' about ' + telegram.esc(about) if about else ''} yet. Tell me and I'll "
+                "remember it.", html=True); return 'memory_none'
+    head = (f"About <b>{telegram.esc(p['name'])}</b>" + (f" ({telegram.esc(p['relation'])}" + (f", {telegram.esc(p['org'])}"
+            if p.get('org') else '') + ')' if p.get('relation') else '') if p else
+            f"What I have{' about ' + telegram.esc(about) if about else ''}")
+    lines = '\n'.join(f"{i}. {telegram.esc(f['text'])}" for i, f in enumerate(facts, 1))
+    ch.send(f"🐝 {head}:\n{lines}\n\n<i>Say \"forget 2\" to drop one, or tell me what's changed.</i>", html=True)
+    return 'memory_shown'
+
+def forget_it(ch, repo, text, poll=20):
+    """"Forget that" (the fact kept last), "forget 2" (from the list he saw), "forget everything about Asha": always
+    shown first and done on his yes (memory 2.0)."""
+    from . import store
+    low = text.lower()
+    m = re.search(r"\b(?:forget|delete|remove|erase)\s+(?:number\s+|no\.?\s*|#)?(\d+)\b", low)
+    about = re.search(r"\b(?:everything|all)\s+(?:about|on)\s+(.+?)[?.!]*$", text.strip(), re.I)
+    targets, person = [], None
+    if m and SHOWN_FACTS and 1 <= int(m.group(1)) <= len(SHOWN_FACTS):
+        targets = [SHOWN_FACTS[int(m.group(1)) - 1]]
+    elif about:
+        person = store.person(about.group(1).strip())
+        targets = store.facts_about(person['id']) if person else [f for f, _ in store.search(about.group(1), k=10)]
+    elif LAST_KEPT.get('text'):
+        f = store.find_fact(LAST_KEPT['text'])
+        targets = [f] if f else []
+    if not targets and not person:
+        ch.send("🐝 Which one? Ask me \"what do you know about ...\" and tell me its number."); return 'forget_unclear'
+    if person:
+        msg = (f"🐝 Forget everything about <b>{telegram.esc(person['name'])}</b> ({len(targets)} "
+               f"thing{'s' if len(targets) != 1 else ''} kept)?")
+    else:
+        msg = f"🐝 Forget {'this' if len(targets) == 1 else 'these'}?\n" + \
+              '\n'.join(f'• {telegram.esc(f["text"])}' for f in targets[:8])
+    ch.send(msg, html=True, buttons=[[('🗑 Forget it', 'fgt|yes'), ('Keep it', 'fgt|no')]])
+    choice, other = choose(ch, poll, [('fgt|yes', ('yes', 'forget it', 'haan', 'do it')), ('fgt|no', NO_WORDS)])
+    if choice != 'fgt|yes':
+        ch.send('Very good. Kept as it is.'); return 'forget_kept'
+    for f in targets:
+        if f['kind'] != 'rule':
+            memory.forget_note(repo, f['text'])
+        store.forget(f['id'])
+        if f['kind'] == 'rule':   # a standing rule: out of the builders' instructions too
+            rules = memory.load(repo)
+            for n, r in enumerate(rules, 1):
+                if store.norm(r['text']) == f['norm']:
+                    memory.forget(repo, n); break
+    if person:
+        store.forget_person(person['id'])
+    LAST_KEPT.clear(); SHOWN_FACTS.clear()
+    ch.send("✅ Forgotten. It won't come up again (it's gone from my records within a week).")
+    return 'forgotten'
 
 def read(ch, text):
     """What the owner means by his newest message, read in the context of the conversation (Gate 38 live test: "Yes",
@@ -1508,6 +1658,11 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         got = {'intent': 'ship'}
     elif __import__('hive.brain', fromlist=['x']).DOC.search(text):   # a document about his business: learned
         got = {'intent': 'document'}
+    elif FORGET_SURE.search(low) or (FORGET_THAT.search(low) and time.time() - LAST_KEPT.get('at', 0) < 600 and
+                                      not (_building() or '').startswith('A build is running')):   # memory 2.0
+        got = {'intent': 'forget'}
+    elif MEMORY_ASK.search(low):   # "what do you know about Asha?"
+        got = {'intent': 'memory_ask'}
     elif BRIEF_WORDS.search(low):
         got = {'intent': 'brief'}
     elif UNDO_WORDS.search(low):
@@ -1528,6 +1683,10 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         got = fast_read(ch, text) or read(ch, text)   # half a second when the trained reader is sure, else Claude
     intent, rule = got.get('intent', 'reply'), (got.get('rule') or text).strip()
     who = _who(ch)
+    if intent == 'memory_ask':
+        return memory_ask(ch, repo, text)
+    if intent == 'forget':
+        return forget_it(ch, repo, text, poll)
     if intent == 'show':   # he wants to see it: at phone size, or on the screens and pages he names
         show(ch, repo, text=text)
         return 'shown'

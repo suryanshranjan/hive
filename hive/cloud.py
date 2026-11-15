@@ -111,7 +111,8 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
                      (os.path.join(hive_dir, 'resume.json'), f'{dst_hive}/resume.json'),   # work to pick up there ("I'm sleepy")
                      (access._path(repo), f'{dst_hive}/access/{os.path.basename(access._path(repo))}')):   # his data, read-only
         if os.path.exists(src):
-            t.put(src, dst); sent.append(os.path.basename(src))
+            t.put(src, dst)   # said by what it is, so he knows his data's addresses went (encrypted: hive/vault.py)
+            sent.append('his data sources (encrypted)' if src == access._path(repo) else os.path.basename(src))
     from . import vault   # the files above may be encrypted (hive/vault.py): their key goes too, or he is told
     if vault.where() in ('file', 'keychain') and vault._key(create=False):
         kf = os.path.join(tmp, 'vault.key'); open(kf, 'wb').write(vault._key(create=False))

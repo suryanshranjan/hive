@@ -45,6 +45,7 @@ except ImportError:   # CI has no YAML reader: the same facts, read as text
 docker = open('deploy/render/Dockerfile', encoding='utf-8').read()
 check('image: HOME on the disk, setup knows it is on Render', ('HOME=/data/home' in docker, 'HIVE_HOST=render' in docker), (True, True))
 check('image: starts with hive boot', 'hive boot' in docker, True)
+check('image: Hive runs as its own user, never root', ('useradd' in docker, 'runuser -u hive' in docker, 'IS_SANDBOX' in docker), (True, True, False))
 
 # 2. hive boot: settings in, files out
 check('repo: owner/name', boot.repo_url('acme/shop'), 'https://github.com/acme/shop.git')

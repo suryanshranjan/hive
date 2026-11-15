@@ -124,5 +124,5 @@ Does he state numbers about his business (a count, an amount, a rate)? Reply wit
 def told(repo, text):
     """Numbers he states in a message ("we had 120 sign-ups this week"), kept; returns them."""
     from . import explain
-    got = explain.ask_json(TOLD.format(text=text)) or {}
+    got = explain.ask_small(TOLD.format(text=text)) or {}   # a small reading job (Gate 118: $1.00 of $1.77)
     return record(repo, got.get('numbers') if isinstance(got, dict) else {}, how='he said')

@@ -24,6 +24,7 @@ For the owner:
   hive cloud pull [--from user@host]     bring the result branches back
   hive secrets [migrate|keychain]        where your keys are kept; encrypt them now; keep the key in the keychain
   hive audit [n]                         the last things Hive did outside this computer (mail sent, live, PRs)
+  hive memory [list|search <words>|people|forget <id>|export [file]|purge]   what Hive knows about you and your business
 
 Step by step (scripts and experiments):
   hive init --test-cmd "<runs all tests, writes JUnit XML to .hive/junit.xml>"
@@ -169,6 +170,9 @@ def build_parser():
     lm = sub.add_parser('llm'); lm.add_argument('action', choices=['setup', 'api'])
     sub.add_parser('name').add_argument('name', nargs='*')
     sub.add_parser('pace').add_argument('choice', nargs='?', choices=['fast', 'cheap'])
+    mm = sub.add_parser('memory'); mm.add_argument('action', nargs='?', choices=['list', 'search', 'people', 'forget',
+                                                                                  'export', 'purge'])
+    mm.add_argument('arg', nargs='*')
     au = sub.add_parser('audit'); au.add_argument('n', nargs='?', type=int, default=20)
     se = sub.add_parser('secrets'); se.add_argument('action', nargs='?', choices=['migrate', 'keychain'])
     ru = sub.add_parser('rules'); ru.add_argument('action', nargs='?', choices=['forget']); ru.add_argument('n', nargs='?', type=int)
@@ -324,6 +328,9 @@ def main(argv=None):
                'cheap': 'Cheap: I use one builder (the lowest cost, slower).'}.get(p, 'Not chosen yet: I use as many '
               'builders as help, and ask you once at the next build.') + ' Change it with `hive pace fast` or `hive pace cheap`.')
         return 0
+    if a.cmd == 'memory':
+        from . import store
+        return store.cli('.', a.action, ' '.join(a.arg) or None)
     if a.cmd == 'audit':
         from . import audit
         return audit.show(a.n)

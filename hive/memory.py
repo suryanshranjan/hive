@@ -8,6 +8,14 @@ Rulings are business decisions, so they live on the owner's machine in ~/.hive/r
 repository. A project is identified by its first commit, so every clone of it shares the same rulings."""
 import json, os, subprocess, time
 
+def _store(fn, *a, **k):
+    """Also keep it in the structured store (hive/store.py), which never stops the JSON write that builds rely on."""
+    try:
+        from . import store
+        return getattr(store, fn)(*a, **k)
+    except Exception:
+        return None
+
 DIR = os.path.join(os.path.expanduser('~'), '.hive', 'rules')
 PROMPT_LIMIT = 40   # the most recent rulings that go into a build's instructions
 
@@ -69,11 +77,15 @@ def notes(repo):
     except (OSError, ValueError):
         return []
 
-def add_note(repo, text):
-    """Keep one fact about his business (not repeated; at most the latest 60)."""
+def add_note(repo, text, kind='note', source='chat', person=None, valid_until=None, trust='owner'):
+    """Keep one fact about his business (not repeated; at most the latest 60 here, every one in the store, with its
+    kind: note, preference, deadline or person; who it is about; and until when it holds)."""
     text = ' '.join((text or '').split())
     if not text:
         return
+    _store('add_fact', text, kind, project_key(repo), source=source, person=person, valid_until=valid_until, trust=trust)
+    if trust != 'owner':
+        return   # read from outside: in the store, marked as such, never in the notes builds and plans read as his word
     kept = [n for n in notes(repo) if n.lower() != text.lower()] + [text]
     os.makedirs(DIR, exist_ok=True)
     with open(_notes_path(repo), 'w', encoding='utf-8') as f:
@@ -119,6 +131,8 @@ def record(repo, run, goal=''):
         add(f"{c['question']} The owner decided: {c['chosen']} (this settled a contradiction)", 'resolution')
     if new:
         _save(repo, rulings + new)
+        for r in new:
+            _store('add_fact', r['text'], 'rule', project_key(repo), source=r['kind'])
     return len(new)
 
 def instructions(repo):
@@ -143,6 +157,9 @@ def forget(repo, n):
     if not 1 <= n <= len(rulings):
         print(f'There is no ruling {n}.'); return 1
     gone = rulings.pop(n - 1); _save(repo, rulings)
+    f = _store('find_fact', gone['text'], 'rule', project_key(repo))
+    if f:
+        _store('forget', f['id'])
     print(f'Forgotten: {gone["text"]}'); return 0
 
 def add(repo, text, kind='owner'):
@@ -152,10 +169,32 @@ def add(repo, text, kind='owner'):
     if text and text not in {r['text'] for r in rulings}:
         rulings.append({'text': text, 'kind': kind, 'when': time.strftime('%Y-%m-%d'), 'feature': ''})
         _save(repo, rulings)
+    if text:
+        _store('add_fact', text, 'rule', project_key(repo), source=kind)
     return len(rulings)
 
 def replace(repo, old_indexes, text):
     """The owner changed his mind: drop the rulings he overrode (0-based indexes) and keep the new one."""
-    rulings = [r for n, r in enumerate(load(repo)) if n not in set(old_indexes)]
+    before = load(repo)
+    rulings = [r for n, r in enumerate(before) if n not in set(old_indexes)]
     _save(repo, rulings)
-    return add(repo, text, 'changed')
+    n = add(repo, text, 'changed')
+    new = _store('find_fact', text, 'rule', project_key(repo))
+    for i in old_indexes:   # the store keeps what he overrode, marked as replaced by the new rule
+        if 0 <= i < len(before):
+            old = _store('find_fact', before[i]['text'], 'rule', project_key(repo))
+            if old and new:
+                _store('supersede', old['id'], new['id'])
+    return n
+
+def forget_note(repo, text):
+    """Drop one business note (he asked Hive to forget it): out of the notes and out of the store."""
+    key = ' '.join((text or '').split()).lower()
+    kept = [n for n in notes(repo) if n.lower() != key]
+    if len(kept) != len(notes(repo)):
+        with open(_notes_path(repo), 'w', encoding='utf-8') as f:
+            json.dump(kept, f, indent=1, ensure_ascii=False)
+    for kind in ('note', 'preference', 'deadline', 'person'):
+        got = _store('find_fact', text, kind, project_key(repo))
+        if got:
+            _store('forget', got['id'])

@@ -46,7 +46,7 @@ def learn(repo, path, name=None):
     facts = [str(f).strip() for f in (got.get('facts') or []) if str(f).strip()][:15]
     rules = [str(r).strip() for r in (got.get('rules') or []) if str(r).strip()][:8]
     for f in facts:
-        memory.add_note(repo, f)
+        memory.add_note(repo, f, source='document')
     have = {r['text'].lower() for r in memory.load(repo)}
     for r in rules:
         if r.lower() not in have:
