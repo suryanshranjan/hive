@@ -2,7 +2,21 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 15 2026, after Gates 115-116 and Render)
+## Where we left off (Nov 15 2026 evening; the owner: "we will pick up the rest later")
+
+- **Done today, pushed:** Gates 115, 115b, 116 scored (BRAIN §5). The planner asks up to 3 specific questions (default); a messy picture still beats words; a failed fast-reply provider rests 10 min; the Render image builds, and a bad bot token stops the deploy plainly.
+- **Waiting on him, in order:**
+  1. **Gate 117, real Render** (`gates/gate117/`): he puts `RENDER_API_KEY`, a new bot's `TELEGRAM_BOT_TOKEN` and `ANTHROPIC_API_KEY` in `~/.hive/render_test.env` (never in the chat), then `python gates/gate117/render117.py up`; he says "hi" to the new bot; `logs`; a redeploy; `down`.
+  2. **Gate 114** (`gates/gate114/flight114.py`): `aws-renew` (the laptop's AWS sign-in is expired), `limit`, `cycle`, `fast` (after `hive llm api`).
+  3. His real mail, calendar, payments ("connect my email" on the phone).
+  4. The founder session (`docs/founder_session.md`).
+- **Next without him:**
+  - a follow-up question when his answer only half-says the fact (Gate 115b's two misses);
+  - asking fewer when nothing is hidden;
+  - his own phone photos for Gate 116.
+- **Small, his call:** commit or delete the untracked Gate 109-113 run logs.
+
+## Before that (Nov 15 2026, after Gates 115-116 and Render)
 
 - **Gate 115 done** (`gates/gate115/RESULTS.md`): the planner asks up to 3 specific questions about what only he knows (8/8 vs 4/8, simulated founder; inflated by a founder who over-shares). Now the default.
 - **Gate 116 done** (`gates/gate116/RESULTS.md`): photo of a screen 17/19, busy screenshot 18/19, clean 19/19, words 11/19.
