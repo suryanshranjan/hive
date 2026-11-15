@@ -76,7 +76,7 @@ there anything else?"; an empty list if the plan rests only on what you saw."""
 
 def ask_mode():
     return os.environ.get('HIVE_PLAN_ASK') or ASK_DEFAULT
-ASK_DEFAULT = 'one'
+ASK_DEFAULT = 'three'   # Gate 115: 8 of 8 plans accounted for what only he knew, against 4 of 8 with one question
 
 def prompt(goal, notes_text, rules_text):
     three = ask_mode() == 'three'

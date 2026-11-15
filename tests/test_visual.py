@@ -100,7 +100,7 @@ assistant.fast_read = lambda c, t: {'intent': 'amend', 'rule': t}   # as Claude 
 assistant.handle(ch(fake), code, 'make the header a darker colour', poll=1, apply_build=apply_build)
 assistant.fast_read = real_fast
 check('words about a look: the tip that a picture lands closer (Gate 105: 18/18 vs 13/18)',
-      'a picture lands closer' in fake.sent[0]['text'], True)
+      'a picture lands closer' in fake.sent[0]['text'] and 'a photo of the screen works too' in fake.sent[0]['text'], True)
 
 # 7. when it cannot take screenshots, he is told why in plain words
 screens.take = real_take

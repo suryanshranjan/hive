@@ -2,7 +2,15 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 15 2026, the owner: "let's fix it all"; Gate 114 registered)
+## Where we left off (Nov 15 2026, after Gates 115-116 and Render)
+
+- **Gate 115 done** (`gates/gate115/RESULTS.md`): the planner asks up to 3 specific questions about what only he knows (8/8 vs 4/8, simulated founder; inflated by a founder who over-shares). Now the default.
+- **Gate 116 done** (`gates/gate116/RESULTS.md`): photo of a screen 17/19, busy screenshot 18/19, clean 19/19, words 11/19.
+- **Render / only a phone:** built and unit-tested (`tests/test_render.py`), never deployed. To fly it, he: makes a bot with BotFather; opens the Deploy to Render link from the README; fills `TELEGRAM_BOT_TOKEN` and `ANTHROPIC_API_KEY`; says "hi" to the new bot; deletes the service afterwards (~$28 a month).
+- **Next without him:** Gate 115b: a stricter simulated founder who answers only what is asked, and asking fewer when nothing is hidden (it asked 3 on the control).
+- **Next with him:** Gate 114 (below), a real Render deploy, his own phone photos for Gate 116, the founder session.
+
+## Before that (Nov 15 2026, the owner: "let's fix it all"; Gate 114 registered)
 
 - **Built and unit-tested, not flown** (`gates/gate114/PREDICTIONS.md`):
   - fast replies with any provider's key (`hive llm api`), streamed (`tests/test_fast.py`);

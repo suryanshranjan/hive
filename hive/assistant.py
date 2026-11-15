@@ -1625,7 +1625,8 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         st = latest_build(repo)
         before = shoot(repo)
         tip = ('' if refs.has(rule) or not LOOK_WORDS.search(rule.lower()) else
-               "\n\n<i>If you have a screenshot of a page you like, send it next time: a picture lands closer than words.</i>")
+               "\n\n<i>If you have a screenshot of a page you like, send it next time (a photo of the screen works too): a "
+               "picture lands closer than words.</i>")   # Gates 105, 116: clean 19/19, photo 17/19, busy 18/19, words 11/19
         ch.send(f"🛠 Very good, sir: {telegram.esc(refs.words(rule) or 'as in your picture')}" +
                 (" (with your picture)" if refs.has(rule) else '') + ". Changing your latest build now; I'll show you "
                 "before and after." + tip, html=True)
