@@ -8,7 +8,7 @@ Hive is also a research lab. Every feature in it came out of one of **113 pre-re
 
 ## What Hive does
 
-Hive is a founder's assistant in the manner of J.A.R.V.I.S. You talk to it on Telegram: text, Hindi-English, voice notes or pictures.
+Hive is a founder's assistant in the manner of J.A.R.V.I.S., and a shipping tool for developers ([below](#if-youre-a-developer-who-just-wants-to-ship)). You talk to it on Telegram: text, Hindi-English, voice notes or pictures.
 
 | You want to… | You say | Hive |
 | --- | --- | --- |
@@ -20,6 +20,17 @@ Hive is a founder's assistant in the manner of J.A.R.V.I.S. You talk to it on Te
 | Step away | *"I'm sleepy"* | Offers to carry the work on in the cloud so you can shut your laptop |
 
 It asks you only what only you can decide, one question at a time.
+
+### If you're a developer who just wants to ship
+
+Hive works the same way for you, in your terms:
+
+- **Say it technically, and it's taken as is.** *"cache /products in Redis, 60 s TTL"* gets "👍 Yes, let's do it", your instruction restated precisely, and at most two questions a normal engineer would ask. No business talk.
+- **Hand it your backlog and go.** `hive start --overnight` builds while you sleep; the builders write their questions down, and you answer them over breakfast (`hive morning`).
+- **Every change arrives as a pull request** with the diff, the test results, screenshots and the cost. Nothing touches `main`, nothing goes live until you merge, and every existing test must keep passing.
+- **Bring your own agents.** Claude, Codex and Gemini builders mix in one team (*"use 2 Claude and 2 Codex"*); a guard refuses anything that breaks a passing test, duplicates a definition or commits a secret.
+- **From the terminal too.** `hive` alone runs one conversation from an idea to a tested branch, no phone needed.
+- **Honest about cost.** On real Django issues one builder solved 8 of 10, and a full swarm also 8 of 10 at 15 times the cost (Gates 86, 89). So on a technical task Hive uses one builder, and saves the swarm for big jobs with many independent parts.
 
 ### Rules it never breaks
 
