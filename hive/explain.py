@@ -119,6 +119,15 @@ API_MODEL = 'claude-opus-5-5'
 API_PRICE = {'claude-opus-5-5': (4.0, 20.0), 'claude-sonnet-5-5': (2.0, 10.0), 'claude-haiku-5-5': (0.10, 0.50)}
 SYSTEM = 'You read what a business owner and his builders wrote, and answer exactly in the JSON you are asked for.'
 _API = {}
+_FAST_DOWN = [0.0]   # when the fast model last failed to answer: skipped for a while, as Claude Code is (no wait per message)
+FAST_REST = 600
+
+def _fast_failed(e):
+    """A provider that is down or refuses the key is skipped for FAST_REST seconds; a reply that only failed to parse
+    is not its fault, and costs nothing next time."""
+    import time
+    if not isinstance(e, ValueError):
+        _FAST_DOWN[0] = time.time()
 
 def fast_cfg():
     """The fast model's settings, or {} when none. ANTHROPIC_API_KEY alone also counts (Anthropic, default model)."""
@@ -140,7 +149,10 @@ def fast_cfg():
     return cfg
 
 def fast_on():
-    """True when replies can go straight to a model and be streamed."""
+    """True when replies can go straight to a model and be streamed (not while it is resting after a failure)."""
+    import time
+    if time.time() - _FAST_DOWN[0] < FAST_REST:
+        return False
     cfg = fast_cfg()
     return bool(cfg) and (cfg['provider'] != 'anthropic' or _anthropic(cfg) is not None)
 
@@ -191,16 +203,19 @@ def _compat_chunks(resp):
 
 def _ask_api(prompt):
     """One JSON question straight to the fast model; None when none is set up (the next way is tried)."""
-    cfg = fast_cfg()
-    if not cfg:
+    if not fast_on():
         return None
-    if cfg['provider'] == 'anthropic':
-        client = _anthropic(cfg)
-        if client is None:
-            return None
-        return _json_reply(_anthropic_text(client.messages.create(**_anthropic_request(cfg, prompt))))
-    with _compat(cfg, prompt, False) as r:
-        return _json_reply(json.load(r)['choices'][0]['message']['content'])
+    cfg = fast_cfg()
+    try:
+        if cfg['provider'] == 'anthropic':
+            client = _anthropic(cfg)
+            if client is None:
+                return None
+            return _json_reply(_anthropic_text(client.messages.create(**_anthropic_request(cfg, prompt))))
+        with _compat(cfg, prompt, False) as r:
+            return _json_reply(json.load(r)['choices'][0]['message']['content'])
+    except Exception as e:
+        _fast_failed(e); raise
 
 def partial_field(text, field='reply'):
     """The part of a JSON string field written so far, from a reply still being streamed ('' if it has not started)."""
@@ -227,9 +242,9 @@ def partial_field(text, field='reply'):
 def stream_json(prompt, on_field, field='reply'):
     """Ask in JSON from the fast model, calling on_field(text so far) as the chosen field is written. The full reply,
     or None when no fast model is set up or it failed (the caller then asks the usual way)."""
-    cfg = fast_cfg()
-    if not cfg:
+    if not fast_on():
         return None
+    cfg = fast_cfg()
     got, last = [''], ['']
     def take(piece):
         got[0] += piece
@@ -256,7 +271,7 @@ def stream_json(prompt, on_field, field='reply'):
             text = got[0]
         return _json_reply(text)
     except Exception as e:
-        _log_failure('stream_json', e, prompt)
+        _fast_failed(e); _log_failure('stream_json', e, prompt)
         return None
 
 PROVIDERS = {   # the common ones, so he only types a key; any other: its address and model
@@ -306,7 +321,7 @@ def setup_api(say=print, ask=input, getpass_=None):
         os.chmod(FAST, 0o600)
     except OSError:
         pass
-    _API.clear()
+    _API.clear(); _FAST_DOWN[0] = 0.0   # a new key gets a fresh start
     if not fast_on():
         say('  Saved, but fast replies are switched off here (HIVE_API=0 or HIVE_EXPLAIN_CMD is set).'); return 1
     first, t0 = [], time.time()

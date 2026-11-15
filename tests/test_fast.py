@@ -90,6 +90,10 @@ explain._ask_claude = lambda p: None   # no Claude Code in this test
 ch = Chat()
 assistant._speak_streamed(ch, 'hi', 'fallback line')
 check('down: the fallback line', [x[2] for x in ch.log], ['fallback line'])
+check('down: rested, not tried again on the next message', (explain.fast_on(), explain._ask_api('hi')), (False, None))
+explain._FAST_DOWN[0] -= explain.FAST_REST + 1
+check('down: tried again after the rest', explain.fast_on(), True)
+explain._FAST_DOWN[0] = 0.0
 
 # 6. an Anthropic key goes through Anthropic's SDK (a stand-in server speaks its streaming events)
 class Messages(http.server.BaseHTTPRequestHandler):
