@@ -1,0 +1,18 @@
+{"id": "c1", "history": [], "text": "find Asha's mail about the tasting and put a call with her on Thursday at 4", "steps": ["mail_find", "calendar_add"], "ref": [1, "guests"]}
+{"id": "c2", "history": [], "text": "check if I'm free tomorrow at 3, then book the supplier call for then", "steps": ["calendar_check", "calendar_add"], "ref": null}
+{"id": "c3", "history": [], "text": "reply to Ravi's last mail saying Saturday works, and remember he is covering the Saturday rota", "steps": ["mail_find", "mail_reply", "remember"], "alt": [["mail_reply", "remember"]], "ref": null}
+{"id": "c4", "history": [], "text": "what did Neha say about the GST filing? keep it in your notes", "steps": ["mail_find", "remember"], "alt": [["mail_read", "remember"]], "ref": null}
+{"id": "c5", "history": [["hive", "Done: the invite page is built. 18 tests pass. Say ship it."]], "text": "ship it and then put it live", "steps": ["ship", "go_live"], "ref": null}
+{"id": "c6", "history": [["hive", "A build is running: the referral page, 12 minutes in."]], "text": "stop the build and undo the last change", "steps": ["stop_build", "undo"], "ref": null}
+{"id": "c7", "history": [], "text": "how many orders came in this week? mail the number to priya@kestrel.example", "steps": ["data", "mail_send"], "ref": null}
+{"id": "c8", "history": [], "text": "forget what I told you about Sharma Traders and remember that Gupta Foods is our dal supplier now", "steps": ["forget", "remember"], "ref": null}
+{"id": "c9", "history": [], "text": "find the invoice mail from GreenBox and put the payment due date on my calendar", "steps": ["mail_find", "calendar_add"], "ref": null}
+{"id": "c10", "history": [["hive", "Done: the new menu page. Say show me or ship it."]], "text": "show me how it looks on mobile, then send it to the engineer", "steps": ["show", "ship"], "ref": null}
+{"id": "c11", "history": [], "text": "find the mail from Kestrel Logistics about the new contract and reply that we accept", "steps": ["mail_find", "mail_reply"], "ref": [1, "to"]}
+{"id": "c12", "history": [], "text": "find Arjun's mail about hiring and send him a note at his address saying let's meet Monday", "steps": ["mail_find", "mail_send"], "ref": [1, "to"]}
+{"id": "c13", "history": [], "text": "remember the FSSAI renewal is due on 30 November and block an hour on my calendar the day before to prepare", "steps": ["remember", "calendar_add"], "ref": null}
+{"id": "c14", "history": [], "text": "quiet hours from 10 pm to 7 am, and always tell me about mail from Priya", "steps": ["pulse_set", "pulse_set"], "alt": [["pulse_set"]], "ref": null}
+{"id": "k1", "history": [], "text": "add a share button and a download button to the menu page", "steps": ["build"], "ref": null}
+{"id": "k2", "history": [], "text": "make the header darker and the logo a bit bigger", "steps": ["build"], "alt": [["amend"]], "ref": null}
+{"id": "k3", "history": [], "text": "any important emails today?", "steps": ["mail_read"], "ref": null}
+{"id": "k4", "history": [], "text": "am I free tomorrow afternoon?", "steps": ["calendar_check"], "ref": null}
