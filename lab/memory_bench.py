@@ -98,6 +98,99 @@ CONTROLS_AFTER = [   # said after the originals, on the same topics, changing no
     'Mehta Caterers also asked about a dinner menu', 'Studio Nine pitched us a new website', 'wallet credit never expires',
 ]
 
+# ---- Gate 119 (written before it ran): new paraphrases, and changes of mind about how the business works
+
+HELDOUT = [   # (index into FACTS, a question sharing no content word with the fact, the keyword)
+    (1, 'which day do the grains arrive?', 'Thursday'),
+    (2, 'how big is the Mehta order?', '40'),
+    (4, 'what is the price for a month of lunches?', '2,400'),
+    (7, 'who handles our tax returns?', 'Neha'),
+    (9, 'can a subscriber take a break, and for how long?', '7 days'),
+    (11, 'when must the numbers reach our backer?', '5th'),
+    (14, 'who makes our containers and at what price?', 'GreenBox'),
+    (17, 'until what time do we take same-day orders?', '1:30'),
+    (19, 'which channel gets us the most new customers?', 'Instagram'),
+    (22, 'how do we cook for customers who avoid onion?', 'separate'),
+    (25, 'how quickly do we reply to an unhappy customer?', '2 hours'),
+    (29, 'when do the hygiene inspectors come?', 'January'),
+]
+
+LIVE2 = [   # (first message, change of mind or None, question, before, after); 4 changes are about how the business works
+    ('we buy oil from Fortune Traders in Vashi', 'we switched our oil supplier to Gemini Edible Oils',
+     'who supplies our oil?', 'Fortune', 'Gemini'),
+    ('a customer can cancel until 9 am for the same day', 'cancellations now close at 7 am, not 9',
+     'until when can a customer cancel?', '9 am', '7 am'),
+    ('late deliveries get a free dessert', 'no more free dessert for late deliveries, we give 10% off the next order',
+     'what do customers get for a late delivery?', 'dessert', '10%'),
+    ('the minimum corporate order is 20 meals', 'we lowered the corporate minimum to 12 meals',
+     'what is the minimum corporate order?', '20', '12'),
+    ('Pooja runs our Instagram', 'Pooja moved to sales, Irfan runs Instagram now',
+     'who runs our Instagram?', 'Pooja', 'Irfan'),
+    ('referrals give both people one free meal', 'referrals now give Rs 100 wallet credit each instead of a free meal',
+     'what does a referral give?', 'free meal', '100'),
+    # controls: the same kind of facts, never changed
+    ('the kitchen opens at 6 am', None, 'when does the kitchen open?', '6 am', None),
+    ('weekend orders need 2 days notice', None, 'how much notice do weekend orders need?', '2 days', None),
+    ('Farhan does our accounts audit every quarter', None, 'who audits our accounts?', 'Farhan', None),
+    ('the festive box costs Rs 899', None, 'what does the festive box cost?', '899', None),
+]
+CONTROLS2_AFTER = ['we also buy ghee from Gemini Edible Oils', 'weekday cancellations for dinner close at 4 pm',
+                   'Irfan also helps with packing on Sundays', 'the kitchen closes at 10 pm']
+
+def heldout():
+    """Gate 119 H: the held-out paraphrases, with words only and with meaning."""
+    out = {}
+    for arm, env in (('words', '0'), ('meaning', '')):
+        os.environ['HIVE_EMBED'] = env
+        home, repo = setup()
+        from hive import memory, recall
+        for f in FACTS:
+            memory.add_note(repo, f[0])
+        for i in range(60):
+            memory.add_note(repo, f'Ordinary note {i}: the week went as usual.')
+        hits = [kw.lower() in recall.render(recall.recall(repo, q)).lower() for _, q, kw in HELDOUT]
+        out[arm] = {'hits': sum(hits), 'of': len(hits), 'missed': [HELDOUT[i][1] for i, h in enumerate(hits) if not h]}
+        r1 = [kw.lower() in recall.render(recall.recall(repo, q)).lower() for _, q, kw in FACTS]
+        out[arm]['R1'] = sum(r1)
+    os.environ.pop('HIVE_EMBED', None)
+    t0 = time.time()
+    for _, q, _ in HELDOUT:
+        recall.recall(repo, q)
+    out['ms_per_recall'] = round(1000 * (time.time() - t0) / len(HELDOUT))
+    return out
+
+def live2():
+    """Gate 119 L: the new changes of mind through the real model, scored from the store (is the old fact replaced?)."""
+    home, repo = setup()
+    from hive import assistant, explain, memory, recall, store, telegram
+    sys.path.insert(0, os.path.join(ROOT, 'tests'))
+    from test_telegram_fake import FakeTelegram, ME
+    ch = lambda: telegram.Channel({'chat_id': ME, 'token': 'x', 'address': 'sir'}, api=FakeTelegram([]))
+    P = memory.project_key(repo)
+    ids = lambda: {f['id'] for f in store.live_facts(P)}
+    def say(text):
+        before = ids(); assistant.remember(ch(), repo, text).join(180); return ids() - before
+    spent0 = explain.SPENT[0]
+    first = [say(m) for m, _, _, _, _ in LIVE2]
+    for c in CONTROLS2_AFTER:
+        say(c)
+    later = [say(c) if c else set() for _, c, _, _, _ in LIVE2]
+    live_now = ids(); rows = []
+    for (m, change, q, before, after), f_ids, c_ids in zip(LIVE2, first, later):
+        ctx = recall.render(recall.recall(repo, q)).lower()
+        rows.append({'q': q, 'change': bool(change), 'first_kept': bool(f_ids),
+                     'change_kept': bool(c_ids) if change else None,
+                     'old_replaced': (bool(f_ids) and not (f_ids & live_now)) if change else None,
+                     'control_live': (bool(f_ids) and f_ids <= live_now) if not change else None,
+                     'answer_in_reply': (after or before).lower() in ctx})
+    chg = [r for r in rows if r['change']]; co = [r for r in rows if not r['change']]
+    return {'first_kept': sum(r['first_kept'] for r in rows), 'of': len(rows),
+            'changes_kept': sum(r['change_kept'] for r in chg), 'old_replaced': sum(r['old_replaced'] for r in chg),
+            'changes': len(chg), 'controls_live': sum(r['control_live'] for r in co), 'controls': len(co),
+            'answer_in_reply': sum(r['answer_in_reply'] for r in rows),
+            'rows': rows, 'live_facts': [f['text'] for f in store.live_facts(P)],
+            'spent_usd': round(explain.SPENT[0] - spent0, 4)}
+
 def setup():
     home = tempfile.mkdtemp(prefix='gate118_')
     # HOME stays his: the real model (Claude Code) logs in from it. Everything Hive writes goes to the temp folder.
@@ -180,7 +273,8 @@ def live():
 
 if __name__ == '__main__':
     part = (sys.argv[1:] or ['retrieval'])[0]
-    got = retrieval() if part == 'retrieval' else live()
-    os.makedirs(os.path.join(ROOT, 'gates', 'gate118'), exist_ok=True)
-    json.dump(got, open(os.path.join(ROOT, 'gates', 'gate118', f'results_{part}.json'), 'w'), indent=1)
+    got = {'retrieval': retrieval, 'live': live, 'heldout': heldout, 'live2': live2}[part]()
+    gate = 'gate119' if part in ('heldout', 'live2') else 'gate118'
+    os.makedirs(os.path.join(ROOT, 'gates', gate), exist_ok=True)
+    json.dump(got, open(os.path.join(ROOT, 'gates', gate, f'results_{part}.json'), 'w'), indent=1)
     print(json.dumps({k: v for k, v in got.items() if k not in ('rows', 'live_facts')}, indent=1))
