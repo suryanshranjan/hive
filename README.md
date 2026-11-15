@@ -1,6 +1,6 @@
 # Hive
 
-**Run your company from your phone.** Tell Hive what you want for the business, in plain words. It works out what to change, builds it with a team of AI coding agents, shows you screenshots, and hands it to your engineer. It also reads your mail, calendar, payments and data, and answers you on Telegram.
+**Run your company from your phone.** Tell Hive what you want for the business, in plain words. It works out what to change, builds it with a team of AI coding agents (Claude Code, OpenAI Codex, or both), shows you screenshots, and hands it to your engineer. It also reads your mail, calendar, payments and data, and answers you on Telegram.
 
 Hive is also a research lab. Every feature in it came out of one of **113 pre-registered experiments**, each scored against predictions published before it ran, failures included. [Why that matters](#why-hive-is-research-not-a-demo).
 
@@ -28,7 +28,7 @@ Hive works the same way for you, in your terms:
 - **Say it technically, and it's taken as is.** *"cache /products in Redis, 60 s TTL"* gets "👍 Yes, let's do it", your instruction restated precisely, and at most two questions a normal engineer would ask. No business talk.
 - **Hand it your backlog and go.** `hive start --overnight` builds while you sleep; the builders write their questions down, and you answer them over breakfast (`hive morning`).
 - **Every change arrives as a pull request** with the diff, the test results, screenshots and the cost. Nothing touches `main`, nothing goes live until you merge, and every existing test must keep passing.
-- **Bring your own agents.** Claude, Codex and Gemini builders mix in one team (*"use 2 Claude and 2 Codex"*); a guard refuses anything that breaks a passing test, duplicates a definition or commits a secret.
+- **Use Codex, Claude or both.** Builders can be Claude Code, OpenAI Codex or Gemini, alone or mixed in one team (*"use 2 Claude and 2 Codex"*, or `hive start --agent codex`). In testing, a mixed Claude and Codex team built a 1,340-test project with 100% on the hidden tests and never broke main (Gate 47); a guard refuses anything that breaks a passing test, duplicates a definition or commits a secret.
 - **From the terminal too.** `hive` alone runs one conversation from an idea to a tested branch, no phone needed.
 - **Honest about cost.** On real Django issues one builder solved 8 of 10, and a full swarm also 8 of 10 at 15 times the cost (Gates 86, 89). So on a technical task Hive uses one builder, and saves the swarm for big jobs with many independent parts.
 
@@ -60,7 +60,8 @@ hive setup      # connects your phone (Telegram); then Hive says hello there
 
 ### What it costs
 
-- **Claude:** Hive's builders run on Claude Code, so you need a Claude subscription (Pro or Max) or an Anthropic API account. That is the only thing you must pay for.
+- **Claude:** Hive's assistant and planner run on Claude Code, so you need a Claude subscription (Pro or Max) or an Anthropic API account. That is the only thing you must pay for.
+- **Codex (optional):** the building can also be done by OpenAI's Codex, on your ChatGPT plan, alone or mixed with Claude (*"use 2 Claude and 2 Codex"*). Handy if you already pay for ChatGPT, or to spread the work across both plans' limits. Gemini works as a builder too.
 - **Each job:** Hive tells you the price before it starts, and asks before going past your budget (*"set my budget to $50 a month"*). In the tests, a small change cost about $0.80, a three-step plan about $1.50 to $3, and answering from your data a few cents.
 - **Always on (optional):** a machine on your own AWS account, about $23 a month (small) or $72 (bigger). Or keep it on your computer for free.
 - **Hosting, mail, calendar, payments:** Hive uses the accounts you already have; it adds no fee of its own.
@@ -74,7 +75,7 @@ Already have Python 3.10+, git and Claude Code? `pip install git+https://github.
 pip install playwright && playwright install chromium   # screenshots on your phone
 pip install "hive-swarm[voice] @ git+https://github.com/suryanshranjan/hive"   # voice notes (Whisper, on your machine)
 pip install "hive-swarm[data] @ git+https://github.com/suryanshranjan/hive"    # Postgres, MySQL, Excel and PDF data
-npm i -g @openai/codex && codex login       # Codex builders too: "use 2 Claude and 2 Codex"
+npm i -g @openai/codex && codex login       # OpenAI Codex as a builder, on your ChatGPT plan: "use 2 Claude and 2 Codex"
 hive deploy setup vercel                     # your host: vercel, netlify, railway, azure, fly, render, or custom
 hive access add --db postgres://reader:...@host/db   # your data, read-only
 hive brain add docs/                         # your policies and FAQs, so Hive knows the business
