@@ -15,7 +15,7 @@ os.environ.pop('HIVE_EXPLAIN_CMD', None)
 
 def claude_json(prompt):
     for _ in range(3):
-        r = subprocess.run(['claude', '-p', '--output-format', 'json', '--tools', ''], input=prompt, capture_output=True,
+        r = subprocess.run([shutil.which('claude') or 'claude', '-p', '--output-format', 'json', '--tools', ''], input=prompt, capture_output=True,
                            text=True, encoding='utf-8', errors='replace', timeout=300, cwd=tempfile.gettempdir())
         try:
             out = json.loads(r.stdout); t = out['result']
