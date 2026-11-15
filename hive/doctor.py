@@ -63,6 +63,8 @@ def checks(repo='.', claude_probe=True):
                 'Optional: pip install "hive-swarm[voice]" (transcribes on this machine; your voice never leaves it).'))
     out.append((os.path.exists(explain.BACKUP), False, 'a backup model for plain words',
                 'Optional: hive llm setup (for example NVIDIA NIM), used only if Claude cannot be reached.'))
+    out.append((explain.fast_on(), False, 'fast replies (a model API key: Anthropic or any provider)',
+                'Optional: hive llm api. Replies start in about a second instead of 7-8 (paid per use, about 1-2 cents a reply).'))
     return out
 
 def setup(repo='.', ask=input, claude_probe=True):

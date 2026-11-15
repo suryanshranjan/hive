@@ -21,6 +21,17 @@ if cmd == 'ec2 describe-instances' and os.environ.get('FAKE_AWS_STOPPED') and 's
 if cmd == 'ec2 describe-instances' and 'terminate' in open(os.environ['FAKE_AWS_LOG']).read():
     print(json.dumps({'Reservations': [{'Instances': [{'PublicIpAddress': '203.0.113.9', 'State': {'Name': 'terminated'}}]}]}))
     sys.exit(0)
+if cmd == 'sts get-caller-identity':   # who is signed in: the limited user under --profile hive, else root or a user
+    prof = args[args.index('--profile') + 1] if '--profile' in args else ''
+    arn = ('arn:aws:iam::123456789012:user/hive-builder' if prof == 'hive' else
+           'arn:aws:iam::123456789012:root' if os.environ.get('FAKE_AWS_ROOT') else 'arn:aws:iam::123456789012:user/owner')
+    print(json.dumps({'Account': '123456789012', 'Arn': arn})); sys.exit(0)
+if cmd == 'iam get-user' and 'iam create-user' not in open(os.environ['FAKE_AWS_LOG']).read():
+    sys.stderr.write('An error occurred (NoSuchEntity): The user with name hive-builder cannot be found.\n'); sys.exit(254)
+if cmd == 'iam list-access-keys':
+    print(json.dumps({'AccessKeyMetadata': [{'AccessKeyId': 'AKIAOLD'}] if os.environ.get('FAKE_AWS_OLDKEY') else []})); sys.exit(0)
+if cmd == 'iam create-access-key':
+    print(json.dumps({'AccessKey': {'AccessKeyId': 'AKIANEW', 'SecretAccessKey': 'secret-new'}})); sys.exit(0)
 if cmd == 'configure get':
     print('ap-south-1')
 elif cmd in replies:

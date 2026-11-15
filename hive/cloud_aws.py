@@ -51,8 +51,94 @@ npm install -g @anthropic-ai/claude-code
 touch /var/lib/hive-ready
 """
 
+# A limited AWS login for Hive (the owner's laptop was signed in as the account's root user, which can do anything,
+# including close the account). `hive cloud --limit` makes an IAM user that can only make, start, stop and delete Hive's
+# own tagged machines, keys and firewalls, and points Hive at it. Nothing else on his account is reachable from it.
+LIMITED = lambda: os.path.join(os.path.expanduser('~'), '.hive', 'aws.json')   # {"profile", "user"}
+LIMITED_USER, LIMITED_PROFILE = 'hive-builder', 'hive'
+OURS = {'Null': {'aws:ResourceTag/hive': 'false'}}   # only resources tagged hive (everything Hive makes is)
+POLICY = {'Version': '2012-10-17', 'Statement': [
+    {'Sid': 'Look', 'Effect': 'Allow', 'Resource': '*',
+     'Action': ['sts:GetCallerIdentity', 'ec2:DescribeInstances', 'ec2:DescribeInstanceStatus', 'ec2:DescribeImages',
+                'ec2:DescribeKeyPairs', 'ec2:DescribeSecurityGroups', 'ec2:DescribeSubnets', 'ec2:DescribeVpcs']},
+    {'Sid': 'Ubuntu', 'Effect': 'Allow', 'Action': 'ssm:GetParameter',
+     'Resource': 'arn:aws:ssm:*::parameter/aws/service/canonical/*'},
+    {'Sid': 'MakeTagged', 'Effect': 'Allow', 'Action': ['ec2:CreateKeyPair', 'ec2:CreateSecurityGroup'], 'Resource': '*',
+     'Condition': {'Null': {'aws:RequestTag/hive': 'false'}}},
+    {'Sid': 'TagOnlyWhileMaking', 'Effect': 'Allow', 'Action': 'ec2:CreateTags', 'Resource': '*',
+     'Condition': {'StringEquals': {'ec2:CreateAction': ['CreateKeyPair', 'CreateSecurityGroup', 'RunInstances']}}},
+    {'Sid': 'RunSmallTagged', 'Effect': 'Allow', 'Action': 'ec2:RunInstances', 'Resource': 'arn:aws:ec2:*:*:instance/*',
+     'Condition': {'Null': {'aws:RequestTag/hive': 'false'}, 'StringLike': {'ec2:InstanceType': ['t3.*', 'm7i.large', 'm7i.xlarge']}}},
+    {'Sid': 'RunWith', 'Effect': 'Allow', 'Action': 'ec2:RunInstances', 'Resource': [
+        'arn:aws:ec2:*::image/*', 'arn:aws:ec2:*:*:subnet/*', 'arn:aws:ec2:*:*:network-interface/*',
+        'arn:aws:ec2:*:*:volume/*', 'arn:aws:ec2:*:*:key-pair/*', 'arn:aws:ec2:*:*:security-group/*']},
+    {'Sid': 'OnlyOurs', 'Effect': 'Allow', 'Resource': '*', 'Condition': OURS,
+     'Action': ['ec2:StartInstances', 'ec2:StopInstances', 'ec2:TerminateInstances', 'ec2:DeleteKeyPair',
+                'ec2:DeleteSecurityGroup', 'ec2:AuthorizeSecurityGroupIngress', 'ec2:RevokeSecurityGroupIngress']},
+]}
+
+def default_profile():
+    """The AWS login Hive uses when none is named: HIVE_AWS_PROFILE, else the limited one once made, else the CLI's."""
+    if 'HIVE_AWS_PROFILE' in os.environ:   # set and empty: the AWS command line's own login
+        return os.environ['HIVE_AWS_PROFILE'] or None
+    try:
+        return json.load(open(LIMITED())).get('profile')
+    except (OSError, ValueError):
+        return None
+
+def is_root(who):
+    return str((who or {}).get('Arn', '')).endswith(':root')
+
+ROOT_WARNING = ("You're signed in to AWS as the account's root user, which can do anything on it. Hive needs much less: "
+                "`hive cloud --limit` makes a login that can only touch Hive's own machines (one minute, once).")
+
+def limit(admin_profile='', say=print, ask=input):
+    """hive cloud --limit: make the IAM user hive-builder with only Hive's rights, give it a key, save it as the AWS
+    profile 'hive' and use it from now on. Run once, signed in with a login that can make users (root or an admin)."""
+    try:
+        who = _aws(['sts', 'get-caller-identity'], admin_profile)
+    except (RuntimeError, FileNotFoundError) as e:
+        say(f"I need the AWS command line signed in to your account first (`aws login`): {e}"); return 2
+    say(f"This makes one AWS user, '{LIMITED_USER}', on account {who.get('Account', '?')}. It can only make, start, "
+        "stop and delete Hive's own machines (tagged 'hive'), never anything else of yours. Its key is kept on this "
+        "computer, in the AWS command line's own settings.")
+    if not ask('Go ahead? (yes/no) > ').strip().lower().startswith('y'):
+        say('Nothing made.'); return 1
+    try:
+        _aws(['iam', 'get-user', '--user-name', LIMITED_USER], admin_profile)
+    except RuntimeError:
+        _aws(['iam', 'create-user', '--user-name', LIMITED_USER, '--tags', 'Key=hive,Value=builder'], admin_profile)
+    _aws(['iam', 'put-user-policy', '--user-name', LIMITED_USER, '--policy-name', 'hive-only',
+          '--policy-document', json.dumps(POLICY)], admin_profile)
+    old = _aws(['iam', 'list-access-keys', '--user-name', LIMITED_USER], admin_profile).get('AccessKeyMetadata', [])
+    for k in old:   # one key at a time: an old one (lost with an earlier laptop) is retired
+        _aws(['iam', 'delete-access-key', '--user-name', LIMITED_USER, '--access-key-id', k['AccessKeyId']], admin_profile)
+    key = _aws(['iam', 'create-access-key', '--user-name', LIMITED_USER], admin_profile)['AccessKey']
+    region = subprocess.run(shlex.split(AWS) + ['configure', 'get', 'region'] + (['--profile', admin_profile] if admin_profile else []),
+                            capture_output=True, text=True).stdout.strip() or 'ap-south-1'
+    for k, v in (('aws_access_key_id', key['AccessKeyId']), ('aws_secret_access_key', key['SecretAccessKey']),
+                 ('region', region)):
+        subprocess.run(shlex.split(AWS) + ['configure', 'set', k, v, '--profile', LIMITED_PROFILE], capture_output=True)
+    os.makedirs(os.path.dirname(LIMITED()), exist_ok=True)
+    json.dump({'profile': LIMITED_PROFILE, 'user': LIMITED_USER}, open(LIMITED(), 'w'))
+    for _ in range(10):   # a new key takes a few seconds to work everywhere in AWS
+        try:
+            me = _aws(['sts', 'get-caller-identity'], LIMITED_PROFILE)
+            if me.get('Arn', '').endswith('/' + LIMITED_USER):
+                break
+        except RuntimeError:
+            pass
+        time.sleep(3)
+    else:
+        say("Made, but the new login didn't answer yet. Try `hive cloud --limit` again in a minute."); return 1
+    say(f"Done. Hive now uses '{LIMITED_USER}' (AWS profile '{LIMITED_PROFILE}'). You can sign out of root on this "
+        "computer; Hive no longer needs it.")
+    return 0
+
 def _aws(args, profile=None, region=None, check=True):
-    cmd = shlex.split(AWS) + args + ['--output', 'json'] + (['--profile', profile] if profile else []) + (['--region', region] if region else [])
+    if profile is None:
+        profile = default_profile()
+    cmd =shlex.split(AWS) + args + ['--output', 'json'] + (['--profile', profile] if profile else []) + (['--region', region] if region else [])
     p = subprocess.run(cmd, capture_output=True, text=True)
     if check and p.returncode != 0:
         raise RuntimeError(f"aws {' '.join(args[:2])}: {p.stderr.strip()[:300]}")
@@ -79,7 +165,9 @@ def new(repo='.', size='t3.small', region=None, profile=None, with_login=True, s
     except (RuntimeError, FileNotFoundError):
         say("I need the AWS command line, logged in to your account: install it (aws.amazon.com/cli), then run "
             "`aws configure` or `aws login`, and try again."); return 2
-    region = region or subprocess.run(shlex.split(AWS) + ['configure', 'get', 'region'] + (['--profile', profile] if profile else []),
+    if is_root(who):
+        say(ROOT_WARNING)
+    region =region or subprocess.run(shlex.split(AWS) + ['configure', 'get', 'region'] + (['--profile', profile] if profile else []),
                                       capture_output=True, text=True).stdout.strip() or 'ap-south-1'
     slug = re.sub(r'[^a-z0-9]+', '-', (memory.project_name(repo) or cloud._project(repo)).lower()).strip('-')[:30] or 'project'
     name = f"hive-{slug}-{int(time.time()) % 100000}"   # named after his startup in the AWS console

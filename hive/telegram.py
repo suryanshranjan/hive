@@ -130,6 +130,20 @@ class Channel:
                     raise
                 time.sleep(wait)
 
+    def edit(self, message_id, text, html=False):
+        """Rewrite a message already sent (a reply streamed in as it is written). Hive's record of the conversation
+        keeps the latest words, not each draft. True if the chat took it."""
+        body = text if html else esc(text)
+        plain = _html.unescape(re.sub(r'<[^>]+>', '', body)).strip()[:600]
+        if self.history and self.history[-1][0] == 'hive':
+            self.history = self.history[:-1]
+        self.remember('hive', plain)
+        try:
+            self.api('editMessageText', chat_id=self.chat, message_id=message_id, text=body, parse_mode='HTML')
+            return True
+        except Exception:   # "message is not modified", a dropped connection: the next edit or the final one catches up
+            return False
+
     def send_photo(self, path, caption='', buttons=None, html=False):
         """A picture for the owner (a screenshot of what was built), with a caption and optional buttons. Founders judge
         a screen by looking at it, not by reading what it does (the owner: "share the screenshot on my phone")."""

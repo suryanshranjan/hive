@@ -165,6 +165,8 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 | Money to chase is always said | Gate 112 run 2: a failed payment left out | One line on failed payments, always | `hive/payments.py` ANSWER |
 
 | A deduction is never taken twice | Gate 113: ₹900 taken off a total already net (the mirror of Gate 108's double bonus) | The query step shows a few rows of an amount beside its bonus, deduction, fee or discount column, so the answer sees which includes which; re-asked 3/3, Dabba Days still right | `hive/access.py` PICK, ANSWER |
+| Replies in about a second, any provider (the owner: "api key can be of anthropic or any provider") | Nov 15: a reply was 7-8 s, mostly Claude Code starting up; Gate 114 part D (registered, not flown) | With a key (`hive llm api`): Anthropic's SDK or any OpenAI-style provider; chat replies stream into one Telegram message and are finished in place; no key, no change | `hive/explain.py` fast_cfg, stream_json; `hive/assistant.py` _speak_streamed; `tests/test_fast.py` |
+| Hive never needs his root login | Nov 15: the laptop's AWS login was the account's root user; Gate 114 parts B-C (registered, not flown) | `hive cloud --limit` makes `hive-builder`, which can only touch machines, keys and firewalls tagged `hive`; Hive warns when signed in as root, and checks its own login for expiry | `hive/cloud_aws.py` POLICY, limit; `hive/logins.py` ok; `tests/test_aws_limit.py` |
 | Install in one line | The owner: a founder should not need an engineer to start | `install.sh` (Linux, macOS), `install.ps1` (Windows): git, Python, Node, Claude Code, Hive; tested on a bare Ubuntu and on Windows | README Quick start |
 
 ## Still to turn into the product

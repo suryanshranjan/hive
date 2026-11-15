@@ -110,6 +110,214 @@ def _ask_claude(prompt):
         raise RuntimeError('claude reply had no result')
     return _json_reply(reply.get('result', reply) if isinstance(reply, dict) else reply)
 
+# The direct path (the owner: replies took 7-8 s, mostly Claude Code starting up; Nov 15 measurement). With an API key,
+# Hive's own reading calls go straight to a model: no process to start, and a chat reply is streamed into his chat as it
+# is written. The key can be Anthropic's (its SDK) or any provider with the common chat-completions API (OpenAI, NVIDIA
+# NIM, Groq, OpenRouter, Together, a local server...). Without a key nothing changes: Claude Code's login, then backup.
+FAST = os.path.join(os.path.expanduser('~'), '.hive', 'fast.json')   # {"provider", "api_key", "model", "base_url"}; never in a repo
+API_MODEL = 'claude-opus-5-5'
+API_PRICE = {'claude-opus-5-5': (4.0, 20.0), 'claude-sonnet-5-5': (2.0, 10.0), 'claude-haiku-5-5': (0.10, 0.50)}
+SYSTEM = 'You read what a business owner and his builders wrote, and answer exactly in the JSON you are asked for.'
+_API = {}
+
+def fast_cfg():
+    """The fast model's settings, or {} when none. ANTHROPIC_API_KEY alone also counts (Anthropic, default model)."""
+    if os.environ.get('HIVE_API') == '0' or 'HIVE_EXPLAIN_CMD' in os.environ:   # a test or experiment names its reader
+        return {}
+    try:
+        cfg = json.load(open(FAST))
+    except (OSError, ValueError):
+        cfg = {}
+    if not cfg.get('api_key') and os.environ.get('ANTHROPIC_API_KEY'):
+        cfg = {'provider': 'anthropic', 'api_key': os.environ['ANTHROPIC_API_KEY']}
+    if not cfg.get('api_key'):
+        return {}
+    cfg.setdefault('provider', 'anthropic')
+    if cfg['provider'] == 'anthropic':
+        cfg['model'] = os.environ.get('HIVE_API_MODEL') or cfg.get('model') or API_MODEL
+    elif not cfg.get('base_url') or not cfg.get('model'):
+        return {}
+    return cfg
+
+def fast_on():
+    """True when replies can go straight to a model and be streamed."""
+    cfg = fast_cfg()
+    return bool(cfg) and (cfg['provider'] != 'anthropic' or _anthropic(cfg) is not None)
+
+def _anthropic(cfg):
+    if _API.get('key') != cfg['api_key']:
+        try:
+            import anthropic
+        except ImportError:
+            return None
+        _API.update(key=cfg['api_key'], client=anthropic.Anthropic(api_key=cfg['api_key'], timeout=120.0, max_retries=1))
+    return _API['client']
+
+def _anthropic_request(cfg, prompt):
+    return dict(model=cfg['model'], max_tokens=16000, output_config={'effort': 'low'},   # chat-like reading: low is fastest
+                system=SYSTEM, messages=[{'role': 'user', 'content': prompt}])
+
+def _anthropic_text(msg):
+    if msg.stop_reason == 'refusal':
+        raise RuntimeError('the API declined this one')
+    i, o = API_PRICE.get(msg.model, (0, 0))
+    spend(((msg.usage.input_tokens or 0) * i + (msg.usage.output_tokens or 0) * o) / 1e6)
+    return ''.join(b.text for b in msg.content if b.type == 'text')
+
+def _compat(cfg, prompt, stream):
+    """A chat-completions request to any compatible provider (OpenAI's shape, which most providers speak)."""
+    import urllib.request
+    body = {'model': cfg['model'], 'max_tokens': 4000, 'stream': stream,
+            'messages': [{'role': 'system', 'content': SYSTEM}, {'role': 'user', 'content': prompt}]}
+    req = urllib.request.Request(cfg['base_url'].rstrip('/') + '/chat/completions', data=json.dumps(body).encode(),
+                                 headers={'Content-Type': 'application/json', 'Authorization': f"Bearer {cfg['api_key']}"})
+    return urllib.request.urlopen(req, timeout=120)
+
+def _compat_chunks(resp):
+    """The text pieces of a streamed chat-completions reply (server-sent events)."""
+    for raw in resp:
+        line = raw.decode('utf-8', 'replace').strip()
+        if not line.startswith('data:'):
+            continue
+        data = line[5:].strip()
+        if data == '[DONE]':
+            break
+        try:
+            piece = (json.loads(data).get('choices') or [{}])[0].get('delta', {}).get('content')
+        except ValueError:
+            continue
+        if piece:
+            yield piece
+
+def _ask_api(prompt):
+    """One JSON question straight to the fast model; None when none is set up (the next way is tried)."""
+    cfg = fast_cfg()
+    if not cfg:
+        return None
+    if cfg['provider'] == 'anthropic':
+        client = _anthropic(cfg)
+        if client is None:
+            return None
+        return _json_reply(_anthropic_text(client.messages.create(**_anthropic_request(cfg, prompt))))
+    with _compat(cfg, prompt, False) as r:
+        return _json_reply(json.load(r)['choices'][0]['message']['content'])
+
+def partial_field(text, field='reply'):
+    """The part of a JSON string field written so far, from a reply still being streamed ('' if it has not started)."""
+    m = re.search(r'"%s"\s*:\s*"' % re.escape(field), text)
+    if not m:
+        return ''
+    out, i = [], m.end()
+    while i < len(text):
+        c = text[i]
+        if c == '"':
+            break
+        if c == '\\':
+            j = i + (6 if text[i + 1:i + 2] == 'u' else 2)
+            if j > len(text):   # an escape not finished yet
+                break
+            try:
+                out.append(json.loads('"' + text[i:j] + '"'))
+            except ValueError:
+                pass
+            i = j; continue
+        out.append(c); i += 1
+    return ''.join(out)
+
+def stream_json(prompt, on_field, field='reply'):
+    """Ask in JSON from the fast model, calling on_field(text so far) as the chosen field is written. The full reply,
+    or None when no fast model is set up or it failed (the caller then asks the usual way)."""
+    cfg = fast_cfg()
+    if not cfg:
+        return None
+    got, last = [''], ['']
+    def take(piece):
+        got[0] += piece
+        now = partial_field(got[0], field)
+        if now != last[0]:
+            last[0] = now
+            try:
+                on_field(now)
+            except Exception:
+                pass
+    try:
+        if cfg['provider'] == 'anthropic':
+            client = _anthropic(cfg)
+            if client is None:
+                return None
+            with client.messages.stream(**_anthropic_request(cfg, prompt)) as s:
+                for piece in s.text_stream:
+                    take(piece)
+                text = _anthropic_text(s.get_final_message())
+        else:
+            with _compat(cfg, prompt, True) as r:
+                for piece in _compat_chunks(r):
+                    take(piece)
+            text = got[0]
+        return _json_reply(text)
+    except Exception as e:
+        _log_failure('stream_json', e, prompt)
+        return None
+
+PROVIDERS = {   # the common ones, so he only types a key; any other: its address and model
+    '1': ('Anthropic (Claude)', 'anthropic', None, API_MODEL),
+    '2': ('OpenAI', 'openai', 'https://api.openai.com/v1', 'gpt-5-mini'),
+    '3': ('NVIDIA NIM', 'openai', 'https://integrate.api.nvidia.com/v1', 'meta/llama-3.3-70b-instruct'),
+    '4': ('Groq', 'openai', 'https://api.groq.com/openai/v1', 'llama-3.3-70b-versatile'),
+    '5': ('OpenRouter', 'openai', 'https://openrouter.ai/api/v1', 'anthropic/claude-sonnet-5.5'),
+}
+
+def setup_api(say=print, ask=input, getpass_=None):
+    """hive llm api: pick a provider, store its key in ~/.hive/fast.json (owner-only), and time one streamed reply so
+    he sees the gain."""
+    import getpass, importlib, subprocess as sp, sys, time
+    say("\nA model API key makes replies start in about a second instead of 7-8. Any provider works.\n"
+        "Note: it reads your messages and your builders' notes, so use a provider you trust.\n")
+    for k, (name, *_rest) in PROVIDERS.items():
+        say(f'  {k}. {name}')
+    say('  6. Another provider (one that speaks the OpenAI chat API)')
+    pick = ask('  Which one? (Enter for 1) > ').strip() or '1'
+    if pick in PROVIDERS:
+        name, provider, base, model = PROVIDERS[pick]
+        model = ask(f'  Model (Enter for {model}) > ').strip() or model
+    else:
+        name, provider = 'your provider', 'openai'
+        base = ask('  Its API address (for example https://api.together.xyz/v1) > ').strip()
+        model = ask('  Model > ').strip()
+    if provider == 'openai' and not (base and model):
+        say('  An address and a model are both needed; nothing saved.'); return 1
+    if provider == 'anthropic':
+        try:
+            importlib.import_module('anthropic')
+        except ImportError:
+            say('  Installing the Anthropic SDK (once)...')
+            if sp.run([sys.executable, '-m', 'pip', 'install', '-q', 'anthropic']).returncode != 0:
+                say('  It did not install. Try: pip install anthropic'); return 1
+    key = (getpass_ or getpass.getpass)(f'  {name} API key (it will not be shown) > ').strip()
+    if not key:
+        say('  No key given; nothing saved.'); return 1
+    cfg = {'provider': provider, 'api_key': key, 'model': model}
+    if base:
+        cfg['base_url'] = base
+    os.makedirs(os.path.dirname(FAST), exist_ok=True)
+    with open(FAST, 'w') as f:
+        json.dump(cfg, f)
+    try:
+        os.chmod(FAST, 0o600)
+    except OSError:
+        pass
+    _API.clear()
+    if not fast_on():
+        say('  Saved, but fast replies are switched off here (HIVE_API=0 or HIVE_EXPLAIN_CMD is set).'); return 1
+    first, t0 = [], time.time()
+    got = stream_json('Reply with JSON only: {"reply": "Ready when you are."}',
+                      lambda s: first or first.append(time.time() - t0))
+    if not got:
+        say('  Saved, but a test call failed. Check the key and model (details in ~/.hive/explain.log).'); return 1
+    say(f"  Saved. First words in {first[0] if first else time.time() - t0:.1f} s, the whole reply in "
+        f"{time.time() - t0:.1f} s ({model}).")
+    return 0
+
 def _ask_backup(prompt):
     """Any OpenAI-compatible endpoint the owner configured (for example NVIDIA NIM), used only when Claude fails."""
     if not os.path.exists(BACKUP):
@@ -193,7 +401,7 @@ def explain(owner_dir, goal, assumptions, rulings=None):
             '\n'.join(f'- {r}' for r in rulings[-40:]) + '\n') if rulings else ''
     prompt = PROMPT.format(goal=_goal_summary(goal), items=items, rulings=past)
     reply = None
-    for ask in (_ask_claude, _ask_backup):   # Claude Code's login first; the owner's own backup model if that fails
+    for ask in (_ask_api, _ask_claude, _ask_backup):   # Claude Code's login first; the owner's own backup model if that fails
         try:
             reply = ask(prompt)
             if reply:
@@ -260,7 +468,7 @@ def conflicts(decisions):
     if len(decisions) < 2:
         return []
     text = '\n'.join(f'{n}. {d}' for n, d in enumerate(decisions, 1))
-    for ask in (_ask_claude, _ask_backup):
+    for ask in (_ask_api, _ask_claude, _ask_backup):
         try:
             reply = ask(CONFLICT_PROMPT.format(decisions=text))
             if reply is None:
@@ -293,8 +501,8 @@ def plain(prompt, before=('Reply with JSON only', 'Reply with the answer only', 
     return prompt.rstrip() + '\n\n' + PLAIN
 
 def ask_json(prompt):
-    """One question to a model that answers in JSON: Claude first, the backup model second; None if neither answers."""
-    for ask in (_ask_claude, _ask_backup):
+    """One question to a model that answers in JSON: the API (with a key), Claude Code, then the backup; None if none answers."""
+    for ask in (_ask_api, _ask_claude, _ask_backup):
         try:
             reply = ask(prompt)
             if reply is not None:

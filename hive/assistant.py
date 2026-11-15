@@ -256,8 +256,10 @@ def speak(ch, repo, task, fallback):
                  (f' This is the {times}th time in a row: he may not be seeing your replies, or he is impatient. Ask, '
                   'briefly, whether your messages are reaching him, and offer the one most useful next step.'
                   if times >= 3 else ''))
-    t = threading.Thread(target=lambda: box.update(got=explain.ask_json(
-        VOICE.format(who=_who(ch) or 'sir', facts=facts(repo, ch), task=task)) or {}), daemon=True)
+    prompt = VOICE.format(who=_who(ch) or 'sir', facts=facts(repo, ch), task=task)
+    if explain.fast_on() and callable(getattr(ch, 'edit', None)):
+        return _speak_streamed(ch, prompt, fallback)
+    t = threading.Thread(target=lambda: box.update(got=explain.ask_json(prompt) or {}), daemon=True)
     t.start()
     # Claude Code takes ~5 s just to start (the model ~1-2 s): at 8 s most replies fell back to canned lines (Jarvis bench)
     end = time.time() + float(os.environ.get('HIVE_VOICE_SECONDS', 20))
@@ -270,6 +272,41 @@ def speak(ch, repo, task, fallback):
         ch.send('🐝 ' + telegram.esc(reply), html=True)
     else:
         ch.send(fallback, html=True)
+
+STREAM_FIRST = 24   # characters before the first words go out (a lone "Sir," would look like a cut-off message)
+STREAM_EVERY = 1.0   # seconds between rewrites: Telegram allows about one edit a second in a chat
+
+def _speak_streamed(ch, prompt, fallback):
+    """The reply appears in his chat as it is written, then is finished in place (the owner: replies took 7-8 s; with
+    the API the first words show in about a second). Falls back to the usual way when the stream gives nothing."""
+    import threading
+    box = {'text': '', 'done': False}
+    def run():
+        box['got'] = explain.stream_json(prompt, lambda s: box.update(text=s))
+        box['done'] = True
+    t = threading.Thread(target=run, daemon=True); t.start()
+    mid, shown, last = None, '', 0.0
+    end = time.time() + float(os.environ.get('HIVE_VOICE_SECONDS', 20))
+    while not box['done'] and time.time() < end:
+        now, text = time.time(), box['text'].strip()
+        if mid is None and len(text) >= STREAM_FIRST:
+            mid, shown, last = ch.send('🐝 ' + telegram.esc(text) + ' …', html=True), text, now
+        elif mid is not None and text != shown and now - last >= STREAM_EVERY:
+            ch.edit(mid, '🐝 ' + telegram.esc(text) + ' …', html=True); shown, last = text, now
+        elif mid is None and callable(getattr(ch, 'typing', None)) and now - last >= 4:
+            ch.typing(); last = now
+        t.join(0.15)
+    reply = ((box.get('got') or {}).get('reply') or box['text'] or '').strip()
+    if mid is not None:
+        ch.edit(mid, '🐝 ' + telegram.esc(reply), html=True)
+    elif reply:
+        ch.send('🐝 ' + telegram.esc(reply), html=True)
+    elif not box['done']:   # still nothing after the wait: the plain line, never a second slow call
+        ch.send(fallback, html=True)
+    else:
+        got = explain.ask_json(prompt) or {}   # the stream failed outright: the usual way, once
+        reply = (got.get('reply') or '').strip()
+        ch.send('🐝 ' + telegram.esc(reply) if reply else fallback, html=True)
 
 GREETINGS = {'hi', 'hii', 'hello', 'hey', 'hey hive', 'hi hive', 'hello hive', 'yo', 'hola', 'namaste', 'good morning',
              'good evening', 'good afternoon', 'jarvis', 'hive'}

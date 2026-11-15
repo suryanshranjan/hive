@@ -13,6 +13,7 @@ dependencies = []
 
 [project.optional-dependencies]
 voice = ["faster-whisper>=1.0"]
+api = ["anthropic>=1.0"]   # replies straight from the Anthropic API, streamed (hive llm api)
 data = ["psycopg[binary]>=3.1", "pymysql>=1.1", "openpyxl>=3.1", "pypdf>=4"]   # reading his Postgres, MySQL, Excel and PDF files
 
 [project.scripts]

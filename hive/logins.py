@@ -53,6 +53,11 @@ def ok(service, timeout=60):
     cmd = _exe(s['check'])
     if not cmd:
         return False
+    if service == 'aws':   # the login Hive itself uses: the limited profile once made (its keys do not expire)
+        from . import cloud_aws
+        prof = cloud_aws.default_profile()
+        if prof:
+            cmd = cmd + ['--profile', prof]
     try:
         return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout).returncode == 0
     except (subprocess.TimeoutExpired, OSError):

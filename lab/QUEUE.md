@@ -2,7 +2,18 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 15 2026 morning, after the night's work: Gates 111-113)
+## Where we left off (Nov 15 2026, the owner: "let's fix it all"; Gate 114 registered)
+
+- **Built and unit-tested, not flown** (`gates/gate114/PREDICTIONS.md`):
+  - fast replies with any provider's key (`hive llm api`), streamed (`tests/test_fast.py`);
+  - a limited AWS login (`hive cloud --limit`), a warning on root, and the AWS expiry check on Hive's own login (`tests/test_aws_limit.py`).
+- **Next, in order (`python gates/gate114/flight114.py <part>`):**
+  1. `aws-renew`: the laptop's AWS sign-in has expired by itself; he renews it from the phone (part A).
+  2. `limit`, then `cycle`: the limited login checked with dry runs, then a t3.small made and deleted as `hive-builder` (parts B, C).
+  3. `fast`: once he runs `hive llm api` with a key (part D).
+  4. Part E: he says "connect my email / calendar / Stripe" on the phone.
+
+## Before that (Nov 15 2026 morning, after the night's work: Gates 111-113)
 
 The owner said "fix everything" toward a Jarvis for the whole company, chose the order (always on first), then "complete everything, I'm going to sleep".
 - **Gate 111, always on is his choice** (`gates/gate111/RESULTS.md`). The phone and setup offer this computer (free), small (~$23 a month) or bigger (~$72), priced from AWS's list. Attempt 2 held on all predictions on real AWS. Fixed from attempt 1: ssh had no timeout; an old hand-over was replayed in the cloud.

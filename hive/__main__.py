@@ -15,8 +15,10 @@ For the owner:
   hive doctor                            check this machine and project are ready
   hive telegram setup | test | call <name>   connect your phone; how Hive addresses you
   hive llm setup                         optional: a backup model (e.g. NVIDIA NIM) for plain words
+  hive llm api                           optional: a model API key (Anthropic or any provider), replies in about a second
   hive cloud --new [--size t3.small]     one step: make a machine on your AWS account and move Hive there
   hive cloud --stop                      delete that machine (nothing left running or billing)
+  hive cloud --limit                     once: a limited AWS login for Hive, so it never needs your root login
   hive cloud --to user@host [--with-login]   move this project's Hive to a server you already have
   hive cloud pull [--from user@host]     bring the result branches back
 
@@ -45,7 +47,7 @@ class Parser(argparse.ArgumentParser):
         self._argv = list(sys.argv[1:] if args is None else args)
         a = super().parse_args(args, namespace)
         if getattr(a, 'cmd', None) == 'cloud':   # one thing at a time: make, delete, move to a server, or bring back
-            chosen = [n for n, on in (('--new', a.new), ('--stop', a.stop), ('--to', a.to), ('pull', a.action == 'pull')) if on]
+            chosen = [n for n, on in (('--new', a.new), ('--stop', a.stop), ('--limit', a.limit), ('--to', a.to), ('pull', a.action == 'pull')) if on]
             if len(chosen) > 1:
                 self._argv = ['cloud']
                 self.error(f"choose one of {', '.join(chosen)}, not several")
@@ -154,13 +156,13 @@ def build_parser():
     sub.add_parser('listen')
     cl = sub.add_parser('cloud'); cl.add_argument('action', nargs='?', choices=['pull']); cl.add_argument('--to')
     cl.add_argument('--from', dest='frm'); cl.add_argument('--with-login', action='store_true'); cl.add_argument('--no-start', action='store_true')
-    cl.add_argument('--new', action='store_true'); cl.add_argument('--stop', action='store_true')   # make / delete an AWS machine
+    cl.add_argument('--new', action='store_true'); cl.add_argument('--stop', action='store_true'); cl.add_argument('--limit', action='store_true')   # make / delete an AWS machine
     cl.add_argument('--no-login', action='store_true')   # --new brings the Claude login (builders work there) unless this
     cl.add_argument('--size', default='t3.small'); cl.add_argument('--region'); cl.add_argument('--profile')
     mo = sub.add_parser('morning'); mo.add_argument('name', nargs='?'); mo.add_argument('--phone', action='store_true')
     tg = sub.add_parser('telegram'); tg.add_argument('action', choices=['setup', 'test', 'call', 'ask', 'verdicts'])
     tg.add_argument('address', nargs='?'); tg.add_argument('--out'); tg.add_argument('--intro')
-    lm = sub.add_parser('llm'); lm.add_argument('action', choices=['setup'])
+    lm = sub.add_parser('llm'); lm.add_argument('action', choices=['setup', 'api'])
     sub.add_parser('name').add_argument('name', nargs='*')
     sub.add_parser('pace').add_argument('choice', nargs='?', choices=['fast', 'cheap'])
     ru = sub.add_parser('rules'); ru.add_argument('action', nargs='?', choices=['forget']); ru.add_argument('n', nargs='?', type=int)
@@ -204,6 +206,9 @@ def main(argv=None):
         from . import cloud
         if a.action == 'pull':
             return cloud.pull('.', a.frm)
+        if a.limit:   # a login for Hive that can only touch Hive's own machines (instead of root)
+            from . import cloud_aws
+            return cloud_aws.limit(a.profile or '')
         if a.new or a.stop:
             from . import cloud_aws
             return cloud_aws.stop() if a.stop else cloud_aws.new('.', a.size, a.region, a.profile, not a.no_login, not a.no_start)
@@ -315,7 +320,7 @@ def main(argv=None):
         return memory.forget('.', a.n or 0) if a.action == 'forget' else memory.show('.')
     if a.cmd == 'llm':
         from . import explain
-        return explain.setup_backup()
+        return explain.setup_api() if a.action == 'api' else explain.setup_backup()
     if a.cmd == 'telegram':
         if a.action == 'call':
             return telegram.call(a.address or '')
