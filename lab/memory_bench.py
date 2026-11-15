@@ -103,7 +103,9 @@ def setup():
     # HOME stays his: the real model (Claude Code) logs in from it. Everything Hive writes goes to the temp folder.
     # (First live attempt: HOME pointed here too, Claude Code found no login, and every call failed: 0 kept, $0.)
     sys.path.insert(0, ROOT)
-    from hive import memory, numbers, register
+    from hive import embed, memory, numbers, register
+    if embed.available():
+        embed.wait()   # the bench measures recall with the model loaded, as after Hive has been up a minute
     memory.DIR = os.path.join(home, '.hive', 'rules')
     numbers.DIR = os.path.join(home, '.hive', 'numbers'); register.PATH = os.path.join(home, '.hive', 'profile.json')
     repo = os.path.join(home, 'dabba'); subprocess.run(['git', 'init', '-q', '-b', 'main', repo])
