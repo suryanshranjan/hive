@@ -22,6 +22,8 @@ P=$T/box/hive-cloud/project
 check "the project arrives on its branch" "$(git -C $P rev-parse --abbrev-ref HEAD)" main
 check "the owner's rulings and Telegram link go with it" \
   "$(ls $T/box/hive-cloud/.hive/rules/*.json | wc -l | tr -d ' ') $(test -f $T/box/hive-cloud/.hive/telegram.json && echo yes)" "1 yes"
+check "his time zone goes too: a UTC cloud machine must still say good morning at his morning (Nov 15: 'Good evening' at his 5 am)" \
+  "$(grep -c utc_offset $T/box/hive-cloud/.hive/profile.json)" 1
 check ".env and the Claude login stay behind" "$(test -f $P/.env && echo sent || echo kept) $(test -d $T/box/hive-cloud/.claude && echo sent || echo kept)" "kept kept"
 check "it says how to log in there" "$(grep -c 'run .claude. once' $T/go.txt)" 1
 git -C $P checkout -q -b hive/refund-page && echo "x" > $P/refund.py && git -C $P add refund.py && git -C $P -c user.name=h -c user.email=h@h commit -qm "built in the cloud"

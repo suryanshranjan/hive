@@ -552,6 +552,7 @@ Rules of the lab:
 
 ## 12. Changelog
 
+- **Nov 15 2026 (IST), from the owner's phone:** the Gate 111 cloud machine (UTC) sent the brief, headed "Good evening", at his 5 am: moving to the cloud did not take his time zone or the record of today's brief. Both now go with Hive (`hive/cloud.py`; `tests/test_cloud.sh`).
 - **Nov 15 2026 (IST), Gate 113 and installers:** Gate 108 replicated on FixKaro (price rule replicated; 9/10; hidden rule found); a deduction taken twice fixed in the data prompts; one-line installers for Linux, macOS and Windows, tested on a bare Ubuntu and on Windows.
 - **Nov 15 2026 (IST), Gates 111-112 (the night's work, on the owner's word):** always on is his choice, at real prices, flown on AWS (ssh timeout and stale hand-over fixed); his mail (any IMAP mailbox), calendar (iCal address) and payments (Stripe, Razorpay), read-only with replies only on his yes, flown on real protocols with the real model; passwords and keys taken back out of the chat; today's events and takings in the brief.
 - **Nov 15 2026 (IST), Gate 110:** a real host from the phone, on the owner's Vercel. Hive installs Vercel's tool and signs in from the phone (`logins.py`); deploy copies carry his project's name. Attempt 2: Vercel puts a new project's first deployment live (fixed: explicit previews; on a new project Hive asks him, then puts his current version live first). Attempt 3 held. Also: Vercel's labelled address is read; Hive says Vercel previews ask him to sign in; deploy copies are deleted on Windows (172 had been left).
