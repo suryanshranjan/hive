@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends git curl ca-cer
  && useradd -m -u 1000 hive  && rm -rf /var/lib/apt/lists/* /root/.npm
 WORKDIR /opt/hive
 COPY . .
-RUN pip install --no-cache-dir ".[api,secure,memory]"   # secure: keys encrypted on the disk; memory: recall by meaning
+RUN pip install --no-cache-dir ".[api,secure,memory,speech]"   # keys encrypted; recall by meaning; voice replies
 # HOME on the disk (render.yaml mounts it at /data); HIVE_HOST tells setup it is already always on
 ENV HOME=/data/home HIVE_HOST=render PYTHONUNBUFFERED=1 HIVE_MODELS=/data/models
 # Render's disk arrives owned by root: the start makes HOME his user's (once), then Hive and its builders run as that

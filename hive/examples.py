@@ -11,11 +11,11 @@ failures; the fix it reports is a check against the task's own objective. Here t
 it writes a test that calls the function the product already uses (what the existing code and tests call), runs them,
 and reports the examples the code does not follow. It never changes the build."""
 import glob, json, os, shutil, subprocess, tempfile
+from . import claude_cmd, READ_TOOLS
 
 from . import argv
 
-CMD = os.environ.get('HIVE_EXAMPLES_CMD', 'claude -p --output-format json --permission-mode acceptEdits '
-                                          '--allowedTools Bash Read Write Glob Grep')
+CMD = os.environ.get('HIVE_EXAMPLES_CMD', claude_cmd(('Bash', 'Read', 'Write', 'Glob', 'Grep'), edits=True))
 
 BRIEF = """You are checking a just-built feature against its business owner's own words. The folder {code} holds the
 product's code. The goal was:

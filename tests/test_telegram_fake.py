@@ -1,5 +1,5 @@
 """The fake Telegram shared by the tests (records what Hive sends, replies with scripted taps and messages)."""
-import html, re
+import html, os, re
 ME, STRANGER = 111, 999
 fail = 0
 def check(name, got, want):
@@ -18,6 +18,11 @@ class FakeTelegram:
         if method == 'sendPhoto':   # a screenshot: recorded with its caption and the file it came from
             p = dict(p, text='[photo] ' + html.unescape(re.sub(r'<[^>]+>', '', p.get('caption', ''))), photo=p['_upload'][1])
             self.sent.append(p); return {'message_id': len(self.sent)}
+        if method == 'sendVoice':   # a voice note: recorded with the file it came from (hive/voice.py)
+            path = p['_upload'][1]
+            self.sent.append(dict(p, text='[voice]', voice=path, size=os.path.getsize(path) if os.path.exists(path) else 0,
+                                  head=open(path, 'rb').read(4) if os.path.exists(path) else b''))
+            return {'message_id': len(self.sent)}
         if method == 'answerCallbackQuery':
             return True
         if method == 'deleteMessage':   # a message carrying a password, taken back out of the chat

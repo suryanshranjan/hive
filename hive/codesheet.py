@@ -8,10 +8,10 @@ Gate 42 (synthetic owner who knows his rules): the corrected code sheet took fre
 68.4% from Hive's interview and 100% from the owner's own complete sheet. The cost moved to the owner's reading: 68
 rules, 34 marked. A real owner reading such a sheet is not yet tested."""
 import json, os, shutil, subprocess, tempfile
+from . import claude_cmd, READ_TOOLS
 from . import argv
 
-CMD = os.environ.get('HIVE_DESCRIBE_CMD', 'claude -p --output-format json --permission-mode acceptEdits '
-                                          '--allowedTools Bash Read Write Glob Grep')
+CMD = os.environ.get('HIVE_DESCRIBE_CMD', claude_cmd(('Bash', 'Read', 'Write', 'Glob', 'Grep'), edits=True))
 
 BRIEF = """You are documenting what a piece of software does, so that its business owner can check it. The folder
 {code} holds the code, just built for this feature:

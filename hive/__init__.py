@@ -14,6 +14,27 @@ PY = ('"' + _sys.executable.replace(chr(92), '/') + '"') if (_os.name == 'nt' or
 # git rewrote line endings there, so fresh copies showed changes nobody made and the guard's rebase refused to land.
 # The owner's own checkout keeps his settings.
 
+def claude_cmd(tools, edits=False):
+    """Claude Code, headless, answering in JSON, with these tools (and file edits accepted when edits): the one place
+    the command is written (the audit, Nov 15: nine copies of it drifted apart). Each caller keeps its own HIVE_*_CMD
+    override."""
+    return ('claude -p --output-format json' + (' --permission-mode acceptEdits' if edits else '') +
+            ' --allowedTools ' + ' '.join(tools))
+
+READ_TOOLS = ('Read', 'Grep', 'Glob', 'Bash')
+
+def link(src, dst):
+    """dst points at src (a dependency folder shared into a copy). A symlink where allowed; on Windows without the
+    right to make one (no admin, no Developer Mode), a directory junction, which needs neither (the audit, Nov 15).
+    True if linked."""
+    try:
+        _os.symlink(src, dst, target_is_directory=_os.path.isdir(src)); return True
+    except OSError:
+        if _os.name != 'nt' or not _os.path.isdir(src):
+            return False
+    import subprocess
+    return subprocess.run(['cmd', '/c', 'mklink', '/J', dst, src], capture_output=True).returncode == 0
+
 def argv(cmd):
     """A command line as a list for subprocess. On Windows `claude`, `codex` and other npm tools are .cmd files that
     CreateProcess cannot find by bare name, so every model call failed there and Hive fell back to canned replies."""

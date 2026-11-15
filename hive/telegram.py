@@ -66,7 +66,8 @@ def _multipart(params, field, path):
         parts.append(f'--{edge}\r\nContent-Disposition: form-data; name="{k}"\r\n\r\n{v}\r\n'.encode())
     name = os.path.basename(path)
     parts.append(f'--{edge}\r\nContent-Disposition: form-data; name="{field}"; filename="{name}"\r\n'
-                 f'Content-Type: image/png\r\n\r\n'.encode() + open(path, 'rb').read() + b'\r\n')
+                 f'Content-Type: {"audio/ogg" if name.endswith(".ogg") else "image/png"}\r\n\r\n'.encode() +
+                 open(path, 'rb').read() + b'\r\n')
     parts.append(f'--{edge}--\r\n'.encode())
     return b''.join(parts), f'multipart/form-data; boundary={edge}'
 
@@ -159,6 +160,19 @@ class Channel:
         for wait in (2, 5, 15, None):
             try:
                 return self.api('sendPhoto', **p)['message_id']
+            except (OSError, http.client.HTTPException):
+                if wait is None:
+                    raise
+                time.sleep(wait)
+
+    def send_voice(self, path, caption=''):
+        """A voice note for the owner (Hive answering a voice note in voice; hive/voice.py). Returns its message id."""
+        p = {'chat_id': self.chat, '_upload': ('voice', path)}
+        if caption:
+            p.update(caption=esc(caption)[:1000], parse_mode='HTML')
+        for wait in (2, 5, None):
+            try:
+                return self.api('sendVoice', **p)['message_id']
             except (OSError, http.client.HTTPException):
                 if wait is None:
                     raise
@@ -295,6 +309,7 @@ class Channel:
                             pass
                     continue
                 reply_to = (m.get('reply_to_message') or {}).get('message_id')
+                self.heard_voice = bool(m.get('voice') or m.get('audio'))   # he spoke: Hive may answer in voice
                 if m.get('text'):
                     self.last_id = m.get('message_id')   # so a message carrying a password can be taken back out
                     out.append((m['text'].strip(), None, reply_to)); self.remember('owner', m['text'].strip())

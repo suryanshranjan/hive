@@ -245,6 +245,26 @@ def facts(repo, ch=None):
         lines.append(f'Happening now: {note}')
     return '\n'.join(lines)
 
+def _voice_too(ch, text):
+    """He spoke (or always wants voice): the same answer as a voice note, in the background, after the text."""
+    try:
+        from . import voice
+        if not voice.wanted(getattr(ch, 'heard_voice', False)) or not callable(getattr(ch, 'send_voice', None)):
+            return None
+        import threading
+        def run():
+            path = voice.synthesize(text)
+            if path:
+                try:
+                    ch.send_voice(path)
+                finally:
+                    import shutil as _sh
+                    _sh.rmtree(os.path.dirname(path), ignore_errors=True)
+        t = threading.Thread(target=run, daemon=True); t.start()
+        return t
+    except Exception:
+        return None
+
 def speak(ch, repo, task, fallback):
     """One message in Hive's own voice (the owner: "like Jarvis handles Tony"); the plain fallback if no model."""
     import threading
@@ -274,6 +294,7 @@ def speak(ch, repo, task, fallback):
     reply = ((box.get('got') or {}).get('reply') or '').strip()
     if reply:
         ch.send('🐝 ' + telegram.esc(reply), html=True)
+        _voice_too(ch, reply)
     else:
         ch.send(fallback, html=True)
 
@@ -301,6 +322,8 @@ def _speak_streamed(ch, prompt, fallback):
             ch.typing(); last = now
         t.join(0.15)
     reply = ((box.get('got') or {}).get('reply') or box['text'] or '').strip()
+    if reply:
+        _voice_too(ch, reply)
     if mid is not None:
         ch.edit(mid, '🐝 ' + telegram.esc(reply), html=True)
     elif reply:
@@ -619,7 +642,8 @@ The conversation before it:
 
 Does this message tell the assistant something lasting about his business or his life that is worth remembering for
 future conversations: his customers, market, team, plans, priorities, deadlines, the people he works with, or how he
-likes things done? Not a rule for how the product should behave (those are kept elsewhere), not a question, not small
+likes things done, and how his business works (prices, offers, cut-off times, refund and cancellation terms, who does
+what). Not an instruction to change his software ("make the button blue", "add a page"), not a question, not small
 talk, not about one build. Today is {today}.
 
 What the assistant already keeps that may be related (numbered):
@@ -803,6 +827,7 @@ def read(ch, text):
     history = ch.recent() if hasattr(ch, 'recent') else ''
     return explain.ask_json(CLASSIFY.format(history=history, text=text)) or {}
 
+PULSE = {}   # Pulse running in the background now ({"running": True}), so two looks never overlap
 BUILD = {}   # the build running in the background: {'proc', 'goal', 'started', 'log'}
 CURRENT = {}   # the owner's chat, for news from a background build
 
@@ -1047,7 +1072,7 @@ Reply with the answer only."""
 
 LOOK = explain.plain(LOOK)
 
-ASK_CMD = os.environ.get('HIVE_LOOK_CMD', 'claude -p --output-format json --allowedTools Read Grep Glob Bash')
+ASK_CMD = os.environ.get('HIVE_LOOK_CMD', __import__('hive').claude_cmd(__import__('hive').READ_TOOLS))
 
 def _scratch(repo):
     """A throwaway copy of his project to read and run (the owner: no gaps; an answer can be checked by running it).
@@ -1622,7 +1647,7 @@ def run_plan(ch, repo, apply_build, wait=None):
     finally:
         PLAN['running'] = False
 
-def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=None):
+def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=None, origin='owner'):
     """Answer one message from the owner. apply_build(state, rule, ch) updates a build (hive.start.apply_ruling);
     start_build(repo, goal) runs a new build that reports to the phone (hive.start.start, overnight style);
     cloud(repo, on) makes a cloud machine and moves Hive there (on=True), or deletes it (hive.cloud_aws)."""
@@ -1665,6 +1690,10 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         got = {'intent': 'ship'}
     elif __import__('hive.brain', fromlist=['x']).DOC.search(text):   # a document about his business: learned
         got = {'intent': 'document'}
+    elif __import__('hive.voice', fromlist=['x']).PREF.search(text):   # "always reply in voice", "no voice replies" (P3)
+        got = {'intent': 'voice_pref'}
+    elif __import__('hive.pulse', fromlist=['x']).is_setting(text):   # "quiet hours 10 pm to 7 am", "pulse" (P2)
+        got = {'intent': 'pulse_set'}
     elif FORGET_SURE.search(low) or (FORGET_THAT.search(low) and time.time() - LAST_KEPT.get('at', 0) < 600 and
                                       not (_building() or '').startswith('A build is running')):   # memory 2.0
         got = {'intent': 'forget'}
@@ -1689,7 +1718,25 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     else:
         got = fast_read(ch, text) or read(ch, text)   # half a second when the trained reader is sure, else Claude
     intent, rule = got.get('intent', 'reply'), (got.get('rule') or text).strip()
+    from . import tools   # the one check before any action (hive/tools.py): outside words never act; actions audited
+    try:
+        tools.allow(intent, origin, text)
+    except tools.Refused as e:
+        ch.send('🐝 ' + telegram.esc(str(e)), html=True)
+        return 'refused'
     who = _who(ch)
+    if intent == 'voice_pref':
+        from . import voice
+        said = voice.set_from(text)
+        if voice.provider() is None and voice.preference() != 'never':
+            said += (' (This computer has no voice yet: pip install "hive-swarm[speech]", or set HIVE_TTS_KEY for a '
+                     'speech API.)')
+        ch.send('🐝 ' + telegram.esc(said), html=True)
+        return 'voice_pref'
+    if intent == 'pulse_set':
+        from . import pulse
+        ch.send('🐝 ' + telegram.esc(pulse.set_from(text) or pulse.status_line()), html=True)
+        return 'pulse_set'
     if intent == 'memory_ask':
         return memory_ask(ch, repo, text)
     if intent == 'forget':
@@ -2083,9 +2130,9 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
     except (OSError, ValueError):
         pass
     CURRENT['ch'] = ch   # a background build reports its problems here
-    try:   # the meaning model loads in the background, so his first question is not kept waiting (hive/embed.py)
-        from . import embed
-        embed.warm()
+    try:   # the meaning model and the local voice load in the background: no reply waits on either
+        from . import embed, voice
+        embed.warm(); voice.warm()
     except Exception:
         pass
     try:   # work his computer handed over before he shut it ("I'm sleepy" -> to the cloud): pick it up now
@@ -2106,18 +2153,46 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
                     ch.send('⏱ The two-hour test is over. ' + telegram.esc(trydeploy.down(repo)), html=True)
             except Exception as e:
                 print(f'Could not take the test page down: {e!r}', flush=True)
+            try:   # once a week: near-duplicate facts folded into the newest, forgotten ones removed from the file
+                from . import store
+                if store.tidy_due(memory.project_key(repo)) and not telegram.busy_elsewhere():
+                    store.tidy(memory.project_key(repo)); store.purge_forgotten()
+            except Exception as e:
+                print(f'Could not tidy the memory: {e!r}', flush=True)
             try:   # the morning brief, unprompted, once a day
                 from . import brief
                 if brief.due() and not telegram.busy_elsewhere():
                     brief.send(ch, repo)
             except Exception as e:
                 print(f'Could not send the brief: {e!r}', flush=True)
+            try:   # Pulse: every few minutes, in the background, what needs him is found and said (hive/pulse.py)
+                from . import pulse
+                if pulse.due() and not PULSE.get('running'):
+                    def _pulse():
+                        PULSE['running'] = True
+                        try:
+                            pulse.tick(ch, repo)
+                        except Exception as e:
+                            print(f'Pulse: {e!r}', flush=True)
+                        finally:
+                            PULSE['running'] = False
+                    import threading
+                    threading.Thread(target=_pulse, daemon=True).start()
+            except Exception as e:
+                print(f'Could not start Pulse: {e!r}', flush=True)
             if telegram.busy_elsewhere():
                 time.sleep(poll); continue   # a build or review is talking to the owner: step aside
             try:
                 batch = ch.updates(timeout=poll)
             except Exception as e:   # never go silent on the owner: report, wait, listen again
                 print(f'Telegram error, retrying: {e}', flush=True); time.sleep(poll); continue
+            for _, data, _ in batch:   # a tap on a Pulse alert (Got it, Reply, In an hour)
+                if data and data.startswith('pls|'):
+                    try:
+                        from . import pulse
+                        pulse.tap(ch, data, repo, poll)
+                    except Exception as e:
+                        print(f'Could not handle the alert tap: {e!r}', flush=True)
             texts, repeated = coalesce([t for t, _, _ in batch if t])
             if repeated and texts:   # he had to say it more than once: Hive was slow or away
                 try:

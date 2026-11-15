@@ -175,7 +175,9 @@ def _text_of_file(path):
 # -- databases: read-only, one SELECT at a time --
 
 FORBIDDEN = re.compile(r'\b(insert|update|delete|drop|alter|create|truncate|grant|revoke|copy|attach|detach|pragma|'
-                       r'vacuum|call|exec|execute|merge|replace|lock|set|reindex|comment|into|load|outfile|dumpfile|'
+                       # REPLACE( is the string function, a column may be called set or comment: a statement that
+                       # writes with them cannot start a single SELECT (the audit, Nov 15: they refused real reads)
+                       r'vacuum|call|exec|execute|merge|replace(?!\s*\()|lock|reindex|into|load|outfile|dumpfile|set_config|'
                        r'handler|rename|analyze|refresh|listen|notify|begin|commit|rollback|savepoint|release|'
                        # functions that act rather than read (stop sessions, sleep, touch files, reach other servers)
                        r'pg_terminate_backend|pg_cancel_backend|pg_reload_conf|pg_rotate_logfile|pg_sleep\w*|pg_read_\w+|'

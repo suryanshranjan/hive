@@ -3,6 +3,7 @@ more creators signing up this month"); Claude reads his product in a throwaway c
 proposes 2-4 changes in his words, each with the precise instruction its builder gets and, only where needed, the one
 decision only he can make. Hive then builds them one after another on one branch (hive/assistant.py pursue)."""
 import json, os, re, shutil, subprocess
+from . import claude_cmd, READ_TOOLS
 
 PLAN = """You are the business owner's assistant, planning how to reach a goal he has for his product. You are in a
 throwaway copy of his product: read the code (pages, flows, wording) to find what actually stands in the way of his
@@ -57,7 +58,7 @@ at most 2 questions for him. Treat the panel as a way to think, not as evidence.
 {{"panel": [{{"who": "...", "says": "..."}}], "changed": "one sentence: what the panel changed in the plan, or 'nothing'",
   "finding": "...", "steps": [same fields as before]}}"""
 
-CMD = os.environ.get('HIVE_PLAN_CMD', 'claude -p --output-format json --allowedTools Read Grep Glob Bash')
+CMD = os.environ.get('HIVE_PLAN_CMD', claude_cmd(READ_TOOLS))
 
 # What only he knows (BRAIN §8 item 5; Gate 115). 'one': one question when the planner suspects something (since Gate
 # 106). 'three': the planner lists what its plan silently assumes about his business that nothing it saw can confirm,

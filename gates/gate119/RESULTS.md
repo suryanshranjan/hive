@@ -31,3 +31,17 @@ The open question for a later gate is whether the rule path and the notes path a
   - A reply never waits for the model: it loads in the background when Hive starts, and until then recall uses words alone.
   - The model is downloaded once per machine (`HIVE_MODELS`; on Render, the disk).
 - **One call per message for memory:** the fact, its kind and person, and which kept facts it replaces. The separate REPLACES call is gone.
+
+## Check after the fix (the same live set; not a new registered gate)
+
+The owner said "fix everything left". REMEMBER now keeps how his business works (prices, offers, cut-off times, refund and cancellation terms). It still leaves instructions to change his software to the rules path.
+
+On the same 10 messages, 4 controls and 6 changes (`results_live2_after_policy_fix.json`; the registered run stays in `results_live2.json`):
+- first messages kept **10/10**;
+- changes kept **6/6**;
+- old facts replaced **6/6**;
+- controls untouched **4/4**;
+- answer in context **10/10**;
+- **$0.39**.
+
+It was one run on a set that was already seen, so it confirms the fix works; it is not fresh evidence.

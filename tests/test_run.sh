@@ -74,4 +74,8 @@ swarm.prepare('$TW/later', '$TW/runlater', 2, 'Add refunds and invoices.', 40, N
 check "a later build names its own areas, not the earlier goal's" "$(grep -c 'refund_rules' $T/runlater/prompts/w1.md) $(grep -c 'creator_fees' $T/runlater/prompts/w1.md)" "1 0"
 check "areas named from the goal's parts are on the shared branch and in the prompt" \
   "$(git -C $T/runareas/work/w1 show HEAD:.hive/config.json | grep -c 'creator_fees') $(grep -c 'the goal.s part \"Payouts\"' $T/runareas/prompts/w2.md)" "2 1"
+# past his monthly cap, no more builders start (the audit, Nov 15: the cap only warned before a build)
+mkdir -p $T/bh/.hive && echo '{"monthly": 1}' > $T/bh/.hive/budget.json
+HOME=$T/bh USERPROFILE=$(cd $T/bh && (pwd -W 2>/dev/null || pwd)) HIVE_WORKER_CMD="sh $HIVE/tests/fake_costly_worker.sh" $PY -m hive run --repo $T/project --run $T/runcap --workers 3 --max-parallel 1 --goal "x y z" > $T/runcap.out 2>&1
+check "past the cap: said once, and the other builders never start"   "$(grep -c "not starting more builders" $T/runcap.out) $(tail -n +2 $T/runcap/agents.csv | wc -l | tr -d ' ')" "1 1"
 rm -rf $T; exit $fail

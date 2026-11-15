@@ -8,11 +8,11 @@ the whole sheet lost them, and 30 hand-picked cases left parts unshown. Gate 58 
 correction applied alone and re-shown. With the same skimming owner, the sheet then stated 9 of 25 decisions right
 against 4 after the list alone, hidden tests 58.8% against 43.2%, and he confirmed 9 of 10 corrected cases on re-show."""
 import json, os, re, shutil, subprocess, tempfile
+from . import claude_cmd, READ_TOOLS
 
 from . import argv, explain, telegram
 
-CMD = os.environ.get('HIVE_SPOT_CMD', 'claude -p --output-format json --permission-mode acceptEdits '
-                                      '--allowedTools Bash Read Write Glob Grep')
+CMD = os.environ.get('HIVE_SPOT_CMD', claude_cmd(('Bash', 'Read', 'Write', 'Glob', 'Grep'), edits=True))
 
 BRIEF = """You are preparing quick spot checks for a busy business owner. The folder {code} holds his product's code, just
 built for this feature:

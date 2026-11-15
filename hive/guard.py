@@ -117,7 +117,8 @@ def main_snapshot(cfg):
         tar.extractall(d)                     # older Pythons: the archive is our own git tree, so no filter is needed
     for link in cfg.get('snapshot_links', []):
         if os.path.exists(link) and not os.path.exists(os.path.join(d, link)):
-            os.symlink(os.path.abspath(link), os.path.join(d, link))
+            from . import link as _link
+            _link(os.path.abspath(link), os.path.join(d, link))
     return d
 
 # ---------------------------------------------------------------- the cache, keyed by code content

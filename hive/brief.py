@@ -71,6 +71,13 @@ def facts(repo, since):
                              "failed" + (f", {v['refunded']:.2f} refunded" if v['refunded'] else ''))
         except Exception:
             pass
+    try:   # what Pulse kept for the digest: below his line, or found in quiet hours (hive/pulse.py)
+        from . import pulse
+        waited = pulse.digest()
+        if waited:
+            lines.append('Noticed while you were away or busy: ' + '; '.join(waited[:6]))
+    except Exception:
+        pass
     return lines
 
 def compose(repo, ch=None, since=None):

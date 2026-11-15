@@ -15,6 +15,11 @@ CONNECT_MAIL = re.compile(CONNECT + r"\b(e-?mails?|mail ?box|inbox|gmail|zoho ?m
                           r"^\s*(connect|link) (e-?mail|gmail|mail|inbox)\b", re.I)
 CONNECT_CAL = re.compile(CONNECT + r"\b(calendar|google calendar)\b|^\s*(connect|link) (google )?calendar\b", re.I)
 CONNECT_PAY = re.compile(CONNECT + r"\b(stripe|razorpay)\b|^\s*(connect|link) (stripe|razorpay)\b", re.I)
+CONNECT_GOOGLE = re.compile(r"\b(connect|link|set ?up|sign in to|use)\b.{0,12}\b(my |our )?(google|gmail and calendar|"
+                            r"google (account|workspace))\b|^\s*disconnect google\b", re.I)
+GOOGLE_CODE = re.compile(r'https?://127\.0\.0\.1:8765/?\?\S*(code|error)=\S+', re.I)
+ADD_EVENT = re.compile(r"^\s*(please\s+)?(put|add|schedule|book|block|set up|create)\b.{1,80}\b(on|in|to) (my|our|the) "
+                       r"(google )?calendar\b|^\s*(schedule|book) (a |an )?(call|meeting|slot)\b", re.I)
 KEYS = re.compile(r'\b(sk|rk)_(live|test)_\w{8,}|\brzp_(live|test)_\w{6,}', re.I)
 REPLY = re.compile(r"^\s*(please\s+)?(reply|respond|write back|answer|email back|mail back)\b.{0,60}", re.I)
 MAIL = re.compile(r"\b(e-?mails?|mails?|inbox|mail ?box|wrote to me|emailed|anyone write|who wrote)\b", re.I)
@@ -29,8 +34,14 @@ BUILD = re.compile(r"^\s*(please\s+)?(add|build|make|create|change|fix|remove|pu
 
 def route(text, repo):
     """'connect_mail', 'connect_cal', 'connect_pay', 'reply_mail', 'mail', 'cal', 'pay', or None."""
+    if GOOGLE_CODE.search(text):
+        return 'google_code'
+    if CONNECT_GOOGLE.search(text):
+        return 'connect_google'
     if KEYS.search(text) or CONNECT_PAY.search(text):
         return 'connect_pay'
+    if ADD_EVENT.search(text):
+        return 'add_event'
     if calendar_.ICS.search(text) or CONNECT_CAL.search(text):
         return 'connect_cal'
     if CONNECT_MAIL.search(text):
@@ -182,6 +193,10 @@ def handle(ch, repo, text, poll, kind=None):
         return connect_cal(ch, repo, text, poll)
     if kind == 'connect_pay':
         return connect_pay(ch, repo, text, poll)
+    if kind in ('connect_google', 'google_code'):
+        return connect_google(ch, repo, text, poll)
+    if kind == 'add_event':
+        return add_event(ch, repo, text, poll)
     if kind == 'reply_mail':
         return reply_mail(ch, repo, text, poll)
     mod = {'mail': mail, 'cal': calendar_, 'pay': payments}.get(kind)
@@ -195,6 +210,72 @@ def handle(ch, repo, text, poll, kind=None):
         r = {'ok': False, 'say': f"I couldn't reach it just now ({str(e)[:100]})."}
     ch.send(('📧 ' if kind == 'mail' else '📅 ' if kind == 'cal' else '💳 ') + telegram.esc(r['say']), html=True)
     return kind + ('_answered' if r.get('ok') else '_failed')
+
+GOOGLE_STEPS = ("🔐 <b>Connecting Google takes two minutes, once.</b> Gmail's permissions need your own sign-in app:\n"
+                "1. console.cloud.google.com → a new project → APIs &amp; Services → enable <b>Gmail API</b>, "
+                "<b>Google Calendar API</b> and <b>Google Drive API</b>.\n"
+                "2. OAuth consent screen: External, and add yourself as a <b>test user</b>.\n"
+                "3. Credentials → Create credentials → OAuth client ID → <b>Desktop app</b>.\n"
+                "Then send me its <b>client ID</b> and <b>client secret</b> in one message. I delete it as soon as I've read "
+                "it, and keep them encrypted on this computer.")
+
+def connect_google(ch, repo, text, poll):
+    """His Google account, from his phone (hive/google.py)."""
+    from . import google
+    if re.search(r'^\s*disconnect google', text, re.I):
+        google.forget(); ch.send('Google is disconnected; its tokens are gone from this computer.'); return 'google_off'
+    if GOOGLE_CODE.search(text):   # he pasted the address Google sent him to
+        ok, said = google.finish(GOOGLE_CODE.search(text).group(0))
+        ch.forget(GOOGLE_CODE.search(text).group(0))
+        ch.send(('✅ ' if ok else '⚠️ ') + telegram.esc(said), html=True); return 'google_connected' if ok else 'google_failed'
+    if not google.has_client():
+        got = _ask(ch, poll, GOOGLE_STEPS, [[('Not now', 'off|no')]])
+        if not got:
+            return 'not_connected'
+        cid = re.search(r'[\w-]+\.apps\.googleusercontent\.com', got)
+        sec = re.search(r'\bGOCSPX-[\w-]+|\bsecret\W+(\S{16,})', got)
+        ch.forget(got)
+        if not (cid and sec):
+            ch.send("I couldn't find both the client ID (…apps.googleusercontent.com) and the secret (GOCSPX-…) in that. "
+                    'Say "connect google" to try again.'); return 'not_connected'
+        google.set_client(cid.group(0), sec.group(0) if sec.group(0).startswith('GOCSPX') else sec.group(1))
+    ch.send("🔗 <b>Open this, sign in and allow.</b> Google will then open a page that doesn't load: copy that page's "
+            "address and send it to me.", html=True)
+    ch.send(google.sign_in_link())
+    return 'google_link_sent'
+
+EVENT = """A business owner asked his assistant to put something on his calendar: "{text}"
+Now it is {now} ({tz}). Reply with JSON only: {{"title": "...", "start": "YYYY-MM-DDTHH:MM", "minutes": 30,
+"where": "", "guests": ["email addresses he named, if any"]}}. If the day or time is not clear, {{"unclear": "one short
+question"}}."""
+
+def add_event(ch, repo, text, poll):
+    """"Put the tasting with Asha on my calendar tomorrow at 3": shown, added on his yes, once."""
+    from . import explain, google
+    import datetime as dt, time as _t
+    if not google.connected('calendar'):
+        ch.send('Your calendar is read-only for me now. Say "connect google" so I can add events (on your yes).')
+        return 'add_event_no_google'
+    got = explain.ask_json(EVENT.format(text=text, now=dt.datetime.now().strftime('%A %d %B %Y, %H:%M'),
+                                        tz=_t.strftime('%Z'))) or {}
+    if got.get('unclear') or not got.get('start'):
+        ch.send('📅 ' + telegram.esc(got.get('unclear') or 'When should it be?'), html=True); return 'add_event_unclear'
+    start = dt.datetime.fromisoformat(got['start']); end = start + dt.timedelta(minutes=int(got.get('minutes') or 30))
+    guests = [g for g in got.get('guests') or [] if ADDRESS.fullmatch(g or '')]
+    clash = google.busy(start, end)
+    ch.send(f"📅 <b>{telegram.esc(got.get('title') or 'Event')}</b>, {start:%a %d %b, %H:%M}-{end:%H:%M}" +
+            (f" at {telegram.esc(got['where'])}" if got.get('where') else '') +
+            (f"\nInvites go to {telegram.esc(', '.join(guests))}." if guests else '') +
+            (f"\n⚠️ Already then: {telegram.esc(', '.join(clash))}." if clash else '') + '\n\nAdd it?', html=True,
+            buttons=[[('📅 Add it', 'evt|yes'), ("Don't", 'evt|no')]])
+    kind, said = telegram._wait(ch, poll, {'evt|yes', 'evt|no'})
+    if not (said == 'evt|yes' or (kind == 'text' and (said or '').strip().lower() in ('yes', 'add it', 'haan', 'ok'))):
+        ch.send('Very good. Nothing was added.'); return 'add_event_no'
+    from . import tools
+    tools.allow('add_event', 'owner', got.get('title', ''))
+    ok, link = google.add_event(got.get('title') or 'Event', start, end, got.get('where') or '', guests)
+    ch.send('✅ Added to your calendar.' + (' (It was already there.)' if link == 'already added' else ''))
+    return 'event_added'
 
 def summary(repo):
     """What of his office Hive can see, for what it tells the model about him."""

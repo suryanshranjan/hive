@@ -24,6 +24,8 @@ For the owner:
   hive cloud pull [--from user@host]     bring the result branches back
   hive secrets [migrate|keychain]        where your keys are kept; encrypt them now; keep the key in the keychain
   hive audit [n]                         the last things Hive did outside this computer (mail sent, live, PRs)
+  hive google [setup|forget]             Gmail, Google Calendar and Drive through Google's own API
+  hive pulse [once|status]               watch mail, calendar, payments, deadlines; tell you what needs you
   hive memory [list|search <words>|people|forget <id>|export [file]|purge]   what Hive knows about you and your business
 
 Step by step (scripts and experiments):
@@ -170,6 +172,8 @@ def build_parser():
     lm = sub.add_parser('llm'); lm.add_argument('action', choices=['setup', 'api'])
     sub.add_parser('name').add_argument('name', nargs='*')
     sub.add_parser('pace').add_argument('choice', nargs='?', choices=['fast', 'cheap'])
+    gg = sub.add_parser('google'); gg.add_argument('action', nargs='?', choices=['setup', 'forget'])
+    pu = sub.add_parser('pulse'); pu.add_argument('action', nargs='?', choices=['once', 'status'])
     mm = sub.add_parser('memory'); mm.add_argument('action', nargs='?', choices=['list', 'search', 'people', 'forget',
                                                                                   'export', 'purge'])
     mm.add_argument('arg', nargs='*')
@@ -328,6 +332,12 @@ def main(argv=None):
                'cheap': 'Cheap: I use one builder (the lowest cost, slower).'}.get(p, 'Not chosen yet: I use as many '
               'builders as help, and ask you once at the next build.') + ' Change it with `hive pace fast` or `hive pace cheap`.')
         return 0
+    if a.cmd == 'google':
+        from . import google
+        return google.main([a.action] if a.action else [])
+    if a.cmd == 'pulse':
+        from . import pulse
+        return pulse.main([a.action] if a.action else [])
     if a.cmd == 'memory':
         from . import store
         return store.cli('.', a.action, ' '.join(a.arg) or None)

@@ -4,11 +4,11 @@ pull request), so "every test passes" means something. His own folder is never w
 
 Without it, Hive stopped: "Builders need tests to know when the work is right. Add some and run me again." """
 import json, os, shutil, subprocess, tempfile
+from . import claude_cmd, READ_TOOLS
 
 DIR = os.path.join(os.path.expanduser('~'), '.hive', 'safety')
 FOLDER = 'tests_hive'
-CMD = os.environ.get('HIVE_SAFETY_CMD', 'claude -p --output-format json --permission-mode acceptEdits '
-                                         '--allowedTools Bash Read Edit Write Glob Grep')
+CMD = os.environ.get('HIVE_SAFETY_CMD', claude_cmd(('Bash', 'Read', 'Edit', 'Write', 'Glob', 'Grep'), edits=True))
 
 NET = """This project has no tests. Before anyone changes it, write a safety net: tests that pin how the product behaves
 TODAY, so a later change that breaks something is caught.

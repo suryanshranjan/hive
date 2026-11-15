@@ -14,9 +14,19 @@ def _path(repo):
     return os.path.join(DIR, memory.project_key(repo) + '.json')
 
 def config(repo):
+    """His calendar: the secret iCal address, or {'kind': 'google'} when Google Calendar is connected through
+    Google's API (hive/google.py), which can also add events on his yes."""
     from . import vault
     got = vault.load_json(_path(repo), {})
-    return got if isinstance(got, dict) else {}
+    if isinstance(got, dict) and got:
+        return got
+    try:
+        from . import google
+        if google.connected('calendar'):
+            return {'kind': 'google'}
+    except Exception:
+        pass
+    return {}
 
 def _fetch(url):
     url = re.sub(r'^webcal://', 'https://', url)
@@ -40,49 +50,119 @@ def setup(repo, url):
 def _unfold(text):
     return re.sub(r'\r?\n[ \t]', '', text)
 
+def _zone(params):
+    """The time zone an iCal value names (TZID=Asia/Kolkata), or None."""
+    m = re.search(r'TZID=("?)([^;:"]+)\1', params or '')
+    if not m:
+        return None
+    try:
+        from zoneinfo import ZoneInfo
+        return ZoneInfo(m.group(2).strip())
+    except Exception:   # an unknown zone name (or no zone data on this machine): read as his own time, as before
+        return None
+
 def _when(value, params=''):
-    """An iCal date or time as a local naive datetime (all-day events at midnight)."""
+    """An iCal date or time as his local naive datetime (all-day events at midnight). A time in a named zone
+    (TZID=...) or in UTC (...Z) is turned into his time (the audit, Nov 15: a 3 pm New York call showed as 3 pm here)."""
     v = value.strip()
     if len(v) == 8:   # all day: 20261116
         return dt.datetime.strptime(v, '%Y%m%d'), True
     utc = v.endswith('Z')
     t = dt.datetime.strptime(v.rstrip('Z')[:15], '%Y%m%dT%H%M%S')
-    if utc:
-        t = t.replace(tzinfo=dt.timezone.utc).astimezone().replace(tzinfo=None)
+    zone = dt.timezone.utc if utc else _zone(params)
+    if zone is not None:
+        t = t.replace(tzinfo=zone).astimezone().replace(tzinfo=None)
     return t, False
 
+DAYS = {'MO': 0, 'TU': 1, 'WE': 2, 'TH': 3, 'FR': 4, 'SA': 5, 'SU': 6}
+
+def _occurrences(start, rule, stop):
+    """The start times of a repeating event up to stop: DAILY, WEEKLY (with BYDAY and INTERVAL), MONTHLY (same day of
+    the month), YEARLY; COUNT and UNTIL honoured. Anything else: the first time only."""
+    freq = re.search(r'FREQ=(\w+)', rule)
+    if not freq or freq.group(1) not in ('DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY'):
+        return [start]
+    every = int(re.search(r'INTERVAL=(\d+)', rule).group(1)) if 'INTERVAL=' in rule else 1
+    count = int(re.search(r'COUNT=(\d+)', rule).group(1)) if 'COUNT=' in rule else 10 ** 6
+    until = re.search(r'UNTIL=(\d{8}(T\d{6}Z?)?)', rule)
+    if until:
+        stop = min(stop, _when(until.group(1))[0] if len(until.group(1)) > 8 else
+                   _when(until.group(1))[0] + dt.timedelta(days=1, seconds=-1))
+    by = re.search(r'BYDAY=([^;]+)', rule)
+    byday = [DAYS[d] for d in re.findall(r'(MO|TU|WE|TH|FR|SA|SU)', by.group(1))] if by else []
+    out, n, f = [], 0, freq.group(1)
+    if f == 'WEEKLY' and byday:
+        week = start - dt.timedelta(days=start.weekday())
+        while week <= stop and n < count:
+            for d in sorted(set(byday)):
+                t = week + dt.timedelta(days=d)
+                t = t.replace(hour=start.hour, minute=start.minute, second=start.second)
+                if start <= t <= stop and n < count:
+                    out.append(t); n += 1
+            week += dt.timedelta(weeks=every)
+        return out
+    t, k = start, 0
+    while t <= stop and n < count:
+        out.append(t); n += 1; k += 1
+        if f == 'DAILY':
+            t = start + dt.timedelta(days=every * k)
+        elif f == 'WEEKLY':
+            t = start + dt.timedelta(weeks=every * k)
+        else:   # the same day of the month (or year); a month without that day is skipped, as calendars do
+            while True:
+                months = (every * k) * (12 if f == 'YEARLY' else 1)
+                y, m = divmod(start.month - 1 + months, 12)
+                try:
+                    t = start.replace(year=start.year + y, month=m + 1); break
+                except ValueError:
+                    k += 1
+    return out
+
 def events_from(ics, horizon_days=60):
-    """The events in an iCal text: [{'title', 'start', 'end', 'all_day', 'where', 'notes'}], weekly and daily repeats
-    expanded up to horizon_days ahead (the common ones; others are shown once)."""
-    out = []
+    """The events in an iCal text: [{'title', 'start', 'end', 'all_day', 'where', 'notes'}], repeats expanded up to
+    horizon_days ahead, dates he removed from a series (EXDATE) left out, and a moved occurrence (RECURRENCE-ID) shown
+    at its new time instead of the old one."""
+    out, moved = [], {}
+    blocks = []
     for block in re.findall(r'BEGIN:VEVENT(.*?)END:VEVENT', _unfold(ics), re.S):
-        f = {}
+        f, exdates = {}, set()
         for line in block.strip().splitlines():
             if ':' not in line:
                 continue
             k, v = line.split(':', 1)
             name, _, params = k.partition(';')
+            if name.upper() == 'EXDATE':
+                for x in v.split(','):
+                    try:
+                        exdates.add(_when(x, params)[0])
+                    except ValueError:
+                        pass
+                continue
             f.setdefault(name.upper(), (v, params))
+        blocks.append((f, exdates))
+        if 'RECURRENCE-ID' in f:   # one occurrence of a series, changed or cancelled: replaces the original time
+            try:
+                moved.setdefault(f.get('UID', ('',))[0], set()).add(_when(*f['RECURRENCE-ID'])[0])
+            except ValueError:
+                pass
+    now = dt.datetime.now()
+    unesc = lambda s: s.replace('\\n', '\n').replace('\\,', ',').replace('\\;', ';')
+    for f, exdates in blocks:
         if 'DTSTART' not in f or f.get('STATUS', ('',))[0].upper() == 'CANCELLED':
             continue
-        start, all_day = _when(*f['DTSTART'])
-        end = _when(*f['DTEND'])[0] if 'DTEND' in f else start + (dt.timedelta(days=1) if all_day else dt.timedelta(hours=1))
-        unesc = lambda s: s.replace('\\n', '\n').replace('\\,', ',').replace('\\;', ';')
+        try:
+            start, all_day = _when(*f['DTSTART'])
+            end = _when(*f['DTEND'])[0] if 'DTEND' in f else start + (dt.timedelta(days=1) if all_day else dt.timedelta(hours=1))
+        except ValueError:
+            continue
         ev = {'title': unesc(f.get('SUMMARY', ('(no title)',))[0]), 'start': start, 'end': end, 'all_day': all_day,
               'where': unesc(f.get('LOCATION', ('',))[0]), 'notes': unesc(f.get('DESCRIPTION', ('',))[0])[:300]}
         rule = f.get('RRULE', ('',))[0].upper()
-        m = re.search(r'FREQ=(DAILY|WEEKLY)', rule)
-        if m:
-            step = dt.timedelta(days=1 if m.group(1) == 'DAILY' else 7)
-            until = re.search(r'UNTIL=(\d{8}(T\d{6}Z?)?)', rule)
-            stop = min(_when(until.group(1))[0] if until else dt.datetime.max,
-                       dt.datetime.now() + dt.timedelta(days=horizon_days))
-            count = int(re.search(r'COUNT=(\d+)', rule).group(1)) if 'COUNT=' in rule else 10 ** 6
-            t, k = start, 0
-            while t <= stop and k < count:
-                if t >= dt.datetime.now() - dt.timedelta(days=1):
+        if rule and 'RECURRENCE-ID' not in f:
+            skip = exdates | moved.get(f.get('UID', ('',))[0], set())
+            for t in _occurrences(start, rule, now + dt.timedelta(days=horizon_days)):
+                if t not in skip and t >= now - dt.timedelta(days=1):
                     out.append(dict(ev, start=t, end=t + (end - start)))
-                t += step; k += 1
         else:
             out.append(ev)
     return sorted(out, key=lambda e: e['start'])
@@ -94,6 +174,9 @@ def events(repo, days=7, back=0):
         return None
     now = dt.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     lo, hi = now - dt.timedelta(days=back), now + dt.timedelta(days=days + 1)
+    if cfg.get('kind') == 'google':
+        from . import google
+        return [e for e in google.events(days=days, back=back) if lo <= e['start'] < hi]
     return [e for e in events_from(_fetch(cfg['url'])) if lo <= e['start'] < hi]
 
 def _line(e):
@@ -129,4 +212,6 @@ def today_lines(repo):
     return [_line(e) for e in evs or []]
 
 def summary(repo):
-    return 'His calendar (read-only)' if config(repo) else ''
+    cfg = config(repo)
+    return ('His Google Calendar (events added only on his yes)' if cfg.get('kind') == 'google' else
+            'His calendar (read-only)' if cfg else '')

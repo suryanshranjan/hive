@@ -112,6 +112,19 @@ check('a password he sent by mistake is taken out of the archive', 'hunter22' in
 store.add_fact('Owner two sells shoes.', 'note', P, owner='o2')
 check('one owner\'s facts are not another\'s', (any('shoes' in f['text'] for f in recall.recall(repo, 'shoes')),
       [f['text'] for f, _ in store.search('shoes', P, owner='o2')]), (False, ['Owner two sells shoes.']))
+# 10b. the weekly tidy: the same fact twice in other words becomes one; different numbers stay apart
+os.environ['HIVE_EMBED'] = '0'
+t1 = store.add_fact('Rice comes from Annapurna Mills every Thursday.', 'note', P, when=time.time() - 100)
+t2 = store.add_fact('Rice comes from Annapurna Mills, every Thursday', 'note', P)
+p1 = store.add_fact('The trial plan is Rs 699.', 'note', P, when=time.time() - 100)
+p2 = store.add_fact('The trial plan is Rs 799.', 'note', P)
+n = store.tidy(P)
+live_ids = {f['id'] for f in store.live_facts(P)}
+check('tidy: a twin is folded into the newer one; different numbers are not twins',
+      (n >= 1, t1 in live_ids, t2 in live_ids, p1 in live_ids and p2 in live_ids), (True, False, True, True))
+check('tidy: not due again for a week', store.tidy_due(P), False)
+os.environ.pop('HIVE_EMBED')
+
 # 11. by meaning, when the model is here (optional): "who brings our lentils?" finds the dal supplier
 from hive import embed
 if embed.available() and embed.wait(600):

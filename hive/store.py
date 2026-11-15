@@ -400,3 +400,46 @@ def cli(repo, action=None, arg=None):
         json.dump(out, open(dest, 'w', encoding='utf-8'), indent=1, ensure_ascii=False)
         print(f'Everything Hive keeps about this project and you, in {dest}.'); return 0
     print('hive memory [list|search <words>|people|forget <id>|export [file]|purge]'); return 1
+
+# ------------------------------------------------------------------------------------------------- the weekly tidy
+
+TIDY_DAYS = 7
+
+def _key_words(text):
+    stop = {'the', 'a', 'an', 'is', 'are', 'our', 'his', 'her', 'he', 'we', 'it', 'of', 'to', 'in', 'on', 'for', 'and',
+            'at', 'by', 'with', 'from', 'business', 'has', 'have', 'was', 'be', 'that', 'this'}
+    return frozenset(w for w in re.findall(r'\w+', (text or '').lower()) if w not in stop)
+
+def tidy(project, owner=OWNER, close=0.95):
+    """Fold near-duplicate facts into the newest one (the same fact said twice in other words: "Rice comes from
+    Annapurna Mills every Thursday." and "Rice comes from Annapurna Mills on Thursdays."). The older is kept for the
+    record, marked as replaced, so recall shows one. Same words, or meaning at least `close` when the embedding model
+    is loaded. Rules are left alone. Returns how many were folded."""
+    facts = [f for f in live_facts(project, owner=owner) if f['kind'] != 'rule']
+    folded = 0
+    by_words = {}
+    for f in sorted(facts, key=lambda f: f['created']):   # oldest first: a later twin replaces it
+        k = (f['kind'], f.get('person_id'), _key_words(f['text']))
+        if k in by_words:
+            supersede(by_words[k]['id'], f['id']); folded += 1
+        by_words[k] = f
+    from . import embed
+    if embed.available() and embed.ready():
+        live = [f for f in live_facts(project, owner=owner) if f['kind'] != 'rule']
+        if len(live) > 1:
+            import numpy as np
+            vecs = embed.vectors([f['text'] for f in live]); m = np.stack(vecs); sims = m @ m.T
+            gone = set()
+            order = sorted(range(len(live)), key=lambda i: live[i]['created'])
+            for a_i, a in enumerate(order):
+                for b in order[a_i + 1:]:
+                    if a in gone:
+                        break
+                    if (sims[a, b] >= close and live[a]['kind'] == live[b]['kind'] and
+                            re.findall(r'\d+', live[a]['text']) == re.findall(r'\d+', live[b]['text'])):
+                        supersede(live[a]['id'], live[b]['id']); gone.add(a); folded += 1
+    put(f'tidied:{project}', time.time(), owner)
+    return folded
+
+def tidy_due(project, owner=OWNER):
+    return time.time() - (get(f'tidied:{project}', 0, owner) or 0) > TIDY_DAYS * 86400

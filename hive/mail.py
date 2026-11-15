@@ -34,9 +34,19 @@ def _path(repo):
     return os.path.join(DIR, memory.project_key(repo) + '.json')
 
 def config(repo):
+    """His mailbox: IMAP and SMTP settings, or {'kind': 'google'} when his Gmail is connected through Google's API
+    (hive/google.py) and no IMAP mailbox is set."""
     from . import vault
     got = vault.load_json(_path(repo), {})
-    return got if isinstance(got, dict) else {}
+    if isinstance(got, dict) and got:
+        return got
+    try:
+        from . import google
+        if google.connected('gmail'):
+            return {'kind': 'google', 'user': 'his Gmail'}
+    except Exception:
+        pass
+    return {}
 
 def guess(address, provider=None):
     """The servers for an address: a known provider by its domain or by name ("zoho", "godaddy"), else imap./smtp. at
@@ -108,6 +118,9 @@ def messages(repo, days=7, unread=False, words=None, n=30, folder='INBOX'):
     cfg = config(repo)
     if not cfg:
         return None
+    if cfg.get('kind') == 'google':   # Gmail through Google's API: the same shape, so everything reads it the same
+        from . import google
+        return google.messages(days=days, unread=unread, words=words, n=n)
     box = _imap(cfg)
     try:
         box.select(folder, readonly=True)   # EXAMINE: nothing he hasn't read is marked read
@@ -141,6 +154,9 @@ def messages(repo, days=7, unread=False, words=None, n=30, folder='INBOX'):
 def send(repo, to, subject, body, reply_to=None):
     """Send one message from his address (only ever after his yes). reply_to: the message replied to, kept in its
     thread. Returns (ok, why)."""
+    if config(repo).get('kind') == 'google':   # sent from his Gmail, once (hive/google.py's outbox)
+        from . import google
+        return google.send(to, subject, body, reply_to=reply_to)
     cfg = config(repo)
     if not cfg:
         return False, 'no mailbox connected'

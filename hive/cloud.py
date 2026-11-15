@@ -29,7 +29,11 @@ class Target:
 
     def run(self, cmd, check=True):
         full = ['sh', '-c', cmd] if self.local else ['ssh'] + self.opts + [self.to, cmd]
-        p = subprocess.run(full, capture_output=True, text=True)
+        from . import run as _run
+        limit = _run.seconds('HIVE_REMOTE_SECONDS', 1800)   # a hung command there (a lost connection, an install
+        p = _run.run(full, limit)                            # waiting on a prompt) no longer holds Hive for ever
+        if p is None:
+            raise RuntimeError(f'on {self.to}: {cmd}: stopped after {int(limit)} s with no answer (HIVE_REMOTE_SECONDS)')
         if check and p.returncode != 0:
             raise RuntimeError(f'on {self.to}: {cmd}\n{p.stderr.strip()[:400]}')
         return p
@@ -39,7 +43,7 @@ class Target:
             os.makedirs(os.path.dirname(dst), exist_ok=True); shutil.copy2(src, dst)
         else:
             self.run(f'mkdir -p {shlex.quote(os.path.dirname(dst))}')
-            subprocess.run(['scp', '-q'] + self.opts + [src, f'{self.to}:{dst}'], check=True)
+            subprocess.run(['scp', '-q'] + self.opts + [src, f'{self.to}:{dst}'], check=True, timeout=1800)
 
     def get(self, src, dst):
         """Copy a file back from there; False if it is not there."""

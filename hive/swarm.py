@@ -11,7 +11,7 @@ import csv, json, os, shutil, subprocess, sys, time
 from . import argv, PY, codemap, config, law, owner
 from .guard import sh
 
-DEFAULT_CMD = 'claude -p --output-format json --permission-mode acceptEdits --allowedTools Bash Read Edit Write Glob Grep'
+DEFAULT_CMD = __import__('hive').claude_cmd(('Bash', 'Read', 'Edit', 'Write', 'Glob', 'Grep'), edits=True)
 
 # Any coding agent can be a builder (the owner: "Hive can work with any"). Each runs unattended in its own clone and
 # reads its instructions on stdin; agents that take the task as an argument get it from stdin through `sh -c`.
@@ -84,6 +84,8 @@ def _usage(path):
                 if line.startswith('{') and '"usage"' in line:
                     u = json.loads(line).get('usage') or {}
                     d = {'usage': {'input_tokens': u.get('input_tokens'), 'output_tokens': u.get('output_tokens')}}
+            if d:   # Codex says tokens, not dollars: priced here, so his monthly total counts Codex builders too
+                d['total_cost_usd'] = codex_cost(d['usage'].get('input_tokens'), d['usage'].get('output_tokens'))
         except Exception:
             pass
         if not d:
@@ -93,6 +95,28 @@ def _usage(path):
     err = d.get('api_error_status') or (('auth' if 'authenticat' in str(d.get('result', '')).lower() else 'error')
                                         if d.get('is_error') and d.get('terminal_reason') == 'api_error' else '')
     return tok or '', d.get('total_cost_usd', ''), err
+
+def codex_cost(inp, out):
+    """Dollars for Codex tokens, an estimate at HIVE_CODEX_PRICE ("input,output" dollars per million tokens; default
+    1.25,10, list prices as last known). The audit, Nov 15: Codex builds counted as $0 against his cap."""
+    try:
+        pin, pout = (float(x) for x in os.environ.get('HIVE_CODEX_PRICE', '1.25,10').split(','))
+    except ValueError:
+        pin, pout = 1.25, 10.0
+    return round((int(inp or 0) * pin + int(out or 0) * pout) / 1e6, 6)
+
+def over_budget(run_spent):
+    """A plain sentence when this run has taken the month past his cap by more than HIVE_BUDGET_OVERRUN (default 20%
+    over): no more builders are started or picked up. None otherwise, or when he set no cap."""
+    from . import budget
+    c = budget.cap()
+    if not c:
+        return None
+    total = budget.spent_month() + run_spent
+    if total <= c * float(os.environ.get('HIVE_BUDGET_OVERRUN', 1.2)):
+        return None
+    return (f"This month has reached ${total:.2f} against your ${c:g} limit, so I'm not starting more builders on this "
+            "build. What has landed is kept. Raise the limit (say: set my budget to ...) to carry on.")
 
 RESUME = ("\n\n# You are picking up again\n\nYou were stopped partway by Claude's usage limit; it has reset now. Your clone "
           "still has everything you did, and others may have landed work since. Read the end of your log, commit or "
@@ -226,7 +250,8 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
         for link in cfg.get('snapshot_links', []):   # dependency folders, shared read-only from the source checkout
             src, dst = os.path.join(repo, link), os.path.join(work, link)
             if os.path.exists(src) and not os.path.exists(dst):
-                os.symlink(src, dst)
+                from . import link as _link
+                _link(src, dst)
         text = (template.replace('{ME}', me).replace('{N}', str(workers)).replace('{WORK}', work).replace('{BRANCH}', b)
                 .replace('{LOG}', os.path.join(run, 'logs', f'{me}.log')).replace('{GOAL}', goal_text)
                 .replace('{TEST_CMD}', cfg['test_cmd']).replace('{AREAS}', _areas_text(cfg)).replace('{OWNER}', owner_text)
@@ -311,7 +336,7 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
         try:
             p.stdin.write(prompt)
             p.stdin.close()
-        except BrokenPipeError:
+        except OSError:   # BrokenPipeError; on Windows a builder that already exited gives EINVAL instead
             pass
         say(f'{"picked up" if attempts.get(me) else "launched"} {me}' + (f' ({builder_agent(k=kth(me))})' if len(agents()) > 1 else ''))
         first.setdefault(me, time.time())
@@ -319,12 +344,26 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
         return [me, time.time(), p, out]
 
     cap = max_parallel or len(queue); live = []; rows = []; waiting = []   # waiting: [(when, worker)]
+    told = []
+    def stop_for_budget():
+        """Past his monthly cap (plus the margin): say so once, and start nothing more (the audit, Nov 15: the cap
+        was advice before a build only, never a stop)."""
+        why = over_budget(sum(float(r.get('cost_usd') or 0) for r in rows) + sum(c for _, c in spent.values()))
+        if why and not told:
+            told.append(why); say(why)
+            for q in queue:
+                mark(q, state='budget')
+            queue.clear()
+        return bool(why)
     while queue and len(live) < cap:
         live.append(start(queue.pop(0)))
     while live or waiting:
         for when, me in list(waiting):   # usage limit has reset: the worker carries on in its own clone
             if time.time() >= when:
-                waiting.remove((when, me)); live.append(start(me))
+                waiting.remove((when, me))
+                if stop_for_budget():
+                    mark(me, state='budget'); continue
+                live.append(start(me))
         for item in list(live):
             me, t0, p, out = item
             if p.poll() is None:
@@ -351,8 +390,6 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
                     f"{me} stopped: Claude's usage limit was reached. I'll pick up again at "
                     f"{time.strftime('%H:%M', time.localtime(when))}; its work so far is kept.")
                 continue
-            if queue:
-                live.append(start(queue.pop(0)))
             t, c = spent.get(me, (0, 0.0))
             tok = (int(tok or 0) + t) or tok; cost = round(float(cost or 0) + c, 6) if (cost or c) else cost
             rows.append(dict(worker=me, agent=builder_agent(k=kth(me)), start=int(first[me]), end=int(time.time()),
@@ -362,6 +399,8 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
                  'timed out' if os.path.exists(os.path.join(run, 'out', f'{me}.timeout')) else 'finished',
                  ended=int(time.time()), exit=p.returncode)
             say(f'{me} finished: exit {p.returncode}, {rows[-1]["minutes"]} min, cost {cost}' + (f', API ERROR {err}' if err else ''))
+            if queue and not stop_for_budget():   # after its cost is counted, so the cap sees it
+                live.append(start(queue.pop(0)))
         time.sleep(2)
     if boxed:
         sandbox.forget_logins(run)   # the copies of the agents' logins go with the run

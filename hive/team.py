@@ -78,7 +78,8 @@ def board_text(run):
     if not rows:
         return ''
     word = {'working': 'working', 'finished': 'finished', 'stopped': 'stopped by you', 'queued': 'waiting to start',
-            'waiting': "paused until its agent's usage limit resets", 'timed out': 'stopped: it ran past its time limit'}
+            'waiting': "paused until its agent's usage limit resets", 'timed out': 'stopped: it ran past its time limit',
+            'budget': "not started: this month's budget is reached"}
     lines = []
     for r in rows:
         line = f"{r['name']} ({r['agent']}): {word.get(r['state'], r['state'])}"

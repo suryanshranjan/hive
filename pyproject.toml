@@ -16,7 +16,8 @@ voice = ["faster-whisper>=1.0"]
 api = ["anthropic>=1.0"]   # replies straight from the Anthropic API, streamed (hive llm api)
 data = ["psycopg[binary]>=3.1", "pymysql>=1.1", "openpyxl>=3.1", "pypdf>=4"]   # reading his Postgres, MySQL, Excel and PDF files
 secure = ["cryptography>=43", "keyring>=25"]
-memory = ["fastembed>=0.4"]   # recall by meaning, not only words (hive/embed.py; runs on this machine)   # his keys and passwords encrypted on disk (hive secrets); keychain optional
+memory = ["fastembed>=0.4"]
+speech = ["piper-tts>=1.3", "imageio-ffmpeg>=0.5"]   # Hive answers a voice note in voice (hive/voice.py), on this machine   # recall by meaning, not only words (hive/embed.py; runs on this machine)   # his keys and passwords encrypted on disk (hive secrets); keychain optional
 
 [project.scripts]
 hive = "hive.__main__:main"

@@ -37,4 +37,13 @@ check('a bad limit in the environment falls back to the default', run.seconds('H
 env = swarm.builder_env({'ANTHROPIC_API_KEY': 'a', 'OPENAI_API_KEY': 'o', 'TELEGRAM_BOT_TOKEN': 't', 'GITHUB_TOKEN': 'g',
                          'AWS_SECRET_ACCESS_KEY': 's', 'HIVE_MASTER_KEY': 'm', 'HIVE_FAST_KEY': 'f', 'PATH': '/bin'})
 check('builders: model keys and PATH kept, Hive\'s secrets removed', sorted(env), ['ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'PATH'])
+# Codex builds are priced, so they count against his cap; past it, no more builders are started (the audit, Nov 15)
+check('Codex tokens priced: 1M in, 100k out at the default 1.25/10', swarm.codex_cost(1_000_000, 100_000), 2.25)
+h = tempfile.mkdtemp(); os.environ['HOME'] = os.environ['USERPROFILE'] = h
+from hive import budget
+budget.PATH = os.path.join(h, '.hive', 'budget.json')
+check('no cap: never stops', swarm.over_budget(500), None)
+budget.set_cap(10)
+check('within the cap and its margin: carries on', swarm.over_budget(11.5), None)
+check('past it: a plain sentence, and no more builders', 'not starting more builders' in (swarm.over_budget(12.5) or ''), True)
 sys.exit(fail)

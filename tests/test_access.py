@@ -140,4 +140,11 @@ finally:
     builtins.__import__ = real_import; access.subprocess.run = real_run
 check('psql: the password is never on its command line',
       ('sup3rsecret' in ' '.join(seen.get('args', [])), (seen.get('env') or {}).get('PGPASSWORD')), (False, 'sup3rsecret'))
+# the guard refuses what writes, not ordinary reads that use REPLACE() or a column named set or comment (the audit)
+check('reads with REPLACE(), a set column, a comment column are allowed',
+      [bool(access.safe_sql(q)) for q in ("SELECT REPLACE(name, 'x', 'y') FROM t", 'SELECT "set", comment FROM orders',
+                                          'SELECT id FROM t WHERE comment IS NOT NULL')], [True, True, True])
+check('writing and settings are still refused',
+      [access.safe_sql(q) for q in ("REPLACE INTO t VALUES (1)", "SELECT set_config('x', 'y', false)",
+                                    'SELECT 1; DELETE FROM t', 'UPDATE t SET a = 1', "SELECT pg_sleep(10)")], [None] * 5)
 sys.exit(fail)
