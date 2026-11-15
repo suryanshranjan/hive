@@ -58,6 +58,13 @@ hive setup      # connects your phone (Telegram); then Hive says hello there
 
 **3. On your phone, say "set me up".** Hive asks whether you run a business, build a product, or are starting something new, and gets to know it in about two minutes. Everything after that happens in Telegram.
 
+### What it costs
+
+- **Claude:** Hive's builders run on Claude Code, so you need a Claude subscription (Pro or Max) or an Anthropic API account. That is the only thing you must pay for.
+- **Each job:** Hive tells you the price before it starts, and asks before going past your budget (*"set my budget to $50 a month"*). In the tests, a small change cost about $0.80, a three-step plan about $1.50 to $3, and answering from your data a few cents.
+- **Always on (optional):** a machine on your own AWS account, about $23 a month (small) or $72 (bigger). Or keep it on your computer for free.
+- **Hosting, mail, calendar, payments:** Hive uses the accounts you already have; it adds no fee of its own.
+
 Already have Python 3.10+, git and Claude Code? `pip install git+https://github.com/suryanshranjan/hive` is enough.
 
 <details>
@@ -130,7 +137,7 @@ These shaped Hive's design, and several went against what we expected.
 - **AI coding agents can build together without talking.** Swarms of up to 12 agents, coordinating only through git, finished projects of up to 1,340 tests, never gamed the tests, and rarely collided (Gates 1-3, 10). Giving them a message board added nothing (Gates 43, 44). *So Hive's builders work silently, behind a guard.*
 - **The limit isn't code, it's knowing what the owner wants.** On rules a model can't guess, swarms passed every visible example but only 35-58% of hidden tests (Gates 3-17).
 - **Examples the owner picks beat questions the agents ask.** Owner-chosen examples fixed 2.7 times as many errors as builder-chosen ones (Gate 13). On a real company's rules: 84.8% against 49.6% (Gates 18, 20).
-- **A real founder can't reliably state his own rules, but he can correct a description of what was built.** His answers to two framings of the same decision agreed 1 time in 8, and rules he confirmed didn't hold a day later (Gates 36-38). A plain sheet of what the code does, corrected by the owner, reached 99.6-100% (Gates 42, 44). *So Hive shows you what it built and asks about concrete situations, not abstract rules.*
+- **A real founder can't reliably state their own rules, but can correct a description of what was built.** The founder's answers to two framings of the same decision agreed 1 time in 8, and rules the founder confirmed didn't hold a day later (Gates 36-38). A plain sheet of what the code does, corrected by the owner, reached 99.6-100% (Gates 42, 44). *So Hive shows you what it built and asks about concrete situations, not abstract rules.*
 - **One agent that asks beat a team working from a hand-over,** by 21-30 points (Gates 66, 68). *So Hive's builders ask first.*
 - **A picture beats words for how something should look:** 18 of 18 checks against 13 of 18 (Gate 105). *So Hive takes "make it like this" with a picture.*
 - **Give it the business goal, not the task.** From "more sign-ups" alone, Hive found and built 8 of 9 planted problems, with 4 owner messages (Gate 106). It repeated this on a second mock company in another trade (Gate 113).
@@ -140,7 +147,7 @@ These shaped Hive's design, and several went against what we expected.
 
 - Most recent gates use a **simulated founder** answering from a written policy, on mock companies made by the same author.
 - Many results come from **one run per arm**.
-- The real test, **a founder using Hive on his own company**, hasn't happened yet. The office (mail, calendar, payments) has run on real protocols with test servers, not on real accounts.
+- The real test, **a founder using Hive on their own company**, hasn't happened yet. The office (mail, calendar, payments) has run on real protocols with test servers, not on real accounts.
 
 ---
 
@@ -163,7 +170,7 @@ Every result below was predicted on GitHub before the run. Real-company results 
 | Real Django issues | One builder 8/10; `hive start` 8/10 at 15× the cost. On technical goals Hive now acts like one builder | Gates 86, 89 |
 | Reliability and owner load | pass^5 held (10 of 10); owner prompts 55 → 23 per feature | Gates 93-104 |
 | Memory against silent drift; the owner's examples checked before delivery | 27-29 of 29 with memory (20, 29, 17 without); the check caught a refund sent the wrong way | Gates 101, 103 |
-| His picture vs his words for a look | 18/18 against 13/18; a blind judge preferred the picture 3 of 3; same cost | Gate 105 |
+| A picture vs words for a look | 18/18 against 13/18; a blind judge preferred the picture 3 of 3; same cost | Gate 105 |
 | Give it the business, not the task | 8 of 9 planted problems found and built from a goal alone, 4 owner messages | Gate 106 |
 | A fresh founder end to end (14 steps on the phone) | Runs 3 and 4 passed every step (about 13 min, $3). Run 1 found the plan never went live; fixed | Gate 107 |
 | Run a company's numbers through Hive | Onboarding in 0.3 min, 10 of 10 figure answers, a hidden ₹500 rule found in the payouts, screens on every device, a plan built (7.9 min, $0.76). Earlier runs found 2 faults, both fixed | Gate 108 |
