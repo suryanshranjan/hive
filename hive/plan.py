@@ -74,14 +74,24 @@ up to 3 that would change the plan most as "missing": a list of short plain ques
 thing in his words ("Can the kitchen take more weekend orders right now, or is it full?"), never a general "is
 there anything else?"; an empty list if the plan rests only on what you saw."""
 
+ASK_FIT = """Then check what this plan silently assumes about his business that nothing you saw can confirm. Look especially
+at: whether he can serve more of what the plan pushes (full batches, staff, stock, capacity); deals, discounts or
+promises that live outside the site; anything he is about to start, stop or change; the real reason customers stay or
+leave, when the pages only show a symptom; who on his team does what. Ask only where his answer
+would change a step (what it builds, or whether it is built at all); never to confirm what the plan already does. Put
+those as "missing": a list of at most 3 short plain questions, each naming the specific thing in his words ("Can the
+kitchen take more weekend orders right now, or is it full?"). Often 0 or 1 is right; an empty list when every step
+rests on what you saw."""
+
 def ask_mode():
     return os.environ.get('HIVE_PLAN_ASK') or ASK_DEFAULT
 ASK_DEFAULT = 'three'   # Gate 115: 8 of 8 plans accounted for what only he knew, against 4 of 8 with one question
 
 def prompt(goal, notes_text, rules_text):
-    three = ask_mode() == 'three'
-    return PLAN.format(goal=goal, notes=notes_text, rules=rules_text, ask_missing=ASK_THREE if three else ASK_ONE,
-                       missing_shape='[]' if three else '""')
+    mode = ask_mode()
+    ask = {'three': ASK_THREE, 'fit': ASK_FIT}.get(mode, ASK_ONE)
+    return PLAN.format(goal=goal, notes=notes_text, rules=rules_text, ask_missing=ask,
+                       missing_shape='""' if ask is ASK_ONE else '[]')
 
 def _json(text):
     m = re.search(r'\{.*\}', text or '', re.S)
