@@ -70,11 +70,19 @@ fake = FakeTelegram([say('Yes, ₹500 extra on their first deal'), tap('pln|no')
 assistant.handle(ch(fake), repo, 'Creators who join never make their first deal. Help me get more of them to a first deal.', poll=1)
 check("what the product can't show is asked first; his answer is kept and planned with",
       (any(m['text'].startswith("❓ Before I plan it, one thing your product can't tell me:") for m in fake.sent), len(calls),
-       'Do you already give new creators anything for their first deal? Yes, ₹500 extra on their first deal' in calls[1]),
+       'Asked: Do you already give new creators anything for their first deal? He said: Yes, ₹500 extra on their first deal' in calls[1]),
       (True, 2, True))
 calls.clear(); fake = FakeTelegram([tap('pm|none'), tap('pln|no')])
 assistant.handle(ch(fake), repo, 'I want more creators to invite their friends.', poll=1)
 check('"nothing to add": planned once', len(calls), 1)
+three = ['Can you take more weekend orders right now?', 'Do schools get a discount the site does not show?', 'Is anything about to stop?']
+plan.make = lambda repo_, goal, notes=(), rules=(), **k: calls.append(list(notes)) or {'finding': 'f', 'missing': three,
+    'steps': [{'title': 't', 'why': 'w', 'seen': 's', 'build': 'b', 'look': False, 'decide': '', 'options': []}]}
+calls.clear(); fake = FakeTelegram([say('1 no, full till April. 2 yes 20% for three schools. 3 no'), tap('pln|no')])
+assistant.handle(ch(fake), repo, 'I want more weekend orders.', poll=1)
+asked = next((m['text'] for m in fake.sent if m['text'].startswith('❓')), '')
+check('up to 3 things asked in one numbered message, answered in one', (asked.startswith("❓ Before I plan it, 3 things your product can't tell me:"),
+      all(f'{k}. ' in asked for k in (1, 2, 3)), len(calls), any('20% for three schools' in n for n in calls[1])), (True, True, 2, True))
 
 # 5. one command: live on his phone, saying hello; never a second listener
 json.dump({'chat_id': ME, 'token': 'x', 'address': 'sir'}, open(telegram.PATH, 'w'))

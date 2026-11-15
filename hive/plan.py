@@ -34,12 +34,9 @@ included, what happens if they stop). For each step:
 - "decide": a question only he can answer, because it is about his business (an amount, a promise to customers, what
   can wait), with 2 or 3 short "options"; empty if the step needs nothing from him. Never ask what the code, the page
   or common sense can settle. At most 2 steps may have a question.
-Also think about what the product cannot show you: something only he would know that would change this plan (an
-offer or reward his business already gives that the pages never mention, a promise, a limit). If there is likely to
-be one, put it as "missing": one short plain question to him ("Do you already give new creators anything for their
-first deal that the site doesn't mention?"); else "".
+{ask_missing}
 Reply with JSON only:
-{{"finding": "one sentence: the main thing holding his customers back, as you saw it", "missing": "",
+{{"finding": "one sentence: the main thing holding his customers back, as you saw it", "missing": {missing_shape},
   "steps": [{{"title": "...", "why": "...", "seen": "...", "build": "...", "look": false, "decide": "", "options": []}}]}}"""
 
 PANEL = """Here is a plan to change a product, and what we know about the business and its customers.
@@ -62,6 +59,30 @@ at most 2 questions for him. Treat the panel as a way to think, not as evidence.
 
 CMD = os.environ.get('HIVE_PLAN_CMD', 'claude -p --output-format json --allowedTools Read Grep Glob Bash')
 
+# What only he knows (BRAIN §8 item 5; Gate 115). 'one': one question when the planner suspects something (since Gate
+# 106). 'three': the planner lists what its plan silently assumes about his business that nothing it saw can confirm,
+# and asks the up to 3 that would change the plan most. HIVE_PLAN_ASK picks; the default follows Gate 115's result.
+ASK_ONE = """Also think about what the product cannot show you: something only he would know that would change this plan (an
+offer or reward his business already gives that the pages never mention, a promise, a limit). If there is likely to
+be one, put it as "missing": one short plain question to him ("Do you already give new creators anything for their
+first deal that the site doesn't mention?"); else \"\"."""
+ASK_THREE = """Then check what this plan silently assumes about his business that nothing you saw can confirm, and that would
+change the plan if it were false. Look especially at: whether he can serve more of what the plan pushes (full batches,
+staff, stock, capacity); deals, discounts or promises that live outside the site; anything he is about to start, stop or
+change; the real reason customers stay or leave, when the pages only show a symptom; who on his team does what. Put the
+up to 3 that would change the plan most as "missing": a list of short plain questions to him, each naming the specific
+thing in his words ("Can the kitchen take more weekend orders right now, or is it full?"), never a general "is
+there anything else?"; an empty list if the plan rests only on what you saw."""
+
+def ask_mode():
+    return os.environ.get('HIVE_PLAN_ASK') or ASK_DEFAULT
+ASK_DEFAULT = 'one'
+
+def prompt(goal, notes_text, rules_text):
+    three = ask_mode() == 'three'
+    return PLAN.format(goal=goal, notes=notes_text, rules=rules_text, ask_missing=ASK_THREE if three else ASK_ONE,
+                       missing_shape='[]' if three else '""')
+
 def _json(text):
     m = re.search(r'\{.*\}', text or '', re.S)
     if not m:
@@ -70,6 +91,11 @@ def _json(text):
         return json.loads(m.group(0))
     except ValueError:
         return None
+
+def _missing(m):
+    """What to ask him before planning: a list of at most 3 short questions (a lone string is one question)."""
+    items = m if isinstance(m, list) else [m]
+    return [str(q).strip()[:300] for q in items if str(q or '').strip()][:3]
 
 def clean(plan):
     """A plan Hive can run: 1-4 steps, each with a title and a build instruction; at most 2 questions."""
@@ -89,7 +115,7 @@ def clean(plan):
                       'decide': q if q and sum(1 for x in steps if x['decide']) < 2 else '', 'options': opts if q else []})
     steps = steps[:4]
     out = {'finding': str(plan.get('finding', '')).strip()[:300], 'steps': steps,
-           'missing': str(plan.get('missing') or '').strip()[:300]}
+           'missing': _missing(plan.get('missing'))}
     if isinstance(plan.get('panel'), list):
         out['panel'] = [p for p in plan['panel'] if isinstance(p, dict)][:5]; out['changed'] = str(plan.get('changed', ''))[:300]
     return out if steps else None
@@ -119,8 +145,8 @@ def make(repo, goal, notes=(), rules=(), timeout=600, panel=None):
     work, copy = _scratch(repo)
     notes_text = '\n'.join(f'- {n}' for n in notes) or '(nothing yet)'
     try:
-        got, cost = _ask(copy, PLAN.format(goal=goal, notes=notes_text,
-                                           rules='\n'.join(f'{k}. {r}' for k, r in enumerate(rules, 1)) or '(none yet)'), timeout)
+        got, cost = _ask(copy, prompt(goal, notes_text, '\n'.join(f'{k}. {r}' for k, r in enumerate(rules, 1)) or '(none yet)'),
+                         timeout)
         plan = clean(got)
         if plan and panel:
             again, c2 = _ask(copy, PANEL.format(goal=goal, notes=notes_text, plan=json.dumps(plan, ensure_ascii=False)), timeout)

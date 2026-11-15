@@ -1372,13 +1372,19 @@ def pursue(ch, repo, text, poll, apply_build=None, run=True):
                 ch.typing()
         return box.get('plan')
     p = think()
-    if p and p.get('missing'):   # what the product can't show (Gate 106's one miss: a reward only in his payouts)
-        ch.send(f"❓ <b>Before I plan it, one thing your product can't tell me:</b>\n{telegram.esc(p['missing'])}", html=True,
-                buttons=[[('Nothing to add', 'pm|none')]])
+    asks = p.get('missing') if p else None
+    asks = [asks] if isinstance(asks, str) and asks.strip() else (asks or [])
+    if asks:   # what the product can't show (Gate 106's one miss: a reward only in his payouts; Gate 115: up to 3)
+        if len(asks) == 1:
+            head, body = "Before I plan it, one thing your product can't tell me:", telegram.esc(asks[0])
+        else:
+            head = f"Before I plan it, {len(asks)} things your product can't tell me:"
+            body = '\n'.join(f"{k}. {telegram.esc(q)}" for k, q in enumerate(asks, 1)) + "\n\n<i>One message is fine.</i>"
+        ch.send(f"❓ <b>{head}</b>\n{body}", html=True, buttons=[[('Nothing to add', 'pm|none')]])
         kind, ans = telegram._wait(ch, poll, {'pm|none'})
         said = (ans or '').strip() if kind != 'tap' else ''
         if said and not re.fullmatch(r"(no|nope|nothing|none|nahi|kuch nahi|no,? nothing)[.! ]*", said.lower()):
-            memory.add_note(repo, f"{p['missing']} {said}")   # kept for every later plan, and planned with now
+            memory.add_note(repo, f"Asked: {' / '.join(asks)} He said: {said}")   # kept for every later plan, and planned with now
             ch.send("Thank you, sir. Planning with that in mind.")
             p = think() or p
     if not p:
