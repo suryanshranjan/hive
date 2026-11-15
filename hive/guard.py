@@ -86,17 +86,25 @@ def python_sources(rev):
 
 # ---------------------------------------------------------------- running the suite
 
+SUITE_SECONDS = 1800   # HIVE_SUITE_TIMEOUT: a suite that runs longer is stopped and counts as unreadable
+
 def run_suite(code_dir, cfg):
-    """Run the project's test command in code_dir and return {test id: passed} from its JUnit XML."""
+    """Run the project's test command in code_dir and return {test id: passed} from its JUnit XML, or None when there
+    are no results to read (the suite timed out, or wrote no readable XML). None is never "nothing failed": before the
+    audit (Nov 15) it was {}, and an unreadable run of main let every landing through."""
+    from . import run as _run
     xml = os.path.join(code_dir, cfg['junit'])
     if os.path.exists(xml):
         os.remove(xml)
     os.makedirs(os.path.dirname(xml) or '.', exist_ok=True)
-    subprocess.run(cfg['test_cmd'], shell=True, cwd=code_dir, capture_output=True, text=True)
+    limit = _run.seconds('HIVE_SUITE_TIMEOUT', SUITE_SECONDS)
+    if _run.run(cfg['test_cmd'], limit, shell=True, cwd=code_dir) is None:
+        print(f'The test suite ran past {int(limit)} s and was stopped (HIVE_SUITE_TIMEOUT).', flush=True)
+        return None
     try:
         return junit.results(xml)
     except Exception:
-        return {}
+        return None
 
 def main_snapshot(cfg):
     """The shared branch checked out in a temporary folder, with dependency folders linked from this clone."""
@@ -143,6 +151,8 @@ def main_results(cfg):
             res = run_suite(snap, cfg)
         finally:   # Nov 2: every landing left its snapshot behind (800 in a day, up to 71 MB each, and the disk filled)
             shutil.rmtree(snap, ignore_errors=True)
+        if res is None:
+            return None
         cache_put(main, res)
         open(os.path.join(d, 'stats.log'), 'a').write('miss\n'); return res
 
@@ -280,7 +290,15 @@ def land(name, message, note=None):
             for f, scope, n in sorted(new_dups):
                 print(f'  {f}: {scope}.{n}')
             print(f'Rename or merge them, commit, then: hive land {name} --continue'); return 6
-        base = main_results(cfg); mine = run_suite(os.getcwd(), cfg)
+        base = main_results(cfg)
+        if base is None:   # main's own results could not be read: nothing lands blind (the audit, Nov 15)
+            log(f'BLOCKED_NOMAIN {name}')
+            print("Refused: the shared branch's tests could not be run or read (no JUnit XML, or past the time limit), "
+                  'so a regression could not be ruled out. Check test_cmd and junit in .hive/config.json, then: '
+                  f'hive land {name} --continue'); return 10
+        mine = run_suite(os.getcwd(), cfg)
+        if mine is None:
+            mine = {}   # unreadable here: every test that passes on main counts as broken
         regressed = sorted(k for k, v in base.items() if v and not mine.get(k))
         if regressed:
             log(f'BLOCKED_REGRESSION {name} {len(regressed)}')

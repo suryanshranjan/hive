@@ -95,4 +95,10 @@ echo '{"name": "hive-half", "region": "ap-south-1", "instance": "i-0half", "grou
 printf 'y\n' | $PY -m hive cloud --stop > $T/half.txt 2>&1
 check "a machine never moved to: said plainly, deleted without a safety word, nothing left" \
   "$? $(grep -c 'Nothing was ever moved to it' $T/half.txt) $(grep -c 'type DELETE' $T/half.txt) $(grep -c 'terminate-instances --instance-ids i-0half' $T/aws.log) $(ls $T/.hive/cloud | wc -l | tr -d ' ')" "0 1 0 1 0"
+# a folder and branch name that are shell code must stay names (the audit, Nov 15: they ran on the machine)
+unset HIVE_CLOUD_LOCAL
+# not ";" in the name: Git for Windows reads that as a list of paths
+W="$T/odd \$(touch PWNED1)"; git init -q -b 'x$(touch${IFS}PWNED2)' "$W" && git -C "$W" -c user.name=t -c user.email=t@t commit -q --allow-empty -m init
+(cd "$W" && $PY -m hive cloud --to $T/box3 --no-start > $T/odd.txt 2>&1)
+check "odd names are moved as names, never run"   "$(ls $T/box3/hive-cloud | grep -c 'odd \$(touch PWNED1)') $(ls $T/box3/hive-cloud $T "$W" $T/box3/hive-cloud/* 2>/dev/null | grep -c "^PWNED")" "1 0"
 rm -rf $T; exit $fail

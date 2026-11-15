@@ -65,6 +65,8 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
     t = Target(to, key); name = _project(repo)
     proj = f'{t.home()}/{name}'
     branch = subprocess.run(['git', '-C', repo, 'rev-parse', '--abbrev-ref', 'HEAD'], capture_output=True, text=True).stdout.strip()
+    if branch == 'HEAD' or subprocess.run(['git', 'check-ref-format', '--branch', branch], capture_output=True).returncode:
+        say('Check out a branch first: Hive moves a named branch, not a detached commit.'); return 3
     say(f"Moving {name} to {t.to}. Only committed work goes; .env files, keys and dependencies stay here.")
     t.run('true')   # reachable?
     tmp = tempfile.mkdtemp()
@@ -73,9 +75,11 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
     t.put(bundle, f'{t.home()}/{name}.bundle')
     # first time: clone; again later: bring that branch up to date with this machine (git will not fetch into a branch
     # that is checked out, which a second real run hit). Hive's result branches (hive/...) there are left alone.
-    t.run(f'mkdir -p {Q(t.home())} && cd {Q(t.home())} && if test -d {name}/.git; then git -C {name} fetch -q ../{name}.bundle '
-          f'{branch} && git -C {name} checkout -q {branch} && git -C {name} reset -q --hard FETCH_HEAD; else '
-          f'git clone -q -b {branch} {name}.bundle {name}; fi && rm -f {name}.bundle')
+    # the folder and branch names are his, so each is quoted (the audit, Nov 15: a name with ; or $( ) ran as a command)
+    n, b, nb = Q(name), Q(branch), Q(name + '.bundle')
+    t.run(f'mkdir -p {Q(t.home())} && cd {Q(t.home())} && if test -d {n}/.git; then git -C {n} fetch -q {Q("../" + name + ".bundle")} '
+          f'{b} && git -C {n} checkout -q {b} && git -C {n} reset -q --hard FETCH_HEAD; else '
+          f'git clone -q -b {b} {nb} {n}; fi && rm -f {nb}')
     # Hive itself, from GitHub, in its own Python environment there: current Ubuntu refuses `pip install --user` into
     # the system Python (PEP 668), which the first real EC2 test hit. A local target shares this machine's Hive.
     py = 'python3'
@@ -108,6 +112,12 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
                      (access._path(repo), f'{dst_hive}/access/{os.path.basename(access._path(repo))}')):   # his data, read-only
         if os.path.exists(src):
             t.put(src, dst); sent.append(os.path.basename(src))
+    from . import vault   # the files above may be encrypted (hive/vault.py): their key goes too, or he is told
+    if vault.where() in ('file', 'keychain') and vault._key(create=False):
+        kf = os.path.join(tmp, 'vault.key'); open(kf, 'wb').write(vault._key(create=False))
+        t.put(kf, f'{dst_hive}/vault.key'); os.remove(kf); sent.append('the key to his secrets')
+    elif vault.where() == 'env':
+        say('  His secrets are encrypted with HIVE_MASTER_KEY: set the same HIVE_MASTER_KEY on that machine.')
     if with_login:
         cred = os.path.join(os.path.expanduser('~'), '.claude', '.credentials.json')
         if os.path.exists(cred):

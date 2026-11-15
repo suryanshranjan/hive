@@ -7,6 +7,8 @@ The owner (the Tony scenario): "Ship it" should mean the engineer gets it, ready
 asked, what was checked and what it cost, not a branch name he has to pass on by hand."""
 import json, os, re, shutil, subprocess
 
+from .audit import logged
+
 def _git(repo, *a):
     return subprocess.run(['git', '-C', repo, *a], capture_output=True, text=True, encoding='utf-8', errors='replace')
 
@@ -46,6 +48,7 @@ def title(state):
     goal = re.sub(r'\s+', ' ', re.sub(r'\(his picture: [^)]*\)|\[photo: [^\]]*\]', '', state.get('goal', ''))).strip()
     return 'Hive: ' + (goal[:70] + ('...' if len(goal) > 70 else '') if goal else state['name'])
 
+@logged('ship.pull_request', lambda repo, st=None, *a, **k: (st or {}).get('name', ''))
 def ship(repo, state):
     """Push hive/<name> and open (or find) its pull request. Returns {'ok', 'branch', 'url', 'how', 'why'}:
     how is 'pr' (a pull/merge request opened or already open), 'link' (pushed; url opens a new one in the browser) or

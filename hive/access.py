@@ -24,22 +24,13 @@ def _path(repo):
     return os.path.join(DIR, f'{memory.project_key(repo)}.json')
 
 def load(repo):
-    try:
-        got = json.load(open(_path(repo), encoding='utf-8'))
-        return got if isinstance(got, list) else []
-    except (OSError, ValueError):
-        return []
+    from . import vault
+    got = vault.load_json(_path(repo), [])
+    return got if isinstance(got, list) else []
 
 def _save(repo, sources):
-    os.makedirs(DIR, exist_ok=True)
-    p = _path(repo)
-    with open(p + '.tmp', 'w', encoding='utf-8') as f:
-        json.dump(sources, f, indent=1)
-    os.replace(p + '.tmp', p)
-    try:
-        os.chmod(p, 0o600)   # his keys: readable by him only (no effect on Windows, where his profile is private)
-    except OSError:
-        pass
+    from . import vault
+    vault.save_json(_path(repo), sources)   # database addresses and keys, encrypted when Hive can (hive/vault.py)
 
 def add(repo, kind, where, name=None, headers=None):
     """Keep one source (replacing one of the same name). Returns it."""
@@ -211,6 +202,20 @@ def _rows_text(cols, rows):
         w.writerow(['' if v is None else v for v in r])
     return out.getvalue() + (f'(first {ROWS} rows only)\n' if len(rows) > ROWS else '')
 
+def _without_password(url):
+    """A database address with its password taken out, and the password: (address, password or None)."""
+    from urllib.parse import unquote, urlsplit, urlunsplit
+    try:
+        u = urlsplit(url)
+    except ValueError:
+        return url, None
+    if '://' not in url or u.password is None:
+        return url, None
+    host = u.hostname or ''
+    host = f'[{host}]' if ':' in host else host
+    netloc = (u.username or '') + '@' + host + (f':{u.port}' if u.port else '')
+    return urlunsplit((u.scheme, netloc, u.path, u.query, u.fragment)), unquote(u.password)
+
 def run_sql(where, query, timeout=30):
     """Run one read-only query; returns its rows as CSV text. Raises Unreadable for a query that would write."""
     q = safe_sql(query)
@@ -255,6 +260,9 @@ def run_sql(where, query, timeout=30):
         except Exception as e:
             raise Unreadable(f'the query failed ({str(e)[:120]})') from None
         env = dict(os.environ, PGOPTIONS='-c default_transaction_read_only=on', PGCONNECT_TIMEOUT=str(timeout))
+        where, password = _without_password(where)
+        if password:   # never on the command line, where any user of the machine can read it (the audit, Nov 15)
+            env['PGPASSWORD'] = password
         try:
             p = subprocess.run(['psql', where, '-X', '-q', '--csv', '-v', 'ON_ERROR_STOP=1', '-c', limited], env=env,
                                capture_output=True, text=True, timeout=timeout + 30)

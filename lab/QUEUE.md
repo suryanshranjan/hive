@@ -2,7 +2,16 @@
 
 Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update "Where we left off" and push.
 
-## Where we left off (Nov 15 2026 evening; the owner: "we will pick up the rest later")
+## Where we left off (Nov 15 2026, late: capability audit, then P0 security)
+
+- **Done, pushed:** the capability audit and the approved Telegram-first plan (`docs/jarvis_plan.md`; out of scope this phase: web, phone apps, desktop, calls). P0 first round (BRAIN §12): encrypted secrets (`hive secrets`), Render pairing word, shell quoting, guard refuses when main's tests are unreadable, suite and builder time limits, secret-free builder environments, outside text marked as data, `hive audit`. All 36 test files pass on Windows.
+- **Next, in order:**
+  1. **P0, the Docker sandbox for builders** (default where Docker exists; warn elsewhere): a builder image with Claude Code and Codex, the clone and bare repo mounted, no `~/.hive`; then the Render image as a non-root user.
+  2. **P1 memory:** `hive/store.py` (SQLite + FTS5, `owner_id` on every table), import of the JSON files, `recall()` into `assistant.facts`, forget and correct from Telegram; a memory bench with new seeds kept out of the repo.
+  3. P2 Pulse, P3 voice replies (Piper), P4 tool registry, P5 Google over REST (`docs/jarvis_plan.md`).
+- **Still waiting on him:** Gate 117 (real Render, now with the pairing word), Gate 114, his real mail/calendar/payments, the founder session.
+
+## Before that (Nov 15 2026 evening; the owner: "we will pick up the rest later")
 
 - **Done today, pushed:** Gates 115, 115b, 116 scored (BRAIN §5). The planner asks up to 3 specific questions (default); a messy picture still beats words; a failed fast-reply provider rests 10 min; the Render image builds, and a bad bot token stops the deploy plainly.
 - **Waiting on him, in order:**

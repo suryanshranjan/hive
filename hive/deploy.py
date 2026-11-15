@@ -10,6 +10,8 @@ The host's own tool does the work, logged in once on this computer by him or his
 Set up once per project: `hive deploy setup <host>`, or on the phone ("connect Vercel")."""
 import json, os, re, shutil, subprocess, tempfile
 
+from .audit import logged
+
 DIR = os.path.join(os.path.expanduser('~'), '.hive', 'deploy')
 
 HOSTS = {   # name: (tool, preview command or None, live command, how to log in)
@@ -34,10 +36,13 @@ def title(repo):
     return {'custom': 'your site', 'fly': 'Fly'}.get(h, h.title() or 'your site')
 
 def config(repo):
-    try:
-        return json.load(open(os.path.join(DIR, _key(repo) + '.json')))
-    except (OSError, ValueError):
-        return {}
+    from . import vault
+    got = vault.load_json(os.path.join(DIR, _key(repo) + '.json'), {})
+    return got if isinstance(got, dict) else {}
+
+def _save(repo, cfg):
+    from . import vault
+    vault.save_json(os.path.join(DIR, _key(repo) + '.json'), cfg)   # a deploy hook is a secret (hive/vault.py)
 
 def setup(repo, host, preview=None, live=None, hook=None):
     """Remember where his product lives. host: one of HOSTS, or 'custom' with his own commands. Returns the config."""
@@ -47,12 +52,13 @@ def setup(repo, host, preview=None, live=None, hook=None):
     cfg = {'host': host}
     if host == 'custom':
         cfg.update(preview=preview, live=live)
-    elif host == 'render':
-        cfg.update(live=f'curl -fsS -X POST "{hook}"' if hook else None)
+    elif host == 'render':   # the hook runs in a shell, so only an address's own characters may reach it (the audit, Nov 15)
+        if hook and not re.fullmatch(r'https://[A-Za-z0-9.-]+(/[A-Za-z0-9_./?=:-]*)?', hook.strip()):
+            raise ValueError("That doesn't look like a Render deploy hook (https://api.render.com/deploy/srv-...?key=...).")
+        cfg.update(live=f'curl -fsS -X POST "{hook.strip()}"' if hook else None)
     else:
         cfg.update(preview=preview or HOSTS[host][1], live=live or HOSTS[host][2])
-    os.makedirs(DIR, exist_ok=True)
-    json.dump(cfg, open(os.path.join(DIR, _key(repo) + '.json'), 'w'), indent=1)
+    _save(repo, cfg)
     return cfg
 
 def ready(repo):
@@ -132,6 +138,7 @@ def _url(out):
     found = re.findall(r'https://[^\s"\'<>]+', out or '')
     return found[-1].rstrip('.,)') if found else None
 
+@logged('deploy.preview', lambda repo, ref=None, *a, **k: ref or '')
 def preview(repo, branch):
     """Put this branch at its own address. {'ok', 'url', 'why'}; why: 'none', 'tool', 'no_preview', 'failed', or 'first'
     (his host has nothing of his yet and would put its first version live, so nothing was sent)."""
@@ -166,6 +173,7 @@ def merged(repo, branch, main='main'):
             return m
     return None
 
+@logged('deploy.live', lambda repo, ref=None, *a, **k: ref or '')
 def live(repo, main_ref, test_cmd=None):
     """Put his main version live, after its tests pass. {'ok', 'url', 'why', 'say'}."""
     state, why = ready(repo)
@@ -192,7 +200,7 @@ def live(repo, main_ref, test_cmd=None):
         url = _url(p.stdout + '\n' + p.stderr)
         sha = subprocess.run(['git', '-C', code, 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip()
         cfg.setdefault('history', []).append({'t': __import__('time').time(), 'sha': sha, 'url': url})   # for undo
-        json.dump(cfg, open(os.path.join(DIR, _key(repo) + '.json'), 'w'), indent=1)
+        _save(repo, cfg)
         return {'ok': True, 'url': url, 'why': None, 'say': ''}
     finally:
         remove(work)
@@ -208,9 +216,10 @@ def note_before(repo, main_ref):
     if not sha:
         return False
     cfg['history'] = [{'t': 0, 'sha': sha, 'url': None, 'assumed': True}]
-    json.dump(cfg, open(os.path.join(DIR, _key(repo) + '.json'), 'w'), indent=1)
+    _save(repo, cfg)
     return True
 
+@logged('deploy.back')
 def back(repo):
     """Put live the version that was live before the last one Hive put live (undo). {'ok', 'url', 'say', 'when'}"""
     h = config(repo).get('history') or []
@@ -221,5 +230,5 @@ def back(repo):
     r = live(repo, prev['sha'])   # it passed its tests when it went live
     if r['ok']:   # the restored version is the current one again
         cfg = config(repo); cfg['history'] = h[:-1]
-        json.dump(cfg, open(os.path.join(DIR, _key(repo) + '.json'), 'w'), indent=1)
+        _save(repo, cfg)
     return dict(r, when=prev['t'])

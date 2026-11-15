@@ -19,20 +19,13 @@ def _path(repo):
     return os.path.join(DIR, memory.project_key(repo) + '.json')
 
 def load(repo):
-    try:
-        return json.load(open(_path(repo), encoding='utf-8'))
-    except (OSError, ValueError):
-        return {}
+    from . import vault
+    got = vault.load_json(_path(repo), {})
+    return got if isinstance(got, dict) else {}
 
 def _save(repo, d):
-    os.makedirs(DIR, exist_ok=True)
-    p = _path(repo)
-    with open(p, 'w', encoding='utf-8') as f:
-        json.dump(d, f, indent=1)
-    try:
-        os.chmod(p, 0o600)
-    except OSError:
-        pass
+    from . import vault
+    vault.save_json(_path(repo), d)   # his keys, encrypted when Hive can (hive/vault.py)
 
 def _get(provider, key, path, params):
     """One read. Only GET is ever sent."""

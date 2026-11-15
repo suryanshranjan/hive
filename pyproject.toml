@@ -15,6 +15,7 @@ dependencies = []
 voice = ["faster-whisper>=1.0"]
 api = ["anthropic>=1.0"]   # replies straight from the Anthropic API, streamed (hive llm api)
 data = ["psycopg[binary]>=3.1", "pymysql>=1.1", "openpyxl>=3.1", "pypdf>=4"]   # reading his Postgres, MySQL, Excel and PDF files
+secure = ["cryptography>=43", "keyring>=25"]   # his keys and passwords encrypted on disk (hive secrets); keychain optional
 
 [project.scripts]
 hive = "hive.__main__:main"

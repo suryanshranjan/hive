@@ -22,6 +22,8 @@ For the owner:
   hive cloud --limit                     once: a limited AWS login for Hive, so it never needs your root login
   hive cloud --to user@host [--with-login]   move this project's Hive to a server you already have
   hive cloud pull [--from user@host]     bring the result branches back
+  hive secrets [migrate|keychain]        where your keys are kept; encrypt them now; keep the key in the keychain
+  hive audit [n]                         the last things Hive did outside this computer (mail sent, live, PRs)
 
 Step by step (scripts and experiments):
   hive init --test-cmd "<runs all tests, writes JUnit XML to .hive/junit.xml>"
@@ -167,6 +169,8 @@ def build_parser():
     lm = sub.add_parser('llm'); lm.add_argument('action', choices=['setup', 'api'])
     sub.add_parser('name').add_argument('name', nargs='*')
     sub.add_parser('pace').add_argument('choice', nargs='?', choices=['fast', 'cheap'])
+    au = sub.add_parser('audit'); au.add_argument('n', nargs='?', type=int, default=20)
+    se = sub.add_parser('secrets'); se.add_argument('action', nargs='?', choices=['migrate', 'keychain'])
     ru = sub.add_parser('rules'); ru.add_argument('action', nargs='?', choices=['forget']); ru.add_argument('n', nargs='?', type=int)
     i = sub.add_parser('init'); i.add_argument('--test-cmd', required=True); i.add_argument('--junit', default='.hive/junit.xml')
     c = sub.add_parser('claim'); c.add_argument('name'); c.add_argument('areas'); c.add_argument('desc')
@@ -320,6 +324,12 @@ def main(argv=None):
                'cheap': 'Cheap: I use one builder (the lowest cost, slower).'}.get(p, 'Not chosen yet: I use as many '
               'builders as help, and ask you once at the next build.') + ' Change it with `hive pace fast` or `hive pace cheap`.')
         return 0
+    if a.cmd == 'audit':
+        from . import audit
+        return audit.show(a.n)
+    if a.cmd == 'secrets':
+        from . import vault
+        return vault.main([a.action] if a.action else [])
     if a.cmd == 'rules':
         from . import memory
         return memory.forget('.', a.n or 0) if a.action == 'forget' else memory.show('.')

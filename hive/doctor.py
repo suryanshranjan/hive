@@ -58,6 +58,11 @@ def checks(repo='.', claude_probe=True):
                 'Optional: run Hive inside Docker or a spare VM for code you do not fully trust.'))
     out.append((bool(telegram.load()), False, "the owner's phone is connected (Telegram)",
                 'Optional: hive telegram setup, so questions and reviews reach your phone.'))
+    from . import vault
+    w, plain = vault.status()
+    out.append((w != 'plain' and not plain, False, 'your keys and passwords are encrypted on disk',
+                'Optional: pip install "hive-swarm[secure]", then hive secrets migrate.' if w == 'plain' else
+                'Run hive secrets migrate (some files are still in plain text).'))
     from . import voice
     out.append((voice.available(), False, 'voice notes (answer Hive by talking on Telegram)',
                 'Optional: pip install "hive-swarm[voice]" (transcribes on this machine; your voice never leaves it).'))

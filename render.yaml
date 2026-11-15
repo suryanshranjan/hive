@@ -14,8 +14,12 @@ services:
       mountPath: /data
       sizeGB: 10
     envVars:
-      - key: TELEGRAM_BOT_TOKEN   # from @BotFather (/newbot); whoever writes to the bot first becomes its owner
+      - key: TELEGRAM_BOT_TOKEN   # from @BotFather (/newbot)
         sync: false
+      - key: HIVE_PAIR_CODE       # a secret word you choose; send it to your bot first to make Hive yours (empty: see the logs)
+        sync: false
+      - key: HIVE_MASTER_KEY      # made by Render; encrypts his keys on the disk, and is never written to it
+        generateValue: true
       - key: ANTHROPIC_API_KEY    # console.anthropic.com: the builders (Claude Code) and fast replies
         sync: false
       - key: HIVE_REPO            # optional: your product on GitHub, as owner/name; empty starts a new project

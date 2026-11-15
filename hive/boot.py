@@ -2,7 +2,9 @@
 
 The founder fills a form on his phone; the host passes it in as settings (environment variables), and this turns them
 into Hive's own files on the host's disk, then listens on Telegram:
-  TELEGRAM_BOT_TOKEN   required: his bot, from @BotFather. The first private chat that writes to it becomes his.
+  TELEGRAM_BOT_TOKEN   required: his bot, from @BotFather.
+  HIVE_PAIR_CODE       a word he chooses in the form and sends to the bot first: only the chat that sends it becomes
+                       the owner. Left empty, Hive makes a 6-digit one and prints it in the host's logs.
   ANTHROPIC_API_KEY    the builders (Claude Code) and Hive's fast replies run on it.
   HIVE_FAST_PROVIDER, HIVE_FAST_KEY, HIVE_FAST_MODEL, HIVE_FAST_BASE_URL
                        optional: fast replies from another provider (any OpenAI-style API), as `hive llm api` would set.
@@ -10,7 +12,8 @@ into Hive's own files on the host's disk, then listens on Telegram:
                        optional: his product on GitHub ("owner/name" or its address), cloned once. Without them Hive
                        starts an empty project ("I want to build something new").
 Everything lives under HOME, which the host keeps on a disk, so a restart or a redeploy keeps his chat, his rules and
-his work. Secrets are written owner-only and never into the project."""
+his work. Secrets are encrypted when Hive can (hive/vault.py; on Render set HIVE_MASTER_KEY to keep the key off
+the disk), and never go into the project."""
 import json, os, re, subprocess, sys
 
 from . import explain, telegram
@@ -46,18 +49,23 @@ def configure(env=None, home=None):
     if not token:
         raise SystemExit('TELEGRAM_BOT_TOKEN is not set: make a bot with @BotFather and paste its token in the host\'s form.')
     tg = os.path.join(hive, 'telegram.json')
-    try:
-        old = json.load(open(tg))
-    except (OSError, ValueError):
-        old = {}
-    if old.get('token') != token:   # a new bot: whoever writes to it first is its owner (telegram.bind_first)
-        _private(tg, json.dumps({'token': token}))
+    os.environ['HOME'] = os.environ['USERPROFILE'] = home   # the vault keeps its key under this HOME
+    from . import vault
+    old = vault.load_json(tg, {}) or {}
+    pair, before = (env.get('HIVE_PAIR_CODE') or '').strip(), dict(old)
+    if old.get('token') != token:   # a new bot: the chat that sends the pairing word is its owner (telegram.bind_first)
+        old = {'token': token}
+    if not old.get('chat_id') and (pair or not old.get('pair')):
+        import secrets
+        old['pair'] = pair or f'{secrets.randbelow(10 ** 6):06d}'
+    if old != before:
+        vault.save_json(tg, old)
     if env.get('HIVE_FAST_KEY'):
         fast = {'provider': env.get('HIVE_FAST_PROVIDER') or 'openai', 'api_key': env['HIVE_FAST_KEY']}
         for k, v in (('model', env.get('HIVE_FAST_MODEL')), ('base_url', env.get('HIVE_FAST_BASE_URL'))):
             if v:
                 fast[k] = v
-        _private(os.path.join(hive, 'fast.json'), json.dumps(fast))
+        vault.save_json(os.path.join(hive, 'fast.json'), fast)
     claude = os.path.join(home, '.claude.json')   # Claude Code runs headless on the API key: no first-run questions
     if env.get('ANTHROPIC_API_KEY') and not os.path.exists(claude):
         _private(claude, json.dumps({'hasCompletedOnboarding': True}))
@@ -66,9 +74,15 @@ def configure(env=None, home=None):
     for k, v in (('user.name', 'Hive'), ('user.email', 'hive@localhost'), ('init.defaultBranch', 'main')):
         if _git('config', '--global', '--get', k).returncode != 0:
             _git('config', '--global', k, v)
-    if env.get('GITHUB_TOKEN'):   # the token goes to git's own store on the disk, never into an address or the project
-        _git('config', '--global', 'credential.helper', 'store')
-        _private(os.path.join(home, '.git-credentials'), f"https://x-access-token:{env['GITHUB_TOKEN']}@github.com\n")
+    if env.get('GITHUB_TOKEN'):   # git asks the environment for it each time: the token is never written to disk
+        # (before the audit, Nov 15, it sat in plain text in ~/.git-credentials)
+        os.environ['GITHUB_TOKEN'] = env['GITHUB_TOKEN']
+        _git('config', '--global', 'credential.https://github.com.helper',
+             '!f() { test "$1" = get && echo username=x-access-token && echo "password=$GITHUB_TOKEN"; }; f')
+        try:
+            os.remove(os.path.join(home, '.git-credentials'))
+        except OSError:
+            pass
     project = os.path.join(home, 'project')
     url = repo_url(env.get('HIVE_REPO'))
     if not os.path.isdir(os.path.join(project, '.git')):
@@ -85,10 +99,13 @@ def configure(env=None, home=None):
 
 def main(env=None, home=None, api=None, listen=True):
     project = configure(env, home)
-    cfg = json.load(open(os.path.join(home or os.path.expanduser('~'), '.hive', 'telegram.json')))
+    from . import vault
+    cfg = vault.load_json(os.path.join(home or os.path.expanduser('~'), '.hive', 'telegram.json'), {})
     telegram.PATH = os.path.join(home or os.path.expanduser('~'), '.hive', 'telegram.json')
-    if not cfg.get('chat_id') and not telegram.bind_first(cfg['token'], api=api):
-        return 1
+    if not cfg.get('chat_id'):
+        print(f"Pairing word: {cfg['pair']}  (send it to your bot on Telegram to make Hive yours)", flush=True)
+        if not telegram.bind_first(cfg['token'], api=api, code=cfg['pair']):
+            return 1
     print(f'Hive is up: project {project}; fast replies {"on" if explain.fast_on() else "off"}.', flush=True)
     if not listen:
         return 0

@@ -63,7 +63,20 @@ check('the server stops by itself after two hours', any('timeout 7200 python3 -m
 check('the port was opened', aws_calls[-1], 'authorize-security-group-ingress')
 token = r['url'].rstrip('/').split('/')[-1]
 check('his pages were copied over and unpacked at the secret address',
-      os.path.exists(os.path.join(box.dir, 'hive-try', token, 'index.html')), True)
+      os.path.exists(os.path.join(box.dir, 'hive-try', 'www', token, 'index.html')), True)
+# the bare address must never list the secret folder (audit, Nov 15): serve the real folder over HTTP and look
+import http.server, threading, urllib.request
+www = os.path.join(box.dir, 'hive-try', 'www')
+srv = http.server.ThreadingHTTPServer(('127.0.0.1', 0),
+                                      lambda *a: http.server.SimpleHTTPRequestHandler(*a, directory=www))
+threading.Thread(target=srv.serve_forever, daemon=True).start()
+bare = urllib.request.urlopen(f'http://127.0.0.1:{srv.server_address[1]}/', timeout=10).read().decode()
+page = urllib.request.urlopen(f'http://127.0.0.1:{srv.server_address[1]}/{token}/', timeout=10).read().decode()
+srv.shutdown()
+check('the bare address does not show the secret', token in bare, False)
+check('the secret address shows his page', 'Dabba Days' in page, True)
+check('the server serves only its own folder, with the log outside it',
+      any('--directory www' in c for c in box.cmds) and not os.path.exists(os.path.join(www, 'server.log')), True)
 p = subprocess.run(['sh', '-c', trydeploy.STOP_SERVER + '; echo still-here'], capture_output=True, text=True)
 check('stopping an old test server does not stop the command itself (Gate 109)', p.stdout.strip(), 'still-here')
 check('an existing machine is not marked as made for the test', trydeploy.state()['made_machine'], False)

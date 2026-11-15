@@ -68,8 +68,8 @@ No computer? Hive can run on your own [Render](https://render.com) account, alwa
 
    [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/suryanshranjan/hive)
 
-4. **Fill in the form:** the bot's token and the model key. Optional: your product on GitHub (`owner/name`) with a GitHub token, or a key from another provider for fast replies. Tap **Deploy**.
-5. **Send your bot a message.** The first person to write to it becomes its owner; anyone after that is turned away. Hive says hello; say **"set me up"**.
+4. **Fill in the form:** the bot's token, the model key, and a **pairing word** you make up (any secret word). Optional: your product on GitHub (`owner/name`) with a GitHub token, or a key from another provider for fast replies. Tap **Deploy**.
+5. **Send your bot the pairing word.** Only the chat that sends it becomes the owner; anyone else is turned away. (Left the word empty? Render's logs show a 6-digit one.) Hive says hello; say **"set me up"**.
 
 Cost: about $28 a month on your Render bill (a 1 CPU, 2 GB worker and a 10 GB disk, at Render's list prices as last known; check render.com/pricing), plus what the model uses. Your chat, rules and work live on that disk, so a restart loses nothing. Nobody else hosts anything for you, and your keys stay in your Render account.
 

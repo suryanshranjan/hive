@@ -68,4 +68,22 @@ before=$(ls -d ${TMPDIR:-/tmp}/hive-main-* 2>/dev/null | wc -l)
 cd $T/a && git reset -q --hard origin/main && git pull -q --rebase origin main && printf '\ndef triple(x):\n    return 3 * x\n' >> calc.py && touch new_marker_$$ && echo "# force a fresh run of main" >> test_calc.py && git add -A && git commit -qm "triple" && $PY -m hive land trip "add triple" >/dev/null
 after=$(ls -d ${TMPDIR:-/tmp}/hive-main-* 2>/dev/null | wc -l)
 check "no snapshot left behind" $([ $after -le $before ] && echo 0 || echo 1) 0
+# 5. main's tests cannot be read (no XML) or run past the limit: nothing lands blind (the audit, Nov 15: it all landed)
+for mode in noxml slow; do
+  cd $T && rm -rf s_$mode up_$mode.git w_$mode && git init -q -b main s_$mode && cd s_$mode && git config user.email t@t && git config user.name t
+  printf 'def add(a, b):
+    return a + b
+' > calc.py
+  if [ $mode = noxml ]; then CMD="$PY -c pass"; else CMD="$PY -c \"import time; time.sleep(60)\""; fi
+  $PY -m hive init --test-cmd "$CMD" >/dev/null
+  git add -A && git commit -qm seed && git clone -q --bare . $T/up_$mode.git && git clone -q $T/up_$mode.git $T/w_$mode
+  cd $T/w_$mode && git config user.email w@t && git config user.name w && printf '
+def sub(a, b):
+    return a - b
+' >> calc.py
+  start=$(date +%s)
+  HIVE_SUITE_TIMEOUT=4 HIVE_GUARD_CACHE=$T/cache_$mode $PY -m hive land s "add sub" >/dev/null 2>&1; rc=$?
+  check "main unreadable ($mode): refused, not landed" "$rc $(git -C $T/up_$mode.git log --oneline main | wc -l | tr -d ' ')" "10 1"
+  [ $mode = slow ] && check "a hung suite is stopped at its limit" "$([ $(( $(date +%s) - start )) -lt 40 ] && echo yes)" yes
+done
 rm -rf $T; exit $fail

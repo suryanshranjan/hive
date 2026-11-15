@@ -242,6 +242,18 @@ def prepare(repo, run, workers, goal, minutes=40, examples=None, questions=None,
               open(os.path.join(run, 'run.json'), 'w'), indent=1)
     return run
 
+# Builders get the model keys they run on, never Hive's own secrets: the owner's chat, other providers' keys, his
+# GitHub, cloud and host logins (the audit, Nov 15: builders run with full access, so whatever is in their
+# environment is theirs to read or leak).
+BUILDER_HIDES = ('TELEGRAM_BOT_TOKEN', 'HIVE_FAST_KEY', 'HIVE_PAIR_CODE', 'GITHUB_TOKEN', 'GH_TOKEN', 'GITLAB_TOKEN',
+                 'RENDER_API_KEY', 'VERCEL_TOKEN', 'NETLIFY_AUTH_TOKEN', 'RAILWAY_TOKEN', 'FLY_API_TOKEN',
+                 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'AWS_SESSION_TOKEN', 'HIVE_MASTER_KEY',
+                 'PGPASSWORD', 'DATABASE_URL', 'STRIPE_API_KEY', 'RAZORPAY_KEY_SECRET')
+
+def builder_env(base=None):
+    """The environment a builder runs in: this one without Hive's own secrets."""
+    return {k: v for k, v in (os.environ if base is None else base).items() if k.upper() not in BUILDER_HIDES}
+
 def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
     """Run every worker (at most max_parallel at once), wait for all, and write <run>/agents.csv."""
     run = os.path.abspath(run)
@@ -249,7 +261,7 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
     missing = missing_agents()
     if missing:   # an agent that is not here would fail every builder on it, one by one: say so once, before any start
         raise SystemExit(' '.join(f"{a} isn't installed here. {AGENT_HELP.get(a, '')}".strip() for a in missing))
-    env =dict(os.environ, PYTHONPATH=HIVE_ROOT + os.pathsep + os.environ.get('PYTHONPATH', ''),
+    env = dict(builder_env(), PYTHONPATH=HIVE_ROOT + os.pathsep + os.environ.get('PYTHONPATH', ''),
                HIVE_GUARD_CACHE=os.path.join(run, 'guard_cache'), HIVE_RUN=run)
     env = codemap.path_env(run, env)   # Gate 78-79: graphify on the builders' PATH when there is a map
     queue = sorted(f[:-3] for f in os.listdir(os.path.join(run, 'prompts')) if f.endswith('.md'))
@@ -268,13 +280,18 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
     for me in queue:
         mark(me, state='queued')
     tries = int(os.environ.get('HIVE_RESUME_TRIES', 8))   # about 6 hours of waiting at most
+    # one attempt's wall clock (the audit, Nov 15: a hung builder held an overnight run for ever); waiting out a usage
+    # limit does not count, since each pick-up starts its own clock
+    from . import run as _run
+    limit = _run.seconds('HIVE_BUILDER_HOURS', 4) * 3600
     attempts, spent, first = {}, {}, {}   # per worker: limit stops so far, tokens and cost of earlier attempts, start
 
     def start(me):
         out = open(os.path.join(run, 'out', f'{me}.json'), 'w')
+        group = ({'creationflags': subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == 'nt' else {'start_new_session': True})
         p = subprocess.Popen(argv(builder_cmd(k=kth(me))), cwd=os.path.join(run, 'work', me), stdin=subprocess.PIPE, stdout=out,
                              stderr=subprocess.STDOUT, text=True, encoding='utf-8', errors='replace',   # Windows: "₹" in a goal
-                             env=dict(env, HIVE_WORKER=me, PYTHONIOENCODING='utf-8'))
+                             env=dict(env, HIVE_WORKER=me, PYTHONIOENCODING='utf-8'), **group)
         try:
             p.stdin.write(open(os.path.join(run, 'prompts', f'{me}.md'), encoding='utf-8').read() + (RESUME if attempts.get(me) else ''))
             p.stdin.close()
@@ -295,6 +312,11 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
         for item in list(live):
             me, t0, p, out = item
             if p.poll() is None:
+                if time.time() - t0 > limit:   # past its time: the builder and everything it started are stopped
+                    from . import run as _run
+                    _run._kill_tree(p); p.wait()
+                    open(os.path.join(run, 'out', f'{me}.timeout'), 'w').write(str(int(limit)))
+                    say(f'{me} ran past {limit / 3600:g} h and was stopped (HIVE_BUILDER_HOURS); what it landed is kept.')
                 continue
             live.remove(item); out.close()
             path = os.path.join(run, 'out', f'{me}.json')
@@ -318,7 +340,8 @@ def launch(run, max_parallel=0, say=lambda m: print(m, flush=True)):
             rows.append(dict(worker=me, agent=builder_agent(k=kth(me)), start=int(first[me]), end=int(time.time()),
                              minutes=round((time.time() - first[me]) / 60, 1), exit=p.returncode, tokens=tok,
                              cost_usd=cost, api_error=err, limit_stops=attempts.get(me, 0)))
-            mark(me, state='stopped' if os.path.exists(os.path.join(run, 'stopped', me)) else 'finished',
+            mark(me, state='stopped' if os.path.exists(os.path.join(run, 'stopped', me)) else
+                 'timed out' if os.path.exists(os.path.join(run, 'out', f'{me}.timeout')) else 'finished',
                  ended=int(time.time()), exit=p.returncode)
             say(f'{me} finished: exit {p.returncode}, {rows[-1]["minutes"]} min, cost {cost}' + (f', API ERROR {err}' if err else ''))
         time.sleep(2)

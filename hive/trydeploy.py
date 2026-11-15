@@ -97,12 +97,14 @@ def up(repo, branch, say=print, new_machine=None, target=None):
         _open_port(m)
         t = target(m) if target else cloud.Target(f"ubuntu@{m['ip']}", m['key'])
         token = secrets.token_urlsafe(12)
-        root = 'hive-try'
+        # The server's own folder (www) holds only the secret folder and a blank index.html, so the bare address
+        # shows a blank page, never a listing that names the secret; its log lives outside what is served (audit, Nov 15).
+        root, www = 'hive-try', 'hive-try/www'
         t.run(STOP_SERVER, check=False)
-        t.run(f'rm -rf {root} && mkdir -p {root}/{token}')
+        t.run(f'rm -rf {root} && mkdir -p {www}/{token} && printf "<!doctype html><title></title>" > {www}/index.html')
         t.put(tar, f'{root}/site.tar')
-        t.run(f'tar -xf {root}/site.tar -C {root}/{token} && rm {root}/site.tar')
-        t.run(f'cd {root} && (nohup timeout {HOURS * 3600} python3 -m http.server {PORT} --bind 0.0.0.0 '
+        t.run(f'tar -xf {root}/site.tar -C {www}/{token} && rm {root}/site.tar')
+        t.run(f'cd {root} && (nohup timeout {HOURS * 3600} python3 -m http.server {PORT} --bind 0.0.0.0 --directory www '
               f'> server.log 2>&1 &)')
         url = f"http://{m['ip']}:{PORT}/{token}/" + (f'{sub}/' if sub else '')
         _save({'url': url, 'ip': m['ip'], 'branch': branch, 'started': time.time(),

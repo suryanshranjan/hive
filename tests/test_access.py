@@ -114,4 +114,30 @@ check('a database that cannot be reached is kept and told plainly, its password 
 repo2 = os.path.join(home, 'project2'); subprocess.run(['git', 'init', '-q', '-b', 'main', repo2])
 check('no data yet: not routed to data', assistant.DATA_WORDS.search('how many orders this week?') is not None, True)
 
+# psql: the password goes in its environment, never on its command line (the audit, Nov 15)
+check('a database password is taken out of the address',
+      access._without_password('postgresql://shop:p%40ss@db.example.com:5433/orders?sslmode=require'),
+      ('postgresql://shop@db.example.com:5433/orders?sslmode=require', 'p@ss'))
+check('an address with no password is left as it is', access._without_password('postgresql://db/orders'),
+      ('postgresql://db/orders', None))
+seen = {}
+real_run = access.subprocess.run
+def fake_psql(args, env=None, **k):
+    seen.update(args=args, env=env); return subprocess.CompletedProcess(args, 0, 'n\n1\n', '')
+access.subprocess.run = fake_psql
+real_import = __builtins__.__import__ if hasattr(__builtins__, '__import__') else __import__
+import builtins
+def no_drivers(name, *a, **k):
+    if name.split('.')[0] in ('psycopg', 'psycopg2'):
+        raise ImportError(name)
+    return real_import(name, *a, **k)
+builtins.__import__ = no_drivers
+try:
+    access.run_sql('postgresql://shop:sup3rsecret@db.example.com/orders', 'select 1')
+except Exception as e:
+    seen['error'] = repr(e)
+finally:
+    builtins.__import__ = real_import; access.subprocess.run = real_run
+check('psql: the password is never on its command line',
+      ('sup3rsecret' in ' '.join(seen.get('args', [])), (seen.get('env') or {}).get('PGPASSWORD')), (False, 'sup3rsecret'))
 sys.exit(fail)

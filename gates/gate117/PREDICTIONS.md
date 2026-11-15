@@ -23,3 +23,9 @@ The image was first built locally on Docker Desktop, where the build is checked:
 - the phone-browser tap on the Deploy button itself: the API makes the same service;
 - GitHub cloning of his product (`HIVE_REPO`): this flight starts an empty project;
 - fast replies from another provider.
+
+## Amended before launch (Nov 15 2026, after the capability audit; nothing has flown yet)
+
+The audit found that `bind_first` gave the bot to whoever wrote to it first, so anyone who found the bot's name before the owner could take his Hive. Now only the chat that sends the **pairing word** binds: the word he typed into the form (`HIVE_PAIR_CODE`, or in `~/.hive/render_test.env` for this flight), else a 6-digit word that `hive boot` prints in Render's logs.
+- Step 2 becomes: the owner sends the pairing word to the new bot (`render117.py logs` shows it if none was set), then "set me up".
+- R2 adds: a second account that writes **before** the owner is not bound; it is asked for the word, never told it, and answered at most 5 times.

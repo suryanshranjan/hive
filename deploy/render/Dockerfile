@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends git curl ca-cer
  && rm -rf /var/lib/apt/lists/* /root/.npm
 WORKDIR /opt/hive
 COPY . .
-RUN pip install --no-cache-dir ".[api]"
+RUN pip install --no-cache-dir ".[api,secure]"   # secure: his keys encrypted on the disk (HIVE_MASTER_KEY)
 # HOME on the disk (render.yaml mounts it at /data); HIVE_HOST tells setup it is already always on
 ENV HOME=/data/home HIVE_HOST=render PYTHONUNBUFFERED=1 IS_SANDBOX=1
 CMD ["sh", "-c", "mkdir -p \"$HOME\" && exec hive boot"]

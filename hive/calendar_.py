@@ -14,10 +14,9 @@ def _path(repo):
     return os.path.join(DIR, memory.project_key(repo) + '.json')
 
 def config(repo):
-    try:
-        return json.load(open(_path(repo), encoding='utf-8'))
-    except (OSError, ValueError):
-        return {}
+    from . import vault
+    got = vault.load_json(_path(repo), {})
+    return got if isinstance(got, dict) else {}
 
 def _fetch(url):
     url = re.sub(r'^webcal://', 'https://', url)
@@ -32,14 +31,8 @@ def setup(repo, url):
     except Exception as e:
         return False, f"I couldn't read that calendar address ({str(e)[:120]}). In Google Calendar it's under Settings, " \
                       "your calendar, Integrate calendar: \"Secret address in iCal format\"."
-    os.makedirs(DIR, exist_ok=True)
-    p = _path(repo)
-    with open(p, 'w', encoding='utf-8') as f:
-        json.dump({'url': url, 'added': time.time()}, f)
-    try:
-        os.chmod(p, 0o600)
-    except OSError:
-        pass
+    from . import vault
+    vault.save_json(_path(repo), {'url': url, 'added': time.time()})   # the secret address, encrypted when Hive can
     soon = [e for e in evs if dt.datetime.now() <= e['start'] <= dt.datetime.now() + dt.timedelta(days=7)]
     return True, f"Connected to your calendar: {len(soon)} event{'s' if len(soon) != 1 else ''} in the next 7 days. " \
                  "I can only read it."

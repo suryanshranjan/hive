@@ -92,8 +92,9 @@ def _call(token, method, **params):
 def load():
     if os.environ.get('HIVE_TELEGRAM') == '0' or not os.path.exists(PATH):
         return None
-    cfg = json.load(open(PATH))
-    return cfg if cfg.get('token') and cfg.get('chat_id') else None
+    from . import vault
+    cfg = vault.load_json(PATH, {})   # the bot's token: encrypted when Hive can (hive/vault.py)
+    return cfg if isinstance(cfg, dict) and cfg.get('token') and cfg.get('chat_id') else None
 
 class Channel:
     """One owner's chat. `api(method, **params)` is the Telegram Bot API (replaced by a fake in tests)."""
@@ -775,15 +776,22 @@ def review(run, ch, goal='', check='', poll=20, greeting='Good morning', rulings
             '✅ Very good. Everything stands as built.')
     return rows
 
-def bind_first(token, api=None, wait_s=None, say=lambda s: print(s, flush=True)):
-    """Phone-only setup (Render): the bot's token is known, the owner's chat is not. The first private chat that writes
-    to the bot becomes the owner's, saved next to the token; anyone after that is refused (Channel.updates). Returns the
-    chat id, or None if nobody wrote within wait_s seconds (None: wait for ever)."""
+PAIR_TRIES = 5   # wrong pairing words a chat may send before it is ignored for good
+
+def _pair_norm(text):
+    return re.sub(r'\s+', '', (text or '')).casefold()
+
+def bind_first(token, api=None, wait_s=None, say=lambda s: print(s, flush=True), code=None):
+    """Phone-only setup (Render): the bot's token is known, the owner's chat is not. The first private chat that sends
+    the pairing word (code: the word he chose in Render's form, or one printed in the host's logs) becomes the owner's,
+    saved next to the token; anyone after that is refused (Channel.updates). Before the audit (Nov 15) the first chat
+    to write at all won, so anyone who found the bot's name first could take it. Returns the chat id, or None if
+    nobody paired within wait_s seconds (None: wait for ever)."""
+    if not _pair_norm(code):
+        raise ValueError('bind_first needs a pairing word')
     call = api or (lambda method, **p: _call(token, method, **p))
-    try:
-        cfg = json.load(open(PATH))
-    except (OSError, ValueError):
-        cfg = {}
+    from . import vault
+    cfg = vault.load_json(PATH, {}) or {}
     if cfg.get('token') == token and cfg.get('chat_id'):
         return cfg['chat_id']
     try:
@@ -794,8 +802,9 @@ def bind_first(token, api=None, wait_s=None, say=lambda s: print(s, flush=True))
                 "TELEGRAM_BOT_TOKEN, then redeploy.")
             raise SystemExit(2)
         bot = 'your bot'
-    say(f'Waiting for the first message to @{bot}: whoever writes first becomes its owner.')
+    say(f'Waiting for your pairing word on @{bot}. Open the bot on your phone and send it; only that chat becomes the owner.')
     offset, end = None, (time.time() + wait_s) if wait_s else None
+    tries = {}
     while end is None or time.time() < end:
         p = {'timeout': 20 if end is None else max(0, min(20, int(end - time.time())))}
         if offset is not None:
@@ -810,13 +819,17 @@ def bind_first(token, api=None, wait_s=None, say=lambda s: print(s, flush=True))
             if not (m and m.get('chat', {}).get('type') == 'private'):
                 continue
             chat, who = m['chat']['id'], (m.get('from') or {}).get('first_name') or 'you'
-            os.makedirs(os.path.dirname(PATH), exist_ok=True)
-            with open(PATH, 'w') as f:
-                json.dump({'token': token, 'chat_id': chat, 'address': who}, f)
-            try:
-                os.chmod(PATH, 0o600)
-            except OSError:
-                pass
+            if _pair_norm(code) not in _pair_norm(m.get('text')):
+                tries[chat] = tries.get(chat, 0) + 1
+                if tries[chat] <= PAIR_TRIES:
+                    try:
+                        call('sendMessage', chat_id=chat, text=(
+                            "Hello. To make me yours, send the pairing word you chose when you set me up on Render "
+                            "(or the one shown in Render's logs)." if tries[chat] < PAIR_TRIES else STRANGER))
+                    except Exception:
+                        pass
+                continue
+            vault.save_json(PATH, {'token': token, 'chat_id': chat, 'address': who})
             call('getUpdates', offset=offset, timeout=0)   # his hello is read: it must not count as an answer later
             call('sendMessage', chat_id=chat, parse_mode='HTML', text=(
                 f"🐝 <b>Hello, {esc(who)}. I'm Hive, and I'm yours now.</b> I'm running in the cloud, always on, and I "
@@ -854,10 +867,8 @@ def setup():
         print('  No message arrived within 5 minutes. Run hive telegram setup again.'); return 1
     _call(token, 'getUpdates', offset=offset, timeout=0)   # mark it read
     address = input(f'\n4. How should Hive address you? (Enter for "{who}"; or for example: sir) > ').strip() or who
-    os.makedirs(os.path.dirname(PATH), exist_ok=True)
-    with open(PATH, 'w') as f:
-        json.dump({'token': token, 'chat_id': chat, 'address': address}, f)
-    os.chmod(PATH, 0o600)
+    from . import vault
+    vault.save_json(PATH, {'token': token, 'chat_id': chat, 'address': address})
     _call(token, 'sendMessage', chat_id=chat, text=f"Hello, {address}. I'm connected and at your service. When the "
                                                   "builders need a decision, I'll bring it here, with my recommendation. "
                                                   "I listen to this chat only.")
@@ -869,9 +880,8 @@ def call(address):
     if not cfg:
         print('Not connected yet: run hive telegram setup.'); return 1
     cfg['address'] = address.strip()
-    with open(PATH, 'w') as f:
-        json.dump(cfg, f)
-    os.chmod(PATH, 0o600)
+    from . import vault
+    vault.save_json(PATH, cfg)
     Channel(cfg).send(f'🐝 Very good, {cfg["address"]}.'); print(f'Hive will address you as "{cfg["address"]}".'); return 0
 
 def test():

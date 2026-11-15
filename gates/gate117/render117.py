@@ -3,7 +3,8 @@ Render's API, so it can be timed and deleted cleanly:
   python gates/gate117/render117.py up       make the worker (render.yaml's settings) and wait for its first deploy
   python gates/gate117/render117.py logs     the service's recent log lines (secrets never printed)
   python gates/gate117/render117.py down     delete the service and its disk (nothing left billing)
-Keys come from ~/.hive/render_test.env (RENDER_API_KEY, TELEGRAM_BOT_TOKEN, ANTHROPIC_API_KEY), never from the repo.
+Keys come from ~/.hive/render_test.env (RENDER_API_KEY, TELEGRAM_BOT_TOKEN, ANTHROPIC_API_KEY, optional HIVE_PAIR_CODE),
+never from the repo.
 Results: gates/gate117/results/flight.json."""
 import json, os, re, sys, time, urllib.error, urllib.parse, urllib.request
 
@@ -58,7 +59,8 @@ def up():
     body = {'type': 'background_worker', 'name': 'hive-g117', 'ownerId': owner,
             'repo': 'https://github.com/suryanshranjan/hive', 'branch': 'main', 'autoDeployTrigger': 'off',
             'envVars': [{'key': 'TELEGRAM_BOT_TOKEN', 'value': k['TELEGRAM_BOT_TOKEN']},
-                        {'key': 'ANTHROPIC_API_KEY', 'value': k['ANTHROPIC_API_KEY']}],
+                        {'key': 'ANTHROPIC_API_KEY', 'value': k['ANTHROPIC_API_KEY']}]
+                       + ([{'key': 'HIVE_PAIR_CODE', 'value': k['HIVE_PAIR_CODE']}] if k.get('HIVE_PAIR_CODE') else []),
             'serviceDetails': {'runtime': 'docker', 'plan': 'standard', 'region': 'singapore',
                                'envSpecificDetails': {'dockerfilePath': './deploy/render/Dockerfile', 'dockerContext': '.'},
                                'disk': {'name': 'hive-data', 'mountPath': '/data', 'sizeGB': 10}}}

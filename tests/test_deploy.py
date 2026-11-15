@@ -136,4 +136,15 @@ for words, taps, want in (('no', [tap('fst|no')], 'no_preview'), ('yes', [tap('f
 check('Vercel\'s labelled address is the one read, not the last link printed',
       deploy._url('{"x": "vercel inspect https://a-1.vercel.app"}\nPreview  https://a-git.vercel.app\n'), 'https://a-git.vercel.app')
 deploy.shutil.which = real_which
+# a Render hook runs in a shell: anything but an address's own characters is refused (the audit, Nov 15)
+hk = os.path.join(home, 'hookrepo'); subprocess.run(['git', 'init', '-q', '-b', 'main', hk])
+subprocess.run(['git', '-C', hk, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '--allow-empty', '-m', 'i'])
+good = deploy.setup(hk, 'render', hook='https://api.render.com/deploy/srv-abc123?key=Xy_9-z')
+check('render: a real hook address is kept', good['live'], 'curl -fsS -X POST "https://api.render.com/deploy/srv-abc123?key=Xy_9-z"')
+for bad in ('https://api.render.com/deploy/x"; rm -rf ~; echo "', 'https://x.com/$(id)', 'https://x.com/a&calc', 'http://x.com/a'):
+    try:
+        deploy.setup(hk, 'render', hook=bad); refused = False
+    except ValueError:
+        refused = True
+    check(f'render: a hook with shell characters is refused ({bad[:24]}...)', refused, True)
 sys.exit(fail)
