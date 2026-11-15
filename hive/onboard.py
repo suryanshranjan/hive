@@ -218,18 +218,26 @@ def step_home(ch, repo, poll, k, n):
     """Where Hive runs: his choice, at real monthly prices (the owner: "it depends on the user"). A machine he picks is
     made after set-up, once the rest is done (Hive moves there and keeps listening while his computer is off)."""
     from . import cloud_aws
+    if cloud_aws.on_render():   # set up from his phone on Render: already always on, nothing to choose
+        cloud_aws.prefer('render'); _keep(repo, home='render')
+        ch.send(f"☁️ <b>{k} of {n}.</b> I'm already always on, on your Render account (about "
+                f"${cloud_aws.render_monthly()} a month there). Nothing to choose.", html=True)
+        return
     (small, what_s), (big, what_b) = cloud_aws.SIZES
     ch.send(f"<b>{k} of {n}. Where should I run?</b>\n\n"
             "• <b>On this computer</b>: free, but I stop when it's off or asleep.\n"
             f"• <b>Always on, small</b>: about ${cloud_aws.monthly(small)} a month on your AWS account; {what_s}.\n"
-            f"• <b>Always on, bigger</b>: about ${cloud_aws.monthly(big)} a month; {what_b}.\n\n"
+            f"• <b>Always on, bigger</b>: about ${cloud_aws.monthly(big)} a month; {what_b}.\n"
+            f"• <b>Always on, on Render</b>: about ${cloud_aws.render_monthly()} a month on your own Render account; "
+            "set up from any phone, no computer needed.\n\n"
             "<i>You can change this any time: \"move to the cloud\" or \"delete the cloud machine\".</i>", html=True,
             buttons=[[('💻 This computer, free', f'onb|home|laptop')],
                      [(f'☁️ Small, ~${cloud_aws.monthly(small)}/month', f'onb|home|{small}')],
-                     [(f'☁️ Bigger, ~${cloud_aws.monthly(big)}/month', f'onb|home|{big}')]])
+                     [(f'☁️ Bigger, ~${cloud_aws.monthly(big)}/month', f'onb|home|{big}')],
+                     [(f'☁️ Render, ~${cloud_aws.render_monthly()}/month', 'onb|home|render')]])
     while True:
         kind, got = telegram._wait(ch, poll, {'onb|home|laptop', f'onb|home|{small}', f'onb|home|{big}',
-                                              f'onb|skip|{k}', 'onb|stop'})
+                                              'onb|home|render', f'onb|skip|{k}', 'onb|stop'})
         if kind == 'tap':
             choice = got.split('|')[2] if got.startswith('onb|home|') else None
             if got == 'onb|stop':
@@ -238,16 +246,29 @@ def step_home(ch, repo, poll, k, n):
             n_ = _norm(got)
             if n_ in STOP:
                 raise _Paused
-            choice = (big if re.search(r'\b(big|bigger|large)\b', n_) else small if re.search(r'\b(small|cloud|always)\b', n_)
+            choice = ('render' if re.search(r'\brender\b', n_) else
+                      big if re.search(r'\b(big|bigger|large)\b', n_) else small if re.search(r'\b(small|cloud|always)\b', n_)
                       else 'laptop' if re.search(r'\b(computer|laptop|free|here|this)\b', n_) else
                       None if n_ in SKIP else '?')
             if choice == '?':
-                ch.send("Tap one, or say \"this computer\", \"small\" or \"bigger\"."); continue
+                ch.send("Tap one, or say \"this computer\", \"small\", \"bigger\" or \"Render\"."); continue
         break
     if not choice:
         return
     cloud_aws.prefer(choice)
     _keep(repo, home=choice)
+    if choice == 'render':   # his own Render account: he starts it there; none of his keys pass through here
+        ch.send("☁️ <b>Very good: Render.</b> About five minutes, all from your phone:\n"
+                "1. Your project needs to be on GitHub (your engineer can do it, or say \"put it on GitHub\").\n"
+                f"2. Open {cloud_aws.RENDER_DEPLOY} and sign in to Render (or make an account).\n"
+                "3. Make a new bot for it: send /newbot to @BotFather (two bots can't share one chat).\n"
+                "4. Fill in the form: the new bot's token, an Anthropic API key (console.anthropic.com), and your "
+                "project's GitHub name with a GitHub token.\n"
+                "5. Tap <b>Deploy</b>, then send the new bot a message from this phone.\n\n"
+                f"About ${cloud_aws.render_monthly()} a month, on your Render bill. Until it says hello, I carry on "
+                "here; then you can switch this computer off.",
+                html=True)
+        return
     ch.send("💻 Very good: I'll run on this computer." if choice == 'laptop' else
             f"☁️ Very good: always on, about ${cloud_aws.monthly(choice)} a month. I'll move there when we've finished "
             "setting up.")

@@ -27,6 +27,20 @@ def monthly(size):
     """What a machine left on costs a month, all in: the machine, its disk and its public address (dollars, rounded)."""
     return round(PRICE.get(size, 0.1) * 730 + DISK_GB * GB_MONTH + ADDRESS * 730)
 
+# Render, the second always-on choice (the owner asked): a worker with a disk, on the founder's own Render account,
+# started from a phone with the Deploy button (render.yaml, hive/boot.py). Plan 1c-2g (1 CPU, 2 GB): Claude Code and a
+# builder need more than the 512 MB plan. Prices are Render's list as last known ($25 a month for 1c-2g, $0.25 per
+# GB-month of disk); its pricing page did not render for checking on Nov 15 2026, so they are not verified.
+RENDER_PLAN, RENDER_MONTH, RENDER_DISK_GB, RENDER_GB_MONTH = '1c-2g', 25.0, 10, 0.25
+RENDER_DEPLOY = 'https://render.com/deploy?repo=https://github.com/suryanshranjan/hive'
+
+def render_monthly():
+    return round(RENDER_MONTH + RENDER_DISK_GB * RENDER_GB_MONTH)
+
+def on_render():
+    """True when this Hive runs on Render (Render sets RENDER=true in every service)."""
+    return os.environ.get('RENDER') == 'true' or os.environ.get('HIVE_HOST') == 'render'
+
 CHOICE = lambda: os.path.join(os.path.expanduser('~'), '.hive', 'always_on.json')
 
 def prefer(size):

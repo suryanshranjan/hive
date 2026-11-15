@@ -101,6 +101,7 @@ class Channel:
         self.chat = cfg['chat_id']; self.address = cfg.get('address'); self._token = cfg.get('token')
         self.api = api or (lambda method, **p: _call(cfg['token'], method, **p))
         self.offset = None
+        self._told = set()   # strangers already told this bot is someone else's
         self.note = None   # what to say when the owner asks for status (set by whoever is running)
         self.listener = listener   # the always-on listener never claims the chat; builds and reviews do
         self.history = []   # the conversation so far, (who, text), so a reply is read in context: "yes" to what?
@@ -273,8 +274,15 @@ class Channel:
                 out.append((None, cq.get('data'), cq.get('message', {}).get('message_id')))
             elif 'message' in u:
                 m = u['message']
-                if m.get('chat', {}).get('id') != self.chat:
-                    continue   # someone else: ignored
+                if m.get('chat', {}).get('id') != self.chat:   # someone else: never read, told once (a public bot
+                    other = m.get('chat', {}).get('id')           # name can be found by anyone)
+                    if other and m.get('chat', {}).get('type') == 'private' and other not in self._told:
+                        self._told.add(other)
+                        try:
+                            self.api('sendMessage', chat_id=other, text=STRANGER)
+                        except Exception:
+                            pass
+                    continue
                 reply_to = (m.get('reply_to_message') or {}).get('message_id')
                 if m.get('text'):
                     self.last_id = m.get('message_id')   # so a message carrying a password can be taken back out
@@ -766,6 +774,56 @@ def review(run, ch, goal='', check='', poll=20, greeting='Good morning', rulings
     ch.send(('🛠 Right away. The builders are on it. ' + "I'll let you know the moment it's done.") if rows else
             '✅ Very good. Everything stands as built.')
     return rows
+
+def bind_first(token, api=None, wait_s=None, say=lambda s: print(s, flush=True)):
+    """Phone-only setup (Render): the bot's token is known, the owner's chat is not. The first private chat that writes
+    to the bot becomes the owner's, saved next to the token; anyone after that is refused (Channel.updates). Returns the
+    chat id, or None if nobody wrote within wait_s seconds (None: wait for ever)."""
+    call = api or (lambda method, **p: _call(token, method, **p))
+    try:
+        cfg = json.load(open(PATH))
+    except (OSError, ValueError):
+        cfg = {}
+    if cfg.get('token') == token and cfg.get('chat_id'):
+        return cfg['chat_id']
+    try:
+        bot = call('getMe').get('username', 'your bot')
+    except Exception:
+        bot = 'your bot'
+    say(f'Waiting for the first message to @{bot}: whoever writes first becomes its owner.')
+    offset, end = None, (time.time() + wait_s) if wait_s else None
+    while end is None or time.time() < end:
+        p = {'timeout': 20 if end is None else max(0, min(20, int(end - time.time())))}
+        if offset is not None:
+            p['offset'] = offset
+        try:
+            batch = call('getUpdates', **p)
+        except (OSError, http.client.HTTPException, RuntimeError):
+            time.sleep(3); continue
+        for u in batch:
+            offset = u['update_id'] + 1
+            m = u.get('message')
+            if not (m and m.get('chat', {}).get('type') == 'private'):
+                continue
+            chat, who = m['chat']['id'], (m.get('from') or {}).get('first_name') or 'you'
+            os.makedirs(os.path.dirname(PATH), exist_ok=True)
+            with open(PATH, 'w') as f:
+                json.dump({'token': token, 'chat_id': chat, 'address': who}, f)
+            try:
+                os.chmod(PATH, 0o600)
+            except OSError:
+                pass
+            call('getUpdates', offset=offset, timeout=0)   # his hello is read: it must not count as an answer later
+            call('sendMessage', chat_id=chat, parse_mode='HTML', text=(
+                f"🐝 <b>Hello, {esc(who)}. I'm Hive, and I'm yours now.</b> I'm running in the cloud, always on, and I "
+                "listen to this chat only.\n\nSay <b>\"set me up\"</b> and I'll get to know your business or your product "
+                "in about two minutes, or help you start something new."))
+            say(f'Bound to the first chat that wrote ({who}).')
+            return chat
+    return None
+
+STRANGER = ("This assistant belongs to someone else, so I can't help here. To have your own, see "
+            "https://github.com/suryanshranjan/hive (it works from a phone).")
 
 def setup():
     print('\nLet\'s connect Hive to your Telegram, so questions reach your phone.\n'

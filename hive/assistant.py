@@ -1546,7 +1546,7 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         from . import onboard
         r = onboard.run(ch, repo, poll)
         home = onboard.progress(repo).get('home')
-        if r == 'done' and cloud and home and home != 'laptop' and not in_cloud(repo):   # always on, as he chose
+        if r == 'done' and cloud and home and home not in ('laptop', 'render') and not in_cloud(repo):   # always on, as he chose
             from . import cloud_aws, logins
             if not logins.ensure(ch, 'aws', poll):
                 return 'onboard_login_needed'

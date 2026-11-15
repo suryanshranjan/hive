@@ -8,6 +8,7 @@ For the owner:
                                          a mix such as --agent claude,codex gives the builders each in turn
   hive morning [--phone]                 after an overnight build: check its decisions (on Telegram with --phone)
   hive listen                            stay on Telegram: change your mind, "build: ...", "status"
+  hive boot                              on a host (Render, from a phone): settings in, bind the first chat, listen
   hive rules [forget <n>]                your standing rulings for this project
   hive name ["Sunny Shop"]               what Hive calls this project (your startup's name)
   hive pace [fast|cheap]                 build fast (more builders, more cost) or cheap (one builder)
@@ -144,6 +145,7 @@ def build_parser():
     st.add_argument('--save-agent', action='store_true')   # remember --agent for every build on this computer
     st.add_argument('--overnight', action='store_true'); st.add_argument('--no-interview', action='store_true')   # no questions; check the assumptions later with `hive morning`
     sub.add_parser('doctor'); sub.add_parser('setup')
+    sub.add_parser('boot')   # on a host with no keyboard (Render): settings in, then listen
     up = sub.add_parser('up'); up.add_argument('--repo')   # live on his phone, listening; --repo: his code's GitHub address
     br = sub.add_parser('brain'); br.add_argument('action', choices=['add']); br.add_argument('path')
     de = sub.add_parser('deploy'); de.add_argument('action', choices=['setup', 'preview', 'status'])
@@ -213,6 +215,9 @@ def main(argv=None):
             from . import cloud_aws
             return cloud_aws.stop() if a.stop else cloud_aws.new('.', a.size, a.region, a.profile, not a.no_login, not a.no_start)
         return cloud.go('.', a.to, a.with_login, not a.no_start)
+    if a.cmd == 'boot':
+        from . import boot
+        return boot.main()
     if a.cmd in ('doctor', 'setup'):
         from . import doctor
         return doctor.main('.') if a.cmd == 'doctor' else doctor.setup('.')
