@@ -123,4 +123,14 @@ fake = FakeTelegram([say('render please')]); ch = telegram.Channel({'token': 't'
 r2 = tempfile.mkdtemp(); onboard.step_home(ch, r2, 1, 6, 6)
 check('said "render": understood', onboard.progress(r2).get('home'), 'render')
 check('price: 1c-2g plus a 10 GB disk', cloud_aws.render_monthly(), 28)
+# a mistyped token: said plainly and stopped, never silence for ever (Gate 117 prep: it waited on "@your bot")
+said = []
+def refused(method, **p):
+    raise RuntimeError('Telegram getMe: Unauthorized')
+try:
+    telegram.bind_first('123:bogus', api=refused, wait_s=1, say=said.append); code = None
+except SystemExit as e:
+    code = e.code
+check('a refused token: a plain reason and a stop', (code, any('refused' in s and 'BotFather' in s for s in said)), (2, True))
+
 sys.exit(fail)

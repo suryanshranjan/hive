@@ -788,7 +788,11 @@ def bind_first(token, api=None, wait_s=None, say=lambda s: print(s, flush=True))
         return cfg['chat_id']
     try:
         bot = call('getMe').get('username', 'your bot')
-    except Exception:
+    except Exception as e:   # a mistyped token is refused (401, 404): said plainly, not silence for ever (Gate 117 prep)
+        if isinstance(e, RuntimeError) and re.search(r'Unauthorized|Not Found|HTTP 40[14]', str(e)):
+            say("Telegram refused this bot's token. Copy it again from @BotFather (/mybots > your bot > API Token) into "
+                "TELEGRAM_BOT_TOKEN, then redeploy.")
+            raise SystemExit(2)
         bot = 'your bot'
     say(f'Waiting for the first message to @{bot}: whoever writes first becomes its owner.')
     offset, end = None, (time.time() + wait_s) if wait_s else None
