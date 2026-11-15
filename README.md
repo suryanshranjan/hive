@@ -58,12 +58,27 @@ hive setup      # connects your phone (Telegram); then Hive says hello there
 
 **3. On your phone, say "set me up".** Hive asks whether you run a business, build a product, or are starting something new, and gets to know it in about two minutes. Everything after that happens in Telegram.
 
+### Only a phone
+
+No computer? Hive can run on your own [Render](https://render.com) account, always on, set up entirely from your phone's browser (about five minutes):
+
+1. **Make a bot.** In Telegram, send `/newbot` to @BotFather and follow its two steps. It gives you a token like `123456:ABC-DEF…`.
+2. **Get a model key** at [console.anthropic.com](https://console.anthropic.com) (API keys). Builders and replies run on it.
+3. **Tap the button** and sign in to Render:
+
+   [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/suryanshranjan/hive)
+
+4. **Fill in the form:** the bot's token and the model key. Optional: your product on GitHub (`owner/name`) with a GitHub token, or a key from another provider for fast replies. Tap **Deploy**.
+5. **Send your bot a message.** The first person to write to it becomes its owner; anyone after that is turned away. Hive says hello; say **"set me up"**.
+
+Cost: about $28 a month on your Render bill (a 1 CPU, 2 GB worker and a 10 GB disk, at Render's list prices as last known; check render.com/pricing), plus what the model uses. Your chat, rules and work live on that disk, so a restart loses nothing. Nobody else hosts anything for you, and your keys stay in your Render account.
+
 ### What it costs
 
 - **Claude:** Hive's assistant and planner run on Claude Code, so you need a Claude subscription (Pro or Max) or an Anthropic API account. That is the only thing you must pay for.
 - **Codex (optional):** the building can also be done by OpenAI's Codex, on your ChatGPT plan, alone or mixed with Claude (*"use 2 Claude and 2 Codex"*). Handy if you already pay for ChatGPT, or to spread the work across both plans' limits. Gemini works as a builder too.
 - **Each job:** Hive tells you the price before it starts, and asks before going past your budget (*"set my budget to $50 a month"*). In the tests, a small change cost about $0.80, a three-step plan about $1.50 to $3, and answering from your data a few cents.
-- **Always on (optional):** a machine on your own AWS account, about $23 a month (small) or $72 (bigger). Or keep it on your computer for free.
+- **Always on (optional):** a machine on your own AWS account, about $23 a month (small) or $72 (bigger), or Render, about $28 (set up from a phone). Or keep it on your computer for free.
 - **Hosting, mail, calendar, payments:** Hive uses the accounts you already have; it adds no fee of its own.
 
 Already have Python 3.10+, git and Claude Code? `pip install git+https://github.com/suryanshranjan/hive` is enough.

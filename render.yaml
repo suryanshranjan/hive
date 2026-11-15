@@ -1,0 +1,30 @@
+# Hive, always on, started from a phone: the "Deploy to Render" button in README.md reads this file.
+# Field names from Render's Blueprint spec (render.com/docs/blueprint-spec, checked Nov 15 2026). A disk needs a paid
+# instance; 1c-2g (1 CPU, 2 GB) because Claude Code and a builder do not fit in 512 MB.
+services:
+  - type: worker
+    name: hive
+    runtime: docker
+    dockerfilePath: ./deploy/render/Dockerfile
+    dockerContext: .
+    plan: 1c-2g
+    autoDeployTrigger: "off"   # his Hive changes only when he redeploys, never under him
+    disk:
+      name: hive-data
+      mountPath: /data
+      sizeGB: 10
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN   # from @BotFather (/newbot); whoever writes to the bot first becomes its owner
+        sync: false
+      - key: ANTHROPIC_API_KEY    # console.anthropic.com: the builders (Claude Code) and fast replies
+        sync: false
+      - key: HIVE_REPO            # optional: your product on GitHub, as owner/name; empty starts a new project
+        sync: false
+      - key: GITHUB_TOKEN         # optional: lets Hive read and push to that repository (never to main)
+        sync: false
+      - key: HIVE_FAST_KEY        # optional: fast replies from another provider (any OpenAI-style API)
+        sync: false
+      - key: HIVE_FAST_BASE_URL   # optional, with HIVE_FAST_KEY: for example https://api.openai.com/v1
+        sync: false
+      - key: HIVE_FAST_MODEL      # optional, with HIVE_FAST_KEY: for example gpt-5-mini
+        sync: false
