@@ -9,11 +9,13 @@ Hive is a founder's assistant, in the manner of J.A.R.V.I.S. You talk to it on T
 - **Pictures:** "make it like this".
 - **Complaints:** "a customer says…"
 - **Your numbers:** "how many orders came in this week?" Answered from your own data, read-only, once you've connected it.
+- **Your office:** "any important emails?", "reply to Asha saying Thursday works", "am I free at 3?", "how much did we make this week?" From your mailbox, Google Calendar, Stripe or Razorpay. It only reads; a reply goes out only when you tap Send, and it never moves money.
 - **Stepping away:** "I'm sleepy." Hive offers to carry the work on in the cloud so you can shut your computer, or another way.
+- **Always on, if you want it:** you choose where Hive runs: your computer (free), or a small (about $23 a month) or bigger (about $72) machine on your own AWS account.
 
 Getting started is one conversation: say "set me up", and Hive asks whether you run a business, have a product you build, or want to start something new, then gets to know it in about two minutes. Hive asks you only what only you can decide. It builds on copies of your code, checks every test, and arrives as a pull request for your engineer. When it's merged, "put it live" puts it live, and "undo that" takes anything back.
 
-Hive is a research project as much as a product: **108 pre-registered experiments** (*gates*), each scored against predictions pushed before it ran, failures included. Start with [`BRAIN.md`](BRAIN.md) for what is known and how sure we are.
+Hive is a research project as much as a product: **113 pre-registered experiments** (*gates*), each scored against predictions pushed before it ran, failures included. Start with [`BRAIN.md`](BRAIN.md) for what is known and how sure we are.
 
 ---
 
@@ -167,7 +169,7 @@ The lower-level commands for scripts and experiments (`init`, `run`, `owner`, `r
 
 ## What the evidence says
 
-Every result below was predicted on GitHub before the run. Real-company results publish aggregate numbers only. Most of the recent gates use a synthetic owner who answers from a written policy, on mock products. The founder session on a real product is the next test.
+Every result below was predicted on GitHub before the run. Real-company results publish aggregate numbers only. Most of the recent gates use a synthetic owner who answers from a written policy, on mock products. The founder session on a real product, and the office on his real accounts, are the next tests.
 
 | Finding | Result | Where |
 | --- | --- | --- |
@@ -188,11 +190,11 @@ Every result below was predicted on GitHub before the run. Real-company results 
 | Give it the business, not the task | 8 of 9 planted problems found and built from a goal alone, 4 owner messages, no technical words; a simulated customer panel (MiroFish's idea) added nothing | Gate 106 |
 | A fresh founder end to end (14 steps on the phone) | Runs 3 and 4 passed every step (about 13 min, $3). Run 1 found that the plan never went live, which is fixed | Gate 107 |
 | Run a company's numbers through Hive | After fixes, run 3: onboarding in 0.3 min, 10 of 10 figure answers from the data, a ₹500 rule found only in the payouts and explained, screens on every device, a 3-step plan built (7.9 min, $0.76). Runs 1-2 found 2 faults (a build that couldn't start; queries dropped, which fired the kill at 5 of 10), both fixed. Run 4 repeated run 3, and its plan found all 4 planted problems | Gate 108 |
-| A second company, another trade | FixKaro (appliance repair): setup, 9 of 10 figures, a pay rule only the data held, screens on every device, and a plan that found 3 of 4 planted problems, the hidden price among them (8 min, $1.07) | Gate 113 |
-| Run the office from the phone: mail, calendar, payments | On a real mail server, Stripe's official mock and the real model: the mails that matter in 50 words, nothing marked read, a reply sent in-thread only on your tap, the week's takings exact with a failed payment flagged, "am I free?" answered. Stand-ins, not real accounts yet | Gate 112 |
-| Always on, your choice | On real AWS: offered at real monthly prices; the size you pick is made; Hive listens there; "delete the cloud machine" deletes it (2.3 min, $0.002) | Gate 111 |
-| Run hosting from the phone, on real Vercel | Hive installed Vercel's tool itself and connected; a link to try; "put it live" refused before the merge, done on your yes; "undo that" took it back; everything deleted, nothing else touched, $0. It first found Vercel puts a new project's first version live (now Hive asks) | Gate 110 |
 | Hand the work to the cloud and back, on real AWS | "I'm sleepy" with a build running: moved to a t3.small in 2.4 min; the work restarted there, his 2 answers asked on Telegram and built in (10 tests passing); the work came home and the machine was deleted, nothing left billing (29 min, $0.88). The test page first failed on a bug, then, fixed, went up at a private link and came down (3.4 min) | Gate 109 |
+| Run hosting from the phone, on real Vercel | Hive installed Vercel's tool itself and connected; a link to try; "put it live" refused before the merge, done on your yes; "undo that" took it back; everything deleted, nothing else touched, $0. It first found Vercel puts a new project's first version live (now Hive asks) | Gate 110 |
+| Always on, your choice | On real AWS: offered at real monthly prices; the size you pick is made; Hive listens there; "delete the cloud machine" deletes it (2.3 min, $0.002) | Gate 111 |
+| Run the office from the phone: mail, calendar, payments | On a real mail server, Stripe's official mock and the real model: the mails that matter in 50 words, nothing marked read, a reply sent in-thread only on your tap, the week's takings exact with a failed payment flagged, "am I free?" answered. Stand-ins, not real accounts yet | Gate 112 |
+| A second company, another trade | FixKaro (appliance repair): setup, 9 of 10 figures, a pay rule only the data held, screens on every device, and a plan that found 3 of 4 planted problems, the hidden price among them (8 min, $1.07) | Gate 113 |
 
 The failed and withdrawn ideas are kept with their evidence ([`BRAIN.md`](BRAIN.md) §6). Every finding that changes Hive is mapped to the code that acts on it in [`docs/research_to_product.md`](docs/research_to_product.md). The assistant's whole interaction design is in [`docs/jarvis.md`](docs/jarvis.md).
 
@@ -205,15 +207,15 @@ Every gate pushes its predictions and kill conditions to GitHub **before** it ru
 | Path | Contents |
 | --- | --- |
 | [`BRAIN.md`](BRAIN.md) | Shared memory: findings and how sure we are, measured constants, evidence log, prediction scorecard, open questions |
-| [`hive/`](hive/) | The product. `assistant.py` is the phone assistant; `start.py` the build; `swarm.py` and `guard.py` the builders; `plan.py` business goals; `onboard.py` setting up; `access.py` reading your data, read-only; `logins.py` renewing sign-ins; `trydeploy.py` test deploys; `ship.py` and `deploy.py` pull requests and hosting; `brief.py`, `numbers.py`, `budget.py`, `brain.py`, `safety.py`, `register.py`, `screens.py` and `refs.py` cover the rest |
+| [`hive/`](hive/) | The product. `assistant.py` is the phone assistant; `start.py` the build; `swarm.py` and `guard.py` the builders; `plan.py` business goals; `onboard.py` setting up; `access.py` reading your data, read-only; `logins.py` renewing sign-ins; `trydeploy.py` test deploys; `cloud.py` and `cloud_aws.py` always-on; `office.py` with `mail.py`, `calendar_.py` and `payments.py` the office; `ship.py` and `deploy.py` pull requests and hosting; `brief.py`, `numbers.py`, `budget.py`, `brain.py`, `safety.py`, `register.py`, `screens.py` and `refs.py` cover the rest |
 | [`tests/`](tests/) | About 530 checks with stand-in builders, a fake Telegram and a stand-in model, no network or tokens. They run on every push |
-| [`gates/`](gates/) | Every experiment (Gates 0-108): predictions, results, referee code, transcripts |
+| [`gates/`](gates/) | Every experiment (Gates 0-113): predictions, results, referee code, transcripts |
 | [`lab/`](lab/) | Run a gate in one command; [`lab/QUEUE.md`](lab/QUEUE.md) is the queue and session handoff |
 | [`docs/`](docs/) | The interaction design ([`jarvis.md`](docs/jarvis.md)), channels ([`channels.md`](docs/channels.md)), the gap plan, the founder session, related work |
 
 ## Privacy
 
-Several gates use a real company's code and rules (Company X). Its name, code, rules, documents and the founder's answers are not in this repository; those gates publish aggregate numbers only. Hive keeps an owner's Telegram link, rulings, business notes, numbers, budget, hosting settings and data access (with its keys, readable by the owner only) in `~/.hive/` on their own machine, never in a repository. It only ever reads his data, and asks for read-only logins. Moving Hive to the cloud copies these to his own machine there. Voice notes are transcribed on that machine.
+Several gates use a real company's code and rules (Company X). Its name, code, rules, documents and the founder's answers are not in this repository; those gates publish aggregate numbers only. Hive keeps an owner's Telegram link, rulings, business notes, numbers, budget, hosting settings and data access (with its keys, readable by the owner only) in `~/.hive/` on their own machine, never in a repository. It only ever reads his data, and asks for read-only logins. Mailbox app passwords, calendar addresses and payment keys are kept the same way, and the message carrying one is deleted from the chat. Moving Hive to the cloud copies these to his own machine there. Voice notes are transcribed on that machine.
 
 ## License
 
