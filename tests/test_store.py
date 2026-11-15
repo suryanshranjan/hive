@@ -112,5 +112,15 @@ check('a password he sent by mistake is taken out of the archive', 'hunter22' in
 store.add_fact('Owner two sells shoes.', 'note', P, owner='o2')
 check('one owner\'s facts are not another\'s', (any('shoes' in f['text'] for f in recall.recall(repo, 'shoes')),
       [f['text'] for f, _ in store.search('shoes', P, owner='o2')]), (False, ['Owner two sells shoes.']))
+# 11. by meaning, when the model is here (optional): "who brings our lentils?" finds the dal supplier
+from hive import embed
+if embed.available() and embed.wait(600):
+    store.add_fact('Our dal supplier is Sharma Traders in Indore.', 'note', P)
+    got = [f['text'] for f in recall.recall(repo, 'who brings our lentils?')]
+    check('by meaning: a question sharing no word with the fact finds it', any('Sharma' in t for t in got), True)
+else:
+    print('skip the meaning checks: fastembed is not installed (pip install "hive-swarm[memory]")')
+os.environ['HIVE_EMBED'] = '0'
+check('without the model, recall still works by words', bool(recall.recall(repo, 'dal supplier')), True)
 store.close()
 sys.exit(fail)

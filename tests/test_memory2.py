@@ -52,13 +52,12 @@ check('the plain notes builds and plans read still have them', len(memory.notes(
 
 # 1b. a change of mind about a fact (not only a rule): the old one is replaced, not kept beside the new
 def fake_model2(prompt):
-    if 'worth remembering' in prompt:
+    if 'worth remembering' in prompt:   # one call: the fact, and which kept facts (numbered in the prompt) it replaces
+        known = prompt.split('may be related (numbered):')[1].split('If his message changes')[0].strip().split('\n')
         if 'Gupta' in prompt.split('His newest message:')[1].split('\n')[1]:
-            return {'note': 'Our dal supplier is now Gupta Foods.', 'kind': 'note', 'person': None, 'until': ''}
-        return {'note': 'Our dal supplier is Sharma Traders.', 'kind': 'note', 'person': None, 'until': ''}
-    if 'no longer true' in prompt:
-        return {'replaced': [i + 1 for i, l in enumerate(prompt.split('Facts kept from before:')[1].split('\n')[1:])
-                             if 'Sharma' in l]}
+            return {'note': 'Our dal supplier is now Gupta Foods.', 'kind': 'note', 'person': None, 'until': '',
+                    'replaces': [i + 1 for i, l in enumerate(known) if 'Sharma' in l]}
+        return {'note': 'Our dal supplier is Sharma Traders.', 'kind': 'note', 'person': None, 'until': '', 'replaces': []}
     return _aj(prompt)
 explain.ask_json = fake_model2
 assistant.remember(ch(FakeTelegram([])), repo, 'we buy our dal from Sharma Traders').join(5)

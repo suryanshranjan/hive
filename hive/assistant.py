@@ -621,8 +621,15 @@ Does this message tell the assistant something lasting about his business or his
 future conversations: his customers, market, team, plans, priorities, deadlines, the people he works with, or how he
 likes things done? Not a rule for how the product should behave (those are kept elsewhere), not a question, not small
 talk, not about one build. Today is {today}.
+
+What the assistant already keeps that may be related (numbered):
+{known}
+If his message changes one of these (a new supplier, a new price, a new date, someone left), it is always lasting, even
+when it is about how his business or product works: give the fact as it is now, and the numbers of the kept facts it
+makes untrue. A message that only adds to a topic replaces nothing.
 Reply with JSON only: {{"note": "the fact, in one short plain sentence with names and numbers as he gave them, or empty
 if there is nothing lasting",
+"replaces": [numbers of the kept facts above that are no longer true],
 "kind": "note" | "preference" (how he likes things done) | "deadline" (something due by a date) | "person" (about
 someone in his world),
 "person": {{"name": "the person's name as he says it", "relation": "customer, supplier, cofounder, investor, employee,
@@ -642,16 +649,33 @@ def remember(ch, repo, text):
             except Exception:
                 pass
         try:
-            got = explain.ask_small(REMEMBER.format(text=text, history=history, today=time.strftime('%Y-%m-%d (%A)')))
+            related = _related(repo, text)   # one call keeps the fact and says what it replaces (Gate 118: a change
+            got = explain.ask_small(REMEMBER.format(   # that read like a product rule was lost; two calls cost more)
+                text=text, history=history, today=time.strftime('%Y-%m-%d (%A)'),
+                known='\n'.join(f'{i}. {f["text"]}' for i, f in enumerate(related, 1)) or '(nothing yet)'))
             if isinstance(got, dict):
-                keep(repo, got)
+                keep(repo, got, related)
         except Exception:
             pass
     t = threading.Thread(target=run, daemon=True); t.start()
     return t
 
-def keep(repo, got):
-    """Keep what REMEMBER found, with its kind, who it is about and until when it holds (memory 2.0)."""
+def _related(repo, text, k=5):
+    """The kept facts (not rules) closest to his message, by words and by meaning: what a change of mind could replace."""
+    try:
+        from . import store
+        project = memory.project_key(repo)
+        got = {}
+        for f, _ in store.search(text, project=project, k=k) + store.semantic(text, project=project, k=k):
+            if f['kind'] != 'rule':
+                got.setdefault(f['id'], f)
+        return list(got.values())[:k]
+    except Exception:
+        return []
+
+def keep(repo, got, related=None):
+    """Keep what REMEMBER found, with its kind, who it is about and until when it holds, and mark the kept facts it
+    makes untrue as replaced by it (memory 2.0)."""
     note = got.get('note')
     if not (isinstance(note, str) and note.strip()):
         return None
@@ -667,45 +691,28 @@ def keep(repo, got):
     until = None
     if kind == 'deadline' and re.fullmatch(r'\d{4}-\d{2}-\d{2}', str(got.get('until') or '')):
         until = time.mktime(time.strptime(got['until'], '%Y-%m-%d')) + 86400   # holds through the day it is due
-    try:   # what it may replace, looked up before it is kept (so it is not its own match)
-        from . import store
-        similar = [f for f, _ in store.search(note, project=memory.project_key(repo), k=4)
-                   if store.norm(f['text']) != store.norm(note) and f['kind'] != 'rule']
-    except Exception:
-        similar = []
     memory.add_note(repo, note.strip(), kind=kind, person=name or None, valid_until=until)
     LAST_KEPT.update(text=note.strip(), at=time.time())
-    if similar:
-        replaced(repo, note.strip(), similar)
+    nums = got.get('replaces')
+    if related and isinstance(nums, list):
+        supersede(repo, note.strip(), [related[k - 1] for k in nums if isinstance(k, int) and 1 <= k <= len(related)])
     return note.strip()
 
-REPLACES = """A business owner's assistant keeps facts about his business. He has just said something new:
-"{new}"
-
-Facts kept from before:
-{old}
-
-Which of the facts from before does the new one make untrue (he changed supplier, the price moved, the date changed,
-someone left)? Only a fact the new one contradicts or updates, not one that is merely about the same topic.
-Reply with JSON only: {{"replaced": [numbers of the facts that are no longer true]}}"""
-
-def replaced(repo, new, similar):
-    """A change of mind about a fact, not only a rule (memory 2.0): the facts the new one makes untrue are marked as
-    replaced by it, so a reply sees "the supplier is now Gupta Foods" and not also "the supplier is Sharma Traders"."""
+def supersede(repo, new, old_facts):
+    """The facts he has changed his mind about are marked as replaced by the new one, in the store and out of the
+    plain notes builds and plans read."""
     from . import store
-    got = explain.ask_small(REPLACES.format(new=new, old='\n'.join(f'{i}. {f["text"]}' for i, f in enumerate(similar, 1))))
-    nums = (got or {}).get('replaced') if isinstance(got, dict) else None
     now = store.find_fact(new, project=memory.project_key(repo))
-    gone = []
-    for k in nums if isinstance(nums, list) else []:
-        if isinstance(k, int) and 1 <= k <= len(similar) and now:
-            store.supersede(similar[k - 1]['id'], now['id']); gone.append(similar[k - 1]['text'])
-    if gone:   # out of the plain notes builds and plans read, too
-        kept = [n for n in memory.notes(repo) if store.norm(n) not in {store.norm(g) for g in gone}]
+    gone = [f for f in old_facts if now and f['id'] != now['id'] and store.norm(f['text']) != store.norm(new)]
+    for f in gone:
+        store.supersede(f['id'], now['id'])
+    if gone:
+        drop = {store.norm(f['text']) for f in gone}
+        kept = [n for n in memory.notes(repo) if store.norm(n) not in drop]
         import json as _json
-        with open(memory._notes_path(repo), 'w', encoding='utf-8') as f:
-            _json.dump(kept, f, indent=1, ensure_ascii=False)
-    return gone
+        with open(memory._notes_path(repo), 'w', encoding='utf-8') as fh:
+            _json.dump(kept, fh, indent=1, ensure_ascii=False)
+    return [f['text'] for f in gone]
 
 MEMORY_ASK = re.compile(r"\bwhat (do|did) you (know|remember)\b|\bwhat have i told you\b|\b(kya|kitna) (pata|yaad) hai\b")
 # about his memory without doubt: a number from the list, everything about someone, what he told Hive
@@ -2076,6 +2083,11 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
     except (OSError, ValueError):
         pass
     CURRENT['ch'] = ch   # a background build reports its problems here
+    try:   # the meaning model loads in the background, so his first question is not kept waiting (hive/embed.py)
+        from . import embed
+        embed.warm()
+    except Exception:
+        pass
     try:   # work his computer handed over before he shut it ("I'm sleepy" -> to the cloud): pick it up now
         resume_here(ch, repo)
     except Exception as e:

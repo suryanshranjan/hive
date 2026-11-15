@@ -8,9 +8,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends git curl ca-cer
  && useradd -m -u 1000 hive  && rm -rf /var/lib/apt/lists/* /root/.npm
 WORKDIR /opt/hive
 COPY . .
-RUN pip install --no-cache-dir ".[api,secure]"   # secure: his keys encrypted on the disk (HIVE_MASTER_KEY)
+RUN pip install --no-cache-dir ".[api,secure,memory]"   # secure: keys encrypted on the disk; memory: recall by meaning
 # HOME on the disk (render.yaml mounts it at /data); HIVE_HOST tells setup it is already always on
-ENV HOME=/data/home HIVE_HOST=render PYTHONUNBUFFERED=1
+ENV HOME=/data/home HIVE_HOST=render PYTHONUNBUFFERED=1 HIVE_MODELS=/data/models
 # Render's disk arrives owned by root: the start makes HOME his user's (once), then Hive and its builders run as that
 # user, never as root (the audit, Nov 15: everything ran as root, with Claude Code told it was a sandbox).
-CMD ["sh", "-c", "mkdir -p \"$HOME\" && { [ \"$(stat -c %U \"$HOME\")\" = hive ] || chown -R hive:hive \"$HOME\"; } && exec runuser -u hive -- env HOME=\"$HOME\" hive boot"]
+CMD ["sh", "-c", "mkdir -p \"$HOME\" \"$HIVE_MODELS\" && chown hive:hive \"$HIVE_MODELS\" && { [ \"$(stat -c %U \"$HOME\")\" = hive ] || chown -R hive:hive \"$HOME\"; } && exec runuser -u hive -- env HOME=\"$HOME\" hive boot"]

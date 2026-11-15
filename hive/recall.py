@@ -46,6 +46,15 @@ def recall(repo, text, k=K):
     for f, s in hits:   # how well it matches, a little for being recent, a little for coming from him
         age_days = (now - f['created']) / 86400
         add(f, 2.0 * s / top + 0.3 / (1 + age_days / 30) + (0.2 if f['trust'] == 'owner' else 0))
+    try:   # close in meaning, when the embedding model is here (hive/embed.py): "lentils" finds "dal"
+        sem = store.semantic(text, project=project, k=k)
+    except Exception:
+        sem = []
+    if sem:
+        best = sem[0][1]
+        for f, sim in sem:   # only what stands out from the rest (unrelated facts sit about 0.1 below related ones)
+            if sim >= best - 0.08 and sim >= 0.5:
+                add(f, 2.0 * sim / best + (0.2 if f['trust'] == 'owner' else 0))
     for p in _named_people(text):
         for f in store.facts_about(p['id'])[-6:]:
             add(f, 1.5)

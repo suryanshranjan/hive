@@ -60,6 +60,14 @@ MIGRATIONS = [
         INSERT INTO messages_fts(messages_fts, rowid, text) VALUES ('delete', old.id, old.text); END;
     CREATE TABLE IF NOT EXISTS synced (path TEXT PRIMARY KEY, mtime REAL NOT NULL);
     """,
+    # 2: meaning (hive/embed.py): one vector per fact, made when first needed, gone with the fact
+    """
+    CREATE TABLE IF NOT EXISTS embeddings (fact_id INTEGER PRIMARY KEY, model TEXT NOT NULL, vec BLOB NOT NULL);
+    CREATE TRIGGER IF NOT EXISTS embeddings_ad AFTER DELETE ON facts BEGIN
+        DELETE FROM embeddings WHERE fact_id = old.id; END;
+    CREATE TRIGGER IF NOT EXISTS embeddings_au AFTER UPDATE OF text ON facts BEGIN
+        DELETE FROM embeddings WHERE fact_id = old.id; END;
+    """,
 ]
 
 def path():
@@ -207,6 +215,28 @@ def search(text, project=None, k=12, owner=OWNER, include_forgotten=False):
     except sqlite3.OperationalError:
         return []
     return [(dict(r), -r['rank']) for r in rows]
+
+def semantic(text, project=None, k=12, owner=OWNER):
+    """Facts close in meaning to his words, best first: [(fact, similarity 0-1)]. [] without the embedding model."""
+    from . import embed
+    if not (text or '').strip() or not embed.available() or not embed.ready():   # never waits on the model
+        return []
+    import numpy as np
+    facts = live_facts(project, owner=owner)
+    if not facts:
+        return []
+    con = connect()
+    have = {r[0]: r[1] for r in con.execute('SELECT fact_id, vec FROM embeddings WHERE model=?', (embed.MODEL,)).fetchall()}
+    missing = [f for f in facts if f['id'] not in have]
+    if missing:   # made once per fact, the first time it could be recalled
+        for f, v in zip(missing, embed.vectors([f['text'] for f in missing])):
+            blob = v.astype(np.float32).tobytes(); have[f['id']] = blob
+            con.execute('INSERT OR REPLACE INTO embeddings (fact_id, model, vec) VALUES (?,?,?)', (f['id'], embed.MODEL, blob))
+    q = embed.vectors([text])[0]
+    m = np.stack([np.frombuffer(have[f['id']], dtype=np.float32) for f in facts])
+    sims = m @ q
+    order = np.argsort(-sims)[:k]
+    return [(facts[i], float(sims[i])) for i in order]
 
 # --------------------------------------------------------------------------------------------------------------- people
 
