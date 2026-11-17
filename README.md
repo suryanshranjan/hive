@@ -1,12 +1,5 @@
 # Hive
 
-**Reliability update (working tree, Nov 17):** SQLite is now the memory authority. Mail/calendar, shipping, deployment and cloud callbacks use proposal-specific approvals; mail/calendar approvals survive restarts, and uncertain outcomes are retained without automatic replay. Pulse commits findings before checkpoints and retains undelivered digest items. Say `timezone Asia/Kolkata` or `quiet hours 10:30 pm to 7 am` in Telegram.
-
-Coding, project tests and previews require an isolated runner. Host fallback is disabled; Render's personal-assistant worker cannot build projects without a separate safe runner. Multi-step routing remains opt-in with `HIVE_ROUTER=plan` while execution qualification continues. Speech quality and real-account service journeys still need validation. A preview approval never authorizes a first production deployment.
-
-See [the reliability milestone](docs/reliability.md) for exact Docker regression commands, state-transfer behavior and remaining release gates. The fixture tests do not establish real-account readiness.
-
-
 **Run your company from your phone.** Tell Hive what you want for the business, in plain words. It works out what to change, builds it with a team of AI coding agents (Claude Code, OpenAI Codex, or both), shows you screenshots, and hands it to your engineer. It also reads your mail, calendar, payments and data, remembers what you tell it, tells you first when something needs you, and answers you on Telegram, in text or by voice.
 
 Hive is also a research lab. Every feature in it came out of one of **115 scored, pre-registered experiments**, each scored against predictions published before it ran, failures included. [Why that matters](#why-hive-is-research-not-a-demo).
@@ -22,12 +15,11 @@ Hive is a founder's assistant in the manner of J.A.R.V.I.S., and a shipping tool
 | Grow the business | *"I want more creators signing up this month"* | Reads your product, finds what holds customers back, and proposes a short plan with a price. On your yes it builds each step and sends screenshots |
 | Get something built | *"add an invite page"*, *"make it like this"* + a picture | Says it back in one line with the price, builds it, shows you |
 | Know your numbers | *"how many orders came in this week?"* | Answers from your own data, read-only |
-| Handle your office | *"any important emails?"*, *"reply to Asha saying Thursday works"*, *"am I free at 3?"*, *"put the tasting with Asha on my calendar tomorrow at 3"*, *"how much did we make this week?"* | Reads your mailbox (any, or Gmail through Google), Google Calendar, Stripe or Razorpay. A reply or a new event goes out only when you tap yes, with a single-use approval and recorded outcome. It never moves money |
+| Handle your office | *"any important emails?"*, *"reply to Asha saying Thursday works"*, *"am I free at 3?"*, *"put the tasting with Asha on my calendar tomorrow at 3"*, *"how much did we make this week?"* | Reads your connected mail, calendar and payment accounts. Shows you a reply or event before sending it, and waits for your confirmation. It never moves money |
 | Have it remember | *"Asha from Mehta Caterers takes 40 tiffins every Monday"*; later *"what do you know about Asha?"*, *"forget that"* | Keeps what you tell it about your business and the people in it, brings it back when it matters (even asked in other words), replaces it when you change your mind, and forgets on your word |
 | Hear from it first | nothing; or *"quiet hours 10 pm to 7 am"*, *"tell me about any mail from Asha"* | Watches your mail, calendar, payments and deadlines, and tells you only what needs you, once, outside quiet hours; the rest waits for the morning brief |
 | Talk | a voice note | Answers in a voice note too, made on your own machine (*"always reply in voice"*, *"no voice replies"*) |
 | Ship it | *"ship it"*, *"put it live"*, *"undo that"* | A pull request for your engineer; live only after it's merged and every test passes; anything taken back |
-| Ask for several things at once | *"find Asha's mail about the tasting and put a call with her on Thursday at 4"* | Does them in order, the second using the first (her address becomes the invite), each that reaches outside on your yes (Gate 120: 14 of 14 such requests read right) |
 | Step away | *"I'm sleepy"* | Offers to carry the work on in the cloud so you can shut your laptop |
 
 It asks you only what only you can decide, one question at a time.
@@ -71,12 +63,16 @@ hive setup      # connects your phone (Telegram); then Hive says hello there
 
 **3. On your phone, say "set me up".** Hive asks whether you run a business, build a product, or are starting something new, and gets to know it in about two minutes. Everything after that happens in Telegram.
 
+To have Hive build software, install Docker on the computer running Hive and keep it open.
+
 ### Only a phone
 
 No computer? Hive can run on your own [Render](https://render.com) account, always on, set up entirely from your phone's browser (about five minutes):
 
+This setup supports chatting, memory and connected accounts. Software builds also need a computer or server with Docker.
+
 1. **Make a bot.** In Telegram, send `/newbot` to @BotFather and follow its two steps. It gives you a token like `123456:ABC-DEF…`.
-2. **Get a model key** at [console.anthropic.com](https://console.anthropic.com) (API keys). Builders and replies run on it.
+2. **Get a model key** at [console.anthropic.com](https://console.anthropic.com) (API keys). Hive uses it to answer you.
 3. **Tap the button** and sign in to Render:
 
    [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/suryanshranjan/hive)
@@ -84,7 +80,7 @@ No computer? Hive can run on your own [Render](https://render.com) account, alwa
 4. **Fill in the form:** the bot's token, the model key, and a **pairing word** you make up (any secret word). Optional: your product on GitHub (`owner/name`) with a GitHub token, or a key from another provider for fast replies. Tap **Deploy**.
 5. **Send your bot the pairing word.** Only the chat that sends it becomes the owner; anyone else is turned away. (Left the word empty? Render's logs show a 6-digit one.) Hive says hello; say **"set me up"**.
 
-Cost: about $28 a month on your Render bill (a 1 CPU, 2 GB worker and a 10 GB disk, at Render's list prices as last known; check render.com/pricing), plus what the model uses. Your chat, rules and work live on that disk. Pending mail/calendar proposals persist; interrupted actions need reconciliation, and general multi-step plans are not yet restart-safe. Nobody else hosts anything for you, and your keys stay in your Render account.
+Your hosting and model usage are billed by your providers. Your chat and memory stay on your own Render account, along with your keys.
 
 ### What it costs
 
@@ -103,7 +99,6 @@ Already have Python 3.10+, git and Claude Code? `pip install git+https://github.
 pip install playwright && playwright install chromium   # screenshots on your phone
 pip install "hive-swarm[voice] @ git+https://github.com/suryanshranjan/hive"   # voice notes (Whisper, on your machine)
 pip install "hive-swarm[data] @ git+https://github.com/suryanshranjan/hive"    # Postgres, MySQL, Excel and PDF data
-pip install "hive-swarm[secure] @ git+https://github.com/suryanshranjan/hive"  # your keys encrypted on disk (then: hive secrets migrate)
 pip install "hive-swarm[memory] @ git+https://github.com/suryanshranjan/hive"  # remembers by meaning, not only words (on your machine)
 pip install "hive-swarm[speech] @ git+https://github.com/suryanshranjan/hive"  # answers your voice notes in voice (on your machine)
 hive google setup                            # Gmail, Google Calendar and Drive (or say "connect google" on the phone)
@@ -115,7 +110,6 @@ hive cloud --new                             # always on: a machine on your AWS 
 ```
 
 Most of these can also be done from the phone ("connect my email", "connect google", "we're on Vercel", "move to the cloud").
-Install Docker (Docker Desktop on Windows and macOS) and keep it running, and builders work in a sandbox by themselves.
 </details>
 
 ---
@@ -264,6 +258,8 @@ Everything works from the phone; these are for the computer.
 Lower-level commands for scripts and experiments are in `hive --help`.
 
 ## Repository layout
+
+For contributors: [engineering notes and verification](docs/reliability.md).
 
 | Path | Contents |
 | --- | --- |
