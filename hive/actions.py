@@ -50,12 +50,16 @@ def propose(tool, args, ch, ctx=None):
         if request_key:
             existing = con.execute('SELECT id FROM actions WHERE request_key=?', (request_key,)).fetchone()
             if existing:
+                from . import tasks
+                tasks.link_action(existing[0])
                 return existing[0]
         con.execute('INSERT INTO actions(id,tool,args,proposal_hash,owner_id,chat_id,origin,state,created,expires,project,request_key,account_binding) '
                     'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)', (aid, tool, payload, digest, ctx.owner,
                     str(ch.chat), ctx.origin, 'proposed', time.time(), time.time() + 900, ctx.project, request_key,
                     account_binding(tool, ctx.project)))
         con.execute('INSERT INTO action_events(action_id,state,at) VALUES(?,?,?)', (aid, 'proposed', time.time()))
+        from . import tasks
+        tasks.link_action(aid)
     return aid
 
 
@@ -219,6 +223,9 @@ def resume(ch, data, message_id, repo):
                                           dt.datetime.fromisoformat(a['end']), a['where'], a['guests'])
             return ActionResult('succeeded' if ok else 'unknown', receipt)
         result = execute(aid, add)
+    elif row['tool'] == 'agent_action':
+        from . import runtime_tools
+        result = execute(aid, lambda a: runtime_tools.approved_external(repo, a))
     else:
         ch.send('This action cannot be resumed here. Ask me to propose it again.')
         return False

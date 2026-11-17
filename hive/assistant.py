@@ -820,9 +820,9 @@ def forget_it(ch, repo, text, poll=20):
 ROUTER_DEFAULT = 'intent'   # Plan routing remains opt-in until full execution qualification.
 
 def router_mode():
-    """'plan' (a message read as steps, hive/router.py) or 'intent' (one intent, CLASSIFY). HIVE_ROUTER overrides."""
+    """'intent', fixed 'plan', or result-driven 'adaptive'; HIVE_ROUTER overrides."""
     m = (os.environ.get('HIVE_ROUTER') or ROUTER_DEFAULT).strip().lower()
-    return m if m in ('plan', 'intent') else ROUTER_DEFAULT
+    return m if m in ('plan', 'intent', 'adaptive') else ROUTER_DEFAULT
 
 def read(ch, text):
     """What the owner means by his newest message, read in the context of the conversation (Gate 38 live test: "Yes",
@@ -915,9 +915,11 @@ def background_build(repo, goal, ch=None, interview=True, report=True, workers=N
            (['--agent', team.chosen()['agent']] if team.chosen().get('agent') else []) +   # the team he chose by phone
            (['--workers', str(workers)] if workers else
             ['--workers', str(team.chosen()['workers'])] if team.chosen().get('workers') else []))
+    from . import tasks
+    active = tasks.ACTIVE_STEP.get()
     proc = subprocess.Popen(cmd, cwd=repo, start_new_session=os.name != 'nt',   # so a stop ends its builders too
                             stdout=open(log, 'w'), stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
-                            env=hive_env(HIVE_FROM_PHONE='1'))
+                            env=hive_env(HIVE_FROM_PHONE='1', HIVE_PLAN_TASK=active[0] if active else ''))
     BUILD.update(proc=proc, goal=goal, started=time.time(), log=log, stopped=False)
 
     def watch():
@@ -1587,7 +1589,10 @@ def pursue(ch, repo, text, poll, apply_build=None, run=True):
     if other is not None:
         ch.send("Very good, I'll hold the plan."); return handle(ch, repo, other, poll, apply_build)
     if choice not in ('pln|all', 'pln|one'):
-        ch.send('Very good. The plan keeps; say "do the plan" when you want it.'); PLAN.update(goal=text, steps=steps, step=0, running=False)
+        ch.send('Very good. The plan keeps; say "do the plan" when you want it.')
+        PLAN.clear(); PLAN.update(goal=text, steps=steps, step=0, running=False)
+        from . import buildplans
+        PLAN['task_id'] = buildplans.save(ch, repo, PLAN, approved=False)
         return 'plan_held'
     if choice == 'pln|one':
         steps = steps[:1]
@@ -1602,50 +1607,25 @@ def pursue(ch, repo, text, poll, apply_build=None, run=True):
         answers.append(opts[int(ans.split('|')[1])] if kind == 'tap' else (ans or '').strip())
         if answers[-1]:
             memory.add(repo, f"{s['decide']} {answers[-1]}", 'plan')   # his decision is kept for every later build
-    PLAN.update(goal=text, steps=steps, step=1, running=True, answers=answers, cost=p.get('cost', 0)); PLAN.pop('cancel', None)
+    PLAN.clear(); PLAN.update(goal=text, steps=steps, step=1, running=True, answers=answers, cost=p.get('cost', 0))
+    from . import buildplans
+    PLAN['task_id'] = buildplans.save(ch, repo, PLAN)
     from . import numbers
     numbers.refresh(repo)   # where his numbers stand before the change, to compare with later
     numbers.mark(repo, f'you agreed the plan for "{text[:80]}"')
     ch.send(f"🛠 Right, sir. {'Building the first step now' if len(steps) > 1 else 'Building it now'}: "
             f"{telegram.esc(steps[0]['title'])}. I'll show you each step as it lands; say \"status\" any time.", html=True)
     if run:
-        threading.Thread(target=run_plan, args=(ch, repo, apply_build), daemon=True).start()
+        from contextvars import copy_context
+        threading.Thread(target=copy_context().run, args=(run_plan, ch, repo, apply_build), daemon=True).start()
     return 'planned'
 
 def run_plan(ch, repo, apply_build, wait=None):
-    """Build the agreed plan: step 1 as a build, every later step as a fix round on the same branch; after each, he sees
-    it (screenshots for a page, plain words otherwise). Stops, and says why, if a step fails."""
-    from . import plan as planner, screens
-    steps, answers = PLAN['steps'], PLAN.get('answers') or [''] * len(PLAN['steps'])
-    see = screens.available() and screens.is_frontend(repo)
-    try:
-        for k, s in enumerate(steps, 1):
-            if PLAN.pop('cancel', False):   # he said "undo that" mid-plan
-                return 'cancelled'
-            PLAN['step'] = k
-            told = planner.instruction(s, answers[k - 1])
-            if k == 1:
-                proc = background_build(repo, told, ch, interview=False, report=False, workers=1)   # one small job
-                rc = (wait or proc.wait)()
-                if rc != 0 or not latest_build(repo):
-                    return 'failed'   # background_build's watcher has told him why
-            else:
-                ch.send(f"🛠 Step {k} of {len(steps)}: {telegram.esc(s['title'])}. On it.", html=True)
-                if not apply_build or apply_build(latest_build(repo), told, None) not in (0, None):
-                    ch.send(f"⚠️ Step {k} didn't pass its checks, so I've stopped here, sir. Everything before it is "
-                            "built and safe. Say \"status\" and I'll show you where it stands.")
-                    return 'failed'
-            head = f"✅ <b>Step {k} of {len(steps)} done: {telegram.esc(s['title'])}.</b>"
-            if see:
-                show(ch, repo, intro=head)
-            else:
-                ch.send(head + ' ' + telegram.esc(what_changed(repo, ch)), html=True)
-        st = latest_build(repo) or {}
-        ch.send(f"🎉 <b>That's the plan done, sir.</b> {telegram.esc(st.get('check', ''))}\n\nTell me what's off, or say "
-                "<b>ship it</b> and it all goes to your engineer as one pull request.", html=True)
-        return 'done'
-    finally:
-        PLAN['running'] = False
+    """Compatibility entry point; durable task state owns execution progress."""
+    from . import buildplans
+    if not PLAN.get('task_id'):
+        PLAN['task_id'] = buildplans.save(ch, repo, PLAN)
+    return buildplans.resume(ch, repo, PLAN['task_id'], apply_build, wait)
 
 @policy.request
 def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=None, origin='owner'):
@@ -1660,6 +1640,30 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     if policy.context().origin == 'owner':
         register.notice(text)
     CURRENT['text'] = text   # he writes technically: Hive answers in his terms
+    from . import router
+    task_reply = router.task_command(ch, repo, text, poll, handle=lambda c, r, t, pl: handle(
+        c, r, t, pl, apply_build=apply_build, start_build=start_build, cloud=cloud, origin=origin))
+    if task_reply is not None:
+        return task_reply
+    from . import routines
+    routine_reply = routines.command(ch, repo, text)
+    if routine_reply is not None:
+        return routine_reply
+    answer_task = re.fullmatch(r'answer task ([0-9a-f]{12}):\s*(.+)', text.strip(), re.I | re.S)
+    if answer_task:
+        from . import agent
+        return 'chain:' + ','.join(agent.answer(ch, repo, answer_task[1].lower(), answer_task[2], poll))
+    if low.startswith('agent:'):
+        from . import agent
+        return 'chain:' + ','.join(agent.start(ch, repo, text.split(':', 1)[1].strip(), poll))
+    # Existing build, account-setup, stop and shipping flows keep their concrete interfaces.
+    if (router_mode() == 'adaptive' and not GOAL_WORDS.search(low) and
+            not low.startswith('build:') and not is_stop_request(text) and not UNDO_WORDS.search(low) and
+            not CONNECT_WORDS.search(low) and not LIVE_WORDS.search(low) and
+            not telegram.is_status(text) and low.strip(' !.?') not in GREETINGS and
+            not re.search(r'\b(ship it|do the plan|run the plan|start the plan|set me up)\b', low)):
+        from . import agent
+        return 'chain:' + ','.join(agent.start(ch, repo, text, poll))
     said = text.split(':', 1)[1].strip() if low.startswith('build:') else ''
     if len(said.split()) >= 3:   # "build: <a real description>" needs no model; "build again" is read in context
         got = {'intent': 'build', 'rule': said}   # (it once took "again" as the thing to build)
@@ -1848,7 +1852,8 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         PLAN.update(step=1, running=True); PLAN.setdefault('answers', [''] * len(PLAN['steps']))
         ch.send(f"🛠 Right, sir: the plan, starting with {telegram.esc(PLAN['steps'][0]['title'])}.", html=True)
         import threading
-        threading.Thread(target=run_plan, args=(ch, repo, apply_build), daemon=True).start()
+        from contextvars import copy_context
+        threading.Thread(target=copy_context().run, args=(run_plan, ch, repo, apply_build), daemon=True).start()
         return 'planned'
     if intent == 'amend' and apply_build and latest_build(repo):   # change what he just saw; before and after
         st = latest_build(repo)
@@ -2148,6 +2153,12 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
         pass
     from . import actions
     interrupted = actions.recover()
+    from . import tasks
+    interrupted_tasks = tasks.recover(ch, repo)
+    if interrupted_tasks:
+        ch.send(f'{interrupted_tasks} interrupted tasks have saved progress. Say tasks to inspect or resume them.')
+    from . import buildplans
+    buildplans.restore(ch, repo)
     from . import memory_jobs
     memory_jobs.recover()
     if interrupted:
@@ -2171,6 +2182,12 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
     try:
         while not (until and until()):
             memory_jobs.start()
+            if not telegram.busy_elsewhere() and not (_building() or '').startswith('A build is running'):
+                try:
+                    from . import routines
+                    routines.tick(ch, repo)
+                except Exception as e:
+                    print(f'Routine check stopped ({type(e).__name__}).', flush=True)
             try:   # a test page past its two hours: taken down (and its test machine deleted), and he is told
                 from . import trydeploy
                 if trydeploy.expired():

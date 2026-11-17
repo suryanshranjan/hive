@@ -57,7 +57,9 @@ assistant.PLAN['running'] = False   # (the thread from handle: stopped below by 
 # 4. the plan is built: step 1 as a build, then fix rounds on the same branch; each shown; the end offers ship it
 built, applied = [], []
 class Done:
-    def wait(self): return 0
+    def wait(self):
+        st['plan_task'] = assistant.PLAN['task_id']
+        return 0
 assistant.background_build = lambda repo, goal, ch=None, interview=True, report=True, workers=None: built.append((goal, interview, report)) or Done()
 st = {'repo': repo, 'name': 'signups-1103', 'branch': 'main', 'b': 'main', 'check': '12 tests, all passing.'}
 assistant.latest_build = lambda r: st
@@ -66,6 +68,7 @@ def apply_build(state, rule, ch):
     applied.append(rule); return 0
 assistant.what_changed = lambda repo, ch=None: 'It now shows what creators earn.'
 assistant.run_plan = real_run_plan
+assistant.PLAN.pop('task_id', None)  # this fixture starts a distinct plan with a different goal
 assistant.PLAN.update(goal='more sign-ups', steps=three['steps'], step=1, running=True, answers=['Yes, at first payout', '', '₹500'])
 fake = FakeTelegram([])
 r = assistant.run_plan(ch(fake), repo, apply_build)
@@ -78,6 +81,7 @@ check('step 1 is a build without a quiz; later steps are fix rounds; each step i
                                                    '✅ Step 3 of 3 done: Reward the first deal'], True, True, False))
 
 # 5. a step that fails its checks stops the plan, with what is safe
+assistant.PLAN.pop('task_id', None)  # a separate new plan for this failure scenario
 assistant.PLAN.update(step=1, running=True)
 fake = FakeTelegram([])
 r = assistant.run_plan(ch(fake), repo, lambda s, rule, c: 1)

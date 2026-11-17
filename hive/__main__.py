@@ -26,6 +26,9 @@ For the owner:
   hive audit [n]                         the last things Hive did outside this computer (mail sent, live, PRs)
   hive google [setup|forget]             Gmail, Google Calendar and Drive through Google's own API
   hive pulse [once|status]               watch mail, calendar, payments, deadlines; tell you what needs you
+  hive mcp [add|refresh|remove|list]      connect MCP tools (use hive mcp --help)
+  hive browser [setup|enable|disable|status]   isolated persistent web browser
+  hive verify-services [--live-read-only]     check account connections without writes
   hive memory [list|search <words>|people|forget <id>|export [file]|purge]   what Hive knows about you and your business
 
 Step by step (scripts and experiments):
@@ -141,6 +144,9 @@ def _start(a):
 def build_parser():
     ap = Parser(prog='hive', description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest='cmd', parser_class=Parser)
+    for name, help_text in (('mcp', 'Connect MCP tools'), ('browser', 'Configure isolated browser control'),
+                            ('verify-services', 'Check service connections')):
+        sub.add_parser(name, help=help_text)  # delegated before the main parser; each has its own --help
     st = sub.add_parser('start'); st.add_argument('--goal')
     st.add_argument('--workers', type=positive)   # default: the swarm law decides (a comment here once swallowed --goal)
     st.add_argument('--minutes', type=positive, default=40)
@@ -201,6 +207,15 @@ def build_parser():
     return ap
 
 def main(argv=None):
+    values = list(sys.argv[1:] if argv is None else argv)
+    if values and values[0] in ('mcp', 'browser', 'verify-services'):
+        from importlib import import_module
+        module = {'mcp': 'connectors', 'browser': 'browser', 'verify-services': 'service_checks'}[values[0]]
+        try:
+            return import_module('.' + module, __package__).main(values[1:])
+        except Exception as exc:
+            print(f'{values[0]} failed ({type(exc).__name__}). Check configuration and optional dependencies.', file=sys.stderr)
+            return 1
     ap = build_parser()
     a = ap.parse_args(argv)
     if a.cmd in (None, 'start'):

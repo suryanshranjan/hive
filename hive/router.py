@@ -8,9 +8,9 @@ several things in order. A later step can use an earlier one's result: "$1.email
   {"steps": [{"tool": "mail_find", "args": {"about": "Asha's mail about the tasting"}},
              {"tool": "calendar_add", "args": {"what": "call with Asha", "when": "Thursday 4 pm", "guests": ["$1.email"]}}]}
 
-It ships only if Gate 120 says it reads single messages no worse than the reader it replaces (HIVE_ROUTER=plan turns it
-on before that; the gate decides the default). Each step still goes through the one check before any action
-(hive/tools.py), and every step that reaches outside still asks for his yes."""
+Plan routing remains opt-in (HIVE_ROUTER=plan) while real execution is qualified. Chains checkpoint in SQLite;
+explicit resume skips completed steps, and uncertain writes block recovery. Each step still goes through the policy
+check (hive/tools.py), and every step that reaches outside still asks for his yes."""
 import re
 
 from . import explain
@@ -77,18 +77,36 @@ DIRECT = {'mail_send', 'remember', 'mail_find'}   # steps only the step runner d
 KNOWN = set(re.findall(r'^- "([a-z_]+)"', TOOLS, re.M)) | {'cloud_on', 'cloud_off'}
 
 def plan(history, text):
-    """His message as {'steps': [{'tool', 'args'}], 'confirmed', 'clarify'}; steps with unknown tools are dropped;
-    {'steps': []} if the model gave nothing usable."""
+    """His message as a validated plan; unsupported tools/references refuse the whole plan."""
     got = explain.ask_json(PLAN.format(history=history or '(nothing yet)', text=text, tools=TOOLS)) or {}
     from .tools import Refused
-    if not isinstance(got.get('steps', []), list) or len(got.get('steps', [])) > 4:
-        raise Refused('Please split this into requests of at most four steps.')
-    steps = []
-    for s in (got.get('steps') or [])[:4]:
-        if not isinstance(s, dict) or s.get('tool') not in KNOWN or not isinstance(s.get('args', {}), dict):
-            raise Refused('The proposed plan contains an unsupported action. Nothing was started.')
-        steps.append({'tool': s['tool'], 'args': s.get('args', {})})
+    if not isinstance(got, dict):
+        raise Refused('I could not read that plan. Nothing was started.')
+    steps = validate_steps(got.get('steps', []))
     return {'steps': steps, 'confirmed': bool(got.get('confirmed')), 'clarify': got.get('clarify') or ''}
+
+
+def validate_steps(steps):
+    """Reject the whole plan before acting, including invalid forward references."""
+    from .tools import Refused
+    if not isinstance(steps, list) or len(steps) > 4:
+        raise Refused('Please split this into requests of at most four steps.')
+    def refs(value, n):
+        if isinstance(value, (list, dict)):
+            for child in value.values() if isinstance(value, dict) else value:
+                refs(child, n)
+        elif isinstance(value, str):
+            match = re.fullmatch(r'\$(\d+)(?:\.(\w+))?', value.strip())
+            if match and not 1 <= int(match[1]) < n:
+                raise Refused('A step can only use an earlier result. Nothing was started.')
+    clean = []
+    for n, step in enumerate(steps, 1):
+        if (not isinstance(step, dict) or not isinstance(step.get('tool'), str) or
+                step['tool'] not in KNOWN or not isinstance(step.get('args', {}), dict)):
+            raise Refused('The proposed plan contains an unsupported action. Nothing was started.')
+        refs(step.get('args', {}), n)
+        clean.append({'tool': step['tool'], 'args': step.get('args', {})})
+    return clean
 
 INTENT_ARG = {'build': 'what', 'change': 'rule', 'rule': 'rule', 'instruct': 'rule', 'amend': 'rule', 'goal': 'goal',
               'complaint': 'text', 'data': 'question', 'reply': 'text'}
@@ -131,33 +149,107 @@ def _ref(value, results):
     return r.get(m.group(2)) if m.group(2) else r
 
 def run_chain(ch, repo, steps, text, poll=20, handle=None, origin='owner'):
-    """Several steps in order, each through the one check, each external one on his yes, a later one using an earlier
-    one's result. Stops at the first step that cannot be done, and says which and why. Returns [what each step did]."""
-    from . import telegram, tools
-    results, done = {}, []
-    if len(steps) > 1:
-        ch.send('🐝 ' + telegram.esc(f"On it: {len(steps)} things, in order."), html=True)
-    for n, step in enumerate(steps, 1):
+    """Persist before executing; redelivered requests reuse their existing task."""
+    from . import tasks, tools
+    try:
+        if origin != 'owner':
+            raise tools.Refused('Only your own chat can start saved tasks.')
+        steps = validate_steps(steps)
+        if not steps:
+            return []
+        task = tasks.create(ch, repo, steps, text)
+        claimed = tasks.claim(task['id'], ch, repo)
+        if claimed:
+            return _run_task(ch, repo, claimed, poll, handle)
+        task = tasks.get(task['id'], ch, repo)
+        ch.send(tasks.describe(task))
+        return tasks.outcomes(task)
+    except tools.Refused as e:
+        ch.send(str(e))
+        return ['refused']
+
+
+def _run_task(ch, repo, task, poll, handle):
+    from . import tasks, telegram, tools
+    steps, tid = task['steps'], task['id']
+    results = {int(n): r for n, r in task['results'].items() if int(n) < task['next_step']}
+    if task['next_step'] == 1 and len(steps) > 1:
+        ch.send(f"On it: {len(steps)} things, in order. Task {tid}.")
+    for n in range(task['next_step'], len(steps) + 1):
+        step = steps[n - 1]
         tool = step['tool']
+        tasks.begin_step(tid, n)
         try:
-            args = {k: _ref(v, results) for k, v in step['args'].items()}
-        except ValueError as e:
-            ch.send(str(e) + '. I stopped before taking this action.')
-            done.append('needs_input'); break
-        try:
-            tools.allow({'mail_send': 'mail_send', 'mail_reply': 'mail_send', 'calendar_add': 'add_event'}.get(tool, tool),
-                        origin, text)
-        except tools.Refused as e:
-            ch.send('🐝 ' + telegram.esc(str(e)), html=True); done.append('refused'); break
-        r = _step(ch, repo, tool, args, text, poll, handle)
-        results[n] = r if isinstance(r, dict) else {'said': r}
-        done.append(results[n].get('status', 'done'))
-        if results[n].get('status') not in ('done', 'succeeded', 'mail_sent', 'event_added', 'answered',
-                                           'mail_answered', 'cal_answered', 'memory_shown', 'chat'):
-            ch.send('🐝 ' + telegram.esc(f"I stopped at step {n}: {results[n].get('why') or 'it could not be done'}."),
-                    html=True)
+            if task['bindings'] != tasks.bindings(repo, steps):
+                raise tools.Refused('A connected account changed. Start a new request with the current account.')
+            tools.allow(tool, 'owner', task['instruction'])
+            args = _ref(step['args'], results)
+        except (ValueError, tools.Refused) as e:
+            r = {'status': 'refused' if isinstance(e, tools.Refused) else 'needs_input', 'why': str(e)}
+        else:
+            try:
+                with tasks.executing(tid, n):
+                    r = _step(ch, repo, tool, args, task['instruction'], poll, handle)
+                if not isinstance(r, dict) or not isinstance(r.get('status'), str):
+                    r = {'status': 'unknown', 'why': 'The step did not report a confirmed outcome.'}
+            except Exception:
+                # The provider may have accepted a write before a connection failed.
+                r = {'status': 'failed' if tool in tasks.RETRYABLE else 'unknown',
+                     'why': 'The step was interrupted. Its outcome needs checking.'}
+        tasks.finish_step(tid, n, r)
+        results[n] = r
+        if r['status'] not in tasks.SUCCESS:
+            saved = tasks.get(tid, ch, repo)
+            ch.send('🐝 ' + telegram.esc(f"I stopped at step {n}: {r.get('why') or r['status']}. " +
+                                        tasks.describe(saved)), html=True)
             break
-    return done
+    return tasks.outcomes(tasks.get(tid, ch, repo))
+
+
+def resume_chain(ch, repo, tid, poll=20, handle=None):
+    from . import tasks
+    saved = tasks.reconcile(tid, ch, repo)
+    if saved and saved['mode'] == 'adaptive':
+        from . import agent
+        return agent.resume(ch, repo, tid, poll)
+    if saved and saved['mode'] == 'build':
+        from . import buildplans
+        buildplans.resume(ch, repo, tid)
+        return tasks.outcomes(tasks.get(tid, ch, repo))
+    task = tasks.claim(tid, ch, repo, resume=True)
+    if task:
+        ch.send(f"Continuing task {tid} from step {task['next_step']}.")
+        return _run_task(ch, repo, task, poll, handle)
+    task = tasks.get(tid, ch, repo)
+    ch.send(tasks.describe(task) if task else 'That task is unavailable in this chat and project.')
+    return tasks.outcomes(task) if task else []
+
+
+def task_command(ch, repo, text, poll=20, handle=None):
+    """Explicit task controls work even while plan routing is opt-in."""
+    from . import tasks, tools
+    match = re.fullmatch(r'(resume task|cancel task|task) ([0-9a-f]{12})', text.strip(), re.I)
+    if text.strip().lower() != 'tasks' and not match:
+        return None
+    try:
+        if match and match[1].lower() == 'cancel task':
+            tools.allow('run_plan', detail=text)
+            tasks.cancel(match[2].lower(), ch, repo)
+            ch.send('Task cancelled. Completed actions were not undone.')
+            return 'task_cancelled'
+        if match and match[1].lower() == 'resume task':
+            tools.allow('run_plan', detail=text)
+            return 'chain:' + ','.join(resume_chain(ch, repo, match[2].lower(), poll, handle))
+        tools.allow('status', detail=text)
+        if match:
+            task = tasks.get(match[2].lower(), ch, repo)
+            ch.send(tasks.describe(task, detailed=True) if task else 'That task is unavailable in this chat and project.')
+        else:
+            ch.send(tasks.listing(ch, repo))
+        return 'tasks_shown'
+    except tools.Refused as e:
+        ch.send(str(e))
+        return 'refused'
 
 def _step(ch, repo, tool, args, text, poll, handle):
     from . import calendar_, mail, office, telegram

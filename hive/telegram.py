@@ -115,7 +115,11 @@ class Channel:
         self._consumed_update = None
         if self.keep:
             try:
-                self.history = [tuple(x) for x in json.load(open(CONVERSATION))][-16:]
+                with open(CONVERSATION, encoding='utf-8') as conversation:
+                    saved = json.load(conversation)
+                self.history = [tuple(x) for x in saved
+                                if isinstance(x, list) and len(x) == 2 and x[0] in ('owner', 'hive')
+                                and isinstance(x[1], str)][-32:]
             except Exception:
                 pass
 
@@ -199,8 +203,9 @@ class Channel:
         except Exception:
             return None
 
-    def remember(self, who, text, keep=16):
-        self.history = (self.history + [(who, (text or '').strip()[:600])])[-keep:]
+    def remember(self, who, text, keep=32):
+        # Preserve complete instructions; apply the model budget at rendering time.
+        self.history = (self.history + [(who, (text or '').strip())])[-keep:]
         if self.keep:   # private, next to the owner's other Hive settings
             try:
                 os.makedirs(os.path.dirname(CONVERSATION), exist_ok=True)
@@ -210,7 +215,7 @@ class Channel:
                 os.chmod(CONVERSATION, 0o600)
             except Exception:
                 pass
-            try:   # the whole conversation, searchable (memory 2.0); the 16 above are what a reply reads at once
+            try:   # the whole conversation, searchable (memory 2.0)
                 from . import store
                 mid = store.log_message(who, text)
                 if who == 'owner':
@@ -239,9 +244,31 @@ class Channel:
         except Exception:
             return False
 
-    def recent(self, n=10):
-        """The last few turns, as plain lines, for a model reading his next message in context."""
-        return '\n'.join(f"{'Owner' if w == 'owner' else 'Hive'}: {t}" for w, t in self.history[-n:]) or '(nothing yet)'
+    def recent(self, n=32, max_chars=24000):
+        """A bounded, contiguous conversation suffix; never silently cut every turn.
+
+        If the newest entry alone exceeds the budget, retain its beginning and
+        ending (where corrections often occur), with an explicit omission marker.
+        The stored entry remains complete for future retrieval.
+        """
+        if n <= 0 or max_chars < 128:
+            return '(nothing yet)'
+        rows, used = [], 0
+        omitted = '[Earlier conversation omitted from this context.]\n'
+        budget = max_chars - len(omitted)
+        for who, text in reversed(self.history[-n:]):
+            line = f"{'Owner' if who == 'owner' else 'Hive'}: {text}"
+            needed = len(line) + bool(rows)
+            if used + needed > budget:
+                if not rows:
+                    marker = '\n[Middle of this message omitted from context.]\n'
+                    room = budget - len(marker)
+                    rows.append(line[:room // 2] + marker + line[-(room - room // 2):])
+                break
+            rows.append(line)
+            used += needed
+        prefix = omitted if len(rows) < len(self.history) else ''
+        return prefix + '\n'.join(reversed(rows)) if rows else '(nothing yet)'
 
     def typing(self):
         """Show "typing..." in the owner's chat while Hive works on a reply (best effort)."""

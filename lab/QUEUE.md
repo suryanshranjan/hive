@@ -4,12 +4,43 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 
 ## Current implementation handoff (Nov 17 2026)
 
+- **Publication:** owner requested committing and pushing the runtime changes. README now
+  leads with the phone workflow and includes adaptive/MCP/browser/routine setup, saved-task
+  controls, local verification results and remaining live-account limits. Local documentation
+  links and anchors checked; research predictions, scorecard and measured constants unchanged.
+
+- **Adaptive follow-up implemented:** `agent:` or `HIVE_ROUTER=adaptive` selects the durable
+  observe/act/replan loop. MCP Streamable HTTP tools, Docker browser control and interval
+  routines are available. Business-goal plans save steps, answers and their own build state;
+  confirmed action receipts reconcile without re-executing writes. Setup/limits:
+  `docs/adaptive_tasks.md`. Unknown writes/build steps still require inspection.
+- **New evidence:** full Docker regression 48/48 suites; final selection 9/9; expanded adaptive suite 22/22 on
+  Windows; MCP protocol fixture 5/5; real Chromium 3/3; host browser IPC/mount check 1/1.
+  Initial Chromium sandbox startup failure was fixed by allowing inner-sandbox `chroot`
+  while retaining all outer capability drops. Read-only readiness probe: Google and
+  Telegram not configured. No model experiment or live-account writes.
+- **Next:** configure accounts on the intended host and qualify live-model replanning,
+  provider reads/writes/readback, authenticated browser flows and external MCP services.
+  Also qualify interrupted build effects and moved project paths. Opt-in runtime remains
+  bounded by available tools; recurrence is interval-based and needs the listener running.
+
+- **Task/context follow-up:** SQLite migration 4 checkpoints static router chains. `tasks`,
+  `task <id>` and `resume task <id>` inspect/resume progress; completed steps are skipped,
+  duplicate deliveries reuse their task, and interrupted writes stay blocked. Owner/chat/project
+  scope and mail/calendar configuration hashes bind recovery. Only interrupted `mail_find`
+  and `calendar_check` reads are retryable on explicit resume. Conversation storage keeps 32
+  complete entries; rendered context has a 24k-character budget with visible omissions.
+- **Follow-up verification:** 19 new task/context tests pass on Windows; Docker selections
+  passed 9/9 and 7/7 suites (the final selection includes all 19 new tests). No live models or
+  accounts. See `docs/reliability.md`. Adaptive planning, business-goal build recovery and
+  receipt reconciliation are covered by the subsequent implementation above; live
+  qualification and task mapping across changed project paths remain open.
 - Reliability changes and the Gate 120 routing results are included in this handoff. P0/P1 are not considered production-closed.
 - Implemented: durable, exact action approvals; request-origin checks; authoritative SQLite memory and ordered extraction jobs; scoped/temporal retrieval and deletion tombstones; atomic Pulse checkpoints, delivery claims and non-consuming digests; Telegram batch persistence; isolated execution requirement and real Windows ACLs.
 - Verify with `python tests/run_reliability.py --fixture-execution` (controlled fixtures only). Windows ACL tests need a normal user token; removing inherited rights intentionally prevents the restricted sandbox token from writing those test paths.
 - Docker runner `hive-builder:3` includes required encryption dependencies; real worker-boundary and timeout-cleanup checks passed locally. Cloud return now snapshots SQLite and refuses local divergence. Voice transcripts retain owner provenance and temporary audio is removed. Commands and limits: `docs/reliability.md`.
 - Final local verification: **45/45 Docker fixture suites passed**, including 40 failure-journey unittests. The Windows reliability/Telegram/voice selection passed 3/3; installed-command/cloud-return Docker selection passed 3/3. Hosted CI has not run for this working tree.
-- Still to validate: real Gmail/Calendar and Telegram delivery, restore/move on real machines, general multi-step restart recovery, Hindi-English audio quality. Keep `HIVE_ROUTER=plan` opt-in until chain execution qualifies.
+- Still to validate: real Gmail/Calendar and Telegram delivery, restore/move on real machines, live saved-chain recovery, Hindi-English audio quality. Keep `HIVE_ROUTER=plan` opt-in until chain execution qualifies.
 
 ## Where we left off (Nov 15 2026, late: capability audit, then P0 security)
 

@@ -336,7 +336,7 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     say(f'\n[{_now()}] Starting.')
     state = dict(repo=repo, branch=branch, name=name, home=home, test_cmd=test_cmd, links=links, goal=goal_text, t_g=t_g, technical=technical,
                  rules=rules, workers=workers, minutes=minutes, before=before, started=time.time(), overnight=overnight,
-                 asked=asked, spent0=spent0, look=look_job)
+                 asked=asked, spent0=spent0, look=look_job, plan_task=os.environ.get('HIVE_PLAN_TASK', ''))
     run1 = os.path.join(home, 'build')
     b, code = _phase(source, run1, workers, goal_text + rules, minutes, 'later' if overnight else QUESTIONS_PER_BUILDER * workers, True,
                      not overnight, phone)

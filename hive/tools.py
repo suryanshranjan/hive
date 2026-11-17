@@ -59,6 +59,7 @@ def validate(name, args):
 ORDER = [READ, SETTING, REVERSIBLE, EXTERNAL, MONEY]
 
 TOOLS = {   # every intent his messages are read into (hive/assistant.py handle), and what it can change
+    'agent_read': READ, 'agent_action': EXTERNAL, 'routine_set': SETTING,
     'greeting': READ, 'reply': READ, 'status': READ, 'team': READ, 'show': READ, 'brief': READ, 'data': READ,
     'about_product': READ, 'complaint': READ, 'memory_ask': READ, 'office': READ, 'clarify': READ, 'confirmed': READ,
     'pulse_set': SETTING, 'voice_pref': SETTING, 'set_team': SETTING, 'budget': SETTING, 'onboard': SETTING,

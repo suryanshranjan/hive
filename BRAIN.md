@@ -2,7 +2,7 @@
 
 Read this first. It is the shared memory for anyone working on Hive, human or agent: what we know, how sure we are, what is being tested, and exactly how to continue. When you learn something, update this file in the same commit as the evidence.
 
-Last updated: Nov 15 2026 (IST), after Gates 115, 115b and 116 (Gates 114 and 117 registered, not flown).
+Last updated: Nov 17 2026 (IST), adaptive runtime, integrations and build recovery engineering follow-up; research gates unchanged.
 
 ## 1. The question
 
@@ -567,6 +567,43 @@ Rules of the lab:
 - Give 95% intervals clustered by function, say when a comparison is observational, and remember that one run per team is not a replication.
 
 ## 12. Changelog
+
+- **Nov 17 2026 (IST), documentation/publication follow-up:** README reorganized around
+  setup, adaptive tasks, browser/MCP tools, recurring work and recovery, while retaining
+  the phone-first product introduction. Added current fixture evidence and explicit live
+  qualification limits; removed stale provider price estimates and blanket guarantees.
+  Owner requested committing and pushing the implementation. No new research experiment
+  or change to the prediction scorecard or measured constants.
+
+- **Nov 17 2026 (IST), adaptive runtime follow-up (engineering evidence):** Migration 5
+  adds adaptive decisions/observations, linked action receipts, recurring owner instructions
+  and durable business-goal build state. The loop can revise a failed read and choose a
+  different tool. New adapters support owner-configured MCP Streamable HTTP and an isolated
+  Playwright browser. Confirmed ledger receipts reconcile interrupted writes without replay;
+  ambiguous actions/builds remain blocked. **Established in controlled fixtures:** 48/48
+  Docker regression suites and final selection 9/9; expanded adaptive tests 22/22 on Windows; real MCP client 5/5;
+  Chromium fixture 3/3 and host browser boundary check 1/1. Browser startup initially failed
+  on sandbox `chroot`; the corrected seccomp profile passed with all outer capabilities
+  dropped. **Defaults:** 12 adaptive steps, $2 reported model spend, 10 minutes checked
+  between calls; interval routines 5 minutes to 366 days. Research scorecard/constants are
+  unchanged. **Open:** live models/accounts, authenticated sites, external MCP services,
+  mid-build uncertain effects, project-path remapping and adversarial qualification. Local
+  read-only readiness probe found neither Google nor Telegram configured. No model gate,
+  deployment or live write was run. See `docs/adaptive_tasks.md` and `docs/reliability.md`.
+
+- **Nov 17 2026 (IST), task recovery/context follow-up (engineering evidence, not a research gate):**
+  Known code-audit gaps led to SQLite task checkpoints (`hive/tasks.py`, migration 4),
+  explicit Telegram inspect/resume commands, duplicate-request suppression, scope/account
+  binding and rejection of invalid references before execution. Completed router steps and
+  their results survive restart. Interrupted mutations block without replay; interrupted
+  `mail_find`/`calendar_check` reads need explicit resume. Recent chat now preserves 32 full
+  entries and renders within a 24k-character budget with visible omissions. **Established
+  in controlled fixtures:** 19 new tests pass on Windows; Docker selections passed 9/9 and
+  7/7 suites, including actual approval handling on a resumed fake-service send. No new
+  measured model-performance claim or scorecard change. Adaptive replanning, build-plan
+  recovery and receipt reconciliation were implemented in the subsequent entry above;
+  live qualification and changed project paths remain open. Plan routing stays opt-in. See
+  `tests/test_tasks.py` and `docs/reliability.md` for evidence and limits.
 
 - **Nov 16 2026 (IST), Gate 120: Hive reads a message as a plan (the owner: "smarter routing"):** `hive/router.py` reads each message as up to 4 steps; a later step can use an earlier result ("find Asha's mail and put a call with her on Thursday": her address becomes the guest). As accurate as the one-intent reader on Gate 59's exam (92.3 vs 91.5%), all 14 chains right; now the default (`HIVE_ROUTER=intent` for the old). Found: the one-intent reader had drifted from 95.4% to 91.5% as its meanings grew from 13 to 22.
 - **Nov 15 2026 (IST), P2-P5 built (the owner: "do all the code changes"):** **Pulse** (`hive/pulse.py`): Hive speaks first: new mail scored by the small model (VIPs always), meetings in the next hour and clashes, failed payments, his deadlines (3 days, 1 day, the day); each said once, at or above his line, quiet hours kept, the rest in the digest; set in his words ("quiet hours 10 pm to 7 am", "tell me about any mail from Asha", "don't tell me about payments"); buttons Got it / Reply / In an hour. **Voice replies** (`hive/voice.py`): when he speaks, Hive answers in voice too (Piper on this machine, or any OpenAI-style speech API), never for links or long lists; "always reply in voice" / "no voice replies". **Tools** (`hive/tools.py`): every intent with its risk; one check before any action; words from outside can only read; money never; actions audited; the nine copies of the Claude command made one (`hive.claude_cmd`). **Google** (`hive/google.py`): Gmail, Calendar and Drive over REST with the smallest scopes, signed in from the phone (his own OAuth client, PKCE, the pasted address), tokens encrypted; Hive's mail and calendar features run on it; "put ... on my calendar" on his yes; sends and events never twice, even when cut off (found by the test: a lost answer was sent twice). Not flown: none of the four against a real account yet; native tool calls in place of the reader (needs a routing gate first).

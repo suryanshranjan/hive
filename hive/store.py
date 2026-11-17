@@ -116,6 +116,28 @@ MIGRATIONS = [
         context TEXT NOT NULL, state TEXT NOT NULL DEFAULT 'queued', attempts INTEGER NOT NULL DEFAULT 0,
         retry_at REAL NOT NULL DEFAULT 0);
     """,
+    # 4: restart-safe checkpoints for the assistant's general step runner.
+    """
+    CREATE TABLE tasks (
+        id TEXT PRIMARY KEY, owner_id TEXT NOT NULL, chat_id TEXT NOT NULL, project TEXT NOT NULL,
+        request_key TEXT UNIQUE, instruction TEXT NOT NULL, steps TEXT NOT NULL, bindings TEXT NOT NULL,
+        results TEXT NOT NULL DEFAULT '{}', next_step INTEGER NOT NULL DEFAULT 1, active_step INTEGER,
+        state TEXT NOT NULL DEFAULT 'queued', detail TEXT NOT NULL DEFAULT '',
+        created REAL NOT NULL, updated REAL NOT NULL);
+    CREATE INDEX tasks_scope ON tasks(owner_id,chat_id,project,created);
+    """,
+    # 5: adaptive tasks, build plans, action reconciliation and scheduled jobs.
+    """
+    ALTER TABLE tasks ADD COLUMN mode TEXT NOT NULL DEFAULT 'chain';
+    ALTER TABLE tasks ADD COLUMN metadata TEXT NOT NULL DEFAULT '{}';
+    CREATE TABLE task_actions (task_id TEXT NOT NULL REFERENCES tasks(id), step INTEGER NOT NULL,
+        action_id TEXT NOT NULL REFERENCES actions(id), PRIMARY KEY(task_id,step,action_id));
+    CREATE TABLE routines (
+        id TEXT PRIMARY KEY, owner_id TEXT NOT NULL, chat_id TEXT NOT NULL, project TEXT NOT NULL,
+        instruction TEXT NOT NULL, interval_seconds INTEGER NOT NULL, next_run REAL NOT NULL,
+        enabled INTEGER NOT NULL DEFAULT 1, task_id TEXT, created REAL NOT NULL, detail TEXT NOT NULL DEFAULT '');
+    CREATE UNIQUE INDEX routines_once ON routines(owner_id,chat_id,project,instruction,interval_seconds);
+    """,
 ]
 
 

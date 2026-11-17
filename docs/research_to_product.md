@@ -214,3 +214,38 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 The implementation now separates parsing evidence from execution guarantees. `actions.py`/`policy.py` bind approvals to immutable arguments and origin; `memory_jobs.py` makes extraction durable; `notifications.py` records delivery claims and uncertainty. `store.py` owns facts, corrections and deletion tombstones, with one-time JSON import. `tests/test_reliability.py` and `tests/run_reliability.py` provide repeatable fake-service failure journeys. This is engineering validation, not a new live-account research gate. General plan recovery and voice qualification remain open.
 
 Regression findings also changed the runtime: SQLite statements now share the transaction lock so another thread's write cannot be rolled back with the wrong request; `cloud.py` returns consistent database snapshots and refuses divergent local state; voice transcripts preserve owner provenance and temporary audio is deleted. `hive-builder:3` includes required dependencies. Real Docker boundary/timeout checks passed locally without models or account credentials. Verification commands and qualification limits: `docs/reliability.md`.
+
+### Task recovery and conversation context (Nov 17, code-audit follow-up)
+
+The assistant's static router kept intermediate results only in memory; chat routing saw
+ten entries cropped to 600 characters each. `hive/tasks.py` now checkpoints plans and results
+in SQLite, deduplicates request updates, binds recovery to owner/chat/project and account
+configuration, and exposes explicit inspect/resume commands. Invalid forward references
+refuse the entire plan. Interrupted writes remain unknown and blocked; only two known read
+tools can be retried on explicit resume. `telegram.py` keeps 32 complete entries and applies
+a 24k-character context budget with visible omissions at render time.
+
+Evidence: 19 controlled task/context tests, Windows pass, Docker selections 9/9 and 7/7
+suites. This is an implementation correction based on inspected code, not a Grok benchmark
+or a new model experiment. The subsequent implementation below addresses adaptive planning
+and business-goal recovery; live account qualification remains open.
+
+### Adaptive execution and integration follow-up (Nov 17, engineering evidence)
+
+The code audit found fixed handler chains, no result-driven replanning, no extensible
+tool discovery or browser adapter, and an in-memory business-goal plan. `agent.py` now
+records each decision before execution and feeds observations into the next decision.
+`runtime_tools.py` supplies schemas and approvals; `connectors.py` uses the official MCP
+v1 HTTP client; `browser.py`/`browser_worker.py` provide isolated browser control.
+`routines.py` persists interval instructions with one outstanding task each.
+`buildplans.py` saves approval, answers and exact build state; first-build task tags reject
+stale results. Linked action receipts close the crash gap between a confirmed write and
+its task checkpoint. Unknown effects remain blocked.
+
+Evidence: 48/48 Docker regression suites, final selection 9/9, expanded adaptive suite 22/22 on Windows,
+five real MCP protocol fixture tests, three Chromium fixture tests and one host browser
+IPC/mount test. Chromium initially failed on a sandbox syscall restriction; the corrected
+profile passed without disabling Chromium's sandbox. No research gate or comparative
+model claim follows from these tests. Live model/account behavior remains unvalidated;
+the local readiness probe found Google and Telegram absent. Commands and exact limits:
+`docs/adaptive_tasks.md`, `docs/reliability.md`.

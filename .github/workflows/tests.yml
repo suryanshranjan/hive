@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install test tools
-        run: python -m pip install pytest cryptography tzdata setuptools wheel
+        run: python -m pip install pytest cryptography jsonschema "mcp>=1.12.4,<2" tzdata setuptools wheel
       - name: Git identity for the tests' repositories
         run: |
           git config --global user.email ci@hive.local
@@ -37,10 +37,14 @@ jobs:
           for t in tests/test_telegram.py tests/test_assistant.py tests/test_explain.py tests/test_law.py tests/test_cli.py tests/test_team.py tests/test_visual.py tests/test_ship.py tests/test_complaint.py tests/test_plan.py tests/test_brief.py tests/test_deploy.py tests/test_register.py tests/test_gaps.py tests/test_access.py tests/test_onboard.py tests/test_devices.py tests/test_away.py tests/test_logins.py tests/test_trydeploy.py tests/test_office.py tests/test_fast.py tests/test_aws_limit.py tests/test_render.py tests/test_vault.py tests/test_runlimit.py tests/test_audit.py tests/test_sandbox_unit.py tests/test_store.py tests/test_memory2.py tests/test_calendar.py tests/test_pulse.py tests/test_voice.py tests/test_tools.py tests/test_google.py tests/test_router.py tests/test_reliability.py; do
             echo "== $t"; timeout 600 python3 $t
           done
+      - name: Task restart recovery and conversation context (fake services)
+        run: timeout 300 python3 tests/test_tasks.py
       - name: Secrets encrypted (with the secure extra installed)
         run: |
           python -m pip install "cryptography>=43"
           timeout 300 python3 tests/test_vault.py && timeout 600 python3 tests/test_render.py && timeout 600 python3 tests/test_office.py
+      - name: Adaptive tasks, build recovery, routines and MCP protocol fixtures
+        run: timeout 300 python3 tests/test_adaptive.py && timeout 300 python3 tests/test_connectors.py
       - name: Shell tests (stand-in builders; no tokens)
         run: |
           set -e
@@ -71,3 +75,26 @@ jobs:
 
       - name: Real Docker boundaries and timeout cleanup
         run: timeout 300 python3 tests/test_sandbox_docker.py
+
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build browser image
+        run: docker build -t hive-browser:1 -f hive/templates/browser.Dockerfile hive/templates
+      - name: Chromium against a local fixture with external networking disabled
+        run: |
+          docker run --rm --init --network none --cap-drop ALL --security-opt no-new-privileges \
+            --security-opt "seccomp=$PWD/hive/templates/browser-seccomp.json" --pids-limit 256 \
+            --memory 1g --cpus 1 --shm-size 256m \
+            --mount "type=bind,source=$PWD/hive,target=/opt/hive/hive,readonly" \
+            --mount "type=bind,source=$PWD/tests/test_browser.py,target=/opt/hive/test_browser.py,readonly" \
+            --entrypoint python hive-browser:1 -B /opt/hive/test_browser.py
+      - name: Host IPC and browser mount boundaries
+        run: python -B tests/test_browser_docker.py
