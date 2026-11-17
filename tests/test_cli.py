@@ -120,4 +120,16 @@ check("Hive's replies know the startup's name", 'called Barter Co' in assistant.
 check('a command line keeps its words', argv('claude -p --output-format json')[1:], ['-p', '--output-format', 'json'])
 if os.name == 'nt':
     check('on Windows the tool is found with its .cmd', argv('python -V')[0].lower().endswith('.exe'), True)
+# a character the console cannot show is printed as "?", never a crash (the listener crashed on a goal with a rupee sign)
+import io
+from hive.__main__ import safe_console
+narrow = io.TextIOWrapper(io.BytesIO(), encoding='cp1252')
+try:
+    print('A week of lunches for ₹500 🐝', file=narrow); crashed = False
+except UnicodeEncodeError:
+    crashed = True
+safe_console([narrow])
+print('A week of lunches for ₹500 🐝', file=narrow); narrow.flush()
+check('a console without the rupee sign: crashed before, prints it as "?" now',
+      (crashed, narrow.buffer.getvalue().decode('cp1252').strip()), (True, 'A week of lunches for ?500 ?'))
 sys.exit(fail)

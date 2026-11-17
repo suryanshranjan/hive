@@ -206,7 +206,18 @@ def build_parser():
     sub.add_parser('assumptions')
     return ap
 
+def safe_console(streams=None):
+    """A character the console cannot show (₹, an emoji) is printed as '?' instead of stopping Hive. On Windows the
+    console's code page (cp1252) has neither, and the listener crashed printing a goal with ₹ in it
+    (~/.hive/listen.log, Nov 15). The encoding is kept, so programs reading Hive's output still read it the same way."""
+    for s in streams or (sys.stdout, sys.stderr):
+        try:
+            s.reconfigure(errors='replace')
+        except (AttributeError, ValueError, OSError):
+            pass   # not a text stream that can be reconfigured (a test's stand-in, a closed stream)
+
 def main(argv=None):
+    safe_console()
     values = list(sys.argv[1:] if argv is None else argv)
     if values and values[0] in ('mcp', 'browser', 'verify-services'):
         from importlib import import_module
