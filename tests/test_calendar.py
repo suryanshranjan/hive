@@ -13,7 +13,7 @@ def check(name, got, want):
     ok = got == want; fail |= not ok
     print(('ok   ' if ok else 'FAIL ') + name + ('' if ok else f' (got {got!r}, expected {want!r})'))
 
-local = lambda y, mo, d, h, mi, zone: dt.datetime(y, mo, d, h, mi, tzinfo=__import__('zoneinfo').ZoneInfo(zone)).astimezone().replace(tzinfo=None)
+local = lambda y, mo, d, h, mi, zone: dt.datetime(y, mo, d, h, mi, tzinfo=__import__('zoneinfo').ZoneInfo(zone)).astimezone(__import__('hive.register', fromlist=['zone']).zone()).replace(tzinfo=None)
 soon = dt.datetime.now() + dt.timedelta(days=3)
 day = soon.strftime('%Y%m%d')
 ics = lambda body: 'BEGIN:VCALENDAR\r\n' + body + 'END:VCALENDAR\r\n'

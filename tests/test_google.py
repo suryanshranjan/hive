@@ -38,6 +38,9 @@ class Google(http.server.BaseHTTPRequestHandler):
             if STATE['fail_send_once']:   # it went, but the answer was lost on the way back
                 STATE['fail_send_once'] = False; return self._json(503, {'error': {'message': 'lost'}})
             return self._json(200, {'id': f"m{len(STATE['sent'])}"})
+        if '/calendars/primary/events/' in u.path:
+            item = next((e for e in STATE['events'] if e.get('id') == u.path.rsplit('/',1)[1]), None)
+            return self._json(200 if item else 404, item or {})
         if u.path.endswith('/calendars/primary/events'):
             STATE['events'].append(json.loads(body)); return self._json(200, {'id': 'e1', 'htmlLink': 'https://cal/e1'})
         if u.path.startswith('/upload/drive'):
@@ -48,16 +51,28 @@ class Google(http.server.BaseHTTPRequestHandler):
         if not self._authed():
             return self._json(401, {'error': {'message': 'expired'}})
         if u.path.endswith('/messages') and 'rfc822msgid' in q.get('q', ''):
-            mid = q['q'].split(':', 1)[1]
+            mid = q['q'].split('rfc822msgid:', 1)[1]
             return self._json(200, {'messages': [{'id': 'x'}]} if any(mid in s for s in STATE['sent']) else {})
         if u.path.endswith('/messages'):
             return self._json(200, {'messages': [{'id': 'g1'}]})
+        if '/messages/sent' in u.path:
+            return self._json(200, {'id': u.path.rsplit('/', 1)[1]})
+        if '/messages/m' in u.path:
+            import email
+            mid = u.path.rsplit('/', 1)[1]
+            message = email.message_from_string(STATE['sent'][int(mid[1:]) - 1])
+            data = base64.urlsafe_b64encode(message.get_payload(decode=True)).decode()
+            return self._json(200, {'id': mid, 'payload': {'mimeType': 'text/plain', 'body': {'data': data},
+                'headers': [{'name': k, 'value': v} for k, v in message.items()]}})
         if '/messages/' in u.path:
             body = base64.urlsafe_b64encode(b'Can the tasting move to Friday?').decode()
             return self._json(200, {'id': 'g1', 'threadId': 't1', 'labelIds': ['UNREAD', 'INBOX'], 'payload': {
                 'mimeType': 'text/plain', 'body': {'data': body}, 'headers': [
                     {'name': 'From', 'value': 'Asha <asha@mehta.example>'}, {'name': 'Subject', 'value': 'Tasting'},
                     {'name': 'Message-ID', 'value': '<a1@mehta.example>'}, {'name': 'Date', 'value': 'today'}]}})
+        if '/calendars/primary/events/' in u.path:
+            item = next((e for e in STATE['events'] if e.get('id') == u.path.rsplit('/',1)[1]), None)
+            return self._json(200 if item else 404, item or {})
         if u.path.endswith('/calendars/primary/events'):
             t = (dt.datetime.now() + dt.timedelta(hours=2)).astimezone()
             return self._json(200, {'items': [{'id': 'e0', 'summary': 'Supplier call', 'start': {'dateTime': t.isoformat()},
@@ -73,7 +88,7 @@ os.environ.update(HIVE_GOOGLE_TOKEN=base + '/token', HIVE_GOOGLE_API=base, HIVE_
 from hive import calendar_, google, mail, memory, office, telegram
 memory.DIR = os.path.join(home, '.hive', 'rules')
 sys.path.insert(0, os.path.join(os.getcwd(), 'tests'))
-from test_telegram_fake import FakeTelegram, ME, say
+from test_telegram_fake import FakeTelegram, ME, say, tap
 
 fail = 0
 def check(name, got, want):
@@ -133,10 +148,16 @@ r = office.handle(ch(fake), repo, 'put the tasting with Asha on my calendar tomo
 check('"put ... on my calendar": shown with its guests, added on his yes',
       (r, 'Invites go to asha@mehta.example' in fake.sent[0]['text'], STATE['events'][-1]['summary']),
       ('event_added', True, 'Tasting with Asha'))
+# Replay the same persisted approval after completion: no second event is created.
+from hive import actions, store
+row = store.connect().execute('SELECT id,message_id FROM actions ORDER BY created DESC LIMIT 1').fetchone()
+actions.resume(ch(FakeTelegram([])), f'act|{row[0]}|yes', row[1], repo)
+check('a completed approval cannot create the event again', len(STATE['events']), 1)
+# A fresh explicit approval is a new action, even if the content is identical.
 fake = FakeTelegram([tap('evt|yes')]); office.handle(ch(fake), repo, 'put the tasting with Asha on my calendar tomorrow at 3', 1)
-check('the same event twice is added once', (len(STATE['events']), 'already there' in fake.sent[-1]['text']), (1, True))
+check('a separately approved identical event is a distinct action', len(STATE['events']), 2)
 fake = FakeTelegram([tap('evt|no')]); r = office.handle(ch(fake), repo, 'put the tasting with Asha on my calendar tomorrow at 3', 1)
-check('"Don\'t": nothing added', (r, len(STATE['events'])), ('add_event_no', 1))
+check('Cancel: nothing added', (r, len(STATE['events'])), ('add_event_no', 2))
 
 # 4. Drive (only what Hive made or he picked), and disconnecting
 check('Drive: the files Hive may see', [f['name'] for f in google.drive_files()], ['Menu.pdf'])

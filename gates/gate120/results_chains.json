@@ -1,0 +1,417 @@
+{
+ "chains_ok": 14,
+ "chains": 14,
+ "controls_ok": 4,
+ "controls": 4,
+ "refs_ok": 3,
+ "refs": 3,
+ "rows": [
+  {
+   "id": "c1",
+   "want": [
+    "mail_find",
+    "calendar_add"
+   ],
+   "got": [
+    "mail_find",
+    "calendar_add"
+   ],
+   "ok": true,
+   "ref_ok": true,
+   "args": [
+    {
+     "about": "Asha's mail about the tasting"
+    },
+    {
+     "what": "Call with Asha",
+     "when": "Thursday at 4",
+     "minutes": 30,
+     "guests": [
+      "$1.email"
+     ]
+    }
+   ],
+   "sec": 8.62,
+   "usd": 0.95502
+  },
+  {
+   "id": "c2",
+   "want": [
+    "calendar_check",
+    "calendar_add"
+   ],
+   "got": [
+    "calendar_check",
+    "calendar_add"
+   ],
+   "ok": true,
+   "ref_ok": null,
+   "args": [
+    {
+     "when": "tomorrow at 3"
+    },
+    {
+     "what": "Supplier call",
+     "when": "tomorrow at 3",
+     "minutes": 30,
+     "guests": []
+    }
+   ],
+   "sec": 10.91,
+   "usd": 0.08585
+  },
+  {
+   "id": "c3",
+   "want": [
+    "mail_find",
+    "mail_reply",
+    "remember"
+   ],
+   "got": [
+    "mail_find",
+    "mail_reply",
+    "remember"
+   ],
+   "ok": true,
+   "ref_ok": null,
+   "args": [
+    {
+     "about": "Ravi's most recent mail"
+    },
+    {
+     "to": "$1",
+     "say": "Saturday works."
+    },
+    {
+     "fact": "Ravi is covering the Saturday rota.",
+     "until": ""
+    }
+   ],
+   "sec": 8.53,
+   "usd": 0.0864
+  },
+  {
+   "id": "c4",
+   "want": [
+    "mail_find",
+    "remember"
+   ],
+   "got": [
+    "mail_find",
+    "remember"
+   ],
+   "ok": true,
+   "ref_ok": null,
+   "args": [
+    {
+     "about": "from Neha, about the GST filing"
+    },
+    {
+     "fact": "What Neha said about the GST filing: $1.text",
+     "until": ""
+    }
+   ],
+   "sec": 9.49,
+   "usd": 0.0853
+  },
+  {
+   "id": "c5",
+   "want": [
+    "ship",
+    "go_live"
+   ],
+   "got": [
+    "ship",
+    "go_live"
+   ],
+   "ok": true,
+   "ref_ok": null,
+   "args": [
+    {},
+    {}
+   ],
+   "sec": 7.29,
+   "usd": 0.08481
+  },
+  {
+   "id": "c6",
+   "want": [
+    "stop_build",
+    "undo"
+   ],
+   "got": [
+    "stop_build",
+    "undo"
+   ],
+   "ok": true,
+   "ref_ok": null,
+   "args": [
+    {},
+    {}
+   ],
+   "sec": 7.06,
+   "usd": 0.08559
+  },
+  {
+   "id": "c7",
+   "want": [
+    "data",
+    "mail_send"
+   ],
+   "got": [
+    "data",
+    "mail_send"
+   ],
+   "ok": true,
+   "ref_ok": null,
+   "args": [
+    {
+     "question": "How many orders came in this week?"
+    },
+    {
+     "to": "priya@kestrel.example",
+     "subject": "Orders this week",
+     "say": "The number of orders that came in this week: $1"
+    }
+   ],
+   "sec": 8.93,
+   "usd": 0.08658
+  },
+  {
+   "id": "c8",
+   "want": [
+    "forget",
+    "remember"
+   ],
+   "got": [
+    "forget",
+    "remember"
+   ],
+   "ok": true,
+   "ref_ok": null,
+   "args": [
+    {
+     "what": "Sharma Traders"
+    },
+    {
+     "fact": "Gupta Foods is our dal supplier now.",
+     "until": ""
+    }
+   ],
+   "sec": 7.8,
+   "usd": 0.0856
+  },
+  {
+   "id": "c9",
+   "want": [
+    "mail_find",
+    "calendar_add"
+   ],
+   "got": [
+    "mail_find",
+    "calendar_add"
+   ],
+   "ok": true,
+   "ref_ok": null,
+   "args": [
+    {
+     "about": "invoice from GreenBox"
+    },
+    {
+     "what": "GreenBox invoice payment due",
+     "when": "the payment due date in $1.text",
+     "minutes": 30,
+     "guests": []
+    }
+   ],
+   "sec": 8.29,
+   "usd": 0.08815
+  },
+  {
+   "id": "c10",
+   "want": [
+    "show",
+    "ship"
+   ],
+   "got": [
+    "show",
+    "ship"
+   ],
+   "ok": true,
+   "ref_ok": null,
+   "args": [
+    {},
+    {}
+   ],
+   "sec": 7.93,
+   "usd": 0.08603
+  },
+  {
+   "id": "c11",
+   "want": [
+    "mail_find",
+    "mail_reply"
+   ],
+   "got": [
+    "mail_find",
+    "mail_reply"
+   ],
+   "ok": true,
+   "ref_ok": true,
+   "args": [
+    {
+     "about": "Kestrel Logistics, about the new contract"
+    },
+    {
+     "to": "$1",
+     "say": "We accept the new contract."
+    }
+   ],
+   "sec": 10.03,
+   "usd": 0.08564
+  },
+  {
+   "id": "c12",
+   "want": [
+    "mail_find",
+    "mail_send"
+   ],
+   "got": [
+    "mail_find",
+    "mail_send"
+   ],
+   "ok": true,
+   "ref_ok": true,
+   "args": [
+    {
+     "about": "Arjun's mail about hiring"
+    },
+    {
+     "to": "$1.email",
+     "subject": "Let's meet Monday",
+     "say": "Let's meet Monday."
+    }
+   ],
+   "sec": 8.78,
+   "usd": 0.08719
+  },
+  {
+   "id": "c13",
+   "want": [
+    "remember",
+    "calendar_add"
+   ],
+   "got": [
+    "remember",
+    "calendar_add"
+   ],
+   "ok": true,
+   "ref_ok": null,
+   "args": [
+    {
+     "fact": "The FSSAI renewal is due on 30 November 2026.",
+     "until": "2026-11-30"
+    },
+    {
+     "what": "Prepare for FSSAI renewal",
+     "when": "29 November",
+     "minutes": 60,
+     "guests": []
+    }
+   ],
+   "sec": 9.22,
+   "usd": 0.08765
+  },
+  {
+   "id": "c14",
+   "want": [
+    "pulse_set",
+    "pulse_set"
+   ],
+   "got": [
+    "pulse_set"
+   ],
+   "ok": true,
+   "ref_ok": null,
+   "args": [
+    {
+     "text": "quiet hours from 10 pm to 7 am, and always tell me about mail from Priya"
+    }
+   ],
+   "sec": 7.11,
+   "usd": 0.08521
+  },
+  {
+   "id": "k1",
+   "want": [
+    "build"
+   ],
+   "got": [
+    "build"
+   ],
+   "ok": true,
+   "ref_ok": null,
+   "args": [
+    {
+     "what": "add a share button and a download button to the menu page"
+    }
+   ],
+   "sec": 7.11,
+   "usd": 0.08468
+  },
+  {
+   "id": "k2",
+   "want": [
+    "build"
+   ],
+   "got": [
+    "build"
+   ],
+   "ok": true,
+   "ref_ok": null,
+   "args": [
+    {
+     "what": "make the header darker and the logo a bit bigger"
+    }
+   ],
+   "sec": 7.2,
+   "usd": 0.08533
+  },
+  {
+   "id": "k3",
+   "want": [
+    "mail_read"
+   ],
+   "got": [
+    "mail_read"
+   ],
+   "ok": true,
+   "ref_ok": null,
+   "args": [
+    {
+     "question": "any important emails today?"
+    }
+   ],
+   "sec": 9.81,
+   "usd": 0.08157
+  },
+  {
+   "id": "k4",
+   "want": [
+    "calendar_check"
+   ],
+   "got": [
+    "calendar_check"
+   ],
+   "ok": true,
+   "ref_ok": null,
+   "args": [
+    {
+     "when": "tomorrow afternoon"
+    }
+   ],
+   "sec": 8.41,
+   "usd": 0.08468
+  }
+ ]
+}

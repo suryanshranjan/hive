@@ -42,7 +42,7 @@ for t in ("Asha from Mehta Caterers takes 40 tiffins every Monday", "the licence
     assistant.remember(ch(FakeTelegram([])), repo, t).join(5)
 explain.ask_json = _aj
 P = memory.project_key(repo)
-kinds = sorted((f['kind'], bool(f['person_id']), bool(f['valid_until'])) for f in store.live_facts(P))
+kinds = sorted((f['kind'], bool(f['person_id']), bool(f['due_at'])) for f in store.live_facts(P))
 check('kept with its kind, the person it is about, and the date it holds until',
       kinds, [('deadline', False, True), ('person', True, False), ('preference', False, False)])
 check('the person is known by name, with relation and company',

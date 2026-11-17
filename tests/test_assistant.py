@@ -177,29 +177,29 @@ check('"build: ..." asks once, then starts the build with that goal', (r, starte
 # 3b2. "move to the cloud" from the phone: one tap to confirm, then the machine is made and Hive moves; "delete the
 # cloud machine" removes it; "not now" changes nothing
 moves = []
-fake = FakeTelegram([tap('cld|yes')])
+fake = FakeTelegram([tap('cld|yes'), tap('act|yes')])
 r = assistant.handle(ch(fake), repo, 'Please move to the cloud, my laptop is going off', poll=1,
                      cloud=lambda rp, on: moves.append(on) or 0)
 check('"move to the cloud" asks once, then moves (and the local listener stops)', (r, moves), ('moved', [True]))
 fake = FakeTelegram([tap('cld|no')])
 r = assistant.handle(ch(fake), repo, 'delete the cloud machine', poll=1, cloud=lambda rp, on: moves.append(on) or 0)
 check('"not now" leaves the cloud machine alone', (r, moves), ('not_moved', [True]))
-fake = FakeTelegram([tap('cld|yes')])
+fake = FakeTelegram([tap('cld|yes'), tap('act|yes')])
 r = assistant.handle(ch(fake), repo, 'delete the cloud machine', poll=1, cloud=lambda rp, on: 5)
 check('the cloud copy says it cannot delete itself, and how to (no AWS keys there)',
       (r, 'hive cloud --stop' in fake.sent[-1]['text']), ('cloud_elsewhere', True))
 
 # 3b3. every confirmation reads typed words as well as taps (the live test: typed answers were taken as "no")
 moves = []
-fake = FakeTelegram([say('yes please')])
+fake = FakeTelegram([say('yes please'), tap('act|yes')])
 r = assistant.handle(ch(fake), repo, 'Please move to the cloud', poll=1, cloud=lambda rp, on, login=True: moves.append(login) or 0)
 check('a typed "yes" moves to the cloud (with the login, the recommended choice)', (r, moves), ('moved', [True]))
-fake = FakeTelegram([say('do it without the login')])
+fake = FakeTelegram([say('do it without the login'), tap('act|yes')])
 moves.clear()
 assistant.handle(ch(fake), repo, 'Please move to the cloud', poll=1, cloud=lambda rp, on, login=True: moves.append(login) or 0)
 check('"without the login" picks that option', moves, [False])
 sizes = []
-fake = FakeTelegram([tap('cld|big')])
+fake = FakeTelegram([tap('cld|big'), tap('act|yes')])
 r = assistant.handle(ch(fake), repo, 'Please move to the cloud', poll=1,
                      cloud=lambda rp, on, login=True, size=None: sizes.append(size) or 0)
 check('the move offers his choice at real monthly prices, and "bigger" makes the bigger machine (the owner: it depends on '

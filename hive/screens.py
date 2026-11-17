@@ -131,6 +131,8 @@ def take(code_dir, pages=('/',), out_dir=None, size=PHONE):
 def take_on(code_dir, pages=('/',), devices=('phone',), out_dir=None, sizes=None):
     """Photograph each page on each screen he asked for ("show me the pricing page on desktop and tablet"), with one
     start of his product. Returns [(page, device, png path)], page by page. Raises Unavailable as take does."""
+    if os.environ.get('IS_SANDBOX') != '1':
+        raise Unavailable('Preview execution is disabled outside the isolated runner.')
     sizes = sizes or DEVICES
     if not available():
         raise Unavailable("I can't take screenshots on this machine yet (run: pip install playwright, then playwright "

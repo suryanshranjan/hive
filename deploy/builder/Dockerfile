@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends git curl ca-cer
  && pip install --no-cache-dir pytest \
  && useradd -m -u 1000 hive && chmod 1777 /home/hive \
  && rm -rf /var/lib/apt/lists/* /root/.npm
+RUN pip install --no-cache-dir "cryptography>=43" tzdata
 USER hive
 ENV HOME=/home/hive PYTHONPATH=/opt/hive PYTHONUNBUFFERED=1 IS_SANDBOX=1
 WORKDIR /hive-run

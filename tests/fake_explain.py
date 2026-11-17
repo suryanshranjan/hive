@@ -4,6 +4,8 @@ import json, re, sys
 prompt = sys.stdin.read()
 def _out(d):
     print(json.dumps({'result': json.dumps(d)})); sys.exit(0)
+if 'worth remembering' in prompt:
+    _out({'note': ''})  # valid no-memory result; malformed replies must remain retryable jobs
 if 'asked his assistant about his email' in prompt:   # hive/mail.py: the first message, by sender and subject
     frm = re.search(r'^\[1\] From: (.+)$', prompt, re.M); sub = re.search(r'^Subject: (.+)$', prompt, re.M)
     _out({'answer': f"{frm.group(1)} wrote about {sub.group(1)}." if frm else 'Nothing.', 'about': [1]})

@@ -34,8 +34,14 @@ class Locked(RuntimeError):
 
 def _private_write(path, data, binary=False):
     os.makedirs(os.path.dirname(path), exist_ok=True)
+    private_permissions(os.path.dirname(path), directory=True)
     tmp = f'{path}.{os.getpid()}.tmp'
     fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC | getattr(os, 'O_BINARY', 0), 0o600)
+    try:
+        private_permissions(tmp)
+    except BaseException:
+        os.close(fd)
+        raise
     with os.fdopen(fd, 'wb' if binary else 'w', **({} if binary else {'encoding': 'utf-8'})) as f:
         f.write(data)
     os.replace(tmp, path)
@@ -45,13 +51,27 @@ def _private_write(path, data, binary=False):
         pass
 
 def _fernet_cls():
-    if os.environ.get('HIVE_VAULT', '').lower() == 'plain':
-        return None
     try:
         from cryptography.fernet import Fernet
         return Fernet
     except Exception:
         return None
+
+
+def private_permissions(path, directory=False):
+    """Apply real Windows ACLs or POSIX mode bits before writing personal data."""
+    if os.name != 'nt':
+        os.chmod(path, 0o700 if directory else 0o600)
+        return
+    import getpass, subprocess
+    user = getpass.getuser()
+    domain = os.environ.get('USERDOMAIN')
+    account = f'{domain}\\{user}' if domain else user
+    permission = '(OI)(CI)F' if directory else 'F'
+    result = subprocess.run(['icacls', path, '/inheritance:r', '/grant:r', f'{account}:{permission}'],
+                            capture_output=True, timeout=10)
+    if result.returncode:
+        raise Locked('Could not make the personal-data path private on this machine.')
 
 def _keyring():
     try:
@@ -111,7 +131,7 @@ def save_json(path, data):
     """Write data (any JSON value) to path: encrypted when Hive can, else plain JSON, owner-only either way."""
     Fernet = _fernet_cls()
     if Fernet is None:
-        _private_write(path, json.dumps(data, indent=1, ensure_ascii=False)); return
+        raise Locked('Secret storage requires cryptography. Install hive-swarm[secure]; nothing was saved.')
     token = Fernet(_key()).encrypt(json.dumps(data, ensure_ascii=False).encode('utf-8')).decode()
     _private_write(path, json.dumps({'hive_vault': 1, 'data': token}))
 
@@ -123,11 +143,9 @@ def load_json(path, default=None):
     except (OSError, ValueError):
         return default
     if not sealed(raw):
-        if _fernet_cls() is not None:
-            try:
-                save_json(path, raw)
-            except Exception:
-                pass
+        if _fernet_cls() is None:
+            raise Locked('Reading legacy secret files requires cryptography; install hive-swarm[secure].')
+        save_json(path, raw)
         return raw
     Fernet = _fernet_cls()
     if Fernet is None:
@@ -145,7 +163,7 @@ def load_json(path, default=None):
 def files():
     """Every file under ~/.hive that holds a secret."""
     h = _home(); out = []
-    for name in ('telegram.json', 'fast.json', 'llm.json'):
+    for name in ('telegram.json', 'fast.json', 'llm.json', 'google.json'):
         out.append(os.path.join(h, name))
     for d in ('mail', 'calendar', 'payments', 'access', 'deploy'):
         p = os.path.join(h, d)

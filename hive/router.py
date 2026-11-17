@@ -72,16 +72,22 @@ The steps you can use:
 Reply with JSON only: {{"steps": [{{"tool": "...", "args": {{...}}}}], "confirmed": true if he is agreeing to what you
 just proposed, else false, "clarify": one short question if a build is too vague to build, else ""}}"""
 
+DIRECT = {'mail_send', 'remember', 'mail_find'}   # steps only the step runner does, even alone
+
 KNOWN = set(re.findall(r'^- "([a-z_]+)"', TOOLS, re.M)) | {'cloud_on', 'cloud_off'}
 
 def plan(history, text):
     """His message as {'steps': [{'tool', 'args'}], 'confirmed', 'clarify'}; steps with unknown tools are dropped;
     {'steps': []} if the model gave nothing usable."""
     got = explain.ask_json(PLAN.format(history=history or '(nothing yet)', text=text, tools=TOOLS)) or {}
+    from .tools import Refused
+    if not isinstance(got.get('steps', []), list) or len(got.get('steps', [])) > 4:
+        raise Refused('Please split this into requests of at most four steps.')
     steps = []
     for s in (got.get('steps') or [])[:4]:
-        if isinstance(s, dict) and s.get('tool') in KNOWN:
-            steps.append({'tool': s['tool'], 'args': s.get('args') if isinstance(s.get('args'), dict) else {}})
+        if not isinstance(s, dict) or s.get('tool') not in KNOWN or not isinstance(s.get('args', {}), dict):
+            raise Refused('The proposed plan contains an unsupported action. Nothing was started.')
+        steps.append({'tool': s['tool'], 'args': s.get('args', {})})
     return {'steps': steps, 'confirmed': bool(got.get('confirmed')), 'clarify': got.get('clarify') or ''}
 
 INTENT_ARG = {'build': 'what', 'change': 'rule', 'rule': 'rule', 'instruct': 'rule', 'amend': 'rule', 'goal': 'goal',
@@ -92,8 +98,12 @@ OFFICE = {'mail_find', 'mail_read', 'mail_reply', 'mail_send', 'calendar_check',
 def as_intent(step, text):
     """One step as the reader's old answer ({'intent', 'rule', ...}), so a one-step plan runs through the same code."""
     tool, args = step['tool'], step['args']
-    if tool in ('mail_read', 'mail_find', 'mail_reply', 'mail_send', 'calendar_check', 'calendar_add'):
-        return {'intent': 'office', 'rule': text}
+    office = {'mail_read': 'mail', 'mail_find': 'mail', 'mail_reply': 'reply_mail', 'calendar_check': 'cal',
+              'calendar_add': 'add_event'}
+    if tool in office:
+        return {'intent': 'office', 'office': office[tool], 'rule': text}
+    if tool == 'mail_send':
+        return {'intent': 'reply', 'rule': text}
     if tool == 'remember':
         return {'intent': 'reply', 'rule': text}
     got = {'intent': tool, 'rule': str(args.get(INTENT_ARG.get(tool, 'rule')) or text)}
@@ -106,31 +116,44 @@ def _ref(value, results):
     """"$2.email" -> step 2's email; "$1" -> step 1's whole result; anything else as it is."""
     if isinstance(value, list):
         return [_ref(v, results) for v in value]
+    if isinstance(value, dict):
+        return {k: _ref(v, results) for k, v in value.items()}
     if not isinstance(value, str):
         return value
-    m = re.fullmatch(r'\$(\d)(?:\.(\w+))?', value.strip())
+    m = re.fullmatch(r'\$(\d+)(?:\.(\w+))?', value.strip())
     if not m:
         return value
-    r = results.get(int(m.group(1))) or {}
+    if int(m.group(1)) not in results:
+        raise ValueError('A required earlier step has no result')
+    r = results[int(m.group(1))]
+    if m.group(2) and m.group(2) not in r:
+        raise ValueError('An earlier step did not provide the required detail')
     return r.get(m.group(2)) if m.group(2) else r
 
-def run_chain(ch, repo, steps, text, poll=20, handle=None):
+def run_chain(ch, repo, steps, text, poll=20, handle=None, origin='owner'):
     """Several steps in order, each through the one check, each external one on his yes, a later one using an earlier
     one's result. Stops at the first step that cannot be done, and says which and why. Returns [what each step did]."""
     from . import telegram, tools
     results, done = {}, []
-    ch.send('🐝 ' + telegram.esc(f"On it: {len(steps)} things, in order."), html=True)
+    if len(steps) > 1:
+        ch.send('🐝 ' + telegram.esc(f"On it: {len(steps)} things, in order."), html=True)
     for n, step in enumerate(steps, 1):
-        tool, args = step['tool'], {k: _ref(v, results) for k, v in step['args'].items()}
+        tool = step['tool']
+        try:
+            args = {k: _ref(v, results) for k, v in step['args'].items()}
+        except ValueError as e:
+            ch.send(str(e) + '. I stopped before taking this action.')
+            done.append('needs_input'); break
         try:
             tools.allow({'mail_send': 'mail_send', 'mail_reply': 'mail_send', 'calendar_add': 'add_event'}.get(tool, tool),
-                        'owner', text)
+                        origin, text)
         except tools.Refused as e:
             ch.send('🐝 ' + telegram.esc(str(e)), html=True); done.append('refused'); break
         r = _step(ch, repo, tool, args, text, poll, handle)
         results[n] = r if isinstance(r, dict) else {'said': r}
         done.append(results[n].get('status', 'done'))
-        if results[n].get('status') in ('failed', 'no', 'not_found'):
+        if results[n].get('status') not in ('done', 'succeeded', 'mail_sent', 'event_added', 'answered',
+                                           'mail_answered', 'cal_answered', 'memory_shown', 'chat'):
             ch.send('🐝 ' + telegram.esc(f"I stopped at step {n}: {results[n].get('why') or 'it could not be done'}."),
                     html=True)
             break
@@ -154,14 +177,16 @@ def _step(ch, repo, tool, args, text, poll, handle):
         if not office.ADDRESS.fullmatch((to or '').strip()):
             return {'status': 'failed', 'why': "I don't have an address to send it to"}
         body = args.get('say') or ''
-        ch.send(f"📧 To {telegram.esc(to)}: <b>{telegram.esc(args.get('subject') or '')}</b>\n{telegram.esc(body)}\n\n"
-                "<i>Send it from your address?</i>", html=True, buttons=[[('📤 Send it', 'mls|yes'), ("Don't", 'mls|no')]])
-        kind, got = telegram._wait(ch, poll, {'mls|yes', 'mls|no'})
-        if got != 'mls|yes' and not (kind == 'text' and (got or '').strip().lower() in ('yes', 'send', 'send it', 'haan')):
-            ch.send('Very good. Nothing was sent.'); return {'status': 'no'}
-        ok, why = mail.send(repo, to, args.get('subject') or '(no subject)', body)
-        ch.send('✅ Sent.' if ok else f"⚠️ Not sent ({telegram.esc(why)}).", html=True)
-        return {'status': 'done' if ok else 'failed', 'why': why}
+        from . import actions
+        payload = {'to': to, 'subject': args.get('subject') or '(no subject)', 'body': body}
+        aid = actions.confirm(ch, 'mail_send', payload,
+                              f"To {telegram.esc(to)}: <b>{telegram.esc(payload['subject'])}</b>\n{telegram.esc(body)}",
+                              poll, yes_label='Send it')
+        if not aid:
+            return {'status': 'cancelled'}
+        result = actions.execute(aid, lambda a: office._send_result(repo, a))
+        ch.send('Sent.' if result.status == 'succeeded' else 'The send is unconfirmed; I will not repeat it automatically.')
+        return {'status': result.status}
     if tool == 'calendar_add':
         guests = [g for g in (args.get('guests') or []) if isinstance(g, str) and '@' in g]
         how = f"put {args.get('what') or 'it'} on my calendar {args.get('when') or ''}" + \

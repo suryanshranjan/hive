@@ -60,9 +60,10 @@ def ship(repo, state):
     url = _git(repo, 'remote', 'get-url', 'origin').stdout.strip()
     if not url:
         out['why'] = 'no_remote'; return out
-    shots = _screens(repo, branch)   # for the engineer: how it looks, in the pull request
+    commit = state.get('approved_sha') or branch
+    shots = _screens(repo, commit)   # for the engineer: how it looks, in the pull request
     # only Hive's own branch, by its full name; a fix round rewrites it in place, so it is replaced, never merged into
-    p = _git(repo, 'push', '-q', 'origin', f'+refs/heads/{branch}:refs/heads/{branch}')
+    p = _git(repo, 'push', '-q', 'origin', f'+{commit}:refs/heads/{branch}')
     if p.returncode:
         out.update(why='push', error=(p.stderr or p.stdout).strip()[-300:]); return out
     out['ok'] = True

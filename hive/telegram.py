@@ -103,18 +103,23 @@ class Channel:
         self.chat = cfg['chat_id']; self.address = cfg.get('address'); self._token = cfg.get('token')
         self.api = api or (lambda method, **p: _call(cfg['token'], method, **p))
         self.offset = None
+        self.last_prompt = None
+        self.prompt_buttons = {}
+        self.last_update = ''
         self._told = set()   # strangers already told this bot is someone else's
         self.note = None   # what to say when the owner asks for status (set by whoever is running)
         self.listener = listener   # the always-on listener never claims the chat; builds and reviews do
         self.history = []   # the conversation so far, (who, text), so a reply is read in context: "yes" to what?
         self.keep = api is None   # the real chat keeps its thread on disk (restarts, moves to the cloud and back)
+        self._pending_updates = []
+        self._consumed_update = None
         if self.keep:
             try:
                 self.history = [tuple(x) for x in json.load(open(CONVERSATION))][-16:]
             except Exception:
                 pass
 
-    def send(self, text, buttons=None, reply_to=None, html=False):
+    def send(self, text, buttons=None, reply_to=None, html=False, retry=True):
         """Every message goes out formatted; plain text is escaped first, so nothing the builders or the owner wrote can
         break the formatting. Pass html=True for a message that is already formatted (with esc() around any text)."""
         p = {'chat_id': self.chat, 'text': text if html else esc(text), 'parse_mode': 'HTML'}
@@ -125,9 +130,13 @@ class Channel:
         if reply_to:
             p['reply_to_message_id'] = reply_to
         self.remember('hive', _html.unescape(re.sub(r'<[^>]+>', '', p['text'])))
-        for wait in (2, 5, 15, None):   # a dropped connection must not lose the owner's question
+        for wait in ((2, 5, 15, None) if retry else (None,)):   # a dropped connection must not lose the owner's question
             try:
-                return self.api('sendMessage', **p)['message_id']
+                mid = self.api('sendMessage', **p)['message_id']
+                if buttons:
+                    self.last_prompt = mid
+                    self.prompt_buttons = {b['callback_data']: mid for row in p['reply_markup']['inline_keyboard'] for b in row}
+                return mid
             except (OSError, http.client.HTTPException):
                 if wait is None:
                     raise
@@ -195,13 +204,17 @@ class Channel:
         if self.keep:   # private, next to the owner's other Hive settings
             try:
                 os.makedirs(os.path.dirname(CONVERSATION), exist_ok=True)
-                json.dump(self.history, open(CONVERSATION + '.tmp', 'w')); os.replace(CONVERSATION + '.tmp', CONVERSATION)
+                with open(CONVERSATION + '.tmp', 'w', encoding='utf-8') as fh:
+                    json.dump(self.history, fh)
+                os.replace(CONVERSATION + '.tmp', CONVERSATION)
                 os.chmod(CONVERSATION, 0o600)
             except Exception:
                 pass
             try:   # the whole conversation, searchable (memory 2.0); the 16 above are what a reply reads at once
                 from . import store
-                store.log_message(who, text)
+                mid = store.log_message(who, text)
+                if who == 'owner':
+                    self.last_archive = mid
             except Exception:
                 pass
 
@@ -210,6 +223,9 @@ class Channel:
         and from Hive's record of the conversation. True if the chat message went."""
         secret = (secret or '').strip()
         if secret:
+            from . import store
+            with store.transaction() as con:
+                con.execute('DELETE FROM telegram_inbox WHERE instr(payload,?)>0', (secret,))
             self.history = [(w, t.replace(secret, '••••')) for w, t in self.history]
             try:   # out of the long archive too
                 from . import store
@@ -268,18 +284,45 @@ class Channel:
 
     def updates(self, timeout=20):
         """New replies from the owner's chat only: (text or None, button data or None, id of the message replied to)."""
+        from . import store
+        if self.keep:
+            with store.transaction() as con:
+                if self._consumed_update is not None:
+                    con.execute('DELETE FROM telegram_inbox WHERE chat_id=? AND update_id=?',
+                                (str(self.chat), self._consumed_update))
+                    self._consumed_update = None
+                rows = con.execute('SELECT payload FROM telegram_inbox WHERE chat_id=? ORDER BY update_id',
+                                   (str(self.chat),)).fetchall()
+                self._pending_updates = [json.loads(r[0]) for r in rows]
+                self.offset = store.get('telegram_offset:' + str(self.chat), self.offset)
         p = {'timeout': timeout, 'allowed_updates': ['message', 'callback_query']}
         if self.offset is not None:
             p['offset'] = self.offset
         if not self.listener:
             try:
                 os.makedirs(os.path.dirname(BUSY), exist_ok=True)
-                json.dump({'pid': os.getpid(), 'at': time.time()}, open(BUSY, 'w'))
+                with open(BUSY, 'w', encoding='utf-8') as fh:
+                    json.dump({'pid': os.getpid(), 'at': time.time()}, fh)
             except Exception:
                 pass
         out = []
         try:
-            batch = self.api('getUpdates', **p)
+            batch = [] if self._pending_updates else self.api('getUpdates', **p)
+            if batch:
+                self.offset = batch[-1]['update_id'] + 1
+                if self.keep:
+                    with store.transaction() as con:
+                        for update in batch:
+                            obj = update.get('message') or update.get('callback_query', {}).get('message') or {}
+                            if obj.get('chat', {}).get('id') == self.chat:
+                                con.execute('INSERT OR IGNORE INTO telegram_inbox VALUES(?,?,?)',
+                                            (str(self.chat), update['update_id'], json.dumps(update)))
+                        store.put('telegram_offset:' + str(self.chat), self.offset)
+                self._pending_updates.extend(batch)
+            # A nested waiter cannot discard the rest of a fetched batch.
+            batch = [self._pending_updates.pop(0)] if self._pending_updates else []
+            if batch:
+                self._consumed_update = batch[0]['update_id']
         except RuntimeError as e:   # another reader polled at the same moment (Telegram allows one): try again shortly
             if 'onflict' not in str(e):
                 raise
@@ -287,10 +330,11 @@ class Channel:
         except (OSError, http.client.HTTPException):   # a dropped connection while waiting: the owner is still there
             time.sleep(3); return []   # (Gate 36: one of these ended an interview before its first question)
         for u in batch:
-            self.offset = u['update_id'] + 1
+            self.offset = max(self.offset or 0, u['update_id'] + 1)
             if 'callback_query' in u:
                 cq = u['callback_query']
-                if cq.get('message', {}).get('chat', {}).get('id') != self.chat:
+                if (cq.get('message', {}).get('chat', {}).get('id') != self.chat or
+                        cq.get('from', {}).get('id', self.chat) != self.chat):
                     continue
                 try:   # a courtesy only: Telegram refuses it for a tap over 15 minutes old, which must not be fatal
                     self.api('answerCallbackQuery', callback_query_id=cq['id'])
@@ -299,7 +343,7 @@ class Channel:
                 out.append((None, cq.get('data'), cq.get('message', {}).get('message_id')))
             elif 'message' in u:
                 m = u['message']
-                if m.get('chat', {}).get('id') != self.chat:   # someone else: never read, told once (a public bot
+                if (m.get('chat', {}).get('id') != self.chat or m.get('from', {}).get('id', self.chat) != self.chat):   # someone else: never read, told once (a public bot
                     other = m.get('chat', {}).get('id')           # name can be found by anyone)
                     if other and m.get('chat', {}).get('type') == 'private' and other not in self._told:
                         self._told.add(other)
@@ -308,15 +352,18 @@ class Channel:
                         except Exception:
                             pass
                     continue
+                self.last_update = str(u['update_id'])
                 reply_to = (m.get('reply_to_message') or {}).get('message_id')
                 self.heard_voice = bool(m.get('voice') or m.get('audio'))   # he spoke: Hive may answer in voice
                 if m.get('text'):
                     self.last_id = m.get('message_id')   # so a message carrying a password can be taken back out
                     out.append((m['text'].strip(), None, reply_to)); self.remember('owner', m['text'].strip())
                 elif m.get('voice') or m.get('audio'):
+                    self.last_id = m.get('message_id')
                     heard = self.listen((m.get('voice') or m.get('audio'))['file_id'])
                     if heard:
                         out.append((heard, None, reply_to))
+                        self.remember('owner', heard)
                 elif m.get('photo') or (m.get('document') or {}).get('mime_type', '').startswith('image/'):
                     # a reference he likes, or a screenshot he marked: kept, and passed on as words plus the picture
                     fid = m['photo'][-1]['file_id'] if m.get('photo') else m['document']['file_id']
@@ -349,9 +396,10 @@ class Channel:
         try:
             import tempfile
             path = self.api('getFile', file_id=file_id)['file_path']
-            local = os.path.join(tempfile.mkdtemp(), 'voice.ogg')
-            self.fetch(path, local)
-            text = voice.transcribe(local)
+            with tempfile.TemporaryDirectory(prefix='hive_voice_') as folder:
+                local = os.path.join(folder, 'voice.ogg')
+                self.fetch(path, local)
+                text = voice.transcribe(local)
         except Exception:
             text = None
         if not text:
@@ -513,14 +561,17 @@ def understand(text, about):
                             (" The choices: " + '; '.join(options) + '.' if options else ''))
     return 'answer', None
 
-def _wait(ch, poll, want, current=None, about=None):
+def _wait(ch, poll, want, current=None, about=None, expires=None):
     """Block until the owner taps one of `want` (button data) or types something: ('tap', data) or ('text', words).
     A request for status is answered on the spot and the wait goes on. A tap on an older message's button is answered
     too, pointing at the question being asked (Gate 36: such taps were dropped in silence and the owner kept waiting).
     With `about` = (situation, options, context), "what does this mean?" gets an explanation, not taken as an answer."""
+    current = current if current is not None else getattr(ch, 'last_prompt', None)
     while True:
-        for text, data, _ in ch.updates(timeout=poll):
-            if data in want:
+        if expires is not None and time.time() >= expires:
+            return 'expired', None
+        for text, data, source_message in ch.updates(timeout=poll):
+            if data in want and (current is None or source_message == current):
                 return 'tap', data
             if data and want:
                 ch.send("👆 That button is from an earlier message. I'm on this one now: tap here, or reply in your "
@@ -828,7 +879,7 @@ def bind_first(token, api=None, wait_s=None, say=lambda s: print(s, flush=True),
             raise SystemExit(2)
         bot = 'your bot'
     say(f'Waiting for your pairing word on @{bot}. Open the bot on your phone and send it; only that chat becomes the owner.')
-    offset, end = None, (time.time() + wait_s) if wait_s else None
+    offset, end = None, time.time() + (wait_s if wait_s is not None else 900)
     tries = {}
     while end is None or time.time() < end:
         p = {'timeout': 20 if end is None else max(0, min(20, int(end - time.time())))}
@@ -844,7 +895,10 @@ def bind_first(token, api=None, wait_s=None, say=lambda s: print(s, flush=True),
             if not (m and m.get('chat', {}).get('type') == 'private'):
                 continue
             chat, who = m['chat']['id'], (m.get('from') or {}).get('first_name') or 'you'
-            if _pair_norm(code) not in _pair_norm(m.get('text')):
+            if tries.get(chat, 0) >= PAIR_TRIES:
+                continue
+            import secrets
+            if not secrets.compare_digest(_pair_norm(code), _pair_norm(m.get('text'))):
                 tries[chat] = tries.get(chat, 0) + 1
                 if tries[chat] <= PAIR_TRIES:
                     try:
@@ -877,6 +931,9 @@ def setup():
     except Exception as e:
         print(f'  That token did not work ({e}). Check it and run hive telegram setup again.'); return 1
     print(f"\n3. Now open your bot, @{bot['username']}, in Telegram and send it any message (for example: hi).")
+    import secrets
+    challenge = secrets.token_urlsafe(16)
+    print('Send this pairing word to your bot: ' + challenge)
     offset, chat = None, None
     deadline = time.time() + 300
     while chat is None and time.time() < deadline:
@@ -886,7 +943,8 @@ def setup():
         for u in _call(token, 'getUpdates', **p):
             offset = u['update_id'] + 1
             m = u.get('message')
-            if m and m.get('chat', {}).get('type') == 'private':
+            if m and m.get('chat', {}).get('type') == 'private' and secrets.compare_digest(
+                    _pair_norm(m.get('text')), _pair_norm(challenge)):
                 chat = m['chat']['id']; who = m.get('from', {}).get('first_name', 'you')
     if chat is None:
         print('  No message arrived within 5 minutes. Run hive telegram setup again.'); return 1

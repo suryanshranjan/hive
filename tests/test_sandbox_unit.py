@@ -3,7 +3,7 @@ The real thing, with Docker: tests/test_sandbox.sh.   usage: python3 tests/test_
 import os, subprocess, sys, tempfile
 sys.path.insert(0, os.getcwd())
 home = tempfile.mkdtemp(); os.environ['HOME'] = os.environ['USERPROFILE'] = home
-for k in ('HIVE_SANDBOX', 'HIVE_SANDBOX_CUSTOM', 'HIVE_HOST'):
+for k in ('HIVE_SANDBOX', 'HIVE_SANDBOX_CUSTOM', 'HIVE_HOST', 'IS_SANDBOX'):
     os.environ.pop(k, None)
 from hive import sandbox, PY
 
@@ -37,7 +37,7 @@ cmd, denv = sandbox.command(run, 'w1', 'claude -p', base, agent='claude')
 flat = ' '.join(cmd)
 check('one container per builder, removed when done, named for the board', ('--rm' in cmd, sandbox.name(run, 'w1') in cmd), (True, True))
 check('it sees the run folder and Hive\'s code read-only, nothing of his home', (f'{sandbox.host_path(run)}:/hive-run' in flat,
-      ':/opt/hive:ro' in flat, f'{sandbox.host_path(home)}:' in flat.replace(sandbox.host_path(run), '')), (True, True, False))
+      ':/opt/hive/hive:ro' in flat, f'{sandbox.host_path(home)}:' in flat.replace(sandbox.host_path(run), '')), (True, True, False))
 check('its login is a copy, with only the login in it', (os.path.exists(os.path.join(run, '.logins', 'claude', '.claude', '.credentials.json')),
       os.path.exists(os.path.join(run, '.logins', 'claude', '.claude', 'history.jsonl'))), (True, False))
 check('no key value on the docker command line', any(v in flat for v in ('sk-ant', 'sk-oa', 'bot', 'gh', 'mk')), False)
@@ -49,19 +49,19 @@ sandbox.forget_logins(run)
 check('the copies go with the run', os.path.exists(os.path.join(run, '.logins')), False)
 
 said = []
-check('off: on this computer, nothing said', (os.environ.__setitem__('HIVE_SANDBOX', 'off'), sandbox.decide(run, 't', 'j', base, said.append))[1], False)
-os.environ.pop('HIVE_SANDBOX')
-check('his own builder command is his to place', sandbox.decide(run, 't', 'j', base, said.append, custom=True), False)
-os.environ['HIVE_DOCKER'] = sys.executable + ' -c "import sys; sys.exit(1)"'   # Docker not running
-check('no Docker: on this computer, and he is told why', (sandbox.decide(run, 't', 'j', base, said.append), len(said)), (False, 1))
-sandbox.decide(run, 't', 'j', base, said.append)
-check('... once, not before every build', len(said), 1)
-os.environ['HIVE_HOST'] = 'render'; said.clear(); os.remove(os.path.join(home, '.hive', 'sandbox_told'))
-check('on Render (Hive in its own container): nothing to say', (sandbox.decide(run, 't', 'j', base, said.append), said), (False, []))
-os.environ.pop('HIVE_HOST'); os.environ['HIVE_SANDBOX'] = 'docker'
+for mode in ('off', 'auto', 'docker'):
+    os.environ['HIVE_SANDBOX'] = mode
+    sandbox.running = lambda: False
+    try:
+        sandbox.decide(run, 't', 'j', base, said.append)
+        stopped = False
+    except SystemExit:
+        stopped = True
+    check(f'{mode}: no unisolated fallback', stopped, True)
 try:
-    sandbox.decide(run, 't', 'j', base, said.append); stopped = ''
-except SystemExit as e:
-    stopped = str(e)
-check('required but no Docker: stopped, with the reason', "isn't running" in stopped, True)
+    sandbox.decide(run, 't', 'j', base, said.append, custom=True)
+    stopped = False
+except SystemExit:
+    stopped = True
+check('custom workers cannot bypass isolation', stopped, True)
 sys.exit(fail)

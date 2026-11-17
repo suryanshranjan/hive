@@ -9,16 +9,19 @@ def path():
     return os.path.join(os.path.expanduser('~'), '.hive', 'audit.jsonl')
 
 def record(action, target='', approved='owner tap', ok=True, detail=''):
-    """Keep one line. Never raises: a full disk must not stop the action it records."""
+    """Legacy metadata log. Never put request text, credentials or message bodies here."""
     try:
         p = path(); os.makedirs(os.path.dirname(p), exist_ok=True)
+        from .vault import private_permissions
+        private_permissions(os.path.dirname(p), directory=True)
         line = json.dumps({'at': time.strftime('%Y-%m-%dT%H:%M:%S'), 'action': action, 'target': str(target)[:200],
-                           'approved': approved, 'ok': bool(ok), 'detail': str(detail)[:200]}, ensure_ascii=False)
+                            'approved': approved, 'ok': ok if ok is None else bool(ok), 'detail': str(detail)[:200]}, ensure_ascii=False)
         fd = os.open(p, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
         with os.fdopen(fd, 'a', encoding='utf-8') as f:
             f.write(line + '\n')
-    except Exception:
-        pass
+    except Exception as e:
+        import warnings
+        warnings.warn('Could not write Hive audit metadata: ' + type(e).__name__, RuntimeWarning)
 
 def last(n=20):
     try:
@@ -31,7 +34,7 @@ def show(n=20):
     if not rows:
         print('Nothing recorded yet.'); return 0
     for r in rows:
-        print(f"{r['at']}  {'ok ' if r['ok'] else 'FAILED'}  {r['action']}: {r['target']}  ({r['approved']})")
+        print(f"{r['at']}  {'pending' if r['ok'] is None else 'ok ' if r['ok'] else 'FAILED'}  {r['action']}: {r['target']}  ({r['approved']})")
     return 0
 
 def logged(action, target=lambda *a, **k: ''):

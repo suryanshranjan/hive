@@ -9,7 +9,7 @@ Only one Hive process reads the bot at a time: while a build or review is talkin
 aside (see telegram.busy_elsewhere)."""
 import glob, json, os, re, shutil, subprocess, time
 
-from . import argv, explain, memory, refs, team, telegram
+from . import argv, explain, memory, refs, team, telegram, policy
 
 RUNS = os.path.join(os.path.expanduser('~'), '.hive', 'runs')   # where `hive start` keeps its builds
 PIDFILE = os.path.join(os.path.expanduser('~'), '.hive', 'listen.pid')   # the listener running on this computer
@@ -463,24 +463,24 @@ def ship_it(ch, repo, text, poll):
     st = latest_build(repo)
     if not st:
         ch.send("📦 Nothing built yet to ship, sir. Tell me what to build first."); return 'nothing_to_ship'
-    bad = 'now fail' in (st.get('check') or '')
-    ch.send(f"📦 <b>Send this to your engineer?</b>\n\n{telegram.esc(ship.title(st)[6:][:200])}\n{telegram.esc(st.get('check', ''))}"
-            + ("\n\n⚠️ <b>Some tests that passed before now fail.</b> They will see that first." if bad else '') +
-            "\n\n<i>I'll open a pull request for them to review and merge. Your main version is not touched.</i>", html=True,
-            buttons=[[('📦 Yes, send it', 'shp|yes')], [('Not now', 'shp|no')]])
-    choice, other = choose(ch, poll, [('shp|yes', ('yes', 'send it', 'ship it', 'go ahead', 'haan', 'bhej do')),
-                                      ('shp|no', NO_WORDS)])
-    if other is not None:
-        ch.send("Very good, I'll hold it for now.")
-        return handle(ch, repo, other, poll)
-    if choice != 'shp|yes':
-        ch.send('Very good. It stays here until you say.'); return 'not_shipped'
+    sha = subprocess.run(['git', '-C', repo, 'rev-parse', _build_ref(st)], capture_output=True, text=True).stdout.strip()
+    if not re.fullmatch(r'[0-9a-f]{40,64}', sha):
+        ch.send('I could not identify the exact build version.'); return 'nothing_to_ship'
+    st = dict(st, approved_sha=sha)
+    from . import actions
+    aid = actions.confirm(ch, 'ship', {'state': st},
+                          f"Send build <b>{telegram.esc(st['name'])}</b> ({sha[:12]}) to your engineer as a pull request?\n{telegram.esc(st.get('check', 'Unverified tests'))}",
+                          poll, yes_label='Ship it')
+    if not aid:
+        ch.send('No new upload was started.'); return 'not_shipped'
     remote = subprocess.run(['git', '-C', repo, 'remote', 'get-url', 'origin'], capture_output=True, text=True).stdout
     if 'github.com' in remote and shutil.which('gh'):   # an expired GitHub login is renewed from his phone first
         from . import logins
         if not logins.ensure(ch, 'github', poll):
             return 'login_needed'
-    r = ship.ship(repo, st)
+    r = actions.execute_dict(aid, lambda a: ship.ship(repo, a['state']))
+    if r.get('why') == 'unknown':
+        ch.send(r['say']); return 'ship_unknown'
     if r['ok']:   # for the brief and his numbers: what went to his engineer, and when
         from . import numbers
         numbers.mark(repo, f'"{ship.title(st)[6:][:80]}" went to your engineer')
@@ -658,31 +658,15 @@ if there is nothing lasting",
 someone in his world),
 "person": {{"name": "the person's name as he says it", "relation": "customer, supplier, cofounder, investor, employee,
 family... or empty", "org": "their company or empty"}} if the fact is about one named person, else null,
+"scope": "personal" for family, personal preferences and life facts; "project" for business/project facts,
 "until": "YYYY-MM-DD" for a deadline (the day it is due), else ""}}"""
 
 def remember(ch, repo, text):
     """Keep any lasting fact about his business from his message, in the background so his reply is not slowed (the
     owner: no gaps; Jarvis knows Tony's world, not just this conversation)."""
-    import threading
-    history = ch.recent() if hasattr(ch, 'recent') else ''
-    def run():
-        if re.search(r'\d', text):   # "we had 120 sign-ups this week": his numbers, kept with the time
-            try:
-                from . import numbers
-                numbers.told(repo, text)
-            except Exception:
-                pass
-        try:
-            related = _related(repo, text)   # one call keeps the fact and says what it replaces (Gate 118: a change
-            got = explain.ask_small(REMEMBER.format(   # that read like a product rule was lost; two calls cost more)
-                text=text, history=history, today=time.strftime('%Y-%m-%d (%A)'),
-                known='\n'.join(f'{i}. {f["text"]}' for i, f in enumerate(related, 1)) or '(nothing yet)'))
-            if isinstance(got, dict):
-                keep(repo, got, related)
-        except Exception:
-            pass
-    t = threading.Thread(target=run, daemon=True); t.start()
-    return t
+    from . import memory_jobs
+    return memory_jobs.enqueue(repo, text, ch.recent() if hasattr(ch, 'recent') else '')
+
 
 def _related(repo, text, k=5):
     """The kept facts (not rules) closest to his message, by words and by meaning: what a change of mind could replace."""
@@ -700,6 +684,7 @@ def _related(repo, text, k=5):
 def keep(repo, got, related=None):
     """Keep what REMEMBER found, with its kind, who it is about and until when it holds, and mark the kept facts it
     makes untrue as replaced by it (memory 2.0)."""
+    from . import store
     note = got.get('note')
     if not (isinstance(note, str) and note.strip()):
         return None
@@ -714,28 +699,32 @@ def keep(repo, got, related=None):
             pass
     until = None
     if kind == 'deadline' and re.fullmatch(r'\d{4}-\d{2}-\d{2}', str(got.get('until') or '')):
-        until = time.mktime(time.strptime(got['until'], '%Y-%m-%d')) + 86400   # holds through the day it is due
-    memory.add_note(repo, note.strip(), kind=kind, person=name or None, valid_until=until)
-    LAST_KEPT.update(text=note.strip(), at=time.time())
-    nums = got.get('replaces')
-    if related and isinstance(nums, list):
-        supersede(repo, note.strip(), [related[k - 1] for k in nums if isinstance(k, int) and 1 <= k <= len(related)])
+        import datetime as dt
+        from . import register
+        until = (dt.datetime.fromisoformat(got['until']).replace(tzinfo=register.zone()) + dt.timedelta(days=1)).timestamp()   # holds through the day it is due
+    with store.transaction():
+        fid = memory.add_note(repo, note.strip(), kind=kind, person=name or None, valid_until=until,
+                              source_ref=policy.context().source_ref, scope=got.get('scope', 'project'))
+        if not fid:
+            return None
+        LAST_KEPT.update(text=note.strip(), at=time.time())
+        nums = got.get('replaces')
+        if related and isinstance(nums, list):
+            supersede(repo, note.strip(), [related[k - 1] for k in nums if isinstance(k, int) and 1 <= k <= len(related)])
     return note.strip()
 
 def supersede(repo, new, old_facts):
     """The facts he has changed his mind about are marked as replaced by the new one, in the store and out of the
     plain notes builds and plans read."""
     from . import store
-    now = store.find_fact(new, project=memory.project_key(repo))
+    now = store.find_fact(new, project=memory.project_key(repo)) or store.find_fact(new, project='')
     gone = [f for f in old_facts if now and f['id'] != now['id'] and store.norm(f['text']) != store.norm(new)]
     for f in gone:
         store.supersede(f['id'], now['id'])
     if gone:
         drop = {store.norm(f['text']) for f in gone}
         kept = [n for n in memory.notes(repo) if store.norm(n) not in drop]
-        import json as _json
-        with open(memory._notes_path(repo), 'w', encoding='utf-8') as fh:
-            _json.dump(kept, fh, indent=1, ensure_ascii=False)
+        memory._export(repo)
     return [f['text'] for f in gone]
 
 MEMORY_ASK = re.compile(r"\bwhat (do|did) you (know|remember)\b|\bwhat have i told you\b|\b(kya|kitna) (pata|yaad) hai\b")
@@ -762,7 +751,7 @@ def memory_ask(ch, repo, text):
     p = store.person(about) if about else None
     facts = recall.recall(repo, about or text, k=15)
     if p:
-        facts = store.facts_about(p['id']) + [f for f in facts if f.get('person_id') != p['id']]
+        facts = store.facts_about(p['id'], project=memory.project_key(repo)) + [f for f in facts if f.get('person_id') != p['id']]
     facts = [f for f in facts if f.get('trust') == 'owner'][:12] if about else facts[:12]
     if about and not p:   # only what is about it: the recent filler recall adds would not be
         words = set(re.findall(r'"(\w+)"', store._fts_query(about)))   # its real words, not "the" or "about"
@@ -790,7 +779,7 @@ def forget_it(ch, repo, text, poll=20):
         targets = [SHOWN_FACTS[int(m.group(1)) - 1]]
     elif about:
         person = store.person(about.group(1).strip())
-        targets = store.facts_about(person['id']) if person else [f for f, _ in store.search(about.group(1), k=10)]
+        targets = store.facts_about(person['id']) if person else [f for f, _ in store.search(about.group(1), project=memory.project_key(repo), k=10)]
     elif LAST_KEPT.get('text'):
         f = store.find_fact(LAST_KEPT['text'])
         targets = [f] if f else []
@@ -806,6 +795,13 @@ def forget_it(ch, repo, text, poll=20):
     choice, other = choose(ch, poll, [('fgt|yes', ('yes', 'forget it', 'haan', 'do it')), ('fgt|no', NO_WORDS)])
     if choice != 'fgt|yes':
         ch.send('Very good. Kept as it is.'); return 'forget_kept'
+    # The short conversational context is also a retrieval source. Clear it before
+    # reporting success, including the persisted compatibility conversation.
+    if hasattr(ch, 'history'):
+        ch.history = []
+        if getattr(ch, 'keep', False):
+            with open(telegram.CONVERSATION, 'w', encoding='utf-8') as fh:
+                json.dump([], fh)
     for f in targets:
         if f['kind'] != 'rule':
             memory.forget_note(repo, f['text'])
@@ -820,6 +816,13 @@ def forget_it(ch, repo, text, poll=20):
     LAST_KEPT.clear(); SHOWN_FACTS.clear()
     ch.send("✅ Forgotten. It won't come up again (it's gone from my records within a week).")
     return 'forgotten'
+
+ROUTER_DEFAULT = 'intent'   # Plan routing remains opt-in until full execution qualification.
+
+def router_mode():
+    """'plan' (a message read as steps, hive/router.py) or 'intent' (one intent, CLASSIFY). HIVE_ROUTER overrides."""
+    m = (os.environ.get('HIVE_ROUTER') or ROUTER_DEFAULT).strip().lower()
+    return m if m in ('plan', 'intent') else ROUTER_DEFAULT
 
 def read(ch, text):
     """What the owner means by his newest message, read in the context of the conversation (Gate 38 live test: "Yes",
@@ -1405,22 +1408,19 @@ def preview_it(ch, repo, poll=20):
         return try_deploy(ch, repo, st, poll)
     if not host_login(ch, repo, poll):
         return 'login_needed'
-    ch.send("🔗 Putting your latest build at its own address; a minute or two.")
-    r = deploy.preview(repo, _build_ref(st))
-    if r.get('why') == 'first':   # new on his host, whose first version always goes live: his current one, on his yes
-        host = deploy.title(repo)
-        ch.send(f"🔗 Your product isn't on {host} yet, sir, and {host} always puts a product's first version live. "
-                "Shall I put your current version there first (as it is now, without this build), then send you the "
-                "link to try the build?", buttons=[[('🔗 Yes, do that', 'fst|yes')], [('Not now', 'fst|no')]])
-        choice, other = choose(ch, poll, [('fst|yes', ('yes', 'do that', 'go', 'haan')), ('fst|no', NO_WORDS)])
-        if other is not None:
-            return handle(ch, repo, other, poll)
-        if choice != 'fst|yes':
-            ch.send('Very good. Nothing was put up. Screenshots it is: say "show me".'); return 'no_preview'
-        first = deploy.live(repo, st.get('branch') or 'main', st.get('test_cmd'))
-        if not first['ok']:
-            ch.send('⚠️ ' + telegram.esc(first['say'])); return 'no_preview'
-        r = deploy.preview(repo, _build_ref(st))
+    from . import actions
+    sha = subprocess.run(['git', '-C', repo, 'rev-parse', _build_ref(st)], capture_output=True, text=True).stdout.strip()
+    if not re.fullmatch(r'[0-9a-f]{40,64}', sha):
+        return 'no_preview'
+    aid = actions.confirm(ch, 'preview', {'ref': sha},
+                          f"Publish a preview of <b>{telegram.esc(_build_ref(st))}</b> on your configured host?",
+                          poll, yes_label='Publish preview')
+    if not aid:
+        return 'no_preview'
+    r = actions.execute_dict(aid, lambda a: deploy.preview(repo, a['ref']))
+    if r.get('why') == 'first':
+        ch.send('This host requires a first production deployment. Configure it separately before publishing previews.')
+        return 'no_preview'
     if r['ok']:
         wall = ("\n\nVercel keeps previews private: it will ask you to sign in to Vercel first, and only people on your "
                 "Vercel team can open it." if deploy.config(repo).get('host') == 'vercel' else '')   # Gate 110
@@ -1480,17 +1480,17 @@ def go_live(ch, repo, poll):
                                      else "Say \"ship it\" and it goes to them; once merged, I'll put it live."))
         return 'not_merged'
     host = deploy.title(repo)
-    ch.send(f"🚀 <b>Put it live on {host}?</b>\n\nYour engineer has merged it. I'll run every test on your main version "
-            "first, and only put it live if they all pass.", html=True,
-            buttons=[[('🚀 Put it live', 'liv|yes')], [('Not now', 'liv|no')]])
-    choice, other = choose(ch, poll, [('liv|yes', ('yes', 'put it live', 'go', 'go ahead', 'haan')), ('liv|no', NO_WORDS)])
-    if other is not None:
-        return handle(ch, repo, other, poll)
-    if choice != 'liv|yes':
-        ch.send('Very good. It stays as it is until you say.'); return 'not_live'
-    ch.send("🛠 Checking every test on your main version, then putting it live.")
+    from . import actions
+    sha = subprocess.run(['git', '-C', repo, 'rev-parse', main], capture_output=True, text=True).stdout.strip()
+    if not re.fullmatch(r'[0-9a-f]{40,64}', sha):
+        ch.send('I could not identify the exact merged version.'); return 'not_live'
+    aid = actions.confirm(ch, 'go_live', {'sha': sha, 'test_cmd': st.get('test_cmd')},
+                          f"Deploy merged version <code>{sha[:12]}</code> on {telegram.esc(host)} after its tests pass?",
+                          poll, yes_label='Put it live')
+    if not aid:
+        ch.send('No new deployment was started.'); return 'not_live'
     deploy.note_before(repo, main)   # the first time: what was live before, so "undo that" can go back
-    r = deploy.live(repo, main, st.get('test_cmd'))
+    r = actions.execute_dict(aid, lambda a: deploy.live(repo, a['sha'], a['test_cmd']))
     if not r['ok']:
         ch.send('⚠️ ' + telegram.esc(r['say'])); return 'live_failed'
     numbers.mark(repo, f'"{_goal_words(st)}" went live')
@@ -1647,6 +1647,7 @@ def run_plan(ch, repo, apply_build, wait=None):
     finally:
         PLAN['running'] = False
 
+@policy.request
 def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=None, origin='owner'):
     """Answer one message from the owner. apply_build(state, rule, ch) updates a build (hive.start.apply_ruling);
     start_build(repo, goal) runs a new build that reports to the phone (hive.start.start, overnight style);
@@ -1656,7 +1657,9 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     if callable(typing):
         typing()   # "typing..." at once, as a person would (the owner found it slow)
     from . import register
-    register.notice(text); CURRENT['text'] = text   # he writes technically: Hive answers in his terms
+    if policy.context().origin == 'owner':
+        register.notice(text)
+    CURRENT['text'] = text   # he writes technically: Hive answers in his terms
     said = text.split(':', 1)[1].strip() if low.startswith('build:') else ''
     if len(said.split()) >= 3:   # "build: <a real description>" needs no model; "build again" is read in context
         got = {'intent': 'build', 'rule': said}   # (it once took "again" as the thing to build)
@@ -1716,7 +1719,20 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     elif DATA_WORDS.search(low) and __import__('hive.access', fromlist=['x']).load(repo):   # "how many orders this week?"
         got = {'intent': 'data'}
     else:
-        got = fast_read(ch, text) or read(ch, text)   # half a second when the trained reader is sure, else Claude
+        got = fast_read(ch, text)   # half a second when the trained reader is sure
+        if not got and router_mode() == 'plan':   # his message as a plan of steps (hive/router.py, Gate 120)
+            from . import router, tools
+            try:
+                p = router.plan(ch.recent() if hasattr(ch, 'recent') else '', text)
+            except tools.Refused as e:
+                ch.send(str(e)); return 'refused'
+            if len(p['steps']) > 1 or (p['steps'] and p['steps'][0]['tool'] in router.DIRECT):   # steps, in order
+                return 'chain:' + ','.join(router.run_chain(ch, repo, p['steps'], text, poll, handle=lambda c, r, t, pl: handle(
+                    c, r, t, pl, apply_build=apply_build, start_build=start_build, cloud=cloud, origin=origin), origin=origin))
+            if p['steps']:
+                got = dict(router.as_intent(p['steps'][0], text), confirmed=p['confirmed'], clarify=p['clarify'])
+        if not got:
+            got = read(ch, text)   # Claude reads it as one intent
     intent, rule = got.get('intent', 'reply'), (got.get('rule') or text).strip()
     from . import tools   # the one check before any action (hive/tools.py): outside words never act; actions audited
     try:
@@ -1752,7 +1768,7 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         return connect_host(ch, repo, text, poll)
     if intent == 'office':
         from . import office
-        return office.handle(ch, repo, text, poll)
+        return office.handle(ch, repo, text, poll, kind=got.get('office'))
     if intent == 'away':
         return away(ch, repo, text, poll, apply_build, start_build, cloud)
     if intent == 'onboard':
@@ -2068,7 +2084,8 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
             ch.send('🐝 ' + telegram.esc(answer), html=True)
             return 'answered'
     if intent not in ('change', 'rule'):   # a question, a complaint, small talk: answered, in context, never kept as a rule
-        remember(ch, repo, text)   # a lasting fact about his business is kept for later (in the background)
+        if policy.context().origin == 'owner':
+            remember(ch, repo, text)   # outside data cannot create owner-trusted facts
         speak(ch, repo, 'The conversation so far:\n' + (ch.recent() if hasattr(ch, 'recent') else '') +
               f'\n\nHis newest message: "{text}". Reply as his assistant would: answer what he asked; if he is '
               'frustrated, own the mistake plainly and say what you are doing about it; if he refers back to something, '
@@ -2129,6 +2146,12 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
             print(f'Hive is already listening on this computer (process {other}). Stop that one first.'); return 1
     except (OSError, ValueError):
         pass
+    from . import actions
+    interrupted = actions.recover()
+    from . import memory_jobs
+    memory_jobs.recover()
+    if interrupted:
+        ch.send(f'{interrupted} interrupted actions need checking. I have not repeated them.')
     CURRENT['ch'] = ch   # a background build reports its problems here
     try:   # the meaning model and the local voice load in the background: no reply waits on either
         from . import embed, voice
@@ -2147,6 +2170,7 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
           flush=True)
     try:
         while not (until and until()):
+            memory_jobs.start()
             try:   # a test page past its two hours: taken down (and its test machine deleted), and he is told
                 from . import trydeploy
                 if trydeploy.expired():
@@ -2186,7 +2210,9 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
                 batch = ch.updates(timeout=poll)
             except Exception as e:   # never go silent on the owner: report, wait, listen again
                 print(f'Telegram error, retrying: {e}', flush=True); time.sleep(poll); continue
-            for _, data, _ in batch:   # a tap on a Pulse alert (Got it, Reply, In an hour)
+            for _, data, proposal_mid in batch:   # a tap on a Pulse alert (Got it, Reply, In an hour)
+                if data and data.startswith('act|'):
+                    actions.resume(ch, data, proposal_mid, repo)
                 if data and data.startswith('pls|'):
                     try:
                         from . import pulse
@@ -2211,7 +2237,7 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
                             pass
                         return 0   # one reader of the owner's chat at a time
                 except Exception as e:   # one message going wrong must not stop the listener
-                    print(f'Could not handle "{text}": {e!r}', flush=True)
+                    print(f'Could not handle request ({type(e).__name__}).', flush=True)
                     try:
                         w = ch.name()
                         ch.send(f"⚠️ My apologies{', ' + w if w else ''}: that one went wrong on my side. I'm still here; "

@@ -560,7 +560,7 @@ def _log_failure(who, e, prompt):
             os.replace(log, log + '.old')
         import time
         with open(log, 'a', encoding='utf-8') as f:
-            f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} {who}: {e!r:.300} | {prompt[:120]!r}\n")
+            f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} {who}: {e!r:.300}\n")
     except Exception:
         pass
 

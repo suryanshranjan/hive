@@ -74,9 +74,9 @@ check('forgetting someone forgets what was kept about them', (store.person('Asha
 store.add_fact('The FSSAI licence renewal is due on 30 Nov.', 'deadline', P, valid_until=time.time() + 86400)
 store.add_fact('The GST filing was due on 20 Oct.', 'deadline', P, valid_until=time.time() - 86400)
 got = [f['text'] for f in recall.recall(repo, 'what is due? licence GST filing')]
-check('a deadline to come is recalled; one past its date is not', (any('FSSAI' in t for t in got), any('GST' in t for t in got)),
-      (True, False))
-check('a deadline shows its date', '(until ' in recall.render([f for f in recall.recall(repo, 'FSSAI licence')
+check('deadlines stay visible until resolved, including overdue commitments', (any('FSSAI' in t for t in got), any('GST' in t for t in got)),
+      (True, True))
+check('a deadline shows its date', '(due ' in recall.render([f for f in recall.recall(repo, 'FSSAI licence')
                                                               if 'FSSAI' in f['text']]), True)
 
 # 7. read from outside (mail, a document): marked as data when recalled
@@ -120,8 +120,8 @@ p1 = store.add_fact('The trial plan is Rs 699.', 'note', P, when=time.time() - 1
 p2 = store.add_fact('The trial plan is Rs 799.', 'note', P)
 n = store.tidy(P)
 live_ids = {f['id'] for f in store.live_facts(P)}
-check('tidy: a twin is folded into the newer one; different numbers are not twins',
-      (n >= 1, t1 in live_ids, t2 in live_ids, p1 in live_ids and p2 in live_ids), (True, False, True, True))
+check('tidy: differently worded facts are retained; different numbers stay separate',
+      (n >= 1, t1 in live_ids, t2 in live_ids, p1 in live_ids and p2 in live_ids), (False, True, True, True))
 check('tidy: not due again for a week', store.tidy_due(P), False)
 os.environ.pop('HIVE_EMBED')
 

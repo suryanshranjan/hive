@@ -69,6 +69,18 @@ class FakeTelegram:
         self.uid += 1; return self.uid
 
 
-tap = lambda data: (lambda f: [(ME, None, data, 2)])
+def tap(data):
+    def press(fake):
+        for mid, message in reversed(list(enumerate(fake.sent, 1))):
+            for row in message.get('reply_markup', {}).get('inline_keyboard', []):
+                for button in row:
+                    callback = button['callback_data']
+                    if callback == data:
+                        return [(ME, None, callback, mid)]
+                    if callback.startswith('act|') and ((data.endswith(('|send', '|yes')) and callback.endswith('|yes')) or
+                                                       (data.endswith('|no') and callback.endswith('|no'))):
+                        return [(ME, None, callback, mid)]
+        return [(ME, None, data, 2)]
+    return press
 say = lambda words: (lambda f: [(ME, words, None, None)])
 photo = lambda fid, caption='': (lambda f: [(ME, f'PHOTO:{fid}|{caption}', None, None)])

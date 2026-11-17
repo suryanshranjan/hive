@@ -1,5 +1,8 @@
 name: tests
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [main]
@@ -8,14 +11,21 @@ on:
 jobs:
   tool:
     runs-on: ubuntu-latest
+    container:
+      image: python:3.11-bookworm
+      options: --init
+    env:
+      IS_SANDBOX: '1'
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - name: Install test tools
-        run: python -m pip install pytest
+        run: python -m pip install pytest cryptography tzdata setuptools wheel
       - name: Git identity for the tests' repositories
         run: |
           git config --global user.email ci@hive.local
@@ -24,7 +34,7 @@ jobs:
       - name: Python tests (fake Telegram, stand-in model; no tokens)
         run: |
           set -e
-          for t in tests/test_telegram.py tests/test_assistant.py tests/test_explain.py tests/test_law.py tests/test_cli.py tests/test_team.py tests/test_visual.py tests/test_ship.py tests/test_complaint.py tests/test_plan.py tests/test_brief.py tests/test_deploy.py tests/test_register.py tests/test_gaps.py tests/test_access.py tests/test_onboard.py tests/test_devices.py tests/test_away.py tests/test_logins.py tests/test_trydeploy.py tests/test_office.py tests/test_fast.py tests/test_aws_limit.py tests/test_render.py tests/test_vault.py tests/test_runlimit.py tests/test_audit.py tests/test_sandbox_unit.py tests/test_store.py tests/test_memory2.py tests/test_calendar.py tests/test_pulse.py tests/test_voice.py tests/test_tools.py tests/test_google.py; do
+          for t in tests/test_telegram.py tests/test_assistant.py tests/test_explain.py tests/test_law.py tests/test_cli.py tests/test_team.py tests/test_visual.py tests/test_ship.py tests/test_complaint.py tests/test_plan.py tests/test_brief.py tests/test_deploy.py tests/test_register.py tests/test_gaps.py tests/test_access.py tests/test_onboard.py tests/test_devices.py tests/test_away.py tests/test_logins.py tests/test_trydeploy.py tests/test_office.py tests/test_fast.py tests/test_aws_limit.py tests/test_render.py tests/test_vault.py tests/test_runlimit.py tests/test_audit.py tests/test_sandbox_unit.py tests/test_store.py tests/test_memory2.py tests/test_calendar.py tests/test_pulse.py tests/test_voice.py tests/test_tools.py tests/test_google.py tests/test_router.py tests/test_reliability.py; do
             echo "== $t"; timeout 600 python3 $t
           done
       - name: Secrets encrypted (with the secure extra installed)
@@ -44,11 +54,13 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - name: Install test tools
-        run: python -m pip install pytest
+        run: python -m pip install pytest cryptography tzdata
       - name: Git identity for the tests' repositories
         run: |
           git config --global user.email ci@hive.local
@@ -56,3 +68,6 @@ jobs:
           git config --global init.defaultBranch main
       - name: Builders in containers, for real (stand-in builders; no tokens)
         run: timeout 1500 bash tests/test_sandbox.sh
+
+      - name: Real Docker boundaries and timeout cleanup
+        run: timeout 300 python3 tests/test_sandbox_docker.py

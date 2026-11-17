@@ -102,9 +102,11 @@ explain.ask_json = lambda prompt, **k: {'facts': ['New creators get ₹500 extra
                                        'rules': ['Refunds go back to the card.']} if 'Here is a document' in prompt else real(prompt, **k)
 fake = FakeTelegram([])
 r = assistant.handle(ch(fake), repo, f'our policy [document: {doc} | policy.md]', poll=1)
-check('a document he sends: facts kept for plans, rules kept as his rules', (r, memory.notes(repo)[-1], [x['text'] for x in memory.load(repo)],
-      'Read and kept' in fake.sent[-1]['text']),
-      ('document', 'New creators get ₹500 extra on their first completed deal.', ['Refunds go back to the card.'], True))
+from hive import store
+external = [f for f in store.live_facts(memory.project_key(repo)) if f['source'] == 'document']
+check('document facts and policies stay outside evidence until adopted',
+      (r, len(external), all(f['trust'] == 'outside' for f in external), memory.notes(repo), memory.load(repo)),
+      ('document', 2, True, [], []))
 explain.ask_json = real
 check("a kind it can't read is said plainly", brain.learn(repo, os.path.join(home, 'x.bin')), None)
 # 7. a build folded into a newer one is set aside (its pull request withdrawn), not offered again

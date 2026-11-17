@@ -48,7 +48,7 @@ check('the engineer reads what he asked, what was checked and what it cost; the 
 # 2. he says "ship it", then "not now": nothing leaves his computer
 fake = FakeTelegram([tap('shp|no')])
 r = assistant.handle(ch(fake), repo, 'ship it', poll=1)
-check('asked first; "not now" sends nothing', (r, 'Send this to your engineer?' in fake.sent[0]['text'],
+check('asked first; "not now" sends nothing', (r, 'to your engineer' in fake.sent[0]['text'],
       'hive/' in git(origin, 'branch', '--list').stdout), ('not_shipped', True, False))
 
 # 3. he says yes: only Hive's branch goes up; main is untouched there and here

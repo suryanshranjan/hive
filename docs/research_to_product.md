@@ -192,6 +192,7 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 | Codex builds counted as $0, and the monthly cap only warned before a build | Capability audit, Nov 15 | Codex tokens priced (HIVE_CODEX_PRICE); past the cap plus 20% no more builders start, said once | `hive/swarm.py` `codex_cost`, `over_budget`; `tests/test_run.sh`, `tests/test_runlimit.py` |
 | A [photo: path] marker could copy any file into the code builders see | Capability audit, Nov 15 | Only a real picture (by name and first bytes) is copied | `hive/refs.py`; `tests/test_audit.py` |
 | A policy stated for the first time was not kept (Gate 119) | Gate 119, check after the fix: 10/10 kept, 6/6 replaced | REMEMBER keeps how his business works; software instructions stay on the rules path. Near-duplicates are folded weekly | `hive/assistant.py` REMEMBER, `hive/store.py` `tidy` |
+| One intent per message; "find Asha's mail and put a call with her on Thursday" could not be said in one message | Gate 120: plan reader 92.3% vs 91.5% on the independent exam; chains 14/14; controls 4/4; same speed and cost | Each message read as a plan of steps, a later step using an earlier result; each step through the one check and his yes; default now | `hive/router.py`, `assistant.ROUTER_DEFAULT`; `tests/test_router.py` |
 | Hive spoke only when spoken to | The plan (P2), the owner | Pulse: mail, calendar, payments and deadlines watched; only what matters, once, outside quiet hours; his rules in his words | `hive/pulse.py`; `tests/test_pulse.py` |
 | A voice note got a text reply | The plan (P3) | A voice note gets a voice note back (local Piper by default) | `hive/voice.py`, `telegram.Channel.send_voice`; `tests/test_voice.py` |
 | No single place said what each action may change, or stopped outside words from acting | The plan (P4), the audit | One list of actions with their risk; one check; outside words only read; money never; audited | `hive/tools.py`; `tests/test_tools.py` |
@@ -206,3 +207,10 @@ Status: **in the tool** means it is code with a test; **not used** means the evi
 
 - **Gate 45:** is a verdict given on the code sheet, looking at what was built, stable a day later? If it is, the hand-over is the channel; if not, Hive treats his latest word as the rule and makes changing it cheap.
 - Self-registering modules would cut collisions further (BRAIN §7); not yet needed at 8 builders.
+
+
+### Independent reliability audit follow-up (Nov 17, working tree)
+
+The implementation now separates parsing evidence from execution guarantees. `actions.py`/`policy.py` bind approvals to immutable arguments and origin; `memory_jobs.py` makes extraction durable; `notifications.py` records delivery claims and uncertainty. `store.py` owns facts, corrections and deletion tombstones, with one-time JSON import. `tests/test_reliability.py` and `tests/run_reliability.py` provide repeatable fake-service failure journeys. This is engineering validation, not a new live-account research gate. General plan recovery and voice qualification remain open.
+
+Regression findings also changed the runtime: SQLite statements now share the transaction lock so another thread's write cannot be rolled back with the wrong request; `cloud.py` returns consistent database snapshots and refuses divergent local state; voice transcripts preserve owner provenance and temporary audio is deleted. `hive-builder:3` includes required dependencies. Real Docker boundary/timeout checks passed locally without models or account credentials. Verification commands and qualification limits: `docs/reliability.md`.

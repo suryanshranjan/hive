@@ -117,8 +117,8 @@ def _keep_link(repo, code):
                     open(exclude, 'a').write(('' if have.endswith('\n') or not have else '\n') + name + '\n')
 
 def _run(cmd, cwd, timeout=900):   # the host's tool (tests replace this)
-    return subprocess.run(cmd, shell=True, cwd=cwd, capture_output=True, text=True, encoding='utf-8', errors='replace',
-                          timeout=timeout)
+    from . import sandbox
+    return sandbox.run_project(cmd, cwd, timeout)
 
 FIRST_DEPLOY = re.compile(r'first_deployment_production|first deployment is assigned to Production', re.I)
 OLD = {'vercel deploy --yes': 'vercel deploy --yes --environment preview'}   # set up before Gate 110: made safe

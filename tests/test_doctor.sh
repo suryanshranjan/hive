@@ -9,11 +9,14 @@ mkdir -p $T/bin && printf '#!/bin/sh\necho OK\n' > $T/bin/claude && chmod +x $T/
 export PATH="$(cd $T/bin && pwd):$PATH"   # a stand-in Claude Code (the login probe is skipped)
 [ "$PY" = python ] && printf '@echo OK\r\n' > $T/bin/claude.cmd   # Windows finds programs by extension
 fail=0; check() { if [ "$2" = "$3" ]; then echo "ok   $1"; else echo "FAIL $1 (got $2, expected $3)"; fail=1; fi; }
-$PY -m venv $T/venv >/dev/null 2>&1
+$PY -m venv --system-site-packages $T/venv >/dev/null 2>&1
 B=$T/venv/bin; [ -d $T/venv/Scripts ] && B=$T/venv/Scripts   # Windows keeps a venv's programs in Scripts
 mkdir -p $T/src && cp -r $HIVE/hive $HIVE/pyproject.toml $HIVE/README.md $HIVE/LICENSE $T/src/   # pip builds in a copy, never in the repo
-PIP_CACHE_DIR=$T/pipcache $B/python -m pip install -q $T/src >/dev/null 2>&1
+# Exercise packaging offline; required runtime/build dependencies are preinstalled
+# by CI or deploy/test/Dockerfile and remain visible in this disposable venv.
+PIP_CACHE_DIR=$T/pipcache $B/python -m pip install -q --ignore-installed --no-deps --no-index --no-build-isolation $T/src > $T/install.txt 2>&1 || cat $T/install.txt
 check "it installs with pip and gives a hive command" "$(test -x $B/hive -o -f $B/hive.exe && echo yes)" yes
+unset PYTHONPATH   # the following checks must import the installed wheel, never the source checkout
 cd "$T" || exit 1
 git init -q -b main project && cd project && git config user.email t@t && git config user.name t
 printf 'def test_one(): assert 1\n' > test_one.py && git add -A && git commit -qm init

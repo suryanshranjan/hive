@@ -167,26 +167,31 @@ def reply_mail(ch, repo, text, poll):
         body = mail.draft(repo, msg, text)
         if not body:
             ch.send("I couldn't draft it just now. Try again in a minute."); return 'draft_failed'
-        ch.send(f"📧 <b>Your reply to {telegram.esc(msg['from'])}</b>\n<i>Re: {telegram.esc(msg['subject'])}</i>\n\n"
-                f"{telegram.esc(body)}\n\n<i>Send it from your address?</i>", html=True,
-                buttons=[[('📤 Send it', 'mlr|send')], [('✏️ Change it', 'mlr|edit')], [("Don't send", 'mlr|no')]])
-        kind, got = telegram._wait(ch, poll, {'mlr|send', 'mlr|edit', 'mlr|no'})
-        low = (got or '').strip().lower()
-        if got == 'mlr|send' or (kind == 'text' and low in ('send', 'send it', 'yes', 'yes send it', 'haan', 'ok send')):
-            to = (mail.email.utils.parseaddr(msg['from'])[1] or msg['from'])
-            ok, why = mail.send(repo, to, msg['subject'], body, reply_to=msg)
-            ch.send(f"✅ Sent to {telegram.esc(to)}." if ok else f"⚠️ It wasn't sent ({telegram.esc(why)}). Nothing went out.",
-                    html=True)
-            return 'mail_sent' if ok else 'mail_failed'
-        if got == 'mlr|no' or low in ('no', "don't send", 'dont send', 'cancel', 'stop'):
-            ch.send("Very good. Nothing was sent."); return 'mail_not_sent'
-        if got == 'mlr|edit':
-            ch.send("What should it say differently?")
-            kind, got = telegram._wait(ch, poll, set())
-        text = f"{text}\n\nHe changed his mind about the draft: {got}"
+        from . import actions
+        to = mail.email.utils.parseaddr(msg['from'])[1] or msg['from']
+        args = {'to': to, 'subject': msg['subject'], 'body': body, 'reply_to': msg}
+        aid = actions.confirm(ch, 'mail_send', args,
+            f"Your reply to <b>{telegram.esc(to)}</b>\n{telegram.esc(msg['subject'])}\n\n{telegram.esc(body)}",
+            poll, yes_label='Send it')
+        if aid:
+            result = actions.execute(aid, lambda a: _send_result(repo, a))
+            ch.send(f"Sent to {to}." if result.status == 'succeeded' else
+                    "I couldn't confirm the send. I won't repeat it automatically; check your sent mail.")
+            return 'mail_sent' if result.status == 'succeeded' else 'mail_unknown'
+        ch.send('Nothing was sent. Tell me the changes if you want a different draft.')
+        return 'mail_not_sent'
+
+def _send_result(repo, args):
+    from .actions import ActionResult
+    ok, why = mail.send(repo, args['to'], args['subject'], args['body'], reply_to=args.get('reply_to'))
+    return ActionResult('succeeded' if ok else 'unknown', why if ok else '')
+
 
 def handle(ch, repo, text, poll, kind=None):
     kind = kind or route(text, repo)
+    from . import tools, policy
+    tools.allow({'mail': 'mail_read', 'cal': 'calendar_check', 'pay': 'data',
+                 'reply_mail': 'mail_send'}.get(kind, kind), policy.context().origin)
     if kind == 'connect_mail':
         return connect_mail(ch, repo, text, poll)
     if kind == 'connect_cal':
@@ -256,26 +261,34 @@ def add_event(ch, repo, text, poll):
     if not google.connected('calendar'):
         ch.send('Your calendar is read-only for me now. Say "connect google" so I can add events (on your yes).')
         return 'add_event_no_google'
-    got = explain.ask_json(EVENT.format(text=text, now=dt.datetime.now().strftime('%A %d %B %Y, %H:%M'),
-                                        tz=_t.strftime('%Z'))) or {}
+    got = explain.ask_json(EVENT.format(text=text, now=dt.datetime.now(__import__('hive.register', fromlist=['zone']).zone()).strftime('%A %d %B %Y, %H:%M'),
+                                        tz=str(__import__('hive.register', fromlist=['zone']).zone()))) or {}
     if got.get('unclear') or not got.get('start'):
         ch.send('📅 ' + telegram.esc(got.get('unclear') or 'When should it be?'), html=True); return 'add_event_unclear'
-    start = dt.datetime.fromisoformat(got['start']); end = start + dt.timedelta(minutes=int(got.get('minutes') or 30))
+    from . import register
+    start = dt.datetime.fromisoformat(got['start'])
+    if start.tzinfo is None:
+        start = start.replace(tzinfo=register.zone())
+    end = start + dt.timedelta(minutes=int(got.get('minutes') or 30))
     guests = [g for g in got.get('guests') or [] if ADDRESS.fullmatch(g or '')]
     clash = google.busy(start, end)
-    ch.send(f"📅 <b>{telegram.esc(got.get('title') or 'Event')}</b>, {start:%a %d %b, %H:%M}-{end:%H:%M}" +
+    from . import actions
+    args = {'title': got.get('title') or 'Event', 'start': start.isoformat(), 'end': end.isoformat(),
+            'where': got.get('where') or '', 'guests': guests}
+    aid = actions.confirm(ch, 'add_event', args, f"📅 <b>{telegram.esc(got.get('title') or 'Event')}</b>, {start:%a %d %b, %H:%M}-{end:%H:%M}" +
             (f" at {telegram.esc(got['where'])}" if got.get('where') else '') +
             (f"\nInvites go to {telegram.esc(', '.join(guests))}." if guests else '') +
-            (f"\n⚠️ Already then: {telegram.esc(', '.join(clash))}." if clash else '') + '\n\nAdd it?', html=True,
-            buttons=[[('📅 Add it', 'evt|yes'), ("Don't", 'evt|no')]])
-    kind, said = telegram._wait(ch, poll, {'evt|yes', 'evt|no'})
-    if not (said == 'evt|yes' or (kind == 'text' and (said or '').strip().lower() in ('yes', 'add it', 'haan', 'ok'))):
-        ch.send('Very good. Nothing was added.'); return 'add_event_no'
-    from . import tools
-    tools.allow('add_event', 'owner', got.get('title', ''))
-    ok, link = google.add_event(got.get('title') or 'Event', start, end, got.get('where') or '', guests)
-    ch.send('✅ Added to your calendar.' + (' (It was already there.)' if link == 'already added' else ''))
-    return 'event_added'
+            (f"\n⚠️ Already then: {telegram.esc(', '.join(clash))}." if clash else '') + '\n\nAdd it?', poll, yes_label='Add it')
+    if not aid:
+        ch.send('Nothing was added.'); return 'add_event_no'
+    def execute(a):
+        ok, receipt = google.add_event(a['title'], dt.datetime.fromisoformat(a['start']),
+                                      dt.datetime.fromisoformat(a['end']), a['where'], a['guests'])
+        return actions.ActionResult('succeeded' if ok else 'unknown', receipt)
+    result = actions.execute(aid, execute)
+    ch.send('Added to your calendar.' if result.status == 'succeeded' else
+            "I couldn't verify the calendar change. I won't add it again automatically.")
+    return 'event_added' if result.status == 'succeeded' else 'event_unknown'
 
 def summary(repo):
     """What of his office Hive can see, for what it tells the model about him."""

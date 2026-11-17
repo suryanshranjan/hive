@@ -18,10 +18,12 @@ check "unsaved work is refused (only committed work goes)" "$(grep -c 'Commit th
 git checkout -q test_one.py
 $PY -m hive cloud --to $T/box --no-start > $T/go.txt 2>&1
 check "it reports success" "$?" 0
+$PY -m hive cloud --to $T/box --no-start > $T/repeat.txt 2>&1
+check "another handoff cannot overwrite an existing destination's memory" "$? $(grep -c 'will not overwrite' $T/repeat.txt)" "8 1"
 P=$T/box/hive-cloud/project
 check "the project arrives on its branch" "$(git -C $P rev-parse --abbrev-ref HEAD)" main
 check "the owner's rulings and Telegram link go with it" \
-  "$(ls $T/box/hive-cloud/.hive/rules/*.json | wc -l | tr -d ' ') $(test -f $T/box/hive-cloud/.hive/telegram.json && echo yes)" "1 yes"
+  "$(ls $T/box/hive-cloud/.hive/rules/*.json | grep -v '.notes.json$' | wc -l | tr -d ' ') $(test -f $T/box/hive-cloud/.hive/telegram.json && echo yes)" "1 yes"
 check "his time zone goes too: a UTC cloud machine must still say good morning at his morning (Nov 15: 'Good evening' at his 5 am)" \
   "$(grep -c utc_offset $T/box/hive-cloud/.hive/profile.json)" 1
 check ".env and the Claude login stay behind" "$(test -f $P/.env && echo sent || echo kept) $(test -d $T/box/hive-cloud/.claude && echo sent || echo kept)" "kept kept"
@@ -56,16 +58,19 @@ check "so did what he told Hive about his business" "$(cat $T/box2/hive-cloud/.h
 $PY - <<'P'
 import json, glob, os
 T = os.environ['T']
-r = [g for g in glob.glob(T + '/box2/hive-cloud/.hive/rules/*.json') if not g.endswith('.notes.json')][0]; d = json.load(open(r))
-n = glob.glob(T + '/box2/hive-cloud/.hive/rules/*.notes.json')[0]; json.dump(json.load(open(n)) + ['Launch is in Mumbai first.'], open(n, 'w'))
-d.append({'text': 'Ratings show after both sides review.', 'kind': 'owner', 'when': '2026-10-29', 'feature': ''})
-json.dump(d, open(r, 'w'))
+from hive import store
+con = __import__('sqlite3').connect(T + '/box2/hive-cloud/.hive/hive.db', isolation_level=None)
+project = con.execute("SELECT project FROM facts WHERE kind='rule' LIMIT 1").fetchone()[0]
+with __import__('unittest.mock', fromlist=['patch']).patch.object(store, 'connect', return_value=con):
+    store.add_fact('Ratings show after both sides review.', 'rule', project)
+    store.add_fact('Launch is in Mumbai first.', 'note', project)
+con.close()
 c = T + '/box2/hive-cloud/.hive/conversation.json'; h = json.load(open(c)); h.append(['owner', 'said in the cloud']); json.dump(h, open(c, 'w'))
 P
 git -C $P2 checkout -q -b experiment && echo y > $P2/idea.py && git -C $P2 add idea.py
 git -C $P2 -c user.name=h -c user.email=h@h commit -qm "an experiment in the cloud" && git -C $P2 checkout -q main
 mkdir -p $T/box2/hive-cloud/.hive/runs/ratings-1 && echo '{"name": "ratings-1"}' > $T/box2/hive-cloud/.hive/runs/ratings-1/state.json
-printf 'y\ny\n' | FAKE_AWS_EXPIRED=1 $PY -m hive cloud --stop > $T/expired.txt 2>&1
+printf 'y\ny\n' | FAKE_AWS_EXPIRED=1 HIVE_CLOUD_LOCAL=$T/box2 $PY -m hive cloud --stop > $T/expired.txt 2>&1
 check "with expired AWS credentials, --stop says it could NOT delete, and keeps its record to try again" \
   "$? $(grep -c 'could NOT delete' $T/expired.txt) $(grep -c 'Nothing is left running' $T/expired.txt) $(ls $T/.hive/cloud/machine.json | wc -l | tr -d ' ')" "7 1 0 1"
 echo '{"url": "http://x:8080/s/", "until": 9999999999}' > $T/.hive/trydeploy.json   # a test page is up on the machine

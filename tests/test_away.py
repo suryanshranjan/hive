@@ -1,7 +1,7 @@
 """He is stepping away (the owner: "if the founder says I'm feeling sleepy, Hive should say: shall we move to the cloud so
 you can shut your computer and I carry on, or proceed another way"). A fake Telegram, a stand-in cloud and build.
 usage: python3 tests/test_away.py   (run from the hive repo root)"""
-import json, os, subprocess, sys, tempfile, time
+import atexit, json, os, subprocess, sys, tempfile, time
 sys.path.insert(0, os.getcwd()); sys.path.insert(0, os.path.join(os.getcwd(), 'tests'))
 home = tempfile.mkdtemp(); os.environ['HOME'] = os.environ['USERPROFILE'] = home
 from hive import assistant, explain, logins, memory, telegram
@@ -20,8 +20,13 @@ ch = lambda fake: telegram.Channel({'chat_id': ME, 'token': 'x', 'address': 'sir
 repo = os.path.join(home, 'shop'); subprocess.run(['git', 'init', '-q', '-b', 'main', repo])
 subprocess.run(['git', '-C', repo, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '--allow-empty', '-m', 'shop'])
 
+processes = []
+atexit.register(lambda: [p.terminate() for p in processes if p.poll() is None])
+
 def running(goal='a referral page'):
-    p = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(120)'], start_new_session=os.name != 'nt')
+    p = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(120)'], start_new_session=os.name != 'nt',
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    processes.append(p)
     assistant.BUILD.clear()
     assistant.BUILD.update(proc=p, goal=goal, started=time.time(), log=os.path.join(home, 'b.log'), stopped=False)
     return p
@@ -59,7 +64,7 @@ def cloud_ok(rp, on, login=True):
     seen['resume'] = json.load(open(assistant.RESUME(), encoding='utf-8'))   # written before the move, so it travels
     seen['alive_during_move'] = p.poll() is None
     return 0
-fake = FakeTelegram([tap('awy|cloud')])
+fake = FakeTelegram([tap('awy|cloud'), tap('act|yes')])
 r = assistant.handle(ch(fake), repo, "I'm sleepy, shutting my laptop", poll=1, cloud=cloud_ok)
 texts = [m['text'] for m in fake.sent]
 check('with work running, the cloud is recommended first', ('My suggestion: let me move to the cloud' in texts[0],
@@ -74,7 +79,7 @@ check('once moved, the build here is stopped and he is told he can shut his comp
 
 # 4. the move fails: nothing is lost, the work carries on here, and he is asked to leave the computer on
 p = running()
-fake = FakeTelegram([tap('awy|cloud')])
+fake = FakeTelegram([tap('awy|cloud'), tap('act|yes')])
 r = assistant.handle(ch(fake), repo, 'going to bed', poll=1, cloud=lambda rp, on, login=True: 1)
 check('a failed move keeps the work running here and says so',
       (r, p.poll() is None, os.path.exists(assistant.RESUME()), 'leave your computer on' in fake.sent[-1]['text']),
@@ -83,7 +88,7 @@ check('a failed move keeps the work running here and says so',
 # 4b. his AWS sign-in expired and he says "not now": nothing moves, the work carries on here, he is told
 p = running()
 logins.ensure = lambda ch, service, poll=20: False
-fake = FakeTelegram([tap('awy|cloud')])
+fake = FakeTelegram([tap('awy|cloud'), tap('act|yes')])
 r = assistant.handle(ch(fake), repo, 'going to bed', poll=1, cloud=lambda rp, on, login=True: 0)
 check('no sign-in: nothing moves, the work goes on here, and he is asked to leave the computer on',
       (r, p.poll() is None, os.path.exists(assistant.RESUME()), 'leave your computer on' in fake.sent[-1]['text']),

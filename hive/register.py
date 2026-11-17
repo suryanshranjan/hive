@@ -95,9 +95,34 @@ def remember_timezone(offset_seconds=None):
     json.dump(p, open(PATH, 'w'))
     return p['utc_offset']
 
-def his_time(now=None):
-    """time.struct_time at his clock: HIVE_UTC_OFFSET (seconds), else what setup remembered, else this machine's."""
-    now = now or time.time()
+def zone():
+    """Owner timezone, independent of the server clock. tzdata supports Windows."""
+    import datetime as dt
+    name = os.environ.get('HIVE_TIMEZONE') or _load().get('timezone')
+    if name:
+        from zoneinfo import ZoneInfo
+        return ZoneInfo(name)
     off = os.environ.get('HIVE_UTC_OFFSET')
-    off = int(off) if off not in (None, '') else _load().get('utc_offset')
-    return time.gmtime(now + off) if off is not None else time.localtime(now)
+    if off is None:
+        off = _load().get('utc_offset')
+    if off is not None:
+        return dt.timezone(dt.timedelta(seconds=int(off)))
+    try:
+        from zoneinfo import ZoneInfo
+        return ZoneInfo('Asia/Kolkata')
+    except Exception:
+        return dt.timezone(dt.timedelta(hours=5, minutes=30), 'Asia/Kolkata')
+
+
+def his_time(now=None):
+    import datetime as dt
+    return dt.datetime.fromtimestamp(time.time() if now is None else now, zone()).timetuple()
+
+
+def set_timezone(name):
+    from zoneinfo import ZoneInfo
+    ZoneInfo(name)  # reject invalid zones before saving
+    p = _load(); p['timezone'] = name
+    os.makedirs(os.path.dirname(PATH), exist_ok=True)
+    with open(PATH, 'w', encoding='utf-8') as f:
+        json.dump(p, f)

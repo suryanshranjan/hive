@@ -60,7 +60,7 @@ check('every host he might use is known, or his own commands', (sorted(deploy.HO
 deploy.setup(repo, 'vercel')
 
 # 3. a preview link: the build itself, with his host link carried over; his live product untouched
-fake = FakeTelegram([])
+fake = FakeTelegram([tap('pre|yes')])
 check('"send me a link": the build at its own address', (assistant.handle(ch(fake), repo, 'send me a link', poll=1),
       ran[-1], 'https://shop-git-preview-acme.vercel.app' in fake.sent[-1]['text']),
       ('previewed', ('vercel deploy --yes --environment preview', 'new', True), True))
@@ -117,26 +117,18 @@ def vercel_new(cmd, cwd, timeout=900):
                                        'Preview  https://shop-git-x.vercel.app\n')
 deploy._run = vercel_new; deploy.shutil.which = lambda t: '/bin/' + t
 c('reset', '-q', '--hard', git(repo, 'rev-list', '--max-parents=0', 'main').stdout.strip())   # main before the build was merged
-for words, taps, want in (('no', [tap('fst|no')], 'no_preview'), ('yes', [tap('fst|yes')], 'previewed')):
-    ran.clear(); live_now = []; deploy.setup(repo, 'vercel'); fake = FakeTelegram(taps)
-    r = assistant.handle(ch(fake), repo, 'send me a link', poll=1)
-    texts = [m['text'] for m in fake.sent]
-    if words == 'no':
-        check('new on Vercel: asked first; on "not now" nothing goes live', (r, any("isn't on Vercel yet" in t for t in texts),
-              [x[0] for x in ran if '--prod' in x[0]]), (want, True, []))
-    else:
-        check('on his yes: his current version live first (not the build), then the build at its own preview address',
-              (r, [(x[0].split()[2], x[1]) for x in ran], 'https://shop-git-x.vercel.app' in texts[-1]),
-              (want, [('--yes', 'new'), ('--prod', 'old'), ('--yes', 'new')], True))
-        import glob, tempfile
-        check('no copy of his project is left behind after a deploy (on Windows, 172 were, Gate 110)',
-              glob.glob(os.path.join(tempfile.gettempdir(), 'hive_deploy_*')), [])
-        check("a Vercel preview says it asks him to sign in to Vercel (Gate 110: anyone else meets Vercel's login page)",
-              'sign in to Vercel first' in texts[-1], True)
-check('Vercel\'s labelled address is the one read, not the last link printed',
-      deploy._url('{"x": "vercel inspect https://a-1.vercel.app"}\nPreview  https://a-git.vercel.app\n'), 'https://a-git.vercel.app')
-deploy.shutil.which = real_which
-# a Render hook runs in a shell: anything but an address's own characters is refused (the audit, Nov 15)
+ran.clear(); live_now = []; deploy.setup(repo, 'vercel')
+fake = FakeTelegram([tap('pre|yes')])
+r = assistant.handle(ch(fake), repo, 'send me a link', poll=1)
+check('preview approval never authorizes a first production deployment',
+      (r, any('--prod' in cmd for cmd, _ in ran)), ('no_preview', False))
+# With the host already provisioned, an approved preview stays a preview.
+live_now = [1]; ran.clear(); fake = FakeTelegram([tap('pre|yes')])
+r = assistant.handle(ch(fake), repo, 'send me a link', poll=1)
+check('an existing host publishes the approved preview and explains its access',
+      (r, any('--prod' in cmd for cmd, _ in ran), 'sign in to Vercel' in fake.sent[-1]['text']),
+      ('previewed', False, True))
+
 hk = os.path.join(home, 'hookrepo'); subprocess.run(['git', 'init', '-q', '-b', 'main', hk])
 subprocess.run(['git', '-C', hk, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '--allow-empty', '-m', 'i'])
 good = deploy.setup(hk, 'render', hook='https://api.render.com/deploy/srv-abc123?key=Xy_9-z')

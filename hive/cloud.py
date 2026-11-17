@@ -52,7 +52,7 @@ class Target:
             if not os.path.exists(src):
                 return False
             shutil.copy2(src, dst); return True
-        return subprocess.run(['scp', '-q'] + self.opts + [f'{self.to}:{src}', dst], capture_output=True).returncode == 0
+        return subprocess.run(['scp', '-q'] + self.opts + [f'{self.to}:{src}', dst], capture_output=True, timeout=120).returncode == 0
 
     def home(self):
         return f'{self.to}/hive-cloud' if self.local else REMOTE_HOME
@@ -67,6 +67,11 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
     if subprocess.run(['git', '-C', repo, 'status', '--porcelain', '--untracked-files=no'], capture_output=True, text=True).stdout.strip():
         say('You have unsaved changes. Commit them first: only committed work goes to the cloud.'); return 3
     t = Target(to, key); name = _project(repo)
+    state_path = f'{t.home()}/.hive/hive.db' if t.local else '.hive/hive.db'
+    exists = os.path.isfile(state_path) if t.local else t.run('test -s ' + Q(state_path), check=False).returncode == 0
+    if exists:
+        say('The destination already contains Hive memory. Pull and preserve that state before another handoff; I will not overwrite it.')
+        return 8
     proj = f'{t.home()}/{name}'
     branch = subprocess.run(['git', '-C', repo, 'rev-parse', '--abbrev-ref', 'HEAD'], capture_output=True, text=True).stdout.strip()
     if branch == 'HEAD' or subprocess.run(['git', 'check-ref-format', '--branch', branch], capture_output=True).returncode:
@@ -117,6 +122,20 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
         if os.path.exists(src):
             t.put(src, dst)   # said by what it is, so he knows his data's addresses went (encrypted: hive/vault.py)
             sent.append('his data sources (encrypted)' if src == access._path(repo) else os.path.basename(src))
+    from . import store, vault
+    snapshot = os.path.join(tmp, 'hive.db')
+    import sqlite3
+    dest = sqlite3.connect(snapshot)
+    with store._LOCK:
+        store.connect().backup(dest)
+    memory_baseline = store.fingerprint(dest)
+    dest.close()
+    os.chmod(snapshot, 0o600)
+    t.put(snapshot, f'{dst_hive}/hive.db')
+    for secret_file in vault.files():
+        rel = os.path.relpath(secret_file, hive_dir).replace('\\', '/')
+        t.put(secret_file, f'{dst_hive}/{rel}')
+    sent.append('memory, pending actions and event state')
     from . import vault   # the files above may be encrypted (hive/vault.py): their key goes too, or he is told
     if vault.where() in ('file', 'keychain') and vault._key(create=False):
         kf = os.path.join(tmp, 'vault.key'); open(kf, 'wb').write(vault._key(create=False))
@@ -140,7 +159,7 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
         p = t.run(f'cd {Q(proj)} && {py} -m pip install -q -r requirements.txt', check=False)
         if p.returncode != 0:
             say(f'  The requirements did not install there: {p.stderr.strip()[-300:]}')
-    json.dump({'to': t.to, 'project': proj, 'branch': branch, 'key': key}, open(os.path.join(hive_dir if os.path.isdir(hive_dir) else tmp,
+    json.dump({'to': t.to, 'project': proj, 'branch': branch, 'key': key, 'memory_baseline': memory_baseline}, open(os.path.join(hive_dir if os.path.isdir(hive_dir) else tmp,
                                                                                   'cloud.json'), 'w'))
     say(f"  Copied: the project ({branch}), " + (', '.join(sent) if sent else 'no Hive settings yet') + '.')
     # can builders work there? They run on Claude Code: check it answers (the owner: "else how will development continue")
@@ -208,17 +227,84 @@ def building(t):
         return False
     return bool(t.run("pgrep -f '[h]ive start' >/dev/null && echo yes || true", check=False).stdout.strip())
 
+def _pull_state(t, repo, src_hive, saved, cfg, say):
+    """Return the authoritative DB, preserving both sides on any conflict.
+
+    This is a single-owner handoff, not a merge. A changed local database must
+    never be overwritten by an older cloud copy. Both snapshots remain private.
+    """
+    import sqlite3, secrets
+    from . import store, vault
+    folder = os.path.join(os.path.dirname(store.path()), 'returns', memory.project_key(repo))
+    os.makedirs(folder, exist_ok=True)
+    vault.private_permissions(folder, directory=True)
+    snapshot = os.path.join(folder, 'cloud-' + secrets.token_hex(8) + '.db')
+    source = f'{src_hive}/hive.db'
+    if t.local:
+        if not os.path.isfile(source):
+            say('  The cloud memory database is missing. Nothing will be deleted.'); return False
+        remote = sqlite3.connect(__import__('pathlib').Path(source).as_uri() + '?mode=ro', uri=True)
+        dest = sqlite3.connect(snapshot)
+        try:
+            remote.backup(dest)
+        finally:
+            remote.close(); dest.close()
+    else:
+        remote_copy = f'{src_hive}/return-{secrets.token_hex(8)}.db'
+        code = ('import sqlite3; '
+                f's=sqlite3.connect("file:"+{source!r}+"?mode=ro",uri=True); '
+                f'd=sqlite3.connect({remote_copy!r}); s.backup(d); d.close(); s.close()')
+        result = t.run('umask 077; python3 -c ' + Q(code), check=False)
+        if result.returncode or not t.get(remote_copy, snapshot):
+            say('  Could not snapshot cloud memory. Nothing will be deleted.'); return False
+        t.run('rm -f ' + Q(remote_copy), check=False)
+    vault.private_permissions(snapshot)
+    remote = sqlite3.connect(snapshot)
+    try:
+        if remote.execute('PRAGMA quick_check').fetchone()[0] != 'ok':
+            say('  Cloud memory failed its integrity check. Nothing will be deleted.'); return False
+        if remote.execute('SELECT max(v) FROM schema_version').fetchone()[0] != len(store.MIGRATIONS):
+            say('  Cloud memory has a different schema. Both copies were kept.'); return False
+        with store._LOCK:
+            local = store.connect()
+            current = store.fingerprint(local)
+            if current != store.fingerprint(remote):
+                if not saved.get('memory_baseline') or current != saved['memory_baseline']:
+                    say('  Local memory changed since handoff. Both databases were kept; automatic restore and deletion were refused.')
+                    return False
+                backup = sqlite3.connect(os.path.join(folder, 'local-' + secrets.token_hex(8) + '.db'))
+                try:
+                    local.backup(backup)
+                finally:
+                    backup.close()
+                remote.backup(local)
+            # Rebuild compatibility exports rather than reimporting either copy.
+            for path in (memory._path(repo), memory._notes_path(repo)):
+                local.execute('INSERT OR REPLACE INTO synced VALUES(?,?)', (path, time.time()))
+            memory._export(repo)
+            saved['memory_baseline'] = store.fingerprint(local)
+            with open(cfg, 'w', encoding='utf-8') as fh:
+                json.dump(saved, fh)
+    finally:
+        remote.close()
+    say('  Memory, pending actions and notification state returned; the earlier local snapshot was kept.')
+    return True
+
+
 def pull(repo='.', frm=None, say=print, verify=False):
     """Bring everything done in the cloud to this computer: every branch (hive/... as your result branches, any other
     under hive-cloud/...), the build records, the rules and the conversation. With `verify`, check every branch arrived
     whole before anything may be deleted (the owner: no development may ever be lost). Returns 0 only when complete."""
     repo = os.path.abspath(repo)
     key = None
+    saved = {}
     cfg = os.path.join(os.path.expanduser('~'), '.hive', 'cloud.json')
     if os.path.exists(cfg):
         saved = json.load(open(cfg))
         if not frm or frm == saved.get('to'):
             frm, key = saved['to'], saved.get('key')
+        else:
+            saved = {}  # a different target cannot inherit this handoff's authority
     if not frm:
         say('Tell me where from: hive cloud pull --from user@host'); return 2
     t = Target(frm, key); proj = f'{t.home()}/{_project(repo)}'
@@ -237,12 +323,15 @@ def pull(repo='.', frm=None, say=print, verify=False):
         (f"; {len(heads) - len(results)} other branch(es) under hive-cloud/..." if len(heads) > len(results) else '') + '.')
     # what he said there, and the records of every build made there
     src_hive = f'{t.home()}/.hive' if t.local else '.hive'
+    try:
+        if not _pull_state(t, repo, src_hive, saved, cfg, say):
+            return 1
+    except Exception:
+        say('  Could not safely return cloud memory. Both copies were kept; nothing will be deleted.'); return 1
     rules = memory.project_key(repo) + '.json'
     back = [name for name, src, dst in (
-        ('rules', f'{src_hive}/rules/{rules}', os.path.join(memory.DIR, rules)),
         ('conversation', f'{src_hive}/conversation.json', telegram.CONVERSATION),
-        ('what he told me about his business', f'{src_hive}/rules/{memory.project_key(repo)}.notes.json',
-         memory._notes_path(repo))) if t.get(src, dst)]
+    ) if t.get(src, dst)]
     runs_home = os.path.join(os.path.expanduser('~'), '.hive', 'runs-from-cloud', _project(repo))   # one copy, refreshed
     if t.local:
         src_runs = os.path.join(t.home(), '.hive', 'runs')

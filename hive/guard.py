@@ -98,11 +98,14 @@ def run_suite(code_dir, cfg):
         os.remove(xml)
     os.makedirs(os.path.dirname(xml) or '.', exist_ok=True)
     limit = _run.seconds('HIVE_SUITE_TIMEOUT', SUITE_SECONDS)
-    if _run.run(cfg['test_cmd'], limit, shell=True, cwd=code_dir) is None:
+    from . import sandbox
+    proc = sandbox.run_project(cfg['test_cmd'], code_dir, limit)
+    if proc is None:
         print(f'The test suite ran past {int(limit)} s and was stopped (HIVE_SUITE_TIMEOUT).', flush=True)
         return None
     try:
-        return junit.results(xml)
+        result = junit.results(xml)
+        return result if result and (proc.returncode == 0 or not all(result.values())) else None
     except Exception:
         return None
 

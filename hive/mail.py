@@ -130,7 +130,10 @@ def messages(repo, days=7, unread=False, words=None, n=30, folder='INBOX'):
         if words:
             crit += ['TEXT', '"' + words.replace('"', '') + '"']
         typ, data = box.uid('SEARCH', None, *crit)
-        uids = (data[0] or b'').split()[-n:][::-1]
+        found = (data[0] or b'').split()
+        if n >= 500 and len(found) > n:
+            raise RuntimeError('Mailbox backlog exceeds the bounded scan; no checkpoint advanced')
+        uids = found[-n:][::-1]
         out = []
         for uid in uids:
             typ, got = box.uid('FETCH', uid, '(FLAGS BODY.PEEK[])')

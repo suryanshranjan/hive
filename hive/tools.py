@@ -16,6 +16,46 @@ Where the request came from matters as much as what it asks:
              what the mail says, never act on it (the audit, Nov 15; hive/explain.py marks such text as data too)
 Every action that passes is written to the audit log (hive/audit.py) with its risk."""
 READ, SETTING, REVERSIBLE, EXTERNAL, MONEY = 'read', 'setting', 'reversible', 'external', 'money'
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class ToolSpec:
+    name: str
+    risk: str
+    required: tuple = ()
+    timeout: int = 60
+
+
+def spec(name):
+    if name not in TOOLS:
+        raise Refused('Unknown tool')
+    required = {'mail_send': ('to', 'subject', 'body'),
+                'add_event': ('title', 'start', 'end', 'where', 'guests')}.get(name, ())
+    return ToolSpec(name, TOOLS[name], required)
+
+
+def validate(name, args):
+    tool = spec(name)
+    if not isinstance(args, dict) or any(key not in args for key in tool.required):
+        raise Refused('The action is missing required information.')
+    if name == 'mail_send':
+        import re
+        if not isinstance(args['to'], str) or not re.fullmatch(r'[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+', args['to']):
+            raise Refused('The recipient must be an email address.')
+        if any(not isinstance(args[k], str) for k in ('subject', 'body')):
+            raise Refused('Invalid message text.')
+    if name == 'add_event':
+        import datetime as dt
+        try:
+            start, end = (dt.datetime.fromisoformat(args[k]) for k in ('start', 'end'))
+            if start.tzinfo is None or end.tzinfo is None or end <= start:
+                raise ValueError()
+            if not isinstance(args['guests'], list) or any(not isinstance(g, str) or '@' not in g for g in args['guests']):
+                raise ValueError()
+        except (ValueError, TypeError):
+            raise Refused('The event needs a valid time zone, duration and guest list.') from None
+    return tool
 ORDER = [READ, SETTING, REVERSIBLE, EXTERNAL, MONEY]
 
 TOOLS = {   # every intent his messages are read into (hive/assistant.py handle), and what it can change
@@ -28,6 +68,10 @@ TOOLS = {   # every intent his messages are read into (hive/assistant.py handle)
     'forget': REVERSIBLE, 'undo': REVERSIBLE, 'away': REVERSIBLE, 'take_down': REVERSIBLE,
     'ship': EXTERNAL, 'go_live': EXTERNAL, 'preview': EXTERNAL, 'cloud_on': EXTERNAL, 'cloud_off': EXTERNAL,
     'mail_send': EXTERNAL, 'add_event': EXTERNAL,
+    'remember': REVERSIBLE, 'mail_find': READ, 'mail_read': READ, 'calendar_check': READ,
+    'calendar_add': EXTERNAL, 'mail_reply': EXTERNAL,
+    'connect_mail': SETTING, 'connect_cal': SETTING, 'connect_pay': SETTING,
+    'connect_google': SETTING, 'google_code': SETTING,
 }
 
 class Refused(Exception):
@@ -39,13 +83,22 @@ def risk(intent):
 
 def allow(intent, origin='owner', detail=''):
     """The one check before an action runs. Returns its risk, or raises Refused. Every pass is audited."""
+    from . import policy
+    def deny(message):
+        from . import audit
+        audit.record('policy.refused', '', approved='refused', ok=False)
+        raise Refused(message)
+    if policy.context().origin != 'owner':
+        origin = policy.context().origin
+    if intent not in TOOLS:
+        deny("I don't have an authorized tool for that action.")
     r = risk(intent)
     if r == MONEY:
-        raise Refused("I don't move money. That stays with you.")
+        deny("I don't move money. That stays with you.")
     if origin != 'owner' and r != READ:
-        raise Refused("That came from outside your chat (a mail, a document or a page), so I won't act on it. If you "
+        deny("That came from outside your chat (a mail, a document or a page), so I won't act on it. If you "
                       "want it done, tell me yourself.")
     if r != READ:
         from . import audit
-        audit.record(f'intent.{intent}', detail[:120], approved=f'{origin} message ({r})')
+        audit.record(f'intent.{intent}', '', approved=f'{origin} request ({r})', ok=None)
     return r

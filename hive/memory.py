@@ -4,8 +4,8 @@ builders follow them next time and the owner is never asked the same thing twice
   hive rules              list the rulings kept for this project
   hive rules forget <n>   drop ruling number n (for example after a policy change)
 
-Rulings are business decisions, so they live on the owner's machine in ~/.hive/rules/<project>.json, never in a
-repository. A project is identified by its first commit, so every clone of it shares the same rulings."""
+Rulings live in ~/.hive/hive.db. The rules/<project>.json files are derived compatibility exports.
+A project is identified by its first commit, so every clone shares the same rulings."""
 import json, os, subprocess, time
 
 def _store(fn, *a, **k):
@@ -69,39 +69,62 @@ def _notes_path(repo):
     return os.path.join(DIR, project_key(repo) + '.notes.json')
 
 def notes(repo):
-    """What he has told Hive about his business that is not a rule for the product: who his customers are, what matters
-    most this month, how he likes to work. Kept per project, oldest first (the owner: no gaps)."""
-    p = _notes_path(repo)
-    try:
-        return json.load(open(p, encoding='utf-8')) if os.path.exists(p) else []
-    except (OSError, ValueError):
-        return []
+    """SQLite is authoritative; import each legacy file once."""
+    from . import store
+    store.sync(repo)
+    return [f['text'] for f in store.live_facts(project_key(repo))
+            if f['kind'] != 'rule' and f['trust'] == 'owner']
 
-def add_note(repo, text, kind='note', source='chat', person=None, valid_until=None, trust='owner'):
-    """Keep one fact about his business (not repeated; at most the latest 60 here, every one in the store, with its
-    kind: note, preference, deadline or person; who it is about; and until when it holds)."""
-    text = ' '.join((text or '').split())
-    if not text:
+
+def _export(repo):
+    """Compatibility files are derived snapshots, never a second write authority."""
+    from . import store
+    if store.after_commit(lambda: _export(repo)):
         return
-    _store('add_fact', text, kind, project_key(repo), source=source, person=person, valid_until=valid_until, trust=trust)
-    if trust != 'owner':
-        return   # read from outside: in the store, marked as such, never in the notes builds and plans read as his word
-    kept = [n for n in notes(repo) if n.lower() != text.lower()] + [text]
     os.makedirs(DIR, exist_ok=True)
-    with open(_notes_path(repo), 'w', encoding='utf-8') as f:
-        json.dump(kept[-60:], f, indent=1, ensure_ascii=False)
-    os.chmod(_notes_path(repo), 0o600)
+    for path, rows in ((_notes_path(repo), notes(repo)[-60:]), (_path(repo), load(repo))):
+        tmp = path + '.tmp'
+        with open(tmp, 'w', encoding='utf-8') as f:
+            json.dump(rows, f, indent=1, ensure_ascii=False)
+        os.replace(tmp, path)
+        os.chmod(path, 0o600)
+
+
+def add_note(repo, text, kind='note', source='chat', person=None, valid_until=None, trust='owner', source_ref='', scope='project'):
+    from . import store
+    store.sync(repo)
+    fid = store.add_fact(text, kind, '' if scope == 'personal' else project_key(repo), source=source, source_ref=source_ref,
+                         person=person, valid_until=valid_until, trust=trust)
+    _export(repo)
+    return fid
+
 
 def load(repo):
-    p = _path(repo)
-    return json.load(open(p)) if os.path.exists(p) else []
+    from . import store
+    store.sync(repo)
+    return [dict(text=f['text'], kind=f['source'], when=time.strftime('%Y-%m-%d', time.localtime(f['created'])),
+                 feature=json.loads(f['extra']).get('feature', ''))
+            for f in store.live_facts(project_key(repo), kinds=('rule',)) if f['trust'] == 'owner']
+
 
 def _save(repo, rulings):
-    os.makedirs(DIR, exist_ok=True)
-    p = _path(repo)
-    with open(p, 'w') as f:
-        json.dump(rulings, f, indent=1)
-    os.chmod(p, 0o600)
+    from . import store
+    store.sync(repo)
+    project = project_key(repo)
+    with store.transaction():
+        have = store.live_facts(project, kinds=('rule',))
+        wanted = {store.norm(r['text']) for r in rulings}
+        for f in have:
+            if f['project'] == project and f['norm'] not in wanted:
+                store.forget(f['id'])
+        for r in rulings:
+            old = store.find_fact(r['text'], 'rule', project)
+            if not old or old['deleted_at'] is not None or old['superseded_by'] is not None:
+                from . import policy
+                store.add_fact(r['text'], 'rule', project, source=r.get('kind', 'owner'),
+                               source_ref=policy.context().source_ref, extra=r)
+    _export(repo)
+
 
 def _first_part(text):
     return (text or '').split('\n\n')[0].strip()
@@ -131,8 +154,6 @@ def record(repo, run, goal=''):
         add(f"{c['question']} The owner decided: {c['chosen']} (this settled a contradiction)", 'resolution')
     if new:
         _save(repo, rulings + new)
-        for r in new:
-            _store('add_fact', r['text'], 'rule', project_key(repo), source=r['kind'])
     return len(new)
 
 def instructions(repo):
@@ -169,32 +190,28 @@ def add(repo, text, kind='owner'):
     if text and text not in {r['text'] for r in rulings}:
         rulings.append({'text': text, 'kind': kind, 'when': time.strftime('%Y-%m-%d'), 'feature': ''})
         _save(repo, rulings)
-    if text:
-        _store('add_fact', text, 'rule', project_key(repo), source=kind)
     return len(rulings)
 
 def replace(repo, old_indexes, text):
     """The owner changed his mind: drop the rulings he overrode (0-based indexes) and keep the new one."""
+    from . import policy, store
     before = load(repo)
-    rulings = [r for n, r in enumerate(before) if n not in set(old_indexes)]
-    _save(repo, rulings)
-    n = add(repo, text, 'changed')
-    new = _store('find_fact', text, 'rule', project_key(repo))
-    for i in old_indexes:   # the store keeps what he overrode, marked as replaced by the new rule
-        if 0 <= i < len(before):
-            old = _store('find_fact', before[i]['text'], 'rule', project_key(repo))
-            if old and new:
-                _store('supersede', old['id'], new['id'])
-    return n
+    project = project_key(repo)
+    with store.transaction():
+        new_id = store.add_fact(text, 'rule', project, source='changed', source_ref=policy.context().source_ref)
+        for index in old_indexes:
+            if 0 <= index < len(before):
+                old = store.find_fact(before[index]['text'], 'rule', project)
+                if old and old['id'] != new_id:
+                    store.supersede(old['id'], new_id)
+        _export(repo)
+    return len(load(repo))
+
 
 def forget_note(repo, text):
-    """Drop one business note (he asked Hive to forget it): out of the notes and out of the store."""
-    key = ' '.join((text or '').split()).lower()
-    kept = [n for n in notes(repo) if n.lower() != key]
-    if len(kept) != len(notes(repo)):
-        with open(_notes_path(repo), 'w', encoding='utf-8') as f:
-            json.dump(kept, f, indent=1, ensure_ascii=False)
-    for kind in ('note', 'preference', 'deadline', 'person'):
-        got = _store('find_fact', text, kind, project_key(repo))
-        if got:
-            _store('forget', got['id'])
+    from . import store
+    project = project_key(repo)
+    for f in store.live_facts(project):
+        if f['project'] == project and store.norm(f['text']) == store.norm(text):
+            store.forget(f['id'])
+    _export(repo)

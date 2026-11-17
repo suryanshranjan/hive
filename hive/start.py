@@ -77,8 +77,14 @@ def run_tests(root, cmd, junit_rel='.hive/junit.xml'):
     if os.path.exists(path):
         os.remove(path)
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    subprocess.run(cmd, shell=True, cwd=root, capture_output=True)
-    return junit.results(path) if os.path.exists(path) else {}
+    from . import sandbox, run
+    result = sandbox.run_project(cmd, root, run.seconds('HIVE_SUITE_TIMEOUT', 900))
+    if result is None:
+        return {}
+    results = junit.results(path) if os.path.exists(path) else {}
+    if result.returncode != 0 and results and all(results.values()):
+        return {}
+    return results
 
 def _rmtree(path):
     """Delete a folder, including git's read-only files (Windows refuses those: found running Hive natively there)."""
@@ -601,6 +607,9 @@ def _deliver(state, ch=None):
     _link(state['repo'], result, state['links'])
     before = state['before']; passed = sum(before.values())
     after = run_tests(result, state['test_cmd'])
+    if not after:
+        say('Verification failed: no readable test results. Nothing is marked complete.')
+        return 1
     p2, t2 = sum(after.values()), len(after)
     broken = [k for k, ok in before.items() if ok and not after.get(k)]
     state['check'] = (f'{_n(t2, "test")}, ' + ('all passing.' if p2 == t2 else f'{p2} passing.') +

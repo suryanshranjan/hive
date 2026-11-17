@@ -21,7 +21,7 @@ def claude_cmd(tools, edits=False):
     return ('claude -p --output-format json' + (' --permission-mode acceptEdits' if edits else '') +
             ' --allowedTools ' + ' '.join(tools))
 
-READ_TOOLS = ('Read', 'Grep', 'Glob', 'Bash')
+READ_TOOLS = ('Read', 'Grep', 'Glob')
 
 def link(src, dst):
     """dst points at src (a dependency folder shared into a copy). A symlink where allowed; on Windows without the
@@ -40,6 +40,10 @@ def argv(cmd):
     CreateProcess cannot find by bare name, so every model call failed there and Hive fell back to canned replies."""
     import shlex, shutil
     parts = shlex.split(cmd)
+    if (parts and _os.path.basename(parts[0]).lower() in ('claude', 'claude.cmd', 'claude.exe')
+            and '--allowedTools' in parts and _os.environ.get('IS_SANDBOX') != '1'
+            and any(x in parts for x in ('Bash', 'Write', 'Edit'))):
+        raise RuntimeError('Tool-enabled code execution requires an isolated runner')
     if parts and _os.name == 'nt':
         parts[0] = shutil.which(parts[0]) or parts[0]
     return parts

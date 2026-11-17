@@ -1,24 +1,23 @@
-"""Builders in a container (the owner's choice, Nov 15: by default wherever Docker is there).
+"""Builders in a required container, without access to the assistant's personal state.
 
 A builder is a coding agent running shell commands without asking. On his computer it could read anything he can:
 ~/.hive (his bot token, mail password, payment keys), his other projects, his SSH keys. In a container it sees only:
-  /hive-run   the run folder (its clone, the shared upstream, the owner's questions and answers, the guard's cache)
-  /opt/hive   Hive's own code, read-only
+  /hive-run   the run folder read-only, with this clone, Git transport and questions writable
+  /opt/hive/hive   Hive's package only, read-only
   ~/.claude, ~/.codex   a copy of its agent's login, made for this run and deleted after it
 and its model key in the environment. Network stays open (the model's API, packages).
 
-  HIVE_SANDBOX=auto     (default) in a container when Docker is running and his tests run there; else on this
-                        computer, and he is told why once
-  HIVE_SANDBOX=docker   in a container or not at all
-  HIVE_SANDBOX=off      on this computer, as before
+  HIVE_SANDBOX=auto     (default) requires a container and a passing sandbox preflight
+  HIVE_SANDBOX=docker   same requirement, explicit
+  HIVE_SANDBOX=off      refused; host execution is disabled
 
 The image (deploy/builder/Dockerfile: Python, Node, git, pytest, Claude Code, Codex, Gemini) is built the first time,
-which takes a few minutes. Before a build starts, his project's tests are run once inside it: a project whose tests
-need something the image does not have builds on this computer instead, and he is told. A custom HIVE_WORKER_CMD is
-his own and runs on this computer unless HIVE_SANDBOX_CUSTOM=1."""
+which takes a few minutes. Before a build starts, his project's tests run once inside it. Missing dependencies
+stop the build rather than falling back to the host. A custom HIVE_WORKER_CMD requires HIVE_SANDBOX_CUSTOM=1.
+IS_SANDBOX=1 is reserved for a process already running inside an isolated runner, including CI fixtures."""
 import hashlib, os, shlex, shutil, subprocess, time
 
-IMAGE = 'hive-builder:2'   # bump when deploy/builder/Dockerfile changes
+IMAGE = 'hive-builder:3'   # bump when deploy/builder/Dockerfile changes
 RUN_DIR = '/hive-run'
 HIVE_DIR = '/opt/hive'
 HOME = '/home/hive'
@@ -29,7 +28,8 @@ DOCKERFILE = os.path.join(HIVE_ROOT, 'deploy', 'builder', 'Dockerfile')
 MODEL_KEYS = ('ANTHROPIC_API_KEY', 'ANTHROPIC_BASE_URL', 'ANTHROPIC_MODEL', 'CLAUDE_CODE_USE_BEDROCK',
               'CLAUDE_CODE_USE_VERTEX', 'OPENAI_API_KEY', 'OPENAI_BASE_URL', 'CODEX_API_KEY', 'GEMINI_API_KEY',
               'GOOGLE_API_KEY', 'GOOGLE_CLOUD_PROJECT')
-PASS_PREFIXES = ('HIVE_',)
+RUN_SETTINGS = ('HIVE_SUITE_TIMEOUT', 'HIVE_BUILDER_HOURS', 'HIVE_QUESTION_SECONDS', 'HIVE_QUESTIONS',
+                'HIVE_OVERNIGHT', 'HIVE_ASSUMPTIONS', 'HIVE_NOTES', 'HIVE_AGENT')
 NEVER = ('HIVE_MASTER_KEY', 'HIVE_FAST_KEY', 'HIVE_PAIR_CODE', 'HIVE_RUN', 'HIVE_GUARD_CACHE', 'HIVE_DOCKER',
          'HIVE_SANDBOX', 'HIVE_SANDBOX_CUSTOM', 'HIVE_WORKER_CMD')
 LOGINS = {'claude': [('.claude', '.credentials.json'), ('', '.claude.json')], 'codex': [('.codex', 'auth.json')],
@@ -86,7 +86,7 @@ def name(run, me):
 
 def env_for(base, me):
     """The container's environment: model keys and Hive's run settings, never his secrets or this computer's paths."""
-    out = {k: v for k, v in base.items() if (k in MODEL_KEYS or k.startswith(PASS_PREFIXES)) and k not in NEVER}
+    out = {k: v for k, v in base.items() if (k in MODEL_KEYS or k in RUN_SETTINGS) and k not in NEVER}
     out.update(HIVE_WORKER=me, HIVE_RUN=RUN_DIR, HIVE_GUARD_CACHE=f'{RUN_DIR}/guard_cache', PYTHONIOENCODING='utf-8',
                PYTHONPATH=HIVE_DIR)
     return out
@@ -134,9 +134,24 @@ def command(run, me, cmd, base_env, agent='claude', workdir=None):
     """The docker command that runs `cmd` (a builder's command line) for builder `me`, prompt on stdin."""
     work = workdir or os.path.join(run, 'work', me)
     rel = os.path.relpath(work, run).replace('\\', '/')
-    args = ['run', '--rm', '-i', '--name', name(run, me), '--network', 'bridge',
-            '-v', f'{host_path(run)}:{RUN_DIR}', '-v', f'{host_path(HIVE_ROOT)}:{HIVE_DIR}:ro',
+    args = ['run', '--rm', '--init', '-i', '--name', name(run, me), '--network', 'bridge', '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges',
+            '--pids-limit', '256', '--memory', '2g', '--cpus', '2',
+            '-v', f'{host_path(run)}:{RUN_DIR}:ro',
+            '-v', f'{host_path(os.path.join(HIVE_ROOT, "hive"))}:{HIVE_DIR}/hive:ro',
             '-w', f'{RUN_DIR}/{rel}']
+    # Only this worktree, the shared Git transport and question exchange are writable.
+    args += ['-v', f'{host_path(work)}:{RUN_DIR}/{rel}']
+    for sub in ('up.git', 'owner'):
+        path = os.path.join(run, sub)
+        os.makedirs(path, exist_ok=True)
+        args += ['-v', f'{host_path(path)}:{RUN_DIR}/{sub}']
+    cache = os.path.join(run, 'guard_cache', me)
+    os.makedirs(cache, exist_ok=True)
+    os.makedirs(os.path.join(run, '.logins'), exist_ok=True)
+    args += ['-v', f'{host_path(cache)}:{RUN_DIR}/guard_cache', '--tmpfs', f'{RUN_DIR}/.logins']
+    if os.environ.get('HIVE_SANDBOX_CUSTOM') == '1':
+        # Explicit fixture/custom-worker support; never expose the checkout's private data.
+        args += ['-v', f'{host_path(os.path.join(HIVE_ROOT, "tests"))}:{HIVE_DIR}/tests:ro']
     if os.name != 'nt' and hasattr(os, 'getuid'):   # Linux: files the builder writes stay his
         args += ['--user', f'{os.getuid()}:{os.getgid()}', '-e', f'HOME={HOME}']
     for src, dst in logins(run, agent):
@@ -175,33 +190,37 @@ def preflight(run, test_cmd, junit, base_env):
     return ok, '' if ok else f"its tests don't run in the sandbox ({(p.stderr or p.stdout).strip()[-160:]})"
 
 def decide(run, test_cmd, junit, base_env, say=print, custom=False):
-    """Whether this run's builders go in containers: True, or False with the reason said once. Raises SystemExit
-    under HIVE_SANDBOX=docker when they can't."""
-    m = mode()
-    if m == 'off':
-        return False
-    def no(why):
-        if m == 'docker':
-            raise SystemExit(f"The builders' sandbox is required (HIVE_SANDBOX=docker), but {why}.")
-        told = os.path.join(os.path.expanduser('~'), '.hive', 'sandbox_told')
-        try:
-            before = open(told, encoding='utf-8').read()
-        except OSError:
-            before = ''
-        if before != why:   # said once for each reason, not before every build
-            say(f"Builders run on this computer, not in a sandbox: {why}.")
-            try:
-                os.makedirs(os.path.dirname(told), exist_ok=True); open(told, 'w', encoding='utf-8').write(why)
-            except OSError:
-                pass
-        return False
+    """Use containers or refuse; False is only for an already isolated runner."""
+    if os.environ.get('IS_SANDBOX') == '1':
+        return False  # already inside the isolated runner, never the personal-assistant process
     if custom and os.environ.get('HIVE_SANDBOX_CUSTOM') != '1':
-        return False   # his own builder command: his to place
+        raise SystemExit('Custom workers must be placed in an isolated runner; host workers are disabled.')
+    if mode() == 'off':
+        raise SystemExit('Host execution is disabled. Start Docker to build safely.')
     if not running():
-        if m != 'docker' and (os.path.exists('/.dockerenv') or os.environ.get('HIVE_HOST') == 'render'):
-            return False   # Hive itself is in a container on a machine of its own (Render, a cloud box): nothing to say
-        return no("Docker isn't running here (start Docker Desktop, or install Docker, for the safer way)")
+        raise SystemExit("The builders' sandbox is required, but Docker isn't running. Personal assistance remains available.")
     if not ensure_image(say):
-        return no("the sandbox image could not be built")
+        raise SystemExit('The sandbox image could not be built.')
     ok, why = preflight(run, test_cmd, junit, base_env)
-    return True if ok else no(why)
+    if not ok:
+        raise SystemExit('The project cannot run safely in the sandbox: ' + why)
+    return True
+
+
+def run_project(cmd, folder, timeout):
+    """Project code executes with just its working copy mounted, without personal state."""
+    from . import run as runner
+    if os.environ.get('IS_SANDBOX') == '1':
+        return runner.run(cmd, timeout, shell=True, cwd=folder)
+    if not running() or not ensure_image():
+        raise RuntimeError('Project execution needs Docker; personal assistance is still available.')
+    import secrets
+    container = 'hive-check-' + secrets.token_hex(8)
+    args = docker() + ['run', '--rm', '--init', '--name', container, '--network', 'none', '--cap-drop', 'ALL',
+                       '--security-opt', 'no-new-privileges', '--pids-limit', '256',
+                       '--memory', '2g', '--cpus', '2', '-v', f'{host_path(folder)}:/project',
+                       '-w', '/project', IMAGE, 'sh', '-c', cmd]
+    try:
+        return runner.run(args, timeout, env=popen_env(os.environ, {}))
+    finally:
+        _docker(['rm', '-f', container], timeout=30)  # killing the client alone does not stop its container

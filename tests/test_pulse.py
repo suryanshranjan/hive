@@ -5,6 +5,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 sys.path.insert(0, os.getcwd())
 home = tempfile.mkdtemp(); os.environ['HOME'] = os.environ['USERPROFILE'] = home; os.environ['HIVE_EMBED'] = '0'
 from hive import assistant, explain, memory, pulse, register, store, telegram
+register.zone = lambda: dt.datetime.now().astimezone().tzinfo
 memory.DIR = os.path.join(home, '.hive', 'rules'); telegram.BUSY = os.path.join(home, '.hive', 'telegram.busy')
 register.PATH = os.path.join(home, '.hive', 'profile.json')
 sys.path.insert(0, os.path.join(os.getcwd(), 'tests'))
@@ -45,7 +46,7 @@ pulse.look(repo)
 check('the first look learns what is already there: no flood of old mail', [e['source'] for e in pulse.pending()].count('mail'), 0)
 INBOX[:] = [msg(2, 'Asha <asha@mehta.example>', 'Refund for the cold lunch?'), msg(3, 'Deals <news@shop.example>', 'Big sale'),
             msg(1, 'Old <o@x.in>', 'An old thread')]
-check('new mail is found, the calendar too', pulse.look(repo) >= 2, True)
+check('new important mail is found; noise is not an event', pulse.look(repo), 1)
 fake = FakeTelegram([])
 n = pulse.tell(ch(fake))
 sent = [m['text'] for m in fake.sent]
@@ -57,7 +58,7 @@ check('a mail alert has Got it, Reply and In an hour', [b['callback_data'].split
       ['inline_keyboard'] for b in row], ['ok', 'reply', 'later'])
 pulse.look(repo); fake2 = FakeTelegram([]); pulse.tell(ch(fake2))
 check('nothing is said twice', fake2.sent, [])
-check('the newsletter waits for the digest, then is seen', (any('Big sale' in t for t in pulse.digest()), pulse.digest()), (True, []))
+check('noise is excluded from the digest', any('Big sale' in t for t in pulse.digest()), False)
 
 # 2. his rules, in his words
 check('"tell me about any mail from Ravi": always at once', pulse.set_from('always tell me about any mail from Ravi'),
@@ -73,7 +74,7 @@ check('a time in quiet hours is quiet, one outside is not',
 print('  ' + pulse.set_from("don't tell me about payments"))
 PAYS[:] = [{'provider': 'stripe', 'id': 'ch_1', 'failed': True, 'amount': 999, 'currency': 'INR', 'name': 'Late', 'email': '',
             'reason': 'card declined', 'paid': False}]
-store.put('pulse_seen:payments', time.time() - 600)
+store.put(pulse._seen_key('payments', repo), time.time() - 600)
 pulse.look(repo)
 check('a muted kind is not watched', [e for e in pulse.pending() if e['source'] == 'payments'], [])
 pulse.set_from('tell me about payments again'); pulse.look(repo)

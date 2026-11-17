@@ -68,7 +68,7 @@ check('...keeping what he gave', (memory.project_name(app), onboard.progress(app
       ('Tiny Notes', 'developer', 1))
 fake = FakeTelegram([tap('onb|skip|2'), tap('onb|skip|3'),
                      say('Next.js and Postgres. Never touch the billing folder. Tests: npm test'), tap('onb|done|4'),
-                     tap('onb|skip|5'), tap('onb|skip|6')])
+                     tap('onb|skip|5'), say('skip')])
 r = assistant.handle(ch(fake), app, 'set me up', poll=1)
 texts = [m['text'] for m in fake.sent]
 check('"set me up" again picks up at the step he stopped at', (r, texts[0]), ('onboard_done', '🐝 Picking up where we left off: step 2 of 6.'))
@@ -81,7 +81,7 @@ check("a developer's wrap-up suggests technical asks", 'add an index on users.em
 from hive import cloud_aws
 shop2 = project('shop2'); moved = []
 fake = FakeTelegram([tap('onb|who|business'), tap('onb|skip|1'), tap('onb|skip|2'), tap('onb|skip|3'), tap('onb|skip|4'),
-                     tap('onb|skip|5'), say('small please')])
+                     tap('onb|skip|5'), say('small please'), tap('act|yes')])
 r = assistant.handle(ch(fake), shop2, 'set me up', poll=1,
                      cloud=lambda repo, on, login=True, size=None: moved.append((on, login, size)) or 0)
 check('"always on, small" in set-up: moved to a t3.small after set-up, his choice kept',

@@ -44,7 +44,7 @@ class FakeTelegram:
                 self.uid += 1
                 if data:
                     out.append({'update_id': self.uid, 'callback_query': {'id': str(self.uid), 'data': data,
-                                'message': {'message_id': reply_to, 'chat': {'id': chat}}}})
+                                'message': {'message_id': next((i for i, m in reversed(list(enumerate(self.sent, 1))) if any(b['callback_data'] == data for row in m.get('reply_markup', {}).get('inline_keyboard', []) for b in row)), reply_to), 'chat': {'id': chat}}}})
                 else:
                     m = {'message_id': 1000 + self.uid, 'chat': {'id': chat}, 'text': text}
                     if reply_to:

@@ -85,7 +85,8 @@ def finish(pasted):
     code = (q.get('code') or [''])[0]
     if not code or not pend:
         return False, "That isn't the address Google sent you to. Say \"connect google\" to start again."
-    if q.get('state') and q['state'][0] != pend.get('state'):
+    if (not q.get('state') or q['state'][0] != pend.get('state') or
+            time.time() - pend.get('at', 0) > 900):
         return False, "That address is from another sign-in. Say \"connect google\" to start again."
     got = _post(TOKEN, {'code': code, 'client_id': d['client_id'], 'client_secret': d['client_secret'],
                         'redirect_uri': REDIRECT, 'grant_type': 'authorization_code', 'code_verifier': pend['verifier']})
@@ -164,9 +165,18 @@ def _plain(part):
 def messages(days=7, unread=False, words=None, n=30):
     """Recent mail, newest first, in mail.py's own shape, so everything that reads his mail works the same."""
     q = f'newer_than:{days}d' + (' is:unread' if unread else '') + (f' {words}' if words else '')
-    got = call('GET', f'{GMAIL}/gmail/v1/users/me/messages', params={'q': q, 'maxResults': n})
+    refs, page = [], None
+    while len(refs) < n:
+        params = {'q': q, 'maxResults': min(100, n - len(refs))}
+        if page: params['pageToken'] = page
+        got = call('GET', f'{GMAIL}/gmail/v1/users/me/messages', params=params)
+        refs.extend(got.get('messages', []))
+        page = got.get('nextPageToken')
+        if not page: break
+    if page:
+        raise GoogleError('Mailbox backlog exceeds the bounded scan; no checkpoint advanced')
     out = []
-    for m in got.get('messages', [])[:n]:
+    for m in refs[:n]:
         full = call('GET', f"{GMAIL}/gmail/v1/users/me/messages/{m['id']}", params={'format': 'full'})
         out.append({'uid': m['id'], 'thread': full.get('threadId', ''), 'from': _header(full, 'From'),
                     'to': _header(full, 'To'), 'subject': _header(full, 'Subject'), 'date': _header(full, 'Date'),
@@ -186,16 +196,18 @@ def action_id(*parts):
 
 def send(to, subject, body, reply_to=None, sender=''):
     """Send one mail from his Gmail, once. Returns (ok, why). A second call with the same mail is not sent again."""
-    aid = action_id('mail', to, subject, body, (reply_to or {}).get('id', ''))
+    from .actions import EXECUTING
+    aid = EXECUTING.get() or action_id('mail', to, subject, body, (reply_to or {}).get('id', ''))
     con = _outbox()
     row = con.execute('SELECT state FROM outbox WHERE action_id=?', (aid,)).fetchone()
     mid = f'<hive-{aid}@hive.local>'
     if row and row[0] == 'sent':
         return True, 'already sent'
     if row and row[0] == 'sending':   # cut off mid-way last time: did it go?
-        found = call('GET', f'{GMAIL}/gmail/v1/users/me/messages', params={'q': f'rfc822msgid:{mid}'})
+        found = call('GET', f'{GMAIL}/gmail/v1/users/me/messages', params={'q': f'in:sent rfc822msgid:{mid}'})
         if found.get('messages'):
             con.execute("UPDATE outbox SET state='sent' WHERE action_id=?", (aid,)); return True, 'already sent'
+        return False, 'Send outcome is still unknown; not repeated'
     con.execute('INSERT OR REPLACE INTO outbox (action_id, kind, target, state, at) VALUES (?,?,?,?,?)',
                 (aid, 'mail', to, 'sending', time.time()))
     m = EmailMessage(); m['To'] = to; m['Subject'] = subject; m['Message-ID'] = mid
@@ -216,8 +228,14 @@ def send(to, subject, body, reply_to=None, sender=''):
         sure = 400 <= e.code < 500 and e.code not in (408, 429)
         con.execute('UPDATE outbox SET state=?, result=? WHERE action_id=?', ('failed' if sure else 'sending', str(e)[:200], aid))
         return False, str(e)
-    con.execute("UPDATE outbox SET state='sent', result=? WHERE action_id=?", (got.get('id', ''), aid))
-    return True, ''
+    if not got.get('id'):
+        return False, 'No provider receipt; outcome unknown'
+    verified = call('GET', f"{GMAIL}/gmail/v1/users/me/messages/{got['id']}", params={'format': 'full'})
+    if (verified.get('id') != got['id'] or _header(verified, 'To').strip().lower() != to.strip().lower() or
+            _header(verified, 'Subject') != subject or _plain(verified.get('payload', {})).strip() != body.strip()):
+        return False, 'Provider readback did not verify the message'
+    con.execute("UPDATE outbox SET state='sent', result=? WHERE action_id=?", (got['id'], aid))
+    return True, got['id']
 
 # ------------------------------------------------------------------------------------------------------- Calendar
 
@@ -225,7 +243,8 @@ def _when(e):
     import datetime as dt
     s = e.get('dateTime') or e.get('date')
     if 'T' in s:
-        return dt.datetime.fromisoformat(s.replace('Z', '+00:00')).astimezone().replace(tzinfo=None), False
+        from . import register
+        return dt.datetime.fromisoformat(s.replace('Z', '+00:00')).astimezone(register.zone()).replace(tzinfo=None), False
     return dt.datetime.fromisoformat(s), True
 
 def events(days=7, back=0):
@@ -246,7 +265,11 @@ def events(days=7, back=0):
 
 def add_event(title, start, end, where='', guests=()):
     """Add an event (after his yes). start/end: datetimes in his time. Once: the same event twice is added once."""
-    aid = action_id('event', title, start.isoformat(), end.isoformat())
+    from . import register
+    if start.tzinfo is None: start = start.replace(tzinfo=register.zone())
+    if end.tzinfo is None: end = end.replace(tzinfo=register.zone())
+    from .actions import EXECUTING
+    aid = EXECUTING.get() or action_id('event', title, start.isoformat(), end.isoformat(), where, sorted(guests))
     con = _outbox()
     row = con.execute('SELECT state FROM outbox WHERE action_id=?', (aid,)).fetchone()
     if row and row[0] == 'sent':
@@ -258,17 +281,35 @@ def add_event(title, start, end, where='', guests=()):
             con.execute("UPDATE outbox SET state='sent' WHERE action_id=?", (aid,)); return True, 'already added'
     con.execute('INSERT OR REPLACE INTO outbox (action_id, kind, target, state, at) VALUES (?,?,?,?,?)',
                 (aid, 'event', title, 'sending', time.time()))
-    body = {'summary': title, 'location': where, 'start': {'dateTime': start.astimezone().isoformat()},
+    body = {'id': aid, 'summary': title, 'location': where, 'start': {'dateTime': start.astimezone().isoformat()},
             'end': {'dateTime': end.astimezone().isoformat()}, 'attendees': [{'email': g} for g in guests],
             'extendedProperties': {'private': {'hive_action': aid}}}
     got = call('POST', f'{API}/calendar/v3/calendars/primary/events', body,
                params={'sendUpdates': 'all' if guests else 'none'}, retry=False)
-    con.execute("UPDATE outbox SET state='sent', result=? WHERE action_id=?", (got.get('id', ''), aid))
-    return True, got.get('htmlLink', '')
+    verified = call('GET', f'{API}/calendar/v3/calendars/primary/events/{aid}')
+    if (verified.get('id') != aid or verified.get('summary') != title or
+            __import__('datetime').datetime.fromisoformat(verified.get('start', {}).get('dateTime', '').replace('Z','+00:00')) != start or
+            __import__('datetime').datetime.fromisoformat(verified.get('end', {}).get('dateTime', '').replace('Z','+00:00')) != end or
+            verified.get('location', '') != where or
+            sorted(g.get('email') for g in verified.get('attendees', [])) != sorted(guests)):
+        return False, 'Calendar readback did not match'
+    con.execute("UPDATE outbox SET state='sent', result=? WHERE action_id=?", (aid, aid))
+    return True, verified.get('htmlLink', '')
 
 def busy(start, end):
     """What is already in that time: [titles]."""
-    return [e['title'] for e in events(days=max(1, (end - start).days + 1)) if e['start'] < end and start < e['end']]
+    from . import register
+    if start.tzinfo is None:
+        start = start.replace(tzinfo=register.zone())
+    if end.tzinfo is None:
+        end = end.replace(tzinfo=register.zone())
+    out = []
+    for e in events(days=max(1, (end - __import__('datetime').datetime.now(register.zone())).days + 1)):
+        a, b = e['start'], e['end']
+        if a.tzinfo is None: a = a.replace(tzinfo=register.zone())
+        if b.tzinfo is None: b = b.replace(tzinfo=register.zone())
+        if a < end and start < b: out.append(e['title'])
+    return out
 
 # ---------------------------------------------------------------------------------------------------------- Drive
 

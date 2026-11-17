@@ -71,7 +71,7 @@ def _when(value, params=''):
     t = dt.datetime.strptime(v.rstrip('Z')[:15], '%Y%m%dT%H%M%S')
     zone = dt.timezone.utc if utc else _zone(params)
     if zone is not None:
-        t = t.replace(tzinfo=zone).astimezone().replace(tzinfo=None)
+        t = t.replace(tzinfo=zone).astimezone(__import__('hive.register', fromlist=['zone']).zone()).replace(tzinfo=None)
     return t, False
 
 DAYS = {'MO': 0, 'TU': 1, 'WE': 2, 'TH': 3, 'FR': 4, 'SA': 5, 'SU': 6}
@@ -172,7 +172,7 @@ def events(repo, days=7, back=0):
     cfg = config(repo)
     if not cfg:
         return None
-    now = dt.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    now = dt.datetime.now(__import__('hive.register', fromlist=['zone']).zone()).replace(tzinfo=None, hour=0, minute=0, second=0, microsecond=0)
     lo, hi = now - dt.timedelta(days=back), now + dt.timedelta(days=days + 1)
     if cfg.get('kind') == 'google':
         from . import google

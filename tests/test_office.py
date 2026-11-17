@@ -171,8 +171,10 @@ r = assistant.handle(ch(fake), repo, 'connect razorpay', poll=1)
 check("Razorpay connects; he's told its keys can't be limited, and that Hive only reads", (r,
       "can't be limited to reading" in fake.sent[-1]['text']), ('pay_connected', True))
 fake = FakeTelegram([])
-r = assistant.handle(ch(fake), repo, 'How much did we make this week?', poll=1)
-check('this week, summed exactly: paid 2500 + 1200 + 3000 = 6700 from 3, 2 failed, 200 refunded, 6500 kept',
+# "the last 7 days", not "this week": this week starts on Monday, so in Monday's first hours payments planted
+# a few hours back fall in last week, and the test failed then (found Nov 16, 01:24)
+r = assistant.handle(ch(fake), repo, 'How much did we make in the last 7 days?', poll=1)
+check('the last 7 days, summed exactly: paid 2500 + 1200 + 3000 = 6700 from 3, 2 failed, 200 refunded, 6500 kept',
       (r, fake.sent[-1]['text']), ('pay_answered', '💳 INR: 6700.00 from 3 successful payments; 2 failed; 200.00 refunded; kept 6500.00'))
 check('Stripe was read page by page, and nothing but reads was ever sent', (sum('starting_after=ch_1' in p for _, p, _ in STUB) >= 1,
       {m for m, _, _ in STUB}), (True, {'GET'}))

@@ -130,7 +130,9 @@ check('bind: nobody writes, nothing bound', telegram.bind_first('111:other', api
 json.dump(saved, open(telegram.PATH, 'w'))
 ch = telegram.Channel(telegram.load(), api=Bot([[msg(4, 888, name='Ravi', text='who are you')],
                                                 [msg(5, 888, name='Ravi', text='hello?'), msg(6, 777, text='status')]]))
-first = ch.updates(timeout=0); second = ch.updates(timeout=0)
+first = []; second = []
+for _ in range(5):
+    first.extend(ch.updates(timeout=0))
 check('after a restart: only his chat is read', [t for t, _, _ in first + second], ['status'])
 check('a stranger: told once that it is someone else\'s', [c for c, _ in ch.api.sent], [888])
 

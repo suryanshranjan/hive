@@ -10,17 +10,39 @@ What it holds, every row with owner_id (one owner today; the column keeps a seco
   profile    how to address him, his time zone, how technical he is, quiet hours (one row per key).
   messages   the whole conversation, not only the last 16 messages, so an old thread can be found again.
 
-The JSON files memory.py has always written (rulings, business notes) stay as they are: builds, the cloud copy and
-`hive cloud pull` keep using them. Every write there is also written here, and anything that reached them another
-way (a cloud copy coming home, an older Hive) is taken in by sync() before a search, so the store never misses a fact.
+SQLite is authoritative. Legacy JSON is imported once; memory.py writes derived compatibility exports.
+Action proposals, extraction jobs, notification claims and received Telegram updates share this durable store.
 
 Plain text on disk, owner-only, as the owner chose (Nov 15): search works, and keys and passwords are never put here
 (they live encrypted in hive/vault.py)."""
 import json, os, re, sqlite3, threading, time
+from contextlib import contextmanager
 
 OWNER = 'owner'
 _LOCK = threading.RLock()
 _CONN = {}
+_TX = threading.local()
+
+
+class _Connection(sqlite3.Connection):
+    """Single statements also respect a transaction held by another thread.
+
+    Pulse and extraction share this connection with the listener. Without the
+    same lock here, an unrelated write could join somebody else's savepoint
+    and disappear when that transaction rolls back.
+    """
+    def execute(self, *args, **kwargs):
+        with _LOCK:
+            return super().execute(*args, **kwargs)
+
+    def executemany(self, *args, **kwargs):
+        with _LOCK:
+            return super().executemany(*args, **kwargs)
+
+    def executescript(self, *args, **kwargs):
+        with _LOCK:
+            return super().executescript(*args, **kwargs)
+
 
 MIGRATIONS = [
     # 1: the first shape
@@ -68,7 +90,73 @@ MIGRATIONS = [
     CREATE TRIGGER IF NOT EXISTS embeddings_au AFTER UPDATE OF text ON facts BEGIN
         DELETE FROM embeddings WHERE fact_id = old.id; END;
     """,
+    """
+    CREATE TABLE actions (
+        id TEXT PRIMARY KEY, tool TEXT NOT NULL, args TEXT NOT NULL, proposal_hash TEXT NOT NULL,
+        owner_id TEXT NOT NULL, chat_id TEXT NOT NULL, origin TEXT NOT NULL, state TEXT NOT NULL,
+        created REAL NOT NULL, expires REAL NOT NULL, message_id INTEGER, receipt TEXT NOT NULL DEFAULT '',
+        project TEXT NOT NULL DEFAULT '', request_key TEXT UNIQUE, account_binding TEXT NOT NULL DEFAULT '');
+    CREATE TABLE action_events (id INTEGER PRIMARY KEY, action_id TEXT NOT NULL REFERENCES actions(id),
+        state TEXT NOT NULL, at REAL NOT NULL);
+    ALTER TABLE facts ADD COLUMN due_at REAL;
+    ALTER TABLE facts ADD COLUMN valid_from REAL;
+    ALTER TABLE facts ADD COLUMN confidence TEXT NOT NULL DEFAULT 'stated';
+    UPDATE facts SET due_at=valid_until, valid_until=NULL WHERE kind='deadline';
+    UPDATE facts SET trust='outside' WHERE source IN ('document','email','web');
+    CREATE TABLE memory_tombstones (owner_id TEXT NOT NULL, project TEXT NOT NULL, norm TEXT NOT NULL,
+        PRIMARY KEY(owner_id,project,norm));
+    CREATE TABLE forgotten_sources (owner_id TEXT NOT NULL, source_ref TEXT NOT NULL,
+        PRIMARY KEY(owner_id,source_ref));
+    CREATE TABLE notifications (event_id INTEGER PRIMARY KEY, state TEXT NOT NULL, updated REAL NOT NULL,
+        receipt TEXT NOT NULL DEFAULT '');
+    CREATE TABLE source_health (source TEXT PRIMARY KEY, checked REAL NOT NULL, ok INTEGER NOT NULL);
+    CREATE TABLE telegram_inbox (chat_id TEXT NOT NULL, update_id INTEGER NOT NULL, payload TEXT NOT NULL,
+        PRIMARY KEY(chat_id,update_id));
+    CREATE TABLE memory_jobs (id INTEGER PRIMARY KEY, repo TEXT NOT NULL, text TEXT NOT NULL, history TEXT NOT NULL,
+        context TEXT NOT NULL, state TEXT NOT NULL DEFAULT 'queued', attempts INTEGER NOT NULL DEFAULT 0,
+        retry_at REAL NOT NULL DEFAULT 0);
+    """,
 ]
+
+
+@contextmanager
+def transaction():
+    """Serialize a connection's transactions; nested callers use savepoints."""
+    with _LOCK:
+        con = connect()
+        outer = getattr(_TX, 'callbacks', None) is None
+        if outer:
+            _TX.callbacks = []
+        start = len(_TX.callbacks)
+        name = 'sp_' + str(time.monotonic_ns())
+        con.execute('SAVEPOINT ' + name)
+        try:
+            yield con
+            con.execute('RELEASE SAVEPOINT ' + name)
+        except BaseException:
+            con.execute('ROLLBACK TO SAVEPOINT ' + name)
+            con.execute('RELEASE SAVEPOINT ' + name)
+            del _TX.callbacks[start:]
+            if outer:
+                del _TX.callbacks
+            raise
+        if outer:
+            callbacks = _TX.callbacks
+            del _TX.callbacks
+            for callback in callbacks:
+                try:
+                    callback()
+                except OSError:
+                    import warnings
+                    warnings.warn('A memory compatibility export failed; SQLite remains authoritative.', RuntimeWarning)
+
+
+def after_commit(callback):
+    callbacks = getattr(_TX, 'callbacks', None)
+    if callbacks is None:
+        return False
+    callbacks.append(callback)
+    return True
 
 def path():
     from . import memory   # beside the rules folder, so whatever moves memory (tests, a cloud copy) moves this too
@@ -86,8 +174,10 @@ def connect():
         if con is not None:
             return con
         os.makedirs(os.path.dirname(p), exist_ok=True)
+        from .vault import private_permissions
+        private_permissions(os.path.dirname(p), directory=True)
         new = not os.path.exists(p)
-        con = sqlite3.connect(p, check_same_thread=False, timeout=30, isolation_level=None)
+        con = sqlite3.connect(p, check_same_thread=False, timeout=30, isolation_level=None, factory=_Connection)
         con.row_factory = sqlite3.Row
         con.execute('PRAGMA journal_mode=WAL'); con.execute('PRAGMA foreign_keys=ON')
         con.execute('PRAGMA secure_delete=ON')   # what he asks Hive to forget is overwritten, not left in free pages
@@ -107,40 +197,81 @@ def close():
         _CONN.clear()
 
 def _migrate(con):
-    con.execute('CREATE TABLE IF NOT EXISTS schema_version (v INTEGER NOT NULL)')
-    row = con.execute('SELECT v FROM schema_version').fetchone()
-    v = row[0] if row else 0
-    if not row:
-        con.execute('INSERT INTO schema_version (v) VALUES (0)')
-    for n, sql in enumerate(MIGRATIONS, 1):
-        if n > v:
-            con.executescript('BEGIN;' + sql + f'UPDATE schema_version SET v = {n}; COMMIT;')
+    # Two independently started listeners/Pulse processes must not race migrations.
+    con.execute('BEGIN IMMEDIATE')
+    try:
+        con.execute('CREATE TABLE IF NOT EXISTS schema_version (v INTEGER NOT NULL)')
+        row = con.execute('SELECT max(v) FROM schema_version').fetchone()
+        version = (row[0] if row else 0) or 0
+        con.execute('DELETE FROM schema_version')
+        con.execute('INSERT INTO schema_version VALUES(?)', (version,))
+        for n, sql in enumerate(MIGRATIONS, 1):
+            if n > version:
+                statement = ''
+                for line in sql.splitlines(keepends=True):
+                    statement += line
+                    if sqlite3.complete_statement(statement):
+                        con.execute(statement)
+                        statement = ''
+                if statement.strip():
+                    raise ValueError('Incomplete migration')
+                con.execute('UPDATE schema_version SET v=?', (n,))
+        con.commit()
+    except BaseException:
+        con.rollback()
+        raise
 
 def version():
     return connect().execute('SELECT v FROM schema_version').fetchone()[0]
 
+def fingerprint(con=None):
+    """Logical snapshot identity for conservative single-owner handoffs."""
+    import hashlib
+    con = con or connect()
+    digest = hashlib.sha256()
+    with _LOCK:
+        tables = con.execute("SELECT name,sql FROM sqlite_master WHERE type='table' "
+                             "AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '%_fts%' ORDER BY name").fetchall()
+        for name, schema in tables:
+            digest.update(repr((name, schema)).encode())
+            quoted = '"' + name.replace('"', '""') + '"'
+            for row in con.execute('SELECT * FROM ' + quoted + ' ORDER BY rowid'):
+                digest.update(repr(tuple(row)).encode('utf-8'))
+    return digest.hexdigest()
+
 # ---------------------------------------------------------------------------------------------------------------- facts
 
 def add_fact(text, kind='note', project='', source='chat', source_ref='', trust='owner', person=None, valid_until=None,
-             extra=None, when=None, owner=OWNER):
+             extra=None, when=None, owner=OWNER, due_at=None, valid_from=None):
     """Keep one fact (or bring a forgotten or replaced one back if he says it again). Returns its id."""
     text = ' '.join((text or '').split())
     if not text:
         return None
+    if source_ref and connect().execute('SELECT 1 FROM forgotten_sources WHERE owner_id=? AND source_ref=?',
+                                       (owner, str(source_ref))).fetchone():
+        return None
     pid = person_id(person, owner) if person else None
     con = connect(); n = norm(text); now = when or time.time()
+    if kind == 'deadline' and due_at is None:
+        due_at, valid_until = valid_until, None
     with _LOCK:
         row = con.execute('SELECT id FROM facts WHERE owner_id=? AND project=? AND kind=? AND norm=?',
                           (owner, project, kind, n)).fetchone()
+        if row and when is None:
+            con.execute('DELETE FROM memory_tombstones WHERE owner_id=? AND project=? AND norm=?', (owner, project, n))
         if row:   # said again: it holds again, and is the newest
             con.execute('UPDATE facts SET deleted_at=NULL, superseded_by=NULL, created=?, '
-                        'person_id=COALESCE(?, person_id) WHERE id=?',
-                        (now if when is None else created_of(row[0]), pid, row[0]))
+                        'person_id=COALESCE(?, person_id), valid_until=?, due_at=? WHERE id=?',
+                        (now if when is None else created_of(row[0]), pid, valid_until, due_at, row[0]))
+            if trust == 'owner':
+                con.execute('UPDATE facts SET source=?,source_ref=?,trust=?,valid_from=? WHERE id=?',
+                            (source, source_ref, trust, valid_from, row[0]))
             return row[0]
         cur = con.execute('INSERT INTO facts (owner_id, project, kind, text, norm, person_id, source, source_ref, trust, '
                           'created, valid_until, extra) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
                           (owner, project, kind, text, n, pid, source, source_ref[:200], trust, now, valid_until,
                            json.dumps(extra or {}, ensure_ascii=False)))
+        con.execute('UPDATE facts SET due_at=?,valid_from=? WHERE id=?', (due_at, valid_from, cur.lastrowid))
         return cur.lastrowid
 
 def created_of(fid):
@@ -161,12 +292,24 @@ def supersede(old_id, new_id):
     connect().execute('UPDATE facts SET superseded_by=? WHERE id=? AND id<>?', (new_id, old_id, new_id))
 
 def forget(fact_id, purge=False):
-    """He asked Hive to forget it: hidden at once; with purge, gone from the file too."""
-    con = connect()
-    if purge:
-        con.execute('DELETE FROM facts WHERE id=?', (fact_id,))
-    else:
-        con.execute('UPDATE facts SET deleted_at=? WHERE id=?', (time.time(), fact_id))
+    """Remove retrieval sources and retain a tombstone against legacy resurrection."""
+    with transaction() as con:
+        row = con.execute('SELECT * FROM facts WHERE id=?', (fact_id,)).fetchone()
+        if not row:
+            return
+        con.execute('INSERT OR IGNORE INTO memory_tombstones VALUES(?,?,?)',
+                    (row['owner_id'], row['project'], row['norm']))
+        if row['source_ref']:
+            con.execute('INSERT OR IGNORE INTO forgotten_sources VALUES(?,?)', (row['owner_id'], row['source_ref']))
+            con.execute("DELETE FROM memory_jobs WHERE json_extract(context,'$.source_ref')=?", (row['source_ref'],))
+        con.execute('DELETE FROM messages WHERE owner_id=? AND (instr(lower(text),lower(?))>0 OR id=?)',
+                    (row['owner_id'], row['text'], row['source_ref'] if str(row['source_ref']).isdigit() else -1))
+        con.execute('DELETE FROM embeddings WHERE fact_id=?', (fact_id,))
+        con.execute('DELETE FROM memory_jobs WHERE instr(lower(text),lower(?))>0 OR instr(history,?)>0', (row['text'], row['text']))
+        if purge:
+            con.execute('DELETE FROM facts WHERE id=?', (fact_id,))
+        else:
+            con.execute('UPDATE facts SET deleted_at=? WHERE id=?', (time.time(), fact_id))
 
 def purge_forgotten(older_than_days=7):
     """Forgotten facts are kept a week (so "undo" can bring one back), then removed from the file."""
@@ -181,8 +324,8 @@ def purge_forgotten(older_than_days=7):
 def live_facts(project=None, kinds=None, owner=OWNER, limit=None):
     """Facts that hold now: not forgotten, not replaced, not past their date. Newest last."""
     q = ('SELECT * FROM facts WHERE owner_id=? AND deleted_at IS NULL AND superseded_by IS NULL '
-         'AND (valid_until IS NULL OR valid_until > ?)')
-    args = [owner, time.time()]
+         'AND (valid_until IS NULL OR valid_until > ?) AND (valid_from IS NULL OR valid_from <= ?)')
+    args = [owner, time.time(), time.time()]
     if project is not None:
         q += " AND project IN (?, '')"; args.append(project)
     if kinds:
@@ -204,8 +347,8 @@ def search(text, project=None, k=12, owner=OWNER, include_forgotten=False):
     if not q:
         return []
     cond = '' if include_forgotten else ('AND f.deleted_at IS NULL AND f.superseded_by IS NULL '
-                                          'AND (f.valid_until IS NULL OR f.valid_until > ?)')
-    args = [q, owner] + ([] if include_forgotten else [time.time()])
+                                          'AND (f.valid_until IS NULL OR f.valid_until > ?) AND (f.valid_from IS NULL OR f.valid_from <= ?)')
+    args = [q, owner] + ([] if include_forgotten else [time.time(), time.time()])
     if project is not None:
         cond += " AND f.project IN (?, '')"; args.append(project)
     try:
@@ -274,16 +417,20 @@ def person(name, owner=OWNER):
                             (owner, n, f'%"{n}"%')).fetchone()
     return dict(row) if row else None
 
-def facts_about(pid, owner=OWNER):
-    return [dict(r) for r in connect().execute(
-        'SELECT * FROM facts WHERE owner_id=? AND person_id=? AND deleted_at IS NULL AND superseded_by IS NULL '
-        'ORDER BY created', (owner, pid)).fetchall()]
+def facts_about(pid, owner=OWNER, project=None):
+    return [f for f in live_facts(project, owner=owner) if f['person_id'] == pid]
+
 
 def forget_person(pid):
-    """Forget someone, and everything kept about them."""
-    con = connect(); now = time.time()
-    con.execute('UPDATE people SET deleted_at=? WHERE id=?', (now, pid))
-    con.execute('UPDATE facts SET deleted_at=? WHERE person_id=? AND deleted_at IS NULL', (now, pid))
+    with transaction() as con:
+        for row in con.execute('SELECT id FROM facts WHERE person_id=?', (pid,)).fetchall():
+            forget(row[0])
+        person = con.execute('SELECT name FROM people WHERE id=?', (pid,)).fetchone()
+        if person:
+            con.execute('DELETE FROM memory_jobs WHERE instr(lower(text),lower(?))>0 OR instr(lower(history),lower(?))>0', (person[0],person[0]))
+            con.execute('DELETE FROM messages WHERE instr(lower(text),lower(?))>0', (person[0],))
+        con.execute("UPDATE people SET deleted_at=?,relation='',org='',contact='',aliases='[]' WHERE id=?",
+                    (time.time(), pid))
 
 # -------------------------------------------------------------------------------------------------------------- profile
 
@@ -301,8 +448,8 @@ def put(key, value, owner=OWNER):
 def log_message(who, text, channel='telegram', at=None, owner=OWNER):
     text = (text or '').strip()
     if text:
-        connect().execute('INSERT INTO messages (owner_id, channel, who, text, at) VALUES (?,?,?,?,?)',
-                          (owner, channel, who, text[:4000], at or time.time()))
+        return connect().execute('INSERT INTO messages (owner_id, channel, who, text, at) VALUES (?,?,?,?,?)',
+                          (owner, channel, who, text[:4000], at or time.time())).lastrowid
 
 def search_messages(text, k=6, owner=OWNER):
     q = _fts_query(text)
@@ -340,15 +487,17 @@ def sync(repo):
             continue
         con = connect()
         row = con.execute('SELECT mtime FROM synced WHERE path=?', (p,)).fetchone()
-        if row and row[0] >= mtime:
+        if row:  # legacy import is one-time; compatibility exports are never reimported
             continue
         try:
-            items = json.load(open(p, encoding='utf-8'))
+            with open(p, encoding='utf-8') as fh:
+                items = json.load(fh)
         except (OSError, ValueError):
             continue
         for it in items if isinstance(items, list) else []:
             text = it if isinstance(it, str) else (it or {}).get('text', '')
-            if text and not find_fact(text, None if kind == 'note' else kind, project):   # a note may be kept as a
+            if text and not con.execute('SELECT 1 FROM memory_tombstones WHERE owner_id=? AND project=? AND norm=?',
+                                       (OWNER, project, norm(text))).fetchone() and not find_fact(text, None if kind == 'note' else kind, project):   # a note may be kept as a
                 # person, preference or deadline fact (Gate 118: imported again as a plain note, it showed twice)
                 when = None
                 if isinstance(it, dict) and it.get('when'):
@@ -405,39 +554,18 @@ def cli(repo, action=None, arg=None):
 
 TIDY_DAYS = 7
 
-def _key_words(text):
-    stop = {'the', 'a', 'an', 'is', 'are', 'our', 'his', 'her', 'he', 'we', 'it', 'of', 'to', 'in', 'on', 'for', 'and',
-            'at', 'by', 'with', 'from', 'business', 'has', 'have', 'was', 'be', 'that', 'this'}
-    return frozenset(w for w in re.findall(r'\w+', (text or '').lower()) if w not in stop)
-
 def tidy(project, owner=OWNER, close=0.95):
-    """Fold near-duplicate facts into the newest one (the same fact said twice in other words: "Rice comes from
-    Annapurna Mills every Thursday." and "Rice comes from Annapurna Mills on Thursdays."). The older is kept for the
-    record, marked as replaced, so recall shows one. Same words, or meaning at least `close` when the embedding model
-    is loaded. Rules are left alone. Returns how many were folded."""
+    """Fold exact duplicates only. Different wording or word order is not proof of equivalence.
+
+    `close` is retained for callers of the earlier API; semantic merging is disabled.
+    """
     facts = [f for f in live_facts(project, owner=owner) if f['kind'] != 'rule']
-    folded = 0
-    by_words = {}
-    for f in sorted(facts, key=lambda f: f['created']):   # oldest first: a later twin replaces it
-        k = (f['kind'], f.get('person_id'), _key_words(f['text']))
-        if k in by_words:
-            supersede(by_words[k]['id'], f['id']); folded += 1
-        by_words[k] = f
-    from . import embed
-    if embed.available() and embed.ready():
-        live = [f for f in live_facts(project, owner=owner) if f['kind'] != 'rule']
-        if len(live) > 1:
-            import numpy as np
-            vecs = embed.vectors([f['text'] for f in live]); m = np.stack(vecs); sims = m @ m.T
-            gone = set()
-            order = sorted(range(len(live)), key=lambda i: live[i]['created'])
-            for a_i, a in enumerate(order):
-                for b in order[a_i + 1:]:
-                    if a in gone:
-                        break
-                    if (sims[a, b] >= close and live[a]['kind'] == live[b]['kind'] and
-                            re.findall(r'\d+', live[a]['text']) == re.findall(r'\d+', live[b]['text'])):
-                        supersede(live[a]['id'], live[b]['id']); gone.add(a); folded += 1
+    folded, exact = 0, {}
+    for f in facts:
+        key = (f['project'], f['kind'], f['trust'], f['person_id'], f['norm'], f['due_at'])
+        if key in exact:
+            supersede(exact[key], f['id']); folded += 1
+        exact[key] = f['id']
     put(f'tidied:{project}', time.time(), owner)
     return folded
 

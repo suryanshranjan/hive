@@ -56,7 +56,7 @@ def recall(repo, text, k=K):
             if sim >= best - 0.08 and sim >= 0.5:
                 add(f, 2.0 * sim / best + (0.2 if f['trust'] == 'owner' else 0))
     for p in _named_people(text):
-        for f in store.facts_about(p['id'])[-6:]:
+        for f in store.facts_about(p['id'], project=project)[-6:]:
             add(f, 1.5)
     for f in store.live_facts(project, kinds=('note', 'preference', 'deadline', 'person'), limit=RECENT):
         add(f, 0.5)
@@ -70,7 +70,9 @@ def render(facts):
     outside = [f for f in facts if f.get('trust') == 'outside']
     lines = []
     for f in own:
-        until = f" (until {time.strftime('%d %b', time.localtime(f['valid_until']))})" if f.get('valid_until') else ''
+        from . import register
+        date = f.get('due_at') or f.get('valid_until')
+        until = f" ({'due' if f.get('due_at') else 'until'} {time.strftime('%d %b', register.his_time(date))})" if date else ''
         lines.append(f"- {f['text']}{until}")
     if outside:
         lines.append(untrusted('\n'.join(f"- {f['text']} (from {f.get('source') or 'outside'})" for f in outside),

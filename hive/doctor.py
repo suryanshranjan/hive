@@ -55,15 +55,15 @@ def checks(repo='.', claude_probe=True):
                     "Add tests (Node's built-in test runner or pytest), or tell Hive the command when it asks."))
     from . import sandbox
     boxed = os.path.exists('/.dockerenv') or (sandbox.mode() != 'off' and sandbox.running())
-    out.append((boxed, False, "builders work in a sandbox (they never see your keys or other files)",
-                'Optional: install Docker (Docker Desktop on Windows and macOS) and keep it running; Hive then puts each '
-                'builder in a container by itself.'))
+    out.append((boxed, False, 'an isolated runner is available for project execution',
+                'Install Docker and keep it running before running builders, project tests or previews. '
+                'Personal assistance remains available without project execution.'))
     out.append((bool(telegram.load()), False, "the owner's phone is connected (Telegram)",
                 'Optional: hive telegram setup, so questions and reviews reach your phone.'))
     from . import vault
     w, plain = vault.status()
-    out.append((w != 'plain' and not plain, False, 'your keys and passwords are encrypted on disk',
-                'Optional: pip install "hive-swarm[secure]", then hive secrets migrate.' if w == 'plain' else
+    out.append((w != 'plain' and not plain, w == 'plain', 'your keys and passwords are encrypted on disk',
+                'Install the required cryptography dependency, then run hive secrets migrate.' if w == 'plain' else
                 'Run hive secrets migrate (some files are still in plain text).'))
     from . import voice
     out.append((voice.available(), False, 'voice notes (answer Hive by talking on Telegram)',

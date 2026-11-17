@@ -19,8 +19,12 @@ p = os.path.join(hive, 'mail', 'p1.json')
 
 if vault._fernet_cls() is None:
     print('skip the encrypted checks: the cryptography package is not installed (pip install "hive-swarm[secure]")')
-    vault.save_json(p, secret)
-    check('without cryptography: plain JSON, as before', json.load(open(p)), secret)
+    try:
+        vault.save_json(p, secret)
+        refused = False
+    except vault.Locked:
+        refused = True
+    check('without cryptography: secret storage fails closed', (refused, os.path.exists(p)), (True, False))
     check('without cryptography: said plainly', vault.where(), 'plain')
     sys.exit(fail)
 
@@ -77,7 +81,7 @@ check('keychain: the key is kept per Hive home, under "hive"', [s for s, _ in st
 # 6. HIVE_VAULT=plain (a test or a machine that wants it): plain files
 os.environ['HIVE_VAULT'] = 'plain'
 q = os.path.join(hive, 'plain.json'); vault.save_json(q, {'a': 1})
-check('HIVE_VAULT=plain writes plain JSON', json.load(open(q)), {'a': 1})
+check('HIVE_VAULT=plain cannot downgrade encryption', vault.sealed(json.load(open(q))), True)
 os.environ.pop('HIVE_VAULT')
 
 # 7. owner-only file mode where the system has one
