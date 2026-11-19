@@ -10,19 +10,26 @@ Keep `hive listen` running and send:
 
 ```text
 agent: Find Asha's latest email. If the first search misses, try the subject "catering". Draft and send a reply confirming Thursday.
+chat: Explain what you're waiting for.
 tasks
 task <id>
 resume task <id>
 answer task <id>: North region
+pause task <id>
 cancel task <id>
+verify task <id>
+resolve task <id> complete
+resolve task <id> incomplete
 ```
 
 The exact recipient and message still require your approval. A task can ask for missing
 information and save the answer across restarts. The initial conversation context and
 request time are preserved so follow-ups and relative dates remain grounded after resume.
-`cancel task` applies to tasks that are
-not currently executing; earlier actions are not undone. An action still marked executing
-must first be recovered or checked.
+The listener acknowledges requests with a task ID. Use Telegram's Reply gesture on the
+specific question to answer a legacy prompt. Ordinary messages enter the queue as new
+requests. Two workers can execute across projects, with one active worker per project.
+Adaptive questions and approvals release the worker. The listener must remain running
+while a separate build or review uses Telegram.
 
 `agent:` works with the default router. To route ordinary assistant requests through the
 loop, set `HIVE_ROUTER=adaptive` before starting the listener. Explicit builds, business
@@ -32,6 +39,27 @@ goals, status, stop, account connection and shipping retain their existing flows
 The initial native tools are email search/send, calendar read/create and memory search.
 The loop can also use the browser and configured MCP tools. It does not invent missing
 capabilities or execute arbitrary host shell commands. Software builds use the build flow.
+
+### Completion and controls
+
+Pause and cancellation take effect at the next safe boundary. Inspect an in-flight
+action with `task <id>`. A lost response leaves the outcome open. Read-only verification
+and owner resolution never submit the original action. Owner assessments are recorded
+as `owner_confirmed` or `owner_reported_incomplete`. Old successful tasks retain their
+historical status.
+
+Use `agent: output: Draft a two-sentence invitation` for a text artifact. This criterion
+disables mutations and requires the model to produce the artifact. For an exact Gmail
+submission use `agent: send email: {"to":"owner@example.invalid","subject":"Pilot","body":"Hello"}`.
+For an exact Calendar change use `agent: create event:` followed by a JSON object with
+`title`, offset-aware `start` and `end`, `where`, and `guests`. Each change still needs a
+fresh owner approval. A provider readback must match the saved fields. SMTP supplies
+evidence of submission only. Delivery to a person's inbox requires separate evidence.
+
+For free-form instructions Hive retains the entire request. A partial receipt, a browser
+click, a connector response, or a model's completion proposal leaves the full outcome in
+`waiting_verification` when Hive cannot check all of it. The task detail reports the
+waiting reason, step outcomes, evidence type and reported model spend.
 
 Tasks default to 12 tool steps, a $2 reported model-cost budget and a 10-minute limit
 checked between operations. The Python API accepts up to 40 steps. Cost accounting uses

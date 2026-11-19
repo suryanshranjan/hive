@@ -9,6 +9,10 @@ CREATE = re.compile(r'^every\s+(\d+)\s+(minutes?|hours?|days?)\s*:\s*(.+)$', re.
 CONTROL = re.compile(r'^(pause|enable|run) routine ([0-9a-f]{12})$', re.I)
 
 
+def is_command(text):
+    return bool(CREATE.fullmatch(text) or CONTROL.fullmatch(text) or text.lower() == 'routines')
+
+
 def create(ch, repo, instruction, interval, now=None):
     tools.allow('routine_set')
     scope = tasks._scope(ch, repo)
@@ -62,7 +66,7 @@ def command(ch, repo, text):
         ch.send(str(exc)); return 'refused'
 
 
-def tick(ch, repo, now=None):
+def tick(ch, repo, now=None, enqueue=False):
     """Coalesce missed intervals. Persist the task and next run in one transaction."""
     from . import agent
     now = time.time() if now is None else now
@@ -76,7 +80,7 @@ def tick(ch, repo, now=None):
             return []
         routine = dict(row)
         previous = tasks.get(routine['task_id'], ch, repo) if routine['task_id'] else None
-        if previous and previous['state'] not in ('succeeded', 'cancelled', 'queued'):
+        if previous and previous['state'] not in ('succeeded', 'cancelled', 'owner_confirmed', 'owner_reported_incomplete', 'queued'):
             con.execute('UPDATE routines SET next_run=?,detail=? WHERE id=?',
                         (now + routine['interval_seconds'], 'Waiting for the previous task: ' + previous['id'], routine['id']))
             return []
@@ -91,6 +95,10 @@ def tick(ch, repo, now=None):
             policy.CURRENT.reset(token)
         con.execute('UPDATE routines SET task_id=?,next_run=?,detail=? WHERE id=?',
                     (task['id'], now + routine['interval_seconds'], 'Task queued.', routine['id']))
+        if enqueue:
+            from . import dispatcher
+            dispatcher.enqueue(task, context)
+            return [task['id']]
     token = policy.CURRENT.set(context)
     try:
         agent.run(ch, repo, task['id'])

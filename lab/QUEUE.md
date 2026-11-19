@@ -4,6 +4,11 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 
 ## Current implementation handoff (Nov 17 2026)
 
+**November 19 follow-up.** Migration 6 adds durable listener work, task controls, bound replies and
+verification evidence. Controlled dispatcher journeys run with `python -B tests/test_dispatcher.py`.
+Google and Telegram are unconfigured on this host. The dedicated-account pilot awaits configuration
+and publication of its prediction card. Adaptive routing remains opt-in.
+
 - **Publication:** owner requested committing and pushing the runtime changes. README now
   leads with the phone workflow and includes adaptive/MCP/browser/routine setup, saved-task
   controls, local verification results and remaining live-account limits. Local documentation

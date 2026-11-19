@@ -85,9 +85,15 @@ def spend(dollars, step=None):
                      if os.path.basename(f.filename) != 'explain.py'), 'unknown')
     SPENT[0] += d
     SPENT_BY[step] = round(SPENT_BY.get(step, 0.0) + d, 6)
+    from . import tasks, store
+    tid = tasks.ACTIVE_TASK.get()
+    if tid and d > 0:
+        store.connect().execute('UPDATE tasks SET reported_spend=reported_spend+? WHERE id=?', (d, tid))
 _CLAUDE_DOWN = [0.0]   # when Claude last failed: skip it for a while instead of waiting on it for every message
 
 def _ask_claude(prompt):
+    from . import tasks
+    tasks.boundary()
     import time
     if time.time() - _CLAUDE_DOWN[0] < 600:
         raise RuntimeError('claude failed recently; using the backup')
@@ -205,6 +211,8 @@ def _ask_api(prompt):
     """One JSON question straight to the fast model; None when none is set up (the next way is tried)."""
     if not fast_on():
         return None
+    from . import tasks
+    tasks.boundary()
     cfg = fast_cfg()
     try:
         if cfg['provider'] == 'anthropic':
@@ -242,6 +250,8 @@ def partial_field(text, field='reply'):
 def stream_json(prompt, on_field, field='reply'):
     """Ask in JSON from the fast model, calling on_field(text so far) as the chosen field is written. The full reply,
     or None when no fast model is set up or it failed (the caller then asks the usual way)."""
+    from . import tasks
+    tasks.boundary()
     if not fast_on():
         return None
     cfg = fast_cfg()
@@ -329,6 +339,8 @@ def setup_api(say=print, ask=input, getpass_=None):
     return 0
 
 def _ask_backup(prompt):
+    from . import tasks
+    tasks.boundary()
     """Any OpenAI-compatible endpoint the owner configured (for example NVIDIA NIM), used only when Claude fails."""
     if not os.path.exists(BACKUP):
         return None
@@ -541,6 +553,8 @@ def ask_small(prompt):
 def ask_json(prompt):
     """One question to a model that answers in JSON: the API (with a key), Claude Code, then the backup; None if none answers."""
     for ask in (_ask_api, _ask_claude, _ask_backup):
+        from . import tasks
+        tasks.boundary()
         try:
             reply = ask(prompt)
             if reply is not None:

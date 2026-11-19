@@ -194,6 +194,41 @@ def _outbox():
 def action_id(*parts):
     return hashlib.sha256('\x1f'.join(str(p) for p in parts).encode()).hexdigest()[:24]
 
+
+def readback(aid, tool, args, message_id=None):
+    """Read only. Bind observed identity and all approved fields before issuing a receipt."""
+    if tool == 'mail_send':
+        marker = f'<hive-{aid}@hive.local>'
+        path = f'{GMAIL}/gmail/v1/users/me/messages'
+        if not message_id:
+            matches = call('GET', path, params={'q': f'in:sent rfc822msgid:{marker}'})
+            if len(matches.get('messages', ())) != 1 or matches.get('nextPageToken'):
+                return ''
+            message_id = matches['messages'][0]['id']
+        msg = call('GET', f'{path}/{message_id}', params={'format': 'full'})
+        body = args['body'].replace('\r\n', '\n')
+        reply = args.get('reply_to') or {}
+        if (msg.get('id') == message_id and 'SENT' in msg.get('labelIds', []) and
+                _header(msg, 'Message-ID') == marker and _header(msg, 'To') == args['to'] and
+                not _header(msg, 'Cc') and not _header(msg, 'Bcc') and
+                _header(msg, 'Subject') == args['subject'] and
+                _header(msg, 'In-Reply-To') == reply.get('id', '') and
+                (not reply.get('thread') or msg.get('threadId') == reply['thread']) and
+                _plain(msg.get('payload', {})).replace('\r\n', '\n') == body + ('' if body.endswith('\n') else '\n')):
+            return message_id
+    elif tool == 'add_event':
+        import datetime as dt
+        found = call('GET', f'{API}/calendar/v3/calendars/primary/events/{aid}')
+        def instant(s):
+            return dt.datetime.fromisoformat(s.replace('Z', '+00:00'))
+        if (found.get('id') == aid and found.get('status') != 'cancelled' and
+                found.get('extendedProperties', {}).get('private', {}).get('hive_action') == aid and
+                found.get('summary') == args['title'] and found.get('location', '') == args['where'] and
+                sorted(g.get('email', '') for g in found.get('attendees', [])) == sorted(args['guests']) and
+                all(instant(found[k]['dateTime']) == instant(args[k]) for k in ('start', 'end'))):
+            return aid
+    return ''
+
 def send(to, subject, body, reply_to=None, sender=''):
     """Send one mail from his Gmail, once. Returns (ok, why). A second call with the same mail is not sent again."""
     from .actions import EXECUTING
@@ -201,12 +236,14 @@ def send(to, subject, body, reply_to=None, sender=''):
     con = _outbox()
     row = con.execute('SELECT state FROM outbox WHERE action_id=?', (aid,)).fetchone()
     mid = f'<hive-{aid}@hive.local>'
+    approved = dict(to=to, subject=subject, body=body, reply_to=reply_to)
     if row and row[0] == 'sent':
         return True, 'already sent'
     if row and row[0] == 'sending':   # cut off mid-way last time: did it go?
-        found = call('GET', f'{GMAIL}/gmail/v1/users/me/messages', params={'q': f'in:sent rfc822msgid:{mid}'})
-        if found.get('messages'):
-            con.execute("UPDATE outbox SET state='sent' WHERE action_id=?", (aid,)); return True, 'already sent'
+        receipt = readback(aid, 'mail_send', approved)
+        if receipt:
+            con.execute("UPDATE outbox SET state='sent',result=? WHERE action_id=?", (receipt, aid))
+            return True, 'already sent'
         return False, 'Send outcome is still unknown; not repeated'
     con.execute('INSERT OR REPLACE INTO outbox (action_id, kind, target, state, at) VALUES (?,?,?,?,?)',
                 (aid, 'mail', to, 'sending', time.time()))
@@ -230,9 +267,7 @@ def send(to, subject, body, reply_to=None, sender=''):
         return False, str(e)
     if not got.get('id'):
         return False, 'No provider receipt; outcome unknown'
-    verified = call('GET', f"{GMAIL}/gmail/v1/users/me/messages/{got['id']}", params={'format': 'full'})
-    if (verified.get('id') != got['id'] or _header(verified, 'To').strip().lower() != to.strip().lower() or
-            _header(verified, 'Subject') != subject or _plain(verified.get('payload', {})).strip() != body.strip()):
+    if not readback(aid, 'mail_send', approved, got['id']):
         return False, 'Provider readback did not verify the message'
     con.execute("UPDATE outbox SET state='sent', result=? WHERE action_id=?", (got['id'], aid))
     return True, got['id']
@@ -270,15 +305,16 @@ def add_event(title, start, end, where='', guests=()):
     if end.tzinfo is None: end = end.replace(tzinfo=register.zone())
     from .actions import EXECUTING
     aid = EXECUTING.get() or action_id('event', title, start.isoformat(), end.isoformat(), where, sorted(guests))
+    approved = dict(title=title, where=where, guests=guests, start=start.isoformat(), end=end.isoformat())
     con = _outbox()
     row = con.execute('SELECT state FROM outbox WHERE action_id=?', (aid,)).fetchone()
     if row and row[0] == 'sent':
         return True, 'already added'
     if row and row[0] == 'sending':   # cut off mid-way last time: is it there already?
-        found = call('GET', f'{API}/calendar/v3/calendars/primary/events',
-                     params={'privateExtendedProperty': f'hive_action={aid}'})
-        if found.get('items'):
-            con.execute("UPDATE outbox SET state='sent' WHERE action_id=?", (aid,)); return True, 'already added'
+        if readback(aid, 'add_event', approved):
+            con.execute("UPDATE outbox SET state='sent',result=? WHERE action_id=?", (aid, aid))
+            return True, 'already added'
+        return False, 'Calendar outcome is still unknown'
     con.execute('INSERT OR REPLACE INTO outbox (action_id, kind, target, state, at) VALUES (?,?,?,?,?)',
                 (aid, 'event', title, 'sending', time.time()))
     body = {'id': aid, 'summary': title, 'location': where, 'start': {'dateTime': start.astimezone().isoformat()},
@@ -286,15 +322,10 @@ def add_event(title, start, end, where='', guests=()):
             'extendedProperties': {'private': {'hive_action': aid}}}
     got = call('POST', f'{API}/calendar/v3/calendars/primary/events', body,
                params={'sendUpdates': 'all' if guests else 'none'}, retry=False)
-    verified = call('GET', f'{API}/calendar/v3/calendars/primary/events/{aid}')
-    if (verified.get('id') != aid or verified.get('summary') != title or
-            __import__('datetime').datetime.fromisoformat(verified.get('start', {}).get('dateTime', '').replace('Z','+00:00')) != start or
-            __import__('datetime').datetime.fromisoformat(verified.get('end', {}).get('dateTime', '').replace('Z','+00:00')) != end or
-            verified.get('location', '') != where or
-            sorted(g.get('email') for g in verified.get('attendees', [])) != sorted(guests)):
+    if not readback(aid, 'add_event', approved):
         return False, 'Calendar readback did not match'
     con.execute("UPDATE outbox SET state='sent', result=? WHERE action_id=?", (aid, aid))
-    return True, verified.get('htmlLink', '')
+    return True, got.get('htmlLink') or aid
 
 def busy(start, end):
     """What is already in that time: [titles]."""

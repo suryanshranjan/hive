@@ -9,7 +9,7 @@ import re
 import subprocess
 import sys
 
-SUITES = ('reliability', 'tasks', 'adaptive', 'connectors', 'store', 'memory2', 'tools', 'office', 'router', 'pulse', 'brief', 'telegram',
+SUITES = ('reliability', 'tasks', 'adaptive', 'dispatcher', 'connectors', 'store', 'memory2', 'tools', 'office', 'router', 'pulse', 'brief', 'telegram',
           'google', 'calendar', 'sandbox_unit', 'ship', 'deploy', 'audit', 'runlimit', 'vault', 'render',
           'register', 'plan')
 EXTRA = ('assistant', 'explain', 'law', 'cli', 'team', 'visual', 'complaint', 'gaps', 'access', 'onboard',

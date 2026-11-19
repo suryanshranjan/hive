@@ -414,7 +414,7 @@ class OldTap(FakeTelegram):
         if method == 'answerCallbackQuery':
             raise RuntimeError('Telegram answerCallbackQuery: Bad Request: query is too old')
         return super().__call__(method, **p)
-fake = OldTap([tap('cld|yes'), say('hi'), say('status')])
+fake = OldTap([tap('cld|yes'), say('fixture request'), say('status')])
 calls = iter([RuntimeError('boom'), None, None])
 _handle = assistant.handle
 def flaky_handle(*a, **k):
@@ -423,7 +423,8 @@ def flaky_handle(*a, **k):
         raise e
     return _handle(*a, **k)
 assistant.handle = flaky_handle
-assistant.listen(repo, poll=1, until=lambda: not fake.script, ch=telegram.Channel({'chat_id': ME, 'token': 'x', 'address': 'sir'}, api=fake, listener=True))
+assistant.listen(repo, poll=1, until=lambda: not fake.script and any('its recorded outcome' in m['text'] for m in fake.sent),
+                 ch=telegram.Channel({'chat_id': ME, 'token': 'x', 'address': 'sir'}, api=fake, listener=True))
 assistant.handle = _handle
 other = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)'])   # another listener, still running
 open(assistant.PIDFILE, 'w').write(str(other.pid))
@@ -433,7 +434,7 @@ check('a second listener refuses to start while one is running (live: two answer
 other.kill(); other.wait()
 texts = [m['text'] for m in fake.sent]
 check('an old tap and a failing message do not stop the listener; it says sorry and answers the next',
-      (any('went wrong on my side' in t for t in texts), any('The latest build' in t for t in texts)), (True, True))
+      (any('its recorded outcome' in t for t in texts), any('The latest build' in t for t in texts)), (True, True))
 
 # 3n. like Jarvis with Tony: messages that came together are read together, repeats are answered once with an apology,
 # and a bare "hi" next to a real request gets no reply of its own; replies are in Hive's own voice, from real facts only

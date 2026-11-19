@@ -72,7 +72,7 @@ class TaskTests(unittest.TestCase):
             self.assertEqual(result, ['done', 'succeeded', 'event_added'])
             self.assertEqual(run.call_count, 1)
             self.assertEqual(run.call_args.args[2:4], ('calendar_add', {'guests': ['asha@example.invalid']}))
-        self.assertEqual(tasks.get(tid, self.ch, self.repo)['state'], 'succeeded')
+        self.assertEqual(tasks.get(tid, self.ch, self.repo)['state'], 'waiting_verification')
 
     def test_interrupted_send_is_never_replayed(self):
         with patch.object(router, '_step', side_effect=KeyboardInterrupt):

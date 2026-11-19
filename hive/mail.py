@@ -181,9 +181,11 @@ def send(repo, to, subject, body, reply_to=None):
         else:
             s = smtplib.SMTP(cfg['smtp'], port, timeout=30); s.starttls(context=ssl.create_default_context())
         s.login(cfg['user'], cfg['password'])
-        s.send_message(m)
+        refused = s.send_message(m)
+        if refused:
+            return False, 'SMTP refused the recipient'
         s.quit()
-        return True, ''
+        return True, 'smtp-submitted'
     except Exception as e:
         return False, str(e)[:200]
 

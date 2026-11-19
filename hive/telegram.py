@@ -13,6 +13,7 @@ ever stored as an answer or a correction, never run.
 Voice: a composed, courteous, quietly confident assistant that is a step ahead: short sentences, a clear recommendation,
 never flustered or chatty, and every message leaves the owner one easy thing to do."""
 import getpass, html as _html, http.client, json, os, re, time, urllib.error, urllib.request
+import threading
 
 PATH = os.path.join(os.path.expanduser('~'), '.hive', 'telegram.json')
 
@@ -101,6 +102,7 @@ class Channel:
     """One owner's chat. `api(method, **params)` is the Telegram Bot API (replaced by a fake in tests)."""
     def __init__(self, cfg, api=None, listener=False):
         self.chat = cfg['chat_id']; self.address = cfg.get('address'); self._token = cfg.get('token')
+        self.live_transport = api is None
         self.api = api or (lambda method, **p: _call(cfg['token'], method, **p))
         self.offset = None
         self.last_prompt = None
@@ -109,7 +111,8 @@ class Channel:
         self._told = set()   # strangers already told this bot is someone else's
         self.note = None   # what to say when the owner asks for status (set by whoever is running)
         self.listener = listener   # the always-on listener never claims the chat; builds and reviews do
-        self.history = []   # the conversation so far, (who, text), so a reply is read in context: "yes" to what?
+        self._history_lock = threading.RLock()
+        self.history = []
         self.keep = api is None   # the real chat keeps its thread on disk (restarts, moves to the cloud and back)
         self._pending_updates = []
         self._consumed_update = None
@@ -137,6 +140,7 @@ class Channel:
         for wait in ((2, 5, 15, None) if retry else (None,)):   # a dropped connection must not lose the owner's question
             try:
                 mid = self.api('sendMessage', **p)['message_id']
+                self.last_sent = mid
                 if buttons:
                     self.last_prompt = mid
                     self.prompt_buttons = {b['callback_data']: mid for row in p['reply_markup']['inline_keyboard'] for b in row}
@@ -151,9 +155,10 @@ class Channel:
         keeps the latest words, not each draft. True if the chat took it."""
         body = text if html else esc(text)
         plain = _html.unescape(re.sub(r'<[^>]+>', '', body)).strip()[:600]
-        if self.history and self.history[-1][0] == 'hive':
-            self.history = self.history[:-1]
-        self.remember('hive', plain)
+        with self._history_lock:
+            if self.history and self.history[-1][0] == 'hive' and getattr(self,'last_sent',None) == message_id:
+                self.history.pop()
+            self.remember('hive', plain)
         try:
             self.api('editMessageText', chat_id=self.chat, message_id=message_id, text=body, parse_mode='HTML')
             return True
@@ -204,8 +209,12 @@ class Channel:
             return None
 
     def remember(self, who, text, keep=32):
+        with self._history_lock:
+            return self._remember(who, text, keep)
+
+    def _remember(self, who, text, keep):
         # Preserve complete instructions; apply the model budget at rendering time.
-        self.history = (self.history + [(who, (text or '').strip())])[-keep:]
+        self.history[:] = (self.history + [(who, (text or '').strip())])[-keep:]
         if self.keep:   # private, next to the owner's other Hive settings
             try:
                 os.makedirs(os.path.dirname(CONVERSATION), exist_ok=True)
@@ -231,7 +240,12 @@ class Channel:
             from . import store
             with store.transaction() as con:
                 con.execute('DELETE FROM telegram_inbox WHERE instr(payload,?)>0', (secret,))
-            self.history = [(w, t.replace(secret, '••••')) for w, t in self.history]
+                con.execute('DELETE FROM telegram_replies WHERE instr(text,?)>0', (secret,))
+                con.execute('UPDATE task_prompts SET reply=NULL WHERE instr(reply,?)>0', (secret,))
+                con.execute("UPDATE tasks SET instruction=replace(instruction,?,'••••'),criteria=NULL "
+                            "WHERE mode='message' AND instr(instruction,?)>0", (secret,secret))
+            with self._history_lock:
+                self.history[:] = [(w, t.replace(secret, '••••')) for w, t in self.history]
             try:   # out of the long archive too
                 from . import store
                 store.forget_messages_with(secret)
@@ -285,6 +299,9 @@ class Channel:
 
     def drain(self):
         """Skip anything sent before now (an old "hi" from setup must not count as an answer)."""
+        from . import dispatcher
+        if dispatcher.is_brokered(self):
+            return
         while True:
             p = {'timeout': 0}
             if self.offset is not None:
@@ -311,8 +328,10 @@ class Channel:
 
     def updates(self, timeout=20):
         """New replies from the owner's chat only: (text or None, button data or None, id of the message replied to)."""
-        from . import store
-        if self.keep:
+        from . import dispatcher, store
+        if dispatcher.is_brokered(self):
+            return dispatcher.receive(self, getattr(self,'last_sent',None), self.prompt_buttons, timeout)
+        if self.keep or self.listener:
             with store.transaction() as con:
                 if self._consumed_update is not None:
                     con.execute('DELETE FROM telegram_inbox WHERE chat_id=? AND update_id=?',
@@ -337,7 +356,7 @@ class Channel:
             batch = [] if self._pending_updates else self.api('getUpdates', **p)
             if batch:
                 self.offset = batch[-1]['update_id'] + 1
-                if self.keep:
+                if self.keep or self.listener:
                     with store.transaction() as con:
                         for update in batch:
                             obj = update.get('message') or update.get('callback_query', {}).get('message') or {}
@@ -363,6 +382,7 @@ class Channel:
                 if (cq.get('message', {}).get('chat', {}).get('id') != self.chat or
                         cq.get('from', {}).get('id', self.chat) != self.chat):
                     continue
+                self.last_update = str(u['update_id'])
                 try:   # a courtesy only: Telegram refuses it for a tap over 15 minutes old, which must not be fatal
                     self.api('answerCallbackQuery', callback_query_id=cq['id'])
                 except Exception:   # (the cloud listener died on the move-to-cloud tap the laptop had not marked read)
@@ -593,11 +613,14 @@ def _wait(ch, poll, want, current=None, about=None, expires=None):
     A request for status is answered on the spot and the wait goes on. A tap on an older message's button is answered
     too, pointing at the question being asked (Gate 36: such taps were dropped in silence and the owner kept waiting).
     With `about` = (situation, options, context), "what does this mean?" gets an explanation, not taken as an answer."""
-    current = current if current is not None else getattr(ch, 'last_prompt', None)
+    from . import dispatcher
+    brokered = dispatcher.is_brokered(ch)
+    current = current if current is not None else getattr(ch, 'last_sent' if brokered else 'last_prompt', None)
     while True:
         if expires is not None and time.time() >= expires:
             return 'expired', None
-        for text, data, source_message in ch.updates(timeout=poll):
+        replies = dispatcher.receive(ch, current, want, poll, expires) if brokered else ch.updates(timeout=poll)
+        for text, data, source_message in replies:
             if data in want and (current is None or source_message == current):
                 return 'tap', data
             if data and want:

@@ -12,6 +12,7 @@ class RequestContext:
     update_id: str = ''
     source_ref: str = ''
     project: str = ''
+    text: str = ''
 
 
 CURRENT = ContextVar('hive_request', default=None)
@@ -28,7 +29,7 @@ def request(fn):
         origin = kwargs.get('origin', args[4] if len(args) > 4 else 'owner')
         if parent and parent.origin != 'owner':
             origin = parent.origin
-        ctx = RequestContext(origin=origin, chat=str(getattr(ch, 'chat', '')),
+        ctx = RequestContext(origin=origin, owner=parent.owner if parent else 'owner', text=text, chat=str(getattr(ch, 'chat', '')),
                              update_id=str(getattr(ch, 'last_update', '')),
                              source_ref=str(getattr(ch, 'last_archive', '')), project=str(repo))
         token = CURRENT.set(ctx)

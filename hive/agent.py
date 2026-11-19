@@ -3,7 +3,7 @@ import json
 import time
 import datetime as dt
 
-from . import explain, policy, runtime_tools, store, tasks, tools
+from . import explain, policy, runtime_tools, store, tasks, tools, verification
 
 DEFAULT_STEPS = 12
 MAX_STEPS = 40
@@ -18,19 +18,25 @@ Reply with JSON in exactly one form:
 {"tool": "name", "args": {...}}
 {"ask": "a specific question for the owner"}
 {"done": "a concise factual result grounded in the observations"}
+For an output-only request, return {"artifact": "the complete requested text"}.
+For unclear recipients, targets, or success criteria, ask before proposing any mutation.
 Use done only when the requested work has actually been completed. If a needed tool is
 missing, ask and state the limitation. Do not invent data or a successful tool result.
 '''
 
 
-def start(ch, repo, instruction, poll=20, max_steps=DEFAULT_STEPS, max_cost=2.0):
+def accept(ch, repo, instruction, max_steps=DEFAULT_STEPS, max_cost=2.0):
     if not isinstance(instruction, str) or not instruction.strip() or len(instruction) > 24000:
-        ch.send('Give me a task in 1 to 24,000 characters.'); return []
+        raise tools.Refused('Give me a task in 1 to 24,000 characters.')
     if not 1 <= max_steps <= MAX_STEPS or not 0 < max_cost <= 100:
         raise ValueError('Invalid task limits')
-    task = tasks.create(ch, repo, [], instruction, mode='adaptive',
+    return tasks.create(ch, repo, [], instruction, mode='adaptive',
                         metadata={'max_steps': max_steps, 'max_cost': max_cost, 'spent': 0.0, 'answers': [],
                                   'history': ch.recent() if callable(getattr(ch, 'recent', None)) else ''})
+
+
+def start(ch, repo, instruction, poll=20, max_steps=DEFAULT_STEPS, max_cost=2.0):
+    task = accept(ch, repo, instruction, max_steps, max_cost)
     if task['mode'] != 'adaptive':
         ch.send(tasks.describe(task)); return tasks.outcomes(task)
     return run(ch, repo, task['id'], poll)
@@ -67,11 +73,22 @@ def _context(task, catalog):
     clock = ('\nCurrent time: ' + dt.datetime.now(zone).isoformat() + '\nRequest received: ' +
              dt.datetime.fromtimestamp(task['created'], zone).isoformat() +
              '\nResolve relative dates using the request time and confirm event times with the owner.\n')
-    return PROMPT + clock + '\nOwner request:\n' + task['instruction'] + '\nOwner answers:\n' + json.dumps(
+    return PROMPT + clock + '\nSaved success criteria:\n' + str(task['criteria']) + '\nOwner request:\n' + task['instruction'] + '\nOwner answers:\n' + json.dumps(
         task['metadata'].get('answers', []), ensure_ascii=False) + '\n' + explain.untrusted(raw, 'tool catalog and observations')
 
 
 def run(ch, repo, tid, poll=20, resume=False):
+    token = tasks.ACTIVE_TASK.set(tid)
+    started = time.monotonic()
+    try:
+        return _run(ch, repo, tid, poll, resume, started)
+    finally:
+        store.connect().execute('UPDATE tasks SET active_seconds=active_seconds+? WHERE id=?',
+                                (time.monotonic() - started, tid))
+        tasks.ACTIVE_TASK.reset(token)
+
+
+def _run(ch, repo, tid, poll, resume, started):
     tasks.reconcile(tid, ch, repo)
     task = tasks.claim(tid, ch, repo, resume=resume)
     if not task:
@@ -81,41 +98,61 @@ def run(ch, repo, tid, poll=20, resume=False):
     if task['mode'] != 'adaptive':
         tasks.update(tid, state='paused'); raise tools.Refused('This is not an adaptive task.')
     ch.send(f"Working on task {tid}. Say task {tid} to inspect its progress.")
-    started = time.monotonic()
     try:
         while True:
+            tasks.boundary(tid)
             task = tasks.get(tid, ch, repo)
             meta = task['metadata']
             if meta.get('question'):
-                tasks.update(tid, state='paused', detail=meta['question']); break
-            if (meta['spent'] >= meta['max_cost'] or
-                    time.monotonic() - started > 600):
+                mid = ch.send(meta['question'] + f'\nReply: answer task {tid}: your answer')
+                with store.transaction():
+                    tasks.boundary(tid)
+                    if getattr(ch, 'brokered', False):
+                        from . import dispatcher
+                        dispatcher.prompt(ch, tid, mid, 'answer', [], time.time() + 86400)
+                    tasks.update(tid, state='paused', detail=meta['question'])
+                break
+            if (task['reported_spend'] >= meta['max_cost'] or
+                    task['active_seconds'] + time.monotonic() - started > 600):
                 tasks.update(tid, state='paused', detail='Reached the task step, model-cost or time limit.'); break
             catalog = runtime_tools.catalog(repo)
             n = task['next_step']
             if n <= len(task['steps']):
                 step = task['steps'][n - 1]  # decision persisted before a crash, or interrupted safe read
             else:
-                before = explain.SPENT[0]
+                tasks.boundary(tid)
                 decision = explain.ask_json(_context(task, catalog))
-                meta['spent'] += max(0, explain.SPENT[0] - before)
-                tasks.update(tid, metadata=meta)
+                tasks.boundary(tid)
+                meta['spent'] = tasks.get(tid, ch, repo)['reported_spend']
                 if not isinstance(decision, dict):
                     raise tools.Refused('The model did not return a usable next step.')
-                forms = set(decision) & {'tool', 'done', 'ask'}
+                forms = set(decision) & {'tool', 'done', 'ask', 'artifact'}
                 if len(forms) != 1:
                     raise tools.Refused('The model returned an ambiguous next step.')
-                if 'done' in decision:
-                    if not isinstance(decision['done'], str) or not decision['done'].strip():
+                if 'done' in decision or 'artifact' in decision:
+                    artifact = 'artifact' in decision
+                    value = decision['artifact' if artifact else 'done']
+                    if not isinstance(value, str) or not value.strip():
                         raise tools.Refused('The model returned an empty result.')
-                    tasks.update(tid, state='succeeded', detail=decision['done'][:3000])
-                    ch.send(decision['done'][:3000]); break
+                    if artifact and len(value) > 3600:
+                        raise tools.Refused('The artifact exceeds one chat message. Split the requested output.')
+                    with store.transaction():
+                        tasks.boundary(tid)
+                        verification.assess(task, value if artifact else value[:2000], artifact=artifact)
+                    saved = tasks.get(tid, ch, repo)
+                    ch.send(value if artifact and saved['state'] == 'succeeded' else tasks.describe(saved)); break
                 if 'ask' in decision:
                     if not isinstance(decision['ask'], str) or not decision['ask'].strip():
                         raise tools.Refused('The model returned an empty question.')
                     meta['question'] = decision['ask'][:1500]
-                    tasks.update(tid, metadata=meta, state='paused', detail=meta['question'])
-                    ch.send(meta['question'] + f'\nReply: answer task {tid}: your answer'); break
+                    mid = ch.send(meta['question'] + f'\nReply: answer task {tid}: your answer')
+                    with store.transaction():
+                        tasks.boundary(tid)
+                        if getattr(ch, 'brokered', False):
+                            from . import dispatcher
+                            dispatcher.prompt(ch, tid, mid, 'answer', [], time.time() + 86400)
+                        tasks.update(tid, metadata=meta, state='paused', detail=meta['question'])
+                    break
                 if meta['spent'] >= meta['max_cost']:
                     raise tools.Refused('Reached the model-cost limit before executing another tool.')
                 tool = catalog.get(decision.get('tool')) if isinstance(decision.get('tool'), str) else None
@@ -137,13 +174,19 @@ def run(ch, repo, tid, poll=20, resume=False):
                 raise tools.Refused('A tool changed since this step was planned. Start a new request.')
             if task['bindings'] != tasks.bindings(repo, task['steps']):
                 raise tools.Refused('A connected account changed.')
+            if time.monotonic() - started + task['active_seconds'] >= 600:
+                raise tools.Refused('Reached the execution-time limit before starting the next tool.')
+            verification.guard(task, tool, step['args'])
             tasks.begin_step(tid, n)
-            before_tool = explain.SPENT[0]
             try:
                 with tasks.executing(tid, n):
                     result = runtime_tools.execute(ch, repo, tool, step['args'], poll)
                 if not isinstance(result, dict) or not isinstance(result.get('status'), str):
                     raise ValueError('Missing tool outcome')
+            except tasks.AwaitingReply:
+                break
+            except tasks.Controlled:
+                result = {'status': 'cancelled', 'why': 'Stopped at an owner control boundary.'}
             except tools.Refused as e:
                 result = {'status': 'refused', 'why': str(e)}
             except Exception:
@@ -152,19 +195,25 @@ def run(ch, repo, tid, poll=20, resume=False):
             raw = json.dumps(result, ensure_ascii=False, default=str)
             if len(raw) > 12000:
                 result = {'status': result['status'], 'data': raw[:11000], 'truncated': True}
-            meta['spent'] += max(0, explain.SPENT[0] - before_tool)
             with store.transaction():
+                result = verification.result(tid, n, tool, result)
+                meta['spent'] = tasks.get(tid, ch, repo)['reported_spend']
                 tasks.update(tid, metadata=meta)
                 tasks.finish_step(tid, n, result)
             current = tasks.get(tid, ch, repo)
             if current['state'] != 'running':
                 ch.send(tasks.describe(current)); break
+    except tasks.Controlled:
+        pass
     except tools.Refused as e:
-        tasks.update(tid, state='paused', detail=str(e)); ch.send(str(e) + f' Task {tid} is saved.')
+        with store.transaction():
+            if not tasks.get(tid, ch, repo)['control']:
+                tasks.update(tid, state='paused', detail=str(e))
+        ch.send(str(e) + f' Task {tid} is saved.')
     except Exception:
         # Retain active_step for startup recovery if a checkpoint itself failed.
         current = tasks.get(tid, ch, repo)
-        if current['active_step'] is None:
+        if current['active_step'] is None and current['state'] == 'running' and not current['control']:
             tasks.update(tid, state='paused', detail='The task stopped before choosing another action.')
         raise
     return tasks.outcomes(tasks.get(tid, ch, repo))

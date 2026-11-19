@@ -196,7 +196,10 @@ def _run_task(ch, repo, task, poll, handle):
                 # The provider may have accepted a write before a connection failed.
                 r = {'status': 'failed' if tool in tasks.RETRYABLE else 'unknown',
                      'why': 'The step was interrupted. Its outcome needs checking.'}
-        tasks.finish_step(tid, n, r)
+        from . import store, verification
+        with store.transaction():
+            r = verification.result(tid, n, None, r)
+            tasks.finish_step(tid, n, r)
         results[n] = r
         if r['status'] not in tasks.SUCCESS:
             saved = tasks.get(tid, ch, repo)
@@ -228,15 +231,23 @@ def resume_chain(ch, repo, tid, poll=20, handle=None):
 def task_command(ch, repo, text, poll=20, handle=None):
     """Explicit task controls work even while plan routing is opt-in."""
     from . import tasks, tools
-    match = re.fullmatch(r'(resume task|cancel task|task) ([0-9a-f]{12})', text.strip(), re.I)
+    match = re.fullmatch(r'(resume task|pause task|cancel task|verify task|resolve task|task) ([0-9a-f]{12})(?: (complete|incomplete))?', text.strip(), re.I)
     if text.strip().lower() != 'tasks' and not match:
         return None
     try:
-        if match and match[1].lower() == 'cancel task':
+        if match and match[1].lower() in ('pause task','cancel task'):
             tools.allow('run_plan', detail=text)
-            tasks.cancel(match[2].lower(), ch, repo)
-            ch.send('Task cancelled. Completed actions were not undone.')
-            return 'task_cancelled'
+            task = tasks.control(match[2].lower(), ch, repo, match[1].lower().split()[0])
+            ch.send(tasks.describe(task))
+            return 'task_' + ('cancelled' if match[1].lower() == 'cancel task' else 'paused')
+        if match and match[1].lower() in ('resolve task','verify task'):
+            from . import verification
+            if match[1].lower() == 'resolve task':
+                verification.resolve(ch, repo, match[2].lower(), (match[3] or '').lower())
+            else:
+                verification.retry(ch, repo, match[2].lower())
+            ch.send(tasks.describe(tasks.get(match[2].lower(), ch, repo), detailed=True))
+            return 'task_checked'
         if match and match[1].lower() == 'resume task':
             tools.allow('run_plan', detail=text)
             return 'chain:' + ','.join(resume_chain(ch, repo, match[2].lower(), poll, handle))

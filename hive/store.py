@@ -138,6 +138,30 @@ MIGRATIONS = [
         enabled INTEGER NOT NULL DEFAULT 1, task_id TEXT, created REAL NOT NULL, detail TEXT NOT NULL DEFAULT '');
     CREATE UNIQUE INDEX routines_once ON routines(owner_id,chat_id,project,instruction,interval_seconds);
     """,
+    # 6: listener jobs, safe-boundary controls, bound prompts and completion evidence.
+    """
+    ALTER TABLE tasks ADD COLUMN control TEXT NOT NULL DEFAULT '';
+    ALTER TABLE tasks ADD COLUMN criteria TEXT;
+    ALTER TABLE tasks ADD COLUMN reported_spend REAL NOT NULL DEFAULT 0;
+    ALTER TABLE tasks ADD COLUMN active_seconds REAL NOT NULL DEFAULT 0;
+    UPDATE tasks SET reported_spend=COALESCE(json_extract(metadata,'$.spent'),0);
+    CREATE TABLE execution_queue (
+        task_id TEXT PRIMARY KEY REFERENCES tasks(id), project TEXT NOT NULL, context TEXT NOT NULL,
+        pending INTEGER NOT NULL DEFAULT 1, worker TEXT, started REAL);
+    CREATE UNIQUE INDEX worker_project ON execution_queue(project) WHERE worker IS NOT NULL;
+    CREATE TABLE task_prompts (
+        owner_id TEXT NOT NULL, chat_id TEXT NOT NULL, message_id INTEGER NOT NULL, task_id TEXT NOT NULL,
+        kind TEXT NOT NULL, choices TEXT NOT NULL DEFAULT '[]', expires REAL NOT NULL,
+        reply TEXT, consumed INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(owner_id,chat_id,message_id));
+    CREATE TABLE task_evidence (
+        task_id TEXT NOT NULL REFERENCES tasks(id), step INTEGER NOT NULL, kind TEXT NOT NULL,
+        reference TEXT NOT NULL, at REAL NOT NULL, PRIMARY KEY(task_id,step,kind,reference));
+    CREATE TABLE dispatched_updates (
+        chat_id TEXT NOT NULL, update_id TEXT NOT NULL, PRIMARY KEY(chat_id,update_id));
+    CREATE TABLE telegram_replies (
+        owner_id TEXT NOT NULL, chat_id TEXT NOT NULL, message_id INTEGER NOT NULL, update_id TEXT NOT NULL,
+        text TEXT, button TEXT, created REAL NOT NULL, PRIMARY KEY(chat_id,update_id));
+    """,
 ]
 
 
@@ -189,10 +213,11 @@ def norm(text):
     return re.sub(r'\s+', ' ', (text or '').strip().lower()).rstrip(' .!')
 
 def connect():
-    """This process's connection to the store (made and migrated on first use)."""
+    """One connection per thread so a cursor cannot race another thread's statement cache."""
     p = path()
+    key = (p, threading.get_ident())
     with _LOCK:
-        con = _CONN.get(p)
+        con = _CONN.get(key)
         if con is not None:
             return con
         os.makedirs(os.path.dirname(p), exist_ok=True)
@@ -209,7 +234,7 @@ def connect():
             except OSError:
                 pass
         _migrate(con)
-        _CONN[p] = con
+        _CONN[key] = con
         return con
 
 def close():

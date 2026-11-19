@@ -47,6 +47,8 @@ def propose(tool, args, ch, ctx=None):
     digest = hashlib.sha256((tool + '\n' + payload).encode()).hexdigest()
     request_key = hashlib.sha256((str(ch.chat) + ctx.project + ctx.update_id + digest).encode()).hexdigest() if ctx.update_id else None
     with store.transaction() as con:
+        from . import tasks
+        tasks.boundary()
         if request_key:
             existing = con.execute('SELECT id FROM actions WHERE request_key=?', (request_key,)).fetchone()
             if existing:
@@ -79,7 +81,7 @@ def approve(aid, ch, message_id, yes=True):
         row = get(aid)
         if not row or row['state'] != 'proposed' or row['expires'] <= time.time():
             return False
-        if (row['owner_id'] != ctx.owner or row['chat_id'] != str(ch.chat) or
+        if (row['message_id'] is None or row['owner_id'] != ctx.owner or row['chat_id'] != str(ch.chat) or
                 row['message_id'] != message_id or ctx.origin != 'owner'):
             return False
         state = 'approved' if yes else 'cancelled'
@@ -92,6 +94,9 @@ def execute(aid, fn):
     with store.transaction() as con:
         row = get(aid)
         if not row or row['state'] != 'approved' or row['expires'] <= time.time():
+            return ActionResult('cancelled')
+        if con.execute('SELECT 1 FROM task_actions l JOIN tasks t ON t.id=l.task_id '
+                       "WHERE l.action_id=? AND (t.control<>'' OR t.state='cancelled')", (aid,)).fetchone():
             return ActionResult('cancelled')
         if account_binding(row['tool'], row['project']) != row['account_binding']:
             con.execute("UPDATE actions SET state='needs_input' WHERE id=?", (aid,))
@@ -171,14 +176,32 @@ def cloud_callback(ch, fn, poll=20):
 
 def confirm(ch, tool, args, text, poll=20, yes_label='Confirm'):
     """Show immutable arguments; only this proposal's fresh button grants approval."""
-    from . import telegram
+    from . import telegram, tasks
+    tasks.boundary()
+    step = tasks.ACTIVE_STEP.get()
+    suspend = step and getattr(ch, 'brokered', False) and store.connect().execute(
+        "SELECT 1 FROM tasks WHERE id=? AND mode='adaptive'", (step[0],)).fetchone()
+    if suspend:
+        old = store.connect().execute('SELECT a.* FROM task_actions l JOIN actions a ON a.id=l.action_id '
+                                      "WHERE l.task_id=? AND l.step=? AND a.tool=? AND a.args=? AND a.state='approved'",
+                                      (*step, tool, _json(args))).fetchone()
+        if old:
+            return old['id']
     aid = propose(tool, args, ch)
     if get(aid)['state'] != 'proposed' or get(aid)['expires'] <= time.time():
         ch.send('This request already has a recorded outcome or has expired. No action was repeated.')
         return None
     yes, no = f'act|{aid}|yes', f'act|{aid}|no'
     mid = ch.send(text, html=True, buttons=[[(yes_label, yes), ('Cancel', no)]])
-    bind(aid, mid)
+    with store.transaction():
+        tasks.boundary()
+        bind(aid, mid)
+        if suspend:
+            from . import dispatcher
+            dispatcher.prompt(ch, step[0], mid, 'approval', [yes, no], get(aid)['expires'])
+            tasks.update(step[0], state='waiting_approval', detail='Waiting for approval of the exact arguments.')
+    if suspend:
+        raise tasks.AwaitingReply()
     kind, answer = telegram._wait(ch, poll, {yes, no}, current=mid,
                                   expires=get(aid)['expires'])
     if kind != 'tap' or answer not in (yes, no):
@@ -229,5 +252,6 @@ def resume(ch, data, message_id, repo):
     else:
         ch.send('This action cannot be resumed here. Ask me to propose it again.')
         return False
-    ch.send('Completed.' if result.status == 'succeeded' else 'The result is unconfirmed; I have not repeated it.')
+    ch.send('Action executed. Check the task for outcome evidence.' if result.status == 'succeeded' else
+            'The result is unconfirmed; I have not repeated it.')
     return True

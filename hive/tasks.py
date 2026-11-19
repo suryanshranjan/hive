@@ -19,6 +19,23 @@ SUCCESS = {'done', 'succeeded', 'mail_sent', 'event_added', 'answered', 'mail_an
 # Deliberately narrower than tools.READ: a generic handler may launch other work.
 RETRYABLE = {'mail_find', 'calendar_check'}
 ACTIVE_STEP = ContextVar('hive_task_step', default=None)
+ACTIVE_TASK = ContextVar('hive_task', default=None)
+
+
+class Controlled(Exception):
+    """A persisted owner control stopped execution at a boundary."""
+
+
+class AwaitingReply(Exception):
+    """A durable continuation has released its worker."""
+
+
+def boundary(tid=None):
+    tid = tid or ACTIVE_TASK.get()
+    if tid:
+        row = store.connect().execute('SELECT control FROM tasks WHERE id=?', (tid,)).fetchone()
+        if row and row[0]:
+            raise Controlled(row[0])
 
 
 @contextmanager
@@ -91,11 +108,15 @@ def get(tid, ch, repo):
 
 
 def create(ch, repo, steps, instruction, mode='chain', metadata=None):
+    from . import verification
     scope = _scope(ch, repo)
     ctx = policy.context()
     update = ctx.update_id or str(getattr(ch, 'last_update', '') or '')
     # A redelivered update must not rerun just because the model made a new plan.
-    key = hashlib.sha256(_json([*scope, update, instruction]).encode()).hexdigest() if update else None
+    identity = [*scope, update, instruction]
+    if mode == 'message':
+        identity.append('listener message')
+    key = hashlib.sha256(_json(identity).encode()).hexdigest() if update else None
     bound = bindings(repo, steps)
     with store.transaction() as con:
         if key:
@@ -103,9 +124,10 @@ def create(ch, repo, steps, instruction, mode='chain', metadata=None):
             if old:
                 return get(old[0], ch, repo)
         tid, now = secrets.token_hex(6), time.time()
-        con.execute('INSERT INTO tasks(id,owner_id,chat_id,project,request_key,instruction,steps,bindings,created,updated,mode,metadata) '
-                    'VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',
-                    (tid, *scope, key, instruction, _json(steps), _json(bound), now, now, mode, _json(metadata or {})))
+        criterion = verification.criteria(instruction) if mode == 'adaptive' else {'kind': 'owner_request', 'request': instruction}
+        con.execute('INSERT INTO tasks(id,owner_id,chat_id,project,request_key,instruction,steps,bindings,created,updated,mode,metadata,criteria) '
+                    'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)',
+                    (tid, *scope, key, instruction, _json(steps), _json(bound), now, now, mode, _json(metadata or {}), _json(criterion)))
     return get(tid, ch, repo)
 
 
@@ -122,12 +144,13 @@ def claim(tid, ch, repo, resume=False):
             con.execute("UPDATE tasks SET state='blocked',detail=?,updated=? WHERE id=?",
                         ('A connected account changed. Start a new request with the current account.', time.time(), tid))
             return None
-        con.execute("UPDATE tasks SET state='running',updated=? WHERE id=?", (time.time(), tid))
+        con.execute("UPDATE tasks SET state='running',control='',updated=? WHERE id=?", (time.time(), tid))
     return get(tid, ch, repo)
 
 
 def begin_step(tid, n):
     with store.transaction() as con:
+        boundary(tid)
         changed = con.execute("UPDATE tasks SET active_step=?,updated=? WHERE id=? AND state='running' "
                               'AND next_step=? AND active_step IS NULL', (n, time.time(), tid, n)).rowcount
         if not changed:
@@ -145,10 +168,25 @@ def finish_step(tid, n, result):
         advance = ok or (adaptive_read and result.get('status') in ('failed', 'not_found', 'needs_input'))
         state = ('succeeded' if n == len(task['steps']) and task['mode'] != 'adaptive' else 'running') if advance else (
             'paused' if adaptive_read or task['steps'][n - 1]['tool'] in RETRYABLE else 'blocked')
+        if task['mode'] == 'adaptive' and not adaptive_read and result.get('status') == 'unknown':
+            state = 'waiting_verification'
+        if (task['mode'] == 'adaptive' and not adaptive_read and ok and
+                result.get('verification') != 'provider_verified'):
+            state = 'waiting_verification'
+        if task['control'] and state != 'waiting_verification':
+            uncertain = not adaptive_read and (result.get('status') == 'unknown' or
+                (ok and result.get('verification') != 'provider_verified' and
+                 task['steps'][n-1]['tool'] not in RETRYABLE))
+            state = 'waiting_verification' if uncertain else (
+                'cancelled' if task['control'] == 'cancel' else 'paused')
         con.execute('UPDATE tasks SET results=?,next_step=?,active_step=NULL,state=?,detail=?,updated=? WHERE id=?',
                     (_json(task['results']), n + 1 if advance else n, state,
+                     'Outcome needs readback or owner assessment.' if state == 'waiting_verification' else
                      '' if ok else str(result.get('why') or result.get('status') or 'No outcome recorded'),
                      time.time(), tid))
+        if state == 'succeeded' and task['mode'] == 'chain' and task['criteria']:
+            from . import verification
+            verification.assess(task)
 
 
 def recover(ch, repo):
@@ -164,10 +202,12 @@ def recover(ch, repo):
             if n:
                 safe = task['steps'][n - 1]['tool'] in RETRYABLE or (
                     task['mode'] == 'adaptive' and task['steps'][n - 1].get('retry_safe', False))
-                state = 'paused' if safe else 'blocked'
+                state = 'paused' if safe else ('waiting_verification' if task['mode'] in ('adaptive','message') else 'blocked')
                 detail = ('An interrupted read can be retried when you resume.' if safe else
                           'An action was interrupted. Check its outcome; Hive will not repeat it.')
                 task['results'][str(n)] = {'status': 'unknown', 'why': detail}
+            if task['control'] == 'cancel' and state == 'paused':
+                state = 'cancelled'
             con.execute('UPDATE tasks SET state=?,detail=?,results=?,active_step=NULL,updated=? WHERE id=?',
                         (state, detail, _json(task['results']), time.time(), task['id']))
     return len(rows)
@@ -177,15 +217,16 @@ def reconcile(tid, ch, repo):
     """Only the action ledger can establish a previously interrupted write's success."""
     with store.transaction() as con:
         task = get(tid, ch, repo)
-        if not task or task['state'] != 'blocked':
+        if not task or task['state'] not in ('blocked','waiting_verification') or task['control']:
             return task
         n = task['next_step']
         rows = con.execute('SELECT a.state,a.receipt FROM actions a JOIN task_actions t ON a.id=t.action_id '
                            'WHERE t.task_id=? AND t.step=?', (tid, n)).fetchall()
         if not rows or any(r['state'] != 'succeeded' for r in rows):
             return task
-        task['results'][str(n)] = {'status': 'succeeded', 'receipt': rows[-1]['receipt'],
-                                  'recovered': True}
+        from . import verification
+        task['results'][str(n)] = verification.result(tid, n, None, {
+            'status': 'succeeded', 'receipt': rows[-1]['receipt'], 'recovered': True})
         state = 'succeeded' if task['mode'] != 'adaptive' and n == len(task['steps']) else 'paused'
         con.execute('UPDATE tasks SET results=?,next_step=?,state=?,detail=?,updated=? WHERE id=?',
                     (_json(task['results']), n + 1, state, 'Recovered a confirmed action receipt.', time.time(), tid))
@@ -230,34 +271,60 @@ def describe(task, detailed=False):
     line += '\nRequest: ' + instruction[:160] + ('…' if len(instruction) > 160 else '')
     if task['detail']:
         line += '\n' + task['detail']
+    if task['state'] == 'waiting_verification':
+        line += f"\nSay verify task {task['id']} or resolve task {task['id']} complete|incomplete."
     if task['state'] in ('queued', 'paused'):
         line += f"\nSay resume task {task['id']} to continue."
     if detailed:
+        from . import verification
+        line += f"\nReported model spend: ${task['reported_spend']:.4f}"
+        if task['control']:
+            line += '\nOwner requested: ' + task['control']
+        if not task['criteria'] and task['state'] == 'succeeded':
+            line += '\nHistorical completion. Independent verification was not recorded.'
+        for item in verification.evidence(task['id']):
+            line += f"\n{item['kind']}: {item['reference'][:160]}"
         for n, step in enumerate(task['steps'], 1):
             state = task['results'].get(str(n), {}).get('status',
                     'running' if task['active_step'] == n else 'pending')
             line += f"\n{n}. {step['tool']}: {state}"
-    return line
+    return line[:3950]
 
 
 def listing(ch, repo):
     rows = store.connect().execute('SELECT * FROM tasks WHERE owner_id=? AND chat_id=? AND project=? '
                                    'ORDER BY created DESC,id DESC LIMIT 5', _scope(ch, repo)).fetchall()
-    return '\n\n'.join(describe(_decode(row)) for row in rows) or 'No saved tasks for this project.'
+    return '\n\n'.join(describe(_decode(row))[:720] for row in rows) or 'No saved tasks for this project.'
 
 
-def cancel(tid, ch, repo):
+def control(tid, ch, repo, request):
+    if request not in ('cancel', 'pause'):
+        raise ValueError('Invalid task control')
     with store.transaction() as con:
         task = get(tid, ch, repo)
-        if not task or task['state'] == 'running':
-            raise tools.Refused('The task is unavailable or still executing. Stop its current action first.')
+        if not task or task['state'] in ('succeeded','cancelled','owner_confirmed','owner_reported_incomplete'):
+            raise tools.Refused('The task is unavailable or already closed.')
+        if task['control'] == 'cancel':
+            request = 'cancel'
         linked = con.execute('SELECT a.id,a.state FROM actions a JOIN task_actions t ON a.id=t.action_id '
                              'WHERE t.task_id=?', (tid,)).fetchall()
-        if any(row['state'] == 'executing' for row in linked):
-            raise tools.Refused('An action is still executing; its outcome must be checked first.')
         for row in linked:
             if row['state'] in ('proposed', 'approved'):
                 con.execute("UPDATE actions SET state='cancelled' WHERE id=?", (row['id'],))
                 con.execute('INSERT INTO action_events(action_id,state,at) VALUES(?,?,?)',
                             (row['id'], 'cancelled', time.time()))
-        update(tid, state='cancelled', detail='Cancelled by the owner. Earlier effects were not undone.')
+        con.execute('UPDATE tasks SET control=? WHERE id=?', (request, tid))
+        con.execute('UPDATE task_prompts SET consumed=1 WHERE task_id=?', (tid,))
+        con.execute('UPDATE execution_queue SET pending=0 WHERE task_id=?', (tid,))
+        state = 'cancelled' if request == 'cancel' else 'paused'
+        if task['state'] == 'running' and task['active_step'] is not None:
+            state = 'running'
+        elif task['state'] == 'waiting_verification' or any(r['state'] in ('executing','unknown') for r in linked):
+            state = 'waiting_verification'
+        con.execute('UPDATE tasks SET active_step=CASE WHEN ? THEN active_step ELSE NULL END,state=?,detail=?,updated=? WHERE id=?',
+                    (state == 'running', state, 'Owner requested ' + request + '. Earlier effects are retained.', time.time(), tid))
+    return get(tid, ch, repo)
+
+
+def cancel(tid, ch, repo):
+    return control(tid, ch, repo, 'cancel')

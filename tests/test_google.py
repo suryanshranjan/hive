@@ -52,7 +52,7 @@ class Google(http.server.BaseHTTPRequestHandler):
             return self._json(401, {'error': {'message': 'expired'}})
         if u.path.endswith('/messages') and 'rfc822msgid' in q.get('q', ''):
             mid = q['q'].split('rfc822msgid:', 1)[1]
-            return self._json(200, {'messages': [{'id': 'x'}]} if any(mid in s for s in STATE['sent']) else {})
+            return self._json(200, {'messages': [{'id': f'm{n}'} for n, s in enumerate(STATE['sent'], 1) if mid in s]})
         if u.path.endswith('/messages'):
             return self._json(200, {'messages': [{'id': 'g1'}]})
         if '/messages/sent' in u.path:
@@ -62,7 +62,7 @@ class Google(http.server.BaseHTTPRequestHandler):
             mid = u.path.rsplit('/', 1)[1]
             message = email.message_from_string(STATE['sent'][int(mid[1:]) - 1])
             data = base64.urlsafe_b64encode(message.get_payload(decode=True)).decode()
-            return self._json(200, {'id': mid, 'payload': {'mimeType': 'text/plain', 'body': {'data': data},
+            return self._json(200, {'id': mid, 'labelIds': ['SENT'], 'threadId': 't1', 'payload': {'mimeType': 'text/plain', 'body': {'data': data},
                 'headers': [{'name': k, 'value': v} for k, v in message.items()]}})
         if '/messages/' in u.path:
             body = base64.urlsafe_b64encode(b'Can the tasting move to Friday?').decode()

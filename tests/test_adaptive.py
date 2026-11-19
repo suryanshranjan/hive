@@ -45,7 +45,7 @@ class AdaptiveTests(unittest.TestCase):
         self.assertIn('not_found', planner.call_args_list[1].args[0])
         self.assertIn('answer-42', planner.call_args_list[2].args[0])
         write.call.assert_called_once_with({'q': 'answer-42'})
-        self.assertEqual(self.current()['state'], 'succeeded')
+        self.assertEqual(self.current()['state'], 'waiting_verification')
 
     def test_cancelled_write_stops_before_another_decision(self):
         tool = self.tool('record', tools.EXTERNAL)
@@ -84,7 +84,7 @@ class AdaptiveTests(unittest.TestCase):
             agent.resume(self.ch, self.repo, tid)
         tool.call.assert_called_once()
         self.assertTrue(self.current()['results']['1']['recovered'])
-        self.assertEqual(self.current()['state'], 'succeeded')
+        self.assertEqual(self.current()['state'], 'waiting_verification')
 
     def test_interrupted_read_retries_saved_decision(self):
         tool = self.tool(fn=Mock(side_effect=KeyboardInterrupt))
@@ -115,7 +115,7 @@ class AdaptiveTests(unittest.TestCase):
 
     def test_step_limit_allows_final_answer_but_no_extra_tool(self):
         tool = self.tool()
-        for ending, expected in (({'done': 'Found'}, 'succeeded'), ({'tool': 'lookup', 'args': {'q': 'new'}}, 'paused')):
+        for ending, expected in (({'done': 'Found'}, 'waiting_verification'), ({'tool': 'lookup', 'args': {'q': 'new'}}, 'paused')):
             with patch.object(runtime_tools, 'catalog', return_value={'lookup': tool}), \
                     patch.object(explain, 'ask_json', side_effect=[{'tool': 'lookup', 'args': {'q': 'a'}}, ending]):
                 agent.start(self.ch, self.repo, 'Read ' + expected, max_steps=1)
@@ -125,7 +125,7 @@ class AdaptiveTests(unittest.TestCase):
     def test_cost_limit_stops_before_tool(self):
         tool = self.tool()
         def decide(*args):
-            explain.SPENT[0] += 3
+            explain.spend(3, 'fixture')
             return {'tool': 'lookup', 'args': {'q': 'a'}}
         with patch.object(runtime_tools, 'catalog', return_value={'lookup': tool}), \
                 patch.object(explain, 'SPENT', [0]), patch.object(explain, 'ask_json', side_effect=decide):

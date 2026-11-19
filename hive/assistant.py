@@ -203,7 +203,7 @@ def facts(repo, ch=None):
     # the startup's name, never the folder's (given the folder, it said "your shop project")
     name = memory.project_name(repo)
     from . import register
-    talk = register.line(CURRENT.get('text', ''))
+    talk = register.line((policy.context().text or CURRENT.get('text', '')))
     lines = ([talk] if talk else []) + [('Running in the cloud; his computer can be off.' if in_cloud(repo) else
               'Running on his computer.'),
              (f"Latest build: branch hive/{st['name']}. {st.get('check', '')}" if st else 'Nothing built on this project yet.'),
@@ -235,7 +235,7 @@ def facts(repo, ch=None):
         lines.append(f'The team he chose for builds: {team.describe(team.chosen())}.')
     try:   # memory 2.0: what bears on what he just said (and the latest few), not only his 15 newest notes
         from . import recall
-        known = recall.render(recall.recall(repo, CURRENT.get('text', '')))
+        known = recall.render(recall.recall(repo, (policy.context().text or CURRENT.get('text', ''))))
     except Exception:
         known = '\n'.join(f'- {n}' for n in memory.notes(repo)[-15:])
     if known:   # what he has told you about his business, so answers fit his world
@@ -1627,6 +1627,15 @@ def run_plan(ch, repo, apply_build, wait=None):
         PLAN['task_id'] = buildplans.save(ch, repo, PLAN)
     return buildplans.resume(ch, repo, PLAN['task_id'], apply_build, wait)
 
+def adaptive_request(text):
+    low = text.strip().lower()
+    return bool(low) and (router_mode() == 'adaptive' and not GOAL_WORDS.search(low) and
+            not low.startswith('build:') and not is_stop_request(text) and not UNDO_WORDS.search(low) and
+            not CONNECT_WORDS.search(low) and not LIVE_WORDS.search(low) and
+            not telegram.is_status(text) and low.strip(' !.?') not in GREETINGS and
+            not re.search(r'\b(ship it|do the plan|run the plan|start the plan|set me up)\b', low))
+
+
 @policy.request
 def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=None, origin='owner'):
     """Answer one message from the owner. apply_build(state, rule, ch) updates a build (hive.start.apply_ruling);
@@ -1639,7 +1648,6 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     from . import register
     if policy.context().origin == 'owner':
         register.notice(text)
-    CURRENT['text'] = text   # he writes technically: Hive answers in his terms
     from . import router
     task_reply = router.task_command(ch, repo, text, poll, handle=lambda c, r, t, pl: handle(
         c, r, t, pl, apply_build=apply_build, start_build=start_build, cloud=cloud, origin=origin))
@@ -1657,11 +1665,7 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         from . import agent
         return 'chain:' + ','.join(agent.start(ch, repo, text.split(':', 1)[1].strip(), poll))
     # Existing build, account-setup, stop and shipping flows keep their concrete interfaces.
-    if (router_mode() == 'adaptive' and not GOAL_WORDS.search(low) and
-            not low.startswith('build:') and not is_stop_request(text) and not UNDO_WORDS.search(low) and
-            not CONNECT_WORDS.search(low) and not LIVE_WORDS.search(low) and
-            not telegram.is_status(text) and low.strip(' !.?') not in GREETINGS and
-            not re.search(r'\b(ship it|do the plan|run the plan|start the plan|set me up)\b', low)):
+    if adaptive_request(text):
         from . import agent
         return 'chain:' + ','.join(agent.start(ch, repo, text, poll))
     said = text.split(':', 1)[1].strip() if low.startswith('build:') else ''
@@ -2151,6 +2155,15 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
             print(f'Hive is already listening on this computer (process {other}). Stop that one first.'); return 1
     except (OSError, ValueError):
         pass
+    from . import dispatcher
+    with dispatcher.reader_lock(PIDFILE + '.lock') as acquired:
+        if not acquired:
+            print('Hive already has an active Telegram listener.')
+            return 1
+        return _listen_locked(ch, repo, poll, until, apply_build, start_build, cloud)
+
+
+def _listen_locked(ch, repo, poll, until, apply_build, start_build, cloud):
     from . import actions
     interrupted = actions.recover()
     from . import tasks
@@ -2179,13 +2192,19 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
         pass
     print("Listening on Telegram. Tell Hive anything, any time: a change of mind, a new rule, or 'status'. Ctrl+C to stop.",
           flush=True)
-    try:
-        while not (until and until()):
+    import copy
+    import threading
+    from . import dispatcher
+    queue = dispatcher.Dispatcher(ch, repo, lambda c, r, message: handle(
+        c, r, message, apply_build=apply_build, start_build=start_build, cloud=cloud))
+    queue.start()
+    def maintenance(ch):
+        while not queue.stop.is_set():
             memory_jobs.start()
             if not telegram.busy_elsewhere() and not (_building() or '').startswith('A build is running'):
                 try:
                     from . import routines
-                    routines.tick(ch, repo)
+                    routines.tick(ch, repo, enqueue=True)
                 except Exception as e:
                     print(f'Routine check stopped ({type(e).__name__}).', flush=True)
             try:   # a test page past its two hours: taken down (and its test machine deleted), and he is told
@@ -2221,46 +2240,24 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
                     threading.Thread(target=_pulse, daemon=True).start()
             except Exception as e:
                 print(f'Could not start Pulse: {e!r}', flush=True)
-            if telegram.busy_elsewhere():
-                time.sleep(poll); continue   # a build or review is talking to the owner: step aside
+            queue.stop.wait(max(1, poll))
+    background = copy.copy(ch)
+    background.brokered = True
+    service = threading.Thread(target=maintenance, args=(background,), daemon=True)
+    service.start()
+    try:
+        while not queue.moved.is_set() and not (until and until()):
             try:
                 batch = ch.updates(timeout=poll)
-            except Exception as e:   # never go silent on the owner: report, wait, listen again
-                print(f'Telegram error, retrying: {e}', flush=True); time.sleep(poll); continue
-            for _, data, proposal_mid in batch:   # a tap on a Pulse alert (Got it, Reply, In an hour)
-                if data and data.startswith('act|'):
-                    actions.resume(ch, data, proposal_mid, repo)
-                if data and data.startswith('pls|'):
-                    try:
-                        from . import pulse
-                        pulse.tap(ch, data, repo, poll)
-                    except Exception as e:
-                        print(f'Could not handle the alert tap: {e!r}', flush=True)
-            texts, repeated = coalesce([t for t, _, _ in batch if t])
-            if repeated and texts:   # he had to say it more than once: Hive was slow or away
-                try:
-                    ch.send(f"🐝 My apologies for the wait{', ' + ch.name() if ch.name() else ''}; I have all your messages "
-                            "now. Here it is, once.")
-                except Exception:
-                    pass
-            for text in texts:
-                try:
-                    if handle(ch, repo, text, apply_build=apply_build, start_build=start_build,
-                              cloud=cloud) == 'moved':
-                        print('Hive now runs in the cloud and reads Telegram there; this listener stops.', flush=True)
-                        try:   # mark what this listener handled as read, so the cloud copy starts clean
-                            ch.api('getUpdates', offset=ch.offset, timeout=0)
-                        except Exception:
-                            pass
-                        return 0   # one reader of the owner's chat at a time
-                except Exception as e:   # one message going wrong must not stop the listener
-                    print(f'Could not handle request ({type(e).__name__}).', flush=True)
-                    try:
-                        w = ch.name()
-                        ch.send(f"⚠️ My apologies{', ' + w if w else ''}: that one went wrong on my side. I'm still here; "
-                                "say it again, or another way.")
-                    except Exception:
-                        pass
+            except (OSError, RuntimeError) as exc:
+                print(f'Telegram receive failed ({type(exc).__name__}).', flush=True)
+                queue.stop.wait(1)
+                continue
+            for text, button, mid in batch:
+                queue.dispatch(text, button, mid)
     except KeyboardInterrupt:
         pass
+    finally:
+        queue.close()
+        service.join(timeout=2)
     return 0
