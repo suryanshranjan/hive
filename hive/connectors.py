@@ -9,6 +9,8 @@ import hashlib
 import json
 import os
 import re
+import secrets
+from contextlib import AsyncExitStack
 from datetime import timedelta
 from urllib.parse import urlparse
 
@@ -36,10 +38,30 @@ def fingerprint(name):
     if entry is None:
         return 'missing'
     token = os.environ.get(entry.get('token_env', ''), '')
-    return hashlib.sha256(json.dumps([entry, token], sort_keys=True).encode()).hexdigest()
+    selected = [os.environ.get(key, '') for key in entry.get('env', ())]
+    return hashlib.sha256(json.dumps([entry, token, selected], sort_keys=True).encode()).hexdigest()
 
 
-async def _request(entry, operation, name=None, args=None):
+def _http_client(**options):
+    from mcp.shared._httpx_utils import create_mcp_http_client
+
+    client = create_mcp_http_client(**options)
+
+    async def reject_call_redirect(response):
+        request = response.request
+        if response.is_redirect and request.method == 'POST':
+            try:
+                body = json.loads(await request.aread())
+            except ValueError:
+                return
+            if isinstance(body, dict) and body.get('method') == 'tools/call':
+                raise tools.Refused('The tool call returned a redirect. Check its outcome before continuing.')
+
+    client.event_hooks['response'].append(reject_call_redirect)
+    return client
+
+
+async def _request(entry, operation, name=None, args=None, interactive=False):
     try:
         from mcp import ClientSession
         from mcp.client.streamable_http import streamablehttp_client
@@ -52,8 +74,25 @@ async def _request(entry, operation, name=None, args=None):
         if not token:
             raise RuntimeError('The configured MCP token environment variable is missing.')
         headers['Authorization'] = 'Bearer ' + token
-    async with streamablehttp_client(_url(entry['url']), headers=headers, timeout=timedelta(seconds=20),
-                                     sse_read_timeout=timedelta(seconds=45)) as (read, write, _):
+    async with AsyncExitStack() as stack:
+        if entry.get('transport') == 'stdio':
+            from . import mcp_stdio
+            read, write = await stack.enter_async_context(mcp_stdio.transport(entry))
+        else:
+            auth = None
+            if entry.get('oauth'):
+                from . import mcp_auth
+                auth = mcp_auth.provider(entry, interactive)
+            read, write, _ = await stack.enter_async_context(
+                streamablehttp_client(
+                    _url(entry['url']),
+                    headers=headers,
+                    auth=auth,
+                    timeout=timedelta(seconds=20),
+                    sse_read_timeout=timedelta(seconds=45),
+                    httpx_client_factory=_http_client,
+                )
+            )
         async with ClientSession(read, write, read_timeout_seconds=timedelta(seconds=45)) as session:
             await session.initialize()
             found, cursor, cursors = [], None, set()
@@ -92,6 +131,12 @@ def refresh(name):
     if name not in entries:
         raise ValueError('Unknown MCP connection')
     found = request(entries[name], 'discover')
+    entries[name]['tools'] = checked(found)
+    vault.save_json(path(), entries)
+    return len(found)
+
+
+def checked(found):
     names = set()
     for item in found:
         tool_name = item.get('name')
@@ -101,9 +146,7 @@ def refresh(name):
         # Check schemas now; required arguments are checked when actually called.
         from jsonschema import Draft202012Validator
         Draft202012Validator.check_schema(item.get('inputSchema', {}))
-    entries[name]['tools'] = found
-    vault.save_json(path(), entries)
-    return len(found)
+    return found
 
 
 def catalog(repo):
@@ -129,8 +172,15 @@ def main(argv):
     parser = argparse.ArgumentParser(prog='hive mcp')
     sub = parser.add_subparsers(dest='command', required=True)
     add = sub.add_parser('add'); add.add_argument('name'); add.add_argument('url')
+    add.add_argument('--oauth', action='store_true')
     add.add_argument('--token-env', default=''); add.add_argument('--read-tool', action='append', default=[])
-    for command in ('refresh', 'remove'):
+    stdio = sub.add_parser('add-stdio')
+    stdio.add_argument('name'); stdio.add_argument('image')
+    stdio.add_argument('--args',default='[]')
+    stdio.add_argument('--env',action='append',default=[])
+    stdio.add_argument('--mount',action='append',default=[])
+    stdio.add_argument('--read-tool',action='append',default=[])
+    for command in ('refresh', 'remove', 'login'):
         sub.add_parser(command).add_argument('name')
     sub.add_parser('list')
     args = parser.parse_args(argv)
@@ -139,14 +189,42 @@ def main(argv):
         for name, entry in entries.items():
             print(f"{name}: {len(entry.get('tools', []))} tools; {len(entry.get('read_tools', []))} owner-marked reads")
         return 0
-    if args.command == 'add':
+    if args.command in ('add','add-stdio'):
         if not re.fullmatch(r'[a-z][a-z0-9_-]{0,31}', args.name):
             parser.error('Connection names use lowercase letters, numbers, underscores or hyphens.')
+    if args.command == 'login':
+        original = entries.get(args.name)
+        if not original or not original.get('oauth'):
+            parser.error('Register this connector with add --oauth first.')
+        candidate = dict(original, grant=secrets.token_hex(16))
+        found = asyncio.run(asyncio.wait_for(_request(candidate,'discover',interactive=True),timeout=330))
+        from . import mcp_auth, store
+        if not mcp_auth.Grant(candidate).load().get('tokens'):
+            parser.error('The server did not establish an OAuth grant.')
+        with store.transaction():
+            entries = config()
+            if entries.get(args.name) != original:
+                parser.error('The connector changed during login.')
+            candidate['tools'] = checked(found)
+            entries[args.name] = candidate
+            vault.save_json(path(), entries)
+        print(f'{args.name}: connected.'); return 0
+    if args.command == 'add-stdio':
+        from . import mcp_stdio
+        entries[args.name] = mcp_stdio.entry(args.image,json.loads(args.args),args.env,args.mount,args.read_tool)
+        vault.save_json(path(),entries)
+    if args.command == 'add':
+        if args.oauth and args.token_env:
+            parser.error('Choose one credential source.')
         if args.token_env and not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', args.token_env):
             parser.error('--token-env must name an environment variable, not contain its value.')
         entries[args.name] = {'url': _url(args.url), 'token_env': args.token_env,
                               'read_tools': args.read_tool, 'tools': []}
+        if args.oauth:
+            entries[args.name].update(oauth=args.name,grant=secrets.token_hex(16))
         vault.save_json(path(), entries)
+        if args.oauth:
+            print(f'Run hive mcp login {args.name} to authorize discovery.'); return 0
     if args.command == 'remove':
         entries.pop(args.name, None); vault.save_json(path(), entries); return 0
     print(f'{args.name}: discovered {refresh(args.name)} tools.')

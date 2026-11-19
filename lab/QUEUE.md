@@ -13,6 +13,10 @@ The separate Release 2 candidate adds scoped business and memory tools and child
 Run `python -B tests/test_build_receipts.py` for exact-commit recovery, missing artifacts,
 branch divergence and project-scoped data access.
 
+The Release 3 candidate adds the optional host-local control gateway, mobile noVNC
+view, MCP OAuth grants and containerized stdio connectors. Setup and reverse proxy
+configuration are in `docs/control_gateway.md`.
+
 - **Publication:** owner requested committing and pushing the runtime changes. README now
   leads with the phone workflow and includes adaptive/MCP/browser/routine setup, saved-task
   controls, local verification results and remaining live-account limits. Local documentation

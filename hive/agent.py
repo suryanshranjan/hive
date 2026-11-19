@@ -63,7 +63,8 @@ def _context(task, catalog):
         if result is not None:
             observations.append({'step': n, 'tool': step['tool'], 'args': step['args'], 'result': result})
     raw = json.dumps({'tools': [t.public() for t in catalog.values()], 'observations': observations,
-                     'prior_conversation': task['metadata'].get('history', '')},
+                     'prior_conversation': task['metadata'].get('history', ''),
+                     'page_after_owner_return': task['metadata'].get('returned_page')},
                      ensure_ascii=False, default=str)
     # Bound each observation at capture time; never silently drop an old successful write.
     if len(raw) > 100000:
@@ -200,6 +201,9 @@ def _run(ch, repo, tid, poll, resume, started):
                 meta['spent'] = tasks.get(tid, ch, repo)['reported_spend']
                 tasks.update(tid, metadata=meta)
                 tasks.finish_step(tid, n, result)
+                if (tool.name in ('browser_inspect','browser_open') and isinstance(result.get('data'),dict)
+                        and result['data'].get('takeover_required') and not tasks.get(tid,ch,repo)['control']):
+                    tasks.update(tid,state='waiting_browser',detail=f'Owner sign-in required. Say browser takeover {tid}.')
             current = tasks.get(tid, ch, repo)
             if current['state'] != 'running':
                 ch.send(tasks.describe(current)); break

@@ -1630,6 +1630,9 @@ def run_plan(ch, repo, apply_build, wait=None):
 
 def adaptive_request(text):
     low = text.strip().lower()
+    from . import gateway
+    if gateway.COMMAND.fullmatch(low):
+        return False
     return bool(low) and (router_mode() == 'adaptive' and not GOAL_WORDS.search(low) and
             not low.startswith('build:') and not is_stop_request(text) and not UNDO_WORDS.search(low) and
             not CONNECT_WORDS.search(low) and not LIVE_WORDS.search(low) and
@@ -1643,6 +1646,9 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     start_build(repo, goal) runs a new build that reports to the phone (hive.start.start, overnight style);
     cloud(repo, on) makes a cloud machine and moves Hive there (on=True), or deletes it (hive.cloud_aws)."""
     low = text.lower().strip()
+    from . import gateway
+    if gateway.COMMAND.fullmatch(low):
+        return gateway.command(ch,repo,text)
     typing = getattr(ch, 'typing', None)
     if callable(typing):
         typing()   # "typing..." at once, as a person would (the owner found it slow)
@@ -2199,6 +2205,8 @@ def _listen_locked(ch, repo, poll, until, apply_build, start_build, cloud):
     queue = dispatcher.Dispatcher(ch, repo, lambda c, r, message: handle(
         c, r, message, apply_build=apply_build, start_build=start_build, cloud=cloud))
     queue.start()
+    from . import gateway
+    gateway_server = gateway.serve()
     def maintenance(ch):
         while not queue.stop.is_set():
             memory_jobs.start()
@@ -2259,6 +2267,8 @@ def _listen_locked(ch, repo, poll, until, apply_build, start_build, cloud):
     except KeyboardInterrupt:
         pass
     finally:
+        if gateway_server:
+            gateway_server.should_exit = True
         queue.close()
         service.join(timeout=2)
     return 0

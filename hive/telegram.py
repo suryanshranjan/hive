@@ -165,6 +165,11 @@ class Channel:
         except Exception:   # "message is not modified", a dropped connection: the next edit or the final one catches up
             return False
 
+    def send_link(self, text, label, url):
+        """Keep single-use capabilities out of the conversation/model archive."""
+        return self.api('sendMessage', chat_id=self.chat, text=text,
+                        reply_markup={'inline_keyboard':[[{'text':label,'url':url}]]})['message_id']
+
     def send_photo(self, path, caption='', buttons=None, html=False):
         """A picture for the owner (a screenshot of what was built), with a caption and optional buttons. Founders judge
         a screen by looking at it, not by reading what it does (the owner: "share the screenshot on my phone")."""

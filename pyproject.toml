@@ -12,7 +12,8 @@ requires-python = ">=3.10"
 dependencies = ["cryptography>=43", "jsonschema>=4.22", "tzdata>=2024.1; sys_platform == 'win32'"]
 
 [project.optional-dependencies]
-mcp = ["mcp>=1.12.4,<2"]
+mcp = ["mcp>=1.30,<2"]
+gateway = ["starlette>=0.47", "uvicorn[standard]>=0.35"]
 voice = ["faster-whisper>=1.0"]
 api = ["anthropic>=1.0"]   # replies straight from the Anthropic API, streamed (hive llm api)
 data = ["psycopg[binary]>=3.1", "pymysql>=1.1", "openpyxl>=3.1", "pypdf>=4"]   # reading his Postgres, MySQL, Excel and PDF files

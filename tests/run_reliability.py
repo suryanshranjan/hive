@@ -12,7 +12,7 @@ import sys
 SUITES = ('reliability', 'tasks', 'adaptive', 'dispatcher', 'connectors', 'store', 'memory2', 'tools', 'office', 'router', 'pulse', 'brief', 'telegram',
           'google', 'calendar', 'sandbox_unit', 'ship', 'deploy', 'audit', 'runlimit', 'vault', 'render',
           'register', 'plan')
-EXTRA = ('build_receipts', 'assistant', 'explain', 'law', 'cli', 'team', 'visual', 'complaint', 'gaps', 'access', 'onboard',
+EXTRA = ('gateway', 'build_receipts', 'assistant', 'explain', 'law', 'cli', 'team', 'visual', 'complaint', 'gaps', 'access', 'onboard',
          'devices', 'away', 'logins', 'trydeploy', 'fast', 'aws_limit', 'voice')
 SHELL = ('guard', 'claims', 'run', 'owner', 'assume', 'start', 'doctor', 'cloud')
 

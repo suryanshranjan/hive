@@ -26,13 +26,14 @@ def allowed(url, local_origins=()):
 
 
 class Browser:
-    def __init__(self, profile, local_origins=(), sandbox=True):
+    def __init__(self, profile, local_origins=(), sandbox=True, headed=False):
         from playwright.sync_api import sync_playwright
         self.local_origins = local_origins
         self.playwright = sync_playwright().start()
         try:
             self.context = self.playwright.chromium.launch_persistent_context(
-                profile, headless=True, chromium_sandbox=sandbox, accept_downloads=False,
+                profile, headless=not headed, chromium_sandbox=sandbox, accept_downloads=False,
+                args=['--kiosk','--window-position=0,0','--window-size=1280,900'] if headed else [],
                 service_workers='block', viewport={'width': 1280, 'height': 900})
         except Exception:
             self.playwright.stop()
@@ -50,7 +51,13 @@ class Browser:
         if page != self.page:
             page.close()
 
+    def needs_owner(self):
+        return (self.page.locator('input[type=password],input[autocomplete=one-time-code],input[autocomplete=username]').count()
+                or any(s in urlparse(self.page.url).path.lower() for s in ('/login','/signin','/sign-in','/oauth','/authorize')))
+
     def snapshot(self):
+        if self.needs_owner():
+            return {'takeover_required':True, 'text':'Owner sign-in is required.'}
         return {'url': self.page.url, 'title': self.page.title(),
                 'text': self.page.locator('body').inner_text(timeout=5000)[:8000],
                 'elements': self.page.locator('a,button,input,textarea,select').evaluate_all('''els => els.slice(0,80).map(e => ({
@@ -65,6 +72,8 @@ class Browser:
                 raise ValueError('Only public HTTP(S) URLs or explicitly allowed local origins can be opened.')
             self.page.goto(args['url'], wait_until='domcontentloaded', timeout=20000)
         elif operation in ('click', 'fill', 'press'):
+            if self.needs_owner():
+                raise ValueError('Owner sign-in is required.')
             if args['url'] != self.page.url:
                 raise ValueError('The page changed after this action was proposed. Inspect it again.')
             target = self.page.locator(args['selector'])
@@ -87,10 +96,37 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--profile', default='/profile')
     parser.add_argument('--allow-local-origin', action='append', default=[])
+    parser.add_argument('--headed', action='store_true')
     args = parser.parse_args()
-    browser = Browser(args.profile, args.allow_local_origin)
+    display = manager = None
+    if args.headed:
+        import os, subprocess, time
+        display = subprocess.Popen(['Xvfb', os.environ['DISPLAY'], '-screen','0','1280x900x24','-nolisten','tcp'])
+        for _ in range(100):
+            if os.path.exists('/tmp/.X11-unix/X97'):
+                break
+            time.sleep(0.05)
+        manager = subprocess.Popen(['openbox','--sm-disable'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+    browser = Browser(args.profile, args.allow_local_origin, headed=args.headed)
     try:
-        for line in sys.stdin:
+        import queue, threading
+        requests = queue.Queue()
+        def read_requests():
+            try:
+                for line in sys.stdin:
+                    requests.put(line)
+            finally:
+                requests.put(None)
+        threading.Thread(target=read_requests,daemon=True).start()
+        while True:
+            try:
+                line = requests.get_nowait()
+            except queue.Empty:
+                # Playwright's sync dispatcher must service route callbacks while the owner navigates.
+                browser.page.wait_for_timeout(50)
+                continue
+            if line is None:
+                break
             request = {}
             try:
                 request = json.loads(line)
@@ -102,6 +138,10 @@ def main():
             print(json.dumps(result, ensure_ascii=False), flush=True)
     finally:
         browser.close()
+        if manager:
+            manager.terminate()
+        if display:
+            display.terminate()
 
 
 if __name__ == '__main__':

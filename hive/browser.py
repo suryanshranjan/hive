@@ -12,6 +12,7 @@ import threading
 from . import memory, policy, tools, vault
 
 IMAGE = 'hive-browser:1'
+CONTROL_IMAGE = 'hive-browser-control:1'
 SESSIONS = {}
 LOCK = threading.RLock()
 
@@ -42,7 +43,9 @@ class Session:
             '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges', '--security-opt', 'seccomp=' + seccomp,
             '--pids-limit', '256', '--memory', '1g', '--cpus', '1', '--shm-size', '256m',
             '--mount', f'type=bind,source={package},target=/opt/hive/hive,readonly',
-            '--mount', f'type=volume,source={profile},target=/profile', IMAGE]
+            '--mount', f'type=volume,source={profile},target=/profile']
+        self.headed = bool(config().get('control'))
+        cmd += [CONTROL_IMAGE, '--headed'] if self.headed else [IMAGE]
         for address in config().get('local_origins', []):
             cmd += ['--allow-local-origin', address]
         self.proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
@@ -96,6 +99,14 @@ class Session:
 
 
 def call(repo, operation, args):
+    from . import gateway
+    with LOCK:
+        if gateway.held(repo):
+            raise tools.Refused('Browser control is with the owner. Return control from Telegram or the phone.')
+        return session_for(repo).call(operation, args)
+
+
+def session_for(repo):
     key = (policy.context().owner, os.path.realpath(repo), fingerprint())
     with LOCK:
         for old_key in list(SESSIONS):
@@ -104,7 +115,7 @@ def call(repo, operation, args):
         session = SESSIONS.get(key)
         if session is None or session.proc.poll() is not None:
             session = SESSIONS[key] = Session(repo)
-    return session.call(operation, args)
+    return session
 
 
 def close_all():
@@ -137,10 +148,15 @@ def catalog(repo):
 
 def main(argv):
     parser = argparse.ArgumentParser(prog='hive browser')
-    parser.add_argument('command', choices=('setup', 'enable', 'disable', 'status', 'allow-local'))
+    parser.add_argument('command', choices=('setup', 'setup-control', 'enable', 'disable', 'status', 'allow-local'))
     parser.add_argument('origin', nargs='?')
     args = parser.parse_args(argv)
     cfg = config()
+    if args.command == 'setup-control':
+        from . import sandbox
+        templates = os.path.join(os.path.dirname(__file__), 'templates')
+        subprocess.run(sandbox.docker() + ['build','-t',CONTROL_IMAGE,'-f',os.path.join(templates,'browser-control.Dockerfile'),templates],check=True)
+        cfg['control'] = True
     if args.command == 'setup':
         from . import sandbox
         templates = os.path.join(os.path.dirname(__file__), 'templates')

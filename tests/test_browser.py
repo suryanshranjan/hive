@@ -23,9 +23,11 @@ class BrowserTests(unittest.TestCase):
                 if self.path.startswith('/save'):
                     cls.saved += 1
                     body = b'<html><title>Saved</title><body>Saved once.</body></html>'
+                elif self.path.startswith('/login'):
+                    body = b'<form>Private login screen<input type="password"></form>'
                 else:
                     body = b'''<html><title>Fixture</title><body><h1>Local form</h1>
-                    <form action="/save"><input id="name" name="name"><input id="secret" type="password" value="hidden-secret">
+                    <form action="/save"><input id="name" name="name"><input id="secret" type="hidden" value="hidden-secret">
                     <button id="save">Save</button></form><button class="many">A</button><button class="many">B</button>
                     <script>document.cookie = 'fixture=persisted; max-age=3600; path=/';</script></body></html>'''
                 self.send_response(200); self.send_header('Content-Type', 'text/html')
@@ -66,6 +68,13 @@ class BrowserTests(unittest.TestCase):
             self.assertFalse(allowed(url))
             with self.assertRaises(ValueError): self.browser.execute('open', {'url': url})
         self.assertFalse(allowed('http://user:password@127.0.0.1/'))
+
+    def test_login_screen_is_held_for_owner(self):
+        result = self.browser.execute('open',{'url':self.origin+'/login'})
+        self.assertTrue(result['takeover_required'])
+        self.assertNotIn('Private login screen',json.dumps(result))
+        with self.assertRaises(ValueError):
+            self.browser.execute('fill',{'url':self.origin+'/login','selector':'input','text':'fixture'})
 
     def test_profile_persists_cookies_across_browser_restart(self):
         self.browser.execute('open', {'url': self.origin})

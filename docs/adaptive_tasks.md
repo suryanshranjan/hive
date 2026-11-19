@@ -84,8 +84,9 @@ hive mcp remove reports
 Set the named token environment variable on the listener's host. Do not put a token in
 the command or URL. HTTP is accepted only for localhost; remote connections require HTTPS.
 Discovery uses the official MCP Python v1 SDK and Streamable HTTP, including pagination.
-Tools appear as `mcp.reports.search`. Stdio, legacy SSE and interactive OAuth are not
-implemented. Each call opens a bounded session and checks the discovered input schema.
+Tools appear as `mcp.reports.search`. Each call opens a bounded session and checks the
+discovered input schema. Containerized stdio and gateway OAuth setup are documented in
+[Owner control gateway](control_gateway.md). Legacy SSE is outside this release.
 
 Every tool requires an exact-argument approval unless you explicitly list it with
 `--read-tool`. Server-supplied read-only hints cannot grant permission. Only mark a tool
@@ -123,8 +124,8 @@ This host must resolve from the container. Request-time DNS checks are not an eg
 firewall against hostile DNS rebinding. DOM inspection omits input values; page text
 and URLs can still contain personal information. Page text is untrusted model input.
 
-There is no desktop takeover, interactive login window, CAPTCHA solving, arbitrary
-JavaScript tool or screenshot reasoning in this initial browser adapter. Cookies persist;
+The optional headed browser supports mobile takeover through the control gateway.
+Cookies persist;
 the exact open page is not a recovery checkpoint. Inspect again after a browser restart.
 
 The container follows [Playwright's Docker guidance](https://playwright.dev/python/docs/docker).

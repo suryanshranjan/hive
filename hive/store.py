@@ -174,6 +174,14 @@ MIGRATIONS = [
         state_path TEXT NOT NULL, result_sha TEXT, tests TEXT, receipt REAL,
         PRIMARY KEY(task_id,step));
     """,
+    # 8: takeover capabilities and OAuth callback state. Cookies and tickets are stored as hashes.
+    """
+    CREATE TABLE browser_control (
+        project TEXT PRIMARY KEY, owner_id TEXT NOT NULL,chat_id TEXT NOT NULL,task_id TEXT,
+        container TEXT NOT NULL,ticket TEXT UNIQUE,ticket_until REAL,session TEXT UNIQUE,session_until REAL);
+    CREATE TABLE oauth_callbacks (
+        state_hash TEXT PRIMARY KEY,connector TEXT NOT NULL,expires REAL NOT NULL,response BLOB);
+    """,
 ]
 
 

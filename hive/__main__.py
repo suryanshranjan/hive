@@ -219,9 +219,9 @@ def safe_console(streams=None):
 def main(argv=None):
     safe_console()
     values = list(sys.argv[1:] if argv is None else argv)
-    if values and values[0] in ('mcp', 'browser', 'verify-services'):
+    if values and values[0] in ('mcp', 'browser', 'gateway', 'verify-services'):
         from importlib import import_module
-        module = {'mcp': 'connectors', 'browser': 'browser', 'verify-services': 'service_checks'}[values[0]]
+        module = {'mcp': 'connectors', 'browser': 'browser', 'gateway':'gateway','verify-services': 'service_checks'}[values[0]]
         try:
             return import_module('.' + module, __package__).main(values[1:])
         except Exception as exc:
