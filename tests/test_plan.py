@@ -4,7 +4,7 @@ usage: python3 tests/test_plan.py   (run from the hive repo root)"""
 import json, os, sys, tempfile
 sys.path.insert(0, os.getcwd()); sys.path.insert(0, os.path.join(os.getcwd(), 'tests'))
 home = tempfile.mkdtemp(); os.environ['HOME'] = os.environ['USERPROFILE'] = home
-from hive import assistant, explain, memory, plan, screens, team, telegram
+from hive import assistant, build_receipts, explain, memory, plan, screens, team, telegram
 explain.CMD = '"' + sys.executable.replace(chr(92), '/') + '" tests/fake_explain.py'
 memory.DIR = os.path.join(home, '.hive', 'rules'); telegram.BUSY = os.path.join(home, '.hive', 'telegram.busy')
 telegram.PATH = os.path.join(home, '.hive', 'telegram.json')
@@ -63,6 +63,8 @@ class Done:
 assistant.background_build = lambda repo, goal, ch=None, interview=True, report=True, workers=None: built.append((goal, interview, report)) or Done()
 st = {'repo': repo, 'name': 'signups-1103', 'branch': 'main', 'b': 'main', 'check': '12 tests, all passing.'}
 assistant.latest_build = lambda r: st
+# This suite supplies stand-in builds. test_build_receipts checks the real Git evidence.
+build_receipts.validate = lambda tid, n, repo: {'commit': f'fixture-step-{n}'}
 screens.available = lambda: False
 def apply_build(state, rule, ch):
     applied.append(rule); return 0

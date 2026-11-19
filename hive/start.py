@@ -224,6 +224,8 @@ def start(repo='.', workers=None, goal=None, minutes=40, overnight=False, interv
     # on: his latest build, not merged yet: this one builds on top of it, so his work adds up in one line and one
     # pull request (Gate 107: a new build started from main, and the plan's changes never reached his live product)
     sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', on or branch, repo, source)
+    from . import build_receipts
+    build_receipts.begin(repo, source, 'refs/heads/' + (on or branch), 'hive/' + name, home)
     if on:   # in Hive's own copy his latest build *is* the starting point, under his branch's name: the builders and
         sh('git', '-C', source, 'checkout', '-q', '-B', branch)   # the delivery use that name (run 2: they found none)
     sh('git', '-C', source, 'config', 'user.name', 'hive'); sh('git', '-C', source, 'config', 'user.email', 'hive@local')
@@ -621,7 +623,9 @@ def _deliver(state, ch=None):
     if kept:
         say(f"  I've noted {_n(kept, 'new ruling')} of yours for the next build on this project.")
     out = f"hive/{state['name']}"
-    sh('git', '-C', state['repo'], 'fetch', '-q', '-f', os.path.join(state['final'], 'up.git'), f"+{state['b']}:{out}")
+    from . import build_receipts
+    if not build_receipts.publish(state, result, after):
+        sh('git', '-C', state['repo'], 'fetch', '-q', '-f', os.path.join(state['final'], 'up.git'), f"+{state['b']}:{out}")
     mins = round((time.time() - state['started']) / 60)
     took = 'under a minute' if mins < 1 else _n(mins, 'minute')
     own = max(0.0, explain.SPENT[0] - state.get('spent0', 0.0))   # Hive's own questions and checks, counted too
@@ -780,6 +784,8 @@ def apply_ruling(state, rule, ch=None):
     home = state['home']; n = len(glob.glob(os.path.join(home, 'change*'))) + 1
     src = os.path.join(home, f'change{n}_source'); run = os.path.join(home, f'change{n}')
     sh('git', 'clone', '-q', '-c', 'core.autocrlf=false', '--branch', state['b'], os.path.join(state['final'], 'up.git'), src)
+    from . import build_receipts
+    build_receipts.begin(state['repo'], src, 'refs/heads/hive/' + state['name'], 'hive/' + state['name'], home)
     _link(state['repo'], src, state['links'])
     rule = refs.attach(rule, src, commit=True)   # a picture he sent ("make it like this") goes in with his words
     note = ("\n\n# The owner changed his mind\n\nAfter this was built, the owner gave this ruling. Change the code to "

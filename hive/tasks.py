@@ -89,6 +89,9 @@ def bindings(repo, steps):
         elif name.startswith('browser_'):
             from . import browser
             got['browser'] = browser.fingerprint()
+        elif name in ('business_query','document_get','payment_summary'):
+            from . import work_tools
+            got[name] = next((tool.identity for tool in work_tools.catalog(repo) if tool.name == name), 'missing')
     return got
 
 
@@ -116,6 +119,8 @@ def create(ch, repo, steps, instruction, mode='chain', metadata=None):
     identity = [*scope, update, instruction]
     if mode == 'message':
         identity.append('listener message')
+    if mode == 'build' and ACTIVE_STEP.get():
+        identity.append(ACTIVE_STEP.get())
     key = hashlib.sha256(_json(identity).encode()).hexdigest() if update else None
     bound = bindings(repo, steps)
     with store.transaction() as con:
@@ -171,8 +176,10 @@ def finish_step(tid, n, result):
         if task['mode'] == 'adaptive' and not adaptive_read and result.get('status') == 'unknown':
             state = 'waiting_verification'
         if (task['mode'] == 'adaptive' and not adaptive_read and ok and
-                result.get('verification') != 'provider_verified'):
+                result.get('verification') not in ('provider_verified','locally_verified')):
             state = 'waiting_verification'
+        if con.execute('SELECT 1 FROM child_builds WHERE parent=? AND step=?', (tid, n)).fetchone():
+            state, advance = 'waiting_child', False
         if task['control'] and state != 'waiting_verification':
             uncertain = not adaptive_read and (result.get('status') == 'unknown' or
                 (ok and result.get('verification') != 'provider_verified' and
@@ -208,6 +215,8 @@ def recover(ch, repo):
                 task['results'][str(n)] = {'status': 'unknown', 'why': detail}
             if task['control'] == 'cancel' and state == 'paused':
                 state = 'cancelled'
+            if n and con.execute('SELECT 1 FROM child_builds WHERE parent=? AND step=?', (task['id'], n)).fetchone():
+                state, detail = 'waiting_child', 'Waiting for the saved child build.'
             con.execute('UPDATE tasks SET state=?,detail=?,results=?,active_step=NULL,updated=? WHERE id=?',
                         (state, detail, _json(task['results']), time.time(), task['id']))
     return len(rows)
@@ -306,6 +315,10 @@ def control(tid, ch, repo, request):
             raise tools.Refused('The task is unavailable or already closed.')
         if task['control'] == 'cancel':
             request = 'cancel'
+        for child in con.execute('SELECT child FROM child_builds WHERE parent=?', (tid,)).fetchall():
+            saved = get(child[0], ch, repo)
+            if saved and saved['state'] not in ('succeeded','cancelled','owner_confirmed','owner_reported_incomplete'):
+                control(child[0], ch, repo, request)
         linked = con.execute('SELECT a.id,a.state FROM actions a JOIN task_actions t ON a.id=t.action_id '
                              'WHERE t.task_id=?', (tid,)).fetchall()
         for row in linked:

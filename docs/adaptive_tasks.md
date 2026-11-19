@@ -36,9 +36,14 @@ loop, set `HIVE_ROUTER=adaptive` before starting the listener. Explicit builds, 
 goals, status, stop, account connection and shipping retain their existing flows.
 `HIVE_ROUTER=plan` still selects the older, fixed, four-step router.
 
-The initial native tools are email search/send, calendar read/create and memory search.
+The native catalog includes email search/send, calendar read/create, project memory
+search/add/update/forget, business database queries, document retrieval, payment totals,
+and build submission/status/result. Business queries use the existing read-only database
+adapter. Documents must be registered by name. Memory edits show the exact text for
+approval. Configured command sources are excluded from this catalog.
 The loop can also use the browser and configured MCP tools. It does not invent missing
-capabilities or execute arbitrary host shell commands. Software builds use the build flow.
+capabilities or execute arbitrary host shell commands. An approved build becomes a child
+task. The parent releases its worker until the child has a checked result.
 
 ### Completion and controls
 
@@ -157,12 +162,16 @@ Unknown writes stay blocked. If the separate action ledger confirms that the wri
 succeeded, resume reconciles the receipt and skips the write. Pending MCP/browser approvals
 can also complete after restart, provided their configuration and expiry still match.
 
-Business-goal build plans now save the approved steps, owner answers, current step and
+Business-goal build plans save the approved steps, owner answers, current step and
 the exact build state. A first build is tagged with its task ID to reject stale build
 results. A restart between completed steps resumes the saved branch without rebuilding
 earlier steps. An interrupted build step remains blocked for inspection; Hive does not
-assume its edits failed or replay it. Moving projects to a different path, live branch
-changes outside Hive and mid-build crash reconciliation still need qualification.
+assume its edits failed or replay it. Migration 7 records parent/child links and build
+manifests. Each managed build records its source commit, result branch and commit,
+state file, artifact repository and validation results. A matching result with missing
+validation evidence is checked again in the sandbox. A missing artifact or changed
+branch keeps the build blocked. Use `resume task <child-id>` after restoring the
+recorded branch and artifacts. Shipping and deployment retain their own approval flows.
 
 ```text
 hive verify-services

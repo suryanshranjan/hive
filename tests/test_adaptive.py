@@ -211,6 +211,8 @@ class AdaptiveTests(unittest.TestCase):
         self.assertFalse(routines.rows(self.ch, self.repo)[0]['enabled'])
 
     def test_build_restart_resumes_saved_branch_and_answers(self):
+        receipts = patch('hive.build_receipts.validate', return_value={'commit':'fixture-commit'})
+        receipts.start(); self.addCleanup(receipts.stop)
         assistant.PLAN.clear(); self.addCleanup(assistant.PLAN.clear)
         steps = [{'title': f'Step {n}', 'why': 'why', 'seen': 'file.py', 'build': f'build {n}', 'decide': ''} for n in range(1, 4)]
         tid = buildplans.save(self.ch, self.repo, {'goal': 'Goal', 'steps': steps, 'answers': ['yes', '', 'later']})

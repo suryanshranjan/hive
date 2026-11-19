@@ -73,9 +73,23 @@ def result(tid, step, tool, raw):
                 record(tid, step, 'provider_readback', row['id'])
         else:
             record(tid, step, 'execution_receipt', row['id'])
+            approved = json.loads(row['args'])
+            if row['tool'] == 'agent_action' and approved['tool'] in ('memory_add','memory_update','memory_forget'):
+                from . import memory
+                try:
+                    fid = json.loads(row['receipt'])['data']['id']
+                    fact = store.connect().execute('SELECT text,deleted_at FROM facts WHERE id=? AND project=? AND owner_id=?',
+                        (fid,memory.project_key(row['project']),row['owner_id'])).fetchone()
+                    if fact and ((approved['tool'] == 'memory_forget' and fact['deleted_at'] is not None) or
+                                 (approved['tool'] != 'memory_forget' and fact['deleted_at'] is None and
+                                  fact['text'] == approved['args']['text'])):
+                        record(tid,step,'local_readback',row['id'])
+                except (TypeError, KeyError, ValueError):
+                    pass
     refs = [e for e in evidence(tid) if e['step'] == step]
     raw.update(evidence=refs, verification='provider_verified' if any(
-        e['kind'] == 'provider_readback' for e in refs) else 'unverified')
+        e['kind'] == 'provider_readback' for e in refs) else
+        'locally_verified' if any(e['kind'] == 'local_readback' for e in refs) else 'unverified')
     return raw
 
 

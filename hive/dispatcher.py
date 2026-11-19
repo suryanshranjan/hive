@@ -108,6 +108,12 @@ class Dispatcher:
                         'worker=NULL,started=NULL WHERE task_id IN '
                         '(SELECT id FROM tasks WHERE owner_id=? AND chat_id=?)',
                         (policy.context().owner, str(self.ch.chat)))
+            builds = con.execute("SELECT t.* FROM tasks t JOIN build_manifests m ON t.id=m.task_id AND "
+                                 "t.next_step=m.step WHERE t.state='blocked' AND t.control='' AND "
+                                 "t.owner_id=? AND t.chat_id=? AND m.result_sha IS NOT NULL",
+                                 (policy.context().owner,str(self.ch.chat))).fetchall()
+            for build in builds:
+                enqueue(build, policy.RequestContext(project=build['project']), 'check_build')
         for _ in range(2):
             worker = threading.Thread(target=self._worker, daemon=True)
             self.workers.append(worker)
@@ -202,6 +208,9 @@ class Dispatcher:
             elif verb == 'verify' and task['state'] == 'waiting_verification':
                 enqueue(task, ctx, 'verify')
                 return f'Read-only verification queued for {tid}.'
+            elif verb == 'resume' and task['mode'] == 'build' and task['state'] == 'blocked':
+                enqueue(task, ctx, 'check_build')
+                return f'Checking the saved branch and artifacts for {tid}.'
             elif verb == 'resume' and task['state'] in ('queued','paused'):
                 con.execute("UPDATE tasks SET state='queued',control='' WHERE id=?", (tid,))
                 con.execute("UPDATE task_prompts SET consumed=1 WHERE task_id=? AND kind='answer'", (tid,))
@@ -273,6 +282,7 @@ class Dispatcher:
         worker = secrets.token_hex(12)
         while not self.stop.is_set():
             self.drain_replies()
+            self.completed_children()
             row = self._next(worker)
             if not row:
                 self.stop.wait(0.1)
@@ -292,6 +302,9 @@ class Dispatcher:
                 if params['operation'] == 'verify':
                     verification.retry(ch, repo, tid)
                     ch.send(tasks.describe(tasks.get(tid, ch, repo), True))
+                elif params['operation'] == 'check_build':
+                    from . import buildplans
+                    buildplans.resume(ch, repo, tid)
                 elif task['state'] == 'queued' and not task['control']:
                     self._run(ch, repo, task)
             except tasks.Controlled:
@@ -373,3 +386,30 @@ class Dispatcher:
                         "AND chat_id=? AND kind='approval' AND expires<=? AND consumed=0)", (*scope, time.time()))
             con.execute('UPDATE task_prompts SET consumed=1 WHERE owner_id=? AND chat_id=? AND expires<=?', (*scope, time.time()))
             con.execute('DELETE FROM telegram_replies WHERE created<?', (time.time() - 86400,))
+
+    def completed_children(self):
+        from . import build_receipts
+        rows = store.connect().execute('SELECT c.*,p.project,p.control,t.state AS child_state FROM child_builds c '
+            'JOIN tasks p ON c.parent=p.id JOIN tasks t ON c.child=t.id '
+            "WHERE p.state='waiting_child' AND p.owner_id=? AND p.chat_id=? "
+            "AND t.state IN ('succeeded','blocked','cancelled','waiting_verification')",
+            (policy.context().owner, str(self.ch.chat))).fetchall()
+        for row in rows:
+            receipt = build_receipts.validate(row['child'], 1, row['project']) if row['child_state'] == 'succeeded' else None
+            with store.transaction() as con:
+                task = tasks.get(row['parent'], self.ch, row['project'])
+                if task['state'] != 'waiting_child':
+                    continue
+                if not receipt:
+                    if row['child_state'] != 'blocked':
+                        tasks.update(task['id'], state='waiting_verification', detail='Child build needs inspection: ' + row['child'])
+                    elif 'blocked' not in task['detail']:
+                        tasks.update(task['id'], detail='Child build blocked. Inspect task ' + row['child'])
+                    continue
+                step = row['step']
+                task['results'][str(step)] = {'status':'succeeded', 'child':row['child'], 'commit':receipt['commit'],
+                                               'branch':receipt['branch'], 'tests':len(receipt['tests'])}
+                verification.record(task['id'], step, 'build_receipt', receipt['commit'])
+                con.execute("UPDATE tasks SET results=?,state='queued',next_step=?,detail='' WHERE id=?",
+                            (tasks._json(task['results']), step+1, task['id']))
+                enqueue(task, policy.RequestContext(project=row['project'],update_id='child:' + row['child']))

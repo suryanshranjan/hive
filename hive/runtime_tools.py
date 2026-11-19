@@ -74,8 +74,8 @@ def catalog(repo):
                      'guests': {'type': 'array', 'items': STRING, 'maxItems': 50}},
                     ['title', 'start', 'end', 'where', 'guests']), tools.EXTERNAL, False, lambda a: None),
     ]
-    from . import browser, connectors
-    return {t.name: t for t in native + browser.catalog(repo) + connectors.catalog(repo)}
+    from . import browser, connectors, work_tools
+    return {t.name: t for t in native + work_tools.catalog(repo) + browser.catalog(repo) + connectors.catalog(repo)}
 
 
 def execute(ch, repo, tool, args, poll=20):

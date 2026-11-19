@@ -9,6 +9,10 @@ verification evidence. Controlled dispatcher journeys run with `python -B tests/
 Google and Telegram are unconfigured on this host. The dedicated-account pilot awaits configuration
 and publication of its prediction card. Adaptive routing remains opt-in.
 
+The separate Release 2 candidate adds scoped business and memory tools and child builds.
+Run `python -B tests/test_build_receipts.py` for exact-commit recovery, missing artifacts,
+branch divergence and project-scoped data access.
+
 - **Publication:** owner requested committing and pushing the runtime changes. README now
   leads with the phone workflow and includes adaptive/MCP/browser/routine setup, saved-task
   controls, local verification results and remaining live-account limits. Local documentation

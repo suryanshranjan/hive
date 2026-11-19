@@ -27,10 +27,31 @@ def restore(ch, repo):
 
 
 def resume(ch, repo, tid, apply_build=None, wait=None, poll=20):
-    from . import assistant, plan, screens, start
+    from . import assistant, build_receipts, plan, screens, start, verification
     task = tasks.get(tid, ch, repo)
     if not task or task['mode'] != 'build':
         ch.send('That build plan is unavailable.'); return 'failed'
+    if task['state'] == 'blocked':
+        n = task['next_step']
+        receipt = build_receipts.validate(tid, n, repo)
+        if receipt and not task['control']:
+            import json
+            from pathlib import Path
+            with store.transaction() as con:
+                task = tasks.get(tid, ch, repo)
+                if task['state'] == 'blocked' and task['next_step'] == n and not task['control']:
+                    task['metadata']['build_state'] = json.loads(Path(receipt['state_path']).read_text('utf-8'))
+                    task['results'][str(n)] = {'status':'done','recovered':True,'commit':receipt['commit']}
+                    state = 'succeeded' if n == len(task['steps']) else 'paused'
+                    con.execute('UPDATE tasks SET results=?,next_step=?,state=?,metadata=?,detail=? WHERE id=?',
+                                (tasks._json(task['results']), n+1, state, tasks._json(task['metadata']),
+                                 'Recovered checked build ' + receipt['commit'], tid))
+                    verification.record(tid, n, 'build_receipt', receipt['commit'])
+            task = tasks.get(tid, ch, repo)
+    if task['next_step'] > 1 and task['state'] in ('queued','paused') and task['criteria']:
+        if not build_receipts.validate(tid, task['next_step']-1, repo):
+            tasks.update(tid, state='blocked', detail='The previous build branch or its checked artifacts changed.')
+            ch.send(tasks.describe(tasks.get(tid,ch,repo))); return 'blocked'
     if not task['metadata']['approved']:
         ch.send('Build this plan?\n' + '\n'.join(s['args']['step']['title'] for s in task['steps']),
                 buttons=[[('Build it', 'bpln|yes'), ('Not now', 'bpln|no')]])
@@ -82,7 +103,12 @@ def resume(ch, repo, tid, apply_build=None, wait=None, poll=20):
                         raise RuntimeError('The saved build state is missing or belongs to another project')
                     ch.send(f"🛠 Step {n} of {len(task['steps'])}: {item['step']['title']}. On it.")
                     ok = apply_build(state, instruction, None) in (0, None)
+                receipt = build_receipts.validate(tid, n, repo) if ok and task['criteria'] else None
+                if task['criteria']:
+                    ok = ok and bool(receipt)
                 with store.transaction():
+                    if receipt:
+                        verification.record(tid, n, 'build_receipt', receipt['commit'])
                     tasks.update(tid, metadata=meta)
                     tasks.finish_step(tid, n, {'status': 'done' if ok else 'failed'})
             if not ok:

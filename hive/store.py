@@ -162,6 +162,18 @@ MIGRATIONS = [
         owner_id TEXT NOT NULL, chat_id TEXT NOT NULL, message_id INTEGER NOT NULL, update_id TEXT NOT NULL,
         text TEXT, button TEXT, created REAL NOT NULL, PRIMARY KEY(chat_id,update_id));
     """,
+    # 7: durable child builds and exact-commit validation evidence.
+    """
+    CREATE TABLE child_builds (
+        parent TEXT NOT NULL REFERENCES tasks(id), step INTEGER NOT NULL,
+        child TEXT NOT NULL UNIQUE REFERENCES tasks(id), action_id TEXT NOT NULL REFERENCES actions(id),
+        PRIMARY KEY(parent,step));
+    CREATE TABLE build_manifests (
+        task_id TEXT NOT NULL REFERENCES tasks(id), step INTEGER NOT NULL, project TEXT NOT NULL,
+        base_ref TEXT NOT NULL, base_sha TEXT NOT NULL, branch TEXT NOT NULL, previous_sha TEXT NOT NULL,
+        state_path TEXT NOT NULL, result_sha TEXT, tests TEXT, receipt REAL,
+        PRIMARY KEY(task_id,step));
+    """,
 ]
 
 

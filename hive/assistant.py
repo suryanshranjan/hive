@@ -919,7 +919,8 @@ def background_build(repo, goal, ch=None, interview=True, report=True, workers=N
     active = tasks.ACTIVE_STEP.get()
     proc = subprocess.Popen(cmd, cwd=repo, start_new_session=os.name != 'nt',   # so a stop ends its builders too
                             stdout=open(log, 'w'), stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
-                            env=hive_env(HIVE_FROM_PHONE='1', HIVE_PLAN_TASK=active[0] if active else ''))
+                            env=hive_env(HIVE_FROM_PHONE='1', HIVE_PLAN_TASK=active[0] if active else '',
+                                         HIVE_PLAN_STEP=str(active[1]) if active else ''))
     BUILD.update(proc=proc, goal=goal, started=time.time(), log=log, stopped=False)
 
     def watch():
