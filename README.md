@@ -1,89 +1,19 @@
 # Hive
 
-**Twelve AI coding agents built a 1,340-test project without saying a word to each other. Then we found what actually stops them, wrote it down as a law, and built a product on it.**
+**Run your company from your phone.** Tell Hive what you want for the business, in plain words, on Telegram. It works out what to change, builds it with a silent team of AI coding agents, shows you the result, and hands your engineer a tested change to review. It also reads your mail, calendar and data, remembers what you tell it, speaks up when something needs you, and answers in text or by voice.
 
-Hive started as a research question: *can a swarm of AI coding agents that never message each other build real software, coordinating only through Git? And what limits how big and how correct it can get?*
-
-119 experiments later, we have an answer, an equation, and a product that runs your company from your phone.
-
-[The law](#the-hive-law) · [What we found](#what-we-found) · [The product](#then-we-built-hive) · [Get started](#quick-start) · [For developers](#for-developers)
-
----
-
-## The Hive law
-
-How much useful work a swarm of AI agents can do per hour is capped by whichever of three things runs out first:
-
-```
-X_useful = min(  N(1−f) / (1 + κ·d·(N−1)),     (1−f) / t_g,       I / b  )
-                 └── agents getting in          └── the test gate    └── what the owner
-                     each other's way               everyone queues      wants, reaching
-                                                    behind               the builders
-```
-
-| The limit | In plain words | How sure we are |
-| --- | --- | --- |
-| **Coupling** | More agents means more of them editing the same lines. Past a point, adding one slows the team down. | Form **established** (Universal Scalability Law). Measured: speed peaks near **7 builders** ([Gate 50](gates/gate50/RESULTS.md)) |
-| **The gate** | Every change must pass the full test suite before it lands. That gate is a queue, and the queue caps the team. | **Established** (queueing theory); measured on our runs (Gates 21, 22) |
-| **Intent** | Agents can only build correctly what someone has told them. Past a point the bottleneck isn't the code at all: it's how fast the owner's wishes get through. | **Evidence that it binds**: hidden tests pass 58% → 87% → 98% as the owner answers 0 → 30 → 320 questions (Gates 3, 4). The rate itself is **not yet measured** |
-
-N agents · κ share of agent pairs editing the same lines · d cost of one collision · f share of landings that carry a bug · t_g full-suite time · I intent reaching the builders per hour · b intent needed per unit of correct work. The other parts of the law (critical path, bug threshold, onboarding cost) and the status of each are in [BRAIN.md §3](BRAIN.md#3-the-law-and-how-sure-we-are-of-each-part).
-
-The surprise is the third term. Everyone is racing to make agents write better code. **Our data says the code is not the limit. Knowing what the owner wants is.**
-
----
-
-## What we found
-
-**1. Silence wins.** Up to 12 agents, coordinating only through Git, finished every project they were given, up to 1,340 tests, and never gamed the hidden tests. A shared message board added nothing: 3.5 minutes either way, same cost, same correctness ([Gate 43](gates/gate43/RESULTS.md)). A lead with a plan made them *slower*, 1.20× ([Gate 46](gates/gate46/RESULTS.md)). Five gates agree: talking does not speed the swarm.
-
-**2. The code is easy. The intent is hard.** On business rules a model can't guess, swarms passed every visible example and only **35–58% of the hidden tests** (Gates 3–17). The code worked. It just did the wrong thing.
-
-**3. Asking more questions hits a wall.** Builder questions help (+25 to +32 points), but builders ask where they are *uncertain*, not where they are *wrong*. About a fifth of the errors survive any number of questions ([Gate 12](gates/gate12/RESULTS.md)). And one real owner's answers to the same decision, framed two ways, agreed **1 time in 8** ([Gate 37](gates/gate37/RESULTS.md)).
-
-**4. Verify, don't elicit.** The breakthrough. Don't interview the owner: build first, describe what was built as plain rules, and let the owner mark the wrong ones. Fresh builders given that corrected sheet passed **99.6% and 100%** of the hidden tests, against **68.4%** from the best interview ([Gates 42](gates/gate42/RESULTS.md), [44](gates/gate44/RESULTS.md); simulated owner). Shown a whole rule, an owner returns a whole rule.
-
-**5. Give it the goal, not the task.** Told only *"more sign-ups"*, Hive found **8 of 9** problems planted in a product and fixed them, with 4 messages from the owner ([Gate 106](gates/gate106/RESULTS.md)).
-
-And along the way:
-
-| Finding | Result | Evidence |
-| --- | --- | --- |
-| A swarm is a speed-for-money trade | 7 builders: **3× faster for 1.9× the cost** of one; 12 were slower than 7 | [Gate 50](gates/gate50/RESULTS.md) |
-| Rival AI companies' agents can share one team | 2 Claude + 2 Codex: 1,340 of 1,340 tests, 100% hidden, main never broken | [Gate 47](gates/gate47/RESULTS.md) |
-| A full team isn't always worth it | Real Django issues: one builder solved 8 of 10, a swarm also 8 of 10, at 15× the cost | [Gate 89](gates/gate89/RESULTS.md) |
-| A picture beats words for how something should look | 18 of 18 checks against 13 of 18 | [Gate 105](gates/gate105/RESULTS.md) |
-| Memory that brings back the right fact | 30 of 30 facts found against 2 of 30 before; 12 of 12 questions asked in other words | [Gates 118](gates/gate118/RESULTS.md), [119](gates/gate119/RESULTS.md) |
-| Reading a message as a plan of steps | As accurate as one request (92.3% vs 91.5% on 130 messages); 14 of 14 multi-step requests read right | [Gate 120](gates/gate120/RESULTS.md) |
-
-### How we keep ourselves honest
-
-Most AI agent projects show a demo that worked. We publish **every experiment, including the ones that failed.**
-
-- **Predictions first.** Each experiment (a *gate*) has its predictions and a *kill condition*, the result that would prove the idea wrong, pushed to GitHub before it runs. The lab script refuses to start otherwise.
-- **Hidden tests.** Builders are scored on tests they never see, so they can't game them.
-- **Failures are kept.** Dozens of our predictions failed, and laws we proposed were withdrawn when held-out data broke them. All of it stays in the record ([BRAIN.md §6](BRAIN.md#6-prediction-scorecard)).
-
-**Still unproven:** many experiments use a simulated owner answering from a written policy, on mock companies made by the same author; many results come from one run per arm; and the real test, a founder running their own company through Hive, hasn't happened yet. Experiments on a real company's code publish aggregate numbers only.
-
-[BRAIN.md](BRAIN.md) is the full record of what is known and how sure we are. [Research to product](docs/research_to_product.md) maps each finding to the code it changed. [The lab queue](lab/QUEUE.md) says what's next.
-
----
-
-## Then we built Hive
-
-**Run your company from your phone.** Tell Hive what you want for the business, in plain words, on Telegram. It works out what to change, builds it with a silent swarm of AI coding agents, shows you the result, and hands your engineer a tested change to review. It also reads your mail, calendar and data, remembers what you tell it, speaks up when something needs you, and answers in text or by voice.
-
-Every part of it comes from the research:
-
-- **It asks only what only you can decide** (finding 3). Anything it can find out from your product or your data, it finds out.
-- **It shows you what it built, and you correct it** (finding 4): screenshots and plain words, never code.
-- **Its builders never talk to each other** (finding 1), and the law sizes the team for each job: one builder for a small fix, more when the work splits.
+- **It asks only what only you can decide.** Anything it can find out from your product or your data, it finds out.
+- **It shows you what it built, and you correct it:** screenshots and plain words, never code.
 - **Nothing leaves your machine without your yes.** A mail, a calendar invite, a click on a website, a pull request: you see exactly what will happen and tap to approve it.
+- **It is built on research, not demos.** 119 published experiments, failures included, and a law of our own for what limits a team of AI agents. [The research](#the-research-behind-hive).
+
+[See it work](#see-it-work) · [What you can do](#what-you-can-do) · [The research](#the-research-behind-hive) · [Get started](#quick-start) · [What it costs](#what-it-costs) · [For developers](#for-developers)
 
 > **Where Hive stands today:** every feature below runs and is tested on controlled fixtures. It has **not yet been used by a founder on their own company and real accounts**. That is the next step, not a finished one. [Current limits](#current-limits).
 
-### See it work
+---
+
+## See it work
 
 A shortened exchange from an end-to-end test of a founder's first day ([Gate 107](gates/gate107/RESULTS.md)):
 
@@ -141,6 +71,77 @@ Hindi-English works throughout. Builders can be Claude Code, OpenAI Codex or Gem
 - Leave a test page up quietly. It stops after two hours and Hive offers to remove the machine; that also waits for your yes, and if the button has expired, say *"take it down"*.
 - Run builders outside a sandbox. Each works in its own Docker container, with no access to your keys or your other files.
 - Keep your passwords and keys in plain text. They are encrypted on your machine.
+
+---
+
+## The research behind Hive
+
+**Twelve AI coding agents built a 1,340-test project without saying a word to each other. Then we found what actually stops them, and wrote it down as a law.**
+
+Hive started as a research question: *can a swarm of AI coding agents that never message each other build real software, coordinating only through Git? And what limits how big and how correct it can get?* 119 experiments later, here is the answer.
+
+### The Hive law
+
+How much useful work a swarm of AI agents can do per hour is capped by whichever of three things runs out first:
+
+```
+X_useful = min(  N(1−f) / (1 + κ·d·(N−1)),     (1−f) / t_g,       I / b  )
+                 └── agents getting in          └── the test gate    └── what the owner
+                     each other's way               everyone queues      wants, reaching
+                                                    behind               the builders
+```
+
+| The limit | In plain words | How sure we are |
+| --- | --- | --- |
+| **Coupling** | More agents means more of them editing the same lines. Past a point, adding one slows the team down. | Form **established** (Universal Scalability Law). Measured: speed peaks near **7 builders** ([Gate 50](gates/gate50/RESULTS.md)) |
+| **The gate** | Every change must pass the full test suite before it lands. That gate is a queue, and the queue caps the team. | **Established** (queueing theory); measured on our runs (Gates 21, 22) |
+| **Intent** | Agents can only build correctly what someone has told them. Past a point the bottleneck isn't the code at all: it's how fast the owner's wishes get through. | **Evidence that it binds**: hidden tests pass 58% → 87% → 98% as the owner answers 0 → 30 → 320 questions (Gates 3, 4). The rate itself is **not yet measured** |
+
+N agents · κ share of agent pairs editing the same lines · d cost of one collision · f share of landings that carry a bug · t_g full-suite time · I intent reaching the builders per hour · b intent needed per unit of correct work. The other parts of the law (critical path, bug threshold, onboarding cost) and the status of each are in [BRAIN.md §3](BRAIN.md#3-the-law-and-how-sure-we-are-of-each-part).
+
+The surprise is the third term. Everyone is racing to make agents write better code. **Our data says the code is not the limit. Knowing what the owner wants is.**
+
+### What we found
+
+**1. Silence wins.** Up to 12 agents, coordinating only through Git, finished every project they were given, up to 1,340 tests, and never gamed the hidden tests. A shared message board added nothing: 3.5 minutes either way, same cost, same correctness ([Gate 43](gates/gate43/RESULTS.md)). A lead with a plan made them *slower*, 1.20× ([Gate 46](gates/gate46/RESULTS.md)). Five gates agree: talking does not speed the swarm.
+
+**2. The code is easy. The intent is hard.** On business rules a model can't guess, swarms passed every visible example and only **35–58% of the hidden tests** (Gates 3–17). The code worked. It just did the wrong thing.
+
+**3. Asking more questions hits a wall.** Builder questions help (+25 to +32 points), but builders ask where they are *uncertain*, not where they are *wrong*. About a fifth of the errors survive any number of questions ([Gate 12](gates/gate12/RESULTS.md)). And one real owner's answers to the same decision, framed two ways, agreed **1 time in 8** ([Gate 37](gates/gate37/RESULTS.md)).
+
+**4. Verify, don't elicit.** The breakthrough. Don't interview the owner: build first, describe what was built as plain rules, and let the owner mark the wrong ones. Fresh builders given that corrected sheet passed **99.6% and 100%** of the hidden tests, against **68.4%** from the best interview ([Gates 42](gates/gate42/RESULTS.md), [44](gates/gate44/RESULTS.md); simulated owner). Shown a whole rule, an owner returns a whole rule.
+
+**5. Give it the goal, not the task.** Told only *"more sign-ups"*, Hive found **8 of 9** problems planted in a product and fixed them, with 4 messages from the owner ([Gate 106](gates/gate106/RESULTS.md)).
+
+And along the way:
+
+| Finding | Result | Evidence |
+| --- | --- | --- |
+| A swarm is a speed-for-money trade | 7 builders: **3× faster for 1.9× the cost** of one; 12 were slower than 7 | [Gate 50](gates/gate50/RESULTS.md) |
+| Rival AI companies' agents can share one team | 2 Claude + 2 Codex: 1,340 of 1,340 tests, 100% hidden, main never broken | [Gate 47](gates/gate47/RESULTS.md) |
+| A full team isn't always worth it | Real Django issues: one builder solved 8 of 10, a swarm also 8 of 10, at 15× the cost | [Gate 89](gates/gate89/RESULTS.md) |
+| A picture beats words for how something should look | 18 of 18 checks against 13 of 18 | [Gate 105](gates/gate105/RESULTS.md) |
+| Memory that brings back the right fact | 30 of 30 facts found against 2 of 30 before; 12 of 12 questions asked in other words | [Gates 118](gates/gate118/RESULTS.md), [119](gates/gate119/RESULTS.md) |
+| Reading a message as a plan of steps | As accurate as one request (92.3% vs 91.5% on 130 messages); 14 of 14 multi-step requests read right | [Gate 120](gates/gate120/RESULTS.md) |
+
+### How we keep ourselves honest
+
+Most AI agent projects show a demo that worked. We publish **every experiment, including the ones that failed.**
+
+- **Predictions first.** Each experiment (a *gate*) has its predictions and a *kill condition*, the result that would prove the idea wrong, pushed to GitHub before it runs. The lab script refuses to start otherwise.
+- **Hidden tests.** Builders are scored on tests they never see, so they can't game them.
+- **Failures are kept.** Dozens of our predictions failed, and laws we proposed were withdrawn when held-out data broke them. All of it stays in the record ([BRAIN.md §6](BRAIN.md#6-prediction-scorecard)).
+
+**Still unproven:** many experiments use a simulated owner answering from a written policy, on mock companies made by the same author; many results come from one run per arm; and the real test, a founder running their own company through Hive, hasn't happened yet. Experiments on a real company's code publish aggregate numbers only.
+
+[BRAIN.md](BRAIN.md) is the full record of what is known and how sure we are. [Research to product](docs/research_to_product.md) maps each finding to the code it changed. [The lab queue](lab/QUEUE.md) says what's next.
+
+### How the research shapes Hive
+
+- **Its builders never talk to each other** (finding 1), and the law sizes the team for each job: one builder for a small fix, more when the work splits.
+- **It asks only what only you can decide** (finding 3), because more questions hit a wall.
+- **It shows you what it built and lets you correct it** (finding 4), because verifying beats interviewing.
+- **You give it the goal, not the task** (finding 5).
 
 ---
 
