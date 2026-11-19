@@ -206,6 +206,13 @@ MIGRATIONS = [
     CREATE TABLE handoff_fences(project TEXT PRIMARY KEY,nonce TEXT NOT NULL,reader_quiet INTEGER NOT NULL DEFAULT 0,
         initiating_task TEXT,initiating_action TEXT);
     """,
+    # 11: surface unresolved effects recorded by older fixed-plan runners.
+    """
+    UPDATE tasks SET state='waiting_verification', control=CASE WHEN state='cancelled' THEN 'cancel' ELSE control END
+    WHERE mode='chain' AND state IN ('blocked','paused','queued','cancelled')
+      AND json_extract(results, '$."' || next_step || '".status') IN ('unknown','mail_unknown','event_unknown')
+      AND json_extract(steps, '$[' || (next_step - 1) || '].tool') NOT IN ('mail_find','calendar_check');
+    """,
 ]
 
 

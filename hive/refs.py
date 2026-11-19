@@ -33,17 +33,27 @@ def attach(text, code_dir, commit=False):
     them). Returns the text the builders will read."""
     if not has(text):
         return text
-    folder = os.path.join(code_dir, '.hive', 'refs'); os.makedirs(folder, exist_ok=True)
+    from pathlib import Path
+    from . import telegram
+    folder = Path(code_dir).resolve() / '.hive' / 'refs'
+    if folder.resolve() != folder:
+        return PHOTO.sub('(picture folder unavailable)', text)
+    folder.mkdir(parents=True, exist_ok=True)
     done = []
     def put(m):
-        src = m.group(1).strip()
-        if not os.path.exists(src):
+        src = telegram.inbox_file(m.group(1).strip())
+        if not src:
             return '(he sent a picture, but it could not be found)'
         if not is_image(src):   # only a picture is ever copied into his code, never any other file a marker names
             return '(a picture was named, but that file is not a picture, so it was left out)'
         n = len(os.listdir(folder)) + 1
         name = f'ref_{n}{os.path.splitext(src)[1] or ".jpg"}'
-        shutil.copy(src, os.path.join(folder, name)); done.append(name)
+        while os.path.lexists(folder / name):
+            n += 1
+            name = f'ref_{n}{os.path.splitext(src)[1] or ".jpg"}'
+        with open(folder / name, 'xb') as dst, open(src, 'rb') as source:
+            shutil.copyfileobj(source, dst)
+        done.append(name)
         return f'(his picture: .hive/refs/{name}; open it and match what it shows)'
     out = PHOTO.sub(put, text)
     if commit and done:

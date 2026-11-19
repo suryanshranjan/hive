@@ -9,7 +9,8 @@ This is a reliability milestone, not completion of the personal-assistant roadma
   Retrieved documents cannot turn an outside request into an owner request.
 - `actions` stores immutable proposals, a payload hash, account binding, expiry and the
   approving chat/message. Mail/calendar, shipping, preview/live deployment and cloud
-  callbacks use these approvals. Older undo/test-page paths still need consolidation.
+  callbacks use these approvals. Undo, review withdrawal, and temporary test-page publication
+  and cleanup use the same ledger. Each external change requires its own approval.
 - An action moves from proposed to approved to executing and then a recorded outcome.
   An interrupted or ambiguous action becomes unknown and is never automatically replayed.
   Mail/calendar and adaptive MCP/browser proposals can resume after listener restart;
@@ -31,9 +32,13 @@ configuration is hashed at creation and checked again before execution; a change
 blocks the task. Existing per-action approvals still apply to every external write.
 
 On listener restart, an interrupted `mail_find` or `calendar_check` can be retried on explicit
-resume. An interrupted mutation has an unknown outcome and blocks the chain without replay.
-On explicit resume, a confirmed success in the linked action ledger reconciles the task
-without repeating the write. Unconfirmed effects remain blocked.
+resume. An interrupted mutation enters `waiting_verification`. Use `verify task <id>` for
+read-only provider checks or `resolve task <id> complete|incomplete` to record the owner's
+assessment. Migration 11 also makes those commands available for uncertain writes saved by
+older fixed-plan runners. Existing successes and blocked builds retain their earlier state.
+An exact mail or calendar request can close on matching provider evidence. A partially
+completed request stays open. When readback confirms an interrupted send or event, Hive
+checkpoints the step. The owner can resume the remaining steps or keep them cancelled.
 Other failed steps also stop the chain. Invalid references to a later step refuse the entire
 plan before any step starts. Task records contain private request and result data in SQLite.
 
@@ -105,7 +110,7 @@ docker build -t hive-reliability-test:local -f deploy/test/Dockerfile deploy/tes
 docker run --rm --init --name hive-regression --network none --cap-drop ALL --security-opt no-new-privileges --pids-limit 256 --memory 2g --cpus 2 --tmpfs /tmp:rw,nosuid,exec,size=1g --mount "type=bind,source=$($PWD.Path),target=/source,readonly" --env PYTHONPATH=/source hive-reliability-test:local
 ```
 
-This runs 45 Python scripts (including adaptive tasks and MCP protocol fixtures) and eight shell
+This runs 46 Python scripts (including action-boundary and MCP protocol fixtures) and eight shell
 suites, without model calls or real service credentials. Optional speech/embedding model
 checks are skipped unless their dependencies are installed. The fixture-only `IS_SANDBOX=1`
 setting is suitable inside this container and must not be used to enable host execution.
@@ -175,6 +180,21 @@ In one Windows dispatcher run, acknowledgements while a model was stalled took 2
 
 The handoff suite restored a checked build into a second checkout and resumed the parent. It also returned an unresolved task between separate installations, preserved its ID and left the former host fenced. The Linux cloud shell suite exercises the existing lifecycle commands with a local target and stand-in AWS service. The dedicated-account preflight reported both Google and Telegram unconfigured. [Pilot predictions and scorecard](../gates/pilot_responsive_tasks/PREDICTIONS.md).
 
+### Legacy action and recovery follow-up
+
+Undo records the selected build, review or rollback version before asking for approval.
+When a build incorporates an earlier one, the owner receives a separate withdrawal button
+for its review. Test-page publication binds the commit, AWS account, region and machine.
+The preview server stops after two hours. Telegram then offers to close the port and remove
+the dedicated machine. A dedicated instance can continue billing while cleanup awaits
+approval. If the cleanup button expires, say `take it down` to request a fresh one.
+
+The `action_boundaries` regression suite exercises retrieved text, attachment and source
+paths, preview packaging, model-selected tools, and cleanup approvals using local fixtures.
+The network-disabled regression covers 46 Python suites and eight shell suites. The `tasks`
+suite includes 22 cases and the new boundary suite includes nine. Linux runs the link
+confinement checks that require symlink privileges on Windows.
+
 ## Remaining release gates
 
 1. Real Gmail/Calendar and Telegram journeys, including ambiguous provider outcomes and
@@ -184,5 +204,3 @@ The handoff suite restored a checked build into a second checkout and resumed th
    sessions and build-plan recovery. Mid-build uncertain effects and cross-machine task
    mapping need qualification. Plan/adaptive routing stay opt-in.
 4. Measured Hindi-English transcription, TTS quality and end-to-end voice latency.
-5. Consolidation of remaining legacy action handlers and independent adversarial tests
-   for retrieved content, filesystem reads and model-tool boundaries.

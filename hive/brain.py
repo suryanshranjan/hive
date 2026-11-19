@@ -41,7 +41,7 @@ def learn(repo, path, name=None):
     text = text_of(path)
     if not text.strip():
         return None
-    got = explain.ask_json(READ.format(name=name or os.path.basename(path), text=explain.untrusted(text, 'document'),
+    got = explain.ask_json(READ.format(name=explain.untrusted(name or os.path.basename(path), 'file name'), text=explain.untrusted(text, 'document'),
                                      rule=explain.DATA_RULE)) or {}
     facts = [str(f).strip() for f in (got.get('facts') or []) if str(f).strip()][:15]
     rules = [str(r).strip() for r in (got.get('rules') or []) if str(r).strip()][:8]

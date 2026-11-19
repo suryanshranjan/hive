@@ -115,7 +115,9 @@ json.dump({'repo': plain, 'name': 'b1', 'check': '2 tests, all passing.', 'home'
 real_which, real_ensure, real_up, real_down = shutil.which, logins.ensure, trydeploy.up, trydeploy.down
 shutil.which = lambda tool, *a, **k: '/usr/bin/aws' if tool == 'aws' else real_which(tool, *a, **k)
 logins.ensure = lambda ch_, service, poll=20: True
-trydeploy.up = lambda repo, branch, say=print, **k: (trydeploy._save({'url': 'http://1.2.3.4:8080/s/', 'until': time.time() + 60})
+cloud_aws.default_region = lambda profile=None: 'fixture-region'
+cloud_aws._aws = lambda *a: {'Account': 'fixture-account'}
+trydeploy.up = lambda repo, branch, say=print, **k: (trydeploy._save({'url': 'http://1.2.3.4:8080/s/', 'ip': trydeploy._machine()['ip'], 'until': time.time() + 60})
                                                       or {'ok': True, 'url': 'http://1.2.3.4:8080/s/', 'made': True})
 fake = FakeTelegram([tap('tdp|yes')])
 r = assistant.handle(ch(fake), plain, 'send me a link', poll=1)
@@ -125,7 +127,7 @@ check('no host: the test deploy is offered, with its cost and limits', ('test ma
 check('on yes: the private link, and how to end it', (r, 'http://1.2.3.4:8080/s/' in texts[-1], 'take it down' in texts[-1],
       'delete the test machine' in texts[-1]), ('test_deployed', True, True, True))
 trydeploy.down = lambda repo, **k: (os.remove(trydeploy.STATE()) or 'The test page is down, and the test machine is deleted: nothing is left running or billing.')
-fake = FakeTelegram([])
+fake = FakeTelegram([tap('act|yes')])
 r = assistant.handle(ch(fake), plain, "I'm done testing, take it down", poll=1)
 check('"take it down" ends it and says so', (r, 'nothing is left running' in fake.sent[-1]['text']), ('taken_down', True))
 fake = FakeTelegram([])

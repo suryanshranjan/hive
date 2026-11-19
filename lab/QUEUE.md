@@ -4,6 +4,12 @@ Read this after `BRAIN.md`. Pick the top **ready** card. When you finish, update
 
 ## Current implementation handoff (Nov 17 2026)
 
+**Pre-pilot engineering follow-up.** Migration 11 opens uncertain fixed-plan writes for
+read-only verification or owner resolution. Undo and temporary preview operations now
+use durable approvals, including review withdrawal and cleanup after expiry. The new
+`action_boundaries` suite checks the document, filesystem and tool boundaries. The next
+rollout step remains the dedicated-account pilot described below.
+
 **November 19 follow-up.** Migration 6 adds durable listener work, task controls, bound replies and
 verification evidence. Controlled dispatcher journeys run with `python -B tests/test_dispatcher.py`.
 Google and Telegram are unconfigured on this host. The dedicated-account pilot awaits configuration

@@ -83,7 +83,74 @@ class TaskTests(unittest.TestCase):
         with patch.object(router, '_step') as run:
             self.assertEqual(router.resume_chain(self.ch, self.repo, tid), ['unknown'])
             run.assert_not_called()
-        self.assertEqual(tasks.get(tid, self.ch, self.repo)['state'], 'blocked')
+        self.assertEqual(tasks.get(tid, self.ch, self.repo)['state'], 'waiting_verification')
+        self.assertEqual(router.task_command(self.ch, self.repo, 'verify task ' + tid), 'task_checked')
+        self.assertEqual(router.task_command(self.ch, self.repo, 'resolve task ' + tid + ' incomplete'), 'task_checked')
+        self.assertEqual(tasks.get(tid, self.ch, self.repo)['state'], 'owner_reported_incomplete')
+
+    def test_fixed_plan_lost_response_can_be_checked_without_sending_again(self):
+        from hive import verification
+        ch = telegram.Channel({'chat_id': ME, 'token': 'fake'}, api=FakeTelegram([tap('act|yes')]))
+        ctx = policy.CURRENT.set(policy.RequestContext(chat=str(ME), project=self.repo))
+        self.addCleanup(policy.CURRENT.reset, ctx)
+        with patch.object(mail, 'config', return_value={'kind': 'google'}), \
+                patch.object(office, '_send_result', side_effect=TimeoutError) as send, \
+                patch.object(google, 'readback', return_value='matching-provider-receipt') as read:
+            self.assertEqual(router.run_chain(ch, self.repo, [self.write_step(), self.read_step()], 'Send then find', poll=1),
+                             ['unknown'])
+            tid = self.newest()['id']
+            store.close()
+            self.assertEqual(router.task_command(ch, self.repo, 'verify task ' + tid), 'task_checked')
+            action, = verification.linked(tid)
+            read.assert_called_once_with(action['id'], 'mail_send', json.loads(action['args']))
+            self.assertEqual([e['kind'] for e in verification.evidence(tid)], ['provider_readback'])
+            saved = tasks.get(tid, ch, self.repo)
+            self.assertEqual((saved['state'], saved['next_step']), ('paused', 2))
+            with patch.object(mail, 'find', return_value=None) as find:
+                router.resume_chain(ch, self.repo, tid)
+                find.assert_called_once()
+            send.assert_called_once()
+
+    def test_upgrade_only_reopens_uncertain_fixed_plan_writes(self):
+        con = store.connect()
+        cases = [('chain', self.write_step(), 'unknown', 'blocked', 'waiting_verification'),
+                 ('chain', self.write_step(), 'event_unknown', 'cancelled', 'waiting_verification'),
+                 ('chain', self.write_step(), 'mail_unknown', 'paused', 'waiting_verification'),
+                 ('chain', self.write_step(), 'refused', 'blocked', 'blocked'),
+                 ('build', self.write_step(), 'unknown', 'blocked', 'blocked'),
+                 ('chain', self.write_step(), 'unknown', 'succeeded', 'succeeded')]
+        ids = []
+        for mode, step, status, state, expected in cases:
+            tid = tasks.create(self.ch, self.repo, [step], state, mode=mode)['id']
+            con.execute('UPDATE tasks SET state=?,results=? WHERE id=?', (state, json.dumps({'1': {'status': status}}), tid))
+            ids.append((tid, expected))
+        con.executescript(store.MIGRATIONS[10])
+        for tid, expected in ids:
+            self.assertEqual(tasks.get(tid, self.ch, self.repo)['state'], expected)
+        self.assertEqual(tasks.get(ids[1][0], self.ch, self.repo)['control'], 'cancel')
+
+    def test_exact_fixed_plan_readback_closes_only_the_approved_request(self):
+        from hive import verification
+        args = {'to': 'asha@example.invalid', 'subject': 'Meeting', 'body': 'Hello'}
+        step = {'tool': 'mail_send', 'args': {'to': args['to'], 'say': args['body'], 'subject': args['subject']}}
+        ch = telegram.Channel({'chat_id': ME, 'token': 'fake'}, api=FakeTelegram([tap('act|yes')]))
+        ctx = policy.CURRENT.set(policy.RequestContext(chat=str(ME), project=self.repo))
+        self.addCleanup(policy.CURRENT.reset, ctx)
+        request = 'send email: ' + json.dumps(args)
+        with patch.object(mail, 'config', return_value={'kind': 'google'}), \
+                patch.object(office, '_send_result', side_effect=TimeoutError) as send, \
+                patch.object(google, 'readback', side_effect=['', 'matching-message']):
+            router.run_chain(ch, self.repo, [step], request, poll=1)
+            tid = self.newest()['id']
+            verification.retry(ch, self.repo, tid)
+            self.assertEqual(tasks.get(tid, ch, self.repo)['state'], 'waiting_verification')
+            verification.retry(ch, self.repo, tid)
+            saved = tasks.get(tid, ch, self.repo)
+            self.assertEqual((saved['state'], saved['next_step'], saved['results']['1']['verification']),
+                             ('succeeded', 2, 'provider_verified'))
+            mismatch = dict(step, args=dict(step['args'], to='other@example.invalid'))
+            self.assertEqual(router.run_chain(ch, self.repo, [mismatch], request, poll=1), ['refused'])
+            send.assert_called_once()
 
     def test_interrupted_read_waits_for_explicit_resume(self):
         with patch.object(router, '_step', side_effect=KeyboardInterrupt):

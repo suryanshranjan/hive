@@ -37,7 +37,7 @@ def account_binding(tool, repo):
     return hashlib.sha256(_json([cfg.get('client_id'), cfg.get('refresh_token')]).encode()).hexdigest()
 
 
-def propose(tool, args, ch, ctx=None):
+def propose(tool, args, ch, ctx=None, *, detached=False):
     from . import tools
     ctx = ctx or policy.context()
     tools.allow(tool, ctx.origin)
@@ -50,12 +50,19 @@ def propose(tool, args, ch, ctx=None):
         from . import handoff, tasks
 
         tasks.boundary()
+        step = tasks.ACTIVE_STEP.get()
+        if step:
+            saved = con.execute("SELECT criteria FROM tasks WHERE id=? AND mode='chain'", (step[0],)).fetchone()
+            if saved:
+                from . import verification
+                verification.guard(saved, tools.spec(tool), args)
         handoff.available(ctx.project)
         if request_key:
             existing = con.execute('SELECT id FROM actions WHERE request_key=?', (request_key,)).fetchone()
             if existing:
                 from . import tasks
-                tasks.link_action(existing[0])
+                if not detached:
+                    tasks.link_action(existing[0])
                 return existing[0]
         con.execute('INSERT INTO actions(id,tool,args,proposal_hash,owner_id,chat_id,origin,state,created,expires,project,request_key,account_binding) '
                     'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)', (aid, tool, payload, digest, ctx.owner,
@@ -63,7 +70,8 @@ def propose(tool, args, ch, ctx=None):
                     account_binding(tool, ctx.project)))
         con.execute('INSERT INTO action_events(action_id,state,at) VALUES(?,?,?)', (aid, 'proposed', time.time()))
         from . import tasks
-        tasks.link_action(aid)
+        if not detached:
+            tasks.link_action(aid)
     return aid
 
 
@@ -182,6 +190,21 @@ def cloud_callback(ch, fn, poll=20):
     return call
 
 
+def _buttons(aid, yes_label):
+    return [[(yes_label, f'act|{aid}|yes'), ('Cancel', f'act|{aid}|no')]]
+
+
+def offer(ch, repo, tool, args, text, key, yes_label):
+    """Present a background proposal once. A later owner callback executes it."""
+    from dataclasses import replace
+    ctx = replace(policy.context(), project=str(repo), chat=str(ch.chat), update_id=key)
+    aid = propose(tool, args, ch, ctx, detached=True)
+    row = get(aid)
+    if row['state'] == 'proposed' and row['message_id'] is None and row['expires'] > time.time():
+        bind(aid, ch.send(text, html=True, buttons=_buttons(aid, yes_label)))
+    return aid
+
+
 def confirm(ch, tool, args, text, poll=20, yes_label='Confirm'):
     """Show immutable arguments; only this proposal's fresh button grants approval."""
     from . import telegram, tasks
@@ -200,7 +223,7 @@ def confirm(ch, tool, args, text, poll=20, yes_label='Confirm'):
         ch.send('This request already has a recorded outcome or has expired. No action was repeated.')
         return None
     yes, no = f'act|{aid}|yes', f'act|{aid}|no'
-    mid = ch.send(text, html=True, buttons=[[(yes_label, yes), ('Cancel', no)]])
+    mid = ch.send(text, html=True, buttons=_buttons(aid, yes_label))
     with store.transaction():
         tasks.boundary()
         bind(aid, mid)
@@ -259,6 +282,13 @@ def resume(ch, data, message_id, repo):
     elif row['tool'] == 'agent_action':
         from . import runtime_tools
         result = execute(aid, lambda a: runtime_tools.approved_external(repo, a))
+    elif row['tool'] in ('take_down', 'withdraw_build'):
+        from . import assistant, trydeploy
+        tasks.link_action(aid)
+        run = trydeploy.remove_approved if row['tool'] == 'take_down' else assistant.withdraw_approved
+        result = execute(aid, lambda a: run(repo, a))
+        ch.send(result.receipt or 'Inspect the saved outcome before requesting any further action.')
+        return True
     else:
         ch.send('This action cannot be resumed here. Ask me to propose it again.')
         return False

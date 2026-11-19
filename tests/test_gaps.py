@@ -64,7 +64,8 @@ check('"undo that": set aside, his product exactly as it was', (assistant.handle
       assistant.latest_build(repo)), ('undone', None))
 st.pop('undone', None); json.dump(st, open(os.path.join(st['home'], 'state.json'), 'w'))
 # ... sent to his engineer: the pull request is withdrawn
-st['shipped'] = time.time(); json.dump(st, open(os.path.join(st['home'], 'state.json'), 'w'))
+st['shipped'] = time.time(); st['review_url'] = 'https://example.invalid/shop/pull/1'
+json.dump(st, open(os.path.join(st['home'], 'state.json'), 'w'))
 closed = []; ship.close = lambda repo, state: closed.append(state['name']) or True
 fake = FakeTelegram([tap('und|yes')])
 check('after "ship it": the pull request is withdrawn', (assistant.handle(ch(fake), repo, 'undo that', poll=1), closed,
@@ -87,7 +88,7 @@ deploy._run = lambda cmd, cwd, timeout=900: ran.append(git(cwd, 'rev-parse', 'HE
 deploy.live(repo, old); deploy.live(repo, 'main')   # what was live, then this build
 fake = FakeTelegram([tap('und|yes')])
 check('live: the version before goes back live', (assistant.handle(ch(fake), repo, 'undo that', poll=1), ran[-1] == old,
-      'back to how it was' in fake.sent[-1]['text']), ('undone_live', True, True))
+      old[:12] in fake.sent[-1]['text']), ('undone_live', True, True))
 
 # 5. his code from its address: fetched once into its own folder, brought up to date after
 here = doctor.fetch_repo(repo)
@@ -95,7 +96,8 @@ check('his code fetched from its address, then brought up to date', (os.path.isd
       (True, True))
 
 # 6. the company brain: a document he sends is read; what lasts is kept, and rules plainly stated become his rules
-doc = os.path.join(home, 'policy.md')
+inbox = os.path.join(os.path.dirname(telegram.PATH), 'inbox'); os.makedirs(inbox, exist_ok=True)
+doc = os.path.join(inbox, 'policy.md')
 open(doc, 'w', encoding='utf-8').write('# Creator policy\nNew creators get ₹500 extra on their first completed deal.\nRefunds go back to the card.\n')
 real = explain.ask_json
 explain.ask_json = lambda prompt, **k: {'facts': ['New creators get ₹500 extra on their first completed deal.'],
@@ -111,8 +113,13 @@ explain.ask_json = real
 check("a kind it can't read is said plainly", brain.learn(repo, os.path.join(home, 'x.bin')), None)
 # 7. a build folded into a newer one is set aside (its pull request withdrawn), not offered again
 st.pop('undone', None); st['shipped'] = 1; json.dump(st, open(os.path.join(st['home'], 'state.json'), 'w')); closed.clear()
-assistant._fold(repo, st)
-check('folded into a newer build: set aside, its pull request withdrawn', (assistant.latest_build(repo), closed), (None, ['price-1103']))
+from hive import actions
+fake = FakeTelegram([])
+assistant._fold(repo, st, ch(fake))
+check('folded build is set aside while its separate review awaits approval', (assistant.latest_build(repo), closed), (None, []))
+button = fake.sent[-1]['reply_markup']['inline_keyboard'][0][0]['callback_data']
+actions.resume(ch(fake), button, len(fake.sent), repo)
+check('owner can withdraw the folded review once', closed, ['price-1103'])
 # 8. screenshots of the pages the work changed; the brief at his clock, wherever Hive runs (Gate 107)
 from hive import register, screens
 check('the pages a change touched are the ones shown', (screens.pages_of('', '.', ['signup.html', 'style.css']),

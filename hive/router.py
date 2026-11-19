@@ -12,9 +12,14 @@ Plan routing remains opt-in (HIVE_ROUTER=plan) while real execution is qualified
 explicit resume skips completed steps, and uncertain writes block recovery. Each step still goes through the policy
 check (hive/tools.py), and every step that reaches outside still asks for his yes."""
 import re
+from contextvars import ContextVar
+from dataclasses import replace
 
 from . import explain
 
+# The legacy callback accepts text. Carry its validated intent through that one
+# callback so text returned by a tool never re-enters the owner command parser.
+PLANNED_INTENT = ContextVar('hive_planned_intent', default=None)
 TOOLS = '''
 - "build": he wants something built, added or made in his product (or agrees to / corrects a build you proposed).
   args: {"what": what to build, as he said it}
@@ -86,25 +91,31 @@ def plan(history, text):
     return {'steps': steps, 'confirmed': bool(got.get('confirmed')), 'clarify': got.get('clarify') or ''}
 
 
+REFERENCE = re.compile(r'\$(\d+)(?:\.(\w+))?')
+
+
+def references(value):
+    if isinstance(value, (list, dict)):
+        for child in value.values() if isinstance(value, dict) else value:
+            yield from references(child)
+    elif isinstance(value, str):
+        match = REFERENCE.fullmatch(value.strip())
+        if match:
+            yield int(match[1])
+
+
 def validate_steps(steps):
     """Reject the whole plan before acting, including invalid forward references."""
     from .tools import Refused
     if not isinstance(steps, list) or len(steps) > 4:
         raise Refused('Please split this into requests of at most four steps.')
-    def refs(value, n):
-        if isinstance(value, (list, dict)):
-            for child in value.values() if isinstance(value, dict) else value:
-                refs(child, n)
-        elif isinstance(value, str):
-            match = re.fullmatch(r'\$(\d+)(?:\.(\w+))?', value.strip())
-            if match and not 1 <= int(match[1]) < n:
-                raise Refused('A step can only use an earlier result. Nothing was started.')
     clean = []
     for n, step in enumerate(steps, 1):
         if (not isinstance(step, dict) or not isinstance(step.get('tool'), str) or
                 step['tool'] not in KNOWN or not isinstance(step.get('args', {}), dict)):
             raise Refused('The proposed plan contains an unsupported action. Nothing was started.')
-        refs(step.get('args', {}), n)
+        if any(not 1 <= prior < n for prior in references(step.get('args', {}))):
+            raise Refused('A step can only use an earlier result. Nothing was started.')
         clean.append({'tool': step['tool'], 'args': step.get('args', {})})
     return clean
 
@@ -138,7 +149,7 @@ def _ref(value, results):
         return {k: _ref(v, results) for k, v in value.items()}
     if not isinstance(value, str):
         return value
-    m = re.fullmatch(r'\$(\d+)(?:\.(\w+))?', value.strip())
+    m = REFERENCE.fullmatch(value.strip())
     if not m:
         return value
     if int(m.group(1)) not in results:
@@ -189,9 +200,12 @@ def _run_task(ch, repo, task, poll, handle):
         else:
             try:
                 with tasks.executing(tid, n):
-                    r = _step(ch, repo, tool, args, task['instruction'], poll, handle)
+                    run_step = _observed_step if any(references(step['args'])) else _step
+                    r = run_step(ch, repo, tool, args, task['instruction'], poll, handle)
                 if not isinstance(r, dict) or not isinstance(r.get('status'), str):
                     r = {'status': 'unknown', 'why': 'The step did not report a confirmed outcome.'}
+            except tools.Refused as exc:
+                r = {'status': 'refused', 'why': str(exc)}
             except Exception:
                 # The provider may have accepted a write before a connection failed.
                 r = {'status': 'failed' if tool in tasks.RETRYABLE else 'unknown',
@@ -262,6 +276,26 @@ def task_command(ch, repo, text, poll=20, handle=None):
         ch.send(str(e))
         return 'refused'
 
+def _observed_step(ch, repo, tool, args, text, poll, handle):
+    """Pass observed data to an explicit adapter, retaining its origin in legacy handlers."""
+    from . import memory, policy, tasks, tools
+    if tool in ('mail_find', 'mail_reply', 'mail_send', 'calendar_check', 'calendar_add'):
+        return _step(ch, repo, tool, args, text, poll, handle)
+    if tool == 'remember':
+        fact = args.get('fact')
+        if not isinstance(fact, str) or not fact.strip():
+            raise tools.Refused('The earlier result did not contain a text fact.')
+        tid, n = tasks.ACTIVE_STEP.get()
+        memory.add_note(repo, fact, source='tool', trust='outside', source_ref=f'{tid}:{n}')
+        return {'status': 'done'}
+    tools.allow(tool, 'outside')
+    auth = policy.CURRENT.set(replace(policy.context(), origin='outside'))
+    try:
+        return _step(ch, repo, tool, args, text, poll, handle)
+    finally:
+        policy.CURRENT.reset(auth)
+
+
 def _step(ch, repo, tool, args, text, poll, handle):
     from . import calendar_, mail, office, telegram
     if tool == 'mail_find':
@@ -274,7 +308,8 @@ def _step(ch, repo, tool, args, text, poll, handle):
     if tool == 'mail_reply':
         target = args.get('to')
         how = f"reply to {target.get('from', '') if isinstance(target, dict) else target} saying {args.get('say', '')}"
-        return {'status': office.reply_mail(ch, repo, how, poll) or 'done'}
+        status = office.reply_mail(ch, repo, how, poll)
+        return {'status': 'unknown' if status in (None, 'mail_unknown') else status}
     if tool == 'mail_send':
         to = args.get('to') if isinstance(args.get('to'), str) else ''
         if not office.ADDRESS.fullmatch((to or '').strip()):
@@ -294,7 +329,8 @@ def _step(ch, repo, tool, args, text, poll, handle):
         guests = [g for g in (args.get('guests') or []) if isinstance(g, str) and '@' in g]
         how = f"put {args.get('what') or 'it'} on my calendar {args.get('when') or ''}" + \
               (f" with {', '.join(guests)}" if guests else '')
-        return {'status': office.add_event(ch, repo, how, poll) or 'done'}
+        status = office.add_event(ch, repo, how, poll)
+        return {'status': 'unknown' if status in (None, 'event_unknown') else status}
     if tool == 'calendar_check':
         r = calendar_.answer(repo, f"am I free {args.get('when') or ''}?")
         ch.send('📅 ' + telegram.esc(r['say']), html=True)
@@ -306,8 +342,12 @@ def _step(ch, repo, tool, args, text, poll, handle):
         assistant.keep(repo, {'note': fact, 'kind': 'deadline' if until else 'note', 'until': until})
         ch.send('🧠 Kept: ' + telegram.esc(fact), html=True)
         return {'status': 'done'}
-    if handle is not None:   # any other step runs as a message of its own, through the usual code
+    if handle is not None:
         words = args.get('text') or args.get('what') or args.get('rule') or args.get('question') or \
                 args.get('about') or args.get('goal') or text
-        return {'status': handle(ch, repo, str(words), poll) or 'done'}
+        token = PLANNED_INTENT.set(as_intent({'tool': tool, 'args': args}, str(words)))
+        try:
+            return {'status': handle(ch, repo, str(words), poll) or 'unknown'}
+        finally:
+            PLANNED_INTENT.reset(token)
     return {'status': 'failed', 'why': f'no way to do {tool} here'}

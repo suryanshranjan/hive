@@ -59,6 +59,8 @@ def result(tid, step, tool, raw):
     for key in ('verification', 'evidence', 'execution'):
         raw.pop(key, None)
     rows = linked(tid, step)
+    if any(row['state'] in ('executing', 'unknown') for row in rows):
+        raw['status'] = 'unknown'
     raw['execution'] = raw['status']
     for row in rows:
         if row['state'] != 'succeeded':
@@ -106,8 +108,9 @@ def assess(task, proposal='', artifact=False):
     if (len(rows) == 1 and rows[0]['id'] in refs and criterion.get('kind') == rows[0]['tool']
             and actions.account_binding(rows[0]['tool'],task['project']) == rows[0]['account_binding']
             and criterion.get('args') == json.loads(rows[0]['args'])):
-        tasks.update(tid, state='succeeded', detail='Provider readback matches the saved request.')
-        return
+        if task['mode'] != 'chain' or task['next_step'] > len(task['steps']):
+            tasks.update(tid, state='succeeded', detail='Provider readback matches the saved request.')
+            return
     tasks.update(tid, state='waiting_verification',
                  detail='The full requested outcome still needs verification. '
                  + (f'Model proposal (unverified): {proposal}' if proposal else ''))
@@ -118,6 +121,7 @@ def retry(ch, repo, tid):
     task = tasks.get(tid, ch, repo)
     if not task or task['state'] != 'waiting_verification':
         raise tools.Refused('That task is not waiting for verification.')
+    confirmed = {}
     for row in linked(tid):
         if (row['tool'] not in ('mail_send', 'add_event') or
                 row['state'] not in ('succeeded', 'unknown') or
@@ -134,13 +138,42 @@ def retry(ch, repo, tid):
                 return
             if receipt and actions.account_binding(row['tool'], repo) == row['account_binding']:
                 record(tid, row['step'], 'provider_readback', row['id'])
+                confirmed[row['id']] = receipt
             else:
                 store.connect().execute("DELETE FROM task_evidence WHERE task_id=? AND kind='provider_readback' AND reference=?",
                                         (tid, row['id']))
     with store.transaction():
         task = tasks.get(tid, ch, repo)
+        if task['state'] != 'waiting_verification':
+            return
+        if task['mode'] == 'chain':
+            _checkpoint_readback(task, confirmed)
         if task['state'] == 'waiting_verification':
             assess(task)
+
+
+def _checkpoint_readback(task, confirmed):
+    """A fresh exact provider match can finish one known step without running the next one."""
+    n, tid = task['next_step'], task['id']
+    result = task['results'].get(str(n), {})
+    if n > len(task['steps']) or result.get('status') not in ('unknown', 'mail_unknown', 'event_unknown'):
+        return
+    expected = {'mail_send': 'mail_send', 'mail_reply': 'mail_send', 'calendar_add': 'add_event'}
+    rows = linked(tid, n)
+    if len(rows) != 1:
+        return
+    row = rows[0]
+    if (row['id'] not in confirmed or row['tool'] != expected.get(task['steps'][n - 1]['tool'])
+            or row['account_binding'] != actions.account_binding(row['tool'], task['project'])):
+        return
+    task['results'][str(n)] = {'status': 'succeeded', 'execution': 'succeeded', 'verification': 'provider_verified',
+                               'receipt': confirmed[row['id']], 'evidence': [e for e in evidence(tid) if e['step'] == n]}
+    task['next_step'] = n + 1
+    if n < len(task['steps']):
+        task['state'] = 'cancelled' if task['control'] == 'cancel' else 'paused'
+    store.connect().execute('UPDATE tasks SET next_step=?,results=?,state=?,detail=?,updated=? WHERE id=?',
+                            (n + 1, json.dumps(task['results']), task['state'], 'Provider confirmed the interrupted step.',
+                             time.time(), tid))
 
 
 def resolve(ch, repo, tid, assessment):

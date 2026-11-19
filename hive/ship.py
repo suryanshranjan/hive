@@ -119,10 +119,34 @@ def _screens(repo, branch):
     except Exception:
         return []
 
+def review_url(repo, state):
+    """Look up an older shipped build's review before asking for its withdrawal."""
+    if not state.get('shipped') or state.get('review_url') is not None:
+        return state.get('review_url') or ''
+    branch = 'hive/' + state['name']
+    kind, where = web(_git(repo, 'remote', 'get-url', 'origin').stdout)
+    if kind == 'github' and shutil.which('gh'):
+        reply = _run(['gh', 'pr', 'view', branch, '--repo', '/'.join(where), '--json', 'url,headRefName,state'], repo)
+        try:
+            pr = json.loads(reply.stdout)
+            if (reply.returncode == 0 and pr['state'] == 'OPEN' and pr['headRefName'] == branch
+                    and re.fullmatch(re.escape(f'https://{where[0]}/{where[1]}/pull/') + r'\d+', pr['url'])):
+                return pr['url']
+        except (KeyError, TypeError, ValueError):
+            pass
+    return None
+
+
 def close(repo, state):
     """Withdraw the pull request for this build (he said "undo that" after shipping). True if one was closed."""
-    branch = f"hive/{state['name']}"
+    ref = review_url(repo, state)
+    if not ref:
+        return False
+    if '/merge_requests/' in ref:
+        project, _, number = ref.partition('/-/merge_requests/')
+        return bool(number.isdigit() and shutil.which('glab')) and _run(
+            ['glab', 'mr', 'close', number, '--repo', project], repo).returncode == 0
     if not shutil.which('gh'):
         return False
-    r = _run(['gh', 'pr', 'close', branch, '--comment', 'The owner took this back from his phone (Hive: "undo that").'], repo)
+    r = _run(['gh', 'pr', 'close', ref, '--comment', 'The owner withdrew this review from Hive.'], repo)
     return r.returncode == 0

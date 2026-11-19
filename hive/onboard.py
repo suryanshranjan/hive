@@ -154,6 +154,9 @@ def step_data(ch, repo, poll, k, n):
         if kind != 'text':
             return
         doc = brain.DOC.search(text)
+        if doc and not telegram.inbox_file(doc[1].strip()):
+            ch.send('Please attach the data file in this chat.')
+            continue
         src = ({'kind': 'file', 'where': doc.group(1).strip(), 'name': doc.group(2).strip()} if doc and
                os.path.splitext(doc.group(2))[1].lower() in ('.csv', '.xlsx', '.json', '.tsv') else access.detect(text))
         if not src:
@@ -178,6 +181,9 @@ def _gather(ch, repo, poll, k, n, title, ask, prefix=''):
             return
         doc = brain.DOC.search(text)
         if doc:
+            if not telegram.inbox_file(doc[1].strip()):
+                ch.send('Please attach the document in this chat.')
+                continue
             got = brain.learn(repo, doc.group(1).strip(), doc.group(2).strip())
             ch.send("📚 " + (f"Read: {len(got['facts'])} things kept"
                              + (f", and {len(got['rules'])} rules for how the product behaves" if got['rules'] else '')

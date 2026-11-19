@@ -14,6 +14,8 @@ A source is one of:
 Sources are kept on this computer only (~/.hive/access/<project>.json), never in his repository, and secrets in them
 are never sent back to him or shown to builders. Hive asks for read-only logins and keys, and says so."""
 import csv, io, json, os, re, sqlite3, subprocess, time, urllib.parse, urllib.request
+from pathlib import Path
+import stat
 
 DIR = os.path.join(os.path.expanduser('~'), '.hive', 'access')
 ROWS = 200            # rows back from any one query, at most
@@ -35,6 +37,8 @@ def _save(repo, sources):
 def add(repo, kind, where, name=None, headers=None):
     """Keep one source (replacing one of the same name). Returns it."""
     src = {'name': (name or default_name(kind, where))[:60], 'kind': kind, 'where': where, 'added': time.time()}
+    if kind == 'file':
+        src['where'] = os.path.realpath(where)
     if headers:
         src['headers'] = headers
     _save(repo, [s for s in load(repo) if s['name'] != src['name']] + [src])
@@ -320,6 +324,12 @@ def read(src):
     if kind == 'file':
         if not os.path.exists(where):
             raise Unreadable(f'the file {os.path.basename(where)} is no longer on this computer')
+        path = Path(where).absolute()
+        for part in (path, *path.parents):
+            entry = part.lstat()
+            if (stat.S_ISLNK(entry.st_mode) or
+                    getattr(entry, 'st_reparse_tag', None) == getattr(stat, 'IO_REPARSE_TAG_MOUNT_POINT', -1)):
+                raise Unreadable('the registered document path now points elsewhere; reconnect the intended file')
         return _text_of_file(where)
     if kind == 'cmd':
         p = subprocess.run(where, shell=True, capture_output=True, text=True, timeout=120)

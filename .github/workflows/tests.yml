@@ -39,6 +39,10 @@ jobs:
           done
       - name: Task restart recovery and conversation context (fake services)
         run: timeout 300 python3 tests/test_tasks.py
+      - name: Owner approvals, retrieved content and dispatcher boundaries
+        run: |
+          timeout 300 python3 tests/test_action_boundaries.py
+          timeout 300 python3 tests/test_dispatcher.py
       - name: Secrets encrypted (with the secure extra installed)
         run: |
           python -m pip install "cryptography>=43"

@@ -5,6 +5,10 @@ Read this first. It is the shared memory for anyone working on Hive, human or ag
 Last updated November 19, 2026 (IST). The responsive execution candidate and its controlled tests are described in
 `docs/adaptive_tasks.md`. Child builds carry exact-commit receipts. The phone takeover and MCP fixtures are described in `docs/control_gateway.md`. Calendar schedules and checked handoff are described in `docs/schedules_and_handoff.md`. The dedicated-account pilot is pending. Its predictions are in `gates/pilot_responsive_tasks/PREDICTIONS.md`.
 
+Migration 11 brings interrupted fixed-plan writes into the verification flow. Undo and
+temporary preview cleanup require scoped owner approval. The controlled regression cases
+and operator handoff are in `docs/reliability.md`.
+
 ## 1. The question
 
 Can a swarm of AI coding agents that never message each other build real software by coordinating only through a shared git repository? And what limits how big and how correct such a swarm can get?

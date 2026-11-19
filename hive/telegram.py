@@ -17,6 +17,19 @@ import threading
 
 PATH = os.path.join(os.path.expanduser('~'), '.hive', 'telegram.json')
 
+def inbox_file(path):
+    """Resolve a downloaded attachment. Chat markers may only name files in the private inbox."""
+    from pathlib import Path
+    folder = Path(PATH).parent / 'inbox'
+    candidate = Path(path)
+    try:
+        if (not candidate.is_absolute() or candidate.parent != folder or candidate.is_symlink()
+                or candidate.resolve(strict=True).parent != folder.resolve(strict=True) or not candidate.is_file()):
+            return None
+    except (OSError, RuntimeError, ValueError):
+        return None
+    return str(candidate)
+
 def esc(text):
     """Text from builders, the model or the owner, made safe inside a formatted (HTML) message."""
     return _html.escape(str(text), quote=False)
@@ -211,7 +224,8 @@ class Channel:
         try:
             f = self.api('getFile', file_id=file_id)
             folder = os.path.join(os.path.dirname(PATH), 'inbox'); os.makedirs(folder, exist_ok=True)
-            local = os.path.join(folder, f"{int(time.time() * 1000)}{os.path.splitext(f.get('file_path') or '.jpg')[1] or '.jpg'}")
+            import secrets
+            local = os.path.join(folder, secrets.token_hex(16) + (os.path.splitext(f.get('file_path') or '.jpg')[1] or '.jpg'))
             self.fetch(f['file_path'], local)
             return local
         except Exception:

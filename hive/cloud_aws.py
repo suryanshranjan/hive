@@ -167,6 +167,11 @@ def _my_ip():
     with urllib.request.urlopen('https://checkip.amazonaws.com', timeout=15) as r:
         return r.read().decode().strip()
 
+def default_region(profile=None):
+    cmd = shlex.split(AWS) + ['configure', 'get', 'region'] + (['--profile', profile] if profile else [])
+    return subprocess.run(cmd, capture_output=True, text=True).stdout.strip() or 'ap-south-1'
+
+
 def new(repo='.', size='t3.small', region=None, profile=None, with_login=True, start=True, say=print):
     """Make a machine on the owner's AWS account, wait until it is ready, and move the project there."""
     if os.path.exists(STATE()):
@@ -181,8 +186,7 @@ def new(repo='.', size='t3.small', region=None, profile=None, with_login=True, s
             "`aws configure` or `aws login`, and try again."); return 2
     if is_root(who):
         say(ROOT_WARNING)
-    region =region or subprocess.run(shlex.split(AWS) + ['configure', 'get', 'region'] + (['--profile', profile] if profile else []),
-                                      capture_output=True, text=True).stdout.strip() or 'ap-south-1'
+    region = region or default_region(profile)
     slug = re.sub(r'[^a-z0-9]+', '-', (memory.project_name(repo) or cloud._project(repo)).lower()).strip('-')[:30] or 'project'
     name = f"hive-{slug}-{int(time.time()) % 100000}"   # named after his startup in the AWS console
     say(f"Making a cloud machine for Hive on AWS account {who.get('Account', '?')} ({region}, {size}, about "

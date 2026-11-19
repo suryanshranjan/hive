@@ -216,7 +216,7 @@ Controlled results recorded **November 19, 2026**.
 
 | Check | Result |
 | --- | --- |
-| Network-disabled Docker regression, 45 Python and 8 shell suites | **53/53 passed** |
+| Network-disabled Docker regression, 46 Python and 8 shell suites | **54/54 passed** |
 | Adaptive task recovery | **22/22 passed** |
 | MCP client against a local test service | **5/5 passed** |
 | Real Chromium against a local site, external network off | **4/4 passed** |

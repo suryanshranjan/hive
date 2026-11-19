@@ -103,18 +103,31 @@ UNDO_WORDS = re.compile(r"^\s*(please\s+)?(undo( that| it| this| the last( one| 
 def undo(ch, repo, poll):
     """'Undo that': whatever is most recent, taken back after his yes. A build running is stopped; a build not yet sent
     is set aside; one with his engineer has its pull request withdrawn; one live goes back to the version before."""
-    from . import deploy, numbers, ship
+    from . import actions, deploy, numbers
     p = BUILD.get('proc')
     if (p is not None and p.poll() is None) or PLAN.get('running'):
-        ch.send("↩️ <b>Stop what's being built now?</b> Nothing from it is kept.", html=True,
-                buttons=[[('↩️ Stop it', 'und|yes')], [('Keep going', 'und|no')]])
-        choice, other = choose(ch, poll, [('und|yes', ('yes', 'stop it', 'undo it', 'haan')), ('und|no', NO_WORDS)])
-        if choice != 'und|yes':
+        def running_target():
+            proc = BUILD.get('proc')
+            return {'pid': proc.pid if proc is not None and proc.poll() is None else None,
+                    'started': BUILD.get('started'), 'plan': PLAN.get('task_id'), 'goal': PLAN.get('goal'),
+                    'running': bool(PLAN.get('running'))}
+        aid = actions.confirm(ch, 'undo', running_target(), 'Stop the current build or plan?', poll, 'Stop build')
+        if not aid:
             ch.send('Very good, it carries on.'); return 'kept'
-        PLAN['running'] = False; PLAN['cancel'] = True
-        if p is not None and p.poll() is None:
-            _stop(p)
-        ch.send('↩️ Stopped. Nothing from it was kept.'); return 'undone'
+        def stop(approved):
+            if running_target() != approved:
+                return actions.ActionResult('needs_input', 'The active build changed.')
+            if approved['running'] and approved['plan']:
+                from . import tasks
+                tasks.control(approved['plan'], ch, repo, 'cancel')
+            PLAN['running'] = False
+            PLAN['cancel'] = True
+            if p is not None and p.poll() is None:
+                _stop(p)
+            return actions.ActionResult('succeeded', 'Stopped the current build.')
+        result = actions.execute(aid, stop)
+        ch.send(result.receipt or 'The stop is unconfirmed.')
+        return 'undone' if result.status == 'succeeded' else 'undo_failed'
     st = latest_build(repo)
     if not st:
         ch.send("There's nothing of mine to undo, sir."); return 'nothing'
@@ -124,30 +137,54 @@ def undo(ch, repo, poll):
     what = (f"Put your live product back to how it was before {name} went live?" if is_live else
             f"Withdraw {name} from your engineer and set it aside?" if st.get('shipped') else
             f"Set aside {name}? Your product stays exactly as it is.")
-    ch.send(f"↩️ <b>{telegram.esc(what)}</b>", html=True, buttons=[[('↩️ Yes, undo it', 'und|yes')], [('Not now', 'und|no')]])
-    choice, other = choose(ch, poll, [('und|yes', ('yes', 'undo it', 'do it', 'haan')), ('und|no', NO_WORDS)])
-    if other is not None:
-        return handle(ch, repo, other, poll)
-    if choice != 'und|yes':
-        ch.send('Very good. Nothing changed.'); return 'kept'
     if is_live:
+        if len(hist) < 2:
+            ch.send('There is no previous deployment recorded for this project.'); return 'undo_failed'
         if not host_login(ch, repo, poll):
             return 'login_needed'
-        r = deploy.back(repo)
-        if not r['ok']:
-            ch.send('⚠️ ' + telegram.esc(r['say'])); return 'undo_failed'
+        from .work_tools import digest
+        payload = {'build': st['name'], 'sha': hist[-2]['sha'], 'configuration': digest(deploy.config(repo))}
+        aid = actions.confirm(ch, 'undo', payload, telegram.esc(f"{what} Restore {payload['sha'][:12]} on {deploy.title(repo)}."), poll)
+        if not aid:
+            return 'kept'
+        def rollback(a):
+            cfg = deploy.config(repo)
+            if digest(cfg) != a['configuration'] or cfg['history'][-2]['sha'] != a['sha']:
+                return actions.ActionResult('needs_input', 'The deployment changed. Request a new rollback.')
+            result = deploy.back(repo, expected_sha=a['sha'])
+            return actions.ActionResult('succeeded' if result['ok'] else 'unknown', result.get('url') or '')
+        if actions.execute(aid, rollback).status != 'succeeded':
+            ch.send('The rollback is unconfirmed. Check your host before requesting another change.'); return 'undo_failed'
         numbers.mark(repo, f'went back to the version before "{_goal_words(st)}"')
-        ch.send("↩️ <b>Done: your live product is back to how it was.</b> Your engineer should undo the merge in your main "
-                "version too, so the next build starts from there; I've left that to them.", html=True)
+        ch.send(f"The host accepted the rollback to {payload['sha'][:12]}. Check the live product. "
+                "Your engineer can revert the merge in the main branch separately.")
         return 'undone_live'
-    if st.get('shipped'):
-        ship.close(repo, st)
-    st['undone'] = time.time()
-    try:
-        json.dump(st, open(os.path.join(st.get('home') or os.path.join(RUNS, st['name']), 'state.json'), 'w'), indent=1)
-    except (OSError, KeyError):
-        pass
-    ch.send("↩️ Done, sir: set aside" + (", and withdrawn from your engineer." if st.get('shipped') else ".") +
+    target = _withdraw_target(repo, st)
+    if target['review_url'] is None:
+        ch.send('I could not identify the review for this older build. Check it on the project host.')
+        return 'undo_failed'
+    review = target['review_url'] or st['name']
+    aid = actions.confirm(ch, 'undo', target, telegram.esc(f'{what} ({review})'), poll, 'Undo build')
+    if not aid:
+        return 'kept'
+    def set_aside(approved):
+        current = latest_build(repo)
+        if not current or _withdraw_target(repo, current) != approved:
+            return actions.ActionResult('needs_input', 'The latest build changed.')
+        if current.get('shipped'):
+            result = withdraw_approved(repo, approved)
+            if result.status != 'succeeded':
+                return result
+        current['undone'] = time.time()
+        path = os.path.join(current.get('home') or os.path.join(RUNS, current['name']), 'state.json')
+        with open(path, 'w', encoding='utf-8') as out:
+            json.dump(current, out, indent=1)
+        return actions.ActionResult('succeeded')
+    outcome = actions.execute(aid, set_aside)
+    if outcome.status != 'succeeded':
+        ch.send(outcome.receipt or 'The undo outcome is unconfirmed. Check the build and its review.')
+        return 'undo_failed'
+    ch.send("↩️ Done, sir: set aside" + (", and withdrawn from your engineer." if target['review_url'] else ".") +
             " Your product is exactly as it was.")
     return 'undone'
 
@@ -486,6 +523,7 @@ def ship_it(ch, repo, text, poll):
         numbers.mark(repo, f'"{ship.title(st)[6:][:80]}" went to your engineer')
         try:
             st['shipped'] = time.time()
+            st['review_url'] = r.get('url') if r.get('how') == 'pr' else ''
             json.dump(st, open(os.path.join(st.get('home') or os.path.join(RUNS, st['name']), 'state.json'), 'w'), indent=1)
         except (OSError, KeyError, TypeError):
             pass
@@ -877,15 +915,39 @@ def _unmerged(repo):
     from . import deploy
     return None if deploy.merged(repo, ref, st.get('branch') or 'main') else st
 
-def _fold(repo, old):
-    """The earlier build went into a newer one: set it aside, and withdraw its own pull request if it had one."""
+def _withdraw_target(repo, st):
     from . import ship
+    from .work_tools import digest
+    return {'name': st['name'], 'shipped': st.get('shipped'), 'review_url': ship.review_url(repo, st),
+            'remote': digest(ship._git(repo, 'remote', 'get-url', 'origin').stdout.strip())}
+
+
+def withdraw_approved(repo, target):
+    from . import actions, ship
+    if target.get('review_url') == '':
+        return actions.ActionResult('succeeded', 'No pull request was created for this build.')
+    if not target.get('review_url') or _withdraw_target(repo, target) != target:
+        return actions.ActionResult('needs_input', 'The build remote changed.')
+    if ship.close(repo, target):
+        return actions.ActionResult('succeeded', 'The review was withdrawn.')
+    return actions.ActionResult('unknown', 'Review withdrawal is unconfirmed. Check the review on your host.')
+
+
+def _fold(repo, old, ch=None):
+    """Set aside the folded build and offer its separate review withdrawal."""
+    from . import actions
     try:
         path = os.path.join(old.get('home') or os.path.join(RUNS, old['name']), 'state.json')
         st = json.load(open(path)); st['folded'] = time.time()
         json.dump(st, open(path, 'w'), indent=1)
-        if st.get('shipped'):
-            ship.close(repo, st)
+        if ch is not None and st.get('shipped') and st.get('review_url') != '':
+            target = _withdraw_target(repo, st)
+            if not target['review_url']:
+                ch.send(f"Build {st['name']} was folded. Check its earlier review on the project host.")
+                return
+            actions.offer(ch, repo, 'withdraw_build', target,
+                          f"Withdraw the separate review for folded build {telegram.esc(st['name'])}? {telegram.esc(target['review_url'])}",
+                          'fold:' + st['name'], 'Withdraw review')
     except (OSError, ValueError, KeyError):
         pass
 
@@ -935,7 +997,7 @@ def background_build(repo, goal, ch=None, interview=True, report=True, workers=N
             except Exception:
                 pass
         if rc == 0 and prev:   # the earlier build is part of this one now: one line of work, one pull request
-            _fold(repo, prev)
+            _fold(repo, prev, ch)
         if rc == 0 and report and ch is not None and BUILD.get('proc') is proc and not BUILD.get('stopped'):
             from . import screens   # a frontend: he sees it, unasked (the owner: "share the screenshot on my phone")
             try:
@@ -1435,23 +1497,28 @@ def preview_it(ch, repo, poll=20):
 
 def try_deploy(ch, repo, st, poll):
     """No host set up: offer the build's pages on a test machine on his AWS, at a secret address, for two hours."""
-    from . import logins, trydeploy
-    ch.send("🔗 You haven't set up a hosting service yet, sir. I can put this build on a test machine on your AWS "
-            "account, at a private link, for up to two hours (about $0.03 an hour), then take it down and delete the "
-            "machine. Your live product isn't touched.",
-            buttons=[[('🔗 Yes, put it up', 'tdp|yes')], [('Not now', 'tdp|no')]])
-    choice, other = choose(ch, poll, [('tdp|yes', ('yes', 'put it up', 'go', 'haan')), ('tdp|no', NO_WORDS)])
-    if other is not None:
-        return handle(ch, repo, other, poll)
-    if choice != 'tdp|yes':
-        ch.send("Very good. Screenshots it is: say \"show me\"."); return 'no_preview'
+    from . import actions, logins, trydeploy
     if not logins.ensure(ch, 'aws', poll):
         return 'login_needed'
-    ch.send("🛠 Putting it up. If I have to make the test machine first, that's about 5 minutes.")
     try:
-        r = trydeploy.up(repo, _build_ref(st), say=lambda *a: None)
-    except Exception as e:
-        r = {'ok': False, 'say': f"That didn't work ({str(e)[:120]})."}
+        target = trydeploy.target_snapshot(repo)
+        binding = trydeploy.cloud_binding(target['machine'])
+        if trydeploy.state().get('cloud') not in (None, binding):
+            raise ValueError('The existing test page belongs to a different AWS account or region.')
+    except ValueError as exc:
+        ch.send(str(exc)); return 'no_preview'
+    sha = subprocess.run(['git', '-C', repo, 'rev-parse', '--verify', _build_ref(st) + '^{commit}'],
+                         capture_output=True, text=True).stdout.strip()
+    if not re.fullmatch(r'[0-9a-f]{40,64}', sha):
+        ch.send('I could not identify the build commit.'); return 'no_preview'
+    machine = target['machine']['instance'] or 'a new ' + trydeploy.SIZE + ' instance'
+    what = (f"Publish {sha[:12]} on a test machine on your AWS account {binding['account']} ({machine}, {binding['region']}) for two hours? "
+            "This opens the preview port and replaces any current test page. "
+            "A new machine continues billing until you confirm its deletion.")
+    aid = actions.confirm(ch, 'test_deploy', {'sha': sha, 'target': target, 'cloud': binding}, telegram.esc(what), poll, 'Publish test page')
+    if not aid:
+        return 'no_preview'
+    r = actions.execute_dict(aid, lambda a: trydeploy.publish_approved(repo, a))
     if not r['ok']:
         ch.send('🔗 ' + telegram.esc(r['say']), html=True); return 'no_preview'
     ch.send(f"🔗 <b>Here it is, sir, to try on your phone:</b>\n{r['url']}\n\n<i>A private test copy, up for two hours. "
@@ -1459,10 +1526,47 @@ def try_deploy(ch, repo, st, poll):
             else '') + ".</i>", html=True)
     return 'test_deployed'
 
-def take_down(ch, repo):
-    from . import trydeploy
-    ch.send('🧹 ' + telegram.esc(trydeploy.down(repo)), html=True)
-    return 'taken_down'
+def take_down(ch, repo, poll=20, *, expired=False):
+    from . import actions, projects, store, trydeploy
+    try:
+        target = trydeploy.target_snapshot(repo)
+        if not target['page']:
+            return 'no_cleanup'
+        notice_key = 'expired-page:' + target['page']
+        if expired and store.get(notice_key):
+            return 'cleanup_offered'
+        saved_cloud = trydeploy.state().get('cloud')
+        binding = saved_cloud if expired and saved_cloud else trydeploy.cloud_binding(target['machine'])
+        if saved_cloud and saved_cloud != binding:
+            raise ValueError('The test page belongs to a different AWS account or region.')
+    except ValueError as exc:
+        if expired:
+            page = trydeploy.state()
+            if page.get('project', projects.path(repo)) == projects.path(repo):
+                key = f"test-cleanup-unresolved:{page.get('started')}:{page.get('until')}"
+                if not store.get(key):
+                    ch.send(f'The preview period ended. Cleanup needs attention. {exc}')
+                    store.put(key, True)
+        else:
+            ch.send(str(exc))
+        return 'no_cleanup'
+    machine = target['machine']['instance'] or target['machine']['ip']
+    text = (f"Remove the test page on {machine} in account {binding['account']} ({binding['region']}), close its preview port"
+            + (" and delete its dedicated test machine?" if target['delete_machine'] else "? The machine stays running."))
+    payload = {'target': target, 'cloud': binding}
+    if expired:
+        aid = actions.offer(ch, repo, 'take_down', payload,
+                            telegram.esc('The two-hour preview expired. ' + text + ' You can also say “take it down”.'),
+                            notice_key, 'Confirm cleanup')
+        if actions.get(aid)['message_id'] is not None:
+            store.put(notice_key, True)
+        return 'cleanup_offered'
+    aid = actions.confirm(ch, 'take_down', payload, telegram.esc(text), poll, 'Confirm cleanup')
+    if not aid:
+        return 'no_cleanup'
+    result = actions.execute(aid, lambda a: trydeploy.remove_approved(repo, a))
+    ch.send(result.receipt or 'Cleanup is unconfirmed. Inspect the page and machine before requesting another change.')
+    return 'taken_down' if result.status == 'succeeded' else 'cleanup_unconfirmed'
 
 def go_live(ch, repo, poll):
     """'Put it live': only his own main version, only after his engineer merged the build, only on his yes, and only with
@@ -1646,7 +1750,17 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     """Answer one message from the owner. apply_build(state, rule, ch) updates a build (hive.start.apply_ruling);
     start_build(repo, goal) runs a new build that reports to the phone (hive.start.start, overnight style);
     cloud(repo, on) makes a cloud machine and moves Hive there (on=True), or deletes it (hive.cloud_aws)."""
+    from . import router
+    planned = router.PLANNED_INTENT.get()
+    if planned is not None:
+        router.PLANNED_INTENT.set(None)  # Fresh replies inside the handler are owner messages.
+        return _handle_intent(ch, repo, text, planned, poll, apply_build, start_build, cloud, origin)
     low = text.lower().strip()
+    from . import brain
+    document = brain.DOC.search(text)
+    if document and not telegram.inbox_file(document[1].strip()):
+        ch.send('Please attach the document in this chat so I can read it.')
+        return 'unavailable_document'
     from . import gateway
     if gateway.COMMAND.fullmatch(low):
         return gateway.command(ch,repo,text)
@@ -1656,7 +1770,6 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     from . import register
     if policy.context().origin == 'owner':
         register.notice(text)
-    from . import router
     task_reply = router.task_command(ch, repo, text, poll, handle=lambda c, r, t, pl: handle(
         c, r, t, pl, apply_build=apply_build, start_build=start_build, cloud=cloud, origin=origin))
     if task_reply is not None:
@@ -1749,6 +1862,12 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
                 got = dict(router.as_intent(p['steps'][0], text), confirmed=p['confirmed'], clarify=p['clarify'])
         if not got:
             got = read(ch, text)   # Claude reads it as one intent
+    return _handle_intent(ch, repo, text, got, poll, apply_build, start_build, cloud, origin)
+
+
+def _handle_intent(ch, repo, text, got, poll, apply_build, start_build, cloud, origin):
+    from . import register
+    typing = getattr(ch, 'typing', None)
     intent, rule = got.get('intent', 'reply'), (got.get('rule') or text).strip()
     from . import tools   # the one check before any action (hive/tools.py): outside words never act; actions audited
     try:
@@ -1828,10 +1947,13 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
     if intent == 'preview':
         return preview_it(ch, repo, poll)
     if intent == 'take_down':
-        return take_down(ch, repo)
+        return take_down(ch, repo, poll)
     if intent == 'document':   # the company brain: what lasts in his document, kept for plans and answers
         from . import brain
         m = brain.DOC.search(text)
+        if not m or not telegram.inbox_file(m[1].strip()):
+            ch.send('Please attach the document in this chat so I can read it.')
+            return 'unavailable_document'
         ch.send("📚 Reading it now, sir.")
         got = brain.learn(repo, m.group(1).strip(), m.group(2).strip())
         if got is None:
@@ -2235,7 +2357,7 @@ def _listen_locked(ch, repo, poll, until, apply_build, start_build, cloud):
             try:   # a test page past its two hours: taken down (and its test machine deleted), and he is told
                 from . import trydeploy
                 if trydeploy.expired():
-                    ch.send('⏱ The two-hour test is over. ' + telegram.esc(trydeploy.down(repo)), html=True)
+                    take_down(ch, repo, expired=True)
             except Exception as e:
                 print(f'Could not take the test page down: {e!r}', flush=True)
             try:   # once a week: near-duplicate facts folded into the newest, forgotten ones removed from the file

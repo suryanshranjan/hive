@@ -153,7 +153,9 @@ Routines use their own interval settings, not Pulse quiet hours.
 
 Migration 5 adds task modes, metadata, action links and routines. Completed steps and
 observations survive a restart. Safe reads require explicit task resume after interruption.
-Unknown writes stay blocked. If the separate action ledger confirms that the write already
+Unknown writes in fixed and adaptive plans enter `waiting_verification`. Use
+`verify task <id>` for available read-only checks or `resolve task <id> complete|incomplete`
+to record the owner's assessment. If the action ledger confirms that the write already
 succeeded, resume reconciles the receipt and skips the write. Pending MCP/browser approvals
 can also complete after restart, provided their configuration and expiry still match.
 

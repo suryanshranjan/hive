@@ -220,13 +220,15 @@ def note_before(repo, main_ref):
     return True
 
 @logged('deploy.back')
-def back(repo):
+def back(repo, expected_sha=None):
     """Put live the version that was live before the last one Hive put live (undo). {'ok', 'url', 'say', 'when'}"""
     h = config(repo).get('history') or []
     if len(h) < 2:
         return {'ok': False, 'say': "I've no earlier version of yours that I put live, so I can't take it back from here; "
                 "your host can (on Vercel: Deployments, then Promote the previous one)."}
     prev = h[-2]
+    if expected_sha is not None and prev['sha'] != expected_sha:
+        return {'ok': False, 'say': 'The rollback target changed. Request a new rollback.'}
     r = live(repo, prev['sha'])   # it passed its tests when it went live
     if r['ok']:   # the restored version is the current one again
         cfg = config(repo); cfg['history'] = h[:-1]

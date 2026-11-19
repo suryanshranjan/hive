@@ -131,7 +131,14 @@ def create(ch, repo, steps, instruction, mode='chain', metadata=None):
             if old:
                 return get(old[0], ch, repo)
         tid, now = secrets.token_hex(6), time.time()
-        criterion = verification.criteria(instruction) if mode == 'adaptive' else {'kind': 'owner_request', 'request': instruction}
+        exact_provider_request = instruction.partition(':')[0].strip().lower() in ('send email', 'create event')
+        criterion = (verification.criteria(instruction) if mode == 'adaptive' or (mode == 'chain' and exact_provider_request)
+                     else {'kind': 'owner_request', 'request': instruction})
+        if mode == 'chain' and criterion.get('kind') in ('mail_send', 'add_event'):
+            writes = [s['tool'] for s in steps if tools.risk(s['tool']) != tools.READ]
+            expected = 'calendar_add' if criterion['kind'] == 'add_event' else 'mail_send'
+            if writes != [expected]:
+                raise tools.Refused('The plan must contain the one change specified in the request.')
         con.execute(
             'INSERT INTO tasks(id,owner_id,chat_id,project,request_key,instruction,steps,bindings,created,updated,mode,metadata,criteria,project_id) '
             'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
@@ -193,7 +200,8 @@ def finish_step(tid, n, result):
         advance = ok or (adaptive_read and result.get('status') in ('failed', 'not_found', 'needs_input'))
         state = ('succeeded' if n == len(task['steps']) and task['mode'] != 'adaptive' else 'running') if advance else (
             'paused' if adaptive_read or task['steps'][n - 1]['tool'] in RETRYABLE else 'blocked')
-        if task['mode'] == 'adaptive' and not adaptive_read and result.get('status') == 'unknown':
+        if (task['mode'] in ('chain', 'adaptive') and not adaptive_read
+                and task['steps'][n - 1]['tool'] not in RETRYABLE and result.get('status') == 'unknown'):
             state = 'waiting_verification'
         if (task['mode'] == 'adaptive' and not adaptive_read and ok and
                 result.get('verification') not in ('provider_verified','locally_verified')):
@@ -213,7 +221,7 @@ def finish_step(tid, n, result):
                      time.time(), tid))
         if state == 'succeeded' and task['mode'] == 'chain' and task['criteria']:
             from . import verification
-            verification.assess(task)
+            verification.assess(_decode(con.execute('SELECT * FROM tasks WHERE id=?', (tid,)).fetchone()))
 
 
 def recover(ch, repo):
@@ -229,7 +237,7 @@ def recover(ch, repo):
             if n:
                 safe = task['steps'][n - 1]['tool'] in RETRYABLE or (
                     task['mode'] == 'adaptive' and task['steps'][n - 1].get('retry_safe', False))
-                state = 'paused' if safe else ('waiting_verification' if task['mode'] in ('adaptive','message') else 'blocked')
+                state = 'paused' if safe else ('blocked' if task['mode'] == 'build' else 'waiting_verification')
                 detail = ('An interrupted read can be retried when you resume.' if safe else
                           'An action was interrupted. Check its outcome; Hive will not repeat it.')
                 task['results'][str(n)] = {'status': 'unknown', 'why': detail}
@@ -260,7 +268,7 @@ def reconcile(tid, ch, repo):
         con.execute('UPDATE tasks SET results=?,next_step=?,state=?,detail=?,updated=? WHERE id=?',
                     (_json(task['results']), n + 1, state, 'Recovered a confirmed action receipt.', time.time(), tid))
         if state == 'succeeded' and task['criteria']:
-            verification.assess(task)
+            verification.assess(get(tid, ch, repo))
     return get(tid, ch, repo)
 
 
