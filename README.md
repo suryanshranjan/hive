@@ -157,7 +157,7 @@ Start a request with `agent:` and Hive works through it one step at a time. Afte
 agent: Find Asha's latest catering email. If nothing turns up, try "tasting". Check my calendar for Thursday and summarise the options.
 ```
 
-It can search and send mail, read and add calendar events, search what it remembers, and use any browser or connected tools you've enabled. Software builds keep their own flow. Every step that reaches outside shows you the exact action first. [How it works, and its limits](docs/adaptive_tasks.md).
+The listener returns a task ID immediately. Use `chat:` to keep talking, `task <id>` to inspect progress, and `pause task <id>` or `cancel task <id>` to stop future steps. Tasks can query registered business sources, retrieve documents, summarize payments, edit project memory and submit a sandboxed child build. Each external action requires approval of its exact arguments. [Task controls and evidence](docs/adaptive_tasks.md).
 
 | Setting | What it does |
 | --- | --- |
@@ -174,15 +174,15 @@ hive mcp add reports https://your-service.example/mcp --token-env REPORTS_TOKEN 
 hive mcp list
 ```
 
-Every tool asks for your approval unless you mark it as a safe read with `--read-tool`; a service can't grant itself that. Remote services must use HTTPS. Not yet supported: local (stdio) servers, the older SSE transport, and interactive sign-in.
+Every tool requires approval unless the owner designates it read-only with `--read-tool`. Use `hive mcp login` for an OAuth connector and `hive mcp add-stdio` for a local Docker image. [Connector and sign-in setup](docs/control_gateway.md).
 
 ### Let it use a browser
 
-With Docker running, `hive browser setup` and `hive browser enable`, then: *"agent: open example.com and summarise the page."* Hive can read pages, click, fill in fields and press keys; anything beyond reading asks first. The browser runs in its own locked-down container, and private network addresses are blocked. It doesn't take over logins or solve CAPTCHAs. [Browser details](docs/adaptive_tasks.md#browser-control).
+With Docker running, use `hive browser setup` and `hive browser enable`. An owner-configured HTTPS gateway and `hive browser setup-control` also let you sign in from a phone. Telegram supplies a single-use link. Return control explicitly when you finish. [Browser and gateway setup](docs/control_gateway.md).
 
 ### Repeat work on a schedule
 
-*"every 2 hours: find new catering emails and summarise anything needing my attention"* sets up a routine, from every 5 minutes to once a year. *"routines"* lists them; *"pause routine &lt;id&gt;"*, *"enable routine &lt;id&gt;"* and *"run routine &lt;id&gt;"* control them. Routines run while Hive is listening; runs missed while it was off are folded into one, and a run never overlaps the previous one.
+Use `every 2 hours: summarize new catering emails` or `weekdays at 09:00 Asia/Kolkata: prepare the daily brief`. Calendar schedules show the next three occurrences for approval. Routines can also react to Pulse or authenticated webhooks. An unresolved prior run holds the next occurrence. [Schedules, event filters and handoff](docs/schedules_and_handoff.md).
 
 ### Pick up where it stopped
 
@@ -212,21 +212,23 @@ Hive keeps what you tell it about your business and the people in it, and brings
 
 ## Current limits
 
-Results recorded **November 17, 2026**, on this repository's test suites:
+Controlled results recorded **November 19, 2026**.
 
 | Check | Result |
 | --- | --- |
-| Full regression in Docker: 40 Python and 8 shell suites | **48/48 passed** |
-| Several-things-at-once, scheduling and resume tests | **22/22 passed** on Windows and Docker |
+| Network-disabled Docker regression, 45 Python and 8 shell suites | **53/53 passed** |
+| Adaptive task recovery | **22/22 passed** |
 | MCP client against a local test service | **5/5 passed** |
-| A real Chromium browser against a local site, external network off | **3/3 passed** |
+| Real Chromium against a local site, external network off | **4/4 passed** |
 | Browser container boundaries | **1/1 passed** |
+| Phone-sized browser sign-in and containerized stdio isolation | **2/2 passed** |
+| Zoned schedules and checked handoff | **4 schedule tests and 7 handoff tests** |
 
 These use stand-in models and local test services. They show the code behaves as designed. They don't show how well it works with a live model on your business. Still to be proven:
 - real Google and Telegram accounts end to end;
 - outside MCP services;
-- websites that need a login;
-- moving to the cloud and back;
+- physical-phone sign-in on live sites;
+- SSH handoff and return between independently configured hosts;
 - voice quality on a phone;
 - above all, a founder running a real company through Hive.
 

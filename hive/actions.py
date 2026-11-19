@@ -47,8 +47,10 @@ def propose(tool, args, ch, ctx=None):
     digest = hashlib.sha256((tool + '\n' + payload).encode()).hexdigest()
     request_key = hashlib.sha256((str(ch.chat) + ctx.project + ctx.update_id + digest).encode()).hexdigest() if ctx.update_id else None
     with store.transaction() as con:
-        from . import tasks
+        from . import handoff, tasks
+
         tasks.boundary()
+        handoff.available(ctx.project)
         if request_key:
             existing = con.execute('SELECT id FROM actions WHERE request_key=?', (request_key,)).fetchone()
             if existing:
@@ -95,6 +97,9 @@ def execute(aid, fn):
         row = get(aid)
         if not row or row['state'] != 'approved' or row['expires'] <= time.time():
             return ActionResult('cancelled')
+        from . import handoff
+
+        handoff.available(row['project'])
         if con.execute('SELECT 1 FROM task_actions l JOIN tasks t ON t.id=l.task_id '
                        "WHERE l.action_id=? AND (t.control<>'' OR t.state='cancelled')", (aid,)).fetchone():
             return ActionResult('cancelled')
@@ -120,6 +125,9 @@ def execute(aid, fn):
     finally:
         EXECUTING.reset(token)
     with store.transaction() as con:
+        if con.execute('SELECT 1 FROM handoff_fences WHERE initiating_action=?', (aid,)).fetchone():
+            # The source snapshot has transferred. The receiving host reconciles this action.
+            return result
         con.execute('UPDATE actions SET state=?,receipt=? WHERE id=?', (result.status, result.receipt[:500], aid))
         con.execute('INSERT INTO action_events(action_id,state,at) VALUES(?,?,?)', (aid, result.status, time.time()))
     return result
@@ -227,7 +235,9 @@ def resume(ch, data, message_id, repo):
     except ValueError:
         return False
     row = get(aid)
-    if not row or (row['project'] and row['project'] != str(repo)):
+    from . import tasks
+
+    if not row or (row['project'] and tasks._project(row['project']) != tasks._project(repo)):
         ch.send('That proposal belongs to another project or is unavailable.')
         return False
     if decision not in ('yes', 'no') or not approve(aid, ch, message_id, decision == 'yes'):

@@ -3,7 +3,7 @@
 Read this first. It is the shared memory for anyone working on Hive, human or agent: what we know, how sure we are, what is being tested, and exactly how to continue. When you learn something, update this file in the same commit as the evidence.
 
 Last updated November 19, 2026 (IST). The responsive execution candidate and its controlled tests are described in
-`docs/adaptive_tasks.md`. Live pilot predictions are in `gates/pilot_responsive_tasks/PREDICTIONS.md`.
+`docs/adaptive_tasks.md`. Child builds carry exact-commit receipts. The phone takeover and MCP fixtures are described in `docs/control_gateway.md`. Calendar schedules and checked handoff are described in `docs/schedules_and_handoff.md`. The dedicated-account pilot is pending. Its predictions are in `gates/pilot_responsive_tasks/PREDICTIONS.md`.
 
 ## 1. The question
 

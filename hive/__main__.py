@@ -28,6 +28,8 @@ For the owner:
   hive pulse [once|status]               watch mail, calendar, payments, deadlines; tell you what needs you
   hive mcp [add|refresh|remove|list]      connect MCP tools (use hive mcp --help)
   hive browser [setup|enable|disable|status]   isolated persistent web browser
+  hive gateway [configure|check|webhook]       owner-hosted HTTPS control and event gateway
+  hive mcp login NAME | hive mcp add-stdio     authenticate a connector or register a container
   hive verify-services [--live-read-only]     check account connections without writes
   hive memory [list|search <words>|people|forget <id>|export [file]|purge]   what Hive knows about you and your business
 
@@ -145,7 +147,7 @@ def build_parser():
     ap = Parser(prog='hive', description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest='cmd', parser_class=Parser)
     for name, help_text in (('mcp', 'Connect MCP tools'), ('browser', 'Configure isolated browser control'),
-                            ('verify-services', 'Check service connections')):
+                            ('gateway','Configure the owner control gateway'), ('verify-services', 'Check service connections')):
         sub.add_parser(name, help=help_text)  # delegated before the main parser; each has its own --help
     st = sub.add_parser('start'); st.add_argument('--goal')
     st.add_argument('--workers', type=positive)   # default: the swarm law decides (a comment here once swallowed --goal)

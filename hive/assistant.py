@@ -5,9 +5,9 @@ and offers to update the latest build to match. Also: "status", and new rules to
 Gate 30: an answer contradicted the founder's own verdict from an hour earlier. People change their minds, so changing
 one should be one message, not a new build.
 
-Only one Hive process reads the bot at a time: while a build or review is talking to the owner, the listener steps
-aside (see telegram.busy_elsewhere)."""
+The listener owns the Telegram update stream and routes persisted replies to waiting work."""
 import glob, json, os, re, shutil, subprocess, time
+from contextvars import copy_context
 
 from . import argv, explain, memory, refs, team, telegram, policy
 
@@ -260,7 +260,7 @@ def _voice_too(ch, text):
                 finally:
                     import shutil as _sh
                     _sh.rmtree(os.path.dirname(path), ignore_errors=True)
-        t = threading.Thread(target=run, daemon=True); t.start()
+        t = threading.Thread(target=copy_context().run, args=(run,), daemon=True); t.start()
         return t
     except Exception:
         return None
@@ -283,7 +283,7 @@ def speak(ch, repo, task, fallback):
     prompt = VOICE.format(who=_who(ch) or 'sir', facts=facts(repo, ch), task=task)
     if explain.fast_on() and callable(getattr(ch, 'edit', None)):
         return _speak_streamed(ch, prompt, fallback)
-    t = threading.Thread(target=lambda: box.update(got=explain.ask_json(prompt) or {}), daemon=True)
+    t = threading.Thread(target=copy_context().run, args=(lambda: box.update(got=explain.ask_json(prompt) or {}),), daemon=True)
     t.start()
     # Claude Code takes ~5 s just to start (the model ~1-2 s): at 8 s most replies fell back to canned lines (Jarvis bench)
     end = time.time() + float(os.environ.get('HIVE_VOICE_SECONDS', 20))
@@ -309,7 +309,7 @@ def _speak_streamed(ch, prompt, fallback):
     def run():
         box['got'] = explain.stream_json(prompt, lambda s: box.update(text=s))
         box['done'] = True
-    t = threading.Thread(target=run, daemon=True); t.start()
+    t = threading.Thread(target=copy_context().run, args=(run,), daemon=True); t.start()
     mid, shown, last = None, '', 0.0
     end = time.time() + float(os.environ.get('HIVE_VOICE_SECONDS', 20))
     while not box['done'] and time.time() < end:
@@ -447,7 +447,7 @@ SHOW_WORDS = re.compile(r"\b(show me|screenshots?|screen ?shot|dikhao|dikha do|k
                         r"send me (a |the )?(picture|photo|pic))\b")
 # right after a screenshot, a short "and on tablet?" or "desktop?" asks for the same pages on that screen
 FOLLOW_DEVICE = re.compile(r"^\s*(and|also|now|what about|how about|ab|aur)?\s*(in|on|for)?\s*(the\s+|a\s+)?[a-z ]{0,14}\??\s*$")
-SHOWN = {}   # the last screenshots he saw: {'t', 'pages'}, so "and on desktop?" shows the same pages
+SHOWN = policy.ProjectState()   # the last screenshots shown for this project
 # Gate 105: given his words, a builder matched 13 of 18 checks of a look; given the picture, 18 of 18 ("dark green"
 # for teal, "big heading" for a small one). Words about a look get the tip to send a picture.
 LOOK_WORDS = re.compile(r"\b(colou?rs?|look|looks|design|style|font|header|button|darker|lighter|bigger|smaller|"
@@ -734,8 +734,7 @@ FORGET_SURE = re.compile(r"\b(forget|delete|remove|erase)\s+(number\s+|no\.?\s*|
 # "forget that": the fact just kept, only when one was kept in the last 10 minutes and no build is running ("this is
 # all wrong, forget it" mid-build means stop the build: tests/test_assistant.py caught the first version taking it)
 FORGET_THAT = re.compile(r"^\s*(please\s+|ok(ay)?[,.]?\s+|no[,.]?\s+)?(forget|don'?t remember|bhool ja\w*) (that|this)\b")
-SHOWN_FACTS = []   # the facts last listed for him, so "forget 2" knows which
-LAST_KEPT = {}     # the fact kept from his latest messages, so "forget that" knows which
+LAST_KEPT = policy.ProjectState()
 
 def _about(text):
     m = re.search(r"\b(?:about|on|regarding|baare mein)\s+(.+?)[?.!]*$", text.strip(), re.I)
@@ -756,7 +755,7 @@ def memory_ask(ch, repo, text):
     if about and not p:   # only what is about it: the recent filler recall adds would not be
         words = set(re.findall(r'"(\w+)"', store._fts_query(about)))   # its real words, not "the" or "about"
         facts = [f for f in facts if words & set(re.findall(r'\w+', f['text'].lower()))]
-    SHOWN_FACTS[:] = facts
+    LAST_KEPT['shown_facts'] = facts
     if not facts:
         ch.send(f"🐝 I don't have anything kept{' about ' + telegram.esc(about) if about else ''} yet. Tell me and I'll "
                 "remember it.", html=True); return 'memory_none'
@@ -775,8 +774,9 @@ def forget_it(ch, repo, text, poll=20):
     m = re.search(r"\b(?:forget|delete|remove|erase)\s+(?:number\s+|no\.?\s*|#)?(\d+)\b", low)
     about = re.search(r"\b(?:everything|all)\s+(?:about|on)\s+(.+?)[?.!]*$", text.strip(), re.I)
     targets, person = [], None
-    if m and SHOWN_FACTS and 1 <= int(m.group(1)) <= len(SHOWN_FACTS):
-        targets = [SHOWN_FACTS[int(m.group(1)) - 1]]
+    shown=LAST_KEPT.get('shown_facts',[])
+    if m and 1 <= int(m.group(1)) <= len(shown):
+        targets = [shown[int(m.group(1)) - 1]]
     elif about:
         person = store.person(about.group(1).strip())
         targets = store.facts_about(person['id']) if person else [f for f, _ in store.search(about.group(1), project=memory.project_key(repo), k=10)]
@@ -813,7 +813,7 @@ def forget_it(ch, repo, text, poll=20):
                     memory.forget(repo, n); break
     if person:
         store.forget_person(person['id'])
-    LAST_KEPT.clear(); SHOWN_FACTS.clear()
+    LAST_KEPT.clear()
     ch.send("✅ Forgotten. It won't come up again (it's gone from my records within a week).")
     return 'forgotten'
 
@@ -831,8 +831,8 @@ def read(ch, text):
     return explain.ask_json(CLASSIFY.format(history=history, text=text)) or {}
 
 PULSE = {}   # Pulse running in the background now ({"running": True}), so two looks never overlap
-BUILD = {}   # the build running in the background: {'proc', 'goal', 'started', 'log'}
-CURRENT = {}   # the owner's chat, for news from a background build
+BUILD = policy.ProjectState()
+CURRENT = policy.ProjectState()   # the owner's channel for background build notifications
 
 CHANGED = """You are Hive, a business owner's assistant, in the manner of J.A.R.V.I.S.: calm, precise, warm, a light dry
 touch at most. A build he asked for from his phone has just finished, and you are about to send him its screenshots.
@@ -943,7 +943,7 @@ def background_build(repo, goal, ch=None, interview=True, report=True, workers=N
                     show(ch, repo, intro='🎉 ' + telegram.esc(what_changed(repo, ch)))
             except Exception:
                 pass
-    threading.Thread(target=watch, daemon=True).start()
+    threading.Thread(target=copy_context().run, args=(watch,), daemon=True).start()
 
     def keep_an_eye():   # speak up unprompted (the owner: no gaps): a builder making no progress is worth his attention
         from . import screens
@@ -969,7 +969,7 @@ def background_build(repo, goal, ch=None, interview=True, report=True, workers=N
                             "goes back to the others, or leave it be; it may simply be a hard piece.", html=True)
                 except Exception:
                     pass
-    threading.Thread(target=keep_an_eye, daemon=True).start()
+    threading.Thread(target=copy_context().run, args=(keep_an_eye,), daemon=True).start()
     return proc
 
 PLAIN_REASONS = [   # why a build stopped, as he should hear it (the owner: "everyone who depends on Hive is Iron Man")
@@ -1144,7 +1144,7 @@ def look(ch, repo, text):
             if work:
                 shutil.rmtree(work, ignore_errors=True)
         done.set()
-    threading.Thread(target=run, daemon=True).start()
+    threading.Thread(target=copy_context().run, args=(run,), daemon=True).start()
     typing = getattr(ch, 'typing', None)
     while not done.wait(4):   # keep "typing..." up while Claude works (Telegram shows it for about 5 seconds)
         if callable(typing):
@@ -1529,7 +1529,7 @@ def connect_host(ch, repo, text, poll=20):
         ch.send(f"🔌 Noted: {host.title()}. " + telegram.esc(why))
     return 'connected'
 
-PLAN = {}   # the plan he said yes to: {'goal', 'steps', 'step', 'running'}
+PLAN = policy.ProjectState()
 GOAL_WORDS = re.compile(r"(^|[.!?]\s*)(i want|we need|help me|how (do|can) (i|we))\b[^.?!]{0,60}\b(more|fewer|increase|"
                         r"grow|reduce|boost|get more|get them)\b|\b(badhana|badhao|zyada|kam karna)\b|\b(sign-?ups?|signups|"
                         r"sales|conversions?|retention|churn|engagement)\b[^.?!]{0,30}\b(low|down|dropping|falling|bad|weak)\b")
@@ -1549,9 +1549,11 @@ def pursue(ch, repo, text, poll, apply_build=None, run=True):
                 seen = access.for_plan(repo)
             except Exception:
                 seen = []
-            box['plan'] = planner.make(repo, text, memory.notes(repo) + seen, [r['text'] for r in memory.load(repo)])
-            done.set()
-        threading.Thread(target=go, daemon=True).start()
+            try:
+                box['plan'] = planner.make(repo, text, memory.notes(repo) + seen, [r['text'] for r in memory.load(repo)])
+            finally:
+                done.set()
+        threading.Thread(target=copy_context().run, args=(go,), daemon=True).start()
         while not done.wait(4):
             if callable(getattr(ch, 'typing', None)):
                 ch.typing()
@@ -1617,7 +1619,6 @@ def pursue(ch, repo, text, poll, apply_build=None, run=True):
     ch.send(f"🛠 Right, sir. {'Building the first step now' if len(steps) > 1 else 'Building it now'}: "
             f"{telegram.esc(steps[0]['title'])}. I'll show you each step as it lands; say \"status\" any time.", html=True)
     if run:
-        from contextvars import copy_context
         threading.Thread(target=copy_context().run, args=(run_plan, ch, repo, apply_build), daemon=True).start()
     return 'planned'
 
@@ -1863,7 +1864,6 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         PLAN.update(step=1, running=True); PLAN.setdefault('answers', [''] * len(PLAN['steps']))
         ch.send(f"🛠 Right, sir: the plan, starting with {telegram.esc(PLAN['steps'][0]['title'])}.", html=True)
         import threading
-        from contextvars import copy_context
         threading.Thread(target=copy_context().run, args=(run_plan, ch, repo, apply_build), daemon=True).start()
         return 'planned'
     if intent == 'amend' and apply_build and latest_build(repo):   # change what he just saw; before and after
@@ -1940,7 +1940,12 @@ def handle(ch, repo, text, poll=20, apply_build=None, start_build=None, cloud=No
         if tech and not go:   # the normal questions an engineer would ask, only where something real is unclear
             import threading
             box, done = {}, threading.Event()
-            threading.Thread(target=lambda: (box.update(c=register.clarify(repo, rule)), done.set()), daemon=True).start()
+            def clarify():
+                try:
+                    box.update(c=register.clarify(repo, rule))
+                finally:
+                    done.set()
+            threading.Thread(target=copy_context().run, args=(clarify,), daemon=True).start()
             while not done.wait(4):   # "typing..." while it reads the code (half a minute or so)
                 if callable(typing):
                     typing()
@@ -2167,13 +2172,21 @@ def listen(repo='.', poll=10, apply_build=None, until=None, start_build=None, cl
         if not acquired:
             print('Hive already has an active Telegram listener.')
             return 1
-        return _listen_locked(ch, repo, poll, until, apply_build, start_build, cloud)
+        from . import tasks
+        project=policy.PROJECT.set(tasks._project(repo))
+        try:
+            return _listen_locked(ch, repo, poll, until, apply_build, start_build, cloud)
+        finally:
+            policy.PROJECT.reset(project)
 
 
 def _listen_locked(ch, repo, poll, until, apply_build, start_build, cloud):
-    from . import actions
+    from . import actions, handoff, store, tasks
+    handoff.restore(repo)
+    handoff.available(repo)
+    from . import projects
+    projects.ensure(repo)
     interrupted = actions.recover()
-    from . import tasks
     interrupted_tasks = tasks.recover(ch, repo)
     if interrupted_tasks:
         ch.send(f'{interrupted_tasks} interrupted tasks have saved progress. Say tasks to inspect or resume them.')
@@ -2209,6 +2222,9 @@ def _listen_locked(ch, repo, poll, until, apply_build, start_build, cloud):
     gateway_server = gateway.serve()
     def maintenance(ch):
         while not queue.stop.is_set():
+            if store.connect().execute('SELECT 1 FROM handoff_fences').fetchone():
+                queue.stop.wait(1)
+                continue
             memory_jobs.start()
             if not telegram.busy_elsewhere() and not (_building() or '').startswith('A build is running'):
                 try:
@@ -2223,7 +2239,6 @@ def _listen_locked(ch, repo, poll, until, apply_build, start_build, cloud):
             except Exception as e:
                 print(f'Could not take the test page down: {e!r}', flush=True)
             try:   # once a week: near-duplicate facts folded into the newest, forgotten ones removed from the file
-                from . import store
                 if store.tidy_due(memory.project_key(repo)) and not telegram.busy_elsewhere():
                     store.tidy(memory.project_key(repo)); store.purge_forgotten()
             except Exception as e:
@@ -2252,10 +2267,13 @@ def _listen_locked(ch, repo, poll, until, apply_build, start_build, cloud):
             queue.stop.wait(max(1, poll))
     background = copy.copy(ch)
     background.brokered = True
-    service = threading.Thread(target=maintenance, args=(background,), daemon=True)
+    service = threading.Thread(target=copy_context().run, args=(maintenance,background), daemon=True)
     service.start()
     try:
         while not queue.moved.is_set() and not (until and until()):
+            if store.connect().execute('UPDATE handoff_fences SET reader_quiet=1').rowcount:
+                queue.stop.wait(.2)
+                continue
             try:
                 batch = ch.updates(timeout=poll)
             except (OSError, RuntimeError) as exc:
@@ -2264,6 +2282,7 @@ def _listen_locked(ch, repo, poll, until, apply_build, start_build, cloud):
                 continue
             for text, button, mid in batch:
                 queue.dispatch(text, button, mid)
+            queue.drain_replies()
     except KeyboardInterrupt:
         pass
     finally:

@@ -76,7 +76,11 @@ SPENT_BY = {}   # the same, by the Hive step that made the call (Gate 85: where 
 def spend(dollars, step=None):
     """Count one of Hive's own model calls, under the step that made it (default: the calling module.function)."""
     try:
-        d = float(dollars or 0)
+        import math
+
+        d = float(dollars)
+        if not math.isfinite(d) or d < 0:
+            return
     except (TypeError, ValueError):
         return
     if step is None:
@@ -86,9 +90,11 @@ def spend(dollars, step=None):
     SPENT[0] += d
     SPENT_BY[step] = round(SPENT_BY.get(step, 0.0) + d, 6)
     from . import tasks, store
-    tid = tasks.ACTIVE_TASK.get()
-    if tid and d > 0:
-        store.connect().execute('UPDATE tasks SET reported_spend=reported_spend+? WHERE id=?', (d, tid))
+    tid = tasks.ACTIVE_TASK.get() or os.getenv('HIVE_PLAN_TASK')
+    if tid:
+        store.connect().execute(
+            'UPDATE tasks SET reported_spend=reported_spend+?,spend_reports=spend_reports+1 WHERE id=?', (d, tid)
+        )
 _CLAUDE_DOWN = [0.0]   # when Claude last failed: skip it for a while instead of waiting on it for every message
 
 def _ask_claude(prompt):

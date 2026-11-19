@@ -1,5 +1,6 @@
 """Request authority comes from the transport, never from model output."""
 from contextvars import ContextVar
+from collections import UserDict
 from dataclasses import dataclass
 from functools import wraps
 
@@ -13,9 +14,22 @@ class RequestContext:
     source_ref: str = ''
     project: str = ''
     text: str = ''
+    task_id: str = ''
 
 
 CURRENT = ContextVar('hive_request', default=None)
+PROJECT = ContextVar('hive_listener_project', default=None)
+
+
+class ProjectState(UserDict):
+    """Legacy conversational state shared by requests within one listener project."""
+
+    def __init__(self):
+        self.projects = {}
+
+    @property
+    def data(self):
+        return self.projects.setdefault(PROJECT.get(), {})
 
 
 def context():
@@ -29,9 +43,16 @@ def request(fn):
         origin = kwargs.get('origin', args[4] if len(args) > 4 else 'owner')
         if parent and parent.origin != 'owner':
             origin = parent.origin
-        ctx = RequestContext(origin=origin, owner=parent.owner if parent else 'owner', text=text, chat=str(getattr(ch, 'chat', '')),
-                             update_id=str(getattr(ch, 'last_update', '')),
-                             source_ref=str(getattr(ch, 'last_archive', '')), project=str(repo))
+        ctx = RequestContext(
+            origin=origin,
+            owner=parent.owner if parent else 'owner',
+            text=text,
+            chat=str(getattr(ch, 'chat', '')),
+            update_id=str(getattr(ch, 'last_update', '')),
+            source_ref=str(getattr(ch, 'last_archive', '')),
+            project=str(repo),
+            task_id=parent.task_id if parent else '',
+        )
         token = CURRENT.set(ctx)
         try:
             # All cloud paths (direct request, onboarding, away/handoff) share the boundary.

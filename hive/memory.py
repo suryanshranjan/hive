@@ -20,6 +20,10 @@ DIR = os.path.join(os.path.expanduser('~'), '.hive', 'rules')
 PROMPT_LIMIT = 40   # the most recent rulings that go into a build's instructions
 
 def project_key(repo):
+    from . import projects
+    row=projects.mapped(repo)
+    if row:
+        return row['memory_alias']
     roots = subprocess.run(['git', '-C', repo, 'rev-list', '--max-parents=0', 'HEAD'], capture_output=True,
                            text=True).stdout.split()
     return (sorted(roots)[0][:12] if roots else os.path.basename(os.path.abspath(repo))) or 'project'

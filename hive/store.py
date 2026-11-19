@@ -182,6 +182,30 @@ MIGRATIONS = [
     CREATE TABLE oauth_callbacks (
         state_hash TEXT PRIMARY KEY,connector TEXT NOT NULL,expires REAL NOT NULL,response BLOB);
     """,
+    # 9: normalized wall-clock schedules and deduplicated event occurrences.
+    """
+    ALTER TABLE routines ADD COLUMN definition TEXT NOT NULL DEFAULT '{}';
+    DROP INDEX routines_once;
+    CREATE UNIQUE INDEX routines_definition ON routines(owner_id,chat_id,project,instruction,interval_seconds,definition);
+    CREATE TABLE trigger_events(project TEXT NOT NULL,source TEXT NOT NULL,event_id TEXT NOT NULL,
+        data TEXT NOT NULL,received REAL NOT NULL,PRIMARY KEY(project,source,event_id));
+    CREATE TABLE event_runs(routine_id TEXT NOT NULL REFERENCES routines(id),source TEXT NOT NULL,
+        event_id TEXT NOT NULL,task_id TEXT REFERENCES tasks(id),PRIMARY KEY(routine_id,source,event_id));
+    """,
+    # 10: stable project identity, machine mappings and quiesced handoff ownership.
+    """
+    CREATE TABLE projects(id TEXT PRIMARY KEY,repository TEXT NOT NULL,memory_alias TEXT NOT NULL);
+    CREATE TABLE project_paths(project_id TEXT NOT NULL REFERENCES projects(id),machine TEXT NOT NULL,path TEXT NOT NULL,
+        PRIMARY KEY(machine,path));
+    ALTER TABLE tasks ADD COLUMN project_id TEXT REFERENCES projects(id);
+    ALTER TABLE tasks ADD COLUMN spend_reports INTEGER NOT NULL DEFAULT 0;
+    UPDATE tasks SET spend_reports=1 WHERE reported_spend>0;
+    ALTER TABLE telegram_replies ADD COLUMN source_id INTEGER;
+    ALTER TABLE telegram_replies ADD COLUMN source_ref TEXT NOT NULL DEFAULT '';
+    ALTER TABLE routines ADD COLUMN project_id TEXT REFERENCES projects(id);
+    CREATE TABLE handoff_fences(project TEXT PRIMARY KEY,nonce TEXT NOT NULL,reader_quiet INTEGER NOT NULL DEFAULT 0,
+        initiating_task TEXT,initiating_action TEXT);
+    """,
 ]
 
 
@@ -270,6 +294,8 @@ def _migrate(con):
         con.execute('CREATE TABLE IF NOT EXISTS schema_version (v INTEGER NOT NULL)')
         row = con.execute('SELECT max(v) FROM schema_version').fetchone()
         version = (row[0] if row else 0) or 0
+        if version > len(MIGRATIONS):
+            raise RuntimeError('This snapshot requires a newer Hive version.')
         con.execute('DELETE FROM schema_version')
         con.execute('INSERT INTO schema_version VALUES(?)', (version,))
         for n, sql in enumerate(MIGRATIONS, 1):
@@ -302,7 +328,8 @@ def fingerprint(con=None):
         for name, schema in tables:
             digest.update(repr((name, schema)).encode())
             quoted = '"' + name.replace('"', '""') + '"'
-            for row in con.execute('SELECT * FROM ' + quoted + ' ORDER BY rowid'):
+            condition = " WHERE key NOT LIKE 'telegram_reader:%'" if name == 'profile' else ''
+            for row in con.execute('SELECT * FROM ' + quoted + condition + ' ORDER BY rowid'):
                 digest.update(repr(tuple(row)).encode('utf-8'))
     return digest.hexdigest()
 

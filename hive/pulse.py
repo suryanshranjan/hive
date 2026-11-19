@@ -312,6 +312,8 @@ def look(repo):
                 count = 0
                 for source, key, title, p, body, ref in findings:
                     if add(source, key, title, p, body, ref):
+                        from . import schedules
+                        schedules.event(repo,'pulse.'+source,str(key),dict(title=title[:300],body=body[:600],priority=p,ref=str(ref)[:300]))
                         count += 1
                 for key, value in getattr(findings, 'updates', {}).items():
                     store.put(key, value)

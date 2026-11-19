@@ -96,6 +96,7 @@ def give_back(ch, repo, cookie=None):
         if fresh.get('takeover_required'):
             raise tools.Refused('The browser is still on a sign-in screen. Open a fresh takeover link to finish.')
         with store.transaction() as con:
+            store.put('browser_account:' + scope[2], secrets.token_hex(16))
             con.execute('DELETE FROM browser_control WHERE project=?',(scope[2],))
             if row['task_id']:
                 task = tasks.get(row['task_id'],ch,repo)
@@ -105,6 +106,12 @@ def give_back(ch, repo, cookie=None):
                     meta['returned_page'] = fresh
                     tasks.update(task['id'],metadata=meta)
                     if task['mode']=='adaptive' and task['state']=='waiting_browser':
+                        if 'browser' in task['bindings']:
+                            task['bindings']['browser'] = browser.fingerprint(repo)
+                            con.execute(
+                                'UPDATE tasks SET bindings=? WHERE id=?',
+                                (tasks._json(task['bindings']), task['id']),
+                            )
                         tasks.update(task['id'],state='queued',detail='Owner returned browser control.')
                         dispatcher.enqueue(task,policy.RequestContext(project=repo,update_id='return:'+secrets.token_hex(8)))
     return 'Browser control returned. Hive inspected the current page.'
@@ -265,9 +272,35 @@ try {
         return private(Response('Sign-in response received. Return to Hive.'))
     async def ready(req):
         return JSONResponse({'gateway':'ready'}) if same_host(req) else Response(status_code=403)
-    return Starlette(routes=[Route('/ready',ready),Route('/control',page),Route('/exchange',exchange,methods=['POST']),
-        Route('/return',release,methods=['POST']),Route('/assets/{path:path}',asset),WebSocketRoute('/socket',socket),
-        Route('/oauth/{name}',callback)])
+
+    async def webhook(req):
+        from . import schedules
+
+        if not same_host(req):
+            return Response(status_code=403)
+        body = bytearray()
+        async for chunk in req.stream():
+            if len(body) + len(chunk) > 16384:
+                return Response(status_code=413)
+            body.extend(chunk)
+        try:
+            accepted = schedules.webhook(req.path_params['name'], req.headers, bytes(body))
+        except (ValueError, tools.Refused):
+            return Response(status_code=400)
+        return Response(status_code=202 if accepted else 403)
+
+    return Starlette(
+        routes=[
+            Route('/ready', ready),
+            Route('/control', page),
+            Route('/exchange', exchange, methods=['POST']),
+            Route('/return', release, methods=['POST']),
+            Route('/assets/{path:path}', asset),
+            WebSocketRoute('/socket', socket),
+            Route('/oauth/{name}', callback),
+            Route('/events/{name}', webhook, methods=['POST']),
+        ]
+    )
 
 
 def serve():
@@ -284,16 +317,39 @@ def serve():
 
 def main(argv):
     parser = argparse.ArgumentParser(prog='hive gateway')
-    parser.add_argument('command',choices=['configure','check'])
+    parser.add_argument('command', choices=['configure', 'check', 'webhook'])
     parser.add_argument('address',nargs='?')
     parser.add_argument('--port',type=int,default=8791)
+    parser.add_argument('--key-env')
+    parser.add_argument('--field', action='append', default=[])
+    parser.add_argument('--project', default='.')
     args = parser.parse_args(argv)
+    if args.command == 'webhook':
+        cfg = config()
+        if (
+            not cfg
+            or not re.fullmatch(r'[a-z][a-z0-9_-]{0,31}', args.address or '')
+            or not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', args.key_env or '')
+            or not args.field
+            or not all(re.fullmatch(r'[a-z][a-z0-9_]{0,40}', f) for f in args.field)
+        ):
+            parser.error(
+                'Configure the gateway, then provide a webhook name, --key-env and declared --field values.'
+            )
+        cfg.setdefault('webhooks', {})[args.address] = {
+            'fields': sorted(set(args.field)),
+            'key_env': args.key_env,
+            'project': tasks._project(args.project),
+        }
+        vault.save_json(cfg_path(), cfg)
+        print(cfg['origin'] + '/events/' + args.address)
+        return 0
     if args.command == 'configure':
         url = urlsplit(args.address or '')
         if (url.scheme!='https' or not url.hostname or url.username or url.password or url.path not in ('','/')
                 or url.query or url.fragment or not 1<=args.port<=65535):
             parser.error('Supply the public HTTPS origin and a valid loopback port.')
-        vault.save_json(cfg_path(),{'origin':'https://'+url.netloc,'port':args.port})
+        vault.save_json(cfg_path(), dict(config(), origin='https://' + url.netloc, port=args.port))
         print('Gateway configuration saved. Restart hive listen.')
         return 0
     import urllib.request

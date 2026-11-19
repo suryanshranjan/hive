@@ -7,6 +7,7 @@ import secrets
 import threading
 import time
 from contextlib import contextmanager
+from dataclasses import replace
 
 from . import actions, agent, policy, store, tasks, tools, verification
 
@@ -82,8 +83,9 @@ def receive(ch, mid, choices, timeout, expires=None):
             if row and row['reply'] and not row['consumed']:
                 con.execute('UPDATE task_prompts SET consumed=1,reply=NULL WHERE owner_id=? AND chat_id=? '
                             'AND message_id=? AND task_id=?', scope)
-                text, data, message_id, source_id = json.loads(row['reply'])
+                text, data, message_id, source_id, *archive = json.loads(row['reply'])
                 ch.last_id = source_id
+                ch.last_archive = archive[0] if archive else ''
                 return [(text, data, message_id)]
             if row and row['expires'] <= time.time():
                 raise tools.Refused('The prompt expired. Request a fresh prompt.')
@@ -100,7 +102,17 @@ class Dispatcher:
         self.workers = []
 
     def start(self):
+        from . import projects
+
         with store.transaction() as con:
+            abandoned = con.execute(
+                "SELECT DISTINCT t.project FROM tasks t JOIN project_paths m ON "
+                "m.project_id=t.project_id AND m.path=t.project WHERE m.machine=? AND t.owner_id=? AND "
+                "t.chat_id=? AND t.state='running'",
+                (projects.machine(), policy.context().owner, str(self.ch.chat)),
+            ).fetchall()
+            for row in abandoned:
+                tasks.recover(self.ch, row['project'])
             store.put('telegram_reader:' + str(self.ch.chat), os.getpid())
             # The listener holds the process lock before reconciliation. Only abandoned claims exist.
             con.execute("UPDATE execution_queue SET pending=CASE WHEN worker IS NOT NULL AND task_id IN "
@@ -126,6 +138,23 @@ class Dispatcher:
         store.put('telegram_reader:' + str(self.ch.chat), 0)
 
     def _route(self, row, text, button, source_id, ctx):
+        owner_task = (
+            store.connect()
+            .execute(
+                'SELECT project FROM tasks WHERE id=? AND owner_id=? AND chat_id=?',
+                (row['task_id'], row['owner_id'], row['chat_id']),
+            )
+            .fetchone()
+        )
+        if owner_task:
+            ctx = replace(ctx, project=owner_task['project'])
+        token = policy.CURRENT.set(ctx)
+        try:
+            return self._consume(row, text, button, source_id, ctx)
+        finally:
+            policy.CURRENT.reset(token)
+
+    def _consume(self, row, text, button, source_id, ctx):
         con = store.connect()
         scope = (row['owner_id'], row['chat_id'], row['message_id'])
         if row['consumed'] or row['expires'] <= time.time() or row['reply']:
@@ -133,9 +162,9 @@ class Dispatcher:
         if button and button not in json.loads(row['choices']):
             return 'That button does not belong to this prompt.'
         tid = row['task_id']
-        task = tasks.get(tid, self.ch, self.repo)
+        task = tasks.get(tid, self.ch, ctx.project)
         if row['kind'] == 'legacy':
-            reply = json.dumps([text, button, row['message_id'], source_id])
+            reply = json.dumps([text, button, row['message_id'], source_id, ctx.source_ref])
             con.execute('UPDATE task_prompts SET reply=? WHERE owner_id=? AND chat_id=? AND message_id=?',
                         (reply, *scope))
             return ''
@@ -168,8 +197,12 @@ class Dispatcher:
         ctx = policy.RequestContext(chat=str(self.ch.chat), project=str(self.repo), update_id=uid,
                                     source_ref=str(getattr(self.ch, 'last_archive', '')))
         token = policy.CURRENT.set(ctx)
+        project = policy.PROJECT.set(tasks._project(self.repo))
         try:
             with store.transaction() as con:
+                if con.execute('SELECT 1 FROM handoff_fences').fetchone():
+                    self.ch._consumed_update = None
+                    return
                 if uid and not con.execute('INSERT OR IGNORE INTO dispatched_updates VALUES(?,?)',
                                            (ctx.chat, uid)).rowcount:
                     return
@@ -180,6 +213,7 @@ class Dispatcher:
             self.ch.send(str(exc))
         finally:
             policy.CURRENT.reset(token)
+            policy.PROJECT.reset(project)
 
     def _dispatch(self, text, button, mid, ctx, assistant, telegram):
         con = store.connect()
@@ -193,7 +227,7 @@ class Dispatcher:
             return '\n'.join(filter(None, (build, tasks.listing(self.ch, self.repo))))
         if words.lower() == 'tasks':
             return tasks.listing(self.ch, self.repo)
-        if words.lower().strip(' !.?') in assistant.GREETINGS:
+        if not mid and words.lower().strip(' !.?') in assistant.GREETINGS:
             return 'I’m here. Send work with agent: or talk with chat: while it runs.'
         control = re.fullmatch(r'(?:(pause|cancel|verify|resolve|resume) )?task ([0-9a-f]{12})(?: (complete|incomplete))?', words, re.I)
         if control:
@@ -232,8 +266,8 @@ class Dispatcher:
                 return self._route(row, text, button, getattr(self.ch, 'last_id', None), ctx)
             if not (button or '').startswith(('act|','pls|')):
                 # Telegram can return the reply before sendMessage returns its message ID.
-                con.execute('INSERT OR IGNORE INTO telegram_replies VALUES(?,?,?,?,?,?,?)',
-                            (*scope, mid, ctx.update_id, text, button, time.time()))
+                con.execute('INSERT OR IGNORE INTO telegram_replies VALUES(?,?,?,?,?,?,?,?,?)',
+                            (*scope, mid, ctx.update_id, text, button, time.time(),getattr(self.ch,'last_id',None),ctx.source_ref))
                 return ''
         if button and not button.startswith(('act|','pls|')):
             return 'That button is unavailable.'
@@ -246,8 +280,8 @@ class Dispatcher:
                            "JOIN execution_queue q ON q.task_id=t.id WHERE l.action_id=? AND "
                            "(t.mode='adaptive' OR q.worker IS NOT NULL)",
                            (parts[1],)).fetchone():
-                con.execute('INSERT OR IGNORE INTO telegram_replies VALUES(?,?,?,?,?,?,?)',
-                            (*scope, mid, ctx.update_id, None, button, time.time()))
+                con.execute('INSERT OR IGNORE INTO telegram_replies VALUES(?,?,?,?,?,?,?,?,?)',
+                            (*scope, mid, ctx.update_id, None, button, time.time(),getattr(self.ch,'last_id',None),ctx.source_ref))
                 return ''
         from . import routines
         routine_command = routines.is_command(words)
@@ -267,12 +301,19 @@ class Dispatcher:
         return f"Task {task['id']} {task['state']}."
 
     def _next(self, worker):
+        from . import projects
+
         with store.transaction() as con:
-            row = con.execute('SELECT q.* FROM execution_queue q JOIN tasks t ON t.id=q.task_id '
-                              'WHERE t.owner_id=? AND t.chat_id=? AND q.pending=1 AND q.worker IS NULL '
-                              'AND NOT EXISTS(SELECT 1 FROM execution_queue busy WHERE busy.project=q.project '
-                              'AND busy.worker IS NOT NULL) ORDER BY t.created LIMIT 1',
-                              (policy.context().owner, str(self.ch.chat))).fetchone()
+            row = con.execute(
+                'SELECT q.* FROM execution_queue q JOIN tasks t ON t.id=q.task_id '
+                'WHERE t.owner_id=? AND t.chat_id=? AND q.pending=1 AND q.worker IS NULL '
+                'AND EXISTS(SELECT 1 FROM project_paths m WHERE m.project_id=t.project_id '
+                'AND m.machine=? AND m.path=t.project) '
+                'AND NOT EXISTS(SELECT 1 FROM handoff_fences) '
+                'AND NOT EXISTS(SELECT 1 FROM execution_queue busy WHERE busy.project=q.project '
+                'AND busy.worker IS NOT NULL) ORDER BY t.created LIMIT 1',
+                (policy.context().owner, str(self.ch.chat), projects.machine()),
+            ).fetchone()
             if row:
                 con.execute('UPDATE execution_queue SET pending=0,worker=?,started=? WHERE task_id=?',
                             (worker, time.time(), row['task_id']))
@@ -294,8 +335,11 @@ class Dispatcher:
             ch.brokered, ch.last_update, ch.last_archive = True, params['update'], params['source']
             ch.last_prompt = None
             ch.worker_stop = self.stop
-            ctx = policy.RequestContext(chat=str(ch.chat), project=repo, update_id=ch.last_update, source_ref=ch.last_archive)
+            ctx = policy.RequestContext(
+                chat=str(ch.chat), project=repo, update_id=ch.last_update, source_ref=ch.last_archive, task_id=tid
+            )
             auth = policy.CURRENT.set(ctx)
+            project = policy.PROJECT.set(tasks._project(repo))
             active = tasks.ACTIVE_TASK.set(tid)
             try:
                 task = tasks.get(tid, ch, repo)
@@ -323,10 +367,14 @@ class Dispatcher:
                 print(f'Task {tid} stopped ({type(exc).__name__}).', flush=True)
                 ch.send(f'Task {tid} stopped. Say task {tid} for its recorded outcome.')
             finally:
-                store.connect().execute('UPDATE execution_queue SET worker=NULL,started=NULL WHERE task_id=? AND worker=?',
-                                        (tid, worker))
+                store.connect().execute(
+                    'UPDATE execution_queue SET worker=NULL,started=NULL WHERE task_id=? AND worker=? '
+                    'AND NOT EXISTS(SELECT 1 FROM handoff_fences WHERE initiating_task=?)',
+                    (tid, worker, tid),
+                )
                 tasks.ACTIVE_TASK.reset(active)
                 policy.CURRENT.reset(auth)
+                policy.PROJECT.reset(project)
 
     def _run(self, ch, repo, task):
         tid = task['id']
@@ -359,6 +407,12 @@ class Dispatcher:
                 elif self.handler(ch, repo, task['instruction']) == 'moved':
                     self.moved.set()
             with store.transaction():
+                if (
+                    store.connect()
+                    .execute('SELECT 1 FROM handoff_fences WHERE initiating_task=?', (tid,))
+                    .fetchone()
+                ):
+                    return
                 tasks.finish_step(tid, 1, {'status': 'answered'})
                 current = tasks.get(tid, ch, repo)
                 if current['state'] == 'succeeded':
@@ -373,13 +427,16 @@ class Dispatcher:
 
     def drain_replies(self):
         with store.transaction() as con:
+            if con.execute('SELECT 1 FROM handoff_fences').fetchone():
+                return
             scope = (policy.context().owner, str(self.ch.chat))
-            rows = con.execute('SELECT p.*,r.text,r.button,r.update_id FROM telegram_replies r '
+            rows = con.execute('SELECT p.*,r.text,r.button,r.update_id,r.source_id,r.source_ref FROM telegram_replies r '
                                'JOIN task_prompts p USING(owner_id,chat_id,message_id) '
                                'WHERE p.owner_id=? AND p.chat_id=? ORDER BY r.created LIMIT 20', scope).fetchall()
             for row in rows:
-                ctx = policy.RequestContext(owner=scope[0], chat=scope[1], project=str(self.repo), update_id=row['update_id'])
-                self._route(row, row['text'], row['button'], None, ctx)
+                ctx = policy.RequestContext(owner=scope[0], chat=scope[1], project=str(self.repo),
+                                            update_id=row['update_id'],source_ref=row['source_ref'])
+                self._route(row, row['text'], row['button'], row['source_id'], ctx)
                 con.execute('DELETE FROM telegram_replies WHERE chat_id=? AND update_id=?', (scope[1], row['update_id']))
             con.execute("UPDATE tasks SET state='paused',active_step=NULL,detail='Approval expired. Resume for a fresh approval.' "
                         "WHERE state='waiting_approval' AND id IN (SELECT task_id FROM task_prompts WHERE owner_id=? "
@@ -389,6 +446,8 @@ class Dispatcher:
 
     def completed_children(self):
         from . import build_receipts
+        if store.connect().execute('SELECT 1 FROM handoff_fences').fetchone():
+            return
         rows = store.connect().execute('SELECT c.*,p.project,p.control,t.state AS child_state FROM child_builds c '
             'JOIN tasks p ON c.parent=p.id JOIN tasks t ON c.child=t.id '
             "WHERE p.state='waiting_child' AND p.owner_id=? AND p.chat_id=? "
@@ -397,6 +456,8 @@ class Dispatcher:
         for row in rows:
             receipt = build_receipts.validate(row['child'], 1, row['project']) if row['child_state'] == 'succeeded' else None
             with store.transaction() as con:
+                if con.execute('SELECT 1 FROM handoff_fences').fetchone():
+                    return
                 task = tasks.get(row['parent'], self.ch, row['project'])
                 if task['state'] != 'waiting_child':
                     continue

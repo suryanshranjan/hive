@@ -3,14 +3,14 @@ from dataclasses import asdict
 import json
 import threading
 import time
-from . import policy, store
+from . import policy, store, tasks
 
 _WORKER = threading.Lock()
 
 
 def enqueue(repo, text, history):
     store.connect().execute('INSERT INTO memory_jobs(repo,text,history,context) VALUES(?,?,?,?)',
-                            (str(repo), text, history, json.dumps(asdict(policy.context()))))
+                            (tasks._project(repo), text, history, json.dumps(asdict(policy.context()))))
     return start()
 
 
@@ -27,12 +27,18 @@ def drain():
         from . import assistant, explain, register
         while True:
             with store.transaction() as con:
+                if con.execute('SELECT 1 FROM handoff_fences').fetchone():
+                    return
                 job = con.execute("SELECT * FROM memory_jobs WHERE state IN ('queued','running') ORDER BY id LIMIT 1").fetchone()
                 if not job or job['retry_at'] > time.time() or job['state'] == 'running':
                     return
                 con.execute("UPDATE memory_jobs SET state='running',attempts=attempts+1 WHERE id=?", (job['id'],))
             token = policy.CURRENT.set(policy.RequestContext(**json.loads(job['context'])))
+            tid = policy.context().task_id
+            active = tasks.ACTIVE_TASK.set(tid or None)
+            project = policy.PROJECT.set(tasks._project(job['repo']) if tid else None)
             try:
+                tasks.boundary()
                 related = assistant._related(job['repo'], job['text'])
                 got = explain.ask_small(assistant.REMEMBER.format(text=job['text'], history=job['history'],
                     today=time.strftime('%Y-%m-%d (%A)', register.his_time()),
@@ -40,17 +46,22 @@ def drain():
                 if not isinstance(got, dict) or 'note' not in got:
                     raise RuntimeError('Memory extraction unavailable')
                 with store.transaction() as con:
+                    tasks.boundary()
                     if not con.execute('SELECT 1 FROM memory_jobs WHERE id=?', (job['id'],)).fetchone():
                         continue  # forgotten while the model was working
                     assistant.keep(job['repo'], got, related)
                     # Drop source copies after extraction; the fact keeps its message reference.
                     con.execute('DELETE FROM memory_jobs WHERE id=?', (job['id'],))
+            except tasks.Controlled:
+                store.connect().execute('DELETE FROM memory_jobs WHERE id=?', (job['id'],))
             except Exception:
                 store.connect().execute("UPDATE memory_jobs SET state=?,retry_at=? WHERE id=?",
                     ('needs_input' if job['attempts'] >= 2 else 'queued', time.time() + 60, job['id']))
                 return
             finally:
                 policy.CURRENT.reset(token)
+                tasks.ACTIVE_TASK.reset(active)
+                policy.PROJECT.reset(project)
     finally:
         _WORKER.release()
 

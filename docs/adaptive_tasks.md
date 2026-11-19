@@ -143,13 +143,7 @@ enable routine <id>
 run routine <id>
 ```
 
-Intervals range from 5 minutes to 366 days. Each occurrence creates an adaptive task;
-the instructions can use any available tool. These are interval schedules, not calendar
-cron, webhooks or a general workflow graph. They run in `hive listen`, so the host and
-listener must stay on. Missed intervals coalesce into one run. A paused, blocked or
-running task prevents another occurrence from overlapping it. Resolve or cancel that
-task before the routine continues. `run routine` can run a paused routine once without
-reenabling its recurring schedule. Pausing clears a queued manual-run request.
+Intervals range from 5 minutes to 366 days. Daily and weekly schedules use an explicit IANA time zone. Each occurrence creates an adaptive task. Missed clock occurrences coalesce at restart. An outstanding task, including one awaiting verification, holds later occurrences. A manual run can execute once while the schedule is paused. [Calendar schedules, events and handoff](schedules_and_handoff.md).
 
 Routine writes still require fresh approval. Schedule state and the next task are saved
 in one SQLite transaction; a queued task is reused if the process stops before execution.

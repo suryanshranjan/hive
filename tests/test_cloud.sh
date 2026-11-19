@@ -29,7 +29,7 @@ check "his time zone goes too: a UTC cloud machine must still say good morning a
 check ".env and the Claude login stay behind" "$(test -f $P/.env && echo sent || echo kept) $(test -d $T/box/hive-cloud/.claude && echo sent || echo kept)" "kept kept"
 check "it says how to log in there" "$(grep -c 'run .claude. once' $T/go.txt)" 1
 git -C $P checkout -q -b hive/refund-page && echo "x" > $P/refund.py && git -C $P add refund.py && git -C $P -c user.name=h -c user.email=h@h commit -qm "built in the cloud"
-$PY -m hive cloud pull --from $T/box > $T/pull.txt 2>&1
+$PY -m hive cloud pull --from $T/box > $T/pull.txt 2>&1 || cat "$T/pull.txt"
 check "pull brings the cloud's result branch back, without touching main" \
   "$(git branch --list 'hive/*' | tr -d ' ') $(git rev-parse --abbrev-ref HEAD)" "hive/refund-page main"
 # one step: `hive cloud --new` makes a machine on the owner's AWS account (a stand-in aws; a local folder for the machine)

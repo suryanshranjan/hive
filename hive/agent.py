@@ -62,10 +62,17 @@ def _context(task, catalog):
         result = task['results'].get(str(n))
         if result is not None:
             observations.append({'step': n, 'tool': step['tool'], 'args': step['args'], 'result': result})
-    raw = json.dumps({'tools': [t.public() for t in catalog.values()], 'observations': observations,
-                     'prior_conversation': task['metadata'].get('history', ''),
-                     'page_after_owner_return': task['metadata'].get('returned_page')},
-                     ensure_ascii=False, default=str)
+    raw = json.dumps(
+        {
+            'tools': [t.public() for t in catalog.values()],
+            'observations': observations,
+            'prior_conversation': task['metadata'].get('history', ''),
+            'trigger_event': task['metadata'].get('trigger_event'),
+            'page_after_owner_return': task['metadata'].get('returned_page'),
+        },
+        ensure_ascii=False,
+        default=str,
+    )
     # Bound each observation at capture time; never silently drop an old successful write.
     if len(raw) > 100000:
         raise tools.Refused('This task has more context than I can inspect safely. Please split the request.')

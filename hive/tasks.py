@@ -31,7 +31,7 @@ class AwaitingReply(Exception):
 
 
 def boundary(tid=None):
-    tid = tid or ACTIVE_TASK.get()
+    tid = tid or ACTIVE_TASK.get() or os.getenv('HIVE_PLAN_TASK')
     if tid:
         row = store.connect().execute('SELECT control FROM tasks WHERE id=?', (tid,)).fetchone()
         if row and row[0]:
@@ -88,7 +88,7 @@ def bindings(repo, steps):
             got[name] = connectors.fingerprint(name.split('.', 2)[1])
         elif name.startswith('browser_'):
             from . import browser
-            got['browser'] = browser.fingerprint()
+            got['browser'] = browser.fingerprint(repo)
         elif name in ('business_query','document_get','payment_summary'):
             from . import work_tools
             got[name] = next((tool.identity for tool in work_tools.catalog(repo) if tool.name == name), 'missing')
@@ -111,7 +111,8 @@ def get(tid, ch, repo):
 
 
 def create(ch, repo, steps, instruction, mode='chain', metadata=None):
-    from . import verification
+    from . import handoff, projects, verification
+
     scope = _scope(ch, repo)
     ctx = policy.context()
     update = ctx.update_id or str(getattr(ch, 'last_update', '') or '')
@@ -124,15 +125,31 @@ def create(ch, repo, steps, instruction, mode='chain', metadata=None):
     key = hashlib.sha256(_json(identity).encode()).hexdigest() if update else None
     bound = bindings(repo, steps)
     with store.transaction() as con:
+        handoff.available(repo)
         if key:
             old = con.execute('SELECT id FROM tasks WHERE request_key=?', (key,)).fetchone()
             if old:
                 return get(old[0], ch, repo)
         tid, now = secrets.token_hex(6), time.time()
         criterion = verification.criteria(instruction) if mode == 'adaptive' else {'kind': 'owner_request', 'request': instruction}
-        con.execute('INSERT INTO tasks(id,owner_id,chat_id,project,request_key,instruction,steps,bindings,created,updated,mode,metadata,criteria) '
-                    'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)',
-                    (tid, *scope, key, instruction, _json(steps), _json(bound), now, now, mode, _json(metadata or {}), _json(criterion)))
+        con.execute(
+            'INSERT INTO tasks(id,owner_id,chat_id,project,request_key,instruction,steps,bindings,created,updated,mode,metadata,criteria,project_id) '
+            'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+            (
+                tid,
+                *scope,
+                key,
+                instruction,
+                _json(steps),
+                _json(bound),
+                now,
+                now,
+                mode,
+                _json(metadata or {}),
+                _json(criterion),
+                projects.ensure(repo)['id'],
+            ),
+        )
     return get(tid, ch, repo)
 
 
@@ -140,6 +157,9 @@ def claim(tid, ch, repo, resume=False):
     """One executor; no duplicate update or second resume may run it twice."""
     with store.transaction() as con:
         task = get(tid, ch, repo)
+        from . import handoff
+
+        handoff.available(repo)
         if not task or task['state'] not in (('queued', 'paused') if resume else ('queued',)):
             return None
         if task['mode'] == 'build' and con.execute("SELECT 1 FROM tasks WHERE project=? AND mode='build' "
@@ -239,6 +259,8 @@ def reconcile(tid, ch, repo):
         state = 'succeeded' if task['mode'] != 'adaptive' and n == len(task['steps']) else 'paused'
         con.execute('UPDATE tasks SET results=?,next_step=?,state=?,detail=?,updated=? WHERE id=?',
                     (_json(task['results']), n + 1, state, 'Recovered a confirmed action receipt.', time.time(), tid))
+        if state == 'succeeded' and task['criteria']:
+            verification.assess(task)
     return get(tid, ch, repo)
 
 
@@ -286,7 +308,11 @@ def describe(task, detailed=False):
         line += f"\nSay resume task {task['id']} to continue."
     if detailed:
         from . import verification
-        line += f"\nReported model spend: ${task['reported_spend']:.4f}"
+        line += (
+            f"\nReported model spend: ${task['reported_spend']:.4f}"
+            if task['spend_reports']
+            else '\nModel spend: no cost reported.'
+        )
         if task['control']:
             line += '\nOwner requested: ' + task['control']
         if not task['criteria'] and task['state'] == 'succeeded':

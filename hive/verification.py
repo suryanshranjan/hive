@@ -104,6 +104,7 @@ def assess(task, proposal='', artifact=False):
         return
     refs = {e['reference'] for e in evidence(tid) if e['kind'] == 'provider_readback'}
     if (len(rows) == 1 and rows[0]['id'] in refs and criterion.get('kind') == rows[0]['tool']
+            and actions.account_binding(rows[0]['tool'],task['project']) == rows[0]['account_binding']
             and criterion.get('args') == json.loads(rows[0]['args'])):
         tasks.update(tid, state='succeeded', detail='Provider readback matches the saved request.')
         return

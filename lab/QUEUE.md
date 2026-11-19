@@ -17,6 +17,8 @@ The Release 3 candidate adds the optional host-local control gateway, mobile noV
 view, MCP OAuth grants and containerized stdio connectors. Setup and reverse proxy
 configuration are in `docs/control_gateway.md`.
 
+The Release 4 candidate adds zoned calendar schedules, deduplicated signed events and checked cloud handoff in migrations 9–10. See `docs/schedules_and_handoff.md`. Run the schedule and handoff suites plus the Linux shell cloud regression. The handoff tests cover a return from a separate installation, retained unresolved work, changed account bindings and missing artifacts. The phone sign-in fixture uses mobile viewport and touch emulation. A physical phone, live providers and an SSH host remain rollout checks.
+
 - **Publication:** owner requested committing and pushing the runtime changes. README now
   leads with the phone workflow and includes adaptive/MCP/browser/routine setup, saved-task
   controls, local verification results and remaining live-account limits. Local documentation

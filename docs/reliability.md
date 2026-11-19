@@ -105,7 +105,7 @@ docker build -t hive-reliability-test:local -f deploy/test/Dockerfile deploy/tes
 docker run --rm --init --name hive-regression --network none --cap-drop ALL --security-opt no-new-privileges --pids-limit 256 --memory 2g --cpus 2 --tmpfs /tmp:rw,nosuid,exec,size=1g --mount "type=bind,source=$($PWD.Path),target=/source,readonly" --env PYTHONPATH=/source hive-reliability-test:local
 ```
 
-This runs 40 Python scripts (including adaptive tasks and MCP protocol fixtures) and eight shell
+This runs 45 Python scripts (including adaptive tasks and MCP protocol fixtures) and eight shell
 suites, without model calls or real service credentials. Optional speech/embedding model
 checks are skipped unless their dependencies are installed. The fixture-only `IS_SANDBOX=1`
 setting is suitable inside this container and must not be used to enable host execution.
@@ -166,6 +166,14 @@ measure live-account operation, Hindi-English recognition accuracy or TTS qualit
   browser rerun passed with `chromium_sandbox=True` and all capabilities dropped.
 - `hive verify-services --live-read-only`: Google and Telegram both `not_configured`.
   No model calls, live-account writes or deployment. Hosted CI remains unrun.
+
+## November 19 controlled release checks
+
+The network-disabled regression passed all 53 suites. Separate Docker checks ran the real sandbox worker, verified timeout cleanup, drove Chromium against a fixture, and inspected browser IPC and mounts. The phone-sized Chromium client exchanged a single-use ticket over HTTPS, signed into the fixture through noVNC, and explicitly returned control. The stdio fixture inspected its selected credential and read-only mount from inside its container.
+
+In one Windows dispatcher run, acknowledgements while a model was stalled took 2.881 ms for task detail, 3.482 ms for pause and 2.343 ms for cancellation. With an approved tool stalled, status took 1.758 ms, pause 2.540 ms and cancellation 2.146 ms. Timing started at dispatch and ended after the fake Telegram acknowledgement. This measures local dispatch latency. Internet and Telegram delivery latency require the pilot.
+
+The handoff suite restored a checked build into a second checkout and resumed the parent. It also returned an unresolved task between separate installations, preserved its ID and left the former host fenced. The Linux cloud shell suite exercises the existing lifecycle commands with a local target and stand-in AWS service. The dedicated-account preflight reported both Google and Telegram unconfigured. [Pilot predictions and scorecard](../gates/pilot_responsive_tasks/PREDICTIONS.md).
 
 ## Remaining release gates
 

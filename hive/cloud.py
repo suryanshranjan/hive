@@ -9,6 +9,7 @@ The Claude login goes only with --with-login: otherwise run `claude` once on the
 Never sent: .env files, keys, node_modules (dependencies are installed fresh there), anything not committed.
 For tests and mounted disks, --to may also be a local folder."""
 import json, os, shlex, shutil, subprocess, tempfile, time
+from pathlib import Path
 
 from . import access, memory, telegram
 
@@ -61,6 +62,27 @@ def _project(repo):
     return os.path.basename(os.path.abspath(repo)) or 'project'
 
 def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
+    from . import handoff, tools
+
+    if not to:
+        say('Tell me where: hive cloud --to user@host')
+        return 2
+    manifest = None
+    try:
+        manifest = handoff.freeze(repo)
+        handoff.quiet_reader(repo, manifest)
+        with tempfile.TemporaryDirectory(prefix='hive-handoff-') as temporary:
+            rc = _go(repo, to, with_login, start, say, key, manifest, temporary)
+    except tools.Refused as exc:
+        say(str(exc))
+        rc = 8
+    finally:
+        if manifest and not manifest.get('transferred'):
+            handoff.release(manifest)
+    return rc
+
+
+def _go(repo, to, with_login, start, say, key, manifest, tmp):
     repo = os.path.abspath(repo)
     if not to:
         say('Tell me where: hive cloud --to user@host'); return 2
@@ -78,17 +100,17 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
         say('Check out a branch first: Hive moves a named branch, not a detached commit.'); return 3
     say(f"Moving {name} to {t.to}. Only committed work goes; .env files, keys and dependencies stay here.")
     t.run('true')   # reachable?
-    tmp = tempfile.mkdtemp()
     bundle = os.path.join(tmp, 'project.bundle')
-    subprocess.run(['git', '-C', repo, 'bundle', 'create', '-q', bundle, branch], check=True)
+    subprocess.run(['git', '-C', repo, 'bundle', 'create', '-q', bundle, '--branches'], check=True)
     t.put(bundle, f'{t.home()}/{name}.bundle')
     # first time: clone; again later: bring that branch up to date with this machine (git will not fetch into a branch
     # that is checked out, which a second real run hit). Hive's result branches (hive/...) there are left alone.
     # the folder and branch names are his, so each is quoted (the audit, Nov 15: a name with ; or $( ) ran as a command)
     n, b, nb = Q(name), Q(branch), Q(name + '.bundle')
-    t.run(f'mkdir -p {Q(t.home())} && cd {Q(t.home())} && if test -d {n}/.git; then git -C {n} fetch -q {Q("../" + name + ".bundle")} '
-          f'{b} && git -C {n} checkout -q {b} && git -C {n} reset -q --hard FETCH_HEAD; else '
-          f'git clone -q -b {b} {nb} {n}; fi && rm -f {nb}')
+    if t.run('test -e ' + Q(proj), check=False).returncode == 0:
+        say('The destination project directory already exists. Preserve it and select an empty destination.')
+        return 8
+    t.run(f'mkdir -p {Q(t.home())} && cd {Q(t.home())} && git clone -q -b {b} {nb} {n} && rm -f {nb}')
     # Hive itself, from GitHub, in its own Python environment there: current Ubuntu refuses `pip install --user` into
     # the system Python (PEP 668), which the first real EC2 test hit. A local target shares this machine's Hive.
     py = 'python3'
@@ -99,6 +121,12 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
         p = t.run(f'{py} -m pip install -q --upgrade pytest git+https://github.com/suryanshranjan/hive', check=False)
         if p.returncode != 0:
             say(f'  Could not install Hive there: {p.stderr.strip()[-300:]}'); return 4
+        from . import store
+
+        probe = f'from hive import store; assert len(store.MIGRATIONS) == {len(store.MIGRATIONS)}'
+        if t.run(f'{py} -c ' + Q(probe), check=False).returncode:
+            say('The destination needs the same Hive database schema before it can receive this handoff.')
+            return 4
     # the owner's context: rulings for this project, the Telegram link, the backup model (never in the repository)
     hive_dir = os.path.join(os.path.expanduser('~'), '.hive')
     dst_hive = f'{t.home()}/.hive' if t.local else '.hive'
@@ -119,7 +147,7 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
                      (memory._notes_path(repo), f'{dst_hive}/rules/{os.path.basename(memory._notes_path(repo))}'),   # his business
                      (os.path.join(hive_dir, 'resume.json'), f'{dst_hive}/resume.json'),   # work to pick up there ("I'm sleepy")
                      (access._path(repo), f'{dst_hive}/access/{os.path.basename(access._path(repo))}')):   # his data, read-only
-        if os.path.exists(src):
+        if os.path.exists(src) and not (manifest['tasks'] and os.path.basename(src) == 'resume.json'):
             t.put(src, dst)   # said by what it is, so he knows his data's addresses went (encrypted: hive/vault.py)
             sent.append('his data sources (encrypted)' if src == access._path(repo) else os.path.basename(src))
     from . import store, vault
@@ -131,10 +159,12 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
     memory_baseline = store.fingerprint(dest)
     dest.close()
     os.chmod(snapshot, 0o600)
-    t.put(snapshot, f'{dst_hive}/hive.db')
     for secret_file in vault.files():
         rel = os.path.relpath(secret_file, hive_dir).replace('\\', '/')
         t.put(secret_file, f'{dst_hive}/{rel}')
+    from . import handoff
+
+    handoff.export(t, dst_hive, tmp, manifest, proj)
     sent.append('memory, pending actions and event state')
     from . import vault   # the files above may be encrypted (hive/vault.py): their key goes too, or he is told
     if vault.where() in ('file', 'keychain') and vault._key(create=False):
@@ -147,7 +177,17 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
         if os.path.exists(cred):
             t.put(cred, (f'{t.home()}/.claude' if t.local else '.claude') + '/.credentials.json'); sent.append('Claude login')
             t.run('chmod 700 .claude 2>/dev/null; chmod 600 .claude/.credentials.json 2>/dev/null || true', check=False)
-    t.run(f'chmod -R go-rwx {Q(dst_hive)} 2>/dev/null || true', check=False)
+    # Install the database last. Keep the source fenced if acknowledgement of the transfer is lost.
+    t.put(snapshot, f'{dst_hive}/incoming-{manifest["nonce"]}.db')
+    location=Path(hive_dir)/'cloud.json'
+    location.parent.mkdir(exist_ok=True,parents=True)
+    checkpoint=location.with_suffix('.tmp')
+    checkpoint.write_text(json.dumps(dict(to=t.to,project=proj,branch=branch,key=key,
+                                          memory_baseline=memory_baseline,handoff=manifest)),encoding='utf-8')
+    os.replace(checkpoint,location)
+    manifest['transferred'] = True
+    incoming = f'{dst_hive}/incoming-{manifest["nonce"]}.db'
+    t.run(f'mv {Q(incoming)} {Q(dst_hive+"/hive.db")} && chmod -R go-rwx {Q(dst_hive)}')
     # dependencies, installed fresh there
     for pj in subprocess.run(['git', '-C', repo, 'ls-files', 'package-lock.json', '*/package-lock.json'],
                              capture_output=True, text=True).stdout.split():
@@ -159,8 +199,6 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
         p = t.run(f'cd {Q(proj)} && {py} -m pip install -q -r requirements.txt', check=False)
         if p.returncode != 0:
             say(f'  The requirements did not install there: {p.stderr.strip()[-300:]}')
-    json.dump({'to': t.to, 'project': proj, 'branch': branch, 'key': key, 'memory_baseline': memory_baseline}, open(os.path.join(hive_dir if os.path.isdir(hive_dir) else tmp,
-                                                                                  'cloud.json'), 'w'))
     say(f"  Copied: the project ({branch}), " + (', '.join(sent) if sent else 'no Hive settings yet') + '.')
     # can builders work there? They run on Claude Code: check it answers (the owner: "else how will development continue")
     ready = None
@@ -173,8 +211,24 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
     elif not with_login:
         say("  The Claude login did not go over. On that machine, run `claude` once to log in (or rerun with --with-login).")
     if start:
-        t.run(f'cd {Q(proj)} && (nohup {py} -m hive listen > {Q(t.home()) if t.local else "$HOME/hive-cloud"}/listen.log 2>&1 &)',
-              check=False)
+        import sys
+
+        launch_py = Q(Path(sys.executable).as_posix()) if t.local else py
+        environment = f'env HOME={Q(t.home())} USERPROFILE={Q(t.home())} ' if t.local else ''
+        startup = t.run(
+            f'cd {Q(proj)} && (nohup {environment}{launch_py} -m hive listen > '
+            f'{Q(t.home()) if t.local else "$HOME/hive-cloud"}/listen.log 2>&1 &)',
+            check=False,
+        )
+        probe = f"from hive import handoff; raise SystemExit(not handoff.listener_ready('.', {manifest['nonce']!r}))"
+        if (
+            startup.returncode
+            or t.run(f'cd {Q(proj)} && {environment}{launch_py} -c ' + Q(probe), check=False).returncode
+        ):
+            say(
+                'The snapshot arrived. Destination listener startup is unconfirmed. Inspect listen.log or return ownership.'
+            )
+            return 8
         say("  Hive is listening there.")
         _stop_local_listener(say)
         cfg = telegram.load()
@@ -190,6 +244,7 @@ def go(repo='.', to=None, with_login=False, start=True, say=print, key=None):
                 pass
     say(f"Done. Bring results back any time with: hive cloud pull --from {t.to}")
     return 0
+
 
 def _stop_local_listener(say=print):
     """Only one Hive may read his chat: the listener on this computer stands down once the cloud copy is listening."""
@@ -227,7 +282,8 @@ def building(t):
         return False
     return bool(t.run("pgrep -f '[h]ive start' >/dev/null && echo yes || true", check=False).stdout.strip())
 
-def _pull_state(t, repo, src_hive, saved, cfg, say):
+
+def _pull_state(t, repo, src_hive, saved, cfg, say, conflict='', reconcile=None):
     """Return the authoritative DB, preserving both sides on any conflict.
 
     This is a single-owner handoff, not a merge. A changed local database must
@@ -265,19 +321,28 @@ def _pull_state(t, repo, src_hive, saved, cfg, say):
             say('  Cloud memory failed its integrity check. Nothing will be deleted.'); return False
         if remote.execute('SELECT max(v) FROM schema_version').fetchone()[0] != len(store.MIGRATIONS):
             say('  Cloud memory has a different schema. Both copies were kept.'); return False
+        if conflict:
+            say(conflict + ' Both snapshots were kept.')
+            return False
         with store._LOCK:
             local = store.connect()
             current = store.fingerprint(local)
-            if current != store.fingerprint(remote):
-                if not saved.get('memory_baseline') or current != saved['memory_baseline']:
+            different = current != store.fingerprint(remote)
+            if different or reconcile:
+                if different and (not saved.get('memory_baseline') or current != saved['memory_baseline']):
                     say('  Local memory changed since handoff. Both databases were kept; automatic restore and deletion were refused.')
                     return False
                 backup = sqlite3.connect(os.path.join(folder, 'local-' + secrets.token_hex(8) + '.db'))
                 try:
                     local.backup(backup)
+                    remote.backup(local)
+                    if reconcile:
+                        reconcile()
+                except BaseException:
+                    backup.backup(local)
+                    raise
                 finally:
                     backup.close()
-                remote.backup(local)
             # Rebuild compatibility exports rather than reimporting either copy.
             for path in (memory._path(repo), memory._notes_path(repo)):
                 local.execute('INSERT OR REPLACE INTO synced VALUES(?,?)', (path, time.time()))
@@ -291,6 +356,41 @@ def _pull_state(t, repo, src_hive, saved, cfg, say):
     return True
 
 
+def _return_manifest(target, repo, project, settings, remote_home):
+    """Quiesce on the machine that owns the work before reading its database."""
+    from . import handoff, store, tools
+    import sys
+
+    original = settings['handoff']
+    root = f'{remote_home}/return-{original["nonce"]}'
+    code = 'from hive import handoff,memory; '
+    if target.local:
+        code += 'memory.DIR=' + repr(str(Path(remote_home) / 'rules')) + '; '
+    code += f'handoff.prepare_return({project!r},{repo!r},{root!r},{original["nonce"]!r})'
+    if target.local:
+        result = subprocess.run([sys.executable, '-c', code], capture_output=True, text=True)
+    else:
+        result = target.run('"$HOME/hive-cloud/venv/bin/python" -c ' + Q(code), check=False)
+    if result.returncode:
+        raise tools.Refused('The other machine could not confirm a quiescent checkpoint.')
+    folder = Path(store.path()).parent / 'returns' / original['nonce']
+    manifest = folder / 'handoff.json'
+    if not target.get(root + '/handoff.json', str(manifest)):
+        raise tools.Refused('The return manifest is missing.')
+    data = json.loads(manifest.read_text('utf-8'))
+    if data.get('unopened') == original['nonce']:
+        return None
+    data = handoff.read_manifest(manifest)
+    if data.get('project_id') != original['project_id'] or data.get('repository') != original['repository']:
+        raise tools.Refused('The cloud database belongs to another project.')
+    for build in data['builds']:
+        if build.get('directory'):
+            rel = f'handoff-{data["nonce"]}/{build["directory"]}'
+            for name in ('artifact.bundle', 'state.json'):
+                target.get(f'{root}/{rel}/{name}', str(folder / rel / name))
+    return manifest
+
+
 def pull(repo='.', frm=None, say=print, verify=False):
     """Bring everything done in the cloud to this computer: every branch (hive/... as your result branches, any other
     under hive-cloud/...), the build records, the rules and the conversation. With `verify`, check every branch arrived
@@ -301,7 +401,10 @@ def pull(repo='.', frm=None, say=print, verify=False):
     cfg = os.path.join(os.path.expanduser('~'), '.hive', 'cloud.json')
     if os.path.exists(cfg):
         saved = json.load(open(cfg))
-        if not frm or frm == saved.get('to'):
+        target_matches=bool(saved.get('to') and frm and (
+            frm==saved['to'] or (Target(frm).local and Target(saved['to']).local and
+                os.path.normcase(os.path.realpath(frm))==os.path.normcase(os.path.realpath(saved['to'])))))
+        if not frm or target_matches:
             frm, key = saved['to'], saved.get('key')
         else:
             saved = {}  # a different target cannot inherit this handoff's authority
@@ -310,24 +413,104 @@ def pull(repo='.', frm=None, say=print, verify=False):
     t = Target(frm, key); proj = f'{t.home()}/{_project(repo)}'
     url = proj if t.local else f'{t.to}:{proj}'
     env = dict(os.environ, GIT_SSH_COMMAND='ssh ' + ' '.join(shlex.quote(o) for o in Target(frm, key).opts)) if key else None
+    from . import build_receipts, handoff, projects, store, tools
+
+    original = saved.get('handoff', {})
+    src_hive = f'{t.home()}/.hive' if t.local else '.hive'
+    manifest = None
+    if original:
+        try:
+            manifest = _return_manifest(t, repo, proj, saved, src_hive)
+        except tools.Refused as exc:
+            say(str(exc))
+            return 1
     heads = _remote_heads(repo, url, env)
     if heads is None:
         say('Could not reach the cloud copy to bring the work back.'); return 1
     # results as his hive/... branches; every other branch kept apart, never over his own
-    p = subprocess.run(['git', '-C', repo, 'fetch', url, '+refs/heads/hive/*:refs/heads/hive/*',
-                        '+refs/heads/*:refs/remotes/hive-cloud/*'], capture_output=True, text=True, env=env)
+    p = subprocess.run(
+        ['git', '-C', repo, 'fetch', '--no-tags', url, '+refs/heads/*:refs/remotes/hive-cloud/*'],
+        capture_output=True,
+        text=True,
+        env=env,
+    )
     if p.returncode != 0:
         say(f'Could not fetch: {p.stderr.strip()[:300]}'); return 1
     results = sorted(b for b in heads if b.startswith('hive/'))
-    say(f"Brought back {len(results)} result branch(es)" + (': ' + ', '.join(results) if results else '') +
-        (f"; {len(heads) - len(results)} other branch(es) under hive-cloud/..." if len(heads) > len(results) else '') + '.')
-    # what he said there, and the records of every build made there
-    src_hive = f'{t.home()}/.hive' if t.local else '.hive'
+    current = handoff.refs(repo)
+    expected = saved.get('local_refs', original.get('refs'))
+    checked = build_receipts.git(repo, 'symbolic-ref', 'HEAD', required=False)
+    conflict = ''
+    if original and (
+        expected != current
+        or projects.repository(repo) != original['repository']
+        or projects.path(repo) != original['source']
+        or checked != original['branch']
+        or build_receipts.git(repo, 'status', '--porcelain', '--untracked-files=normal')
+    ):
+        conflict = 'The source checkout changed after the handoff.'
+    changes = []
+    resulting = dict(current)
+    for name in results:
+        ref = 'refs/heads/' + name
+        old = current.get(ref)
+        sha = heads[name]
+        if old == sha:
+            continue
+        if ref == checked or (
+            old
+            and subprocess.run(
+                ['git', '-C', repo, 'merge-base', '--is-ancestor', old, sha], capture_output=True
+            ).returncode
+        ):
+            conflict = 'A result branch diverged.'
+        changes.append(f'update {ref} {sha} {old or "0"*len(sha)}')
+        resulting[ref] = sha
+    if manifest:
+        returned = json.loads(manifest.read_text('utf-8'))
+        if returned['branch'] != checked or any(
+            heads.get(ref.removeprefix('refs/heads/')) != sha for ref, sha in resulting.items()
+        ):
+            conflict = 'The remote project branch or a recorded commit differs.'
+
+    def reconcile():
+        if handoff.refs(repo) != current:
+            raise tools.Refused('Source branches changed during return.')
+        if changes:
+            subprocess.run(
+                ['git', '-C', repo, 'update-ref', '--stdin'],
+                input=('\n'.join(changes) + '\n').encode('utf-8'),
+                capture_output=True,
+                check=True,
+            )
+        try:
+            if manifest:
+                returned['refs'] = resulting
+                manifest.write_text(json.dumps(returned), encoding='utf-8')
+                handoff.restore(repo, manifest)
+            if original:
+                handoff.release(original)
+        except BaseException:
+            undo = []
+            for ref, sha in resulting.items():
+                if current.get(ref) != sha:
+                    undo.append(f'update {ref} {current[ref]} {sha}' if ref in current else f'delete {ref} {sha}')
+            if undo:
+                subprocess.run(
+                    ['git', '-C', repo, 'update-ref', '--stdin'],
+                    input=('\n'.join(undo) + '\n').encode('utf-8'),
+                    capture_output=True,
+                    check=True,
+                )
+            raise
+        saved['local_refs'] = resulting
+
     try:
-        if not _pull_state(t, repo, src_hive, saved, cfg, say):
+        if not _pull_state(t, repo, src_hive, saved, cfg, say, conflict=conflict, reconcile=reconcile):
             return 1
     except Exception:
         say('  Could not safely return cloud memory. Both copies were kept; nothing will be deleted.'); return 1
+    say(f'Brought back {len(results)} checked result branch(es).')
     rules = memory.project_key(repo) + '.json'
     back = [name for name, src, dst in (
         ('conversation', f'{src_hive}/conversation.json', telegram.CONVERSATION),

@@ -136,11 +136,13 @@ class Channel:
                                                      for row in rows]}
         if reply_to:
             p['reply_to_message_id'] = reply_to
-        self.remember('hive', _html.unescape(re.sub(r'<[^>]+>', '', p['text'])))
+        plain = _html.unescape(re.sub(r'<[^>]+>', '', p['text'])).strip()
+        self.remember('hive', plain)
         for wait in ((2, 5, 15, None) if retry else (None,)):   # a dropped connection must not lose the owner's question
             try:
                 mid = self.api('sendMessage', **p)['message_id']
                 self.last_sent = mid
+                self.last_sent_text = plain
                 if buttons:
                     self.last_prompt = mid
                     self.prompt_buttons = {b['callback_data']: mid for row in p['reply_markup']['inline_keyboard'] for b in row}
@@ -155,10 +157,12 @@ class Channel:
         keeps the latest words, not each draft. True if the chat took it."""
         body = text if html else esc(text)
         plain = _html.unescape(re.sub(r'<[^>]+>', '', body)).strip()[:600]
-        with self._history_lock:
-            if self.history and self.history[-1][0] == 'hive' and getattr(self,'last_sent',None) == message_id:
-                self.history.pop()
-            self.remember('hive', plain)
+        previous = (
+            getattr(self, 'last_sent_text', None) if getattr(self, 'last_sent', None) == message_id else None
+        )
+        self.remember('hive', plain, replace_last=previous)
+        if previous is not None:
+            self.last_sent_text = plain
         try:
             self.api('editMessageText', chat_id=self.chat, message_id=message_id, text=body, parse_mode='HTML')
             return True
@@ -213,29 +217,47 @@ class Channel:
         except Exception:
             return None
 
-    def remember(self, who, text, keep=32):
-        with self._history_lock:
-            return self._remember(who, text, keep)
+    def remember(self, who, text, keep=32, *, replace_last=None, redact=None):
+        if not self.keep:
+            with self._history_lock:
+                self._append(who, text, keep, replace_last, redact)
+            return
+        from . import store
 
-    def _remember(self, who, text, keep):
-        # Preserve complete instructions; apply the model budget at rendering time.
-        self.history[:] = (self.history + [(who, (text or '').strip())])[-keep:]
-        if self.keep:   # private, next to the owner's other Hive settings
+        with store.transaction(), self._history_lock:
+            if who == 'hive' and store.connect().execute('SELECT 1 FROM handoff_fences').fetchone():
+                # Departure notifications must not change the database whose ownership just moved.
+                self._append(who, text, keep, replace_last, redact)
+                return
+            # Taking the SQLite writer lock first also serializes builder subprocesses.
+            mid = store.log_message(who, text)
+            if who == 'owner':
+                self.last_archive = mid
             try:
-                os.makedirs(os.path.dirname(CONVERSATION), exist_ok=True)
-                with open(CONVERSATION + '.tmp', 'w', encoding='utf-8') as fh:
-                    json.dump(self.history, fh)
-                os.replace(CONVERSATION + '.tmp', CONVERSATION)
-                os.chmod(CONVERSATION, 0o600)
-            except Exception:
+                with open(CONVERSATION, encoding='utf-8') as fh:
+                    self.history[:] = [
+                        tuple(row)
+                        for row in json.load(fh)
+                        if isinstance(row, list)
+                        and len(row) == 2
+                        and row[0] in ('owner', 'hive')
+                        and isinstance(row[1], str)
+                    ]
+            except (OSError, ValueError):
                 pass
-            try:   # the whole conversation, searchable (memory 2.0)
-                from . import store
-                mid = store.log_message(who, text)
-                if who == 'owner':
-                    self.last_archive = mid
-            except Exception:
-                pass
+            self._append(who, text, keep, replace_last, redact)
+            os.makedirs(os.path.dirname(CONVERSATION), exist_ok=True)
+            with open(CONVERSATION + '.tmp', 'w', encoding='utf-8') as fh:
+                json.dump(self.history, fh)
+            os.replace(CONVERSATION + '.tmp', CONVERSATION)
+            os.chmod(CONVERSATION, 0o600)
+
+    def _append(self, who, text, keep, replace_last, redact):
+        if replace_last is not None and self.history and self.history[-1] == ('hive', replace_last):
+            self.history.pop()
+        if redact:
+            self.history[:] = [(w, t.replace(redact, '••••')) for w, t in self.history]
+        self.history[:] = (self.history + [(who, (text or '').strip())])[-keep:]
 
     def forget(self, secret, message_id=None):
         """A password or key he sent: deleted from the chat (Telegram lets a bot delete his messages in a private chat)
@@ -249,14 +271,12 @@ class Channel:
                 con.execute('UPDATE task_prompts SET reply=NULL WHERE instr(reply,?)>0', (secret,))
                 con.execute("UPDATE tasks SET instruction=replace(instruction,?,'••••'),criteria=NULL "
                             "WHERE mode='message' AND instr(instruction,?)>0", (secret,secret))
-            with self._history_lock:
-                self.history[:] = [(w, t.replace(secret, '••••')) for w, t in self.history]
             try:   # out of the long archive too
                 from . import store
                 store.forget_messages_with(secret)
             except Exception:
                 pass
-            self.remember('hive', '(a password or key was given and put away)')
+            self.remember('hive', '(a password or key was given and put away)', redact=secret)
         try:
             self.api('deleteMessage', chat_id=self.chat, message_id=message_id or getattr(self, 'last_id', None))
             return True
